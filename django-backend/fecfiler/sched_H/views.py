@@ -506,7 +506,18 @@ def schedH1(request):
 @api_view(['GET'])
 def get_fed_nonfed_share(request):
     """
-    get calendar year fed_nonfed share percentage
+    get calendar year fed_nonfed share percentage, also query aggregation
+    and update aggregation value.
+
+    if event_name is available:
+        go to h2 for ration
+        grab event-based aggregation value from h4
+    else:
+        go to h1 for ratio
+            if party, get election_year based fixed ratio
+            if PAC, get activity based ratio
+        grad event_type-based aggregation value from h4
+    calculate fed and non-fed share based on ratio and update aggregate value
     """
     logger.debug('get_fed_nonfed_share with request:{}'.format(request.query_params))
     try:
@@ -516,66 +527,109 @@ def get_fed_nonfed_share(request):
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
         start_dt = datetime.date(int(calendar_year), 1, 1)
         end_dt = datetime.date(int(calendar_year), 12, 31)
-        if cmte_type_category == 'PTY':
+        event_name = request.query_params.get('activity_event_identifier') 
+
+        if event_name: # event-based, goes to h2
             _sql = """
-            select federal_percent from public.sched_h1
-            where create_date between %s and %s
-            and cmte_id = %s
-            order by create_date desc, last_update_date desc
+            select federal_percent 
+            from public.sched_h2 
+            where cmte_id = %s 
+            and activity_event_name = %s
+            and create_date between %s and %s
             """
-            logger.debug('sql for query h1:{}'.format(_sql))
             with connection.cursor() as cursor:
-                cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                logger.debug('query with _sql:{}'.format(_sql))
+                logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
+                cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
                 if not cursor.rowcount:
-                    return Response('Error: no valid h1 data found.')
+                    return Response('Error: no valid h1 data found for this event.')
                 fed_percent = float(cursor.fetchone()[0])
-        elif cmte_type_category == 'PAC':
-            activity = request.query_params.get('activity')
-            if not activity:
-                return Response('Error: activity missing is required for this committee.')
+
             _sql = """
-            select federal_percent from public.sched_h1
-            where create_date between %s and %s
-            and cmte_id = %s
+            select activity_event_amount_ytd 
+            from public.sched_h4 
+            where cmte_id = %s 
+            and activity_event_identifier = %s
+            and create_date between %s and %s
+            order by create_date desc, last_update_date desc;
             """
-            activity_part = """and {} = true """.format(activity)
-            order_part = 'order by create_date desc, last_update_date desc'
-            _sql = _sql + activity_part + order_part
-            logger.debug('sql for query h1:{}'.format(_sql))
             with connection.cursor() as cursor:
-                cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
                 if not cursor.rowcount:
-                    return Response('Error: no valid h1 data found.')
-                fed_percent = float(cursor.fetchone()[0])
-        else:
-            raise Exception('invalid cmte_type entered.')
+                    aggregate_amount = 0 
+                else:
+                    aggregate_amount = float(cursor.fetchone()[0])
+
+        else: # need to go to h1 for ratios
+            activity_event_type = request.query_params.get('activity_event_type')
+
+            # TODO: need to db change to fix this typo
+            if activity_event_type == 'administrative':
+                activity_event_type = 'adminstrative'
+
+            if not activity_event_type:
+                return Response('Error: event type is required for this committee.')
+            
+            if cmte_type_category == 'PTY':
+                _sql = """
+                select federal_percent from public.sched_h1
+                where create_date between %s and %s
+                and cmte_id = %s
+                order by create_date desc, last_update_date desc
+                """
+                logger.debug('sql for query h1:{}'.format(_sql))
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                    if not cursor.rowcount:
+                        return Response('Error: no valid h1 data found.')
+                    fed_percent = float(cursor.fetchone()[0])
+            elif cmte_type_category == 'PAC':
+                # activity_event_type = request.query_params.get('activity_event_type')
+                # if not activity_event_type:
+                    # return Response('Error: event type is required for this committee.')
+                _sql = """
+                select federal_percent from public.sched_h1
+                where create_date between %s and %s
+                and cmte_id = %s
+                """
+                activity_part = """and {} = true """.format(activity_event_type)
+                order_part = 'order by create_date desc, last_update_date desc'
+                _sql = _sql + activity_part + order_part
+                logger.debug('sql for query h1:{}'.format(_sql))
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                    if not cursor.rowcount:
+                        return Response('Error: no valid h1 data found.')
+                    fed_percent = float(cursor.fetchone()[0])
+            else:
+                raise Exception('invalid cmte_type_category.')
+
+            _sql = """
+                select activity_event_amount_ytd 
+                from public.sched_h4 
+                where cmte_id = %s 
+                and activity_event_type = %s
+                and create_date between %s and %s
+                order by create_date desc, last_update_date desc
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, (cmte_id, activity_event_type, start_dt, end_dt))
+                if not cursor.rowcount:
+                    aggregate_amount = 0
+                else:
+                    aggregate_amount = float(cursor.fetchone()[0])
         # fed_percent = float(cursor.fetchone()[0])
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
-
-        # # if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
-        #     # raise Exception ('Missing Input: report_id is mandatory')
-
-        # if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
-        #     raise Exception ('Missing Input: calendar_year is mandatory')
-        # _sql = """
-        #     select json_agg(t) from
-        #     (select federal_percent, non_federal_percent from public.sched_h1
-        #     where create_date between %s and %s
-        #     and cmte_id = %s
-        #     order by create_date desc, last_update_date desc) t
-        # """
-        # with connection.cursor() as cursor:
-        #     cursor.execute(_sql, (start_dt, end_dt, cmte_id))
-        #     # print('rows:{}'.format(cursor.rowcount))
-        #     json_data = cursor.fetchone()[0]
-        #     print(json_data)
-        #     if not json_data:
-        #         # raise Exception('Error: no h1 found.')
-        #         return Response("The schedH1 API - PUT is throwing an error: no h1 data found.", 
-        #         status=status.HTTP_400_BAD_REQUEST)
-        return JsonResponse({'fed_share': fed_share, 'nonfed_share':nonfed_share}, 
-                status = status.HTTP_200_OK)
+        new_aggregate_amount = aggregate_amount + float(total_amount)
+        return JsonResponse(
+            {
+                'fed_share': fed_share, 
+                'nonfed_share': nonfed_share,
+                'aggregate_amount': new_aggregate_amount,
+            }, 
+                status = status.HTTP_200_OK
+        )
     except:
         raise
 
@@ -905,6 +959,52 @@ def delete_schedH2(data):
         delete_sql_schedH2(data.get('cmte_id'), data.get(
             'report_id'), data.get('transaction_id'))
     except Exception as e:
+        raise
+
+@api_view(['GET'])
+def get_h2_summary_table(request):
+    """
+    h2 summary need to be h4 transaction-based:
+    all the calendar-year based h2 need to show up for current report as long as
+    a live h4 transaction refering this h2 exist:
+    h2 report goes with h4, not h2 report_id
+    """
+    logger.debug('get_h2_summary_table with request:{}'.format(request.query_params))
+    _sql = """
+    SELECT json_agg(t) from(
+    SELECT activity_event_name, 
+        ( CASE fundraising 
+            WHEN true THEN 'fundraising' 
+            ELSE 'direct_cand_suppot' 
+            END )  AS event_type, 
+        DATE(create_date) AS date, 
+        ratio_code, 
+        federal_percent, 
+        non_federal_percent 
+    FROM   public.sched_h2 
+    WHERE  cmte_id = %s
+        AND activity_event_name IN (
+            SELECT activity_event_identifier 
+            FROM   public.sched_h4 
+            WHERE  report_id = %s
+            AND cmte_id = %s)) t;
+    """
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        with connection.cursor() as cursor:
+            logger.debug('query with _sql:{}'.format(_sql))
+            logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+            cursor.execute(_sql, (cmte_id, report_id, cmte_id))
+            json_res = cursor.fetchone()[0]
+            print(json_res)
+            if not json_res:
+                return Response('Error: no valid h2 data found for this report.')
+        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
+        return Response( json_res, status = status.HTTP_200_OK)
+    except:
         raise
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
@@ -1542,7 +1642,15 @@ def schedH4_sql_dict(data):
             "phone_number",     
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        # return {k: v for k, v in data.items() if k in valid_fields}
+        valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        line_num, tran_tp = get_line_number_trans_type(
+            data["transaction_type_identifier"]
+        )
+
+        valid_data["line_number"] = line_num
+        valid_data['transaction_type'] = tran_tp
+        return valid_data
     except:
         raise Exception('invalid request data.')
 
@@ -1612,6 +1720,8 @@ def put_sql_schedH4(data):
                   activity_event_type = %s,
                   memo_code = %s,
                   memo_text = %s,
+                  line_number = %s, 
+                  transaction_type = %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y'
@@ -1633,6 +1743,8 @@ def put_sql_schedH4(data):
             data.get('activity_event_type'),
             data.get('memo_code'),
             data.get('memo_text'),
+            data.get('line_number'),
+            data.get('transaction_type'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -1874,9 +1986,11 @@ def post_sql_schedH4(data):
             activity_event_type,
             memo_code,
             memo_text,
+            line_number,
+            transaction_type,
             create_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get('cmte_id'),
@@ -1897,6 +2011,8 @@ def post_sql_schedH4(data):
             data.get('activity_event_type'),
             data.get('memo_code'),
             data.get('memo_text'),
+            data.get('line_number'),
+            data.get('transaction_type'),
             datetime.datetime.now(),
          )
         with connection.cursor() as cursor:
@@ -1947,7 +2063,8 @@ def get_list_all_schedH4(report_id, cmte_id):
             activity_event_type,
             memo_code,
             memo_text,
-            delete_ind,
+            line_number,
+            transaction_type,
             create_date ,
             last_update_date
             FROM public.sched_h4
@@ -1994,8 +2111,9 @@ def get_list_schedH4(report_id, cmte_id, transaction_id):
             activity_event_type,
             memo_code,
             memo_text,
-            delete_ind,
-            create_date ,
+            line_number,
+            transaction_type,
+            create_date,
             last_update_date
             FROM public.sched_h4
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
@@ -2639,28 +2757,74 @@ def schedH6_sql_dict(data):
             'activity_event_type',
             'memo_code',
             'memo_text',
-            'delete_ind',
-            'create_date',
-            'last_update_date',
+            # 'create_date',
+            # 'last_update_date',
+                    # entity_data
+            "entity_id",
+            "entity_type",
+            "entity_name",
+            "first_name",
+            "last_name",
+            "middle_name",
+            "preffix",
+            "suffix",
+            "street_1",
+            "street_2",
+            "city",
+            "state",
+            "zip_code",
+            "occupation",
+            "employer",
+            "ref_cand_cmte_id",
+            "cand_office",
+            "cand_office_state",
+            "cand_office_district",
+            "cand_election_year",
+            "phone_number",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        line_num, tran_tp = get_line_number_trans_type(
+            data["transaction_type_identifier"]
+        )
+        valid_data["line_number"] = line_num
+        valid_data['transaction_type'] = tran_tp
+        return valid_data
     except:
         raise Exception('invalid request data.')
-
 
 def put_schedH6(data):
     """
     update sched_H6 item
-    
     """
     try:
         check_mandatory_fields_SH6(data)
+        if "entity_id" in data:
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(data)
+            roll_back = True
+        else:
+            entity_data = post_entities(data)
+            roll_back = False
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH6(data)
             update_activity_event_amount_ytd_h6(data)
         except Exception as e:
+            if roll_back:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data) 
             raise Exception(
                 'The put_sql_schedH6 function is throwing an error: ' + str(e))
         return data
@@ -2691,7 +2855,6 @@ def put_sql_schedH6(data):
                   activity_event_type = %s,
                   memo_code = %s,
                   memo_text = %s,
-                  create_date= %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
@@ -2753,10 +2916,9 @@ def post_sql_schedH6(data):
             activity_event_type,
             memo_code,
             memo_text,
-            create_date,
-            last_update_date
+            create_date
          )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get('cmte_id'),
@@ -2779,7 +2941,6 @@ def post_sql_schedH6(data):
             data.get('activity_event_type'),
             data.get('memo_code'),
             data.get('memo_text'),
-            datetime.datetime.now(),
             datetime.datetime.now()
          )
         with connection.cursor() as cursor:
@@ -2876,7 +3037,27 @@ def post_schedH6(data):
     3. save data to db
     """
     try:
-        # check_mandatory_fields_SH6(datum, MANDATORY_FIELDS_SCHED_H6)
+        # check_mandatory_fields_SH6(datum, MANDATORY_FIELDS_SCHED_H6o)
+        if "entity_id" in data:
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(data)
+            roll_back = True
+        else:
+            entity_data = post_entities(data)
+            roll_back = False
+
+        # continue to save transaction
+        entity_id = entity_data.get("entity_id")
+        data['entity_id'] = entity_id
         data['transaction_id'] = get_next_transaction_id('SH6')
         
         validate_sh6_data(data)
@@ -2884,6 +3065,11 @@ def post_schedH6(data):
             post_sql_schedH6(data)
             update_activity_event_amount_ytd_h6(data)
         except Exception as e:
+            if roll_back:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 'The post_sql_schedH6 function is throwing an error: ' + str(e))
         return data
@@ -2935,7 +3121,6 @@ def get_list_all_schedH6(report_id, cmte_id):
             activity_event_type,
             memo_code,
             memo_text,
-            delete_ind,
             create_date,
             last_update_date
             FROM public.sched_h6
@@ -2948,8 +3133,11 @@ def get_list_all_schedH6(report_id, cmte_id):
                 raise NoOPError('No sched_H6 transaction found for report_id {} and cmte_id: {}'.format(
                     report_id, cmte_id))
             merged_list = []
-            for dictH6 in schedH6_list:
-                merged_list.append(dictH6)
+            for tran in schedH6_list:
+                entity_id = tran.get("entity_id")
+                q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                dictEntity = get_entities(q_data)[0]
+                merged_list.append({**tran, **dictEntity})
         return merged_list
     except Exception:
         raise
@@ -2980,7 +3168,6 @@ def get_list_schedH6(report_id, cmte_id, transaction_id):
             activity_event_type,
             memo_code,
             memo_text,
-            delete_ind,
             create_date,
             last_update_date
             FROM public.sched_h6
@@ -2993,8 +3180,11 @@ def get_list_schedH6(report_id, cmte_id, transaction_id):
                 raise NoOPError('No sched_H6 transaction found for transaction_id {}'.format(
                     transaction_id))
             merged_list = []
-            for dictH6 in schedH6_list:
-                merged_list.append(dictH6)
+            for tran in schedH6_list:
+                entity_id = tran.get("entity_id")
+                q_data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                dictEntity = get_entities(q_data)[0]
+                merged_list.append({**tran, **dictEntity})
         return merged_list
     except Exception:
         raise
@@ -3127,8 +3317,8 @@ def schedH6(request):
             #     output = get_schedB(data)
             # else:
             data = put_schedH6(datum)
-            # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            output = get_schedH6(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.debug(e)
             return Response("The schedH6 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
