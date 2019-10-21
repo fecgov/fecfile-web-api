@@ -424,7 +424,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
  
           //if(next) {
             max.amend_show = true;
-            max.amend_max = 'up';
+            max.amend_max = 'down'; //'up';
           //}
 
         }
@@ -439,9 +439,33 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     let pre = report;
     pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
 
+    if(pre && report.amend_max === 'up') {
+      this.reportsModel = this.reportsModel.filter(function(item) {
+        return item !== pre
+      })
+
+      let indexReport = this.reportsModel.indexOf(report);
+      if (indexReport > -1) {
+        this.reportsModel.splice(indexReport + 1, 0, pre);
+      }
+    }
+
     while(pre) {
+      let rop = pre;
+
       pre.amend_show = !pre.amend_show;
       pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
+
+      if(pre && report.amend_max === 'up') {
+        this.reportsModel = this.reportsModel.filter(function(item) {
+          return item !== pre
+        })
+
+        let indexRep = this.reportsModel.indexOf(rop);
+        if (indexRep > -1) {
+          this.reportsModel.splice(indexRep + 1, 0, pre);
+        }
+      }
     }
     
   }
