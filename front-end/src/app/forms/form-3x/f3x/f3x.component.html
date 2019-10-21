@@ -105,6 +105,33 @@
           (status)="onNotify($event)"
         >
         </app-sched-f>
+        <app-sched-c
+        [hidden]="scheduleType !== 'sched_c'"
+        [transactionTypeText]="transactionTypeTextSchedF"
+        [transactionType]="transactionTypeSchedF"
+        [scheduleAction]="scheduleAction"
+        [scheduleType]="scheduleType"
+        (status)="onNotify($event)"
+        >
+        </app-sched-c>
+        <app-sched-c1
+        [hidden]="scheduleType !== 'sched_c1'"
+        [transactionTypeText]="transactionTypeTextSchedF"
+        [transactionType]="transactionTypeSchedF"
+        [scheduleAction]="scheduleAction"
+        [scheduleType]="scheduleType"
+        (status)="onNotify($event)"
+        >
+        </app-sched-c1>
+        <app-sched-c2
+          [hidden]="scheduleType !== 'sched_c2'"
+          [transactionTypeText]="transactionTypeTextSchedF"
+          [transactionType]="transactionTypeSchedF"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >
+        </app-sched-c2>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_4'">
@@ -122,6 +149,26 @@
       <div class="form_step" [hidden]="step !== 'transactions' && step !== 'reports'">
         <app-transactions (sidebarSwitch)="switchSidebar($event)" (showTransaction)="onNotify($event)">
         </app-transactions>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loansummary'">
+        <app-loansummary>
+        </app-loansummary>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loanendorsersummary'">
+        <app-loanendorsersummary>
+        </app-loanendorsersummary>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loanpayment'">
+        <app-loanpayment>
+        </app-loanpayment>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loanreceipt'">
+        <app-loanreceipt>
+        </app-loanreceipt>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loanendorser'">
+        <app-loanendorser>
+        </app-loanendorser>
       </div>
     </div>
   </div>
