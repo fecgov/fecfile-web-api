@@ -519,6 +519,7 @@ def get_fed_nonfed_share(request):
         grad event_type-based aggregation value from h4
     calculate fed and non-fed share based on ratio and update aggregate value
     """
+
     logger.debug('get_fed_nonfed_share with request:{}'.format(request.query_params))
     try:
         cmte_id = request.user.username
@@ -563,9 +564,9 @@ def get_fed_nonfed_share(request):
         else: # need to go to h1 for ratios
             activity_event_type = request.query_params.get('activity_event_type')
 
-            # TODO: need to db change to fix this typo
-            if activity_event_type == 'administrative':
-                activity_event_type = 'adminstrative'
+            # # TODO: need to db change to fix this typo
+            # if activity_event_type == 'administrative':
+            #     activity_event_type = 'adminstrative'
 
             if not activity_event_type:
                 return Response('Error: event type is required for this committee.')
@@ -587,12 +588,20 @@ def get_fed_nonfed_share(request):
                 # activity_event_type = request.query_params.get('activity_event_type')
                 # if not activity_event_type:
                     # return Response('Error: event type is required for this committee.')
+                event_type_code = {
+                    "AD" : "adminstrative", # TODO: need to fix this typo
+                    "GV" : "generic_voter_drive",
+                    "PC" : "public_communications",
+                }
+                h1_event_type = event_type_code.get(activity_event_type)
+                if not h1_event_type:
+                    return Response('Error: activity type not valid')
                 _sql = """
                 select federal_percent from public.sched_h1
                 where create_date between %s and %s
                 and cmte_id = %s
                 """
-                activity_part = """and {} = true """.format(activity_event_type)
+                activity_part = """and {} = true """.format(h1_event_type)
                 order_part = 'order by create_date desc, last_update_date desc'
                 _sql = _sql + activity_part + order_part
                 logger.debug('sql for query h1:{}'.format(_sql))
@@ -624,9 +633,9 @@ def get_fed_nonfed_share(request):
         new_aggregate_amount = aggregate_amount + float(total_amount)
         return JsonResponse(
             {
-                'fed_share': fed_share, 
-                'nonfed_share': nonfed_share,
-                'aggregate_amount': new_aggregate_amount,
+                'fed_share': '{0:.2f}'.format(fed_share), 
+                'nonfed_share': '{0:.2f}'.format(nonfed_share),
+                'aggregate_amount': '{0:.2f}'.format(new_aggregate_amount),
             }, 
                 status = status.HTTP_200_OK
         )
@@ -2073,7 +2082,7 @@ def get_list_all_schedH4(report_id, cmte_id):
             """
             cursor.execute(_sql, (report_id, cmte_id))
             tran_list = cursor.fetchone()[0]
-            if trtan_list is None:
+            if tran_list is None:
                 raise NoOPError('No sched_H4 transaction found for report_id {} and cmte_id: {}'.format(
                     report_id, cmte_id))
             merged_list = []
@@ -2197,14 +2206,14 @@ def schedH4(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
+                    request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             datum = get_schedH4(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
@@ -3086,7 +3095,7 @@ def get_schedH6(data):
         
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
-            print('get_schedH6')
+            # print('get_schedH6')
             forms_obj = get_list_schedH6(report_id, cmte_id, transaction_id)
         else:
             forms_obj = get_list_all_schedH6(report_id, cmte_id)
@@ -3253,14 +3262,16 @@ def schedH6(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            # make sure we get query parameters from both
+            # request.data.update(request.query_params)
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
+                    request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             datum = get_schedH6(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:

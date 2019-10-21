@@ -1352,21 +1352,23 @@ def update_print_f99(request):
     # createresp = requests.post(settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/update_f99_info", data=request.data, headers={'Authorization': token_use})
     # if not createresp.ok:
     #     return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
-
-    updateresp = update_f99_info(request._request)
-
-    if updateresp.status_code != 201:
-        entity_status = status.HTTP_400_BAD_REQUEST
-        return Response(updateresp.data, status=entity_status)
-
+    if 'is_submitted' in request.data and request.data.get('is_submitted') in [True, 'True', 'true']:
+        comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
     else:
-        #print(updateresp.content)
-        update_json_data = json.loads(updateresp.content.decode("utf-8"))
+        updateresp = update_f99_info(request._request)
 
-    est = pytz.timezone('US/Eastern')
+        if updateresp.status_code != 201:
+            entity_status = status.HTTP_400_BAD_REQUEST
+            return Response(updateresp.data, status=entity_status)
 
-    #try:
-    comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
+        else:
+            #print(updateresp.content)
+            update_json_data = json.loads(updateresp.content.decode("utf-8"))
+
+        est = pytz.timezone('US/Eastern')
+
+        #try:
+        comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
     if comm_info:
         header = {
                 "version":"8.3",
