@@ -118,6 +118,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public multipleSubTransactionInfo: any[] = [];
   public selectedEntityType: any;
   public subTransactions: any[];
+  public subTransactionsTableType: string;
   public formType = '';
   public editScheduleAction: ScheduleActions = ScheduleActions.edit;
   public addScheduleAction: ScheduleActions = ScheduleActions.add;
@@ -2667,6 +2668,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (trx.child.length > 0) {
                     this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([trx])[0];
                     this.subTransactions = trx.child;
+                    if (this.subTransactionInfo) {
+                      this.subTransactionsTableType = this.subTransactionInfo.scheduleType;
+                    }
                     for (const subTrx of this.subTransactions) {
                       console.log('sub tran id ' + subTrx.transaction_id);
                     }

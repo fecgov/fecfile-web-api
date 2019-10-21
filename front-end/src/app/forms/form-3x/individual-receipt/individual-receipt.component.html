@@ -408,7 +408,8 @@
         </ng-container>
         <app-sub-transactions-table [hidden]="!isShowChildTransactions()" 
           [subTransactions]="subTransactions"
-          [formType]="formType">
+          [formType]="formType"
+          [subTransactionsTableType]="subTransactionsTableType">
         </app-sub-transactions-table>
         <div class="forms__btn-container">
           <button *ngIf="!subTransactionInfo?.isEarmark &&
