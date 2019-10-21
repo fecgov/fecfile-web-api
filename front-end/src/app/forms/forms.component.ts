@@ -24,6 +24,7 @@ export class FormsComponent implements OnInit {
   public confirmModal: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   private _openModal: any = null;
+  private _step: string;
 
   constructor(
   	private _activeRoute: ActivatedRoute,
@@ -38,7 +39,8 @@ export class FormsComponent implements OnInit {
   	this._activeRoute
       .params
       .subscribe( params => {
-  		  this.formType = params.form_id;
+        this.formType = params.form_id;
+        this._step = params.step;
   	});
 
     this._messageService
@@ -56,7 +58,7 @@ export class FormsComponent implements OnInit {
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
   public async canDeactivate(): Promise<boolean> {
-      if (this._formsService.formHasUnsavedData(this.formType)) {
+      if (this._formsService.formHasUnsavedData(this.formType) && this._step !== 'step_5') {
         let result: boolean = null;
         console.log(" form not saved...");
         result = await this._dialogService
