@@ -198,7 +198,7 @@ def get_fec_number():
                                 coverage_start_date, 
                                 coverage_end_date, 
                                 fec_id, 
-                                email_on_file1
+                                email_on_file_1
                         FROM   public.forms_committeeinfo 
                         WHERE  status = 'Processing' 
                         ORDER BY updated_at asc""")
