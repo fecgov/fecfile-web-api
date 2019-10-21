@@ -49,30 +49,32 @@ def get_reports_to_upload():
                         FROM   public.reports 
                         WHERE  status = 'Uploaded' 
                         ORDER BY last_update_date asc""")
-            '''
 
+            '''
             cur.execute("""SELECT cmte_id, report_id, form_type 
                         FROM   public.reports 
                         WHERE  status = 'Saved' 
                         AND  report_id in (1410, 1414, 1426)    
                         ORDER BY last_update_date asc""")
             '''
+
             for row in cur.fetchall():
                 data_row = list(row)
                 data_obj=data_row[0]
                 
-                '''
+                
                 cur.execute("""UPDATE public.reports 
-                            SET status = 'Waiting' 
+                            SET status = 'Upload_Waiting' 
                             WHERE cmte_id = %s 
                             AND report_id = %s 
                             AND status = 'Uploaded' """, [data_row[0],  data_row[1]])
                 '''
                 cur.execute("""UPDATE public.reports 
-                            SET status = 'Waiting' 
+                            SET status = 'Upload_Waiting' 
                             WHERE cmte_id = %s 
                             AND report_id = %s 
-                            AND status = 'Saved' """, [data_row[0],  data_row[1]])                           
+                            AND status = 'Saved' """, [data_row[0],  data_row[1]])      
+                '''                                  
                 _conn.commit()
 
                 data_obj = {
@@ -111,7 +113,7 @@ def get_reports_to_upload():
                                                     fec_status = 'Processing'
                                                 WHERE cmte_id = %s 
                                                 AND report_id = %s 
-                                                AND status = 'Waiting' """, [resp['submission_id'], datetime.datetime.now(), data_row[0],  data_row[1]])
+                                                AND status = 'Upload_Waiting' """, [resp['submission_id'], datetime.datetime.now(), data_row[0],  data_row[1]])
                                 _conn.commit()   
                                 if cursor.rowcount == 0:
                                     raise Exception('Error: updating report update date failed.') 
@@ -124,22 +126,23 @@ def get_reports_to_upload():
                     print(resp.json())                                                        
 
             #Processing F99 reports 
-            '''
+            
             cur.execute("""SELECT committeeid, id FROM public.forms_committeeinfo 
                             WHERE is_submitted
-                            AND status is NULL""")
-            '''
+                            AND status is NULL """)
 
+            '''
             cur.execute("""SELECT committeeid, id FROM public.forms_committeeinfo 
                             WHERE id in (1091, 1092, 1087)
                             AND status is NULL""")
-
+            '''
+            
             for row in cur.fetchall():
                 data_row = list(row)
                 data_obj=data_row[0]
                 
                 cur.execute("""UPDATE public.forms_committeeinfo  
-                            SET status = 'Waiting' 
+                            SET status = 'Upload_Waiting' 
                             WHERE committeeid = %s 
                             AND id = %s  
                             AND status is NULL """, [data_row[0],  data_row[1]])
@@ -163,10 +166,11 @@ def get_reports_to_upload():
                         cur.execute("""UPDATE public.forms_committeeinfo 
                                                 SET submission_id = %s, 
                                                     updated_at = %s,
-                                                    fec_status = 'Processing'
+                                                    fec_status = 'Processing',
+                                                    status = 'Processing'
                                                 WHERE committeeid = %s 
                                                 AND id = %s 
-                                                AND status = 'Waiting' """, [resp['submission_id'], datetime.datetime.now(), data_row[0],  data_row[1]])
+                                                AND status = 'Upload_Waiting' """, [resp['submission_id'], datetime.datetime.now(), data_row[0],  data_row[1]])
                         _conn.commit()   
                         if cursor.rowcount == 0:
                             raise Exception('Error: updating forms_committeeinfo update date failed.') 
