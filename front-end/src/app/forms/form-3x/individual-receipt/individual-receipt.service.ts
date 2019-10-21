@@ -375,16 +375,16 @@ export class IndividualReceiptService {
     if (committeeDetails) {
       if (committeeDetails.cmte_type_category) {
         params = params.append('cmte_type_category', committeeDetails.cmte_type_category);
-        if (committeeDetails.cmte_type_category !== 'PTY') {
-          params = params.append('activity', activityEvent);
-        }
       }
     }
 
     params = params.append('calendar_year', new Date().getFullYear().toString());
-
     if (amount) {
       params = params.append('total_amount', amount.toString());
+    }
+    if (activityEvent) {
+      // params = params.append('activity', activityEvent.toString());
+      params = params.append('activity_event_type', 'administrative');
     }
 
     return this._http.get(`${environment.apiUrl}${url}`, {
