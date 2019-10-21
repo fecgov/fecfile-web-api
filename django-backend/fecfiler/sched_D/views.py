@@ -41,6 +41,8 @@ from fecfiler.sched_A.views import get_next_transaction_id
 # Create your views here.
 logger = logging.getLogger(__name__)
 
+API_CALL_SB = {"api_call": "/sb/schedB"}
+
 MANDATORY_FIELDS_SCHED_D = [
     "report_id",
     "cmte_id",
@@ -578,9 +580,11 @@ def get_schedD(data):
         if "transaction_id" in data:
             transaction_id = check_transaction_id(data.get("transaction_id"))
             forms_obj = get_list_schedD(report_id, cmte_id, transaction_id)
-            child_obj = get_child_transactions(report_id, cmte_id, transaction_id)
-            if len(child_obj) > 0:
-                forms_obj[0]["child"] = child_obj
+            child_objs = get_child_transactions(report_id, cmte_id, transaction_id)
+            for obj in child_objs:
+                obj.update(API_CALL_SB)
+            if len(child_objs) > 0:
+                forms_obj[0]["child"] = child_objs
         else:
             forms_obj = get_list_all_schedD(report_id, cmte_id)
         return forms_obj
