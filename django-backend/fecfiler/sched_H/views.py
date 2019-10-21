@@ -519,6 +519,7 @@ def get_fed_nonfed_share(request):
         grad event_type-based aggregation value from h4
     calculate fed and non-fed share based on ratio and update aggregate value
     """
+
     logger.debug('get_fed_nonfed_share with request:{}'.format(request.query_params))
     try:
         cmte_id = request.user.username
@@ -563,9 +564,9 @@ def get_fed_nonfed_share(request):
         else: # need to go to h1 for ratios
             activity_event_type = request.query_params.get('activity_event_type')
 
-            # TODO: need to db change to fix this typo
-            if activity_event_type == 'administrative':
-                activity_event_type = 'adminstrative'
+            # # TODO: need to db change to fix this typo
+            # if activity_event_type == 'administrative':
+            #     activity_event_type = 'adminstrative'
 
             if not activity_event_type:
                 return Response('Error: event type is required for this committee.')
@@ -587,12 +588,20 @@ def get_fed_nonfed_share(request):
                 # activity_event_type = request.query_params.get('activity_event_type')
                 # if not activity_event_type:
                     # return Response('Error: event type is required for this committee.')
+                event_type_code = {
+                    "AD" : "adminstrative", # TODO: need to fix this typo
+                    "GV" : "generic_voter_drive",
+                    "PC" : "public_communications",
+                }
+                h1_event_type = event_type_code.get(activity_event_type)
+                if not h1_event_type:
+                    return Response('Error: activity type not valid')
                 _sql = """
                 select federal_percent from public.sched_h1
                 where create_date between %s and %s
                 and cmte_id = %s
                 """
-                activity_part = """and {} = true """.format(activity_event_type)
+                activity_part = """and {} = true """.format(h1_event_type)
                 order_part = 'order by create_date desc, last_update_date desc'
                 _sql = _sql + activity_part + order_part
                 logger.debug('sql for query h1:{}'.format(_sql))
