@@ -137,7 +137,9 @@
         </thead>
         <tbody>
             <ng-container *ngFor="let report of reportsModel | paginate: config; let i = index">                
-                <tr *ngIf="report.amend_show">               
+                <tr *ngIf="report.amend_show" [ngStyle]="{'background-color': 
+                    (report.amend_ind === 'N' || report.amend_ind === 'T'
+                    || report.amend_max === 'up' || report.amend_max === 'down') ? '' : '#D9EDF6'}">
                 <!--<td >
                     <input [(ngModel)]="report.selected" type="checkbox" (click)="checkForMultiChecked($event)">
                 </td>-->
@@ -149,8 +151,8 @@
                     <div class="row td-amend">
                         {{(report.amend_ind === 'N' || report.amend_ind === 'T') ? '' : report.amend_ind}}
                         <div >
-                            <i *ngIf="report.amend_max === 'up'" class="fas fa-angle-up amend-arrow" (click)="amendArrow(report)"></i>
                             <i *ngIf="report.amend_max === 'down'" class="fas fa-angle-down amend-arrow" (click)="amendArrow(report)"></i>
+                            <i *ngIf="report.amend_max === 'up'" class="fas fa-angle-up amend-arrow" (click)="amendArrow(report)"></i>
                         </div>
                     </div>
                 </td>

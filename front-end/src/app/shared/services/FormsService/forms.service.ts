@@ -157,7 +157,7 @@ export class FormsService {
         formData.append('is_submitted', 'False');
         formData.append('filename', form99_details.filename);
         formData.append('form_type', 'F99');
-        if (form99_details.id === '' || form99_details.id === '' || form99_details.id === null) {
+        if (form99_details.id === '' || form99_details.id === '' || form99_details.id === null || form99_details.id === undefined) {
           /*data['id']="0";*/
           formData.append('id', '0');
         } else {
@@ -447,10 +447,15 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
+    let form99_details: form99;
     if (form_type === '99') {
-      let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
+      if (formObj && Object.entries(formObj).length !== 0) {
+        form99_details = formObj;
+      } else {
+        form99_details = JSON.parse(localStorage.getItem('form_99_details'));
+      }
 
+      delete form99_details.file;
       url = '/f99/update_f99_info';
       data = form99_details;
 
@@ -466,7 +471,7 @@ export class FormsService {
       .pipe(
         map(res => {
           if (res) {
-            return true;
+            return res;
           }
           return false;
         })
@@ -627,7 +632,9 @@ export class FormsService {
 
       url = '/f99/update_print_f99';
       data = form99_details;
-
+      // if (data.file) {
+      //   delete data.file;
+      // }
       data['form_type'] = 'F99';
 
       console.log('PreviewForm_Preview_Screen form99_details', form99_details);
