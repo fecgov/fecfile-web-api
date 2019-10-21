@@ -957,7 +957,7 @@ public printReport(report: reportModel): void{
       });
 
       setTimeout(() => {
-        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1' } });
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', reportId: report.report_id } });
       }, 1500);
     } else if (report.form_type === 'F3X') {
       this._reportsService
@@ -975,7 +975,7 @@ public printReport(report: reportModel): void{
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
         this._router.navigate([`/forms/form/${formType}`], {
-          queryParams: { step: 'reports', reportId: report.report_id }
+          queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'receipts'  }
         });
       }, 1500);
     }

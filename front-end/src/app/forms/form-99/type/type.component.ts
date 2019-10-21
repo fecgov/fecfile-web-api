@@ -24,6 +24,7 @@ export class TypeComponent implements OnInit {
 
   public frmType: FormGroup;
   public editMode: boolean;
+  public reportId: number;
   public typeSelected: string = '';
   public isValidType: boolean = false;
   public typeFailed: boolean = false;
@@ -49,6 +50,9 @@ export class TypeComponent implements OnInit {
       if (p.refresh) {
         this._setRefresh = true;
         this.ngOnInit();
+      }
+      if (p.reportId) {
+        this.reportId = p.reportId;
       }
     });
   }
@@ -230,7 +234,8 @@ export class TypeComponent implements OnInit {
           direction: 'next',
           step: 'step_2',
           previousStep: 'step_1',
-          refresh: this._setRefresh
+          refresh: this._setRefresh,
+          reportId: this.reportId
         });
 
         return 1;

@@ -7,6 +7,7 @@ import { MessageService } from '../../services/MessageService/message.service';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { DialogService } from '../../services/DialogService/dialog.service';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
+import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-preview',
@@ -35,16 +36,17 @@ export class PreviewComponent implements OnInit {
   private _step: string = '';
   private _printPriviewPdfFileLink: string = '';
   private _formDetails: any = {};
-  private _setRefresh:boolean = false;
+  private _setRefresh: boolean = false;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
+    private _router: Router,
     private _messageService: MessageService,
     private _formsService: FormsService,
     private _dialogService: DialogService
   ) {
     _activatedRoute.queryParams.subscribe(p => {
-      if (p.refresh) {
+      if (p.refresh === 'true' || p.refresh === true) {
         this._setRefresh = true;
         this.ngOnInit();
       }
@@ -55,14 +57,13 @@ export class PreviewComponent implements OnInit {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this._messageService.getMessage().subscribe(res => {
-  
-      console.log("Preview screen this.formDetails ", this.formDetails);
+      console.log('Preview screen this.formDetails ', this.formDetails);
       this.committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
 
-      if (this.editMode)  {
+      if (this.editMode) {
         this._step = res.step;
-        this.formDetails =  JSON.parse(localStorage.getItem('form_99_details'));
-      }else if (!this.editMode)  {
+        this.formDetails = JSON.parse(localStorage.getItem('form_99_details'));
+      } else if (!this.editMode) {
         this._step = res.step;
         this.formDetails = res.data;
       }
@@ -70,28 +71,27 @@ export class PreviewComponent implements OnInit {
       setTimeout(() => {
         if (this.formType === '99') {
           if (this.formDetails) {
-  
             if (this.formDetails.hasOwnProperty('filename')) {
               this.fileName = this.formDetails.filename;
             } else {
-              this.fileName = "";
+              this.fileName = '';
             }
             const fileFromLocalStorage = localStorage.getItem('orm_99_details.org_fileurl');
             if (this.formDetails.hasOwnProperty('org_fileurl')) {
               this.orgFileUrl = this.formDetails.org_fileurl;
-            } else if (this.formDetails.hasOwnProperty('file') && Object.entries(this.formDetails.file).length !== 0) {
+            } else if (this.formDetails && this.formDetails.file &&
+              this.formDetails.hasOwnProperty('file') && Object.entries(this.formDetails.file).length !== 0) {
               this.orgFileUrl = this.formDetails.file;
             } else if (fileFromLocalStorage) {
               this.orgFileUrl = fileFromLocalStorage;
             } else {
-              this.orgFileUrl = "";
+              this.orgFileUrl = '';
             }
-  
-            console.log("this.orgFileUrl", this.orgFileUrl );
-            console.log("this.fileName", this.fileName );
-  
+
+            console.log('this.orgFileUrl', this.orgFileUrl);
+            console.log('this.fileName', this.fileName);
           }
-  
+
           if (this.formDetails && typeof this.formDetails !== 'undefined' && this.formDetails.reason) {
             if (typeof this.formDetails.reason !== 'undefined') {
               this.typeSelected = this.formDetails.reason;
@@ -99,7 +99,6 @@ export class PreviewComponent implements OnInit {
           }
         }
       }, 500);
-
     });
   }
 
@@ -170,26 +169,78 @@ export class PreviewComponent implements OnInit {
     return false;
   }
 
-  public goToPreviousStep(): void {
-    setTimeout(() => {
-      localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this.formDetails));
-    }, 100);
+  private _setF99Details(): void {
+    if (this.committeeDetails) {
+      if (this.committeeDetails.committeeid) {
+        this.formDetails = this.committeeDetails;
 
-    this.status.emit({
-      form: {},
-      direction: 'previous',
-      step: 'step_2',
-      previousStep: this._step
-    });
+        this.formDetails.reason = '';
+        this.formDetails.text = '';
+        this.formDetails.signee = `${this.committeeDetails.treasurerfirstname} ${this.committeeDetails.treasurerlastname}`;
+        this.formDetails.additional_email_1 = '-';
+        this.formDetails.additional_email_2 = '-';
+        this.formDetails.created_at = '';
+        this.formDetails.is_submitted = false;
+        this.formDetails.id = '';
 
-    this.showValidateBar = false;
-
-    this._messageService.sendMessage({
-      validateMessage: {
-        validate: {},
-        showValidateBar: false
+        let formSavedObj: any = {
+          saved: false
+        };
+        localStorage.setItem(`form_99_details`, JSON.stringify(this.formDetails));
+        localStorage.setItem(`form_99_saved`, JSON.stringify(formSavedObj));
       }
-    });
+    }
+  }
+
+  public goToPreviousStep(): void {
+    if (this.editMode) {
+      setTimeout(() => {
+        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this.formDetails));
+      }, 100);
+
+      this.status.emit({
+        form: {},
+        direction: 'previous',
+        step: 'step_2',
+        edit: this.editMode,
+        previousStep: this._step
+      });
+
+      this.showValidateBar = false;
+
+      this._messageService.sendMessage({
+        validateMessage: {
+          validate: {},
+          showValidateBar: false
+        }
+      });
+    } else {
+      this._dialogService
+        .newReport(
+          'This report has been filed with the FEC. If you want to change, you must file a new report.',
+          ConfirmModalComponent,
+          'Warning',
+          true,
+          false,
+          true
+        )
+        .then(res => {
+          if (res === 'cancel' || res === ModalDismissReasons.BACKDROP_CLICK || res === ModalDismissReasons.ESC) {
+            this.ngOnInit();
+            this._dialogService.checkIfModalOpen();
+          } else if (res === 'NewReport') {
+            this.editMode = true;
+            localStorage.removeItem('form_99_details');
+            localStorage.removeItem('form_99_saved');
+            this._setF99Details();
+            setTimeout(() => {
+              this._router.navigate(['/forms/form/99'], {
+                queryParams: { step: 'step_1', edit: this.editMode, refresh: true }
+              });
+            }, 500);
+          }
+        });
+    }
   }
 
   public goToNextStep(): void {
@@ -202,6 +253,7 @@ export class PreviewComponent implements OnInit {
       direction: 'next',
       step: 'step_4',
       previousStep: this._step,
+      edit: this.editMode,
       refresh: this._setRefresh
     });
 
@@ -241,6 +293,7 @@ export class PreviewComponent implements OnInit {
   }
   public printPreview(): void {
     this._formDetails = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+
     console.log('Accessing PreviewComponent printPriview ...');
     localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._formDetails));
     console.log('Accessing PreviewComponent printPriview ...');
