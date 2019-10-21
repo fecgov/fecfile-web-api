@@ -6,4 +6,4 @@ WORKDIR /opt/func
 ADD . /opt/func
 
 RUN pip3 install psycopg2-binary requests
-ENTRYPOINT ["/bin/bash", "-c", "python /opt/func/get_fec_number.py; python /opt/func/upload_report.py"]
+ENTRYPOINT ["/bin/bash", "-c", "python /opt/func/upload_report.py; sleep 15; python /opt/func/get_fec_number.py"]
