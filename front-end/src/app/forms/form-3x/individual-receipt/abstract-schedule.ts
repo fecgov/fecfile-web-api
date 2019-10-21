@@ -745,8 +745,26 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     totalAmount = totalAmount.replace(/,/g, ``);
     const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
-    this._receiptService.getFedNonFedPercentage__(totalAmount, activityEvent).subscribe(res => {
+    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
       console.log();
+      if (res) {
+        // {"fed_share": 9.09, "nonfed_share": 3.0299999999999994, "aggregate_amount": 12.12}
+        if (res.fed_share) {
+          const patch = {};
+          patch['fed_share_amount'] = res.fed_share;
+          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+        }
+        if (res.nonfed_share) {
+          const patch = {};
+          patch['non_fed_share_amount'] = res.nonfed_share;
+          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+        }
+        if (res.aggregate_amount) {
+          const patch = {};
+          patch['activity_event_amount_ytd'] = res.aggregate_amount;
+          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+        }
+      }
     },
     errorRes => {
       console.log('error caught getting h1 percentage' + errorRes);
@@ -760,17 +778,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
                 // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
                 // based on the event type selected.
-                this.clearFormValues();
-                this.scheduleType = 'sched_h6';
-                this.transactionType = 'ALLOC_FEA_DISB_DEBT';
-                this.transactionTypeText = 'Allocated FEA Debt Payment (H6)';
-                window.scrollTo(0, 0);
+                // this.clearFormValues();
+                // this.scheduleType = 'sched_h6';
+                // this.transactionType = 'ALLOC_FEA_DISB_DEBT';
+                // this.transactionTypeText = 'Allocated FEA Debt Payment (H6 Test until H1/H2 is ready!)';
+                // window.scrollTo(0, 0);
               }
             });
-
-            // this.frmIndividualReceipt.patchValue({'fed_share_amount': 0}, { onlySelf: true });
-            // this.frmIndividualReceipt.patchValue({'non_fed_share_amount': 0}, { onlySelf: true });
-            // this.frmIndividualReceipt.patchValue({'activity_event_amount_ytd': 0}, { onlySelf: true });
           }
         }
       }
@@ -1351,7 +1365,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                    field === 'fed_share_amount' ||
                    field === 'non_fed_share_amount' ||
                    field === 'activity_event_amount_ytd') {
-// fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
+          // fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
           // Amounts in numeric format shoud be supported by the API.
           // The individual-receipt.service is currently only passing string values
           // to in the request.  TODO Why is this?  Remove the check or allow numerics and
@@ -2747,6 +2761,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this.contributionAmountChange({ target: { value: amount.toString() } }, prop, false);
                   } else if (this.isFieldName(prop, 'total_amount') ||
                              this.isFieldName(prop, 'beginning_balance') ||
+                             this.isFieldName(prop, 'incurred_amount') ||
                              this.isFieldName(prop, 'payment_amount') ||
                              this.isFieldName(prop, 'balance_at_close') ||
                              this.isFieldName(prop, 'fed_share_amount') ||

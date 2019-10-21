@@ -117,9 +117,14 @@
               }
             }
             .ng-select-container {
+              // Not working
               height: 45px;
             }
           }
+          // Not working
+          // .ng-select-container {
+          //   height: 45px !important;
+          // }
           .ng-dropdown-panel {
             .ng-dropdown-panel-items {
               .ng-option {
