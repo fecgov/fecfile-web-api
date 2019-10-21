@@ -383,7 +383,6 @@ export class IndividualReceiptService {
       params = params.append('total_amount', amount.toString());
     }
     if (activityEvent) {
-      // params = params.append('activity', activityEvent.toString());
       params = params.append('activity_event_type', 'administrative');
     }
 
