@@ -14,7 +14,10 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from fecfiler.core.transaction_util import get_line_number_trans_type
+from fecfiler.core.transaction_util import (
+    get_line_number_trans_type,
+    get_sched_b_transactions,
+)
 
 from fecfiler.core.views import (
     NoOPError,
@@ -121,12 +124,14 @@ def schedD(request):
     elif request.method == "GET":
         try:
             data = {"cmte_id": request.user.username}
-            if "report_id" in request.data:
-                data["report_id"] = check_report_id(request.data.get("report_id"))
-            elif "report_id" in request.query_params:
+            if "report_id" in request.query_params:
                 data["report_id"] = check_report_id(
                     request.query_params.get("report_id")
                 )
+            # elif "report_id" in request.query_params:
+            #     data["report_id"] = check_report_id(
+            #         request.query_params.get("report_id")
+            #     )
             else:
                 raise Exception("Missing Input: report_id is mandatory")
             if "transaction_id" in request.query_params and check_null_value(
@@ -135,12 +140,12 @@ def schedD(request):
                 data["transaction_id"] = check_transaction_id(
                     request.query_params.get("transaction_id")
                 )
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
-                )
+            # if "transaction_id" in request.data and check_null_value(
+            #     request.data.get("transaction_id")
+            # ):
+            #     data["transaction_id"] = check_transaction_id(
+            #         request.data.get("transaction_id")
+            #     )
             datum = get_schedD(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
@@ -534,13 +539,48 @@ def do_transaction(sql, values):
         raise
 
 
+def get_child_transactions(report_id, cmte_id, transaction_id):
+    """
+    adding all the pissible child transactions:
+    sched_b, ached_e, sched_f, sched_h4, sched_h6
+    """
+
+    sched_b_list = get_sched_b_transactions(
+        report_id, cmte_id, back_ref_transaction_id=transaction_id
+    )
+    # TODO: will add all other transactions later on
+    return sched_b_list
+
+    #     childA_forms_obj = get_list_child_schedA(
+    #     report_id, cmte_id, transaction_id)
+    # for obj in childA_forms_obj:
+    #     obj.update(API_CALL_SA)
+    #     obj.update({'election_year':REQ_ELECTION_YR})
+    #     # obj.update(ELECTION_YR)
+
+    # childB_forms_obj = get_list_child_schedB(
+    #     report_id, cmte_id, transaction_id)
+    # for obj in childB_forms_obj:
+    #     obj.update(API_CALL_SB)
+    #     obj.update({'election_year':REQ_ELECTION_YR})
+    #     # obj.update(ELECTION_YR)
+
+    # child_forms_obj = childA_forms_obj + childB_forms_obj
+    # # for obj in childB_forms_obj:
+    # #     obj.update({'api_call':''})
+
+
 def get_schedD(data):
     try:
+        logger.debug("get_schedD with data:{}".format(data))
         cmte_id = data.get("cmte_id")
         report_id = data.get("report_id")
         if "transaction_id" in data:
             transaction_id = check_transaction_id(data.get("transaction_id"))
             forms_obj = get_list_schedD(report_id, cmte_id, transaction_id)
+            child_obj = get_child_transactions(report_id, cmte_id, transaction_id)
+            if len(child_obj) > 0:
+                forms_obj[0]["child"] = child_obj
         else:
             forms_obj = get_list_all_schedD(report_id, cmte_id)
         return forms_obj
