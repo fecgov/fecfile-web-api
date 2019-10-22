@@ -1623,7 +1623,6 @@ def autolookup_search_contacts(request):
         for key, value in query_params.items():
             if key in allowed_params:
                 order_string = str(key)
-                parameters = [committee_id, committee_id]
                 param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
                 # if cand_q:
                 #     query_string = """
@@ -1651,6 +1650,7 @@ def autolookup_search_contacts(request):
                 # print('haha')
                 # print('cmte-id' in list(request.query_params.items()))
                 if 'cmte_id' in request.query_params:
+                    parameters = [committee_id]
                     query_string = """
                         SELECT json_agg(t) FROM 
                         (SELECT 
@@ -1675,7 +1675,7 @@ def autolookup_search_contacts(request):
                         e.delete_ind,
                         e.create_date,
                         e.last_update_date
-                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000') 
+                        FROM public.entity e WHERE e.cmte_id in ('C00000000') 
                         AND substr(e.ref_cand_cmte_id,1,1)='C'
                         AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                         """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
@@ -1684,6 +1684,7 @@ def autolookup_search_contacts(request):
                     or 'cand_first_name' in request.query_params
                     or 'cand_last_name' in request.query_params
                     ):
+                    parameters = [committee_id]
                     query_string = """
                         SELECT json_agg(t) FROM 
                         (SELECT 
@@ -1709,11 +1710,12 @@ def autolookup_search_contacts(request):
                         e.cand_office_state,
                         e.cand_office_district,
                         e.cand_election_year
-                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000') 
+                        FROM public.entity e WHERE e.cmte_id in ('C00000000') 
                         AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                         AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                         """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
                 else:
+                    parameters = [committee_id, committee_id]
                     query_string = """
                         SELECT json_agg(t) FROM 
                         (SELECT 
@@ -1738,7 +1740,7 @@ def autolookup_search_contacts(request):
                         e.delete_ind,
                         e.create_date,
                         e.last_update_date
-                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                        FROM public.entity e WHERE e.cmte_id in (%s)
                         AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                         """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
 
@@ -1963,7 +1965,11 @@ TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FN
 def get_query_string(category_type,cmte_id,param_string):
     query_string = ''
 
+<<<<<<< HEAD
     if category_type == 'disbursements':
+=======
+    if category_type == 'disbursements_tran':
+>>>>>>> 605e541acd19b718a7adffd2d1e0a00cdeeaeb6d
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_disbursements_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
 
@@ -1986,7 +1992,11 @@ def get_child_query_string(category_type):
 
     query_view = ''
 
+<<<<<<< HEAD
     if category_type == 'disbursements':
+=======
+    if category_type == 'disbursements_tran':
+>>>>>>> 605e541acd19b718a7adffd2d1e0a00cdeeaeb6d
         query_view = """
                         SELECT json_agg(t) FROM
                         (SELECT transaction_type, 
@@ -2103,7 +2113,11 @@ def get_query_view(category_type):
 
     query_view = ''
 
+<<<<<<< HEAD
     if category_type == 'disbursements':
+=======
+    if category_type == 'disbursements_tran':
+>>>>>>> 605e541acd19b718a7adffd2d1e0a00cdeeaeb6d
         query_view = 'all_disbursements_transactions_view'
         
 

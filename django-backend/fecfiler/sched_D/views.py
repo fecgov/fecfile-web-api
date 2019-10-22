@@ -17,6 +17,10 @@ from rest_framework.response import Response
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_b_transactions,
+    get_sched_f_child_transactions,
+    get_sched_h4_child_transactions,
+    get_sched_h6_child_transactions,
+    get_transaction_type_descriptions,
 )
 
 from fecfiler.core.views import (
@@ -42,6 +46,9 @@ from fecfiler.sched_A.views import get_next_transaction_id
 logger = logging.getLogger(__name__)
 
 API_CALL_SB = {"api_call": "/sb/schedB"}
+API_CALL_SF = {"api_call": "/sf/schedF"}
+API_CALL_SH4 = {"api_call": "/sh4/schedH4"}
+API_CALL_SH6 = {"api_call": "/sh6/schedH6"}
 
 MANDATORY_FIELDS_SCHED_D = [
     "report_id",
@@ -545,13 +552,17 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
     """
     adding all the pissible child transactions:
     sched_b, ached_e, sched_f, sched_h4, sched_h6
+    TODO: need to add sched_e child data later on
     """
 
     sched_b_list = get_sched_b_transactions(
         report_id, cmte_id, back_ref_transaction_id=transaction_id
     )
     # TODO: will add all other transactions later on
-    return sched_b_list
+    sched_f_list = get_sched_f_child_transactions(report_id, cmte_id, transaction_id)
+    sched_h4_list = get_sched_h4_child_transactions(report_id, cmte_id, transaction_id)
+    sched_h6_list = get_sched_h6_child_transactions(report_id, cmte_id, transaction_id)
+    return sched_b_list + sched_f_list + sched_h4_list + sched_h6_list
 
     #     childA_forms_obj = get_list_child_schedA(
     #     report_id, cmte_id, transaction_id)
@@ -573,16 +584,35 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
 
 
 def get_schedD(data):
+    """"
+    load sched_d items
+    """
     try:
         logger.debug("get_schedD with data:{}".format(data))
         cmte_id = data.get("cmte_id")
         report_id = data.get("report_id")
+        tran_desc_dic = get_transaction_type_descriptions()
         if "transaction_id" in data:
             transaction_id = check_transaction_id(data.get("transaction_id"))
             forms_obj = get_list_schedD(report_id, cmte_id, transaction_id)
+            tran_id = forms_obj[0].get("transaction_type_identifier")
+            forms_obj[0].update(
+                {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
+            )
             child_objs = get_child_transactions(report_id, cmte_id, transaction_id)
-            for obj in child_objs:
-                obj.update(API_CALL_SB)
+            for obj in child_objs:  # this api_call code need to refactored later on
+                tran_id = obj.get("transaction_type_identifier")
+                obj.update(
+                    {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
+                )
+                if obj["transaction_id"].startswith("SB"):
+                    obj.update(API_CALL_SB)
+                if obj["transaction_id"].startswith("SF"):
+                    obj.update(API_CALL_SF)
+                if "levin_share" in obj:
+                    obj.update(API_CALL_SH6)
+                if "non_fed_share_amount" in obj:
+                    obj.update(API_CALL_SH4)
             if len(child_objs) > 0:
                 forms_obj[0]["child"] = child_objs
         else:

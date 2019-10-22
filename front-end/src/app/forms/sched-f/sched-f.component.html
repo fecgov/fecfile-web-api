@@ -319,7 +319,7 @@
                       </div>
 
                       <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
-                        (Optional)
+                        (Optional) {{i}}  {{col.name}}
                       </ng-container>
                     </label>
                     <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">

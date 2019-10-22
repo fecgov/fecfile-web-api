@@ -217,7 +217,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     // this.formFields = this._staticFormFields;
     super.ngOnInit();
     this.showPart2 = false;
-    this.transactionType = 'INDV_REC';
+    this.transactionType = 'OPEXP'; // 'INDV_REC';
     this.transactionTypeText = 'Coordinated Party Expenditure Debt to Vendor';
     super.ngOnChanges(null);
     this._setTransactionDetail();
@@ -313,5 +313,10 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
       isParent: false,
       isEarmark: false
     };
+
+    if (this.scheduleAction === ScheduleActions.addSubTransaction) {
+      this.clearFormValues();
+    } else if (this.scheduleAction === ScheduleActions.edit) {
+    }
   }
 }
