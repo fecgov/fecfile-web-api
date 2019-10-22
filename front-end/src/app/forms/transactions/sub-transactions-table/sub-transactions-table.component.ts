@@ -41,6 +41,9 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
   public formType: string;
 
   @Input()
+  public subTransactionsTableType: string;
+
+  @Input()
   public subTransactions: any[];
 
   public transactionsModel: Array<TransactionModel>;
@@ -64,6 +67,9 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
    * When input changes are made to subTransactions, populate it in the model and UI.
    */
   public ngOnChanges(): void {
+    if (!this.subTransactionsTableType) {
+      this.subTransactionsTableType = 'sched_a';
+    }
     this._populateTable();
   }
 
@@ -93,10 +99,26 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
         model.memoCode = trx.memo_code;
         model.memoText = trx.memo_text;
 
+        // TODO API needs to provide description transaction type on get for sched_d
+        if (this.subTransactionsTableType === 'sched_d') {
+          model.type = trx.transaction_type_identifier;
+        }
+
         model.transactionTypeIdentifier = trx.transaction_type_identifier;
         model.transactionId = trx.transaction_id;
         model.backRefTransactionId = trx.back_ref_transaction_id;
         model.apiCall = trx.api_call;
+
+        // temp patch until API passes back api_call for child sched_d.
+        // "api_call":"/sa/schedA",
+        if (!trx.api_call) {
+          if (typeof trx.back_ref_transaction_id === 'string') {
+            const refId: string = trx.back_ref_transaction_id;
+            if (refId.startsWith('SB')) {
+              trx.api_call = '/sb/schedB';
+            }
+          }
+        }
 
         modelArray.push(model);
       }

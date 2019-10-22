@@ -95,6 +95,7 @@
                           && col?.name !== 'child*donor_cmte_id'" -->
                           <!-- (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
                                     ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)" -->
+                        <!-- [attr.readonly]="(col.type === 'text' && col?.isReadonly) || isTotalAmountReadOnly(col) ?  true : null"                                     -->
                         <input *ngIf="col?.name !== 'first_name' 
                                 && col?.name !== 'last_name'
                                 && !isFieldName(col?.name, 'cand_first_name')
@@ -107,7 +108,7 @@
                                 && !isFieldName(col?.name, 'beneficiary_cand_id') 
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
-                          [attr.readonly]="(col.type === 'text' && col?.isReadonly) ? true : null"
+                          [attr.readonly]="isFieldReadOnly(col)"
                           [attr.value]="col?.value"
                           [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount') 
                                         || isFieldName(col?.name, 'contribution_aggregate'))? col?.validation?.max + 5: col?.validation?.max"
@@ -344,11 +345,10 @@
                           ">
                       </ng-select>
                     </ng-container>
-                    <!-- (change)="handleActivityEventTypeChange($event, col)" -->
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
                       <ng-select #activityEventTypeSelect 
                         [items]="activityEventTypes" 
-                  
+                        (change)="handleActivityEventTypeChange($event, col)"
                         class="forms__select activity-event-type-select" 
                         [formControlName]="col?.name" 
                         bindValue="activityEventType"
@@ -408,7 +408,8 @@
         </ng-container>
         <app-sub-transactions-table [hidden]="!isShowChildTransactions()" 
           [subTransactions]="subTransactions"
-          [formType]="formType">
+          [formType]="formType"
+          [subTransactionsTableType]="subTransactionsTableType">
         </app-sub-transactions-table>
         <div class="forms__btn-container">
           <button *ngIf="!subTransactionInfo?.isEarmark &&

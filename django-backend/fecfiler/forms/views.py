@@ -323,7 +323,7 @@ def f99_file_upload(self, request, format=None):
     return Response(status=status.HTTP_201_CREATED)
 """
 @api_view(['POST'])
-def update_f99_info(request):
+def update_f99_info(request, print_flag=False):
 
     if request.method == 'POST':
         try:
@@ -371,8 +371,16 @@ def update_f99_info(request):
                         else:
                             return Response({})
                     else:
-                        logger.debug("FEC Error 002:This form is already submitted")
-                        return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
+                        if print_flag:
+                            result = CommitteeInfo.objects.filter(id=request.data['id']).last()
+                            if result:
+                                serializer = CommitteeInfoSerializer(result)
+                                return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+                            else:
+                                return Response({})
+                        else:
+                            logger.debug("FEC Error 002:This form is already submitted")
+                            return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     logger.debug("FEC Error 003:This form Id number does not exist")
                     return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
@@ -1353,9 +1361,10 @@ def update_print_f99(request):
     # if not createresp.ok:
     #     return Response(createresp.json(), status=status.HTTP_400_BAD_REQUEST)
 
-    updateresp = update_f99_info(request._request)
+    updateresp = update_f99_info(request._request, print_flag=True)
 
     if updateresp.status_code != 201:
+        update_json_data = json.loads(updateresp.content.decode("utf-8"))
         entity_status = status.HTTP_400_BAD_REQUEST
         return Response(updateresp.data, status=entity_status)
 

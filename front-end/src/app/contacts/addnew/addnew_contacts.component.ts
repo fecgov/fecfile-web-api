@@ -51,6 +51,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   @Input() transactionType = '';
   //@Input() scheduleAction: ContactActions = null;
   @Input() scheduleAction: ContactActions = ContactActions.add;
+  @Input() transactionToEdit: ContactModel;
 
   /**
    * Subscription for pre-populating the form for view or edit.
@@ -76,7 +77,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   public entityTypes: any = [];
   public officeSought: any = [];
   public officeState: any = [];
-  
+  public editScheduleAction: ContactActions = ContactActions.edit;
+  public addScheduleAction: ContactActions = ContactActions.add;
+  public isEditViewActive: boolean;
+
   private _formType: string = '';
   private _transactionTypePrevious: string = null;
   private _contributionAggregateValue = 0.0;
@@ -206,6 +210,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     // get form data API is passing X for memo code value.
     // Set it to null here until it is checked by user where it will be set to X.
     //this.frmContact.controls['memo_code'].setValue(null);
+
+    this.populateFormForEditOrView(this.transactionToEdit);
   }
 
   /**
@@ -1049,18 +1055,24 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
             if (res.data.hasOwnProperty('committeeFormFields')) {
               if (Array.isArray(res.data.committeeFormFields)) {
                 this.committeeFormFields = res.data.committeeFormFields;
+                //this.formFields = res.data.committeeFormFields;
+                //this._setForm(res.data.committeeFormFields);
               }
             }
 
             if (res.data.hasOwnProperty('organizationFormFields')) {
               if (Array.isArray(res.data.organizationFormFields)) {
                 this.organizationFormFields = res.data.organizationFormFields;
+                //this.formFields = res.data.organizationFormFields;
+                //this._setForm(res.data.organizationFormFields);
               }
             }
 
             if (res.data.hasOwnProperty('candidateFormFields')) {
               if (Array.isArray(res.data.candidateFormFields)) {
                 this.candidateFormFields = res.data.candidateFormFields;
+                //this.formFields = res.data.candidateFormFields;
+                //this._setForm(res.data.candidateFormFields);
               }
             }
 
@@ -1093,6 +1105,47 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
                 this.entityTypes = res.data.addEntityTypes;
               }
             }
+          
+            if(this.scheduleAction === ContactActions.edit) {
+          
+              if (res.data.hasOwnProperty('editEntityTypes')) {
+                if (Array.isArray(res.data.addEntityTypes)) {
+                  this.entityTypes = res.data.editEntityTypes;
+                }
+
+                if (res.data.hasOwnProperty('individualFormFields') && this.transactionToEdit.entity_type === 'IND') {
+                  if (Array.isArray(res.data.individualFormFields)) {
+                    this.individualFormFields = res.data.individualFormFields;
+                    this.formFields = res.data.individualFormFields;
+                    this._setForm(res.data.individualFormFields);
+                  }
+                }
+
+                if (res.data.hasOwnProperty('committeeFormFields') && this.transactionToEdit.entity_type === 'COM') {
+                  if (Array.isArray(res.data.committeeFormFields)) {
+                    this.committeeFormFields = res.data.committeeFormFields;
+                    this.formFields = res.data.committeeFormFields;
+                    this._setForm(res.data.committeeFormFields);
+                  }
+                }
+
+                if (res.data.hasOwnProperty('organizationFormFields') && this.transactionToEdit.entity_type === 'ORG') {
+                  if (Array.isArray(res.data.organizationFormFields)) {
+                    this.organizationFormFields = res.data.organizationFormFields;
+                    this.formFields = res.data.organizationFormFields;
+                    this._setForm(res.data.organizationFormFields);
+                  }
+                }
+
+                if (res.data.hasOwnProperty('candidateFormFields') && this.transactionToEdit.entity_type === 'CAN') {
+                  if (Array.isArray(res.data.candidateFormFields)) {
+                    this.candidateFormFields = res.data.candidateFormFields;
+                    this.formFields = res.data.candidateFormFields;
+                    this._setForm(res.data.candidateFormFields);
+                  }
+                }
+              }
+            }
 
             if (res.data.hasOwnProperty('officeSought')) {
               if (Array.isArray(res.data.officeSought)) {
@@ -1123,8 +1176,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     // The action here is the same as the this.scheduleAction
     // using the field from the message in case there is a race condition with Input().
     if (editOrView !== null) {
-      if (editOrView.transactionModel) {
-        const formData: ContactModel = editOrView.transactionModel;
+      if (editOrView) { //.transactionModel) {
+        const formData: ContactModel = editOrView; //.transactionModel;
 
         this.hiddenFields.forEach(el => {
           if (el.name === 'id') {
@@ -1139,11 +1192,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         const prefix = nameArray[3] ? nameArray[3] : null;
         const suffix = nameArray[4] ? nameArray[4] : null;
 
-        this.frmContact.patchValue({ first_name: firstName.trim() }, { onlySelf: true });
-        this.frmContact.patchValue({ last_name: lastName.trim() }, { onlySelf: true });
-        this.frmContact.patchValue({ middle_name: middleName.trim() }, { onlySelf: true });
-        this.frmContact.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
-        this.frmContact.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
+        this.frmContact.patchValue({ first_name: firstName }, { onlySelf: true });
+        this.frmContact.patchValue({ last_name: lastName }, { onlySelf: true });
+        this.frmContact.patchValue({ middle_name: middleName }, { onlySelf: true });
+        this.frmContact.patchValue({ prefix: prefix }, { onlySelf: true });
+        this.frmContact.patchValue({ suffix: suffix }, { onlySelf: true });
 
         this.frmContact.patchValue({ entity_type: formData.entity_type }, { onlySelf: true });
         this.frmContact.patchValue({ street_1: formData.street1 }, { onlySelf: true });
@@ -1155,11 +1208,17 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ employer: formData.employer }, { onlySelf: true });
         this.frmContact.patchValue({ occupation: formData.occupation }, { onlySelf: true });
 
-        this.frmContact.patchValue({ phoneNumber: formData.phoneNumber }, { onlySelf: true });
+        this.frmContact.patchValue({ phone_number: formData.phoneNumber }, { onlySelf: true });
         this.frmContact.patchValue({ candOffice: formData.candOffice }, { onlySelf: true });
         this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
         this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
-
+      
+        this.frmContact.patchValue({ entity_name: formData.name }, { onlySelf: true });
+        
+        this.frmContact.patchValue({ candCmteId: formData.candCmteId }, { onlySelf: true });
+        this.frmContact.patchValue({ officeSought: formData.officeSought }, { onlySelf: true });
+        this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
+        this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
       }
     }
   }
@@ -1184,8 +1243,14 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
 
   public cancelStep(): void {
-    this.frmContact.reset();
-    this._router.navigate([`/contacts`]);
+    if(this.scheduleAction !== this.editScheduleAction) {
+      this.frmContact.reset();
+      this._router.navigate([`/contacts`]);
+    }else {
+      this.status.emit({
+        editView: false
+      })
+    }
   }
   
   public viewContacts(): void {
@@ -1269,6 +1334,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       }
       contactObj.entity_type = this._entityType;
 
+      if(this.scheduleAction === ContactActions.edit) {
+        contactObj.id = this.transactionToEdit.id;
+      }
+
       localStorage.setItem('contactObj', JSON.stringify(contactObj));
       this._contactsService.saveContact(this.scheduleAction).subscribe(res => {
         if (res) {
@@ -1282,6 +1351,12 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           }
           localStorage.setItem('contactsaved', JSON.stringify({ saved: true }));
           //window.scrollTo(0, 0);
+
+          if(this.scheduleAction === ContactActions.edit) {
+            this.status.emit({
+              editView: false
+            })
+          }
         }
       });
     } else {

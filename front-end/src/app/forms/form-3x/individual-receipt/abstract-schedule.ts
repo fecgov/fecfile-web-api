@@ -47,6 +47,7 @@ import { heLocale } from 'ngx-bootstrap';
 import { TransactionsService } from '../../transactions/service/transactions.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
+import { entityTypes } from './entity-types-json';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -74,14 +75,6 @@ export enum SaveActions {
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
-  // @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  // @Input() selectedOptions: any = {};
-  // @Input() formOptionsVisible = false;
-  // @Input() transactionTypeText = '';
-  // @Input() transactionType = '';
-  // @Input() scheduleAction: ScheduleActions = null;
-  // @Input() scheduleType = '';
-
   transactionTypeText = '';
   transactionType = '';
   scheduleAction: ScheduleActions = null;
@@ -97,7 +90,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _loadFormFieldsSubscription: Subscription;
   private _storeParentModelSubscription: Subscription;
 
-  public editMode: boolean = true;
+  public editMode = true;
   public checkBoxVal = false;
   public cvgStartDate: string = null;
   public cvgEndDate: string = null;
@@ -118,11 +111,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public multipleSubTransactionInfo: any[] = [];
   public selectedEntityType: any;
   public subTransactions: any[];
+  public subTransactionsTableType: string;
   public formType = '';
   public editScheduleAction: ScheduleActions = ScheduleActions.edit;
   public addScheduleAction: ScheduleActions = ScheduleActions.add;
   public addSubScheduleAction: ScheduleActions = ScheduleActions.addSubTransaction;
   public memoDropdownSize = null;
+  public totalAmountReadOnly: boolean;
 
   protected isInit = false;
   protected formFieldsPrePopulated = false;
@@ -247,6 +242,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._contributionAmountChlid = '';
     this._employerOccupationRequired = false;
     this.memoDropdownSize = null;
+    this.totalAmountReadOnly = true;
 
     this._getCandidateOfficeTypes();
 
@@ -722,18 +718,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     } else if (this.isFieldName(col.name, 'total_amount') ||
                this.isFieldName(col.name, 'incurred_amount')) {
       this._formatAmount($event, col.name, col.validation.dollarAmountNegative);
-      this._getFedNonFedPercentage(col);
-
+      if (col.name === 'total_amount') {
+        this._getFedNonFedPercentage();
+      }
     } else {
       this.populatePurpose(col.name);
     }
   }
 
-  private _getFedNonFedPercentage(col: any) {
+  private _getFedNonFedPercentage() {
 
-    if (col.name !== 'total_amount') {
-      return;
-    }
     if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
         this.transactionType !== 'ALLOC_EXP_DEBT') {
       return;
@@ -747,6 +741,46 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
       console.log();
+      if (res) {
+        if (res.fed_share) {
+          const patch = {};
+          patch['fed_share_amount'] = res.fed_share;
+          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+        }
+        if (res.nonfed_share) {
+          const patch = {};
+          patch['non_fed_share_amount'] = res.nonfed_share;
+          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+        }
+        if (res.aggregate_amount) {
+          const patch = {};
+          patch['activity_event_amount_ytd'] = res.aggregate_amount;
+          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+        }
+      }
+    },
+    errorRes => {
+      console.log('error caught getting h1 percentage' + errorRes);
+      if (errorRes.error) {
+        if (typeof errorRes.error === 'string') {
+          if (errorRes.error.toLowerCase().includes('no h1 data found')) {
+            const message = `Please add Schedule H1 before proceeding with adding the ` +
+              `amount.  Schedule H1 is required to correctly allocate the federal and non-federal portions of the transaction.`;
+            this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
+              if (res === 'okay') {
+
+                // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
+                // based on the event type selected.
+                // this.clearFormValues();
+                // this.scheduleType = 'sched_h6';
+                // this.transactionType = 'ALLOC_FEA_DISB_DEBT';
+                // this.transactionTypeText = 'Allocated FEA Debt Payment (H6 Test until H1/H2 is ready!)';
+                // window.scrollTo(0, 0);
+              }
+            });
+          }
+        }
+      }
     });
   }
 
@@ -770,11 +804,56 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
 
     const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
-    console.log();
-
     const patch = {};
     patch[fieldName] = amountValue;
     this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+  }
+
+  public handleActivityEventTypeChange($event: any, col: any) {
+
+    const eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
+    if (!eventTypeVal) {
+
+    }
+    if (eventTypeVal === 'Select') {
+      this.totalAmountReadOnly = true;
+    } else {
+      this.totalAmountReadOnly = false;
+    }
+
+    this._getFedNonFedPercentage();
+  }
+
+  /**
+   * Determine if fields is read only.  If it should
+   * be read only return true else null.  Null will
+   * remove HTML attribute readonly whereas setting it to
+   * false will not remove readonly from DOM and fields remains in readonly.
+   */
+  public isFieldReadOnly(col: any) {
+    if (col.type === 'text' && col.isReadonly) {
+      return true;
+    }
+    if (col.name === 'total_amount') {
+      return this._isTotalAmountReadOnly(col);
+    }
+    return null;
+  }
+
+
+  /**
+   * Return true id readonly else null to remove readonly attribute from DOM.
+   */
+  private _isTotalAmountReadOnly(col: any): boolean {
+    if (col.name !== 'total_amount') {
+      return null;
+    }
+    // Must be H4 or H6
+    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
+      this.transactionType !== 'ALLOC_EXP_DEBT') {
+        return null;
+    }
+    return this.totalAmountReadOnly ? true : null;
   }
 
   /**
@@ -1279,7 +1358,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                    field === 'fed_share_amount' ||
                    field === 'non_fed_share_amount' ||
                    field === 'activity_event_amount_ytd') {
-// fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
+          // fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
           // Amounts in numeric format shoud be supported by the API.
           // The individual-receipt.service is currently only passing string values
           // to in the request.  TODO Why is this?  Remove the check or allow numerics and
@@ -2366,6 +2445,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.multipleSubTransactionInfo = null;
     this.subTransactions = [];
     this.memoDropdownSize = null;
+    this.totalAmountReadOnly = true;
     const levinText = 'LEVIN';
     if ((this.transactionType).startsWith(levinText)) {
       this._receiptService.getLevinAccounts().subscribe(res => {
@@ -2422,6 +2502,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               }
             }
             if (res.data.hasOwnProperty('entityTypes')) {
+              // TODO entityTypes are not returned by dynamic forms API for some.
+              // If propery exists but is null use hard coded default until API returns.
+              if (!res.data.entityTypes) {
+                res.data.entityTypes = entityTypes;
+              }
               if (Array.isArray(res.data.entityTypes)) {
                 this.entityTypes = res.data.entityTypes;
                 if (this.entityTypes) {
@@ -2581,6 +2666,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (trx.child.length > 0) {
                     this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([trx])[0];
                     this.subTransactions = trx.child;
+                    if (this.subTransactionInfo) {
+                      this.subTransactionsTableType = this.subTransactionInfo.scheduleType;
+                    }
                     for (const subTrx of this.subTransactions) {
                       console.log('sub tran id ' + subTrx.transaction_id);
                     }
@@ -2604,6 +2692,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (this.frmIndividualReceipt.get(prop)) {
                     if (this.isFieldName(prop, 'contribution_aggregate')) {
                       this._contributionAggregateValue = trx[prop];
+                    }
+                    if (this.isFieldName(prop, 'activity_event_type')) {
+                      if (trx[prop] !== null || trx[prop] !== 'Select') {
+                        this.totalAmountReadOnly = false;
+                      }
                     }
                     if (this.isFieldName(prop, 'memo_code')) {
                       const memoCodeValue = trx[prop];
@@ -2669,6 +2762,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this.contributionAmountChange({ target: { value: amount.toString() } }, prop, false);
                   } else if (this.isFieldName(prop, 'total_amount') ||
                              this.isFieldName(prop, 'beginning_balance') ||
+                             this.isFieldName(prop, 'incurred_amount') ||
                              this.isFieldName(prop, 'payment_amount') ||
                              this.isFieldName(prop, 'balance_at_close') ||
                              this.isFieldName(prop, 'fed_share_amount') ||
