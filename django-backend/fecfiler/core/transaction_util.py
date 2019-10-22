@@ -188,6 +188,153 @@ def get_sched_a_transactions(
         raise
 
 
+def get_sched_f_child_transactions(report_id, cmte_id, transaction_id):
+    """
+    load child transactions for sched_f
+    """
+    _sql = """
+    SELECT             
+            cmte_id,
+            report_id,
+            transaction_type_identifier,
+            transaction_id, 
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            coordinated_exp_ind,
+            designating_cmte_id,
+            designating_cmte_name,
+            subordinate_cmte_id,
+            subordinate_cmte_name,
+            subordinate_cmte_street_1,
+            subordinate_cmte_street_2,
+            subordinate_cmte_city,
+            subordinate_cmte_state,
+            subordinate_cmte_zip,
+            payee_entity_id,
+            expenditure_date,
+            expenditure_amount,
+            aggregate_general_elec_exp,
+            purpose,
+            category_code,
+            payee_cmte_id,
+            payee_cand_id,
+            payee_cand_last_name,
+            payee_cand_fist_name,
+            payee_cand_middle_name,
+            payee_cand_prefix,
+            payee_cand_suffix,
+            payee_cand_office,
+            payee_cand_state,
+            payee_cand_district,
+            memo_code,
+            memo_text,
+            create_date
+    FROM public.sched_f 
+    WHERE report_id = %s 
+    AND cmte_id = %s 
+    AND back_ref_transaction_id = %s 
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + _sql + """) t""",
+                [report_id, cmte_id, transaction_id],
+            )
+            return post_process_it(cursor, cmte_id, report_id, transaction_id)
+    except:
+        raise
+
+
+def get_sched_h4_child_transactions(report_id, cmte_id, transaction_id):
+    """
+    load child transactions for sched_f
+    TODO: those chiuld trnasaction functions can be refatored later on
+    """
+    _sql = """
+    SELECT             
+            cmte_id,
+            report_id,
+            transaction_type_identifier,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            payee_entity_id,
+            activity_event_identifier,
+            expenditure_date,
+            fed_share_amount,
+            non_fed_share_amount,
+            total_amount,
+            activity_event_amount_ytd,
+            purpose,
+            category_code,
+            activity_event_type,
+            memo_code,
+            memo_text,
+            line_number,
+            transaction_type,
+            create_date
+    FROM public.sched_h4 
+    WHERE report_id = %s 
+    AND cmte_id = %s 
+    AND back_ref_transaction_id = %s 
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + _sql + """) t""",
+                [report_id, cmte_id, transaction_id],
+            )
+            return post_process_it(cursor, cmte_id, report_id, transaction_id)
+    except:
+        raise
+
+
+def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
+    """
+    load child transactions for sched_f
+    """
+    _sql = """
+    SELECT             
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type_identifier,
+            transaction_type,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            entity_id,
+            account_event_identifier,
+            expenditure_date,
+            total_fed_levin_amount,
+            federal_share,
+            levin_share,
+            activity_event_total_ytd,
+            expenditure_purpose,
+            category_code,
+            activity_event_type,
+            memo_code,
+            memo_text, 
+            create_date
+    FROM public.sched_h6
+    WHERE report_id = %s 
+    AND cmte_id = %s 
+    AND back_ref_transaction_id = %s 
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + _sql + """) t""",
+                [report_id, cmte_id, transaction_id],
+            )
+            return post_process_it(cursor, cmte_id, report_id, transaction_id)
+    except:
+        raise
+
+
 def get_sched_b_transactions(
     report_id, cmte_id, transaction_id=None, back_ref_transaction_id=None
 ):
