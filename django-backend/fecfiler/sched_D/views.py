@@ -20,6 +20,7 @@ from fecfiler.core.transaction_util import (
     get_sched_f_child_transactions,
     get_sched_h4_child_transactions,
     get_sched_h6_child_transactions,
+    get_transaction_type_descriptions,
 )
 
 from fecfiler.core.views import (
@@ -590,11 +591,20 @@ def get_schedD(data):
         logger.debug("get_schedD with data:{}".format(data))
         cmte_id = data.get("cmte_id")
         report_id = data.get("report_id")
+        tran_desc_dic = get_transaction_type_descriptions()
         if "transaction_id" in data:
             transaction_id = check_transaction_id(data.get("transaction_id"))
             forms_obj = get_list_schedD(report_id, cmte_id, transaction_id)
+            tran_id = forms_obj[0].get("transaction_type_identifier")
+            forms_obj[0].update(
+                {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
+            )
             child_objs = get_child_transactions(report_id, cmte_id, transaction_id)
             for obj in child_objs:  # this api_call code need to refactored later on
+                tran_id = obj.get("transaction_type_identifier")
+                obj.update(
+                    {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
+                )
                 if obj["transaction_id"].startswith("SB"):
                     obj.update(API_CALL_SB)
                 if obj["transaction_id"].startswith("SF"):
