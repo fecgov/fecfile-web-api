@@ -104,6 +104,35 @@ def populate_transaction_types():
         raise
 
 
+@lru_cache(maxsize=32)
+def get_transaction_type_descriptions():
+    """
+    load all transaction_type descriptions
+    
+
+    return a dic in the following format:
+    {"trans_identifier":"trans_description"}
+
+    All transaction types loaded for now, may need to add funtions to load specific transaction types:
+    """
+    _sql = """
+    SELECT tran_identifier as tran_id, tran_desc
+    FROM ref_transaction_types 
+    """
+    tran_dic = {}
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql)
+            if cursor.rowcount == 0:
+                raise Exception("bummer, no transaction_types found in the database.")
+            for row in cursor.fetchall():
+                tran_dic[row[0]] = row[1]
+        # logger.debug("transaction desc loaded:{}".format(tran_dic))
+        return tran_dic
+    except Exception:
+        raise
+
+
 def get_line_number_trans_type(transaction_type_identifier):
     """
     return corresponding line_num and tran_code(tran_type) for each tran_type_id
