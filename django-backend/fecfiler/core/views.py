@@ -1964,12 +1964,7 @@ TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FN
 
 def get_query_string(category_type,cmte_id,param_string):
     query_string = ''
-
-<<<<<<< HEAD
-    if category_type == 'disbursements':
-=======
     if category_type == 'disbursements_tran':
->>>>>>> 605e541acd19b718a7adffd2d1e0a00cdeeaeb6d
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_disbursements_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
 
@@ -1991,12 +1986,7 @@ def get_query_string(category_type,cmte_id,param_string):
 def get_child_query_string(category_type):
 
     query_view = ''
-
-<<<<<<< HEAD
-    if category_type == 'disbursements':
-=======
     if category_type == 'disbursements_tran':
->>>>>>> 605e541acd19b718a7adffd2d1e0a00cdeeaeb6d
         query_view = """
                         SELECT json_agg(t) FROM
                         (SELECT transaction_type, 
@@ -2112,15 +2102,9 @@ def get_child_query_string(category_type):
 def get_query_view(category_type):
 
     query_view = ''
-
-<<<<<<< HEAD
-    if category_type == 'disbursements':
-=======
     if category_type == 'disbursements_tran':
->>>>>>> 605e541acd19b718a7adffd2d1e0a00cdeeaeb6d
         query_view = 'all_disbursements_transactions_view'
         
-
     elif category_type == 'loans_tran':
         query_view = 'all_loans_transactions_view'
 
