@@ -331,7 +331,7 @@
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">
                       <ng-select #entityTypeSelect 
                         [items]="entityTypes" 
-                        (change)="handleEntityTypeChange($event, col)"
+                        (change)="handleEntityTypeChange($event)"
                         class="forms__select entity-type-select" 
                         [formControlName]="col?.name" 
                         bindValue="entityType"

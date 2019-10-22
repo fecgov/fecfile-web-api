@@ -318,6 +318,11 @@ export class F3xComponent implements OnInit {
                     key: 'field',
                     fieldArray: e.prePopulateFieldArray
                   });
+                } else if (e.hasOwnProperty('prePopulateFromSchedD')) {
+                  this._f3xMessageService.sendPopulateFormMessage({
+                    key: 'prePopulateFromSchedD',
+                    prePopulateFromSchedD: e.prePopulateFromSchedD
+                  });
                 }
               }
             }

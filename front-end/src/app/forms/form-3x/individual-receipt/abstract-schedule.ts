@@ -151,7 +151,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _entityTypeDefault: any;
   protected _parentTransactionModel: TransactionModel;
   private _employerOccupationRequired: boolean;
-  private prePopulateFieldArray: Array<any>;
+  private _prePopulateFieldArray: Array<any>;
+  private _prePopulateFromSchedDData: any;
 
   constructor(
     private _http: HttpClient,
@@ -190,7 +191,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             // has been loaded by the get dynamic fields API call.
             if (message) {
               if (message.fieldArray) {
-                this.prePopulateFieldArray = message.fieldArray;
+                this._prePopulateFieldArray = message.fieldArray;
+              }
+            }
+            break;
+          case 'prePopulateFromSchedD':
+            // set class variable '_prePopulateFromSchedDData' to be referenced once the formGroup
+            // has been loaded by the get dynamic fields API call.
+            if (message) {
+              if (message.prePopulateFromSchedD) {
+                this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
               }
             }
             break;
@@ -717,6 +727,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.contributionAmountChange($event, col.name, col.validation.dollarAmountNegative);
     } else if (this.isFieldName(col.name, 'total_amount') ||
                this.isFieldName(col.name, 'incurred_amount')) {
+      if (this.isFieldName(col.name, 'total_amount') && this.totalAmountReadOnly) {
+        return;
+      }
       this._formatAmount($event, col.name, col.validation.dollarAmountNegative);
       if (col.name === 'total_amount') {
         this._getFedNonFedPercentage();
@@ -1523,9 +1536,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               scheduleType: this.subTransactionInfo.subScheduleType,
               action: ScheduleActions.addSubTransaction
             };
+            // let prePopulateFieldArray = null;
+            // if (this.scheduleType = 'sched_d') {
+            //   prePopulateFieldArray = this._checkForSchedDPrePopulate();
+            // } else {
+            //   prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
+            // }
             const prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
             if (prePopulateFieldArray) {
               addSubTransEmitObj.prePopulateFieldArray = prePopulateFieldArray;
+            } else if (this.scheduleType = 'sched_d') {
+              addSubTransEmitObj.prePopulateFromSchedD = res;
             }
             this.status.emit(addSubTransEmitObj);
           } else if (saveAction === SaveActions.saveForEditSub) {
@@ -2553,15 +2574,22 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } // typeof res.data
         } // res.hasOwnProperty('data')
       } // res
-      this._prePopulateFormField(this.prePopulateFieldArray);
-      this.prePopulateFieldArray = null;
+      this._prePopulateFormField(this._prePopulateFieldArray);
+      this._prePopulateFieldArray = null;
+
+      if (this._prePopulateFromSchedDData
+        && this.scheduleType === 'sched_d'
+        && this.scheduleAction === ScheduleActions.addSubTransaction) {
+          this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
+          this._prePopulateFromSchedDData = null;
+      }
     });
   }
 
   /**
    * Toggle fields in the form depending on entity type.
    */
-  public handleEntityTypeChange(item: any, col: any, entityType: any) {
+  public handleEntityTypeChange(item: any) {
     // Set the selectedEntityType for the toggle method to check.
     for (const entityTypeObj of this.entityTypes) {
       if (entityTypeObj.entityType === item.entityType) {
@@ -2576,6 +2604,79 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.toggleValidationIndOrg(item.group);
     }
   }
+
+  /**
+   * Sched D Debt Payments (Sub-transactions) will be auto-populated with 
+   * fields from the main Sched D.
+   * 
+   * @param schedDData
+   */
+  private _prePopulateFromSchedD(schedDData: any) {
+    let fieldArray = [];
+    if (schedDData.hasOwnProperty('entity_type')) {
+      const entityType = schedDData.entity_type;
+      if (!entityType) {
+        return;
+      }
+      if (typeof entityType !== 'string') {
+        return;
+      }
+
+      this._prePopulateFormFieldHelper(schedDData, 'entity_type', fieldArray);
+      if (entityType === 'ORG') {
+        fieldArray = this._prePopulateFormFieldHelper(schedDData, 'entity_name', fieldArray);
+      } else if (entityType === 'IND') {
+        fieldArray = this._prePopulateFormFieldHelper(schedDData, 'last_name', fieldArray);
+        fieldArray = this._prePopulateFormFieldHelper(schedDData, 'first_name', fieldArray);
+        fieldArray = this._prePopulateFormFieldHelper(schedDData, 'middle_name', fieldArray);
+        fieldArray = this._prePopulateFormFieldHelper(schedDData, 'prefix', fieldArray);
+        fieldArray = this._prePopulateFormFieldHelper(schedDData, 'suffix', fieldArray);
+      } else {
+        // invalid type
+      }
+      fieldArray = this._prePopulateFormFieldHelper(schedDData, 'street_1', fieldArray);
+      fieldArray = this._prePopulateFormFieldHelper(schedDData, 'street_2', fieldArray);
+      fieldArray = this._prePopulateFormFieldHelper(schedDData, 'city', fieldArray);
+      fieldArray = this._prePopulateFormFieldHelper(schedDData, 'state', fieldArray);
+      fieldArray = this._prePopulateFormFieldHelper(schedDData, 'zip_code', fieldArray);
+
+      if (this.entityTypes) {
+        if (Array.isArray(this.entityTypes)) {
+          for (const entityTypeObj of this.entityTypes) {
+            if (entityTypeObj.entityType === entityType) {
+              entityTypeObj.selected = true;
+              this.selectedEntityType = entityTypeObj;
+            } else {
+              entityTypeObj.selected = false;
+            }
+          }
+          this.handleEntityTypeChange(this.selectedEntityType);
+        }
+      }
+    }
+    this._prePopulateFormField(fieldArray);
+  }
+
+  /**
+   * Helper method for pre-populating an array to apply field values to the form.
+   * 
+   * @param data
+   * @param fieldName
+   * @param fieldArray
+   */
+  private _prePopulateFormFieldHelper(data: any, fieldName: string, fieldArray: Array<any>) {
+    if (!fieldArray || !fieldName || !data) {
+      return;
+    }
+    if (!Array.isArray(fieldArray)) {
+      fieldArray = [];
+    }
+    if (data.hasOwnProperty(fieldName)) {
+      fieldArray.push({ name: fieldName, value: data[fieldName] });
+    }
+    return fieldArray;
+  }
+
 
   /**
    * Pre-populate form fields with values from the pre-populate array.
@@ -3224,6 +3325,26 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _findHiddenField(property: string, value: any) {
     return this.hiddenFields.find((hiddenField: any) => hiddenField[property] === value);
   }
+
+  // private _checkForSchedDPrePopulate(): Array<any> {
+  //   const prePopulateFieldArray = null;
+  //   if (this.frmIndividualReceipt.contains('entity_type')) {
+  //     const entityType = this.frmIndividualReceipt.get('entity_type').value;
+  //     if (entityType === 'ORG') {
+  //       prePopulateFieldArray.push({ name: 'entity_type', value: entityType });
+  //       if (this.frmIndividualReceipt.contains('entity_name')) {
+  //         const val = this.frmIndividualReceipt.get('entity_name').value;
+  //         prePopulateFieldArray.push({ name: 'entity_name', value: val });
+  //       }
+  //     } else if (entityType === 'IND') {
+
+  //     } else {
+  //       // invalid type
+  //     }
+  //   }
+
+  //   return prePopulateFieldArray;
+  // }
 
   /**
    * populate the purpose description for child with parent.
