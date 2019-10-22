@@ -47,6 +47,7 @@ import { heLocale } from 'ngx-bootstrap';
 import { TransactionsService } from '../../transactions/service/transactions.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
+import { entityTypes } from './entity-types-json';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -74,14 +75,6 @@ export enum SaveActions {
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
-  // @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  // @Input() selectedOptions: any = {};
-  // @Input() formOptionsVisible = false;
-  // @Input() transactionTypeText = '';
-  // @Input() transactionType = '';
-  // @Input() scheduleAction: ScheduleActions = null;
-  // @Input() scheduleType = '';
-
   transactionTypeText = '';
   transactionType = '';
   scheduleAction: ScheduleActions = null;
@@ -97,7 +90,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _loadFormFieldsSubscription: Subscription;
   private _storeParentModelSubscription: Subscription;
 
-  public editMode: boolean = true;
+  public editMode = true;
   public checkBoxVal = false;
   public cvgStartDate: string = null;
   public cvgEndDate: string = null;
@@ -2509,6 +2502,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               }
             }
             if (res.data.hasOwnProperty('entityTypes')) {
+              // TODO entityTypes are not returned by dynamic forms API for some.
+              // If propery exists but is null use hard coded default until API returns.
+              if (!res.data.entityTypes) {
+                res.data.entityTypes = entityTypes;
+              }
               if (Array.isArray(res.data.entityTypes)) {
                 this.entityTypes = res.data.entityTypes;
                 if (this.entityTypes) {
