@@ -7,7 +7,7 @@
       </app-contacts-filter>
     </div>
   <div class="contacts__container">
-    <header>
+    <header *ngIf="!isEditViewActive()">
       <div class="header-content">
         <div class="float-left">
           <h1 *ngIf="!isEditViewActive(); else editHeading">Contacts 
@@ -287,6 +287,18 @@
         *ngIf="isEditViewActive()"
       >
       </app-contacts-edit>-->
+
+      <addnew_contacts
+        *ngIf="isEditViewActive()"      
+          [formOptionsVisible]=false
+          [selectedOptions]=null
+          [transactionTypeText]=""
+          [transactionType]=""
+          [scheduleAction]="view"
+          [transactionToEdit]="transactionToEdit"
+          (status)="onNotify($event)"
+        >
+      </addnew_contacts>
   
     </div>
   </div>
