@@ -146,7 +146,7 @@
           <label class="label">
             <strong>Attachment:</strong>&nbsp;
           </label>
-          <span *ngIf="orgFileUrl">
+          <span *ngIf="orgFileUrl && orgFileUrl !== ''">
             <a style="background:#0AACFA; padding: .5em; border-radius: 1em" href="{{ orgFileUrl }}" target="_blank">{{ fileName }}</a>
           </span>
           <span *ngIf="!orgFileUrl">

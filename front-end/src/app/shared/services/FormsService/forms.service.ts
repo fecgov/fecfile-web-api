@@ -630,6 +630,7 @@ export class FormsService {
     if (form_type === '99') {
       let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
 
+      delete form99_details.file;
       url = '/f99/update_print_f99';
       data = form99_details;
       // if (data.file) {

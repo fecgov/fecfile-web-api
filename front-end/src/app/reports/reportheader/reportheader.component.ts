@@ -87,6 +87,8 @@ private readonly filtersLSK = 'reports.filters';
     this.existingReportId = localStorage.getItem('Existing_Report_id');
     if (this.existingReportId !== "") {
           localStorage.removeItem('Existing_Report_id');
+          localStorage.removeItem('orm_99_details.org_fileurl');
+          localStorage.removeItem('form99PrintPreviewResponse');
           localStorage.setItem(`form_3X_saved`, JSON.stringify(false));
         }
       
