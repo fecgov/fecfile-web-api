@@ -273,7 +273,7 @@ export class ReasonComponent implements OnInit {
         )
         .then(res => {
           if (res === 'cancel' || res === ModalDismissReasons.BACKDROP_CLICK || res === ModalDismissReasons.ESC) {
-            this.ngOnInit();
+            // this.ngOnInit();
             this._dialogService.checkIfModalOpen();
           } else if (res === 'NewReport') {
             this.editMode = true;
@@ -471,96 +471,107 @@ export class ReasonComponent implements OnInit {
    *
    */
   public doValidateReason() {
-    if (this.frmReason.valid) {
-      if (this._reasonTextContent.length >= 1) {
-        if (!this._checkUnsupportedHTML(this._reasonInnerText)) {
-          if (!this._validateForSpaces(this._reasonInnerText)) {
-            let formSaved: any = {
-              form_saved: this.formSaved
-            };
-            this.reasonFailed = false;
-            this.isValidReason = true;
+    if (this.editMode) {
+      if (this.frmReason.valid) {
+        if (this._reasonTextContent.length >= 1) {
+          if (!this._checkUnsupportedHTML(this._reasonInnerText)) {
+            if (!this._validateForSpaces(this._reasonInnerText)) {
+              let formSaved: any = {
+                form_saved: this.formSaved
+              };
+              this.reasonFailed = false;
+              this.isValidReason = true;
 
-            this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
-            this._form99Details.text = this._reasonInnerHTML;
+              this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
+              this._form99Details.text = this._reasonInnerHTML;
 
-            window.localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+              window.localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
 
-            window.localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
+              window.localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify(formSaved));
 
-            this.saveForm();
+              this.saveForm();
 
-            this.hideText = true;
+              this.hideText = true;
 
-            this.showValidateBar = false;
+              this.showValidateBar = false;
 
-            this.hideText = true;
-            this.formSaved = false;
+              this.hideText = true;
+              this.formSaved = false;
 
-            this._messageService.sendMessage({
-              validateMessage: {
-                validate: '',
-                showValidateBar: false
-              }
-            });
+              this._messageService.sendMessage({
+                validateMessage: {
+                  validate: '',
+                  showValidateBar: false
+                }
+              });
 
-            this.status.emit({
-              form: this.frmReason,
-              direction: 'next',
-              step: 'step_3',
-              previousStep: 'step_2',
-              edit: this.editMode,
-              refresh: this._setRefresh
-            });
+              this.status.emit({
+                form: this.frmReason,
+                direction: 'next',
+                step: 'step_3',
+                previousStep: 'step_2',
+                edit: this.editMode,
+                refresh: this._setRefresh
+              });
 
-            this._messageService.sendMessage({
-              data: this._form99Details,
-              previousStep: 'step_3'
-            });
+              this._messageService.sendMessage({
+                data: this._form99Details,
+                previousStep: 'step_3'
+              });
+            } else {
+              this.reasonFailed = true;
+
+              window.scrollTo(0, 0);
+            } // !this._validateForSpaces
           } else {
-            this.reasonFailed = true;
+            this.reasonHasInvalidHTML = true;
+
+            this.frmReason.controls['reasonText'].setValue('');
 
             window.scrollTo(0, 0);
-          } // !this._validateForSpaces
+          } // !this._checkUnsupportedHTML
         } else {
-          this.reasonHasInvalidHTML = true;
+          this.reasonFailed = true;
+          this.isValidReason = false;
 
           this.frmReason.controls['reasonText'].setValue('');
+          this.frmReason.controls['reasonText'].markAsPristine();
+          this.frmReason.controls['reasonText'].markAsUntouched();
+          this.frmReason.setErrors({ incorrect: true });
+
+          this.status.emit({
+            form: this.frmReason,
+            direction: 'next',
+            step: 'step_2',
+            edit: this.editMode,
+            previousStep: ''
+          });
 
           window.scrollTo(0, 0);
-        } // !this._checkUnsupportedHTML
+          return;
+        } // this.reasonTextArea.length
       } else {
         this.reasonFailed = true;
         this.isValidReason = false;
-
-        this.frmReason.controls['reasonText'].setValue('');
-        this.frmReason.controls['reasonText'].markAsPristine();
-        this.frmReason.controls['reasonText'].markAsUntouched();
         this.frmReason.setErrors({ incorrect: true });
 
-        this.status.emit({
-          form: this.frmReason,
-          direction: 'next',
-          step: 'step_2',
-          edit: this.editMode,
-          previousStep: ''
-        });
+        this.frmReason.controls['reasonText'].setValue('');
+        this.frmReason.controls['reasonText'].markAsTouched();
+        this.frmReason.controls['reasonText'].markAsDirty();
 
         window.scrollTo(0, 0);
         return;
-      } // this.reasonTextArea.length
+      } // this.frmReason.valid
     } else {
-      this.reasonFailed = true;
-      this.isValidReason = false;
-      this.frmReason.setErrors({ incorrect: true });
-
-      this.frmReason.controls['reasonText'].setValue('');
-      this.frmReason.controls['reasonText'].markAsTouched();
-      this.frmReason.controls['reasonText'].markAsDirty();
-
-      window.scrollTo(0, 0);
-      return;
-    } // this.frmReason.valid
+      this.status.emit({
+        form: this.frmReason,
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2',
+        edit: this.editMode,
+        refresh: this._setRefresh
+      });
+    }
   }
 
   /**
@@ -599,6 +610,8 @@ export class ReasonComponent implements OnInit {
 
                 if (!res.file) {
                   localStorage.removeItem('orm_99_details.org_fileurl');
+                } else if (res.file && (Object.entries(res.file).length || res.file !== '')) {
+                  this.file = res.file;
                 }
 
                 localStorage.setItem('form_99_details', JSON.stringify(this._form99Details));
@@ -720,7 +733,7 @@ export class ReasonComponent implements OnInit {
             }
           );
         } else {
-          this._formsService.PreviewForm_ReasonScreen({}, {}, this._formType).subscribe(
+          this._formsService.PreviewForm_Preview_sign_Screen({}, '99').subscribe(
             res => {
               if (res) {
                 this._form99Details.id = res.id;
@@ -782,7 +795,7 @@ export class ReasonComponent implements OnInit {
     }
   }
 
-  private deletePDFFile() {
+  public deletePDFFile() {
     this._dialogService
       .confirm('Do you want to delete uploaded pdf file?', ConfirmModalComponent, 'Delete PDF File', true)
       //.reportExist(alertStr, ConfirmModalComponent,'Report already exists' ,true,false,true)
