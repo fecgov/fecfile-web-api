@@ -34,7 +34,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { F3xMessageService } from '../service/f3x-message.service';
-import { ScheduleActions } from './schedule-actions.enum';
+
 import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
 import { ActiveView } from '../../transactions/transactions.component';
@@ -48,6 +48,8 @@ import { TransactionsService } from '../../transactions/service/transactions.ser
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
 import { entityTypes } from './entity-types-json';
+import { ScheduleActions } from './schedule-actions.enum';
+
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -57,21 +59,6 @@ export enum SaveActions {
   saveForEditSub = 'saveForEditSub',
   updateOnly = 'updateOnly'
 }
-
-// @Component({
-//   selector: 'f3x-individual-receipt',
-//   templateUrl: './individual-receipt.component.html',
-//   styleUrls: ['./individual-receipt.component.scss'],
-//   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe]
-//   // encapsulation: ViewEncapsulation.None
-// })
-// export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges {
-//   @Output() status: EventEmitter<any> = new EventEmitter<any>();
-//   @Input() selectedOptions: any = {};
-//   @Input() formOptionsVisible = false;
-//   @Input() transactionTypeText = '';
-//   @Input() transactionType = '';
-//   @Input() scheduleAction: ScheduleActions = null;
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
@@ -152,7 +139,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
   private _employerOccupationRequired: boolean;
   private _prePopulateFieldArray: Array<any>;
-  private _prePopulateFromSchedDData: any;
+  protected _prePopulateFromSchedDData: any;
 
   constructor(
     private _http: HttpClient,
@@ -1425,6 +1412,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                    field === 'incurred_amount' ||
                    field === 'balance_at_close' ||
                    field === 'payment_amount' ||
+                   field === 'total_amount' ||
                    field === 'fed_share_amount' ||
                    field === 'non_fed_share_amount' ||
                    field === 'activity_event_amount_ytd') {
@@ -1597,8 +1585,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             const prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
             if (prePopulateFieldArray) {
               addSubTransEmitObj.prePopulateFieldArray = prePopulateFieldArray;
-            } else if (this.scheduleType = 'sched_d') {
-              addSubTransEmitObj.prePopulateFromSchedD = res;
+            } else if (this.subTransactionInfo) {
+              if (this.subTransactionInfo.scheduleType === 'sched_d' &&
+                  this.subTransactionInfo.isParent === true) {
+                addSubTransEmitObj.prePopulateFromSchedD = res;
+              }
             }
             this.status.emit(addSubTransEmitObj);
           } else if (saveAction === SaveActions.saveForEditSub) {
@@ -1610,6 +1601,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else if (saveAction === SaveActions.updateOnly) {
             this.viewTransactions();
           } else {
+
+            if (saveAction === SaveActions.saveOnly) {
+
+              // sched D subtran must have payee fields pre-poulated after saving one
+              // and presenting new one to save.
+              if (this.subTransactionInfo) {
+                if (this.subTransactionInfo.scheduleType === 'sched_d' &&
+                    this.subTransactionInfo.isParent === false) {
+                  this._prePopulateFromSchedDData = res;
+                  this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
+                }
+              }
+            }
+
             let resetParentId = true;
             if (this.subTransactionInfo) {
               if (this.subTransactionInfo.isParent === false) {
@@ -2536,15 +2541,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
                 // If fields are pre-populated for "static" forms, append any additional fields
                 // from the API as with SF.
-                if (this.formFieldsPrePopulated) {
-                  if (this.staticFormFields) {
-                    if (this.staticFormFields.length > 0) {
-                      for (const field of this.staticFormFields) {
-                        res.data.formFields.push(field);
-                      }
-                    }
-                  }
-                }
+                // if (this.formFieldsPrePopulated) {
+                //   if (this.staticFormFields) {
+                //     if (this.staticFormFields.length > 0) {
+                //       for (const field of this.staticFormFields) {
+                //         res.data.formFields.push(field);
+                //       }
+                //     }
+                //   }
+                // }
                 this.formFields = res.data.formFields;
                 this._setForm(this.formFields);
               }
@@ -2629,8 +2634,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._prePopulateFormField(this._prePopulateFieldArray);
       this._prePopulateFieldArray = null;
 
+      let apiCall: string = this._findHiddenField('name', 'api_call');
+      apiCall = apiCall ? apiCall : '';
+
+      let schedDSubTran = false;
+      if (this.subTransactionInfo) {
+        if (this.subTransactionInfo.scheduleType === 'sched_d' &&
+            this.subTransactionInfo.isParent === false) {
+              schedDSubTran = true;
+        }
+      }
+
+      // If Data for sched D sub-tran has been received by the message service,
+      // pre-populate the formGroup now that the dynamic form API call is complete.
       if (this._prePopulateFromSchedDData
-        && this.scheduleType === 'sched_d'
+        && schedDSubTran
         && this.scheduleAction === ScheduleActions.addSubTransaction) {
           this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
           this._prePopulateFromSchedDData = null;
@@ -2663,7 +2681,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * 
    * @param schedDData
    */
-  private _prePopulateFromSchedD(schedDData: any) {
+  protected _prePopulateFromSchedD(schedDData: any) {
     let fieldArray = [];
     if (schedDData.hasOwnProperty('entity_type')) {
       const entityType = schedDData.entity_type;
