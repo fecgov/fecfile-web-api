@@ -165,6 +165,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       this.getTransactionsPage(1);
+      this.clonedTransaction = {};
       this.setSortableColumns();
     });
   }
@@ -1294,8 +1295,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     ];
     if (this.transactionCategory === 'disbursements') {
       defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
-      // Desc., Donor Committee ID, Election Code, Election Year
-      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', '', ''];
+      // Donor Committee ID, Election Code, Election Year
+      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', 'committeeId', 'electionCode', 'electionYear'];
     } else if (this.transactionCategory === 'loans-and-debts') {
       // Balance at Close (D)
       defaultSortColumns = ['type', 'name', '', 'amount'];
