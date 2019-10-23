@@ -263,6 +263,8 @@ export class F3xComponent implements OnInit {
 
           this.currentStep = e.step;
 
+          this.transactionCategory = e.transactionCategory;
+
           // Pass Transaction Type to individual-receipt
           if (this.currentStep === 'step_3') {
             // Force reload form fields even if type did not change.
