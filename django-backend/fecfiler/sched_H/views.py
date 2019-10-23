@@ -430,14 +430,14 @@ def schedH1(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
+                    request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             datum = get_schedH1(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
@@ -543,7 +543,7 @@ def get_fed_nonfed_share(request):
                 logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
                 cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
                 if not cursor.rowcount:
-                    return Response('Error: no valid h1 data found for this event.')
+                    raise Exception('Error: no h1 data found.')
                 fed_percent = float(cursor.fetchone()[0])
 
             _sql = """
@@ -569,7 +569,7 @@ def get_fed_nonfed_share(request):
             #     activity_event_type = 'adminstrative'
 
             if not activity_event_type:
-                return Response('Error: event type is required for this committee.')
+                raise Exception('Error: event type is required.')
             
             if cmte_type_category == 'PTY':
                 _sql = """
@@ -582,7 +582,7 @@ def get_fed_nonfed_share(request):
                 with connection.cursor() as cursor:
                     cursor.execute(_sql, (start_dt, end_dt, cmte_id))
                     if not cursor.rowcount:
-                        return Response('Error: no valid h1 data found.')
+                        raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
             elif cmte_type_category == 'PAC':
                 # activity_event_type = request.query_params.get('activity_event_type')
@@ -608,7 +608,7 @@ def get_fed_nonfed_share(request):
                 with connection.cursor() as cursor:
                     cursor.execute(_sql, (start_dt, end_dt, cmte_id))
                     if not cursor.rowcount:
-                        return Response('Error: no valid h1 data found.')
+                        raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
             else:
                 raise Exception('invalid cmte_type_category.')
@@ -1055,14 +1055,14 @@ def schedH2(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
+                    request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             datum = get_schedH2(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
@@ -2798,6 +2798,17 @@ def schedH6_sql_dict(data):
         )
         valid_data["line_number"] = line_num
         valid_data['transaction_type'] = tran_tp
+
+        # TODO; tmp chagne, need to remove those code when db schema corrected
+        if 'total_amount' in data:
+            valid_data['total_fed_levin_amount'] = data.get('total_amount')
+        if 'fed_share_amount' in data:
+            valid_data['federal_share'] = data.get('fed_share_amount')
+        if 'non_fed_share_amount' in data:
+            valid_data['levin_share'] = data.get('non_fed_share_amount')
+        # if 'activity_event_amount_ytd' in data:
+        #     valid_data['activity_event_total_ytd'] = data.get('activity_event_amount_ytd')
+
         return valid_data
     except:
         raise Exception('invalid request data.')
@@ -3099,6 +3110,14 @@ def get_schedH6(data):
             forms_obj = get_list_schedH6(report_id, cmte_id, transaction_id)
         else:
             forms_obj = get_list_all_schedH6(report_id, cmte_id)
+        
+        # TODO: need to remove this when db correction done
+        for obj in forms_obj:
+            obj['fed_share_amount'] = obj.get('federal_share')
+            obj['non_fed_share_amount'] = obj.get('levin_share')
+            obj['total_amount'] = obj.get('total_fed_levin_amount')
+            obj['activity_event_amount_ytd'] = obj.get('activity_event_total_ytd')
+
         return forms_obj
     except:
         raise
