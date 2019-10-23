@@ -106,21 +106,21 @@
         >
         </app-sched-f>
         <app-sched-c
-        [hidden]="scheduleType !== 'sched_c'"
-        [transactionTypeText]="transactionTypeTextSchedF"
-        [transactionType]="transactionTypeSchedF"
-        [scheduleAction]="scheduleAction"
-        [scheduleType]="scheduleType"
-        (status)="onNotify($event)"
+          [hidden]="scheduleType !== 'sched_c'"
+          [transactionTypeText]="transactionTypeTextSchedF"
+          [transactionType]="transactionTypeSchedF"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
         >
         </app-sched-c>
         <app-sched-c1
-        [hidden]="scheduleType !== 'sched_c1'"
-        [transactionTypeText]="transactionTypeTextSchedF"
-        [transactionType]="transactionTypeSchedF"
-        [scheduleAction]="scheduleAction"
-        [scheduleType]="scheduleType"
-        (status)="onNotify($event)"
+          [hidden]="scheduleType !== 'sched_c1'"
+          [transactionTypeText]="transactionTypeTextSchedF"
+          [transactionType]="transactionTypeSchedF"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
         >
         </app-sched-c1>
         <app-sched-c2
@@ -132,6 +132,20 @@
           (status)="onNotify($event)"
         >
         </app-sched-c2>
+        <app-sched-h1
+          *ngIf="scheduleType === 'sched_h1'"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >
+        </app-sched-h1>
+        <app-sched-h2
+          *ngIf="scheduleType === 'sched_h2'"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >
+        </app-sched-h2>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_4'">
@@ -151,24 +165,19 @@
         </app-transactions>
       </div>
       <div class="form_step" [hidden]="step !== 'loansummary'">
-        <app-loansummary>
-        </app-loansummary>
+        <app-loansummary> </app-loansummary>
       </div>
       <div class="form_step" [hidden]="step !== 'loanendorsersummary'">
-        <app-loanendorsersummary>
-        </app-loanendorsersummary>
+        <app-loanendorsersummary> </app-loanendorsersummary>
       </div>
       <div class="form_step" [hidden]="step !== 'loanpayment'">
-        <app-loanpayment>
-        </app-loanpayment>
+        <app-loanpayment> </app-loanpayment>
       </div>
       <div class="form_step" [hidden]="step !== 'loanreceipt'">
-        <app-loanreceipt>
-        </app-loanreceipt>
+        <app-loanreceipt> </app-loanreceipt>
       </div>
       <div class="form_step" [hidden]="step !== 'loanendorser'">
-        <app-loanendorser>
-        </app-loanendorser>
+        <app-loanendorser> </app-loanendorser>
       </div>
     </div>
   </div>
