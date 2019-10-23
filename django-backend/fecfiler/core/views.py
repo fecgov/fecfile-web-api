@@ -5509,3 +5509,38 @@ def new_report_update_date(request):
             )
     return Response({"result" : "success"}, status=status.HTTP_200_OK)
 
+"""
+********************************************************************************************************************************
+GET REPORT STATUS SPRINT-23 - FNE 1064 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_report_status(request):
+
+    try:
+        cmte_id = request.user.username
+        report_id =request.data.get('report_id')
+        form_type =request.data.get('form_type')
+        
+        with connection.cursor() as cursor:
+            forms_obj= {}
+
+            if form_type == "F99":    
+                cursor.execute("SELECT fec_status FROM public.forms_committeeinfo  WHERE committeeid = %s AND id = %s", [cmte_id, report_id])
+            elif form_type == "F3X":
+                cursor.execute("SELECT fec_status FROM public.reports  WHERE cmte_id = %s AND report_id = %s", [cmte_id, report_id])
+            
+            for row in cursor.fetchall():
+                data_row = list(row)
+
+                if (data_row[0] == '' or data_row[0] == None):
+                    forms_obj=''
+                else:
+                    forms_obj=data_row[0]   
+                
+        if not bool(forms_obj):
+           return Response("No fec_status update found for the cmte_id: {} and report_id : {} ".format(cmte_id, report_id), status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_report_status API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
