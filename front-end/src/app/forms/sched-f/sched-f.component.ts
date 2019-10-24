@@ -218,7 +218,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     super.ngOnInit();
     this.showPart2 = false;
     this.transactionType = 'OPEXP'; // 'INDV_REC';
-    this.transactionTypeText = 'Coordinated Party Expenditure Debt to Vendor';
+    // this.transactionTypeText = 'Coordinated Party Expenditure Debt to Vendor';
     super.ngOnChanges(null);
     this._setTransactionDetail();
     console.log();
@@ -233,7 +233,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
     this.showPart2 = false;
     this._setTransactionDetail();

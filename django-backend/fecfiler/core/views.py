@@ -5505,3 +5505,43 @@ def new_report_update_date(request):
             )
     return Response({"result" : "success"}, status=status.HTTP_200_OK)
 
+"""
+********************************************************************************************************************************
+GET REPORT STATUS SPRINT-23 - FNE 1064 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_report_status(request):
+
+    try:
+        cmte_id = request.user.username
+        report_id =request.data.get('report_id')
+        form_type =request.data.get('form_type')
+        
+        with connection.cursor() as cursor:
+            forms_obj= {}
+
+            if form_type == "F99":    
+                cursor.execute("SELECT id as report_id, fec_status, fec_id FROM public.forms_committeeinfo  WHERE committeeid = %s AND id = %s", [cmte_id, report_id])
+            elif form_type == "F3X":
+                cursor.execute("SELECT report_id, fec_status, fec_id FROM public.reports  WHERE cmte_id = %s AND report_id = %s", [cmte_id, report_id])
+            
+            for row in cursor.fetchall():
+                data_row = list(row)
+
+                if (data_row[1] == '' or data_row[1] == None):
+                        forms_obj = {
+                        'report_id':data_row[0],
+                        'fec_status':'',
+                        'fec_id':''
+                        }
+                else:
+                    forms_obj = {
+                        'report_id':data_row[0],
+                        'fec_status':data_row[1],
+                        'fec_id':data_row[2]
+                         }
+
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_report_status API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)

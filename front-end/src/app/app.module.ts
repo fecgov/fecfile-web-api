@@ -79,6 +79,8 @@ import { DecimalPipe } from '@angular/common';
 import { UtilService } from './shared/utils/util.service';
 import { UserIdleModule } from 'angular-user-idle';
 import { SchedFComponent } from './forms/sched-f/sched-f.component';
+import { SchedH1Component } from './forms/sched-h1/sched-h1.component';
+import { SchedH2Component } from './forms/sched-h2/sched-h2.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -142,7 +144,9 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ContactsTableComponent,
     AddNewContactComponent,
     ContactsFilterComponent,
-    SchedFComponent
+    SchedFComponent,
+    SchedH1Component,
+    SchedH2Component
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [

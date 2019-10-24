@@ -199,7 +199,7 @@ export class F99Component implements OnInit {
 
     this.currentStep = e.step;
 
-    if (e.refresh) {
+    if (e.refresh && e.edit !== false) {
       this.editMode = e.refresh;
     } else if (e.edit !== null) {
       this.editMode = e.edit;

@@ -753,7 +753,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
     this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
-      console.log();
+
+      // TODO remove this if H1/H2 not found goes back to retuning a non-200 http code.
+      if (typeof res === 'string') {
+        if (res.toLowerCase().includes('no h1 data found') ||
+          res.toLowerCase().includes('no h2 data found') ||
+          res.toLowerCase().includes('no valid h1 data found') ||
+          res.toLowerCase().includes('no valid h2 data found')
+        ) {
+          this._handleNoH1H2(res);
+          return;
+        }
+      }
+
       if (res) {
         if (res.fed_share) {
           const patch = {};
@@ -775,26 +787,71 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     errorRes => {
       console.log('error caught getting h1 percentage' + errorRes);
       if (errorRes.error) {
-        if (typeof errorRes.error === 'string') {
-          if (errorRes.error.toLowerCase().includes('no h1 data found')) {
-            const message = `Please add Schedule H1 before proceeding with adding the ` +
-              `amount.  Schedule H1 is required to correctly allocate the federal and non-federal portions of the transaction.`;
-            this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
-              if (res === 'okay') {
+        this._handleNoH1H2(errorRes.error);
+        // if (typeof errorRes.error === 'string') {
+        //   if (errorRes.error.toLowerCase().includes('no h1 data found')) {
+        //     const message = `Please add Schedule H1 before proceeding with adding the ` +
+        //       `amount.  Schedule H1 is required to correctly allocate the federal and non-federal portions of the transaction.`;
+        //     this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
+        //       if (res === 'okay') {
 
-                // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
-                // based on the event type selected.
-                // this.clearFormValues();
-                // this.scheduleType = 'sched_h6';
-                // this.transactionType = 'ALLOC_FEA_DISB_DEBT';
-                // this.transactionTypeText = 'Allocated FEA Debt Payment (H6 Test until H1/H2 is ready!)';
-                // window.scrollTo(0, 0);
-              }
-            });
-          }
-        }
+        //         // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
+        //         // based on the event type selected.
+        //         // this.clearFormValues();
+        //         // this.scheduleType = 'sched_h6';
+        //         // this.transactionType = 'ALLOC_FEA_DISB_DEBT';
+        //         // this.transactionTypeText = 'Allocated FEA Debt Payment (H6 Test until H1/H2 is ready!)';
+        //         // window.scrollTo(0, 0);
+        //       }
+        //     });
+        //   }
+        // }
       }
     });
+  }
+
+  private _handleNoH1H2(msg: string) {
+    if (typeof msg !== 'string') {
+      return;
+    }
+
+    // Hard Coding DF/DC  => H2 for now.  Once dynamic forms provides schedule in activityEventTypes
+    const activityEventType = this.frmIndividualReceipt.get('activity_event_type').value;
+    const scheduleName = (activityEventType === 'DF' || activityEventType === 'DC') ? 'H2' : 'H1';
+    const scheduleType = (activityEventType === 'DF' || activityEventType === 'DC') ? 'sched_h2' : 'sched_h1';
+
+    // TODO decide on a specific code or message for not found.
+    // Handling various versions from API until then.
+    if (msg.toLowerCase().includes('no h1 data found') ||
+        msg.toLowerCase().includes('no h2 data found') ||
+        msg.toLowerCase().includes('no valid h1 data found') ||
+        msg.toLowerCase().includes('no valid h2 data found')
+        ) {
+      const message = `Please add Schedule ${scheduleName} before proceeding with adding the ` +
+        `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
+      this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
+        if (res === 'okay') {
+
+          // // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
+          // // based on the event type selected.
+          // this.clearFormValues();
+          // this.scheduleType = 'sched_h6';
+          // this.transactionType = 'ALLOC_FEA_DISB_DEBT';
+          // this.transactionTypeText = 'Allocated FEA Debt Payment (H6 Test until H1/H2 is ready!)';
+          // window.scrollTo(0, 0);
+
+          const emitObj: any = {
+            form: this.frmIndividualReceipt,
+            direction: 'next',
+            step: 'step_3',
+            previousStep: 'step_2',
+            scheduleType: scheduleType,
+            action: ScheduleActions.add
+          };
+          this.status.emit(emitObj);
+        }
+      });
+    }
   }
 
   private _formatAmount(e: any, fieldName: string, negativeAmount: boolean) {
@@ -1536,12 +1593,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               scheduleType: this.subTransactionInfo.subScheduleType,
               action: ScheduleActions.addSubTransaction
             };
-            // let prePopulateFieldArray = null;
-            // if (this.scheduleType = 'sched_d') {
-            //   prePopulateFieldArray = this._checkForSchedDPrePopulate();
-            // } else {
-            //   prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
-            // }
+
             const prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
             if (prePopulateFieldArray) {
               addSubTransEmitObj.prePopulateFieldArray = prePopulateFieldArray;

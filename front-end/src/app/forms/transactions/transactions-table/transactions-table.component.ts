@@ -68,6 +68,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public pageReceivedReports: boolean = false;
   public transactionCategories: any = [];
   public transactionCategory: string = '';
+  public committeeDetails: any;
 
   // ngx-pagination config
   public maxItemsPerPage = 10;
@@ -164,6 +165,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       this.getTransactionsPage(1);
+      this.clonedTransaction = {};
       this.setSortableColumns();
     });
   }
@@ -172,6 +174,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
+    this.committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
     this.pageReceivedTransactions = false;
     this.pageReceivedReports = false;
 
@@ -399,6 +402,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     const serverSortColumnName = this._transactionsService.mapToSingleServerName(this.currentSortedColumnName);
 
+    let categoryType = 'receipts_tran';
+
+    if (this.transactionCategory === 'disbursements') {
+      categoryType = 'disbursements_tran';
+    } else if (this.transactionCategory === 'loans-and-debts') {
+      categoryType = 'loans_tran';
+    } else if (this.transactionCategory === 'other') {
+      categoryType = 'other_tran';
+    }
+
     this._transactionsService
       .getFormTransactions(
         this.formType,
@@ -407,7 +420,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.config.itemsPerPage,
         serverSortColumnName,
         sortedCol.descending,
-        this.filters
+        this.filters,
+        categoryType
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
@@ -422,41 +436,42 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
         // this.transactionsModel = transactionsModelL;
+        this.transactionsModel = transactionsModelL;
 
-        for (
-          let transactionCategorieIndex = 0;
-          transactionCategorieIndex < this.transactionCategories.length;
-          transactionCategorieIndex++
-        ) {
-          for (
-            let transactionCategoryOptionIndex = 0;
-            transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
-            transactionCategoryOptionIndex++
-          ) {
-            for (
-              let transactionCategoryOptionOptionsIndex = 0;
-              transactionCategoryOptionOptionsIndex <
-              this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
-                .length;
-              transactionCategoryOptionOptionsIndex++
-            ) {
-              for (
-                let transactionModelLindex = 0;
-                transactionModelLindex < transactionsModelL.length;
-                transactionModelLindex++
-              ) {
-                if (
-                  transactionsModelL[transactionModelLindex].transactionTypeIdentifier ===
-                    this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex]
-                      .options[transactionCategoryOptionOptionsIndex].value &&
-                  this.transactionCategory === this.transactionCategories[transactionCategorieIndex].value
-                ) {
-                  this.transactionsModel.push(transactionsModelL[transactionModelLindex]);
-                }
-              }
-            }
-          }
-        }
+        // for (
+        //   let transactionCategorieIndex = 0;
+        //   transactionCategorieIndex < this.transactionCategories.length;
+        //   transactionCategorieIndex++
+        // ) {
+        //   for (
+        //     let transactionCategoryOptionIndex = 0;
+        //     transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
+        //     transactionCategoryOptionIndex++
+        //   ) {
+        //     for (
+        //       let transactionCategoryOptionOptionsIndex = 0;
+        //       transactionCategoryOptionOptionsIndex <
+        //       this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
+        //         .length;
+        //       transactionCategoryOptionOptionsIndex++
+        //     ) {
+        //       for (
+        //         let transactionModelLindex = 0;
+        //         transactionModelLindex < transactionsModelL.length;
+        //         transactionModelLindex++
+        //       ) {
+        //         if (
+        //           transactionsModelL[transactionModelLindex].transactionTypeIdentifier ===
+        //             this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex]
+        //               .options[transactionCategoryOptionOptionsIndex].value &&
+        //           this.transactionCategory === this.transactionCategories[transactionCategorieIndex].value
+        //         ) {
+        //           this.transactionsModel.push(transactionsModelL[transactionModelLindex]);
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
 
         if (this.clonedTransaction && this.clonedTransaction.hasOwnProperty('transaction_id')) {
           for (let transactionModelIndex = 0; transactionModelIndex < this.transactionsModel.length; transactionModelIndex++) {
@@ -1280,8 +1295,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     ];
     if (this.transactionCategory === 'disbursements') {
       defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
-      // Desc., Donor Committee ID, Election Code, Election Year
-      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', '', ''];
+      // Donor Committee ID, Election Code, Election Year
+      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', 'committeeId', 'electionCode', 'electionYear'];
     } else if (this.transactionCategory === 'loans-and-debts') {
       // Balance at Close (D)
       defaultSortColumns = ['type', 'name', '', 'amount'];

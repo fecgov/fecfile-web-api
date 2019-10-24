@@ -263,6 +263,8 @@ export class F3xComponent implements OnInit {
 
           this.currentStep = e.step;
 
+          this.transactionCategory = e.transactionCategory;
+
           // Pass Transaction Type to individual-receipt
           if (this.currentStep === 'step_3') {
             // Force reload form fields even if type did not change.
@@ -358,6 +360,14 @@ export class F3xComponent implements OnInit {
     }
   }
 
+  /**
+   * If a schedule component will need to accept transactions types, for example when it
+   * supports multiples, they may be set here as input into the schedule component.
+   *
+   * @param transactionTypeText
+   * @param transactionType
+   * @param scheduleType
+   */
   private _setTransactionTypeBySchedule(transactionTypeText: string, transactionType: string, scheduleType: string) {
     if (!scheduleType) {
       this.transactionType = transactionType;
@@ -369,9 +379,10 @@ export class F3xComponent implements OnInit {
       this.transactionTypeText = transactionTypeText;
       return;
     }
-    if (scheduleType.startsWith('sched_f????????')) {
+    if (scheduleType.startsWith('sched_f')) {
       this.transactionTypeSchedF = transactionType;
       this.transactionTypeTextSchedF = transactionTypeText;
+    } else if (scheduleType.startsWith('sched_c')) {
     } else {
       this.transactionType = transactionType;
       this.transactionTypeText = transactionTypeText;

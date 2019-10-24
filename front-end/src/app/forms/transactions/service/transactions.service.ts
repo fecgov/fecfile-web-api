@@ -82,7 +82,8 @@ export class TransactionsService {
     itemsPerPage: number,
     sortColumnName: string,
     descending: boolean,
-    filters: TransactionFilterModel
+    filters: TransactionFilterModel,
+    categoryType: string
   ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
@@ -99,6 +100,7 @@ export class TransactionsService {
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
     request.descending = descending;
+    request.category_type = categoryType;
 
     if (filters) {
       request.filters = filters;
