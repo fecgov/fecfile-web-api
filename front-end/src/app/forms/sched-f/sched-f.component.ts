@@ -286,6 +286,15 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     if (!this._checkFormFieldIsValid('street_2_co_exp')) {
       return;
     }
+    if (!this._checkFormFieldIsValid('city_co_exp')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('state_co_exp')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('zip_co_exp')) {
+      return;
+    }
     this.showPart2 = true;
   }
 
