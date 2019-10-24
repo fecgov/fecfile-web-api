@@ -34,7 +34,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { F3xMessageService } from '../service/f3x-message.service';
-import { ScheduleActions } from './schedule-actions.enum';
+
 import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
 import { ActiveView } from '../../transactions/transactions.component';
@@ -48,6 +48,8 @@ import { TransactionsService } from '../../transactions/service/transactions.ser
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
 import { entityTypes } from './entity-types-json';
+import { ScheduleActions } from './schedule-actions.enum';
+
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -57,21 +59,6 @@ export enum SaveActions {
   saveForEditSub = 'saveForEditSub',
   updateOnly = 'updateOnly'
 }
-
-// @Component({
-//   selector: 'f3x-individual-receipt',
-//   templateUrl: './individual-receipt.component.html',
-//   styleUrls: ['./individual-receipt.component.scss'],
-//   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe]
-//   // encapsulation: ViewEncapsulation.None
-// })
-// export class IndividualReceiptComponent implements OnInit, OnDestroy, OnChanges {
-//   @Output() status: EventEmitter<any> = new EventEmitter<any>();
-//   @Input() selectedOptions: any = {};
-//   @Input() formOptionsVisible = false;
-//   @Input() transactionTypeText = '';
-//   @Input() transactionType = '';
-//   @Input() scheduleAction: ScheduleActions = null;
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
@@ -152,7 +139,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
   private _employerOccupationRequired: boolean;
   private _prePopulateFieldArray: Array<any>;
-  private _prePopulateFromSchedDData: any;
+  protected _prePopulateFromSchedDData: any;
 
   constructor(
     private _http: HttpClient,
@@ -739,6 +726,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * H4 and H6 will populate readonly fields using the user provided payment and activity.
+   * Call the API to calculate the fed, non-fed and activity YTD values.
+   */
   private _getFedNonFedPercentage() {
 
     if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
@@ -749,52 +740,96 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return;
     }
     let totalAmount = this.frmIndividualReceipt.get('total_amount').value;
-    totalAmount = totalAmount.replace(/,/g, ``);
+    if (!totalAmount) {
+      return;
+    }
+    if (typeof totalAmount === 'string') {
+      totalAmount = totalAmount.replace(/,/g, ``);
+    }
     const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
     this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
-      console.log();
+
+      // TODO remove this if H1/H2 not found goes back to retuning a non-200 http code.
+      if (typeof res === 'string') {
+        if (res.toLowerCase().includes('no h1 data found') ||
+          res.toLowerCase().includes('no h2 data found') ||
+          res.toLowerCase().includes('no valid h1 data found') ||
+          res.toLowerCase().includes('no valid h2 data found')
+        ) {
+          this._handleNoH1H2(res);
+          return;
+        }
+      }
+
       if (res) {
         if (res.fed_share) {
-          const patch = {};
-          patch['fed_share_amount'] = res.fed_share;
-          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+          this._formatAmount({ target: { value: res.fed_share.toString() } },
+            'fed_share_amount', false);
         }
         if (res.nonfed_share) {
-          const patch = {};
-          patch['non_fed_share_amount'] = res.nonfed_share;
-          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+          this._formatAmount({ target: { value: res.nonfed_share.toString() } },
+            'non_fed_share_amount', false);
         }
         if (res.aggregate_amount) {
-          const patch = {};
-          patch['activity_event_amount_ytd'] = res.aggregate_amount;
-          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+          this._formatAmount({ target: { value: res.aggregate_amount.toString() } },
+            'activity_event_amount_ytd', false);
         }
       }
     },
     errorRes => {
       console.log('error caught getting h1 percentage' + errorRes);
       if (errorRes.error) {
-        if (typeof errorRes.error === 'string') {
-          if (errorRes.error.toLowerCase().includes('no h1 data found')) {
-            const message = `Please add Schedule H1 before proceeding with adding the ` +
-              `amount.  Schedule H1 is required to correctly allocate the federal and non-federal portions of the transaction.`;
-            this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
-              if (res === 'okay') {
-
-                // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
-                // based on the event type selected.
-                // this.clearFormValues();
-                // this.scheduleType = 'sched_h6';
-                // this.transactionType = 'ALLOC_FEA_DISB_DEBT';
-                // this.transactionTypeText = 'Allocated FEA Debt Payment (H6 Test until H1/H2 is ready!)';
-                // window.scrollTo(0, 0);
-              }
-            });
-          }
-        }
+        this._handleNoH1H2(errorRes.error);
       }
     });
+  }
+
+  /**
+   * Present user with H1/H2 required before making Debt payment.
+   */
+  private _handleNoH1H2(msg: string) {
+    if (typeof msg !== 'string') {
+      return;
+    }
+
+    // Hard Coding DF/DC  => H2 for now.  Once dynamic forms provides schedule in activityEventTypes
+    const activityEventType = this.frmIndividualReceipt.get('activity_event_type').value;
+    const scheduleName = (activityEventType === 'DF' || activityEventType === 'DC') ? 'H2' : 'H1';
+    const scheduleType = (activityEventType === 'DF' || activityEventType === 'DC') ? 'sched_h2' : 'sched_h1';
+
+    // TODO decide on a specific code or message for not found.
+    // Handling various versions from API until then.
+    if (msg.toLowerCase().includes('no h1 data found') ||
+        msg.toLowerCase().includes('no h2 data found') ||
+        msg.toLowerCase().includes('no valid h1 data found') ||
+        msg.toLowerCase().includes('no valid h2 data found')
+        ) {
+      const message = `Please add Schedule ${scheduleName} before proceeding with adding the ` +
+        `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
+      this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
+        if (res === 'okay') {
+
+          // // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
+          // // based on the event type selected.
+          // this.clearFormValues();
+          // this.scheduleType = 'sched_h6';
+          // this.transactionType = 'ALLOC_FEA_DISB_DEBT';
+          // this.transactionTypeText = 'Allocated FEA Debt Payment (H6 Test until H1/H2 is ready!)';
+          // window.scrollTo(0, 0);
+
+          const emitObj: any = {
+            form: this.frmIndividualReceipt,
+            direction: 'next',
+            step: 'step_3',
+            previousStep: 'step_2',
+            scheduleType: scheduleType,
+            action: ScheduleActions.add
+          };
+          this.status.emit(emitObj);
+        }
+      });
+    }
   }
 
   private _formatAmount(e: any, fieldName: string, negativeAmount: boolean) {
@@ -1286,7 +1321,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     // TODO because parent is saved automatically when user clicks add child, we
     // may not want to save it if unchanged.  Check form status for untouched.
 
-    if (this. frmIndividualReceipt.valid) {
+    if (this.frmIndividualReceipt.valid) {
       const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
@@ -1368,6 +1403,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                    field === 'incurred_amount' ||
                    field === 'balance_at_close' ||
                    field === 'payment_amount' ||
+                   field === 'total_amount' ||
                    field === 'fed_share_amount' ||
                    field === 'non_fed_share_amount' ||
                    field === 'activity_event_amount_ytd') {
@@ -1536,17 +1572,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               scheduleType: this.subTransactionInfo.subScheduleType,
               action: ScheduleActions.addSubTransaction
             };
-            // let prePopulateFieldArray = null;
-            // if (this.scheduleType = 'sched_d') {
-            //   prePopulateFieldArray = this._checkForSchedDPrePopulate();
-            // } else {
-            //   prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
-            // }
+
             const prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
             if (prePopulateFieldArray) {
               addSubTransEmitObj.prePopulateFieldArray = prePopulateFieldArray;
-            } else if (this.scheduleType = 'sched_d') {
-              addSubTransEmitObj.prePopulateFromSchedD = res;
+            } else if (this.subTransactionInfo) {
+              if (this.subTransactionInfo.scheduleType === 'sched_d' &&
+                  this.subTransactionInfo.isParent === true) {
+                addSubTransEmitObj.prePopulateFromSchedD = res;
+              }
             }
             this.status.emit(addSubTransEmitObj);
           } else if (saveAction === SaveActions.saveForEditSub) {
@@ -1558,6 +1592,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else if (saveAction === SaveActions.updateOnly) {
             this.viewTransactions();
           } else {
+
+            if (saveAction === SaveActions.saveOnly) {
+
+              // sched D subtran must have payee fields pre-poulated after saving one
+              // and presenting new one to save.
+              if (this.subTransactionInfo) {
+                if (this.subTransactionInfo.scheduleType === 'sched_d' &&
+                    this.subTransactionInfo.isParent === false) {
+                  this._prePopulateFromSchedDData = res;
+                  this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
+                }
+              }
+            }
+
             let resetParentId = true;
             if (this.subTransactionInfo) {
               if (this.subTransactionInfo.isParent === false) {
@@ -2577,8 +2625,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._prePopulateFormField(this._prePopulateFieldArray);
       this._prePopulateFieldArray = null;
 
+      let apiCall: string = this._findHiddenField('name', 'api_call');
+      apiCall = apiCall ? apiCall : '';
+
+      let schedDSubTran = false;
+      if (this.subTransactionInfo) {
+        if (this.subTransactionInfo.scheduleType === 'sched_d' &&
+            this.subTransactionInfo.isParent === false) {
+              schedDSubTran = true;
+        }
+      }
+
+      // If Data for sched D sub-tran has been received by the message service,
+      // pre-populate the formGroup now that the dynamic form API call is complete.
       if (this._prePopulateFromSchedDData
-        && this.scheduleType === 'sched_d'
+        && schedDSubTran
         && this.scheduleAction === ScheduleActions.addSubTransaction) {
           this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
           this._prePopulateFromSchedDData = null;
@@ -2611,7 +2672,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * 
    * @param schedDData
    */
-  private _prePopulateFromSchedD(schedDData: any) {
+  protected _prePopulateFromSchedD(schedDData: any) {
     let fieldArray = [];
     if (schedDData.hasOwnProperty('entity_type')) {
       const entityType = schedDData.entity_type;
@@ -2871,8 +2932,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                              this.isFieldName(prop, 'activity_event_amount_ytd')) {
                     const amount = trx[prop] ? trx[prop] : 0;
                     this._formatAmount({ target: { value: amount.toString() } }, prop, false);
-                    // ?? TODO Can we assume negavtive is false?
-                    // col.validation.dollarAmountNegative);
                   }
                 }
               }

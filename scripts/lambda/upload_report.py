@@ -1,7 +1,9 @@
 import psycopg2
 import requests
 import os
-
+import datetime
+from collections import OrderedDict
+import json
 
 # Global Variables
 _conn = None
@@ -15,15 +17,50 @@ _database = os.environ.get("DB_NAME", "fecfrontend2")
 _user = os.environ.get("DB_USER", "fecuser2")
 _password = os.environ.get("DB_PASSWD", "postgres")
 
+
+'''
+message_type,
+ 1-FATAL, 2-ERROR, 3-WARN, 4-INFO, 5-DEBUG, 6-TRACE
+'''
+def add_log(reportid, 
+            cmte_id, 
+            message_type, 
+            message_text, 
+            response_json, 
+            error_code, 
+            error_json, 
+            app_error,
+            host_name=os.uname()[1],
+            process_name="upload_report"):
+                     
+    cur = _conn.cursor()
+    cur.execute("""INSERT INTO public.upload_logs(
+                                    report_id, 
+                                    cmte_id, 
+                                    process_name, 
+                                    message_type, 
+                                    message_text, 
+                                    response_json, 
+                                    error_code, 
+                                    error_json, 
+                                    app_error, 
+                                    host_name)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                                    [reportid, cmte_id, process_name, message_type, message_text, response_json, error_code, error_json, app_error, host_name])
+    _conn.commit()
+    
 def get_reports_to_upload():
     """ query data from the vendors table """
     try:
 
         print("get_reports_to_upload accessing ...")
         # Get API token
-        _conn = psycopg2.connect(host=_host,database=_database, user=_user, password=_password)
+        
+
+        #replace username and password from actual user
+        cmte_id = 'C00000422'
         data_obj = {
-                    'username':'C00000422',
+                    'username':cmte_id,
                     'password':'test'
                  }
 
@@ -32,10 +69,20 @@ def get_reports_to_upload():
                                  "/token/obtain", data=data_obj)
         if resp.ok:
             successresp=resp.json()
-            print("token/obtain API call is successfully finished...")  
+            print("token/obtain API call is successfuly finished...")  
             print(successresp)
             token=successresp['token']
             print(token)
+
+            add_log(0,
+                cmte_id, 
+                4,
+                " get_reports_to_upload get token API operation successful", 
+                json.dumps(successresp), 
+                '',
+                '', 
+                '', 
+                ) 
 
             headers_obj = {
                         'Authorization':'JWT '+ token,
@@ -43,7 +90,7 @@ def get_reports_to_upload():
             cur = _conn.cursor()
 
             #Processing F3X reports
-            # pick reports with status =Uploaded
+            # pick reports with status = Uploaded
             
             cur.execute("""SELECT cmte_id, report_id, form_type 
                         FROM   public.reports 
@@ -61,8 +108,7 @@ def get_reports_to_upload():
             for row in cur.fetchall():
                 data_row = list(row)
                 data_obj=data_row[0]
-                
-                
+               
                 cur.execute("""UPDATE public.reports 
                             SET status = 'Upload_Waiting' 
                             WHERE cmte_id = %s 
@@ -88,7 +134,7 @@ def get_reports_to_upload():
                                     "/core/prepare_json_builders_data", data=data_obj, headers=headers_obj)
                 if resp.ok:
                     successresp=resp.json()
-                    print("prepare_json_builders_data call is successfully finished...")  
+                    print("prepare_json_builders_data call is successfuly finished...")  
                     print(successresp)
                     if successresp['Response'].encode('utf-8')=='Success':
                         # call create_json_builders which internally call Data Reciever API
@@ -103,9 +149,9 @@ def get_reports_to_upload():
                                     "/core/create_json_builders", data=data_obj, headers=headers_obj)
                         if resp.ok:
                             successresp=resp.json()
-                            print("create_json_builders call is successfully finished...")  
+                            print("create_json_builders call is successfuly finished...")  
                             print(successresp)           
-                            if successresp['Response'].encode('utf-8')=='Success':
+                            if successresp['result']['status'].encode('utf-8')=='PROCESSING':
                             # update submission_id in report table 
                                 cur.execute("""UPDATE public.reports 
                                                 SET submission_id = %s, 
@@ -113,10 +159,22 @@ def get_reports_to_upload():
                                                     fec_status = 'Processing'
                                                 WHERE cmte_id = %s 
                                                 AND report_id = %s 
-                                                AND status = 'Upload_Waiting' """, [resp['submission_id'], datetime.datetime.now(), data_row[0],  data_row[1]])
+                                                AND status = 'Upload_Waiting' """, [resp['result']['submissionId'], datetime.datetime.now(), data_row[0],  data_row[1]])
                                 _conn.commit()   
+
+                                add_log(data_row[1],
+                                        data_row[0],  
+                                        4,
+                                        "create_json_builders operation successful with submission_id "+ resp['submission_id'], 
+                                        json.dumps(successresp), 
+                                        '',
+                                        '', 
+                                        '', 
+                                    )     
+
                                 if cursor.rowcount == 0:
                                     raise Exception('Error: updating report update date failed.') 
+
                         elif not resp.ok:
                             print("create_json_builders throwing error...")  
                             print(resp.json())
@@ -159,9 +217,9 @@ def get_reports_to_upload():
                                     "/f99/submit_formf99", data=data_obj, headers=headers_obj)
                 if resp.ok:
                     successresp=resp.json()
-                    print("submit_formf99 call is successfully finished...")  
+                    print("submit_formf99 call is successfuly finished...")  
                     print(successresp)           
-                    if successresp['Response'].encode('utf-8')=='Success':
+                    if successresp['result']['status'].encode('utf-8')=='PROCESSING':
                         # update submission_id in report table 
                         cur.execute("""UPDATE public.forms_committeeinfo 
                                                 SET submission_id = %s, 
@@ -170,7 +228,7 @@ def get_reports_to_upload():
                                                     status = 'Processing'
                                                 WHERE committeeid = %s 
                                                 AND id = %s 
-                                                AND status = 'Upload_Waiting' """, [resp['submission_id'], datetime.datetime.now(), data_row[0],  data_row[1]])
+                                                AND status = 'Upload_Waiting' """, [resp['result']['submissionId'], datetime.datetime.now(), data_row[0],  data_row[1]])
                         _conn.commit()   
                         if cursor.rowcount == 0:
                             raise Exception('Error: updating forms_committeeinfo update date failed.') 
@@ -183,7 +241,17 @@ def get_reports_to_upload():
                     _conn.commit()   
 
                     print("submit_formf99 throwing error...")  
-                    print(resp.json())                    
+                    print(resp.json())   
+
+                    add_log(data_row[1],
+                                        data_row[0],  
+                                        4,
+                                        "create_json_builders operation failed" , 
+                                        json.dumps(resp.json()), 
+                                        '',
+                                        '', 
+                                        '', 
+                                    )                   
         elif not resp.ok:
             print("token/obtain API call is failed...")  
             #notsuccessresp=resp.json()
@@ -200,4 +268,5 @@ def get_reports_to_upload():
         
         
 if __name__ == '__main__':
+    _conn = psycopg2.connect(host=_host,database=_database, user=_user, password=_password)
     get_reports_to_upload()

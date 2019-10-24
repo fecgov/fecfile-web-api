@@ -243,20 +243,20 @@
                 <label for="">
                     State
                 </label>
+                <!-- (change)="handleStateChange($event, col)" -->
                 <ng-select #stateSelect 
-                  [items]="states" 
-                  (change)="handleStateChange($event, col)"
+                  [items]="states"                   
                   class="forms__select" 
                   [formControlName]="'state_co_exp'" 
                   bindValue="code" 
                   bindLabel="code" 
                   [selectOnTab]="true"
-                  [ngClass]="
-                      frmIndividualReceipt.get(col?.name)?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                        ? 'forms__select-error'
-                        : ''
-                    ">
+                    [ngClass]="
+                    frmIndividualReceipt.get('state_co_exp')?.invalid &&
+                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      ? 'forms__select-error'
+                      : ''
+                  ">
                   <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
                     <span>{{ item.code + ' - ' + item.name }}</span>
                   </ng-template>
@@ -306,20 +306,15 @@
                   <div class="form-group" [style.width]="setSelectTypeWidth(col)">
                     <label [for]="col?.name">
                       {{ col?.text }}
-                      <!-- replace button with div below to resolve tab issue into button -->
-                      <!-- <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                        tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">Click here for more information</span>
-                      </button> -->
                       <div type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                         tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
                         <i class="info-icon" aria-hidden="true"></i>
                         <span class="sr-only">Click here for more information</span>
                       </div>
 
-                      <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
-                        (Optional) {{i}}  {{col.name}}
+                      <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'
+                                            && !col.staticField">
+                        (Optional)
                       </ng-container>
                     </label>
                     <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
@@ -652,9 +647,12 @@
                 <button *ngIf="showPart2" class="btn btn-secondary btn-right" (click)="back()">
                   Back
                 </button>              
-                <a class="btn btn-primary btn-right" (click)="saveAndReturnToParentDebt()">
+                <!-- <a class="btn btn-primary btn-right" (click)="saveAndReturnToParentDebt()">
                   Return to Debt to Vendor
-                </a>
+                </a> -->
+                <a *ngIf="showPart2" class="btn btn-primary btn-right" (click)="saveAndReturnToParentDebt()">
+                  Save &amp; View Expenditure
+                </a>                
               </div>
             </div>
           </div>

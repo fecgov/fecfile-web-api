@@ -93,32 +93,46 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
           }
         }
 
+        // Amount comes from various API fields depending on the transaction type.
+        // TODO they should be mapped to 1 front-end field.  Remove this once in place.
         model.amount = trx.expenditure_amount ? trx.expenditure_amount : trx.contribution_amount;
+        const transactionType = trx.transaction_type_identifier;
+        switch (transactionType) {
+          case 'ALLOC_EXP_DEBT':
+            model.amount = trx.total_amount;
+            break;
+          case 'ALLOC_FEA_DISB_DEBT':
+            model.amount = trx.total_fed_levin_amount;
+            break;
+          default:
+        }
+
         model.date = trx.expenditure_date ? trx.expenditure_date : trx.contribution_date;
         model.aggregate = trx.contribution_aggregate;
         model.memoCode = trx.memo_code;
         model.memoText = trx.memo_text;
 
-        // TODO API needs to provide description transaction type on get for sched_d
-        if (this.subTransactionsTableType === 'sched_d') {
-          model.type = trx.transaction_type_identifier;
-        }
+        // // TODO API needs to provide description transaction type on get for sched_d
+        // if (this.subTransactionsTableType === 'sched_d') {
+        //   model.type = trx.transaction_type_description;
+        // }
 
+        model.type = trx.transaction_type_description;
         model.transactionTypeIdentifier = trx.transaction_type_identifier;
         model.transactionId = trx.transaction_id;
         model.backRefTransactionId = trx.back_ref_transaction_id;
         model.apiCall = trx.api_call;
 
-        // temp patch until API passes back api_call for child sched_d.
-        // "api_call":"/sa/schedA",
-        if (!trx.api_call) {
-          if (typeof trx.back_ref_transaction_id === 'string') {
-            const refId: string = trx.back_ref_transaction_id;
-            if (refId.startsWith('SB')) {
-              trx.api_call = '/sb/schedB';
-            }
-          }
-        }
+        // // temp patch until API passes back api_call for child sched_d.
+        // // "api_call":"/sa/schedA",
+        // if (!trx.api_call) {
+        //   if (typeof trx.back_ref_transaction_id === 'string') {
+        //     const refId: string = trx.back_ref_transaction_id;
+        //     if (refId.startsWith('SB')) {
+        //       trx.api_call = '/sb/schedB';
+        //     }
+        //   }
+        // }
 
         modelArray.push(model);
       }
