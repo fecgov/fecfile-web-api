@@ -25,6 +25,7 @@ pipeline {
             } 
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
+              steps { build_functions("${VERSION}")}
             }
           }
         }
@@ -33,6 +34,8 @@ pipeline {
           steps {
             //Deploy flyway
             sh("bash data/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev ")
+            //Deploy functions
+            sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev")
             //deployToK8s(String version, String environment, String deployment, String repo)
             //Deploy backend
             deployToK8s("${VERSION}", "dev","fecfile-backend-api","fecnxg-django-backend")
@@ -61,6 +64,7 @@ pipeline {
             } 
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
+              steps { build_functions("${VERSION}")}
             }
           }
         }
@@ -69,7 +73,8 @@ pipeline {
           steps{
             //Deploy flyway
             sh("bash data/deploy.sh ${VERSION} fecfile-frontend-qa-db.casvptvnuxni.us-east-1.rds.amazonaws.com qa ")
-            //deployToK8s(String version, String environment, String deployment, String repo)
+            //Deploy functions
+            sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-qa-db.casvptvnuxni.us-east-1.rds.amazonaws.com qa ")
             //Deploy backend
             deployToK8s("${VERSION}", "qa","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
@@ -92,6 +97,7 @@ pipeline {
             } 
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
+              steps { build_functions("${VERSION}")}
             }
           }
         }
@@ -100,7 +106,8 @@ pipeline {
           steps{
             //Deploy flyway
             sh("bash data/deploy.sh ${VERSION} fecfile-frontend-uat-db.casvptvnuxni.us-east-1.rds.amazonaws.com uat")
-            //deployToK8s(String version, String environment, String deployment, String repo)
+            //Deploy functions
+            sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-uat-db.casvptvnuxni.us-east-1.rds.amazonaws.com uat")
             //Deploy backend
             deployToK8s("${VERSION}", "uat","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
@@ -180,6 +187,13 @@ def build_flyway(String version) {
   def imageC = docker.build("fecfile-flyway-db:${version}", "data/")
   docker.withRegistry("https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecfile-flyway-db") {
       imageC.push()
+  }
+}
+def build_functions(String version) {
+  
+  def imageF = docker.build("fecnxg-functions:${version}", "scripts/lambda/")
+  docker.withRegistry("https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-functions") {
+      imageF.push()
   }
 }
 def deployToK8s(String version, String environment, String deployment, String repo) {
