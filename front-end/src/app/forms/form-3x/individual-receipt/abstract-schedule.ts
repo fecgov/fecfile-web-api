@@ -726,6 +726,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * H4 and H6 will populate readonly fields using the user provided payment and activity.
+   * Call the API to calculate the fed, non-fed and activity YTD values.
+   */
   private _getFedNonFedPercentage() {
 
     if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
@@ -755,19 +759,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
       if (res) {
         if (res.fed_share) {
-          const patch = {};
-          patch['fed_share_amount'] = res.fed_share;
-          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+          this._formatAmount({ target: { value: res.fed_share.toString() } },
+            'fed_share_amount', false);
         }
         if (res.nonfed_share) {
-          const patch = {};
-          patch['non_fed_share_amount'] = res.nonfed_share;
-          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+          this._formatAmount({ target: { value: res.nonfed_share.toString() } },
+            'non_fed_share_amount', false);
         }
         if (res.aggregate_amount) {
-          const patch = {};
-          patch['activity_event_amount_ytd'] = res.aggregate_amount;
-          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+          this._formatAmount({ target: { value: res.aggregate_amount.toString() } },
+            'activity_event_amount_ytd', false);
         }
       }
     },
@@ -775,28 +776,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       console.log('error caught getting h1 percentage' + errorRes);
       if (errorRes.error) {
         this._handleNoH1H2(errorRes.error);
-        // if (typeof errorRes.error === 'string') {
-        //   if (errorRes.error.toLowerCase().includes('no h1 data found')) {
-        //     const message = `Please add Schedule H1 before proceeding with adding the ` +
-        //       `amount.  Schedule H1 is required to correctly allocate the federal and non-federal portions of the transaction.`;
-        //     this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
-        //       if (res === 'okay') {
-
-        //         // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
-        //         // based on the event type selected.
-        //         // this.clearFormValues();
-        //         // this.scheduleType = 'sched_h6';
-        //         // this.transactionType = 'ALLOC_FEA_DISB_DEBT';
-        //         // this.transactionTypeText = 'Allocated FEA Debt Payment (H6 Test until H1/H2 is ready!)';
-        //         // window.scrollTo(0, 0);
-        //       }
-        //     });
-        //   }
-        // }
       }
     });
   }
 
+  /**
+   * Present user with H1/H2 required before making Debt payment.
+   */
   private _handleNoH1H2(msg: string) {
     if (typeof msg !== 'string') {
       return;
@@ -2941,8 +2927,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                              this.isFieldName(prop, 'activity_event_amount_ytd')) {
                     const amount = trx[prop] ? trx[prop] : 0;
                     this._formatAmount({ target: { value: amount.toString() } }, prop, false);
-                    // ?? TODO Can we assume negavtive is false?
-                    // col.validation.dollarAmountNegative);
                   }
                 }
               }
