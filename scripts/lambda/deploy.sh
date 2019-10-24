@@ -51,4 +51,4 @@ spec:
 EOF
 
 # create the job
-kubectl --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile4 --namespace=$3 create -f function.yml
+kubectl --context=arn:aws:eks:us-east-1:813218302951:cluster/fecfile4 --namespace=$3 apply -f function.yml
