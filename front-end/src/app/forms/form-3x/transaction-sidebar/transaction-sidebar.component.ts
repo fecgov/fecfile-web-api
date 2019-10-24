@@ -162,6 +162,29 @@ export class TransactionSidebarComponent implements OnInit {
           }
         }
 
+        if (res.hasOwnProperty('formType')) {
+          if (typeof res.formType === 'string') {
+            if (res.formType === this._formType) {
+              if (res.hasOwnProperty('totals')) {
+                if (typeof res.totals === 'object') {
+                  if (res.totals.hasOwnProperty('Loans/Debts')) {
+                      if (typeof res.totals['Loans/Debts'] === 'number') {
+                        this.loansanddebtsTotal = res.totals['Loans/Debts'];
+                        const totals: any = {
+                          receipts: this.receiptsTotal,
+                          cashOnHand : this.cashOnHandTotal,
+                          disbursements: this.disbursementsTotal,
+                          loansanddebtsTotal: this.loansanddebtsTotal
+                        };
+                        localStorage.setItem(`form_${this._formType}_totals`, JSON.stringify(totals));
+                      }
+                  }
+                }
+              }
+            }
+          }
+        }
+
         if (this.transactionCategory && localStorage.getItem(`form_${this._formType}_temp_transaction_type`) === null) {
           this._setSecondaryTransactionCategories();
         } else if (
