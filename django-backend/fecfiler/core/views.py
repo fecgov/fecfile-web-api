@@ -5519,8 +5519,8 @@ def get_report_status(request):
 
     try:
         cmte_id = request.user.username
-        report_id =request.data.get('report_id')
-        form_type =request.data.get('form_type')
+        report_id =request.query_params.get('report_id')
+        form_type =request.query_params.get('form_type')
         
         with connection.cursor() as cursor:
             forms_obj= {}
