@@ -129,6 +129,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
           }
         },
         {
+          staticField: true,
           name: 'street_2_co_exp',
           value: null,
           validation: {
@@ -251,19 +252,10 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     super.ngOnDestroy();
   }
 
-  // public handleCheckboxChange($event: any, col: any) {
-  //   const { checked } = $event.target;
-  //   const patch = {};
-  //   if (checked) {
-  //     patch[col.name] = 'Y';
-  //   } else {
-  //     patch[col.name] = 'N';
-  //   }
-  //   this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
-  // }
-
   public saveAndReturnToParentDebt() {
-    this._setTransactionDetail();
+    if (!this.frmIndividualReceipt.dirty) {
+      this._setTransactionDetail();
+    }
     this.saveAndReturnToParent();
   }
 
@@ -271,27 +263,38 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     // TODO add this in once the form fields are displaying red when in error.
     // check all page 1 for valid
 
-    // if (!this._checkFormFieldIsValid('coord_expenditure_y')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('designated_com_id')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('designated_com_name')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('subordinate_com_id')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('subordinate_com_name')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('street_1_co_exp')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('street_2_co_exp')) {
-    //   return;
-    // }
+    this.frmIndividualReceipt.markAsTouched();
+
+    if (!this._checkFormFieldIsValid('coord_expenditure_yn')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('designated_com_id')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('designated_com_name')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('subordinate_com_id')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('subordinate_com_name')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('street_1_co_exp')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('street_2_co_exp')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('city_co_exp')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('state_co_exp')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('zip_co_exp')) {
+      return;
+    }
     this.showPart2 = true;
   }
 
