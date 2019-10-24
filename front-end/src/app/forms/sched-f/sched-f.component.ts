@@ -263,7 +263,9 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     // TODO add this in once the form fields are displaying red when in error.
     // check all page 1 for valid
 
-    if (!this._checkFormFieldIsValid('coord_expenditure_y')) {
+    this.frmIndividualReceipt.markAsTouched();
+
+    if (!this._checkFormFieldIsValid('coord_expenditure_yn')) {
       return;
     }
     if (!this._checkFormFieldIsValid('designated_com_id')) {
