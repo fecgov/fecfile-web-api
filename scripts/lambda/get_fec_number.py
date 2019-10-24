@@ -400,6 +400,15 @@ def get_fec_number():
                                                                             data_row[1]])    
                     _conn.commit()       
 
+                    add_log(data_row[1],
+                        data_row[0], 
+                        4,
+                        "F99 upload_filing with SubmissionId upload_filing is failed", 
+                        json.dumps(resp.json()), 
+                        '',
+                        '', 
+                        '', 
+                    )
                     if cursor.rowcount == 0:
                         raise Exception('Error: updating fec_id failed.')   
 
