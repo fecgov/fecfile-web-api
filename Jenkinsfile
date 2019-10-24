@@ -25,6 +25,8 @@ pipeline {
             } 
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
+            }
+            stage("Functions") {
               steps { build_functions("${VERSION}")}
             }
           }
@@ -64,6 +66,8 @@ pipeline {
             } 
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
+            }
+            stage("Functions") {
               steps { build_functions("${VERSION}")}
             }
           }
@@ -97,6 +101,8 @@ pipeline {
             } 
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
+            }
+            stage("Functions") {
               steps { build_functions("${VERSION}")}
             }
           }
