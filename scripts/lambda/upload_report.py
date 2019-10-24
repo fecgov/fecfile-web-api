@@ -90,7 +90,7 @@ def get_reports_to_upload():
             cur = _conn.cursor()
 
             #Processing F3X reports
-            # pick reports with status =Uploaded
+            # pick reports with status = Uploaded
             
             cur.execute("""SELECT cmte_id, report_id, form_type 
                         FROM   public.reports 
@@ -151,7 +151,7 @@ def get_reports_to_upload():
                             successresp=resp.json()
                             print("create_json_builders call is successfuly finished...")  
                             print(successresp)           
-                            if successresp['Response'].encode('utf-8')=='Success':
+                            if successresp['result']['status'].encode('utf-8')=='PROCESSING':
                             # update submission_id in report table 
                                 cur.execute("""UPDATE public.reports 
                                                 SET submission_id = %s, 
@@ -159,11 +159,11 @@ def get_reports_to_upload():
                                                     fec_status = 'Processing'
                                                 WHERE cmte_id = %s 
                                                 AND report_id = %s 
-                                                AND status = 'Upload_Waiting' """, [resp['submission_id'], datetime.datetime.now(), data_row[0],  data_row[1]])
+                                                AND status = 'Upload_Waiting' """, [resp['result']['submissionId'], datetime.datetime.now(), data_row[0],  data_row[1]])
                                 _conn.commit()   
 
-                                add_log(data_row[0],
-                                        data_row[1],  
+                                add_log(data_row[1],
+                                        data_row[0],  
                                         4,
                                         "create_json_builders operation successful with submission_id "+ resp['submission_id'], 
                                         json.dumps(successresp), 
@@ -219,7 +219,7 @@ def get_reports_to_upload():
                     successresp=resp.json()
                     print("submit_formf99 call is successfuly finished...")  
                     print(successresp)           
-                    if successresp['Response'].encode('utf-8')=='Success':
+                    if successresp['result']['status'].encode('utf-8')=='PROCESSING':
                         # update submission_id in report table 
                         cur.execute("""UPDATE public.forms_committeeinfo 
                                                 SET submission_id = %s, 
@@ -228,7 +228,7 @@ def get_reports_to_upload():
                                                     status = 'Processing'
                                                 WHERE committeeid = %s 
                                                 AND id = %s 
-                                                AND status = 'Upload_Waiting' """, [resp['submission_id'], datetime.datetime.now(), data_row[0],  data_row[1]])
+                                                AND status = 'Upload_Waiting' """, [resp['result']['submissionId'], datetime.datetime.now(), data_row[0],  data_row[1]])
                         _conn.commit()   
                         if cursor.rowcount == 0:
                             raise Exception('Error: updating forms_committeeinfo update date failed.') 
@@ -241,7 +241,17 @@ def get_reports_to_upload():
                     _conn.commit()   
 
                     print("submit_formf99 throwing error...")  
-                    print(resp.json())                    
+                    print(resp.json())   
+
+                    add_log(data_row[1],
+                                        data_row[0],  
+                                        4,
+                                        "create_json_builders operation failed" , 
+                                        json.dumps(resp.json()), 
+                                        '',
+                                        '', 
+                                        '', 
+                                    )                   
         elif not resp.ok:
             print("token/obtain API call is failed...")  
             #notsuccessresp=resp.json()
