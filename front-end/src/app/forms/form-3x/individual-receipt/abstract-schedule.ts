@@ -740,7 +740,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return;
     }
     let totalAmount = this.frmIndividualReceipt.get('total_amount').value;
-    totalAmount = totalAmount.replace(/,/g, ``);
+    if (!totalAmount) {
+      return;
+    }
+    if (typeof totalAmount === 'string') {
+      totalAmount = totalAmount.replace(/,/g, ``);
+    }
     const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
     this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
@@ -1316,7 +1321,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     // TODO because parent is saved automatically when user clicks add child, we
     // may not want to save it if unchanged.  Check form status for untouched.
 
-    if (this. frmIndividualReceipt.valid) {
+    if (this.frmIndividualReceipt.valid) {
       const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
@@ -2527,15 +2532,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
                 // If fields are pre-populated for "static" forms, append any additional fields
                 // from the API as with SF.
-                // if (this.formFieldsPrePopulated) {
-                //   if (this.staticFormFields) {
-                //     if (this.staticFormFields.length > 0) {
-                //       for (const field of this.staticFormFields) {
-                //         res.data.formFields.push(field);
-                //       }
-                //     }
-                //   }
-                // }
+                if (this.formFieldsPrePopulated) {
+                  if (this.staticFormFields) {
+                    if (this.staticFormFields.length > 0) {
+                      for (const field of this.staticFormFields) {
+                        res.data.formFields.push(field);
+                      }
+                    }
+                  }
+                }
                 this.formFields = res.data.formFields;
                 this._setForm(this.formFields);
               }
