@@ -11,6 +11,7 @@ import { ReportFilterModel } from 'src/app/reports/model/report-filter.model';
 import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.pipe';
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
+import { RequestOptions } from '@angular/http';
 
 /*export interface GetReportsResponse {
   reports: reportModel[];
@@ -24,6 +25,7 @@ export class FormsService {
   private _filterPipe: FilterPipe;
   private _zipCodePipe: ZipCodePipe;
   private _datePipe: DatePipe;
+  private _stopCanDeactivate: boolean = false;
 
   constructor(private _http: HttpClient, private _cookieService: CookieService) {
     this._orderByPipe = new OrderByPipe();
@@ -664,6 +666,45 @@ export class FormsService {
           return false;
         })
       );
+  }
+
+  public get_report_status(form_type, report_id): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    // let params = new FormData(JSON.parse(localStorage.getItem('form_99_details')));
+    let params = new FormData();
+    let reportId = localStorage.getItem('form_99_details.id');
+    const formType = 'F' + form_type;
+
+    if (formType === 'F3X') {
+      let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
+      reportId = formF3X_ReportInfo.reportId;
+    }
+
+    params.append('report_id', reportId);
+    params.append('form_type', formType);
+
+    const url = '/core/get_report_status?form_type=' + formType + '&report_id=' + reportId;
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    })
+    .pipe(
+      map(res => {
+        if (res) {
+          this._stopCanDeactivate = res['fec_status'] === 'Accepted' ? false : true;
+        } else {
+          this._stopCanDeactivate = false;
+        }
+      })
+    );
+  }
+
+  public checkCanDeactivate() {
+    return this._stopCanDeactivate;
   }
 
   public get_filed_form_types(): Observable<any> {

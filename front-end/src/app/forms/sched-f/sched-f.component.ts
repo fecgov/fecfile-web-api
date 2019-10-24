@@ -22,6 +22,9 @@ import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedul
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
 
+/**
+ * Schedule F is a sub-transaction of Schedule D.
+ */
 @Component({
   selector: 'app-sched-f',
   templateUrl: './sched-f.component.html',
@@ -233,9 +236,15 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnChanges(changes: SimpleChanges) {
+    this.transactionType = 'OPEXP';
     this.formType = '3X';
     this.showPart2 = false;
     this._setTransactionDetail();
+
+    if (this._prePopulateFromSchedDData && this.scheduleAction === ScheduleActions.addSubTransaction) {
+      this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
+      this._prePopulateFromSchedDData = null;
+    }
   }
 
   public ngOnDestroy(): void {

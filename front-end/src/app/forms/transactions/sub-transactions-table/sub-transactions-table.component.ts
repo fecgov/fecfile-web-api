@@ -93,7 +93,20 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
           }
         }
 
+        // Amount comes from various API fields depending on the transaction type.
+        // TODO they should be mapped to 1 front-end field.  Remove this once in place.
         model.amount = trx.expenditure_amount ? trx.expenditure_amount : trx.contribution_amount;
+        const transactionType = trx.transaction_type_identifier;
+        switch (transactionType) {
+          case 'ALLOC_EXP_DEBT':
+            model.amount = trx.total_amount;
+            break;
+          case 'ALLOC_FEA_DISB_DEBT':
+            model.amount = trx.total_fed_levin_amount;
+            break;
+          default:
+        }
+
         model.date = trx.expenditure_date ? trx.expenditure_date : trx.contribution_date;
         model.aggregate = trx.contribution_aggregate;
         model.memoCode = trx.memo_code;
