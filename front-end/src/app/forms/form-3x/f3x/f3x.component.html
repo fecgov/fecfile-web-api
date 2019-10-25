@@ -71,8 +71,8 @@
 
         <app-sched-c
           [hidden]="scheduleType !== 'sched_c'"
-          [transactionTypeText]="transactionTypeTextSchedF"
-          [transactionType]="transactionTypeSchedF"
+          [transactionTypeText]="transactionTypeTextSchedC"
+          [transactionType]="transactionTypeSchedC"
           [scheduleAction]="scheduleAction"
           [scheduleType]="scheduleType"
           (status)="onNotify($event)"
@@ -80,16 +80,16 @@
         </app-sched-c>
         <app-sched-c1
           [hidden]="scheduleType !== 'sched_c1'"
-          [transactionTypeText]="transactionTypeTextSchedF"
-          [transactionType]="transactionTypeSchedF"
+          [transactionTypeText]="transactionTypeTextSchedC"
+          [transactionType]="transactionTypeSchedC"
           [scheduleAction]="scheduleAction"
           [scheduleType]="scheduleType"
           (status)="onNotify($event)"
         >
 
         </app-sched-c1>
-        <app-sched-c2 [hidden]="scheduleType !== 'sched_c2'" [transactionTypeText]="transactionTypeTextSchedF"
-          [transactionType]="transactionTypeSchedF" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+        <app-sched-c2 [hidden]="scheduleType !== 'sched_c2'" [transactionTypeText]="transactionTypeTextSchedC"
+          [transactionType]="transactionTypeSchedC" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
           (status)="onNotify($event)">
         </app-sched-c2>
 
