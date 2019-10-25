@@ -1,0 +1,16 @@
+.non-connected-committee-container input {
+    width: 100%;
+    clear: both;
+  }
+
+form  { display: table;      }
+ng-container    { display: table-row;  }
+
+.text  { display: table-row;  }
+label { display: table-cell; }
+input { display: table-cell; }
+
+button {
+  // right: 10px;
+  margin-right: 15px;
+}
