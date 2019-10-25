@@ -91,6 +91,7 @@ export class AccountComponent implements OnInit {
     window.open('https://webforms.fec.gov/webforms/form1/index.htm', '_blank');
   }
 
+  // TODO: later on to refactor to move http service to a dedicated service module
   saveLevinAccount(levin_name: HTMLInputElement) {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/core/levin_accounts`;
@@ -103,11 +104,13 @@ export class AccountComponent implements OnInit {
     let levin_acct = { "levin_account_name": levin_name.value }
     this._http.post(url, JSON.stringify(levin_acct), {
       headers: httpOptions
-    }).subscribe(res => {
-      console.log(res);
-      levin_acct['levin_account_id'] = res[0].levin_account_id;
-      this.levin_accounts.splice(0, 0, levin_acct);
-    });
+    }).subscribe(
+      res => {
+        console.log(res);
+        levin_acct['levin_account_id'] = res[0].levin_account_id;
+        this.levin_accounts.splice(0, 0, levin_acct);
+      });
+    // reset levin name field
     levin_name.value = '';
 
   }
