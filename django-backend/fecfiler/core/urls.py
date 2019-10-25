@@ -161,5 +161,9 @@ urlpatterns = [
         views.new_report_update_date,
         name="new_report_update_date",
     ),
-
+    url(
+        r"^core/get_report_status$",
+        views.get_report_status,
+        name="get_report_status",
+    ),
 ]
