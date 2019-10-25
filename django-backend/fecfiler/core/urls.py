@@ -160,4 +160,5 @@ urlpatterns = [
         views.new_report_update_date,
         name="new_report_update_date",
     ),
+
 ]

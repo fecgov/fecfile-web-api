@@ -770,6 +770,29 @@ export class TransactionsService {
         })
       );
   }
+
+  public cloneTransaction(transactionId: string) {
+
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/clone_a_transaction';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+      .post(`${environment.apiUrl}${url}`, {transaction_id: transactionId}, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
+        })
+      );
+  }
 }
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.type = row.transaction_type_desc;

@@ -55,7 +55,7 @@
               </div>              
               <ng-container *ngIf="reportOverDue">
                 <span class="text-error">
-                  Over due by {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
+                  Overdue by {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
                 </span>
               </ng-container>
               <ng-container *ngIf="!reportOverDue">

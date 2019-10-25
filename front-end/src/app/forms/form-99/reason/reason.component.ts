@@ -21,6 +21,7 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { htmlLength } from '../../../shared/utils/forms/validation/html-length.validator';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'f99-reason',
@@ -59,6 +60,7 @@ export class ReasonComponent implements OnInit {
   public editingTextArea: boolean = false;
   public fileNameToDisplay: string = null;
 
+  private committee_details: any = {};
   private _printPriviewPdfFileLink: string = '';
   private _form99Details: any = {};
   private _formType: string = '';
@@ -67,6 +69,7 @@ export class ReasonComponent implements OnInit {
   private _reasonInnerText: string = ''; // The text, plus any HTML tags
   private _reasonInnerHTML: string = ''; // Shows the value and applys the HTML
   private _reasonTextContent: string = ''; // The plain text, no HTML from editor
+  private _setRefresh: boolean = false;
 
   constructor(
     private _fb: FormBuilder,
@@ -80,12 +83,19 @@ export class ReasonComponent implements OnInit {
     private _dormSanitizer: DomSanitizer
   ) {
     this._messageService.clearMessage();
+    _activatedRoute.queryParams.subscribe(p => {
+      if (p.refresh) {
+        this._setRefresh = true;
+        this.ngOnInit();
+      }
+    });
   }
 
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this._form99Details = JSON.parse(localStorage.getItem(`form_${this._formType}_details`));
+    this.committee_details = JSON.parse(localStorage.getItem('committee_details'));
 
     if (this._form99Details) {
       if (this._form99Details.text) {
@@ -105,6 +115,7 @@ export class ReasonComponent implements OnInit {
         this.textAreaTextContent = this._dormSanitizer.bypassSecurityTrustHtml(unescapedText);
         this.fileNameToDisplay = this._form99Details.filename ? this._form99Details.filename : null;
       } else {
+        this.editingTextArea = false;
         this.frmReason = this._fb.group({
           reasonText: ['', [Validators.required, htmlLength(this.editorMax)]],
           file: ['']
@@ -151,67 +162,120 @@ export class ReasonComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
   public editorChange(e): void {
-    this._reasonTextContent = e.target.textContent;
+    if (this.editMode) {
+      this._reasonTextContent = e.target.textContent;
 
-    if (this._reasonTextContent.length >= 1) {
-      this._reasonInnerText = e.target.innerText;
+      if (this._reasonTextContent.length >= 1) {
+        this._reasonInnerText = e.target.innerText;
 
-      if (this._checkUnsupportedHTML(this._reasonInnerText)) {
-        this.reasonHasInvalidHTML = true;
+        if (this._checkUnsupportedHTML(this._reasonInnerText)) {
+          this.reasonHasInvalidHTML = true;
 
-        this.frmReason.controls['reasonText'].setValue('');
-        this.frmReason.controls['reasonText'].markAsTouched();
-        this.frmReason.controls['reasonText'].markAsDirty();
-      } else {
-        this.reasonHasInvalidHTML = false;
-
-        if (!this._validateForSpaces(this._reasonInnerText)) {
-          this._reasonInnerHTML = e.target.innerHTML;
-
-          this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
-
+          this.frmReason.controls['reasonText'].setValue('');
           this.frmReason.controls['reasonText'].markAsTouched();
           this.frmReason.controls['reasonText'].markAsDirty();
-
-          this.showValidateBar = false;
-          this.reasonFailed = false;
-
-          this.hideText = true;
-          this.formSaved = false;
-
-          this._messageService.sendMessage({
-            validateMessage: {
-              validate: {},
-              showValidateBar: false
-            }
-          });
         } else {
-          this.frmReason.controls['reasonText'].setValue('');
-          this.frmReason.controls['reasonText'].markAsPristine();
-          this.frmReason.controls['reasonText'].markAsUntouched();
+          this.reasonHasInvalidHTML = false;
 
-          this._reasonInnerHTML = '';
-          this._reasonInnerText = '';
-          this._reasonTextContent = '';
+          if (!this._validateForSpaces(this._reasonInnerText)) {
+            this._reasonInnerHTML = e.target.innerHTML;
 
-          this.reasonFailed = true;
+            this.frmReason.controls['reasonText'].setValue(this._reasonInnerHTML);
+
+            this.frmReason.controls['reasonText'].markAsTouched();
+            this.frmReason.controls['reasonText'].markAsDirty();
+
+            this.showValidateBar = false;
+            this.reasonFailed = false;
+
+            this.hideText = true;
+            this.formSaved = false;
+
+            this._messageService.sendMessage({
+              validateMessage: {
+                validate: {},
+                showValidateBar: false
+              }
+            });
+          } else {
+            this.frmReason.controls['reasonText'].setValue('');
+            this.frmReason.controls['reasonText'].markAsPristine();
+            this.frmReason.controls['reasonText'].markAsUntouched();
+
+            this._reasonInnerHTML = '';
+            this._reasonInnerText = '';
+            this._reasonTextContent = '';
+
+            this.reasonFailed = true;
+          }
         }
+      } else {
+        this.frmReason.controls['reasonText'].setValue('');
+        this.frmReason.controls['reasonText'].markAsPristine();
+        this.frmReason.controls['reasonText'].markAsUntouched();
+
+        this.reasonHasInvalidHTML = false;
+
+        this.reasonFailed = true;
+
+        this._messageService.sendMessage({
+          validateMessage: {
+            validate: {},
+            showValidateBar: false
+          }
+        });
       }
-    } else {
-      this.frmReason.controls['reasonText'].setValue('');
-      this.frmReason.controls['reasonText'].markAsPristine();
-      this.frmReason.controls['reasonText'].markAsUntouched();
+    }
+  }
 
-      this.reasonHasInvalidHTML = false;
+  private _setF99Details(): void {
+    if(this.committee_details) {
+      if(this.committee_details.committeeid) {
+        this._form99Details = this.committee_details;
 
-      this.reasonFailed = true;
+        this._form99Details.reason = '';
+        this._form99Details.text = '';
+        this._form99Details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
+        this._form99Details.additional_email_1 = '-';
+        this._form99Details.additional_email_2 = '-';
+        this._form99Details.created_at = '';
+        this._form99Details.is_submitted = false;
+        this._form99Details.id = '';
 
-      this._messageService.sendMessage({
-        validateMessage: {
-          validate: {},
-          showValidateBar: false
-        }
-      });
+        let formSavedObj: any = {
+          'saved': false
+        };
+        localStorage.setItem(`form_99_details`, JSON.stringify(this._form99Details));
+        localStorage.setItem(`form_99_saved`, JSON.stringify(formSavedObj));
+      }
+    }
+  }
+
+  public checkIfEditMode() {
+    if (!this.editMode) {
+      this._dialogService
+        .newReport(
+          'This report has been filed with the FEC. If you want to change, you must file a new report.',
+          ConfirmModalComponent,
+          'Warning',
+          true, false, true
+          )
+        .then(res => {
+          if (res === 'cancel' ||
+          res === ModalDismissReasons.BACKDROP_CLICK ||
+          res === ModalDismissReasons.ESC) {
+            this.ngOnInit();
+            this._dialogService.checkIfModalOpen();
+          } else if (res === 'NewReport') {
+            this.editMode = true;
+            localStorage.removeItem('form_99_details');
+            localStorage.removeItem('form_99_saved');
+            this._setF99Details();
+            setTimeout(() => {
+              this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: this.editMode, refresh: true } });
+            }, 500);
+          }
+        });
     }
   }
 
@@ -431,7 +495,8 @@ export class ReasonComponent implements OnInit {
               form: this.frmReason,
               direction: 'next',
               step: 'step_3',
-              previousStep: 'step_2'
+              previousStep: 'step_2',
+              refresh: this._setRefresh
             });
 
             this._messageService.sendMessage({
@@ -507,9 +572,9 @@ export class ReasonComponent implements OnInit {
 
         this.showValidateBar = false;
 
-        if (this.file !== null) {
+        if (this._form99Details.id && this._form99Details.id !== null && this._form99Details.id !== '') {
           this._form99Details.file = this.file;
-          this._formsService.saveForm({}, this.file, this._formType).subscribe(
+          this._formsService.updateForm({}, this.file, this._formType).subscribe(
             res => {
               if (res) {
                 this._form99Details.id = res.id;
@@ -532,7 +597,7 @@ export class ReasonComponent implements OnInit {
           );
         } else {
           console.log('if file === null');
-          this._formsService.saveForm({}, {}, this._formType).subscribe(
+          this._formsService.saveForm({}, this.file, this._formType).subscribe(
             res => {
               if (res) {
                 this._form99Details.id = res.id;

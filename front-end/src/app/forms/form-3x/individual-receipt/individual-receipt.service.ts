@@ -50,6 +50,22 @@ export class IndividualReceiptService {
   }
 
   /**
+   * Gets the Levin account details.
+   *
+   */
+  public getLevinAccounts(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/core/levin_accounts`;
+    let httpOptions = new HttpHeaders();
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(url, {
+      headers: httpOptions
+    });
+  }
+
+  /**
    * Saves a schedule.
    *
    * @param      {string}           formType  The form type
@@ -315,6 +331,33 @@ export class IndividualReceiptService {
     }
     params = params.append('transaction_type_identifier', transactionTypeIdentifier);
     params = params.append('contribution_date', contributionDate);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+  }
+
+  public getFedNonFedPercentage(
+    amount: string,
+    activityEvent: string
+  ): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/sh1/get_h1_percentage';
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    // params.append('cmte_id', committeeDetails.committeeid);
+    // params.append('activity_event_type', activityEvent);
+    params = params.append('calendar_year', new Date().getFullYear().toString());
+
+    if (amount) {
+      // params = params.append('total_amount', amount.toString());
+    }
 
     return this._http.get(`${environment.apiUrl}${url}`, {
       headers: httpOptions,

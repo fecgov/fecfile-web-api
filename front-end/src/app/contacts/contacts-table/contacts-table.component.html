@@ -329,7 +329,7 @@
               </div>
             </div>
             <div class="col-md">
-              <div class="checkbox">
+              <div class="checkbox" *ngIf="isRecycleBinViewActive()">
                 <label>
                   <input [(ngModel)]="getSortableColumn('deletedDate').checked"
                     (change)="toggleVisibility('deletedDate', $event)" type="checkbox"

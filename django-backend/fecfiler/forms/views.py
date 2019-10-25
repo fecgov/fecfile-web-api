@@ -286,9 +286,11 @@ def create_f99_info(request):
                         return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     incoming_data['created_at'] = datetime.datetime.now()
+                    incoming_data['updated_at'] = incoming_data['created_at']
                     serializer = CommitteeInfoSerializer(data=incoming_data)
             else:
                 incoming_data['created_at'] = datetime.datetime.now()
+                incoming_data['updated_at'] = incoming_data['created_at']
                 serializer = CommitteeInfoSerializer(data=incoming_data)
         except CommitteeInfo.DoesNotExist:
             logger.debug("FEC Error 004:There is no unsubmitted data. Please create f99 form object before submitting")
@@ -332,6 +334,27 @@ def update_f99_info(request):
 
                 if comm_info:
                     if comm_info.is_submitted==False:
+                        comm_info.committeeid =  request.data.get('committeeid')
+                        comm_info.committeename = request.data.get('committeename')
+                        comm_info.street1 = request.data.get('street1')
+                        comm_info.street2 = request.data.get('street2')
+                        comm_info.city = request.data.get('city')
+                        comm_info.state = request.data.get('state')
+                        comm_info.text = request.data.get('text')
+                        comm_info.reason = request.data.get('reason')
+                        comm_info.zipcode = request.data.get('zipcode')
+                        comm_info.treasurerlastname = request.data.get('treasurerlastname')
+                        comm_info.treasurerfirstname = request.data.get('treasurerfirstname')
+                        comm_info.treasurermiddlename = request.data.get('treasurermiddlename')
+                        comm_info.treasurerprefix = request.data.get('treasurerprefix')
+                        comm_info.treasurersuffix = request.data.get('treasurersuffix')
+                        comm_info.is_submitted = request.data.get('is_submitted')
+
+                        comm_info.file = request.data.get('file')
+                        comm_info.filename = request.data.get('file').name
+                        comm_info.form_type = request.data.get('form_type')
+                        comm_info.coverage_start_date = request.data.get('coverage_start_date')
+                        comm_info.coverage_end_date = request.data.get('coverage_end_date')                       
                         comm_info.signee = request.data.get('signee')
                         comm_info.email_on_file = request.data.get('email_on_file')
                         comm_info.email_on_file_1 = request.data.get('email_on_file_1')

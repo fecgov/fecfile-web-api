@@ -355,8 +355,28 @@ def get_list_all_report(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET all rows from Reports table
-            query_string = """SELECT report_id, cmte_id, form_type, report_type, amend_ind, amend_number, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, email_1, email_2, filed_date, fec_id, fec_accepted_date, fec_status, create_date, last_update_date
-                                                    FROM public.reports WHERE delete_ind is distinct from 'Y' AND cmte_id = %s""" 
+            query_string = """
+            SELECT report_id, 
+            cmte_id, 
+            form_type, 
+            report_type, 
+            amend_ind, 
+            amend_number, 
+            cvg_start_date, 
+            cvg_end_date, 
+            due_date, 
+            superceded_report_id, 
+            previous_report_id, 
+            status, 
+            email_1, 
+            email_2, 
+            filed_date, 
+            fec_id, 
+            fec_accepted_date, 
+            fec_status, 
+            create_date, 
+            last_update_date
+            FROM public.reports WHERE delete_ind is distinct from 'Y' AND cmte_id = %s""" 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
            
             for row in cursor.fetchall():
@@ -904,7 +924,8 @@ def post_sql_entity(
     cand_office,
     cand_office_state,
     cand_office_district,
-    cand_election_year):
+    cand_election_year,
+    phone_number):
 
     try:
         with connection.cursor() as cursor:
@@ -933,8 +954,9 @@ def post_sql_entity(
                     cand_office_state,
                     cand_office_district,
                     cand_election_year,
+                    phone_number,
                     create_date)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
                 [
                     entity_id, 
@@ -958,6 +980,7 @@ def post_sql_entity(
                     cand_office_state,
                     cand_office_district,
                     cand_election_year,
+                    phone_number,
                     datetime.datetime.now(),
                 ]
                     )
@@ -989,7 +1012,9 @@ def get_list_entity(entity_id, cmte_id):
             cand_office,
             cand_office_state,
             cand_office_district,
-            cand_election_year
+            cand_election_year,
+            phone_number,
+            last_update_date
         FROM public.entity 
         WHERE entity_id = %s 
         AND cmte_id = %s 
@@ -1033,7 +1058,9 @@ def get_list_all_entity(cmte_id):
             cand_office,
             cand_office_state,
             cand_office_district,
-            cand_election_year
+            cand_election_year,
+            phone_number,
+            last_update_date
         FROM public.entity 
         WHERE cmte_id = %s 
         AND delete_ind is distinct from 'Y'
@@ -1071,6 +1098,7 @@ def put_sql_entity(
     cand_office_state,
     cand_office_district,
     cand_election_year,
+    phone_number,
     cmte_id):
 
     try:
@@ -1099,7 +1127,9 @@ def put_sql_entity(
                     cand_office = %s,
                     cand_office_state = %s,
                     cand_office_district = %s,
-                    cand_election_year = %s 
+                    cand_election_year = %s,
+                    phone_number=%s,
+                    last_update_date=%s
                 WHERE entity_id = %s AND cmte_id = %s 
                 AND delete_ind is distinct FROM 'Y'
                 """,
@@ -1123,6 +1153,9 @@ def put_sql_entity(
                     cand_office_state,
                     cand_office_district,
                     cand_election_year,
+                    phone_number,
+                    datetime.datetime.now(),
+                    # last_update_date,
                     entity_id, 
                     cmte_id,
                     ])                       
@@ -1224,7 +1257,9 @@ def post_entities(data):
             data.get('cand_office'),
             data.get('cand_office_state'),
             data.get('cand_office_district'),
-            data.get('cand_election_year')
+            data.get('cand_election_year'),
+            data.get('phone_number'),
+            # data.get('last_update_date')
             )
         output = get_entities(data)
         return output[0]
@@ -1265,13 +1300,13 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
                 suffix, street_1, street_2, city, state, zip_code, 
                 occupation, employer, ref_cand_cmte_id, delete_ind, 
                 create_date, last_update_date, cand_office, cand_office_state, 
-                cand_office_district, cand_election_year)
+                cand_office_district, cand_election_year, phone_number)
             SELECT %s, entity_type, %s, entity_name, 
                 first_name, last_name, middle_name, preffix, 
                 suffix, street_1, street_2, city, state, zip_code, 
                 occupation, employer, ref_cand_cmte_id, delete_ind, 
                 create_date, last_update_date, cand_office, cand_office_state, 
-                cand_office_district, cand_election_year
+                cand_office_district, cand_election_year, phone_number
             FROM public.entity e 
             WHERE e.entity_id = %s;
             """
@@ -1362,6 +1397,8 @@ def put_entities(data):
             data.get('cand_office_state'),
             data.get('cand_office_district'),
             data.get('cand_election_year', None),
+            data.get('phone_number'),
+            # data.get('last_update_date'),
             cmte_id)
         output = get_entities(data)
         return output[0]
@@ -1430,7 +1467,8 @@ def entities(request):
                     'cand_office': request.data.get('cand_office'),
                     'cand_office_state': request.data.get('cand_office_state'),
                     'cand_office_district': request.data.get('cand_office_district'),
-                    'cand_election_year': request.data.get('cand_election_year')
+                    'cand_election_year': request.data.get('cand_election_year'),
+                    'phone_number': request.data.get('phone_number'),
                 }     
             data = post_entities(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -1486,7 +1524,9 @@ def entities(request):
                 'cand_office': request.data.get('cand_office'),
                 'cand_office_state': request.data.get('cand_office_state'),
                 'cand_office_district': request.data.get('cand_office_district'),
-                'cand_election_year': request.data.get('cand_election_year')
+                'cand_election_year': request.data.get('cand_election_year'),
+                'phone_number': request.data.get('phone_number'),
+                # 'last_update_date': request.data.get('last_update_date')
             }      
             data = put_entities(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -2133,7 +2173,7 @@ def get_all_transactions(request):
         # a 'child' element to their parent
         trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
                                     where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
-                                    AND back_ref_transaction_id is null
+                                    AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                                     """
                                     # + """ ORDER BY """ + order_string
         # print("trans_query_string: ",trans_query_string)
@@ -3904,6 +3944,105 @@ def contact_sql_dict(data):
     except:
         raise
 
+
+def contact_entity_dict(data):
+    """
+    filter data, validate fields and build entity item dic
+    """
+    try:
+        datum = {
+         # 'cmte_id' : data.get('cmte_id'),
+          'entity_id' : is_null(data.get('id')),   
+          'entity_type'  : is_null(data.get('entity_type')), 
+          'entity_name'  : is_null(data.get('entity_name')), 
+          'first_name'  : is_null(data.get('firstName')), 
+          'last_name'  : is_null(data.get('lastName')), 
+          'middle_name' : is_null(data.get('middleName')), 
+          'preffix'  : is_null(data.get('preffix')), 
+          'suffix' : is_null(data.get('suffix')), 
+          'street_1'  : is_null(data.get('street1')), 
+          'street_2'  : is_null(data.get('street2')), 
+          'city'  : is_null(data.get('city')),  
+          'state' : is_null(data.get('state')), 
+          'zip_code' : is_null(data.get('zip')), 
+          'occupation'  : is_null(data.get('occupation')), 
+          'employer' : is_null(data.get('employer')), 
+          'cand_office'  : is_null(data.get('candOffice')), 
+          'cand_office_state'  : is_null(data.get('candOfficeState')), 
+          'cand_office_district'  : is_null(data.get('candOfficeDistrict')), 
+          'ref_cand_cmte_id'  : is_null(data.get('candCmteId')), 
+          'phone_number'  : is_null(data.get('phoneNumber'),'phone_number'),
+          'cand_election_year': is_null(data.get('candElectionYear'),'cand_election_year'),
+          'last_update_date' : is_null(data.get('lastupdatedate')),
+        }
+
+        return datum
+    except:
+        raise
+
+def put_contact_data(data):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE public.entity SET 
+                    entity_type = %s, 
+                    entity_name = %s, 
+                    first_name = %s, 
+                    last_name = %s, 
+                    middle_name = %s, 
+                    preffix = %s, 
+                    suffix = %s, 
+                    street_1 = %s, 
+                    street_2 = %s, 
+                    city = %s, 
+                    state = %s, 
+                    zip_code = %s, 
+                    occupation = %s, 
+                    employer = %s, 
+                    ref_cand_cmte_id = %s,
+                    cand_office = %s,
+                    cand_office_state = %s,
+                    cand_office_district = %s,
+                    phone_number= %s,
+                    cand_election_year =%s,
+                    last_update_date = %s 
+                WHERE entity_id = %s
+                AND cmte_id = %s 
+                AND delete_ind is distinct FROM 'Y'
+                """,
+                [
+                data.get('entity_type', ""), 
+                data.get('entity_name', ""), 
+                data.get('first_name', ""), 
+                data.get('last_name', ""), 
+                data.get('middle_name', ""), 
+                data.get('preffix', ""), 
+                data.get('suffix', ""), 
+                data.get('street_1', ""), 
+                data.get('street_2', ""), 
+                data.get('city', ""), 
+                data.get('state', ""), 
+                data.get('zip_code', None), 
+                data.get('occupation', ""), 
+                data.get('employer', ""), 
+                data.get('ref_cand_cmte_id'), 
+                data.get('cand_office', ""),
+                data.get('cand_office_state', ""),
+                data.get('cand_office_district', ""),
+                data.get('phone_number'),
+                data.get('cand_election_year', None),
+                datetime.datetime.now(),
+                data.get('entity_id'),
+                data.get('cmte_id')])                       
+                
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    'The Entity ID: {} does not exist in Entity table'.format(entity_id))
+    
+    except Exception:
+        raise
+
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def contacts(request):
     """
@@ -3929,15 +4068,36 @@ def contacts(request):
     """
     # Get records from entity table
     if request.method == 'GET':
-        datum=[]
-        return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+
+
+        try:
+            data = {
+                'cmte_id': request.user.username,
+                }
+            if 'report_id' in request.query_params:
+                data['report_id'] = request.query_params.get('report_id')
+            output = get_contact(data)   
+            return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            logger.debug(e)
+            return Response("The reports API - GET is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     """
     ************************************************* contact - PUT API CALL STARTS HERE **********************************************************
     """
     if request.method == 'PUT':
-        output=[]
-        return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+        try:
+            datum = contact_entity_dict(request.data)
+            datum['cmte_id'] = request.user.username
+            #datum['cmte_id'] = cmte_id
+            put_contact_data(datum)
+            print ("datum", datum)
+            output = get_entities(datum)
+            return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            return Response("The contacts API - PUT is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+        
 
     """
     ************************************************ contact - DELETE API CALL STARTS HERE **********************************************************
@@ -4050,7 +4210,9 @@ def get_list_contact(cmte_id, entity_id = None, name_select_flag = False, entity
 
 def is_null(check_value, check_field =""):
     # if phone_nmumber is numeric field so pass 0 as default 
-    if check_field == "phone_number" and (check_value == None or check_value in ["null", " ", "", "none", "Null"]):
+    if check_field == "phone_number" and (check_value == None or check_value in ["null", " ", "", "none", "Null", "None"]):
+        return None
+    elif check_field == "cand_election_year" and (check_value == None or check_value in ["null", " ", "", "none", "Null", "None"]):
         return None
     elif check_value == None or check_value in ["null", " ", "", "none","Null"]:
         return ""
@@ -4561,8 +4723,12 @@ def clone_a_transaction(request):
     """
     api for clone a transaction. 
     expect: a transaction_id for transaction to be cloned
-    return: new transaction_id with clone status
-    e.g.: {'transaction_id': 'SA100095', 'status': 'success'}
+    return: new transaction_id with clone data in json
+    note:
+    1. transaction date is set to current date 
+    2. transaction amount is set to 0
+    3. create date is also today's date 
+    4. last update date has null value
     """
     # TODO: need to update this list for ohter transactions
     logger.debug('request for cloning a transaction:{}'.format(request.data))
@@ -4575,6 +4741,8 @@ def clone_a_transaction(request):
     }
     # cmte_id = request.user.username
     transaction_id = request.data.get('transaction_id')
+    if not transaction_id:
+        raise Exception('Error: transaction_id is required for this api.')
 
     if transaction_id[0:2] in transaction_tables:
         transaction_table = transaction_tables.get(transaction_id[0:2])
@@ -4597,13 +4765,27 @@ def clone_a_transaction(request):
             columns.append(row[0])
         logger.debug('table columns: {}'.format(list(columns)))
 
+
+
         insert_str = ','.join(columns)
         replace_list = ['transaction_id', 'create_date', 'last_update_date']
         tmp_list = [col if col not in replace_list else '%s' for col in columns]
         select_str = ','.join(tmp_list)
+
+        # set transaction date to today's date and transaction amount to 0
+        from datetime import date
+        _today = date.today().strftime('%m/%d/%Y')
+        if transaction_id.startswith('SA'):
+            select_str = select_str.replace('contribution_date', "'"+_today+"'")
+            select_str = select_str.replace('contribution_amount', "'"+'0.00'+"'")
+        if transaction_id.startswith('SB'):
+            select_str = select_str.replace('expenditure_date', "'"+_today+"'")
+            select_str = select_str.replace('expenditure_amount', "'"+'0.00'+"'")
+            # exclude_list = ['expenditure_date', 'expenditure_amount'] 
         # select_str = insert_str.replace(',transaction_id,', ',%s,'
         # ).replace('create_date', '%s'
         # ).replace('last_update_date', '%s')
+        
         
         clone_sql = """
             INSERT INTO public.{table_name}({_insert})
@@ -4614,11 +4796,35 @@ def clone_a_transaction(request):
         logger.debug('clone transaction with sql:{}'.format(clone_sql))
 
         new_tran_id = get_next_transaction_id(transaction_id[0:2])
+        logger.debug('new transaction id:{}'.format(new_tran_id))
 
         cursor.execute(clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id))
+
         if not cursor.rowcount:
             raise Exception('transaction clone error')
-        return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
+
+
+        # exclude_list = []
+        # if transaction_id.startswith('SA'):
+        #     exclude_list = ['contribution_date', 'contribution_amount']
+        # if transaction_id.startswith('SB'):
+            # exclude_list = ['expenditure_date', 'expenditure_amount'] 
+        # columns = set(columns) - set(exclude_list)
+        select_str = ','.join(columns)
+        load_sql = """
+        SELECT {_select}
+        FROM public.{table_name}
+        """.format(table_name=transaction_table, _select=select_str)
+
+        load_sql = """SELECT json_agg(t) 
+        FROM (""" + load_sql + """WHERE transaction_id = '{}' ) t
+        """.format(new_tran_id)
+        logger.debug('load_sql:{}'.format(load_sql))
+        cursor.execute(load_sql)
+        rep_json = cursor.fetchone()[0]
+
+        # return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
+        return Response(rep_json, status=status.HTTP_200_OK)
 
 """
 ********************************************************************************************************************************
@@ -4626,12 +4832,10 @@ GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TE
 ********************************************************************************************************************************
 """
 
-
 def get_reports_data(report_id):
     try:
-        query_string = """SELECT * FROM public.reports WHERE report_id = %s"""
+        query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL """
         forms_obj = None
-        #commented by Mahendra 10052019
         #print('here',forms_obj)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id])
@@ -4657,40 +4861,55 @@ def insert_sql_report(dict_data):
         raise
 
 
-@api_view(['PUT'])
-def new_report_update_date(request):
-    logger.debug('request for update report last_update_date:')
+
+def create_amended(reportid):
     try:
-        if request.method == 'PUT':
-            cmte_id = request.user.username
-            logger.debug('cmte id:{}'.format(cmte_id))
-            if not request.data.get('report_id'):
-                raise Exception("Error: report_id is required for this api.")
-            report_id = check_report_id(request.data.get('report_id'))
-            logger.debug('report_id:{}'.format(report_id))
-            _sql = """
-            UPDATE public.reports
-            SET last_update_date = %s
-            WHERE cmte_id = %s
-            AND report_id = %s 
-            """
-            with connection.cursor() as cursor:
-                cursor.execute(_sql, [
-                    datetime.datetime.now(),
-                    cmte_id,
-                    report_id
-                ])
-                if cursor.rowcount == 0:
-                    raise Exception('Error: updating report update date failed.')
-            
+        data_dict = get_reports_data(reportid)
+        if data_dict:
+            #data = data[0]
+            report_id = get_next_report_id()
+
+            for data in data_dict:
+                #print(data)
+                data['report_id'] = report_id
+
+                #post_sql_report(reports_obj(''))
+                data['amend_ind'] = 'A'
+                data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
+                data['previous_report_id'] = reportid
+                #data['report_seq'] = get_next_report_id()
+                del data['report_seq']
+                data['status'] = 'Saved'
+                #print(data,'here')
+                insert_sql_report(data)
+                #print(data)
+
+                with connection.cursor() as cursor:
+                    cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[report_id, reportid]) 
+
+                return data
+
         else:
-            raise Exception('Error: request type not implemented.')
+            return False
+
     except Exception as e:
-        return Response(
-            "new report update date API is throwing an error: " + str(e), 
-            status=status.HTTP_400_BAD_REQUEST
-            )
-    return Response({"result" : "success"}, status=status.HTTP_200_OK)
+        print(e)
+        return False
+
+
+def get_report_ids(cmte_id, from_date):
+    data_ids =[]
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT report_id FROM public.reports WHERE cmte_id= %s AND cvg_start_date >= %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL""", [cmte_id, from_date])
+            if cursor.rowcount > 0:
+                for row in cursor.fetchall():
+                    data_ids.append(row[0])
+            
+        return data_ids
+    except Exception as e:
+        print(e)
+        return data_ids
 
 
 
@@ -4700,30 +4919,46 @@ def create_amended_reports(request):
     try:
         if request.method == 'POST':
             reportid = request.POST.get('report_id')
-            print('create_amended_reports',reportid)
-            data_dict = get_reports_data(reportid)
-            if data_dict:
-                #data = data[0]
-                report_id = get_next_report_id()
+            cmte_id = request.user.username
 
-                for data in data_dict:
-                    print(data)
-                    data['report_id'] = str(report_id)
+            val_data = get_reports_data(reportid)
 
-                    #post_sql_report(reports_obj(''))
-                    data['amend_ind'] = 'A'
-                    data['amend_number'] = data.get('amend_number')+1 if data.get('amend_number') else 1
-                    data['previous_report_id'] = reportid
-                    data['report_seq'] = str(get_next_report_id())
-                    print(data,'here')
-                    insert_sql_report(data)
+            if not val_data:
+                return Response("Given Report_id canot be amended", status=status.HTTP_400_BAD_REQUEST)
+
+
+            cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
+
+            #cdate = date.today()
+            from_date = cvg_start_date
+            data_obj = None
+
+            report_id_list = get_report_ids(cmte_id, from_date)
+
+            print(report_id_list, from_date)
+
+            if report_id_list:
+                for i in report_id_list:
+                    amended_obj = create_amended(i)
+                    if str(i) == str(reportid):
+                        data_obj = amended_obj
+
+
+            
                     #post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
             else:
                 return Response("Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST)
 
-        return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
 
 def none_text_to_none(text):
     try:
@@ -5057,4 +5292,39 @@ def levin_accounts(request):
 
     else:
         pass
+
+@api_view(['PUT'])
+def new_report_update_date(request):
+    logger.debug('request for update report last_update_date:')
+    try:
+        if request.method == 'PUT':
+            cmte_id = request.user.username
+            logger.debug('cmte id:{}'.format(cmte_id))
+            if not request.data.get('report_id'):
+                raise Exception("Error: report_id is required for this api.")
+            report_id = check_report_id(request.data.get('report_id'))
+            logger.debug('report_id:{}'.format(report_id))
+            _sql = """
+            UPDATE public.reports
+            SET last_update_date = %s
+            WHERE cmte_id = %s
+            AND report_id = %s 
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [
+                    datetime.datetime.now(),
+                    cmte_id,
+                    report_id
+                ])
+                if cursor.rowcount == 0:
+                    raise Exception('Error: updating report update date failed.')
+            
+        else:
+            raise Exception('Error: request type not implemented.')
+    except Exception as e:
+        return Response(
+            "new report update date API is throwing an error: " + str(e), 
+            status=status.HTTP_400_BAD_REQUEST
+            )
+    return Response({"result" : "success"}, status=status.HTTP_200_OK)
 

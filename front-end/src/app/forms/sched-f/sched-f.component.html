@@ -1,54 +1,296 @@
 <ng-template #rt let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
-</ng-template>
-<ng-template #rtOrg let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
-</ng-template>
-<ng-template #rtCommitteeId let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
-</ng-template>
-<ng-template #rtCandidateId let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
-</ng-template>
-<ng-template #rtCommitteeName let-r="result" let-t="term">
+    <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+  </ng-template>
+  <ng-template #rtOrg let-r="result" let-t="term">
+    <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
+  </ng-template>
+  <ng-template #rtCommitteeId let-r="result" let-t="term">
+    <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
+  </ng-template>
+  <ng-template #rtCandidateId let-r="result" let-t="term">
+    <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
+  </ng-template>
+  <ng-template #rtCommitteeName let-r="result" let-t="term">
     <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
-</ng-template>
-<ng-template #rtCandidate let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
-</ng-template>
-<div class="individual-receipt-container">
-  <form [formGroup]="frmIndividualReceipt">
-    <header>
-      <div class="header-content">
-        <div class="float-left">
-          <h2>
-            Form 3X
-            <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
-            <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container>
-          </h2>
-        </div>
-        <div class="float-right" ngbDropdown>
-          <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
-            <span class="ellipsis-icon" aria-hidden="true"></span>
-            <span class="sr-only">Click for more options</span>
-          </button>
-          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
-            <button class="dropdown-item"><i class="file-import-icon" (click)="ImportTransactions()"></i> Import</button>
+  </ng-template>
+  <ng-template #rtCandidate let-r="result" let-t="term">
+    <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
+  </ng-template>
+  <div class="sched-f-container">
+    <form [formGroup]="frmIndividualReceipt">
+      <header>
+        <div class="header-content">
+          <div class="float-left">
+            <h2>
+              Form 3X
+              <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
+              <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container>
+            </h2>
+          </div>
+          <div class="float-right" ngbDropdown>
+            <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
+              <span class="ellipsis-icon" aria-hidden="true"></span>
+              <span class="sr-only">Click for more options</span>
+            </button>
+            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+              <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
+              <button class="dropdown-item">
+                <i class="file-import-icon" (click)="ImportTransactions()"></i> Import
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <hr />
+        <div class="row">
+          <div class="col-md-12">
+            <hr />
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+  
+      <section *ngIf="loaded">
+        <div [hidden]="showPart2" class="paragraph">
+          <div class="col coord_expenditure_text">
+            <h3>Has filer been designated to make a Coordinated Expenditure?</h3>
+          </div>
+          <div class="row">
+            <div class="col col-md-5">
+              <div class="form-check form-check-inline">                  
+                <label for="coord_expenditure_y"                   
+                  [ngClass]="
+                  frmIndividualReceipt.get('coord_expenditure_yn')?.invalid &&
+                  (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                    ? 'input-field-label-error'
+                    : ''
+                  ">
+                  <input
+                    id="coord_expenditure_y"
+                    type="radio"
+                    formControlName="coord_expenditure_yn"
+                    value="Y"
+                  />
+                  Yes
+                </label>
+              </div>
+              <div class="form-check form-check-inline">                 
+                <label for="coord_expenditure_n"
+                  [ngClass]="
+                  frmIndividualReceipt.get('coord_expenditure_yn')?.invalid &&
+                  (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                    ? 'input-field-label-error'
+                    : ''
+                ">
+                  <input
+                    id="coord_expenditure_n"
+                    type="radio"
+                    formControlName="coord_expenditure_yn"
+                    value="N"
+                  />
+                  No
+                </label>
+              </div>
 
-    <section class ="paragraph">
-      <ng-container *ngFor="let hiddenField of hiddenFields">
-        <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
-      </ng-container>
+            </div>            
+          </div>
+          <div class="row">
+            <div class="col col-md-5">
+              <div class="form-group">
+                <label for="">
+                  Designating Committee ID Number
+                </label>
+                <input class="form-control" 
+                  type="text" 
+                  [formControlName]="'designated_com_id'"
+                  [attr.name]="'designated_com_id'"
+                  [style.width]="'45%'" 
+                  [style.height]="'30px'"
+                  [ngClass]="
+                    frmIndividualReceipt.get('designated_com_id')?.invalid &&
+                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      ? 'input-field-error'
+                      : ''
+                  " 
+                  />
+              </div>
+            </div>
+            <div class="col col-md-5">
+              <div class="form-group">
+                <label for="">
+                  Designating Committee Name
+                </label>
+                <input class="form-control" 
+                  type="text" 
+                  [formControlName]="'designated_com_name'"
+                  [attr.name]="'designated_com_name'"
+                  [style.width]="'100%'" 
+                  [style.height]="'30px'"
+                  [ngClass]="
+                    frmIndividualReceipt.get('designated_com_name')?.invalid &&
+                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      ? 'input-field-error'
+                      : ''
+                  "
+                  />
+              </div>
+            </div>        
+          </div>
+          <div class="row">
+            <div class="col col-md-5">
+              <div class="form-group">
+                <label for="">
+                  Subordinate Committee ID Number
+                </label>
+                <input class="form-control" 
+                  type="text" 
+                  [formControlName]="'subordinate_com_id'"
+                  [attr.name]="'subordinate_com_id'"
+                  [style.width]="'45%'" 
+                  [style.height]="'30px'"
+                  [ngClass]="
+                    frmIndividualReceipt.get('subordinate_com_id')?.invalid &&
+                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      ? 'input-field-error'
+                      : ''
+                  "                            
+                />
+              </div>
+            </div>
+            <div class="col col-md-5">
+              <div class="form-group">
+                <label for="">
+                    Subordinate Committee Name
+                </label>
+                <input class="form-control" 
+                  type="text" 
+                  [formControlName]="'subordinate_com_name'"
+                  [attr.name]="'subordinate_com_name'"
+                  [style.width]="'100%'" 
+                  [style.height]="'30px'"
+                  [ngClass]="
+                    frmIndividualReceipt.get('subordinate_com_name')?.invalid &&
+                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      ? 'input-field-error'
+                      : ''
+                  "              
+                />
+              </div>
+            </div>        
+          </div>
+          <div class="row">
+            <div class="col col-md-5">
+              <div class="form-group">
+                <label for="">
+                  Street 1
+                </label>
+                <input class="form-control" 
+                  type="text" 
+                  [formControlName]="'street_1_co_exp'"
+                  [attr.name]="'street_1_co_exp'"
+                  [style.width]="'80%'" 
+                  [style.height]="'30px'"
+                  [ngClass]="
+                    frmIndividualReceipt.get('street_1_co_exp')?.invalid &&
+                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      ? 'input-field-error'
+                      : ''
+                  "                
+                />
+              </div>
+            </div>
+            <div class="col col-md-5">
+              <div class="form-group">
+                <label for="">
+                    Street 2 (Optional)
+                </label>
+                <input class="form-control" 
+                  type="text" 
+                  [formControlName]="'street_2_co_exp'"
+                  [attr.name]="'street_2_co_exp'"
+                  [style.width]="'80%'" 
+                  [style.height]="'30px'"
+                  [ngClass]="
+                    frmIndividualReceipt.get('street_2_co_exp')?.invalid &&
+                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      ? 'input-field-error'
+                      : ''
+                  "                
+                />
+              </div>
+            </div>        
+          </div>
+          <div class="row">
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="">
+                  City
+                </label>
+                <input class="form-control" 
+                  type="text" 
+                  [formControlName]="'city_co_exp'"
+                  [attr.name]="'city_co_exp'"
+                  [style.width]="'66%'" 
+                  [style.height]="'30px'"
+                  [ngClass]="
+                    frmIndividualReceipt.get('city_co_exp')?.invalid &&
+                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      ? 'input-field-error'
+                      : ''
+                  "                
+                />
+              </div>
+            </div>
+            <div class="col col-md-4">
+              <div class="form-group" [style.width]="'235px'">
+                <label for="">
+                    State
+                </label>
+                <ng-select #stateSelect 
+                  [items]="states" 
+                  (change)="handleStateChange($event, col)"
+                  class="forms__select" 
+                  [formControlName]="'state_co_exp'" 
+                  bindValue="code" 
+                  bindLabel="code" 
+                  [selectOnTab]="true"
+                  [ngClass]="
+                      frmIndividualReceipt.get(col?.name)?.invalid &&
+                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                        ? 'forms__select-error'
+                        : ''
+                    ">
+                  <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+                    <span>{{ item.code + ' - ' + item.name }}</span>
+                  </ng-template>
+                </ng-select>
+              </div>
+            </div>
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="">
+                    Zip
+                </label>
+                <input class="form-control" 
+                  type="text" 
+                  [formControlName]="'zip_co_exp'"
+                  [attr.name]="'zip_co_exp'"
+                  [style.width]="'33%'" 
+                  [style.height]="'30px'"
+                  [ngClass]="
+                    frmIndividualReceipt.get('zip_co_exp')?.invalid &&
+                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      ? 'input-field-error'
+                      : ''
+                  "                
+                />
+              </div>
+            </div>                
+          </div>                     
+        </div>
+      </section>
+  
+      <section *ngIf="showPart2" class="paragraph">
+        <ng-container *ngFor="let hiddenField of hiddenFields">
+          <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
+        </ng-container>
         <ng-container *ngFor="let row of formFields; let i = index">
           <ng-container *ngIf="titles[i]?.fieldset">
             <div class="subtitle-indv">
@@ -75,8 +317,8 @@
                         <i class="info-icon" aria-hidden="true"></i>
                         <span class="sr-only">Click here for more information</span>
                       </div>
-                      <ng-container *ngIf="!col?.validation?.required 
-                        && !col?.isReadonly">
+
+                      <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'">
                         (Optional)
                       </ng-container>
                     </label>
@@ -93,8 +335,6 @@
                         <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                         <!-- && col?.name !== 'child*entity_name'
                           && col?.name !== 'child*donor_cmte_id'" -->
-                          <!-- (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
-                                    ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)" -->
                         <input *ngIf="col?.name !== 'first_name' 
                                 && col?.name !== 'last_name'
                                 && !isFieldName(col?.name, 'cand_first_name')
@@ -112,7 +352,8 @@
                           [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount') 
                                         || isFieldName(col?.name, 'contribution_aggregate'))? col?.validation?.max + 5: col?.validation?.max"
                           [formControlName]="col?.name"
-                          (blur)="handleOnBlurEvent($event, col)"    
+                          (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
+                                    ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -393,145 +634,32 @@
               </div>
             </div>
           </ng-container>
-          <ng-container *ngIf="row.childForm">
-            <div class="row">
-              <div [class]="row.colClassName">
-                {{ row.childFormTitle }}
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">
-                <hr />
-              </div>
-            </div>
-          </ng-container>
         </ng-container>
-        <app-sub-transactions-table [hidden]="!isShowChildTransactions()" 
-          [subTransactions]="subTransactions"
-          [formType]="formType">
-        </app-sub-transactions-table>
-        <div class="forms__btn-container">
-          <button *ngIf="!subTransactionInfo?.isEarmark &&
-                        subTransactionInfo?.isParent && !multipleSubTransactionInfo" 
-            class="btn btn-primary btn-left"
-            (click)="saveForAddSub()">
-            <i class="plus-icon-circle" aria-hidden="true"></i>
-            Add {{ subTransactionInfo.subTransactionTypeDescription }}
-          </button>
-          <div [ngStyle]="{'min-height': memoDropdownSize}" style="height: auto">
-            <div *ngIf="subTransactionInfo?.isParent && multipleSubTransactionInfo" ngbDropdown class="d-inline-block"
-              placement="bottom-left" (openChange)="multipleMemoDropdownChanged($event)">
-              <button class="btn btn-primary dropdown-toggle" id="jfMemoDropdown" ngbDropdownToggle>
-                <i class="plus-icon-circle" aria-hidden="true"></i>
-                <ng-container *ngIf="transactionType === 'DEBT_TO_VENDOR'; else jfTransferMemo">
-                  Make a Payment to Debt
-                </ng-container>
-                <ng-template #jfTransferMemo>Add JF Transfer Memo</ng-template>
-                
-                <i class="dropdown-icon" aria-hidden="true"></i>
-              </button>
-              <div ngbDropdownMenu aria-labelledby="jfMemoDropdown" id="jfMemoDropdown-menu">
-                <ng-container *ngFor="let jfMemo of multipleSubTransactionInfo">
-                  <button ngbDropdownItem (click)="saveForAddMemoSub(jfMemo)">
-                    {{jfMemo.subTransactionTypeDescription}}
-                  </button>
-                </ng-container>
-              </div>
-            </div>
-          </div>
-        </div>
-      <!--</ng-container>-->
-    </section>
-    <footer>
+      </section>
+  
       <footer>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <div *ngIf="subTransactionInfo?.isEarmark === true; else allOtherTrx">   
-                <!-- <div>The scheduleAction is {{scheduleAction}}</div>              -->                
-                <ng-template *ngIf="scheduleAction === editScheduleAction; then editEarMarkTrx; else createEarMarkTrx">
-                </ng-template>
-
-                <ng-template #editEarMarkTrx>
-                  <button class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
-                    Cancel
-                  </button>
-                  <button *ngIf="subTransactionInfo?.isParent" class="btn btn-primary btn-right"
-                    (click)="saveForEditEarmark()">
-                    Next
-                  </button>
-                  <button *ngIf="subTransactionInfo?.isParent === false"
-                    class="btn btn-secondary btn-right" 
-                    (click)="updateOnly()">
-                    Save
-                  </button>
-                  <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
-                    (click)="saveAndReturnToParent()">
-                    Return to {{ subTransactionInfo.transactionTypeDescription }}
-                  </a>                  
-                </ng-template>
-                
-                <ng-template #createEarMarkTrx>
-                  <button *ngIf="!subTransactionInfo || subTransactionInfo?.isParent" class="btn btn-previous btn-left" type="button"
-                    (click)="previousStep()">
-                    Previous
-                  </button>
-                  <button *ngIf="subTransactionInfo?.isParent" class="btn btn-primary btn-right"
-                    (click)="saveForAddEarmark()">
-                    Next
-                  </button>
-                  <button *ngIf="subTransactionInfo?.isParent === false"
-                    class="btn btn-secondary btn-right" (click)="saveAndReturnToNewParent()">
-                    Save &amp; Add Transaction
-                  </button>
-                  <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
-                    (click)="saveAndReturnToParent()">
-                    Return to {{ subTransactionInfo.transactionTypeDescription }}
-                  </a>
-                  <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="viewTransactions()">
-                    View Transactions
-                  </a>
-                </ng-template>
+        <footer>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="forms__btn-container">
+                <button class="btn btn-previous btn-left" type="button" 
+                  (click)="clearFormValues(); returnToParent(editScheduleAction)">
+                  Cancel
+                </button>
+                <button *ngIf="!showPart2" class="btn btn-secondary btn-right" (click)="next()">
+                  Next
+                </button>
+                <button *ngIf="showPart2" class="btn btn-secondary btn-right" (click)="back()">
+                  Back
+                </button>              
+                <a class="btn btn-primary btn-right" (click)="saveAndReturnToParentDebt()">
+                  Return to Debt to Vendor
+                </a>
               </div>
-
-              <ng-template #allOtherTrx>
-                <div *ngIf="scheduleAction === editScheduleAction; else createActions">
-                  <button class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
-                    Cancel
-                  </button>
-                  <button class="btn btn-secondary btn-right" (click)="updateOnly()">
-                    Save
-                  </button>
-                  <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
-                    (click)="saveAndReturnToParent()">
-                    Return to {{ subTransactionInfo.transactionTypeDescription }}
-                  </a>
-                </div>
-                <ng-template #createActions>
-                  <button *ngIf="!subTransactionInfo || subTransactionInfo?.isParent" class="btn btn-previous btn-left" type="button"
-                    (click)="previousStep()">
-                    Previous
-                  </button>
-                  <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false" class="btn btn-previous btn-left"
-                    type="button" (click)="returnToParent(editScheduleAction)">
-                    Cancel
-                  </button>
-                  <button class="btn btn-secondary btn-right" (click)="saveOnly()">
-                    Save &amp; Add Transaction
-                  </button>
-                  <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
-                    (click)="saveAndReturnToParent()">
-                    Return to {{ subTransactionInfo.transactionTypeDescription }}
-                  </a>
-                  <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="viewTransactions()">
-                    View Transactions
-                  </a>
-                </ng-template>
-              </ng-template>
             </div>
           </div>
-        </div>
+        </footer>
       </footer>
-    </footer>
-  </form>
-</div>
+    </form>
+  </div>
+  

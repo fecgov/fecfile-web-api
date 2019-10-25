@@ -43,12 +43,12 @@
     <div class="form__steps">
       <app-steps
         [steps]="[
-        { text: 'Report', step: 'step_1', edit: editMode },
-        { text: 'Type', step: 'step_2', edit: editMode },
-        { text: 'Form', step: 'step_3', edit: editMode },
-        { text: 'Preview', step: 'step_4', edit: editMode },
-        { text: 'Sign', step: 'step_5', edit: editMode },
-        { text: 'Submit', step: 'step_6', edit: editMode }
+          { text: 'Report', step: 'step_1', edit: editMode },
+          { text: 'Type', step: 'step_2', edit: editMode },
+          { text: 'Form', step: 'step_3', edit: editMode },
+          { text: 'Preview', step: 'step_4', edit: editMode },
+          { text: 'Sign', step: 'step_5', edit: editMode },
+          { text: 'Submit', step: 'step_6', edit: editMode }
         ]"
         [current_step]="currentStep"
       >
@@ -82,14 +82,29 @@
 
       <div class="form__step" [hidden]="step !== 'step_3'">
         <f3x-individual-receipt
-          [formOptionsVisible]="formOptionsVisible"
-          [selectedOptions]="selectedOptions"
+          [hidden]="
+            scheduleType !== 'sched_a' &&
+            scheduleType !== 'sched_b' &&
+            scheduleType !== 'sched_d' &&
+            scheduleType !== 'sched_h4' &&
+            scheduleType !== 'sched_h6'
+          "
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
           (status)="onNotify($event)"
         >
         </f3x-individual-receipt>
+        <app-sched-f
+          [hidden]="scheduleType !== 'sched_f'"
+          [transactionTypeText]="transactionTypeTextSchedF"
+          [transactionType]="transactionTypeSchedF"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >
+        </app-sched-f>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_4'">

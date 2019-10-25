@@ -30,53 +30,76 @@ export class PreviewComponent implements OnInit {
   public orgFileUrl: string = '';
   public printpriview_filename: string = '';
   public printpriview_fileurl: string = '';
-
+  public editMode: boolean;
   private _subscription: Subscription;
   private _step: string = '';
   private _printPriviewPdfFileLink: string = '';
   private _formDetails: any = {};
+  private _setRefresh:boolean = false;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _messageService: MessageService,
     private _formsService: FormsService,
     private _dialogService: DialogService
-  ) {}
+  ) {
+    _activatedRoute.queryParams.subscribe(p => {
+      if (p.refresh) {
+        this._setRefresh = true;
+        this.ngOnInit();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this._messageService.getMessage().subscribe(res => {
-      this._step = res.step;
-
-      this.formDetails = res.data;
-
+  
+      console.log("Preview screen this.formDetails ", this.formDetails);
       this.committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
 
-      if (this.formType === '99') {
-        if (this.formDetails) {
-          if (typeof this.formDetails.filename !== 'undefined') {
-            if (this.formDetails.filename !== null) {
+      if (this.editMode)  {
+        this._step = res.step;
+        this.formDetails =  JSON.parse(localStorage.getItem('form_99_details'));
+      }else if (!this.editMode)  {
+        this._step = res.step;
+        this.formDetails = res.data;
+      }
+
+      setTimeout(() => {
+        if (this.formType === '99') {
+          if (this.formDetails) {
+  
+            if (this.formDetails.hasOwnProperty('filename')) {
               this.fileName = this.formDetails.filename;
             } else {
-              this.fileName = '';
+              this.fileName = "";
             }
-          }
-
-          if (typeof this.formDetails.org_fileurl !== 'undefined') {
-            if (this.formDetails.org_fileurl !== null) {
+            const fileFromLocalStorage = localStorage.getItem('orm_99_details.org_fileurl');
+            if (this.formDetails.hasOwnProperty('org_fileurl')) {
               this.orgFileUrl = this.formDetails.org_fileurl;
+            } else if (this.formDetails.hasOwnProperty('file') && Object.entries(this.formDetails.file).length !== 0) {
+              this.orgFileUrl = this.formDetails.file;
+            } else if (fileFromLocalStorage) {
+              this.orgFileUrl = fileFromLocalStorage;
             } else {
-              this.orgFileUrl = '';
+              this.orgFileUrl = "";
+            }
+  
+            console.log("this.orgFileUrl", this.orgFileUrl );
+            console.log("this.fileName", this.fileName );
+  
+          }
+  
+          if (this.formDetails && typeof this.formDetails !== 'undefined' && this.formDetails.reason) {
+            if (typeof this.formDetails.reason !== 'undefined') {
+              this.typeSelected = this.formDetails.reason;
             }
           }
         }
-        if (typeof this.formDetails !== 'undefined') {
-          if (typeof this.formDetails.reason !== 'undefined') {
-            this.typeSelected = this.formDetails.reason;
-          }
-        }
-      }
+      }, 500);
+
     });
   }
 
@@ -178,7 +201,8 @@ export class PreviewComponent implements OnInit {
       form: 'preview',
       direction: 'next',
       step: 'step_4',
-      previousStep: this._step
+      previousStep: this._step,
+      refresh: this._setRefresh
     });
 
     this.showValidateBar = false;

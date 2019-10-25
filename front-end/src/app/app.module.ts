@@ -78,6 +78,7 @@ import { SubTransactionsTableComponent } from './forms/transactions/sub-transact
 import { DecimalPipe } from '@angular/common';
 import { UtilService } from './shared/utils/util.service';
 import { UserIdleModule } from 'angular-user-idle';
+import { SchedFComponent } from './forms/sched-f/sched-f.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -140,7 +141,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ContactsComponent,
     ContactsTableComponent,
     AddNewContactComponent,
-    ContactsFilterComponent
+    ContactsFilterComponent,
+    SchedFComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [
@@ -162,7 +164,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ModalModule.forRoot(),
     NgxPaginationModule,
     NgPipesModule,
-    UserIdleModule.forRoot({idle: 1200, timeout: 120, ping: 500000})
+    UserIdleModule.forRoot({ idle: 1200, timeout: 120, ping: 500000 })
   ],
   providers: [
     CookieService,
