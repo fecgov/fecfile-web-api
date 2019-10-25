@@ -258,6 +258,47 @@ export class TransactionTypeComponent implements OnInit {
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
 
     this.secondaryOptions = this._mainTransactionCategory[0].options;
+    if (this._mainTransactionCategory[0].options[0].value === 'schedule-h1') {
+      this.secondaryOptions[0].options = [{
+        info: "Funds received from the committee's non-federal bank account",
+        infoIcon: "TRUE",
+        name: "schedule-h1",
+        scheduleType: "sched_h1",
+        text: "Allocation Ratios",
+        type: "radio",
+        value: "ALLOC_H1_RATIO"
+      }
+        // {
+        //   info: "Funds received from the committee's non-federal bank account",
+        //   infoIcon: "TRUE",
+        //   name: "schedule-h3",
+        //   scheduleType: "sched_h2",
+        //   text: "Allocation Ratios Summary",
+        //   type: "radio",
+        //   value: "ALLOC_H2_SUM"
+        // }
+      ];
+    }
+    if (this._mainTransactionCategory[0].options[1].value === 'schedule-h2') {
+      this.secondaryOptions[1].options = [{
+        info: "Funds received from the committee's non-federal bank account",
+        infoIcon: "TRUE",
+        name: "schedule-h3",
+        scheduleType: "sched_h2",
+        text: "Allocation Ratios",
+        type: "radio",
+        value: "ALLOC_H2_RATIO"
+      },
+      {
+        info: "Funds received from the committee's non-federal bank account",
+        infoIcon: "TRUE",
+        name: "schedule-h3",
+        scheduleType: "sched_h2",
+        text: "Allocation Ratios Summary",
+        type: "radio",
+        value: "ALLOC_H2_SUM"
+      }];
+    }
 
     this.transactionCategorySelected = true;
 

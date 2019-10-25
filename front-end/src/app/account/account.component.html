@@ -1,78 +1,78 @@
 <div class="account-container">
-		<header>
-		  <div class="header-container">
+	<header>
+		<div class="header-container">
 			<div class="header__text">
-			<h1>Account</h1>
+				<h1>Account</h1>
 			</div>
-		  </div>
-		  <div class="grid-row">
+		</div>
+		<div class="grid-row">
 			<div class="grid-row__col grid-row__col--12">
-				  <hr />
+				<hr />
 			</div>
- 		 </div>
-		</header>
-		<section>
-		  <div class="content">
+		</div>
+	</header>
+	<section>
+		<div class="content">
 			<div class="grid-row">
-			  <div class="grid-col">
-				<p>
-				  <b>Committee Name</b>
-				</p>
-				<p>
-				  {{ accounts?.committeename }}
-				</p>
-			  </div>
-			  <div class="grid-col">
+				<div class="grid-col">
 					<p>
-					  <b>Committee ID</b>
+						<b>Committee Name</b>
 					</p>
 					<p>
-					  {{ accounts?.committeeid }}
+						{{ accounts?.committeename }}
 					</p>
-			  </div>
+				</div>
+				<div class="grid-col">
+					<p>
+						<b>Committee ID</b>
+					</p>
+					<p>
+						{{ accounts?.committeeid }}
+					</p>
+				</div>
 			</div>
 			<div class="grid-row">
 				<div class="grid-col">
 					<p><b>Address Line 1</b></p>
 					<p>
-					  {{ accounts?.street1 }}
+						{{ accounts?.street1 }}
 					</p>
 				</div>
 				<div class="grid-col">
 					<p><b>Address Line 2</b></p>
 					<p>
-					  {{ accounts?.street2 }}
+						{{ accounts?.street2 }}
 					</p>
 				</div>
 			</div>
 			<div class="grid-row">
-			  <div class="grid-col">
-				<p>
-				  <b>City</b>
-				</p>
-				<p>
-				  {{ accounts?.city }}
-				</p>
-			  </div>
-			  <div class="grid-col">
-				<p>
-				  <b>State</b>
-				</p>
-				<p>
-				  {{ accounts?.state }}
-				</p>
-			  </div>
-			  <div class="grid-col">
-				<p>
-				  <b>Zip Code</b>
-				</p>
-				<p>
-				  {{ accounts?.zipcode }}
-				</p>
-			  </div>
+				<div class="grid-col">
+					<p>
+						<b>City</b>
+					</p>
+					<p>
+						{{ accounts?.city }}
+					</p>
+				</div>
+				<div class="grid-col">
+					<p>
+						<b>State</b>
+					</p>
+					<p>
+						{{ accounts?.state }}
+					</p>
+				</div>
+				<div class="grid-col">
+					<p>
+						<b>Zip Code</b>
+					</p>
+					<p>
+						{{ accounts?.zipcode }}
+					</p>
+				</div>
 			</div>
 			<div class="grid-row-btn">
-				<div class="grid-col-1"> 
+				<div class="grid-col-1">
 					<p></p>
 					<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
 				</div>
@@ -80,269 +80,294 @@
 			<div class="grid-row" style="height: 35px;"></div>
 			<div class="grid-row">
 				<div class="grid-row__col grid-row__col--12">
-					  <hr />
+					<hr />
 				</div>
-			  </div>
-			<div class="grid-row">
-			  <div class="grid-col" *ngIf="accounts?.treasurerfirstname != ''">
-				<p>
-				  <b>Treasurer First Name</b>
-				</p>
-				<p>
-				  {{ accounts?.treasurerfirstname }}
-				</p>
-			  </div>
-			  <div class="grid-col" *ngIf="accounts?.treasurermiddlename != ''">
-				<p>
-				  <b>Treasurer Middle Name</b>
-				</p>
-				<p>
-				 {{ accounts?.treasurermiddlename }}
-				</p>
-			  </div>
-			  <div class="grid-col" *ngIf="accounts?.treasurerlastname != ''">
-				<p>
-				  <b>Treasurer Last Name</b>
-				</p>
-				<p>
-				 {{ accounts?.treasurerlastname }}
-				</p>
-			  </div>
 			</div>
 			<div class="grid-row">
-			  <div class="grid-col" *ngIf="accounts?.treasurerprefix != ''">
-				<p>
-				  <b>Treasurer Prefix</b>
-				</p>
-				<p>
-				 {{ accounts?.treasurerprefix }}
-				</p>
-			  </div>
-			  <div class="grid-col" *ngIf="accounts?.treasurersuffix != ''">
-				<p>
-				  <b>Treasurer Sufix</b>
-				</p>
-				<p>
-				 {{ accounts?.treasurersuffix }}
-				</p>
-			  </div>
+				<div class="grid-col" *ngIf="accounts?.treasurerfirstname != ''">
+					<p>
+						<b>Treasurer First Name</b>
+					</p>
+					<p>
+						{{ accounts?.treasurerfirstname }}
+					</p>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.treasurermiddlename != ''">
+					<p>
+						<b>Treasurer Middle Name</b>
+					</p>
+					<p>
+						{{ accounts?.treasurermiddlename }}
+					</p>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.treasurerlastname != ''">
+					<p>
+						<b>Treasurer Last Name</b>
+					</p>
+					<p>
+						{{ accounts?.treasurerlastname }}
+					</p>
+				</div>
 			</div>
 			<div class="grid-row">
-					<div class="grid-col" *ngIf="accounts?.treasurerstreet1 != ''">
-						<p><b>Address Line 1</b></p>
-						<p>
-						  {{ accounts?.treasurerstreet1 }}
-						</p>
-					</div>
-					<div class="grid-col" *ngIf="accounts?.treasurerstreet2 != ''">
-						<p><b>Address Line 2</b></p>
-						<p>
-						  {{ accounts?.treasurerstreet2 }}
-						</p>
-					</div>
+				<div class="grid-col" *ngIf="accounts?.treasurerprefix != ''">
+					<p>
+						<b>Treasurer Prefix</b>
+					</p>
+					<p>
+						{{ accounts?.treasurerprefix }}
+					</p>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.treasurersuffix != ''">
+					<p>
+						<b>Treasurer Sufix</b>
+					</p>
+					<p>
+						{{ accounts?.treasurersuffix }}
+					</p>
+				</div>
 			</div>
 			<div class="grid-row">
-				  <div class="grid-col" *ngIf="accounts?.treasurercity != ''">
+				<div class="grid-col" *ngIf="accounts?.treasurerstreet1 != ''">
+					<p><b>Address Line 1</b></p>
 					<p>
-					  <b>City</b>
+						{{ accounts?.treasurerstreet1 }}
+					</p>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.treasurerstreet2 != ''">
+					<p><b>Address Line 2</b></p>
+					<p>
+						{{ accounts?.treasurerstreet2 }}
+					</p>
+				</div>
+			</div>
+			<div class="grid-row">
+				<div class="grid-col" *ngIf="accounts?.treasurercity != ''">
+					<p>
+						<b>City</b>
 					</p>
 					<p>
-					  {{ accounts?.treasurercity }}
+						{{ accounts?.treasurercity }}
 					</p>
-				  </div>
-				  <div class="grid-col" *ngIf="accounts?.treasurerstate != ''">
+				</div>
+				<div class="grid-col" *ngIf="accounts?.treasurerstate != ''">
 					<p>
-					  <b>State</b>
-					</p>
-					<p>
-					  {{ accounts?.treasurerstate }}
-					</p>
-				  </div>
-				  <div class="grid-col" *ngIf="accounts?.treasurerzipcode != ''">
-					<p>
-					  <b>Zip Code</b>
+						<b>State</b>
 					</p>
 					<p>
-					  {{ accounts?.treasurerzipcode }}
+						{{ accounts?.treasurerstate }}
 					</p>
-				  </div>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.treasurerzipcode != ''">
+					<p>
+						<b>Zip Code</b>
+					</p>
+					<p>
+						{{ accounts?.treasurerzipcode }}
+					</p>
+				</div>
 			</div>
 			<div class="grid-row" *ngIf="accounts?.email_on_file != ''">
-				  <div class="grid-col">
+				<div class="grid-col">
 					<p>
-					  <b>Email</b>
+						<b>Email</b>
 					</p>
 					<p>
-					  {{ accounts?.email_on_file }}
+						{{ accounts?.email_on_file }}
 					</p>
-				  </div>	  
+				</div>
 			</div>
 
 
 			<div class="grid-row-btn">
 				<div class="grid-col-1">
-					<button type="button"  (click)="goToForms1()"><i class="fas fa-edit "></i>Edit</button>
-					</div>
+					<button type="button" (click)="goToForms1()"><i class="fas fa-edit "></i>Edit</button>
+				</div>
 			</div>
 
 			<div class="grid-row" style="height: 20px;"></div>
-			
+
 			<div class="grid-row">
 				<div class="grid-row__col grid-row__col--12">
-					
-					  <hr />					  
+
+					<hr />
 				</div>
-			  </div>
+			</div>
 
-			  <div class="grid-row">
-					<div class="grid-col" *ngIf="accounts?.bankName != ''">
-					  <p>
+			<div class="grid-row">
+				<div class="grid-col" *ngIf="accounts?.bankName != ''">
+					<p>
 						<b>Bank Name</b>
-					  </p>
-					  <p>
+					</p>
+					<p>
 						{{ accounts?.bankName}}
-					  </p>
+					</p>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.bankAddress1 != ''">
+					<p>
+						<b>Address Line 1</b>
+					</p>
+					<p>
+						{{ accounts?.bankAddress1}}
+					</p>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.bankAddress2 != ''">
+					<p>
+						<b>Address Line 2</b>
+					</p>
+					<p>
+						{{ accounts?.bankAddress2}}
+					</p>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.bankCity != ''">
+					<p>
+						<b>City</b>
+					</p>
+					<p>
+						{{ accounts?.bankCity}}
+					</p>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.bankState != ''">
+					<p>
+						<b>State</b>
+					</p>
+					<p>
+						{{ accounts?.bankState}}
+					</p>
+				</div>
+				<div class="grid-col" *ngIf="accounts?.bankZip != ''">
+					<p>
+						<b>Zip Code</b>
+					</p>
+					<p>
+						{{ accounts?.bankZip}}
+					</p>
+				</div>
+			</div>
+
+			<div class="grid-row-btn">
+				<div class="grid-col-1">
+					<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
+				</div>
+			</div>
+			<div class="grid-row" style="height: 20px;"></div>
+
+			<div class="grid-row">
+				<div class="grid-row__col grid-row__col--12">
+					<hr />
+				</div>
+			</div>
+
+
+			<div *ngIf="accounts?.candidatePrefix != ''">
+				<div class="grid-row">
+					<div class="grid-col" *ngIf="accounts?.candidatePrefix != ''">
+						<p>
+							<b>Candidate Prefix</b>
+						</p>
+						<p>
+							{{ accounts?.candidatePrefix}}
+						</p>
 					</div>
-					<div class="grid-col" *ngIf="accounts?.bankAddress1 != ''">
-							<p>
-							  <b>Address Line 1</b>
-							</p>
-							<p>
-							  {{ accounts?.bankAddress1}}
-							</p>
-						  </div>
-						  <div class="grid-col" *ngIf="accounts?.bankAddress2 != ''">
-								<p>
-								  <b>Address Line 2</b>
-								</p>
-								<p>
-								  {{ accounts?.bankAddress2}}
-								</p>
-							  </div>
-							  <div class="grid-col" *ngIf="accounts?.bankCity != ''">
-									<p>
-									  <b>City</b>
-									</p>
-									<p>
-									  {{ accounts?.bankCity}}
-									</p>
-								  </div>
-								  <div class="grid-col" *ngIf="accounts?.bankState != ''">
-										<p>
-										  <b>State</b>
-										</p>
-										<p>
-										  {{ accounts?.bankState}}
-										</p>
-									  </div>
-									  <div class="grid-col" *ngIf="accounts?.bankZip != ''">
-											<p>
-											  <b>Zip Code</b>
-											</p>
-											<p>
-											  {{ accounts?.bankZip}}
-											</p>
-										  </div>
-			  </div>
+					<div class="grid-col" *ngIf="accounts?.candidateFirstName != ''">
+						<p>
+							<b>Candidate First Name</b>
+						</p>
+						<p>
+							{{ accounts?.candidateFirstName}}
+						</p>
+					</div>
+					<div class="grid-col" *ngIf="accounts?.candidateLastName != ''">
+						<p>
+							<b>Candidate Last Name</b>
+						</p>
+						<p>
+							{{ accounts?.candidateLastName}}
+						</p>
+					</div>
+					<div class="grid-col" *ngIf="accounts?.candidateSuffix != ''">
+						<p>
+							<b>Candidate Suffix</b>
+						</p>
+						<p>
+							{{ accounts?.candidateSuffix}}
+						</p>
+					</div>
+					<div class="grid-col" *ngIf="accounts?.partyAffiliation != ''">
+						<p>
+							<b>Party Affiliation</b>
+						</p>
+						<p>
+							{{ accounts?.partyAffiliation}}
+						</p>
+					</div>
+					<div class="grid-col" *ngIf="accounts?.officeSought != ''">
+						<p>
+							<b>Office Sought</b>
+						</p>
+						<p>
+							{{ accounts?.officeSought}}
+						</p>
+					</div>
+					<div class="grid-col" *ngIf="accounts?.officeSought != ''">
+						<p>
+							<b>State</b>
+						</p>
+						<p>
+							{{ accounts?.candidateState}}
+						</p>
+					</div>
+					<div class="grid-col" *ngIf="accounts?.officeSought != ''">
+						<p>
+							<b>District</b>
+						</p>
+						<p>
+							{{ accounts?.candidateDistrict}}
+						</p>
+					</div>
+				</div>
 
-			                          <div class="grid-row-btn">
-					                       <div class="grid-col-1">
-													<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
-												</div>
-											</div>
-											<div class="grid-row" style="height: 20px;"></div>
+				<div class="grid-row-btn">
+					<div class="grid-col-1">
+						<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
+					</div>
+				</div>
+				<div class="grid-row" style="height: 20px;"></div>
 
-											<div class="grid-row">
-												<div class="grid-row__col grid-row__col--12">
-													  <hr />
-												</div>
-											  </div>			
-											  
-
-											  <div *ngIf="accounts?.candidatePrefix != ''">
-													<div class="grid-row">
-														  <div class="grid-col" *ngIf="accounts?.candidatePrefix != ''">
-															<p>
-															  <b>Candidate Prefix</b>
-															</p>
-															<p>
-															  {{ accounts?.candidatePrefix}}
-															</p>
-														  </div>
-														  <div class="grid-col" *ngIf="accounts?.candidateFirstName != ''">
-																  <p>
-																	<b>Candidate First Name</b>
-																  </p>
-																  <p>
-																	{{ accounts?.candidateFirstName}}
-																  </p>
-																</div>
-																<div class="grid-col" *ngIf="accounts?.candidateLastName != ''">
-																	  <p>
-																		<b>Candidate Last Name</b>
-																	  </p>
-																	  <p>
-																		{{ accounts?.candidateLastName}}
-																	  </p>
-																	</div>
-																	<div class="grid-col" *ngIf="accounts?.candidateSuffix != ''">
-																		  <p>
-																			<b>Candidate Suffix</b>
-																		  </p>
-																		  <p>
-																			{{ accounts?.candidateSuffix}}
-																		  </p>
-																		</div>
-																		<div class="grid-col" *ngIf="accounts?.partyAffiliation != ''">
-																			  <p>
-																				<b>Party Affiliation</b>
-																			  </p>
-																			  <p>
-																				{{ accounts?.partyAffiliation}}
-																			  </p>
-																			</div>
-																			<div class="grid-col" *ngIf="accounts?.officeSought != ''">
-																				  <p>
-																					<b>Office Sought</b>
-																				  </p>
-																				  <p>
-																					{{ accounts?.officeSought}}
-																				  </p>
-																				</div>
-																				<div class="grid-col" *ngIf="accounts?.officeSought != ''">
-																					  <p>
-																						<b>State</b>
-																					  </p>
-																					  <p>
-																						{{ accounts?.candidateState}}
-																					  </p>
-																					</div>
-																					<div class="grid-col" *ngIf="accounts?.officeSought != ''">
-																						  <p>
-																							<b>District</b>
-																						  </p>
-																						  <p>
-																							{{ accounts?.candidateDistrict}}
-																						  </p>
-																						</div>
-																					</div>
-
-																				<div class="grid-row-btn">
-																					  <div class="grid-col-1">
-																						  <button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
-																					  </div>
-																				  </div>
-																				  <div class="grid-row" style="height: 20px;"></div>
-
-																				  <div class="grid-row">
-																					  <div class="grid-row__col grid-row__col--12">
-																							<hr />
-																					  </div>
-																					</div>
-																					</div>
+				<div class="grid-row">
+					<div class="grid-row__col grid-row__col--12">
+						<hr />
+					</div>
+				</div>
+			</div>
 
 
-			</div> <!-- ./content -->
-		</section>
+		</div> <!-- ./content -->
+	</section>
+	<section>
+		<!-- adding the levin acct section here -->
+		<div class="text">
+			<label>
+				add new levin account name:
+				<input ngModel type="text" name="levin_acct_name" #levin_name maxlength="50" value="" />
+			</label>
+		</div>
+		<div class="grid-row">
+			<div class="grid-row__col grid-row__col--12">
+				<div class="forms__btn-container">
+					<button type="button" class="btn btn-secondary btn-modal-footer btn-right"
+						(click)="saveLevinAccount(levin_name)">
+						Save
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="grid-row" id="levin_accounts_list">
+			<ul class="list-group">
+				<li *ngFor="let levin_acct of levin_accounts" class="list-group-item">
+					{{levin_acct.levin_account_name}}
+				</li>
+			</ul>
+		</div>
+	</section>
 </div>
-
