@@ -2952,6 +2952,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * @param apiCall
    */
   private _getParentFromChild(reportId: string, backRefTransactionId: string, apiCall: string) {
+
+    // There is a bug the apiCall value is incorrect when where a parent-child have different schedules
+    // as with Sched_D.  Temporary path is to hard code the apiCall based on the trnasactionID 1st to chars.
+    // TODO add back_ref_api_call to child transaction in the getSched API and pass it here.
+    if (backRefTransactionId.startsWith('SD')) {
+      apiCall = '/sd/schedD';
+    }
+
     this._receiptService.getDataSchedule(reportId, backRefTransactionId, apiCall).subscribe(res => {
       if (Array.isArray(res)) {
         for (const trx of res) {
