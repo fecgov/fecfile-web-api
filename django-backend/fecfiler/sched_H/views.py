@@ -1610,6 +1610,7 @@ def schedH4_sql_dict(data):
     filter out valid fileds for sched_H4
 
     """
+    logger.debug('request data:{}'.format(data))
     valid_fields = [
 
             'transaction_type_identifier',
@@ -1659,6 +1660,10 @@ def schedH4_sql_dict(data):
 
         valid_data["line_number"] = line_num
         valid_data['transaction_type'] = tran_tp
+        # TODO: this is a temp code change, we need to update h4,h6 
+        # to unify the field names
+        if 'expenditure_purpose' in data:
+            valid_data['purpose'] = data.get('expenditure_purpose', '')
         return valid_data
     except:
         raise Exception('invalid request data.')
@@ -2043,6 +2048,11 @@ def get_schedH4(data):
             forms_obj = get_list_schedH4(report_id, cmte_id, transaction_id)
         else:
             forms_obj = get_list_all_schedH4(report_id, cmte_id)
+
+        # TODO: temp change, need to reove this code when h4, h6 schedma updated  
+        for obj in forms_obj:
+            obj['expenditure_purpose'] = obj.get('purpose', '')
+
         return forms_obj
     except:
         raise
@@ -2806,8 +2816,9 @@ def schedH6_sql_dict(data):
             valid_data['federal_share'] = data.get('fed_share_amount')
         if 'non_fed_share_amount' in data:
             valid_data['levin_share'] = data.get('non_fed_share_amount')
-        # if 'activity_event_amount_ytd' in data:
-        #     valid_data['activity_event_total_ytd'] = data.get('activity_event_amount_ytd')
+        if 'activity_event_amount_ytd' in data:
+            valid_data['activity_event_total_ytd'] = data.get('activity_event_amount_ytd')
+     
 
         return valid_data
     except:
