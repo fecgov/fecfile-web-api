@@ -4803,6 +4803,7 @@ def clone_a_transaction(request):
         if not cursor.rowcount:
             raise Exception('transaction clone error')
 
+
         # exclude_list = []
         # if transaction_id.startswith('SA'):
         #     exclude_list = ['contribution_date', 'contribution_amount']
@@ -4830,6 +4831,7 @@ def clone_a_transaction(request):
 GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TELLA
 ********************************************************************************************************************************
 """
+
 def get_reports_data(report_id):
     try:
         query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL """
@@ -4857,6 +4859,7 @@ def insert_sql_report(dict_data):
             cursor.execute(sql,dict_data)                                          
     except Exception:
         raise
+
 
 
 def create_amended(reportid):
@@ -4909,6 +4912,7 @@ def get_report_ids(cmte_id, from_date):
         return data_ids
 
 
+
 @api_view(['POST'])
 def create_amended_reports(request):
 
@@ -4948,6 +4952,7 @@ def create_amended_reports(request):
         return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("Create amended report API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 
 
 

@@ -5,7 +5,9 @@ import { ContactsMessageService } from './service/contacts-message.service';
 import { ContactFilterModel } from './model/contacts-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 import { ContactModel } from './model/contacts.model';
+
 import { MessageService } from '../shared/services/MessageService/message.service';
+
 
 export enum ActiveView {
   contacts = 'contacts',
@@ -211,15 +213,18 @@ export class ContactsComponent implements OnInit, OnDestroy {
           typeGroup.push(cat);
         }
         tag.group = typeGroup;
+
       }
     }
     // If tag is not already showing, add it to the tag array.
     if (!typeTag) {
       for (const cat of filters.filterTypes) {
         typeGroup.push(cat);
+
       }
       this.tagArray.push({type: FilterTypes.type, prefix: null, group: typeGroup});
     }
+
   } else {
     this.removeTagArrayItem(FilterTypes.type);
   }
@@ -240,7 +245,9 @@ export class ContactsComponent implements OnInit, OnDestroy {
           keywordGroup.push(cat);
         }
         tag.group = keywordGroup;
+
       }
+      this.tagArray.push({type: FilterTypes.type, prefix: null, group: typeGroup});
     }
     // If tag is not already showing, add it to the tag array.
     if (!typeTag) {
