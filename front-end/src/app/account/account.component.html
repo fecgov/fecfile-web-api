@@ -327,6 +327,7 @@
 					</div>
 				</div>
 
+
 				<div class="grid-row-btn">
 					<div class="grid-col-1">
 						<button type="button" (click)="goToForms1()"><i class="fas fa-edit"></i>Edit</button>
@@ -346,22 +347,31 @@
 	</section>
 	<section>
 		<!-- adding the levin acct section here -->
-		<div class="text">
-			<label>
-				add new levin account name:
-				<input ngModel type="text" name="levin_acct_name" #levin_name maxlength="50" value="" />
-			</label>
-		</div>
-		<div class="grid-row">
+		<h3>Committee Levin Accounts</h3>
+		<form action="">
+			<label for="levin_acct_name">
+				add new levin account:</label>
+			<div class="input-group">
+				<!-- <div class="form-group"> -->
+
+				<input ngModel type="text" name="levin_acct_name" id="levin_acct_name" #levin_name class="form-control"
+					maxlength="50" value="" />
+
+				<!-- </div> -->
+				<!-- <div class="grid-row">
 			<div class="grid-row__col grid-row__col--12">
-				<div class="forms__btn-container">
-					<button type="button" class="btn btn-secondary btn-modal-footer btn-right"
-						(click)="saveLevinAccount(levin_name)">
-						Save
+				<div class="forms__btn-container"> -->
+				<span class="input-group-button">
+					<button type="submit" class="btn btn-secondary" (click)="saveLevinAccount(levin_name)">
+						Add and Save
 					</button>
-				</div>
+				</span>
 			</div>
-		</div>
+			<!-- </div>
+			</div>
+		</div> -->
+		</form>
+
 		<div class="grid-row" id="levin_accounts_list">
 			<ul class="list-group">
 				<li *ngFor="let levin_acct of levin_accounts" class="list-group-item">
