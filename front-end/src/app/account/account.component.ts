@@ -91,7 +91,9 @@ export class AccountComponent implements OnInit {
     window.open('https://webforms.fec.gov/webforms/form1/index.htm', '_blank');
   }
 
+
   // TODO: later on to refactor to move http service to a dedicated service module
+
   saveLevinAccount(levin_name: HTMLInputElement) {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/core/levin_accounts`;
