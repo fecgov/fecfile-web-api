@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, NavigationStart } from '@angular/router';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { TransactionModel } from '../model/transaction.model';
@@ -167,6 +167,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.getTransactionsPage(1);
       this.clonedTransaction = {};
       this.setSortableColumns();
+      // if (p.refresh === 1 || p.refresh === '1') {
+      //   this._router.navigate([`/forms/form/3X`], {
+      //     queryParams: {
+      //       step: 'transactions',
+      //       reportId: p.reportId,
+      //       edit: p.edit,
+      //       transactionCategory: p.transactionCategory,
+      //       refresh: null
+      //     }
+      //   });
+      // }
     });
   }
 
@@ -248,6 +259,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         }
       }
     });
+    this.getTransactionsPage(1);
   }
 
   // /**
@@ -435,47 +447,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this._transactionsService.addUIFileds(res);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
-        // this.transactionsModel = transactionsModelL;
         this.transactionsModel = transactionsModelL;
-
-        // for (
-        //   let transactionCategorieIndex = 0;
-        //   transactionCategorieIndex < this.transactionCategories.length;
-        //   transactionCategorieIndex++
-        // ) {
-        //   for (
-        //     let transactionCategoryOptionIndex = 0;
-        //     transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
-        //     transactionCategoryOptionIndex++
-        //   ) {
-        //     for (
-        //       let transactionCategoryOptionOptionsIndex = 0;
-        //       transactionCategoryOptionOptionsIndex <
-        //       this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
-        //         .length;
-        //       transactionCategoryOptionOptionsIndex++
-        //     ) {
-        //       for (
-        //         let transactionModelLindex = 0;
-        //         transactionModelLindex < transactionsModelL.length;
-        //         transactionModelLindex++
-        //       ) {
-        //         if (
-        //           transactionsModelL[transactionModelLindex].transactionTypeIdentifier ===
-        //             this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex]
-        //               .options[transactionCategoryOptionOptionsIndex].value &&
-        //           this.transactionCategory === this.transactionCategories[transactionCategorieIndex].value
-        //         ) {
-        //           this.transactionsModel.push(transactionsModelL[transactionModelLindex]);
-        //         }
-        //       }
-        //     }
-        //   }
-        // }
 
         if (this.clonedTransaction && this.clonedTransaction.hasOwnProperty('transaction_id')) {
           for (let transactionModelIndex = 0; transactionModelIndex < this.transactionsModel.length; transactionModelIndex++) {
             if (this.transactionsModel[transactionModelIndex].transactionId === this.clonedTransaction.transaction_id) {
+              this.transactionsModel[transactionModelIndex].cloned = true;
               this.editTransaction(this.transactionsModel[transactionModelIndex]);
             }
           }

@@ -60,6 +60,7 @@ export class ReasonComponent implements OnInit {
   public textAreaTextContent: any = '';
   public editingTextArea: boolean = false;
   public fileNameToDisplay: string = null;
+  public showFileNameLengthError: boolean = false;
 
   private committee_details: any = {};
   private _printPriviewPdfFileLink: string = '';
@@ -120,7 +121,11 @@ export class ReasonComponent implements OnInit {
         this._reasonInnerText = unescapedText;
         this._reasonInnerHTML = unescape(unescapedText);
         this.textAreaTextContent = this._dormSanitizer.bypassSecurityTrustHtml(unescapedText);
-        this.fileNameToDisplay = this._form99Details.filename ? this._form99Details.filename : null;
+        if (this._form99Details.filename) {
+          this.fileNameToDisplay = this._form99Details.filename;
+        } else if (localStorage.getItem('orm_99_details.org_filename')) {
+          this.fileNameToDisplay = localStorage.getItem('orm_99_details.org_filename');
+        }
       } else {
         this.editingTextArea = false;
         this.frmReason = this._fb.group({
@@ -424,7 +429,7 @@ export class ReasonComponent implements OnInit {
   public setFile(e): void {
     if (!this.editMode) {
       this.checkIfEditMode();
-    } else if (e.target.files.length === 1 && this.editMode) {
+    } else if (e.target.files.length === 1 && this.editMode && e.target.files[0].name.length <= 100) {
       this.file = e.target.files[0];
       if (this.file.name.includes('.pdf')) {
         let fileNameObj: any = {
@@ -437,6 +442,7 @@ export class ReasonComponent implements OnInit {
           this.notCorrectPdfSize = false;
         }
         localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
+        this.showFileNameLengthError = false;
         this.notValidPdf = false;
         this.validFile = true;
         this.showFileDeleteButton = true;
@@ -450,6 +456,20 @@ export class ReasonComponent implements OnInit {
         this.notCorrectPdfSize = false;
         this.PdfUploaded = false;
       }
+    } else if (e.target.files[0].name.length > 100) {
+      this.showFileNameLengthError = true;
+      let fileNameObj: any = {
+        fileName: ''
+      };
+      localStorage.setItem(`form_${this._formType}_file`, JSON.stringify(fileNameObj));
+      this.validFile = false;
+      this.file = null;
+      this.showFileDeleteButton = false;
+      this.fileInput.nativeElement.value = '';
+      this._form99Details.filename = '';
+      this.PdfUploaded = false;
+      localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
+      window.scrollTo(0, 0);
     } else {
       let fileNameObj: any = {
         fileName: ''
@@ -602,7 +622,9 @@ export class ReasonComponent implements OnInit {
 
         this.showValidateBar = false;
 
-        if (this.PdfUploaded || this.PdfDeleted || (!this._form99Details.id || this._form99Details.id === '')) {
+        if ((this.PdfUploaded && typeof this.file === 'object') ||
+        this.PdfDeleted ||
+        (!this._form99Details.id || this._form99Details.id === '')) {
           this._formsService.saveForm({}, this.file, this._formType).subscribe(
             res => {
               if (res) {
@@ -762,6 +784,7 @@ export class ReasonComponent implements OnInit {
 
       this._form99Details.filename = '';
       this.fileNameToDisplay = null;
+      localStorage.removeItem('orm_99_details.org_filename');
       localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
     }
     //this._modalService.close(modalId);
@@ -818,6 +841,7 @@ export class ReasonComponent implements OnInit {
           this.PdfUploaded = false;
           this._form99Details.filename = '';
           this.fileNameToDisplay = null;
+          localStorage.removeItem('orm_99_details.org_filename');
           localStorage.setItem(`form_${this._formType}_details`, JSON.stringify(this._form99Details));
         }
       });

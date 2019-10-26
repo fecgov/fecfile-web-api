@@ -102,6 +102,7 @@ export class TransactionTypeComponent implements OnInit {
         this.childOptionsListClick(setTargetVal.value);
         this.doValidateOption();
       }
+      this._transactionCategory = p.transactionCategory ? p.transactionCategory : ''; 
     });
   }
 
@@ -177,7 +178,7 @@ export class TransactionTypeComponent implements OnInit {
         action: ScheduleActions.add,
         transactionTypeText: this.transactionTypeText,
         transactionType: this.transactionType,
-        transactionCategory: this.transactionCategory,
+        transactionCategory: this._transactionCategory,
         scheduleType: this.scheduleType
       });
       return 1;
@@ -266,7 +267,8 @@ export class TransactionTypeComponent implements OnInit {
         scheduleType: "sched_h1",
         text: "Allocation Ratios",
         type: "radio",
-        value: "ALLOC_H1_RATIO"
+        // value: ""
+        value: "ALLOC_H1"
       }
         // {
         //   info: "Funds received from the committee's non-federal bank account",

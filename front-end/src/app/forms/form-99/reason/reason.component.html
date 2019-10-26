@@ -84,6 +84,13 @@
           </div>
         </div>
         <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12" *ngIf="showFileNameLengthError">
+            <div class="text-error text-center" *ngIf="showFileNameLengthError">
+              File name cannot exceed 100 characters.
+            </div>
+          </div>
+        </div>
+        <div class="grid-row">
           <div class="grid-row__col grid-row__col--12" *ngIf="PdfUploaded">
             <div class="text-success text-center" *ngIf="PdfUploaded">
               File has been successfully attached.
