@@ -43,7 +43,7 @@ export enum EndorsersActions {
 }
 
 @Component({
-  selector: 'addnew_contacts.',
+  selector: 'app-loanendorser',
   templateUrl: './endorser.component.html',
   styleUrls: ['./endorser.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
