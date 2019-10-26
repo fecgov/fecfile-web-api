@@ -266,7 +266,8 @@ export class TransactionTypeComponent implements OnInit {
         scheduleType: "sched_h1",
         text: "Allocation Ratios",
         type: "radio",
-        value: "ALLOC_H1_RATIO"
+        // value: ""
+        value: "ALLOC_H1"
       }
         // {
         //   info: "Funds received from the committee's non-federal bank account",
