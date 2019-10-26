@@ -60,19 +60,21 @@ export class PreviewComponent implements OnInit {
       console.log('Preview screen this.formDetails ', this.formDetails);
       this.committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
 
-      if (this.editMode) {
-        this._step = res.step;
-        this.formDetails = JSON.parse(localStorage.getItem('form_99_details'));
-      } else if (!this.editMode) {
-        this._step = res.step;
-        this.formDetails = res.data;
-      }
+      // if (this.editMode) {
+      this._step = res.step;
+      this.formDetails = JSON.parse(localStorage.getItem('form_99_details'));
+      // } else if (!this.editMode) {
+      //   this._step = res.step;
+      //   this.formDetails = res.data;
+      // }
 
       setTimeout(() => {
         if (this.formType === '99') {
           if (this.formDetails) {
             if (this.formDetails.hasOwnProperty('filename')) {
               this.fileName = this.formDetails.filename;
+            } else if (localStorage.getItem('orm_99_details.org_filename')) {
+              this.fileName = localStorage.getItem('orm_99_details.org_filename');
             } else {
               this.fileName = '';
             }
@@ -217,6 +219,33 @@ export class PreviewComponent implements OnInit {
         showValidateBar: false
       }
     });
+  }
+
+  public viewMode(): void {
+    this._dialogService
+      .newReport(
+        'This report has been filed with the FEC. If you want to change, you must file a new report.',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        false,
+        true
+      )
+      .then(res => {
+        if (res === 'cancel' || res === ModalDismissReasons.BACKDROP_CLICK || res === ModalDismissReasons.ESC) {
+          this._dialogService.checkIfModalOpen();
+        } else if (res === 'NewReport') {
+          this.editMode = true;
+          localStorage.removeItem('form_99_details');
+          localStorage.removeItem('form_99_saved');
+          this._setF99Details();
+          setTimeout(() => {
+            this._router.navigate(['/forms/form/99'], {
+              queryParams: { step: 'step_1', edit: this.editMode, refresh: true }
+            });
+          }, 500);
+        }
+      });
   }
 
   public goToNextStep(): void {
