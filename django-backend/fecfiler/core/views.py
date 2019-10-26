@@ -5593,3 +5593,67 @@ def get_report_status(request):
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The get_report_status API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+"""
+********************************************************************************************************************************
+GET LOAN ENDORSER DYNAMIC FORM FIELDS API- CORE APP - SPRINT 23 - FNE 1502 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_sched_c_endorser_dynamic_forms_fields(request):
+
+    try:
+
+        with open(os.path.dirname(__file__) + "/loan_endorser_fields.json", encoding='utf-8', errors='ignore') as loan_endorser_json_file:
+            data_obj = json.load(loan_endorser_json_file)
+                
+        if not bool(data_obj):
+            return Response("Loan Endorser dynamice fields json file is missing...!", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("The get_sched_c_endorser_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+********************************************************************************************************************************
+GET LOAN  DYNAMIC FORM FIELDS API- CORE APP - SPRINT 23 - FNE 1501 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_sched_c_loan_dynamic_forms_fields(request):
+
+    try:
+        print("get_sched_c_loan_dynamic_forms_fields called...")
+        with open(os.path.dirname(__file__) + "/loan_fields.json", encoding='utf-8', errors='ignore') as loans_json_file:
+            data_obj = json.load(loans_json_file)
+                
+        if not bool(data_obj):
+            return Response("Loan dynamice fields json file is missing...!", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("The get_sched_c_loan_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+********************************************************************************************************************************
+GET LOAN REPAYMENT DYNAMIC FORM FIELDS API- CORE APP - SPRINT 23 - FNE 1503 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_sched_c_loanPayment_dynamic_forms_fields(request):
+
+    try:
+
+        with open(os.path.dirname(__file__) + "/loan_endorser_fields.json", encoding='utf-8', errors='ignore') as loan_repayment_json_file:
+            data_obj = json.load(loan_repayment_json_file)
+                
+        if not bool(data_obj):
+            return Response("Loan Repayment dynamice fields json file is missing...!", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("The get_sched_c_loanPayment_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+# """
