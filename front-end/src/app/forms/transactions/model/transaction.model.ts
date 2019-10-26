@@ -27,6 +27,7 @@ export class TransactionModel {
   reportStatus: string;
   toggleChild: boolean;
   child: TransactionModel[] = [];
+  cloned: boolean;
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';

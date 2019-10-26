@@ -173,6 +173,7 @@ export class TransactionTypeComponent implements OnInit {
       //   scheduleType = 'sched_h';
       // }
 
+
       console.log("this.transactionTypeText",this.transactionTypeText);
       console.log("this.transactionType",this.transactionType);
       console.log("this.transactionCategory",this.transactionCategory);
