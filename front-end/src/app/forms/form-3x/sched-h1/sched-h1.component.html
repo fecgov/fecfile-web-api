@@ -7,7 +7,9 @@
   <form [formGroup]="frmOption" #f="ngForm" (ngSubmit)="submit(f)"> -->
 
 <div class="individual-receipt-container" *ngIf="!isPac()">
-  <form [formGroup]="frmIndividualReceipt">
+  <!-- <form [formGroup]="frmIndividualReceipt"> -->
+  <form #f="ngForm">
+    <!-- <form #f="ngForm" (ngSubmit)="saveH1(f)"> -->
     <header>
       <div class="header-content">
         <div class="float-left">
@@ -17,7 +19,7 @@
             <!-- <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container> -->
           </h2>
         </div>
-        <div class="float-right" ngbDropdown>
+        <!-- <div class="float-right" ngbDropdown>
           <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
             <span class="ellipsis-icon" aria-hidden="true"></span>
             <span class="sr-only">Click for more options</span>
@@ -26,14 +28,14 @@
             <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
             <button class="dropdown-item"><i class="file-import-icon" (click)="ImportTransactions()"></i>
               Import</button>
-          </div>
-        </div>
+          </div> -->
       </div>
-      <div class="row">
+
+      <!-- <div class="row">
         <div class="col-md-12">
           <hr />
         </div>
-      </div>
+      </div> -->
     </header>
 
     <div class="float-left">
@@ -64,6 +66,12 @@
         </div>
       </ng-container>
     </div>
+    <!-- <p #alert></p> -->
+    <p>{{f.value.message}}</p>
+
+    <button type="submit" class="btn btn-secondary" (click)="saveH1(f)">
+      Save
+    </button>
     <!-- <button class="btn bnt-primary">Save</button> -->
   </form>
 </div>
@@ -72,8 +80,9 @@
 <!-- front end for non-connected committee -->
 <!-- TODO: need to figure out when this thing is enabled. -->
 <div class="non-connected-committee-container" *ngIf="isPac()">
-  <form [formGroup]="frmOption" #f="ngForm" (ngSubmit)="submit(f)">
+  <!-- <form [formGroup]="frmOption" #f="ngForm" (ngSubmit)="submit(f)"> -->
 
+  <form #f="ngForm">
     <div class="float-left">
       <ng-container>
         <h2>Seperarate Segregated Funds and Non-connected Committees</h2>
@@ -137,28 +146,7 @@
           None-Presidential and None-Senate Election Year(15% Federal)
         </label>
       </div> -->
-    <!-- <button class="btn bnt-primary" [disabled]="!f.valid">Save</button> -->
+    <button class="btn bnt-primary" [disabled]="!f.valid" (click)="saveH1(f)">Save</button>
+
   </form>
 </div>
-
-<!-- <p>{{f.value | json}}</p> -->
-
-<footer>
-  <footer>
-    <div class="grid-row">
-      <div class="grid-row__col grid-row__col--12">
-        <div class="forms__btn-container">
-
-          <!-- <div class="modal-footer"> -->
-          <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="saveH1()">
-            Add New
-          </button>
-          <!-- <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray"
-                (click)="cancelColumnOptions()">
-                Cancel
-              </button> -->
-        </div>
-      </div>
-    </div>
-  </footer>
-</footer>
