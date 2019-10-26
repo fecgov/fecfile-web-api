@@ -70,28 +70,37 @@ export class SchedH1Component implements OnInit {
     // formData.append('non_federal_percent', '0.55');
     // h1_obj['report_id'] = '121';
     console.log(f.value)
-    if (f.value.h1_election_year_options === '1') {
-      h1_obj['federal_percent'] = '0.28';
-      h1_obj['non_federal_percent'] = '0.72';
-      h1_obj['presidential_only'] = true;
-    } else if (f.value.h1_election_year_options === '2') {
-      h1_obj['federal_percent'] = '0.36';
-      h1_obj['non_federal_percent'] = '0.64';
-      h1_obj['presidential_and_senate'] = true;
-    } else if (f.value.h1_election_year_options === '3') {
-      h1_obj['federal_percent'] = '0.21';
-      h1_obj['non_federal_percent'] = '0.79';
-      h1_obj['senate_only'] = true;
-    } else if (f.value.h1_election_year_options === '4') {
-      h1_obj['federal_percent'] = '0.15';
-      h1_obj['non_federal_percent'] = '0.85';
-      h1_obj['non_pres_and_non_senate'] = true;
+    if (this.isPac()) {
+      h1_obj['federal_percent'] = f.value.federal_share;
+      h1_obj['non_federal_percent'] = f.value.nonfederal_share;
+      if (f.value.applied_activity1) {
+        h1_obj['administrative'] = true;
+      }
+      if (f.value.applied_activity2) {
+        h1_obj['generic_voter_drive'] = true;
+      }
+      if (f.value.applied_activity3) {
+        h1_obj['public_communications'] = true;
+      }
+    } else {
+      if (f.value.h1_election_year_options === '1') {
+        h1_obj['federal_percent'] = '0.28';
+        h1_obj['non_federal_percent'] = '0.72';
+        h1_obj['presidential_only'] = true;
+      } else if (f.value.h1_election_year_options === '2') {
+        h1_obj['federal_percent'] = '0.36';
+        h1_obj['non_federal_percent'] = '0.64';
+        h1_obj['presidential_and_senate'] = true;
+      } else if (f.value.h1_election_year_options === '3') {
+        h1_obj['federal_percent'] = '0.21';
+        h1_obj['non_federal_percent'] = '0.79';
+        h1_obj['senate_only'] = true;
+      } else if (f.value.h1_election_year_options === '4') {
+        h1_obj['federal_percent'] = '0.15';
+        h1_obj['non_federal_percent'] = '0.85';
+        h1_obj['non_pres_and_non_senate'] = true;
+      }
     }
-
-
-    // console.log(JSON.stringify(formData))
-    // console.log(JSON.stringify(httpOptions))
-    // let h1 = { "levin_account_name": levin_name.value }
     console.log(h1_obj)
     this._http.post(url, JSON.stringify(h1_obj), {
       headers: httpOptions
@@ -99,13 +108,7 @@ export class SchedH1Component implements OnInit {
       res => {
         console.log(res);
         f.value.message = 'h1 saved.'
-        // alert('h1 saved.')
-
-        // levin_acct['levin_account_id'] = res[0].levin_account_id;
-        // this.levin_accounts.splice(0, 0, levin_acct);
       });
-    // reset levin name field
-    // levin_name.value = '';
   }
 
 
