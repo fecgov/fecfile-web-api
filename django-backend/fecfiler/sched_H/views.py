@@ -1502,7 +1502,58 @@ def get_sched_h3_breakdown(request):
         raise Exception('Error on fetching h3 break down')
         
 
+@api_view(['GET'])
+def get_h3_total_amount(request):
+    """
+    get h3 total_amount for editing purpose
+    if a event_name is provided, will get the total amount based on event name
+    if a event_type is provided, will get the total amount based on event type
+    """
+    try:
+        cmte_id = request.user.username
+        logger.debug('get_h2_summary_table with request:{}'.format(request.query_params))
+        if 'activity_event_name' in request.query_params: 
+            event_name = request.query_params.get('activity_event_name') 
+            _sql = """
+            SELECT json_agg(t) from(
+            SELECT total_amount_transferred
+            FROM   public.sched_h3 
+            WHERE  cmte_id = %s
+                AND activity_event_name = %s
+            ORDER BY receipt_date desc, create_date desc) t
+            """
+            with connection.cursor() as cursor:
+                logger.debug('query with _sql:{}'.format(_sql))
+                # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+                cursor.execute(_sql, (cmte_id, event_name))
+                json_res = cursor.fetchone()[0]
+        else:
+            event_type = request.query_params.get('activity_event_type') 
+            if not event_type:
+                raise Exception("event name or event type is required for this api")
+            _sql = """
+            SELECT json_agg(t) from(
+            SELECT total_amount_transferred
+            FROM   public.sched_h3 
+            WHERE  cmte_id = %s
+                AND activity_event_type = %s
+            ORDER BY receipt_date desc, create_date desc) t
+            """ 
+            with connection.cursor() as cursor:
+                logger.debug('query with _sql:{}'.format(_sql))
+                # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+                cursor.execute(_sql, (cmte_id, event_type))
+                json_res = cursor.fetchone()[0]
         
+            # print(json_res)
+        if not json_res:
+            return Response('Error: no valid h3 data found.')
+        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
+        return Response( json_res[0], status = status.HTTP_200_OK)
+    except:
+        raise        
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH3(request):
