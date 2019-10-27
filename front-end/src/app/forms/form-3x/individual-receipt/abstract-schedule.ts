@@ -47,7 +47,7 @@ import { heLocale } from 'ngx-bootstrap';
 import { TransactionsService } from '../../transactions/service/transactions.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
-import { entityTypes } from './entity-types-json';
+import { entityTypes, committeeEventTypes } from './entity-types-json';
 import { ScheduleActions } from './schedule-actions.enum';
 
 
@@ -94,6 +94,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public candidateOfficeTypes: any = [];
   public entityTypes: any = [];
   public activityEventTypes: any = [];
+  public activityEventNames: any = null;
   public subTransactionInfo: any;
   public multipleSubTransactionInfo: any[] = [];
   public selectedEntityType: any;
@@ -109,6 +110,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected isInit = false;
   protected formFieldsPrePopulated = false;
   protected staticFormFields = null;
+  protected _prePopulateFromSchedDData: any;
+  protected _parentTransactionModel: TransactionModel;
 
   private _reportType: any = null;
   private _types: any = [];
@@ -136,10 +139,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _readOnlyMemoCode: boolean;
   private _readOnlyMemoCodeChild: boolean;
   private _entityTypeDefault: any;
-  protected _parentTransactionModel: TransactionModel;
   private _employerOccupationRequired: boolean;
   private _prePopulateFieldArray: Array<any>;
-  protected _prePopulateFromSchedDData: any;
+  private _committeeDetails: any;
+  private _cmteTypeCategory: string;
 
   constructor(
     private _http: HttpClient,
@@ -217,11 +220,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public ngOnInit(): void {
 
-    // this.transactionTypeText = '';
-    // this.transactionType = '';
-    // this.scheduleAction = null;
-    // this.status = new EventEmitter<any>();
-
     this._selectedEntity = null;
     this._selectedChangeWarn = null;
     this._selectedEntityChild = null;
@@ -240,6 +238,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._employerOccupationRequired = false;
     this.memoDropdownSize = null;
     this.totalAmountReadOnly = true;
+
+    if (localStorage.getItem('committee_details') !== null) {
+      this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
+      if (this._committeeDetails.cmte_type_category !== null) {
+        this._cmteTypeCategory = this._committeeDetails.cmte_type_category;
+      }
+    }
 
     this._getCandidateOfficeTypes();
 
@@ -859,14 +864,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public handleActivityEventTypeChange($event: any, col: any) {
 
-    const eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
-    if (!eventTypeVal) {
+    // const eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
+    // if (!eventTypeVal) {
 
-    }
-    if (eventTypeVal === 'Select') {
-      this.totalAmountReadOnly = true;
-    } else {
-      this.totalAmountReadOnly = false;
+    // }
+    // if (eventTypeVal === 'Select') {
+    //   this.totalAmountReadOnly = true;
+    // } else {
+    //   this.totalAmountReadOnly = false;
+    // }
+
+    if ($event.activityEventNames) {
+      this.activityEventNames = $event.activityEventNames;
     }
 
     this._getFedNonFedPercentage();
@@ -2563,6 +2572,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             if (res.data.hasOwnProperty('activityEventTypes')) {
               if (Array.isArray(res.data.electionTypes)) {
                 this.activityEventTypes = res.data.activityEventTypes;
+                if (this._cmteTypeCategory) {
+
+                  if (committeeEventTypes.committeeTypeEvents) {
+                    for (const committeeTypeEvent of committeeEventTypes.committeeTypeEvents) {
+                      if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
+                        this.activityEventTypes = committeeTypeEvent.eventTypes;
+                      }
+                    }
+                  }
+                }
               }
             }
             if (res.data.hasOwnProperty('titles')) {
