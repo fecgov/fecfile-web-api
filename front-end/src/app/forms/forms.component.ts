@@ -78,21 +78,30 @@ export class FormsComponent implements OnInit {
 
       return result;
     } else if (this._formsService.checkCanDeactivate()) {
-      this._dialogService
-        .confirm(
-          'FEC ID has not been generated yet. Please check the FEC ID under reports if you want to leave the page.',
-          ConfirmModalComponent,
-          'Warning',
-          true,
-          ModalHeaderClassEnum.warningHeader,
-          null,
-          'Leave page'
-        )
-        .then(res => {
-          if (res === 'okay') {
-          } else if (res === 'cancel') {
-          }
-        });
+      let result: boolean = null;
+      console.log(' form not saved...');
+      result = await this._dialogService
+      .confirm(
+        'FEC ID has not been generated yet. Please check the FEC ID under reports if you want to leave the page.',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Leave page'
+      ).then(res => {
+        let val: boolean = null;
+
+        if (res === 'okay') {
+          val = false;
+        } else if (res === 'cancel') {
+          val = true;
+        }
+
+        return val;
+      });
+
+      return result;
     } else {
       console.log('Not any unsaved data...');
       return true;

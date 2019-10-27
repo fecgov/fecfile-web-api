@@ -1,38 +1,11 @@
-<!-- <div class="state-local-party-container" *ngIf=true>
-  <div class="float-left">
-    <ng-container>
-      <h1>State and Local Party Committees</h1>
-    </ng-container>
-  </div>
-  <form [formGroup]="frmOption" #f="ngForm" (ngSubmit)="submit(f)"> -->
-
 <div class="individual-receipt-container" *ngIf="!isPac()">
-  <form [formGroup]="frmIndividualReceipt">
+  <form #f="ngForm">
+
     <header>
-      <div class="header-content">
-        <div class="float-left">
-          <h2>
-            State and Local Party Committees
-            <!-- <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container> -->
-            <!-- <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container> -->
-          </h2>
-        </div>
-        <div class="float-right" ngbDropdown>
-          <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
-            <span class="ellipsis-icon" aria-hidden="true"></span>
-            <span class="sr-only">Click for more options</span>
-          </button>
-          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
-            <button class="dropdown-item"><i class="file-import-icon" (click)="ImportTransactions()"></i>
-              Import</button>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <hr />
-        </div>
+      <div class="float-left">
+        <h2>
+          State and Local Party Committees
+        </h2>
       </div>
     </header>
 
@@ -62,103 +35,78 @@
             None-Presidential and None-Senate Election Year(15% Federal)
           </label>
         </div>
+        <p>{{f.value.message}}</p>
+        <button type="submit" class="btn btn-secondary" [disabled]="!f.valid" (click)="saveH1(f)">
+          Save
+        </button>
       </ng-container>
     </div>
-    <!-- <button class="btn bnt-primary">Save</button> -->
   </form>
 </div>
 
 
 <!-- front end for non-connected committee -->
 <!-- TODO: need to figure out when this thing is enabled. -->
-<div class="non-connected-committee-container" *ngIf="isPac()">
-  <form [formGroup]="frmOption" #f="ngForm" (ngSubmit)="submit(f)">
+<div class="individual-receipt-container" *ngIf="isPac()">
+  <form #f="ngForm">
 
-    <div class="float-left">
-      <ng-container>
+    <header>
+      <div class="float-left">
         <h2>Seperarate Segregated Funds and Non-connected Committees</h2>
-
-      </ng-container>
-    </div>
+      </div>
+    </header>
 
     <!-- text fields for fed and nonfed ratio -->
-    <div class="text">
-      <label>
-        Federal:
-        <input ngModel type="text" name="federal_share" maxlength="30" value="" />
-      </label>
-    </div>
-
-    <div class="text">
-      <label>
-        Nonfederal:
-        <input ngModel type="text" name="nonfederal_share" maxlength="30" value="" />
-      </label>
-    </div>
-
-
-
-    <div class="float-left" style="display: table-column; width:100%;">
+    <div class="float-left">
       <ng-container>
-        <h3>this ratio apply to(check all that apply)</h3>
-      </ng-container>
-    </div>
+
+        <div class="form-group">
+          <label for="federal_share">
+            Federal:
+            <input required ngModel type="text" id="federal_share " name="federal_share" maxlength="100" value="0.00" />
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="nonfederal_share">
+            Nonfederal:
+            <input required ngModel type="text" id="nonfederal_share" name="nonfederal_share" maxlength="100"
+              value="0.00" />
+          </label>
+        </div>
+
+        <!-- <div class="float-left"> -->
+        <h3>this ratio apply to(check all that apply):</h3>
+        <!-- </div> -->
 
 
-    <table>
-      <tr>
         <div class="checkbox">
-          <label for="">
-            <input ngModel type="checkbox" name="applied_activity1" value="administrative">
+          <input ngModel type="checkbox" name="applied_activity1" id="ad" value="administrative">
+          <label for="ad">
             administrative
           </label>
         </div>
-      </tr>
-      <tr>
         <div class="checkbox">
-          <label for="">
-            <input ngModel type="checkbox" name="applied_activity2" value="generic_voter_drive">
+          <input ngModel type="checkbox" name="applied_activity2" id="gvd" value="generic_voter_drive">
+          <label for="gvd">
             generic voter drive
           </label>
         </div>
-      </tr>
-      <tr>
         <div class="checkbox">
-          <label for="">
-            <input ngModel type="checkbox" name="applied_activity3" value="public_communication">
+          <input ngModel type="checkbox" name="applied_activity3" id="pc" value="public_communication">
+          <label for="pc">
             public communications referenceing party only
           </label>
         </div>
-      </tr>
-    </table>
-    <!-- <div class="radio">
-        <label for="">
-          <input ngModel type="radio" name="h1_election_year_options" value="4">
-          None-Presidential and None-Senate Election Year(15% Federal)
-        </label>
-      </div> -->
-    <!-- <button class="btn bnt-primary" [disabled]="!f.valid">Save</button> -->
+        <!-- <p>{{f.value | json}}</p> -->
+        <!-- <br> -->
+        <p>{{f.value.message}}</p>
+        <button type="submit" class="btn btn-secondary" [disabled]="!f.valid" (click)="saveH1(f)">
+          Save
+        </button>
+      </ng-container>
+    </div>
+
+    <!-- <p>{{f.value.message}}</p> -->
   </form>
 </div>
-
-<!-- <p>{{f.value | json}}</p> -->
-
-<footer>
-  <footer>
-    <div class="grid-row">
-      <div class="grid-row__col grid-row__col--12">
-        <div class="forms__btn-container">
-
-          <!-- <div class="modal-footer"> -->
-          <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="saveH1()">
-            Add New
-          </button>
-          <!-- <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray"
-                (click)="cancelColumnOptions()">
-                Cancel
-              </button> -->
-        </div>
-      </div>
-    </div>
-  </footer>
-</footer>

@@ -142,11 +142,11 @@
         </div>
       </div>
       <div class="grid-row border-top">
-        <div class="grid-row-col grid-row__col--3">
+        <div class="grid-row-col grid-row__col--5">
           <label class="label">
             <strong>Attachment:</strong>&nbsp;
           </label>
-          <span *ngIf="orgFileUrl && orgFileUrl !== ''">
+          <span *ngIf="orgFileUrl !== 'null' && orgFileUrl !== 'undefined' && orgFileUrl !== ''">
             <a style="background:#0AACFA; padding: .5em; border-radius: 1em" href="{{ orgFileUrl }}" target="_blank">{{ fileName }}</a>
           </span>
           <span *ngIf="!orgFileUrl">
@@ -157,13 +157,12 @@
       <div class="grid-row border-top">
         <label class="grid-row__col grid-row__col--6 text-left"><strong>Text:</strong></label>
         <div class="grid-row__col grid-row__col--6 text-right">
-          <button
-            type="button"
-            class="btn btn-edit"
-            (click)="goToPreviousStep()"
-          ><i class="edit-icon"></i>
-              Edit
-            </button>
+          <button type="button" class="btn btn-edit" *ngIf="editMode" (click)="goToPreviousStep()"><i class="edit-icon"></i>
+            Edit
+          </button>
+          <button type="button" class="btn btn-edit" *ngIf="!editMode" (click)="viewMode()"><i class="edit-icon"></i>
+            Edit
+          </button>
         </div>
       </div>
       <div class="grid-row">

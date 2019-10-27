@@ -39,7 +39,8 @@ def update_parent_purpose(data):
             # Insert data into schedA table
             logger.debug("update parent purpose with sql:{}".format(_sql))
             logger.debug(
-                "update parent {} with purpose:{}".format(parent_tran_id, purpose)
+                "update parent {} with purpose:{}".format(
+                    parent_tran_id, purpose)
             )
             # print(report_id, cmte_id)
             cursor.execute(_sql, [purpose, parent_tran_id, report_id, cmte_id])
@@ -96,7 +97,8 @@ def populate_transaction_types():
         with connection.cursor() as cursor:
             cursor.execute(_sql)
             if cursor.rowcount == 0:
-                raise Exception("bummer, no transaction_types found in the database.")
+                raise Exception(
+                    "bummer, no transaction_types found in the database.")
             for row in cursor.fetchall():
                 tran_dic[row[0]] = (row[1], row[2])
         return tran_dic
@@ -108,7 +110,7 @@ def populate_transaction_types():
 def get_transaction_type_descriptions():
     """
     load all transaction_type descriptions
-    
+
 
     return a dic in the following format:
     {"trans_identifier":"trans_description"}
@@ -124,7 +126,8 @@ def get_transaction_type_descriptions():
         with connection.cursor() as cursor:
             cursor.execute(_sql)
             if cursor.rowcount == 0:
-                raise Exception("bummer, no transaction_types found in the database.")
+                raise Exception(
+                    "bummer, no transaction_types found in the database.")
             for row in cursor.fetchall():
                 tran_dic[row[0]] = row[1]
         # logger.debug("transaction desc loaded:{}".format(tran_dic))
@@ -364,6 +367,104 @@ def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
         raise
 
 
+def get_sched_c1_child_transactions(report_id, cmte_id, transaction_id):
+    """
+    load child transactions for sched_f
+    """
+    print(report_id)
+    print(transaction_id)
+    _sql = """
+    SELECT             
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type_identifier,
+            transaction_type,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            lender_entity_id,
+            loan_amount,
+            loan_intrest_rate,
+            loan_incurred_date,
+            loan_due_date,
+            is_loan_restructured,
+            original_loan_date,
+            credit_amount_this_draw,
+            total_outstanding_balance,
+            other_parties_liable,
+            pledged_collateral_ind,
+            pledge_collateral_desc,
+            pledge_collateral_amount,
+            perfected_intrest_ind,
+            future_income_ind,
+            future_income_desc,
+            future_income_estimate,
+            depository_account_established_date,
+            depository_account_location,
+            depository_account_street_1,
+            depository_account_street_2,
+            depository_account_city,
+            depository_account_state,
+            depository_account_zip,
+            depository_account_auth_date,
+            basis_of_loan_desc,
+            treasurer_entity_id,
+            treasurer_signed_date,
+            authorized_entity_id,
+            authorized_entity_title,
+            authorized_signed_date,
+            create_date
+    FROM public.sched_c1
+    WHERE report_id = %s 
+    AND cmte_id = %s 
+    AND back_ref_transaction_id = %s 
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + _sql + """) t""",
+                [report_id, cmte_id, transaction_id],
+            )
+            return post_process_it(cursor, cmte_id, report_id, transaction_id)
+    except:
+        raise
+
+
+def get_sched_c2_child_transactions(report_id, cmte_id, transaction_id):
+    """
+    load child transactions for sched_f
+    """
+    _sql = """
+    SELECT             
+            cmte_id,
+            report_id,
+            line_number,
+            transaction_type_identifier,
+            guarantor_entity_id,
+            guaranteed_amount,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            create_date
+    FROM public.sched_c2
+    WHERE report_id = %s 
+    AND cmte_id = %s 
+    AND back_ref_transaction_id = %s 
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + _sql + """) t""",
+                [report_id, cmte_id, transaction_id],
+            )
+            return post_process_it(cursor, cmte_id, report_id, transaction_id)
+    except:
+        raise
+
+
 def get_sched_b_transactions(
     report_id, cmte_id, transaction_id=None, back_ref_transaction_id=None
 ):
@@ -450,9 +551,11 @@ def candify_it(cand_json):
     candify_item = {}
     for _f in cand_json:
         if _f == "entity_id":
-            candify_item["beneficiary_cand_entity_id"] = cand_json.get("entity_id")
+            candify_item["beneficiary_cand_entity_id"] = cand_json.get(
+                "entity_id")
         elif _f == "ref_cand_cmte_id":
-            candify_item["beneficiary_cand_id"] = cand_json.get("ref_cand_cmte_id")
+            candify_item["beneficiary_cand_id"] = cand_json.get(
+                "ref_cand_cmte_id")
             candify_item["cand_id"] = cand_json.get("ref_cand_cmte_id")
         elif _f in ["occupation", "employer"]:
             continue

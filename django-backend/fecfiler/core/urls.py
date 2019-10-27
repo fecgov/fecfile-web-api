@@ -166,4 +166,19 @@ urlpatterns = [
         views.get_report_status,
         name="get_report_status",
     ),
+    url(
+        r"^core/get_sched_c_loan_dynamic_forms_fields$",
+        views.get_sched_c_loan_dynamic_forms_fields,
+        name="get_sched_c_loan_dynamic_forms_fields",
+    ),
+    url(
+        r"^core/get_sched_c_loanPayment_dynamic_forms_fields$",
+        views.get_sched_c_loanPayment_dynamic_forms_fields,
+        name="get_sched_c_loanPayment_dynamic_forms_fields",
+    ),
+    url(
+        r"^core/get_sched_c_endorser_dynamic_forms_fields$",
+        views.get_sched_c_endorser_dynamic_forms_fields,
+        name="get_sched_c_endorser_dynamic_forms_fields",
+    ),
 ]

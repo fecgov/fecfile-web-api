@@ -32,6 +32,9 @@ export class SubmitComponent implements OnInit {
 
   ngOnInit() {
     this.form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    if (this._router.url.indexOf('step_5') > -1) {
+      this._checkReportStatus();
+    }
     console.log('form submitted ...', this.form_type);
 
     this._messageService.getMessage().subscribe(res => {
@@ -104,34 +107,5 @@ export class SubmitComponent implements OnInit {
         }
       );
     }
-  }
-
-  public async canDeactivate(): Promise<boolean> {
-    if (this._checkStatus) {
-      if (this._formsService.checkCanDeactivate()) {
-        this._dialogService
-          .confirm(
-            'FEC ID has not been generated yet. Please check the FEC ID under reports if you want to leave the page.',
-            ConfirmModalComponent,
-            'Warning',
-            true,
-            ModalHeaderClassEnum.warningHeader,
-            null,
-            'Leave page'
-          )
-          .then(res => {
-            if (res === 'okay') {
-            } else if (res === 'cancel') {
-              this.navigateToDashboard();
-            }
-          });
-      }
-    } else {
-      return true;
-    }
-  }
-
-  public navigateToDashboard(): void {
-    this._router.navigateByUrl('/dashboard');
   }
 }

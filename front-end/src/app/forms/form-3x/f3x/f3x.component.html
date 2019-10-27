@@ -12,7 +12,10 @@
         step === 'financial_summary' ||
         step === 'transactions' ||
         step === 'reports' ||
-        step === 'step_4'
+        step === 'step_4' ||
+        step === 'loansummary' ||
+        step === 'loan' 
+        
       ">
       <transaction-sidebar [step]="step" title="Transaction Categories" [transactionCategories]="transactionCategories"
         (status)="onNotify($event)" [hidden]="isShowFilters">
@@ -69,7 +72,7 @@
           (status)="onNotify($event)">
         </app-sched-f>
 
-        <app-sched-c
+        <!--<app-sched-c
           [hidden]="scheduleType !== 'sched_c'"
           [transactionTypeText]="transactionTypeTextSchedC"
           [transactionType]="transactionTypeSchedC"
@@ -77,7 +80,7 @@
           [scheduleType]="scheduleType"
           (status)="onNotify($event)"
         >
-        </app-sched-c>
+        </app-sched-c>-->
         <app-sched-c1
           [hidden]="scheduleType !== 'sched_c1'"
           [transactionTypeText]="transactionTypeTextSchedC"
@@ -125,6 +128,9 @@
       <div class="form_step" [hidden]="step !== 'transactions' && step !== 'reports'">
         <app-transactions (sidebarSwitch)="switchSidebar($event)" (showTransaction)="onNotify($event)">
         </app-transactions>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loan'">
+        <app-sched-c-loans> </app-sched-c-loans>
       </div>
       <div class="form_step" [hidden]="step !== 'loansummary'">
         <app-loansummary> </app-loansummary>

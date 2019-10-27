@@ -16,7 +16,7 @@ import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
-import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { UtilService } from '../../../shared/utils/util.service';
@@ -44,7 +44,7 @@ import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { trigger, transition, style, animate, state } from '@angular/animations';
 import { heLocale } from 'ngx-bootstrap';
-import { TransactionsService } from '../../transactions/service/transactions.service';
+import { TransactionsService, GetTransactionsResponse } from '../../transactions/service/transactions.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
 import { entityTypes, committeeEventTypes } from './entity-types-json';
@@ -114,6 +114,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
 
   private _reportType: any = null;
+  private _cloned: boolean = false;
   private _types: any = [];
   private _transaction: any = {};
   private _transactionType: string = null;
@@ -215,6 +216,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     _activatedRoute.queryParams.subscribe(p => {
       this._transactionCategory = p.transactionCategory;
+      this._cloned = p.cloned || p.cloned === 'true' ? true : false;
     });
   }
 
@@ -1821,20 +1823,70 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
-    this.clearFormValues();
-    let reportId = this._receiptService.getReportIdFromStorage(this.formType);
-    console.log('reportId', reportId);
+    if (!this._cloned) {
+      this.clearFormValues();
+      let reportId = this._receiptService.getReportIdFromStorage(this.formType);
+      console.log('reportId', reportId);
 
-    if (!reportId) {
-      reportId = '0';
+      if (!reportId) {
+        reportId = '0';
+      }
+      localStorage.setItem(`form_${this.formType}_view_transaction_screen`, 'Yes');
+      localStorage.setItem('Transaction_Table_Screen', 'Yes');
+      this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
+
+      this._router.navigate([`/forms/form/${this.formType}`], {
+        queryParams: { step: 'transactions', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory }
+      });
+    } else {
+      let reportId = this._receiptService.getReportIdFromStorage(this.formType);
+      if (!reportId) {
+        reportId = '0';
+      }
+      this._dialogService
+      .confirm('You are about to delete this transaction ' + this._transactionToEdit.transactionId + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._transactionsService
+            .trashOrRestoreTransactions(this.formType, 'trash', reportId, [this._transactionToEdit])
+            .subscribe((res: GetTransactionsResponse) => {
+              this._dialogService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + this._transactionToEdit.transactionId,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              ).then(response => {
+                if (response === 'okay' ||
+                response === 'cancel' ||
+                response === ModalDismissReasons.BACKDROP_CLICK ||
+                response === ModalDismissReasons.ESC) {
+                  this._router.navigate([`/forms/form/${this.formType}`], {
+                    queryParams: {
+                      step: 'transactions',
+                      reportId: reportId,
+                      edit: this.editMode,
+                      transactionCategory: this._transactionCategory,
+                      refresh: 1
+                    }
+                  });
+                  this._router.navigateByUrl('/dashboard', { skipLocationChange: true }).then(() => {
+                    this._router.navigate([`/forms/form/${this.formType}`], {
+                      queryParams: {
+                        step: 'transactions',
+                        reportId: reportId,
+                        edit: this.editMode,
+                        transactionCategory: this._transactionCategory
+                      }
+                    });
+                });
+                }
+              });
+            });
+        } else if (res === 'cancel') {
+        }
+      });
     }
-    localStorage.setItem(`form_${this.formType}_view_transaction_screen`, 'Yes');
-    localStorage.setItem('Transaction_Table_Screen', 'Yes');
-    this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
-
-    this._router.navigate([`/forms/form/${this.formType}`], {
-      queryParams: { step: 'transactions', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory }
-    });
   }
 
   public printPreview(): void {

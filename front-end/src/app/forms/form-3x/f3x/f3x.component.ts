@@ -59,6 +59,7 @@ export class F3xComponent implements OnInit {
   public forceChangeSwitch = 0;
 
   private _step: string = '';
+  private _cloned: boolean = false;
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -278,7 +279,9 @@ export class F3xComponent implements OnInit {
             if (this.transactionType && this.transactionType === e.transactionType) {
               this._f3xMessageService.sendLoadFormFieldsMessage('');
             }
-
+            if (e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.cloned) {
+              this._cloned = true;
+            }
             // this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
             // this.transactionType = e.transactionType ? e.transactionType : '';
             this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
@@ -398,9 +401,15 @@ export class F3xComponent implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this.formType}`], {
-            queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory }
-          });
+          if (this._cloned) {
+            this._router.navigate([`/forms/form/${this.formType}`], {
+              queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory, cloned: this._cloned }
+            });
+          } else {
+            this._router.navigate([`/forms/form/${this.formType}`], {
+              queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory }
+            });
+          }
         } else if (this.frm === 'preview') {
           this.step = this._step;
 
