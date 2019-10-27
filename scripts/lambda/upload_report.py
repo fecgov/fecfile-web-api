@@ -81,7 +81,7 @@ def get_reports_to_upload():
                 json.dumps(successresp), 
                 '',
                 '', 
-                '', 
+                '' 
                 ) 
 
             headers_obj = {
@@ -129,11 +129,22 @@ def get_reports_to_upload():
                         'call_from':'Submit'
                     }
 
+                add_log(data_row[1],
+                    data_row[0],  
+                    4,
+                    "F3X prepare_json_builders_data call with data_obj "+ data_obj, 
+                     '', 
+                    '',
+                    '', 
+                    '', 
+                    )     
                 # call prepare_json_builders_data API to prepare Data for JSON  
                 resp = requests.post("http://" + _NEXGEN_DJANGO_API_URL +
                                     "/core/prepare_json_builders_data", data=data_obj, headers=headers_obj)
+
                 if resp.ok:
                     successresp=resp.json()
+
                     print("prepare_json_builders_data call is successfuly finished...")  
                     print(successresp)
                     if successresp['Response'].encode('utf-8')=='Success':
@@ -145,14 +156,35 @@ def get_reports_to_upload():
                                     'call_from':'Submit'
                                    }
 
+                        add_log(data_row[1],
+                                        data_row[0],  
+                                        4,
+                                        "F3X create_json_builders call with data_obj "+ data_obj, 
+                                        '', 
+                                        '',
+                                        '', 
+                                        '', 
+                                    )     
+
                         resp = requests.post("http://" + _NEXGEN_DJANGO_API_URL +
                                     "/core/create_json_builders", data=data_obj, headers=headers_obj)
                         if resp.ok:
                             successresp=resp.json()
                             print("create_json_builders call is successfuly finished...")  
-                            print(successresp)           
+                            print(successresp)     
+
+                            add_log(data_row[1],
+                                        data_row[0],  
+                                        4,
+                                        "create_json_builders operation successful ", 
+                                        json.dumps(successresp),
+                                        '',
+                                        '', 
+                                        '', 
+                                    )  
+
                             if successresp['result']['status'].encode('utf-8')=='PROCESSING':
-                            # update submission_id in report table 
+                                # update submission_id in report table 
                                 cur.execute("""UPDATE public.reports 
                                                 SET submission_id = %s, 
                                                     last_update_date = %s,
@@ -165,21 +197,41 @@ def get_reports_to_upload():
                                 add_log(data_row[1],
                                         data_row[0],  
                                         4,
-                                        "create_json_builders operation successful with submission_id "+ resp['submission_id'], 
+                                        "create_json_builders operation successful with submission_id " + resp['result']['submissionId'], 
                                         json.dumps(successresp), 
                                         '',
                                         '', 
-                                        '', 
-                                    )     
+                                        '' 
+                                    )  
+                                      
 
                                 if cursor.rowcount == 0:
                                     raise Exception('Error: updating report update date failed.') 
 
                         elif not resp.ok:
+                            add_log(data_row[1],
+                                data_row[0], 
+                                4,
+                                "create_json_builders operation failed with submission_id "+ resp['result']['submissionId'],
+                                json.dumps(resp.json()),
+                                '',
+                                '', 
+                                ''
+                                )
+
                             print("create_json_builders throwing error...")  
                             print(resp.json())
                  
                 elif not resp.ok:
+                    add_log(data_row[1],
+                                        data_row[0],  
+                                        4,
+                                        "create_json_builders operation failed with submission_id ", 
+                                        json.dumps(resp.json()), 
+                                        '',
+                                        '', 
+                                        '' )
+
                     print("prepare_json_builders_data throwing error...")  
                     print(resp.json())                                                        
 
@@ -215,6 +267,15 @@ def get_reports_to_upload():
                 # call submit_formf99 API to submi JSON file
                 resp = requests.post("http://" + _NEXGEN_DJANGO_API_URL +
                                     "/f99/submit_formf99", data=data_obj, headers=headers_obj)
+                add_log(data_row[1],
+                                    data_row[0],  
+                                    4,
+                                    "F99 create_json_builders operation successful with submission_id "+ resp['result']['submissionId'], 
+                                    json.dumps(successresp), 
+                                    '',
+                                    '', 
+                                    '' )     
+
                 if resp.ok:
                     successresp=resp.json()
                     print("submit_formf99 call is successfuly finished...")  
@@ -246,16 +307,23 @@ def get_reports_to_upload():
                     add_log(data_row[1],
                                         data_row[0],  
                                         4,
-                                        "create_json_builders operation failed" , 
+                                        "F99 create_json_builders operation failed" , 
                                         json.dumps(resp.json()), 
                                         '',
                                         '', 
-                                        '', 
-                                    )                   
+                                        '' )                   
         elif not resp.ok:
             print("token/obtain API call is failed...")  
             #notsuccessresp=resp.json()
             print(resp.json())
+            add_log(data_row[1],
+                                ata_row[0],  
+                                4,
+                                "token/obtain API call is failed" , 
+                                json.dumps(resp.json()), 
+                                '',
+                                '', 
+                                '' )  
 
 
     #except Exception as e:

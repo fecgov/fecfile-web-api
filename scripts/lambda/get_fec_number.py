@@ -248,7 +248,17 @@ def get_fec_number():
                     _conn.commit()       
 
                     if cursor.rowcount == 0:
-                        raise Exception('Error: updating fec_id failed.')                                                           
+                        raise Exception('Error: updating fec_id failed.')
+
+                    add_log(data_row[1],
+                        data_row[0], 
+                        4,
+                        "F3X upload_filing with SubmissionId upload_filing is failed", 
+                        json.dumps(successresp), 
+                        '',
+                        '', 
+                        '', 
+                    )                                                               
             #cur.close()
 
             #Processing F99 reports 
