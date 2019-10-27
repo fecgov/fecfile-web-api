@@ -435,6 +435,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._listenForAggregateChanges();
     }
 
+    if (this.scheduleAction === ScheduleActions.add) {
+      this.frmIndividualReceipt.patchValue({ beginning_balance: this._decimalPipe.transform(0, '.2-2') },
+        { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ payment_amount: this._decimalPipe.transform(0, '.2-2') },
+        { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ balance_at_close: this._decimalPipe.transform(0, '.2-2') },
+        { onlySelf: true });
+    }
+
     // // Rather than set a flag as a check for setting up a change listener
     // // on the formGroup control field for purpose as done with the employerOccupation,
     // // iterate over the dynamic api form fields for the purpose.  The flag option
@@ -728,9 +737,60 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (col.name === 'total_amount') {
         this._getFedNonFedPercentage();
       }
+      if (col.name === 'incurred_amount') {
+        this._adjustDebtBalanceAtClose();
+      }
     } else {
       this.populatePurpose(col.name);
     }
+  }
+
+  private _adjustDebtBalanceAtClose() {
+    if (this.transactionType !== 'DEBT_TO_VENDOR') {
+      return;
+    }
+    if (!this.frmIndividualReceipt.contains('beginning_balance') ||
+        !this.frmIndividualReceipt.contains('incurred_amount') ||
+        !this.frmIndividualReceipt.contains('payment_amount') ||
+        !this.frmIndividualReceipt.contains('balance_at_close')) {
+      return;
+    }
+
+    let beginningBalance = this.frmIndividualReceipt.get('beginning_balance').value;
+    if (beginningBalance) {
+      if (typeof beginningBalance === 'string') {
+        beginningBalance = beginningBalance.replace(/,/g, ``);
+      }
+    } else {
+      beginningBalance = 0;
+    }
+
+    let incurredAmount = this.frmIndividualReceipt.get('incurred_amount').value;
+    if (incurredAmount) {
+      if (typeof incurredAmount === 'string') {
+        incurredAmount = incurredAmount.replace(/,/g, ``);
+      }
+    } else {
+      incurredAmount = 0;
+    }
+
+    let paymentAmount = this.frmIndividualReceipt.get('payment_amount').value;
+    if (paymentAmount) {
+      if (typeof paymentAmount === 'string') {
+        paymentAmount = paymentAmount.replace(/,/g, ``);
+      }
+    } else {
+      paymentAmount = 0;
+    }
+
+    beginningBalance = parseFloat(beginningBalance);
+    incurredAmount = parseFloat(incurredAmount);
+    paymentAmount = parseFloat(paymentAmount);
+    const balanceAtClose = beginningBalance + incurredAmount - paymentAmount;
+
+    this._formatAmount({ target: { value: balanceAtClose.toString() } },
+      'balance_at_close', false);
+    // this.frmIndividualReceipt.patchValue({ 'balance_at_close': balanceAtClose }, { onlySelf: true });
   }
 
   /**
@@ -3007,11 +3067,52 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 }
               }
               this._validateTransactionDate();
+              this._calculateDebtAmountFields(trx);
             }
           }
         }
       }
     });
+  }
+
+  private _calculateDebtAmountFields(trx: any) {
+    if (trx.transaction_type_identifier !== 'DEBT_TO_VENDOR') {
+      return;
+    }
+
+    // TODO this should come from the API
+    let paymentAmount = 0.00;
+    for (const subTrx of this.subTransactions) {
+      if (subTrx.hasOwnProperty('expenditure_amount')) {
+        if (subTrx.expenditure_amount) {
+          paymentAmount = paymentAmount + subTrx.expenditure_amount;
+        }
+      } else if (subTrx.hasOwnProperty('contribution_amount')) {
+        if (subTrx.contribution_amount) {
+          paymentAmount = paymentAmount + subTrx.contribution_amount;
+        }
+      } else if (subTrx.hasOwnProperty('total_amount')) {
+        if (subTrx.total_amount) {
+          paymentAmount = paymentAmount + subTrx.total_amount;
+        }
+      } else if (subTrx.hasOwnProperty('total_fed_levin_amount')) {
+        if (subTrx.total_fed_levin_amount) {
+          paymentAmount = paymentAmount + subTrx.total_fed_levin_amount;
+        }
+      }
+    }
+    this._formatAmount({ target: { value: paymentAmount.toString() } }, 'payment_amount', false);
+
+    // Beginning balance + Incurred amount - Payment Amount = Balance at close
+    let incurredAmount = 0;
+    if (trx.hasOwnProperty('incurred_amount')) {
+      if (trx.incurred_amount) {
+        incurredAmount = trx.incurred_amount;
+      }
+    }
+    const balanceAtClose = (trx.beginning_balance + incurredAmount) - paymentAmount;
+    this._formatAmount({ target: { value: balanceAtClose.toString() } }, 'balance_at_close', false);
+
   }
 
   /**
