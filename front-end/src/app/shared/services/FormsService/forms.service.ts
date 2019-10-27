@@ -202,10 +202,11 @@ export class FormsService {
         formData.append('is_submitted', 'False');
         /*formData.append('filename', form99_details.filename);*/
         formData.append('form_type', 'F99');
-        if (form99_details.id === '' || form99_details.id === '' || form99_details.id === null) {
+        if (form99_details.id === '' || form99_details.id === undefined || form99_details.id === null) {
           /*data['id']="0";*/
           formData.append('id', '0');
         } else {
+          alert(form99_details.id)
           formData.append('id', form99_details.id.toString());
         }
       }
