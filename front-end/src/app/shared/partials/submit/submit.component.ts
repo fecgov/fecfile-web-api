@@ -7,6 +7,7 @@ import { interval, Subscription } from 'rxjs';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { DialogService } from '../../services/DialogService/dialog.service';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from '../confirm-modal/confirm-modal.component';
+import { FormsComponent } from 'src/app/forms/forms.component';
 
 @Component({
   selector: 'app-submit',
@@ -27,7 +28,8 @@ export class SubmitComponent implements OnInit {
     private _messageService: MessageService,
     private _reportTypeService: ReportTypeService,
     private _dialogService: DialogService,
-    private _formsService: FormsService
+    private _formsService: FormsService,
+    private _formsComponent: FormsComponent
   ) {}
 
   ngOnInit() {
@@ -88,7 +90,9 @@ export class SubmitComponent implements OnInit {
   }
 
   public goToDashboard(): void {
-    this._router.navigateByUrl('dashboard');
+    if (this._formsComponent.canDeactivate()) {
+      this._router.navigateByUrl('dashboard');
+    }
   }
 
   private _checkReportStatus() {
