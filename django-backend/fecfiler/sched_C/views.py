@@ -1375,14 +1375,14 @@ def schedC1(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
+                    request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             datum = get_schedC1(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
@@ -1841,4 +1841,58 @@ def schedC2(request):
         raise NotImplementedError
 
 
+@api_view(['GET'])
+def get_endorser_summary(request):
+    """
+    Get all loans with an outstanding balance
+    this api is used to enable the sched_c summary page
+    need to return:
+    1. name/bank (this is the entity name)
+    2. original loan
+    3. cumulative payemnt to date
+    4. outstanding balance
+    5. due date
+    """
+    logger.debug('GET request received for endorser summary.')
+    try:
+        cmte_id = request.user.username
+        if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
+                report_id = check_report_id(
+                    request.query_params.get('report_id'))
+        else:
+            raise Exception('Missing Input: report_id is mandatory')
+        # print(cmte_id)
+        # print(report_id)
+        _sql = """
+        SELECT Json_agg(t) 
+            FROM   (SELECT 
+                        e.entity_name,
+                        e.entity_type, 
+                        e.last_name,
+                        e.first_name,
+                        e.middle_name,
+                        e.preffix,
+                        e.suffix, 
+                        e.employer,
+                        e.occupation,
+                        c.transaction_id,
+                        c.guaranteed_amount 
+                    FROM   public.sched_c2 c, 
+                        public.entity e 
+                    WHERE c.cmte_id = %s
+                    AND c.report_id = %s
+                    AND c.guarantor_entity_id = e.entity_id 
+                    AND c.delete_ind is distinct from 'Y' 
+                    ) t
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id, report_id])
+            json_result = cursor.fetchone()[0] 
+            if not json_result:
+                return Response([], status=status.HTTP_200_OK)
+                # raise Exception('No endorser data found.')
+            else:
+                return Response(json_result, status=status.HTTP_200_OK)
 
+    except:
+        raise
