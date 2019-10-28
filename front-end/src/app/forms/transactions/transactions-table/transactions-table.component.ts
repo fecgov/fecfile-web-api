@@ -169,26 +169,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
-      // _router.events.subscribe(val => {
-      //   let oldUrl = '';
-      //   let newUrl = '';
-      //   if (val instanceof NavigationEnd) {
-      //     oldUrl = val.url;
-      //   }
-      //   if (val instanceof NavigationStart) {
-      //     newUrl = val.url;
-      //   }
-
-      //   if (oldUrl !== newUrl) {
-      //     this.getTransactionsPage(1);
-      //   }
-      // });
-      // if (this.tableType === this.transactionsView) {
-        this.getPage(1);
-      // } else if (this.tableType === this.recycleBinView) {
-      //   this.getRecyclingPage(1);
-      // }
-
+      this.getPage(1);
       this.clonedTransaction = {};
       this.setSortableColumns();
       if (p.edit === 'true' || p.edit === true) {

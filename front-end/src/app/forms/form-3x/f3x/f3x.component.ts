@@ -60,6 +60,7 @@ export class F3xComponent implements OnInit {
 
   private _step: string = '';
   private _cloned: boolean = false;
+  private _reportId: any;
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -74,6 +75,15 @@ export class F3xComponent implements OnInit {
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
+    _activatedRoute.queryParams.subscribe(p => {
+      this.transactionCategory = p.transactionCategory;
+      if (p.edit === 'true' || p.edit === true) {
+        this.editMode = true;
+      }
+      if (p.reportId && p.reportId !== '0') {
+        this._reportId = p.reportId;
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -397,6 +407,7 @@ export class F3xComponent implements OnInit {
    */
   public canContinue(): void {
     if (this.frm && this.direction) {
+      localStorage.setItem(`reportId`, this._reportId);
       if (this.direction === 'next') {
         if (this.frm.valid) {
           this.step = this._step;
