@@ -2180,6 +2180,9 @@ def filter_get_all_trans(request, param_string):
         if 'filterItemizations' in f_key:
             itemized_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND itemized In " + itemized_tuple
+        if 'filterElectionCodes' in f_key:
+            itemized_tuple = "('"+"','".join(value_d)+"')"
+            param_string = param_string + " AND election_code In " + itemized_tuple
     return param_string
 
 # def get_aggregate_amount(transaction_id):
