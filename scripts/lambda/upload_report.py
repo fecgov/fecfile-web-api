@@ -132,7 +132,7 @@ def get_reports_to_upload():
                 add_log(data_row[1],
                     data_row[0],  
                     4,
-                    "F3X prepare_json_builders_data call with data_obj "+ data_obj, 
+                    "F3X prepare_json_builders_data call with cmte_id ="+str(data_row[0])+ " report id = "+str(data_row[1]),
                      '', 
                     '',
                     '', 
@@ -141,6 +141,16 @@ def get_reports_to_upload():
                 # call prepare_json_builders_data API to prepare Data for JSON  
                 resp = requests.post("http://" + _NEXGEN_DJANGO_API_URL +
                                     "/core/prepare_json_builders_data", data=data_obj, headers=headers_obj)
+
+                add_log(data_row[1],
+                    data_row[0],  
+                    4,
+                    "F3X prepare_json_builders_data after the call with ="+str(data_row[0])+ " report id = "+str(data_row[1]),
+                    json.dumps(resp),
+                    '',
+                    '', 
+                    '', 
+                    )     
 
                 if resp.ok:
                     successresp=resp.json()
@@ -159,7 +169,7 @@ def get_reports_to_upload():
                         add_log(data_row[1],
                                         data_row[0],  
                                         4,
-                                        "F3X create_json_builders call with data_obj "+ data_obj, 
+                                        "F3X create_json_builders call with data_obj ", 
                                         '', 
                                         '',
                                         '', 
