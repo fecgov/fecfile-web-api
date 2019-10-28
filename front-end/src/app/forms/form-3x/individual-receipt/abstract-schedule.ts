@@ -250,6 +250,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
+    if (localStorage.getItem('committee_details') !== null) {
+      this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
+      if (this._committeeDetails.cmte_type_category !== null) {
+        this._cmteTypeCategory = this._committeeDetails.cmte_type_category;
+      }
+    }
+
     this._getCandidateOfficeTypes();
 
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -511,7 +518,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           if (validators[validation]) {
             // occuaption and employer will be required dpending on aggregate
             if (fieldName !== 'employer' && fieldName !== 'occupation') {
-              formValidators.push(Validators.required);
+              if (fieldName === 'incurred_amount' && this.scheduleAction === ScheduleActions.edit) {
+                // not required but not optinal when editing
+              } else {
+                formValidators.push(Validators.required);
+              }
             } else {
               this._employerOccupationRequired = true;
             }
