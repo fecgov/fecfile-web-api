@@ -88,6 +88,7 @@ import { LoanSummarysService } from './forms/sched-c/loan-summary/service/loan-s
 import { EndorserComponent } from './forms/sched-c/endorser/endorser.component';
 import { EndorserService } from './forms/sched-c/endorser/service/endorser.service';
 import { SchedC1Component } from './forms/sched-c1/sched-c1.component';
+import { SchedH3Component } from './forms/sched-h3/sched-h3.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -157,7 +158,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     LoanComponent,
     LoanSummaryComponent,
     EndorserComponent,
-    SchedC1Component
+    SchedC1Component,
+    SchedH3Component
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [

@@ -298,11 +298,12 @@ export class TransactionTypeComponent implements OnInit {
         // }
       ];
     }
-    if (this._mainTransactionCategory[0].options[1].value === 'schedule-h2') {
+    //for h2
+    if(this._mainTransactionCategory[0].options[1].value === 'schedule-h2') {    
       this.secondaryOptions[1].options = [{
         info: "Funds received from the committee's non-federal bank account",
         infoIcon: "TRUE",
-        name: "schedule-h3",
+        name: "schedule-h2",
         scheduleType: "sched_h2",
         text: "Allocation Ratios",
         type: "radio",
@@ -311,11 +312,73 @@ export class TransactionTypeComponent implements OnInit {
       {
         info: "Funds received from the committee's non-federal bank account",
         infoIcon: "TRUE",
-        name: "schedule-h3",
+        name: "schedule-h2",
         scheduleType: "sched_h2",
         text: "Allocation Ratios Summary",
         type: "radio",
-        value: "ALLOC_H2_SUM"
+        value: "ALLOC_H2_SUM" 
+      }];
+    }
+
+    //for h3
+    if(this._mainTransactionCategory[0].options[2].value === 'schedule-h3') {    
+      this.secondaryOptions[2].options = [{
+        info: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal Activity",
+        infoIcon: "TRUE",
+        name: "schedule-h3",
+        scheduleType: "sched_h3",
+        text: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal Activity",
+        type: "radio",
+        value: "ALLOC_H3_RATIO"
+      },
+      {
+        info: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Summary",
+        infoIcon: "TRUE",
+        name: "schedule-h3",
+        scheduleType: "sched_h3",
+        text: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Summary",
+        type: "radio",
+        value: "ALLOC_H3_SUM" 
+      },
+      {
+        info: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Period Totals",
+        infoIcon: "TRUE",
+        name: "schedule-h3",
+        scheduleType: "sched_h3",
+        text: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Period Totals",
+        type: "radio",
+        value: "ALLOC_H3_SUM_P" 
+      }];
+    }
+
+    //for h4
+    if(this._mainTransactionCategory[0].options[3].value === 'schedule-h4') {    
+      this.secondaryOptions[3].options = [{
+        info: "Disbursements Types",
+        infoIcon: "TRUE",
+        name: "schedule-h4",
+        scheduleType: "sched_h4",
+        text: "Disbursements Types",
+        type: "radio",
+        value: "ALLOC_H4_TYPES"
+      },
+      {
+        info: "Disbursements from Allocated Federal / Nonfederal Activity",
+        infoIcon: "TRUE",
+        name: "schedule-h4",
+        scheduleType: "sched_h4",
+        text: "Disbursements from Allocated Federal / Nonfederal Activity",
+        type: "radio",
+        value: "ALLOC_EXP_DEBT" 
+      },
+      {
+        info: "Disbursements for Allocated Federal/Nonfederal Activity Summary",
+        infoIcon: "TRUE",
+        name: "schedule-h4",
+        scheduleType: "sched_h4",
+        text: "Disbursements for Allocated Federal/Nonfederal Activity Summary",
+        type: "radio",
+        value: "ALLOC_H4_SUM" 
       }];
     }
 
