@@ -4183,7 +4183,7 @@ def contact_entity_dict(data):
           'first_name'  : is_null(data.get('first_name')), 
           'last_name'  : is_null(data.get('last_name')), 
           'middle_name' : is_null(data.get('middle_name')), 
-          'preffix'  : is_null(data.get('preffix')), 
+          'preffix'  : is_null(data.get('prefix')), 
           'suffix' : is_null(data.get('suffix')), 
           'street_1'  : is_null(data.get('street_1')), 
           'street_2'  : is_null(data.get('street_2')), 
@@ -4255,7 +4255,7 @@ def put_contact_data(data):
                 data.get('cand_office', ""),
                 data.get('cand_office_state', ""),
                 data.get('cand_office_district', ""),
-                data.get('phone_number'),
+                data.get('phone_number', None),
                 data.get('cand_election_year', None),
                 datetime.datetime.now(),
                 data.get('entity_id'),
@@ -4318,7 +4318,9 @@ def contacts(request):
             put_contact_data(datum)
             print ("datum", datum)
             output = get_entities(datum)
-            return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
+            dict_data = output[0]
+            dict_data['phone_number'] = str(dict_data['phone_number']) if dict_data.get('phone_number') else ''
+            return JsonResponse(dict_data, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             return Response("The contacts API - PUT is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
