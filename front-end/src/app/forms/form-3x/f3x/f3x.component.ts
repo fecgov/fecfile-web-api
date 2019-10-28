@@ -279,7 +279,7 @@ export class F3xComponent implements OnInit {
             if (this.transactionType && this.transactionType === e.transactionType) {
               this._f3xMessageService.sendLoadFormFieldsMessage('');
             }
-            if (e.transactionDetail.transactionModel.cloned) {
+            if (e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.cloned) {
               this._cloned = true;
             }
             // this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';

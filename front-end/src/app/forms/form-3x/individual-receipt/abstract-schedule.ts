@@ -47,7 +47,7 @@ import { heLocale } from 'ngx-bootstrap';
 import { TransactionsService, GetTransactionsResponse } from '../../transactions/service/transactions.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
-import { entityTypes } from './entity-types-json';
+import { entityTypes, committeeEventTypes } from './entity-types-json';
 import { ScheduleActions } from './schedule-actions.enum';
 
 
@@ -94,6 +94,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public candidateOfficeTypes: any = [];
   public entityTypes: any = [];
   public activityEventTypes: any = [];
+  public activityEventNames: any = null;
   public subTransactionInfo: any;
   public multipleSubTransactionInfo: any[] = [];
   public selectedEntityType: any;
@@ -109,6 +110,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected isInit = false;
   protected formFieldsPrePopulated = false;
   protected staticFormFields = null;
+  protected _prePopulateFromSchedDData: any;
+  protected _parentTransactionModel: TransactionModel;
 
   private _reportType: any = null;
   private _cloned: boolean = false;
@@ -137,10 +140,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _readOnlyMemoCode: boolean;
   private _readOnlyMemoCodeChild: boolean;
   private _entityTypeDefault: any;
-  protected _parentTransactionModel: TransactionModel;
   private _employerOccupationRequired: boolean;
   private _prePopulateFieldArray: Array<any>;
-  protected _prePopulateFromSchedDData: any;
+  private _committeeDetails: any;
+  private _cmteTypeCategory: string;
 
   constructor(
     private _http: HttpClient,
@@ -219,11 +222,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public ngOnInit(): void {
 
-    // this.transactionTypeText = '';
-    // this.transactionType = '';
-    // this.scheduleAction = null;
-    // this.status = new EventEmitter<any>();
-
     this._selectedEntity = null;
     this._selectedChangeWarn = null;
     this._selectedEntityChild = null;
@@ -242,6 +240,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._employerOccupationRequired = false;
     this.memoDropdownSize = null;
     this.totalAmountReadOnly = true;
+
+    if (localStorage.getItem('committee_details') !== null) {
+      this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
+      if (this._committeeDetails.cmte_type_category !== null) {
+        this._cmteTypeCategory = this._committeeDetails.cmte_type_category;
+      }
+    }
 
     this._getCandidateOfficeTypes();
 
@@ -428,6 +433,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     if (this._employerOccupationRequired) {
       this._listenForAggregateChanges();
+    }
+
+    if (this.scheduleAction === ScheduleActions.add) {
+      this.frmIndividualReceipt.patchValue({ beginning_balance: this._decimalPipe.transform(0, '.2-2') },
+        { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ payment_amount: this._decimalPipe.transform(0, '.2-2') },
+        { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ balance_at_close: this._decimalPipe.transform(0, '.2-2') },
+        { onlySelf: true });
     }
 
     // // Rather than set a flag as a check for setting up a change listener
@@ -723,9 +737,60 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (col.name === 'total_amount') {
         this._getFedNonFedPercentage();
       }
+      if (col.name === 'incurred_amount') {
+        this._adjustDebtBalanceAtClose();
+      }
     } else {
       this.populatePurpose(col.name);
     }
+  }
+
+  private _adjustDebtBalanceAtClose() {
+    if (this.transactionType !== 'DEBT_TO_VENDOR') {
+      return;
+    }
+    if (!this.frmIndividualReceipt.contains('beginning_balance') ||
+        !this.frmIndividualReceipt.contains('incurred_amount') ||
+        !this.frmIndividualReceipt.contains('payment_amount') ||
+        !this.frmIndividualReceipt.contains('balance_at_close')) {
+      return;
+    }
+
+    let beginningBalance = this.frmIndividualReceipt.get('beginning_balance').value;
+    if (beginningBalance) {
+      if (typeof beginningBalance === 'string') {
+        beginningBalance = beginningBalance.replace(/,/g, ``);
+      }
+    } else {
+      beginningBalance = 0;
+    }
+
+    let incurredAmount = this.frmIndividualReceipt.get('incurred_amount').value;
+    if (incurredAmount) {
+      if (typeof incurredAmount === 'string') {
+        incurredAmount = incurredAmount.replace(/,/g, ``);
+      }
+    } else {
+      incurredAmount = 0;
+    }
+
+    let paymentAmount = this.frmIndividualReceipt.get('payment_amount').value;
+    if (paymentAmount) {
+      if (typeof paymentAmount === 'string') {
+        paymentAmount = paymentAmount.replace(/,/g, ``);
+      }
+    } else {
+      paymentAmount = 0;
+    }
+
+    beginningBalance = parseFloat(beginningBalance);
+    incurredAmount = parseFloat(incurredAmount);
+    paymentAmount = parseFloat(paymentAmount);
+    const balanceAtClose = beginningBalance + incurredAmount - paymentAmount;
+
+    this._formatAmount({ target: { value: balanceAtClose.toString() } },
+      'balance_at_close', false);
+    // this.frmIndividualReceipt.patchValue({ 'balance_at_close': balanceAtClose }, { onlySelf: true });
   }
 
   /**
@@ -861,14 +926,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public handleActivityEventTypeChange($event: any, col: any) {
 
-    const eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
-    if (!eventTypeVal) {
+    // const eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
+    // if (!eventTypeVal) {
 
-    }
-    if (eventTypeVal === 'Select') {
-      this.totalAmountReadOnly = true;
-    } else {
-      this.totalAmountReadOnly = false;
+    // }
+    // if (eventTypeVal === 'Select') {
+    //   this.totalAmountReadOnly = true;
+    // } else {
+    //   this.totalAmountReadOnly = false;
+    // }
+
+    if ($event.activityEventNames) {
+      this.activityEventNames = $event.activityEventNames;
     }
 
     this._getFedNonFedPercentage();
@@ -2615,6 +2684,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             if (res.data.hasOwnProperty('activityEventTypes')) {
               if (Array.isArray(res.data.electionTypes)) {
                 this.activityEventTypes = res.data.activityEventTypes;
+                if (this._cmteTypeCategory) {
+
+                  if (committeeEventTypes.committeeTypeEvents) {
+                    for (const committeeTypeEvent of committeeEventTypes.committeeTypeEvents) {
+                      if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
+                        this.activityEventTypes = committeeTypeEvent.eventTypes;
+                      }
+                    }
+                  }
+                }
               }
             }
             if (res.data.hasOwnProperty('titles')) {
@@ -2988,11 +3067,52 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 }
               }
               this._validateTransactionDate();
+              this._calculateDebtAmountFields(trx);
             }
           }
         }
       }
     });
+  }
+
+  private _calculateDebtAmountFields(trx: any) {
+    if (trx.transaction_type_identifier !== 'DEBT_TO_VENDOR') {
+      return;
+    }
+
+    // TODO this should come from the API
+    let paymentAmount = 0.00;
+    for (const subTrx of this.subTransactions) {
+      if (subTrx.hasOwnProperty('expenditure_amount')) {
+        if (subTrx.expenditure_amount) {
+          paymentAmount = paymentAmount + subTrx.expenditure_amount;
+        }
+      } else if (subTrx.hasOwnProperty('contribution_amount')) {
+        if (subTrx.contribution_amount) {
+          paymentAmount = paymentAmount + subTrx.contribution_amount;
+        }
+      } else if (subTrx.hasOwnProperty('total_amount')) {
+        if (subTrx.total_amount) {
+          paymentAmount = paymentAmount + subTrx.total_amount;
+        }
+      } else if (subTrx.hasOwnProperty('total_fed_levin_amount')) {
+        if (subTrx.total_fed_levin_amount) {
+          paymentAmount = paymentAmount + subTrx.total_fed_levin_amount;
+        }
+      }
+    }
+    this._formatAmount({ target: { value: paymentAmount.toString() } }, 'payment_amount', false);
+
+    // Beginning balance + Incurred amount - Payment Amount = Balance at close
+    let incurredAmount = 0;
+    if (trx.hasOwnProperty('incurred_amount')) {
+      if (trx.incurred_amount) {
+        incurredAmount = trx.incurred_amount;
+      }
+    }
+    const balanceAtClose = (trx.beginning_balance + incurredAmount) - paymentAmount;
+    this._formatAmount({ target: { value: balanceAtClose.toString() } }, 'balance_at_close', false);
+
   }
 
   /**
@@ -3004,6 +3124,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * @param apiCall
    */
   private _getParentFromChild(reportId: string, backRefTransactionId: string, apiCall: string) {
+
+    // There is a bug the apiCall value is incorrect when where a parent-child have different schedules
+    // as with Sched_D.  Temporary path is to hard code the apiCall based on the trnasactionID 1st to chars.
+    // TODO add back_ref_api_call to child transaction in the getSched API and pass it here.
+    if (backRefTransactionId.startsWith('SD')) {
+      apiCall = '/sd/schedD';
+    }
+
     this._receiptService.getDataSchedule(reportId, backRefTransactionId, apiCall).subscribe(res => {
       if (Array.isArray(res)) {
         for (const trx of res) {

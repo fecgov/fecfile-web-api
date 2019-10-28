@@ -346,7 +346,7 @@
                           ">
                       </ng-select>
                     </ng-container>
-                    <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
+                    <!-- <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
                       <ng-select #activityEventTypeSelect 
                         [items]="activityEventTypes" 
                         (change)="handleActivityEventTypeChange($event, col)"
@@ -362,7 +362,43 @@
                               : ''
                           ">
                       </ng-select>
-                    </ng-container>                     
+                    </ng-container> -->
+                    <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
+                      <ng-select #activityEventTypeSelect 
+                        [items]="activityEventTypes" 
+                        (change)="handleActivityEventTypeChange($event, col)"
+                        class="forms__select activity-event-type-select" 
+                        [formControlName]="col?.name" 
+                        bindValue="eventType"
+                        bindLabel="eventTypeDescription" 
+                        [selectOnTab]="true"
+                        [ngClass]="
+                            frmIndividualReceipt.get(col?.name)?.invalid &&
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                              ? 'forms__select-error'
+                              : ''
+                          ">
+                      </ng-select>                     
+                    </ng-container>
+                    <ng-container 
+                      *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_name')
+                        && activityEventNames"
+                    >
+                      <ng-select #activityEventNameSelect 
+                        [items]="activityEventNames" 
+                        class="forms__select activity-event-name-select" 
+                        [formControlName]="col?.name" 
+                        bindValue="activityEventType"
+                        bindLabel="activityEventDescription" 
+                        [selectOnTab]="true"
+                        [ngClass]="
+                            frmIndividualReceipt.get(col?.name)?.invalid &&
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                              ? 'forms__select-error'
+                              : ''
+                          ">
+                      </ng-select>
+                    </ng-container>                                         
                     <ng-container *ngIf="col?.type === 'select' && 
                           (isFieldName(col?.name, 'levin_account_id'))">
                       <ng-select #levinAccountSelect 

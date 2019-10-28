@@ -7,6 +7,7 @@ import { interval, Subscription } from 'rxjs';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { DialogService } from '../../services/DialogService/dialog.service';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from '../confirm-modal/confirm-modal.component';
+import { FormsComponent } from 'src/app/forms/forms.component';
 
 @Component({
   selector: 'app-submit',
@@ -27,11 +28,15 @@ export class SubmitComponent implements OnInit {
     private _messageService: MessageService,
     private _reportTypeService: ReportTypeService,
     private _dialogService: DialogService,
-    private _formsService: FormsService
+    private _formsService: FormsService,
+    private _formsComponent: FormsComponent
   ) {}
 
   ngOnInit() {
     this.form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    if (this._router.url.indexOf('step_5') > -1) {
+      this._checkReportStatus();
+    }
     console.log('form submitted ...', this.form_type);
 
     this._messageService.getMessage().subscribe(res => {
@@ -85,7 +90,11 @@ export class SubmitComponent implements OnInit {
   }
 
   public goToDashboard(): void {
-    this._router.navigateByUrl('dashboard');
+    if (!this._checkStatus) {
+      this._router.navigateByUrl('dashboard');
+    } else {
+      this._formsComponent.canDeactivate();
+    }
   }
 
   private _checkReportStatus() {
@@ -104,34 +113,5 @@ export class SubmitComponent implements OnInit {
         }
       );
     }
-  }
-
-  public async canDeactivate(): Promise<boolean> {
-    if (this._checkStatus) {
-      if (this._formsService.checkCanDeactivate()) {
-        this._dialogService
-          .confirm(
-            'FEC ID has not been generated yet. Please check the FEC ID under reports if you want to leave the page.',
-            ConfirmModalComponent,
-            'Warning',
-            true,
-            ModalHeaderClassEnum.warningHeader,
-            null,
-            'Leave page'
-          )
-          .then(res => {
-            if (res === 'okay') {
-            } else if (res === 'cancel') {
-              this.navigateToDashboard();
-            }
-          });
-      }
-    } else {
-      return true;
-    }
-  }
-
-  public navigateToDashboard(): void {
-    this._router.navigateByUrl('/dashboard');
   }
 }
