@@ -21,7 +21,7 @@
         width: 98%;*/
         margin-left: 10px;
         display: block;
-        width: 20%;
+        width: 98%;
         h1 {
           //font-family: sans-serif;
         }
@@ -95,6 +95,12 @@
               color: $blueZodiac;
             }
           }
+          .input-group-append {
+            .input-group-text {
+              color: $blueZodiac;
+            }
+          }
+
           /**
            * Custom CSS for state dropdown component.
            */
