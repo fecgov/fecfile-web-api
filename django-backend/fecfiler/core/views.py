@@ -1966,7 +1966,7 @@ def get_query_string(category_type,cmte_id,param_string):
     query_string = ''
     if category_type == 'disbursements_tran':
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_disbursements_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                            where cmte_id='""" + cmte_id + """' """ + param_string 
 
     elif category_type == 'loans_tran':
         query_string = ''
@@ -1980,10 +1980,13 @@ def get_query_string(category_type,cmte_id,param_string):
 
     elif category_type == 'receipts_tran':
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_receipts_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                            where cmte_id='""" + cmte_id + """' """ + param_string 
+    elif category_type == 'SL-A':
+        query_string += """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_receipts_transactions_view
+                            where cmte_id='""" + cmte_id + """' AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC') """ + param_string
     else:
         query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_receipts_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                            where cmte_id='""" + cmte_id + """' """ + param_string 
 
     return query_string
 
@@ -2116,19 +2119,25 @@ def get_child_query_string(category_type):
 
 def get_trans_query(category_type, cmte_id, param_string):
     query_string = ''
+    
     if category_type == 'disbursements_tran':
         query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, election_year, election_other_description,transaction_type_identifier, entity_id from all_disbursements_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ 
                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                             """
     elif category_type == 'receipts_tran':
         query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_receipts_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ 
+                            AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
+                            """
+    elif category_type == 'SL-A':
+        query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_receipts_transactions_view
+                            where cmte_id='""" + cmte_id + """' AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC') """ + param_string + """ 
                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                             """
     elif category_type == 'loans_tran':
         query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, purpose_description, loan_amount, loan_payment_to_date, loan_balance, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id from all_loans_debts_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     # elif category_type == 'other_tran':
     #     query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_other_transactions_view
@@ -2137,7 +2146,7 @@ def get_trans_query(category_type, cmte_id, param_string):
     #                         """
     else:
         query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_receipts_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """
                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                             """
     return query_string
@@ -2333,13 +2342,15 @@ def get_all_transactions(request):
             report_list = superceded_report_id_list(request.data.get('reportid'))
             param_string += " AND report_id in ('{}')".format("', '".join(report_list))
 
-        if 'categoryType' in request.data and str(request.data.get('categoryType')) not in ['',"", "null", "none"]:
-            if request.data.get('categoryType') == "SL-A":
-                param_string += " AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC')"
-            else:
-                param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
-
-
+        # if 'categoryType' in request.data and str(request.data.get('categoryType')) not in ['',"", "null", "none"]:
+        #     if request.data.get('categoryType') == "SL-A":
+        #         param_string += " AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC')"
+        #     else:
+        #         param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
+        if 'trashed_flag' in request.data and request.data.get('trashed_flag') in [True, 'True', 'true']:
+                param_string += " AND delete_ind = 'Y'"
+        else:
+            param_string += " AND delete_ind is distinct from 'Y'"
         query_string = get_query_string(ctgry_type,cmte_id,param_string)
         sum_trans = None
 
@@ -2350,8 +2361,6 @@ def get_all_transactions(request):
                 result = cursor.fetchone()
                 count = result[0]
                 sum_trans = result[1]
-
-        
 
         # query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
         #                    where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
@@ -2373,11 +2382,7 @@ def get_all_transactions(request):
         #                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
         #                             """
         #query_view = get_query_view(ctgry_type)
-
         trans_query_string = get_trans_query(ctgry_type,cmte_id, param_string)
-
-
-
 
         # trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id as donar_cmte_id, election_code, election_year, transaction_type_identifier, entity_id from """+ query_view +"""
         #                             where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
@@ -2394,8 +2399,7 @@ def get_all_transactions(request):
             if ctgry_type == 'disbursements_tran':
                 trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
             elif ctgry_type == 'receipts_tran':
-                trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
-
+                trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC"""
             elif ctgry_type == 'loans_tran':
                  trans_query_string = trans_query_string + """ ORDER BY name ASC, loan_incurred_date  ASC""" 
 
@@ -2440,7 +2444,6 @@ def get_all_transactions(request):
         return Response(json_result, status=status_value)
     # except Exception as e:
     #     return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
 
 """
 *****************************************************************************************************************************
