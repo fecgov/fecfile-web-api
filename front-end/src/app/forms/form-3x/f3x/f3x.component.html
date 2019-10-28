@@ -81,14 +81,9 @@
           (status)="onNotify($event)"
         >
         </app-sched-c>-->
-        <app-sched-c1
-          [hidden]="scheduleType !== 'sched_c1'"
-          [transactionTypeText]="transactionTypeTextSchedC"
-          [transactionType]="transactionTypeSchedC"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-c1 [hidden]="scheduleType !== 'sched_c1'" [transactionTypeText]="transactionTypeTextSchedC"
+          [transactionType]="transactionTypeSchedC" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
 
         </app-sched-c1>
         <app-sched-c2 [hidden]="scheduleType !== 'sched_c2'" [transactionTypeText]="transactionTypeTextSchedC"
@@ -96,31 +91,21 @@
           (status)="onNotify($event)">
         </app-sched-c2>
 
-        <app-sched-h1
-          *ngIf="scheduleType === 'sched_h1'"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-h1 *ngIf="scheduleType === 'sched_h1'" [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType" (status)="onNotify($event)">
         </app-sched-h1>
-        <app-sched-h2
-          [hidden]="scheduleType !== 'sched_h2'"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-h2 [hidden]="scheduleType !== 'sched_h2'" [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
         </app-sched-h2>
-        <app-sched-h3
-          [hidden]="scheduleType !== 'sched_h3'"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >      
+        <app-sched-h3 [hidden]="scheduleType !== 'sched_h3'" [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
         </app-sched-h3>
+        <app-sched-h5 [hidden]="scheduleType !== 'sched_h5'" [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
+        </app-sched-h5>
 
       </div>
 
