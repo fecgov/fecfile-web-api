@@ -1,0 +1,112 @@
+<div class="individual-receipt-container" *ngIf="!isPac()">
+  <form #f="ngForm">
+
+    <header>
+      <div class="float-left">
+        <h2>
+          State and Local Party Committees
+        </h2>
+      </div>
+    </header>
+
+    <div class="float-left">
+      <ng-container>
+        <div class="radio">
+          <label for="">
+            <input ngModel type="radio" name="h1_election_year_options" value="1">
+            Presidential-only Election Year(28% Federal)
+          </label>
+        </div>
+        <div class="radio">
+          <label for="">
+            <input ngModel type="radio" name="h1_election_year_options" value="2">
+            Presidential and Senate Election Year(36% Federal)
+          </label>
+        </div>
+        <div class="radio">
+          <label for="">
+            <input ngModel type="radio" name="h1_election_year_options" value="3">
+            Senate-only Election Year(21% Federal)
+          </label>
+        </div>
+        <div class="radio">
+          <label for="">
+            <input ngModel type="radio" name="h1_election_year_options" value="4">
+            None-Presidential and None-Senate Election Year(15% Federal)
+          </label>
+        </div>
+        <p>{{f.value.message}}</p>
+        <button type="submit" class="btn btn-secondary" [disabled]="!f.valid" (click)="saveH1(f)">
+          Save
+        </button>
+      </ng-container>
+    </div>
+  </form>
+</div>
+
+
+<!-- front end for non-connected committee -->
+<!-- TODO: need to figure out when this thing is enabled. -->
+<div class="individual-receipt-container" *ngIf="isPac()">
+  <form #f="ngForm">
+
+    <header>
+      <div class="float-left">
+        <h2>Seperarate Segregated Funds and Non-connected Committees</h2>
+      </div>
+    </header>
+
+    <!-- text fields for fed and nonfed ratio -->
+    <div class="float-left">
+      <ng-container>
+
+        <div class="form-group">
+          <label for="federal_share">
+            Federal:
+            <input required ngModel type="text" id="federal_share " name="federal_share" maxlength="100" value="0.00" />
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="nonfederal_share">
+            Nonfederal:
+            <input required ngModel type="text" id="nonfederal_share" name="nonfederal_share" maxlength="100"
+              value="0.00" />
+          </label>
+        </div>
+
+        <!-- <div class="float-left"> -->
+        <h3>this ratio apply to(check all that apply):</h3>
+        <!-- </div> -->
+
+
+        <div class="checkbox">
+          <input ngModel type="checkbox" name="applied_activity1" id="ad" value="administrative">
+          <label for="ad">
+            administrative
+          </label>
+        </div>
+        <div class="checkbox">
+          <input ngModel type="checkbox" name="applied_activity2" id="gvd" value="generic_voter_drive">
+          <label for="gvd">
+            generic voter drive
+          </label>
+        </div>
+        <div class="checkbox">
+          <input ngModel type="checkbox" name="applied_activity3" id="pc" value="public_communication">
+          <label for="pc">
+            public communications referenceing party only
+          </label>
+        </div>
+        <!-- <p>{{f.value | json}}</p> -->
+        <!-- <br> -->
+        <p>{{f.value.message}}</p>
+        <button type="submit" class="btn btn-secondary" [disabled]="!f.valid" (click)="saveH1(f)">
+          Save
+        </button>
+      </ng-container>
+    </div>
+
+    <!-- <p>{{f.value.message}}</p> -->
+  </form>
+</div>

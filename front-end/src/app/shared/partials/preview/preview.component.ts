@@ -60,27 +60,33 @@ export class PreviewComponent implements OnInit {
       console.log('Preview screen this.formDetails ', this.formDetails);
       this.committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
 
-      if (this.editMode) {
-        this._step = res.step;
-        this.formDetails = JSON.parse(localStorage.getItem('form_99_details'));
-      } else if (!this.editMode) {
-        this._step = res.step;
-        this.formDetails = res.data;
-      }
+      // if (this.editMode) {
+      this._step = res.step;
+      this.formDetails = JSON.parse(localStorage.getItem('form_99_details'));
+      // } else if (!this.editMode) {
+      //   this._step = res.step;
+      //   this.formDetails = res.data;
+      // }
 
       setTimeout(() => {
         if (this.formType === '99') {
           if (this.formDetails) {
             if (this.formDetails.hasOwnProperty('filename')) {
               this.fileName = this.formDetails.filename;
+            } else if (localStorage.getItem('orm_99_details.org_filename')) {
+              this.fileName = localStorage.getItem('orm_99_details.org_filename');
             } else {
               this.fileName = '';
             }
             const fileFromLocalStorage = localStorage.getItem('orm_99_details.org_fileurl');
             if (this.formDetails.hasOwnProperty('org_fileurl')) {
               this.orgFileUrl = this.formDetails.org_fileurl;
-            } else if (this.formDetails && this.formDetails.file &&
-              this.formDetails.hasOwnProperty('file') && Object.entries(this.formDetails.file).length !== 0) {
+            } else if (
+              this.formDetails &&
+              this.formDetails.file &&
+              this.formDetails.hasOwnProperty('file') &&
+              Object.entries(this.formDetails.file).length !== 0
+            ) {
               this.orgFileUrl = this.formDetails.file;
             } else if (fileFromLocalStorage) {
               this.orgFileUrl = fileFromLocalStorage;
@@ -193,54 +199,53 @@ export class PreviewComponent implements OnInit {
   }
 
   public goToPreviousStep(): void {
-    if (this.editMode) {
-      setTimeout(() => {
-        localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this.formDetails));
-      }, 100);
+    setTimeout(() => {
+      localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this.formDetails));
+    }, 100);
 
-      this.status.emit({
-        form: {},
-        direction: 'previous',
-        step: 'step_2',
-        edit: this.editMode,
-        previousStep: this._step
-      });
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_2',
+      edit: this.editMode,
+      previousStep: this._step
+    });
 
-      this.showValidateBar = false;
+    this.showValidateBar = false;
 
-      this._messageService.sendMessage({
-        validateMessage: {
-          validate: {},
-          showValidateBar: false
+    this._messageService.sendMessage({
+      validateMessage: {
+        validate: {},
+        showValidateBar: false
+      }
+    });
+  }
+
+  public viewMode(): void {
+    this._dialogService
+      .newReport(
+        'This report has been filed with the FEC. If you want to change, you must file a new report.',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        false,
+        true
+      )
+      .then(res => {
+        if (res === 'cancel' || res === ModalDismissReasons.BACKDROP_CLICK || res === ModalDismissReasons.ESC) {
+          this._dialogService.checkIfModalOpen();
+        } else if (res === 'NewReport') {
+          this.editMode = true;
+          localStorage.removeItem('form_99_details');
+          localStorage.removeItem('form_99_saved');
+          this._setF99Details();
+          setTimeout(() => {
+            this._router.navigate(['/forms/form/99'], {
+              queryParams: { step: 'step_1', edit: this.editMode, refresh: true }
+            });
+          }, 500);
         }
       });
-    } else {
-      this._dialogService
-        .newReport(
-          'This report has been filed with the FEC. If you want to change, you must file a new report.',
-          ConfirmModalComponent,
-          'Warning',
-          true,
-          false,
-          true
-        )
-        .then(res => {
-          if (res === 'cancel' || res === ModalDismissReasons.BACKDROP_CLICK || res === ModalDismissReasons.ESC) {
-            this.ngOnInit();
-            this._dialogService.checkIfModalOpen();
-          } else if (res === 'NewReport') {
-            this.editMode = true;
-            localStorage.removeItem('form_99_details');
-            localStorage.removeItem('form_99_saved');
-            this._setF99Details();
-            setTimeout(() => {
-              this._router.navigate(['/forms/form/99'], {
-                queryParams: { step: 'step_1', edit: this.editMode, refresh: true }
-              });
-            }, 500);
-          }
-        });
-    }
   }
 
   public goToNextStep(): void {

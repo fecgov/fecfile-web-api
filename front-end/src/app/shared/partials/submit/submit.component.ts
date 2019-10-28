@@ -3,6 +3,12 @@ import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { MessageService } from '../../services/MessageService/message.service';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
+import { interval, Subscription } from 'rxjs';
+import { FormsService } from '../../services/FormsService/forms.service';
+import { DialogService } from '../../services/DialogService/dialog.service';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../confirm-modal/confirm-modal.component';
+import { FormsComponent } from 'src/app/forms/forms.component';
+
 @Component({
   selector: 'app-submit',
   templateUrl: './submit.component.html',
@@ -12,18 +18,29 @@ import { ReportTypeService } from '../../../forms/form-3x/report-type/report-typ
 export class SubmitComponent implements OnInit {
   public form_type: string = '';
   public FEC_Id: string = '#####';
+
+  private _reportId: number;
+  private _subscription: Subscription;
+  private _checkStatus: boolean = true;
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
     private _messageService: MessageService,
-    private _reportTypeService: ReportTypeService
+    private _reportTypeService: ReportTypeService,
+    private _dialogService: DialogService,
+    private _formsService: FormsService,
+    private _formsComponent: FormsComponent
   ) {}
 
   ngOnInit() {
     this.form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
+    if (this._router.url.indexOf('step_5') > -1) {
+      this._checkReportStatus();
+    }
     console.log('form submitted ...', this.form_type);
 
     this._messageService.getMessage().subscribe(res => {
+      this._reportId = res.id;
       console.log('SubmitComponent res =', res);
       if (res.form_submitted) {
         if (this.form_type === '99') {
@@ -67,9 +84,34 @@ export class SubmitComponent implements OnInit {
         }
       }
     });
+
+    const source = interval(10000);
+    this._subscription = source.subscribe(val => this._checkReportStatus());
   }
 
   public goToDashboard(): void {
-    this._router.navigateByUrl('dashboard');
+    if (!this._checkStatus) {
+      this._router.navigateByUrl('dashboard');
+    } else {
+      this._formsComponent.canDeactivate();
+    }
+  }
+
+  private _checkReportStatus() {
+    if (this._router.url.indexOf('step_5') > -1) {
+      this._formsService.get_report_status(this.form_type, this._reportId).subscribe(
+        res => {
+          if (res && res.fec_status === 'Accepted') {
+            this.FEC_Id = res.fec_id;
+            this._checkStatus = false;
+          } else {
+            this._checkStatus = true;
+          }
+        },
+        error => {
+          console.log('error: ', error);
+        }
+      );
+    }
   }
 }

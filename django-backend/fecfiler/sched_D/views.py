@@ -246,7 +246,8 @@ def delete_schedD(data):
 
     try:
         delete_sql_schedD(
-            data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
+            data.get("cmte_id"), data.get(
+                "report_id"), data.get("transaction_id")
         )
     except Exception as e:
         raise
@@ -264,7 +265,7 @@ def delete_sql_schedD(cmte_id, report_id, transaction_id):
 def schedD_sql_dict(data):
     """
     filter data and build sched_d dictionary
-    
+
     Note: those are fields from json data, not the fields in the db 
     table - they are not 100% match:
     like line_number, it is 'line_num' in db for now
@@ -361,7 +362,8 @@ def put_schedD(datum):
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(
+                    "cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedD function is throwing an error: " + str(e)
@@ -454,7 +456,8 @@ def post_schedD(datum):
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(
+                    "cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedD function is throwing an error: " + str(e)
@@ -543,7 +546,8 @@ def do_transaction(sql, values):
         with connection.cursor() as cursor:
             cursor.execute(sql, values)
             if cursor.rowcount == 0:
-                raise Exception("The sql transaction: {} failed...".format(sql))
+                raise Exception(
+                    "The sql transaction: {} failed...".format(sql))
     except Exception:
         raise
 
@@ -559,9 +563,12 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
         report_id, cmte_id, back_ref_transaction_id=transaction_id
     )
     # TODO: will add all other transactions later on
-    sched_f_list = get_sched_f_child_transactions(report_id, cmte_id, transaction_id)
-    sched_h4_list = get_sched_h4_child_transactions(report_id, cmte_id, transaction_id)
-    sched_h6_list = get_sched_h6_child_transactions(report_id, cmte_id, transaction_id)
+    sched_f_list = get_sched_f_child_transactions(
+        report_id, cmte_id, transaction_id)
+    sched_h4_list = get_sched_h4_child_transactions(
+        report_id, cmte_id, transaction_id)
+    sched_h6_list = get_sched_h6_child_transactions(
+        report_id, cmte_id, transaction_id)
     return sched_b_list + sched_f_list + sched_h4_list + sched_h6_list
 
     #     childA_forms_obj = get_list_child_schedA(
@@ -597,13 +604,16 @@ def get_schedD(data):
             forms_obj = get_list_schedD(report_id, cmte_id, transaction_id)
             tran_id = forms_obj[0].get("transaction_type_identifier")
             forms_obj[0].update(
-                {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
+                {"transaction_type_description": tran_desc_dic.get(
+                    tran_id, "")}
             )
-            child_objs = get_child_transactions(report_id, cmte_id, transaction_id)
+            child_objs = get_child_transactions(
+                report_id, cmte_id, transaction_id)
             for obj in child_objs:  # this api_call code need to refactored later on
                 tran_id = obj.get("transaction_type_identifier")
                 obj.update(
-                    {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
+                    {"transaction_type_description": tran_desc_dic.get(
+                        tran_id, "")}
                 )
                 if obj["transaction_id"].startswith("SB"):
                     obj.update(API_CALL_SB)
@@ -680,6 +690,22 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
+            # query_string = """
+            # SELECT cmte_id,
+            #         report_id,
+            #         line_num,
+            #         transaction_type_identifier,
+            #         transaction_id,
+            #         entity_id,
+            #         beginning_balance,
+            #         balance_at_close,
+            #         incurred_amount,
+            #         payment_amount,
+            #         last_update_date
+            # FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
+            # AND transaction_id = %s AND delete_ind is distinct from 'Y'
+            # """
+
             query_string = """
             SELECT cmte_id,
                     report_id,
@@ -687,10 +713,7 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
                     transaction_type_identifier,
                     transaction_id,
                     entity_id,
-                    beginning_balance,
-                    balance_at_close,
-                    incurred_amount,
-                    payment_amount,
+                    balance_at_close as beginning_balance,
                     last_update_date
             FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
             AND transaction_id = %s AND delete_ind is distinct from 'Y'

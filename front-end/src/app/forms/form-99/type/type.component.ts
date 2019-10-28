@@ -235,7 +235,8 @@ export class TypeComponent implements OnInit {
           step: 'step_2',
           previousStep: 'step_1',
           refresh: this._setRefresh,
-          reportId: this.reportId
+          reportId: this.reportId,
+          edit: this.editMode
         });
 
         return 1;
@@ -247,7 +248,8 @@ export class TypeComponent implements OnInit {
         form: this.frmType,
         direction: 'next',
         step: 'step_1',
-        previousStep: ''
+        previousStep: '',
+        edit: this.editMode
       });
 
       return 0;

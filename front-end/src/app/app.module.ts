@@ -79,6 +79,15 @@ import { DecimalPipe } from '@angular/common';
 import { UtilService } from './shared/utils/util.service';
 import { UserIdleModule } from 'angular-user-idle';
 import { SchedFComponent } from './forms/sched-f/sched-f.component';
+import { SchedH1Component } from './forms/sched-h1/sched-h1.component';
+import { SchedH2Component } from './forms/sched-h2/sched-h2.component';
+import { LoanComponent } from './forms/sched-c/loan.component';
+import { LoanService } from './forms/sched-c/service/loan.service';
+import { LoanSummaryComponent } from './forms/sched-c/loan-summary/loan-summary.component';
+import { LoanSummarysService } from './forms/sched-c/loan-summary/service/loan-summary.service';
+import { EndorserComponent } from './forms/sched-c/endorser/endorser.component';
+import { EndorserService } from './forms/sched-c/endorser/service/endorser.service';
+import { SchedC1Component } from './forms/sched-c1/sched-c1.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -142,7 +151,13 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ContactsTableComponent,
     AddNewContactComponent,
     ContactsFilterComponent,
-    SchedFComponent
+    SchedFComponent,
+    SchedH1Component,
+    SchedH2Component,
+    LoanComponent,
+    LoanSummaryComponent,
+    EndorserComponent,
+    SchedC1Component
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [

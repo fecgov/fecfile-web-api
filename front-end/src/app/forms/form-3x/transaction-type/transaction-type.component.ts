@@ -25,6 +25,7 @@ import {
   ModalHeaderClassEnum
 } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { IndividualReceiptService } from '../,,/../individual-receipt/individual-receipt.service';
 
 @Component({
   selector: 'f3x-transaction-type',
@@ -69,7 +70,8 @@ export class TransactionTypeComponent implements OnInit {
     private _dialogService: DialogService,
     private _transactionTypeService: TransactionTypeService,
     private _reportTypeService: ReportTypeService,
-    private _f3xMessageService: F3xMessageService
+    private _f3xMessageService: F3xMessageService,
+    private _receiptService: IndividualReceiptService,    
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -102,6 +104,7 @@ export class TransactionTypeComponent implements OnInit {
         this.childOptionsListClick(setTargetVal.value);
         this.doValidateOption();
       }
+      this._transactionCategory = p.transactionCategory ? p.transactionCategory : ''; 
     });
   }
 
@@ -160,26 +163,41 @@ export class TransactionTypeComponent implements OnInit {
         window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
       }
 
-      // Send message to form (indv-receipt) to clear form field vals if they are still populated.
-      this._f3xMessageService.sendInitFormMessage('');
-
+      if (this.transactionType !== 'LOAN_FROM_IND_BANK' && this.scheduleType !== 'sched_c'){
+        // Send message to form (indv-receipt) to clear form field vals if they are still populated.
+        this._f3xMessageService.sendInitFormMessage('');
+      }  
       // TODO temp - get val from getCategoryTypes API called in f3x comp.
       // let scheduleType = 'sched_a';
       // if (this.transactionType === 'DEBT_TO_VENDOR') {
       //   scheduleType = 'sched_h';
       // }
 
-      this.status.emit({
-        form: this.frmOption,
-        direction: 'next',
-        step: 'step_3',
-        previousStep: 'step_2',
-        action: ScheduleActions.add,
-        transactionTypeText: this.transactionTypeText,
-        transactionType: this.transactionType,
-        transactionCategory: this.transactionCategory,
-        scheduleType: this.scheduleType
-      });
+
+      console.log("this.transactionTypeText",this.transactionTypeText);
+      console.log("this.transactionType",this.transactionType);
+      console.log("this.transactionCategory",this.transactionCategory);
+      console.log("this.scheduleType",this.scheduleType);
+
+      if (this.transactionType === 'LOAN_FROM_IND_BANK' && this.scheduleType === 'sched_c'){
+        console.log("Accessing sched_c loans...");
+        let reportId = this._receiptService.getReportIdFromStorage(this._formType);
+        this._router.navigate([`/forms/form/${this._formType}`], {
+          queryParams: { step: 'loan', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory }
+        });
+      } else {
+          this.status.emit({
+            form: this.frmOption,
+            direction: 'next',
+            step: 'step_3',
+            previousStep: 'step_2',
+            action: ScheduleActions.add,
+            transactionTypeText: this.transactionTypeText,
+            transactionType: this.transactionType,
+            transactionCategory: this._transactionCategory,
+            scheduleType: this.scheduleType
+          });
+       }
       return 1;
     } else {
       if (!this.tranasctionCategoryVal) {
@@ -258,6 +276,48 @@ export class TransactionTypeComponent implements OnInit {
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
 
     this.secondaryOptions = this._mainTransactionCategory[0].options;
+    if (this._mainTransactionCategory[0].options[0].value === 'schedule-h1') {
+      this.secondaryOptions[0].options = [{
+        info: "Funds received from the committee's non-federal bank account",
+        infoIcon: "TRUE",
+        name: "schedule-h1",
+        scheduleType: "sched_h1",
+        text: "Allocation Ratios",
+        type: "radio",
+        // value: ""
+        value: "ALLOC_H1"
+      }
+        // {
+        //   info: "Funds received from the committee's non-federal bank account",
+        //   infoIcon: "TRUE",
+        //   name: "schedule-h3",
+        //   scheduleType: "sched_h2",
+        //   text: "Allocation Ratios Summary",
+        //   type: "radio",
+        //   value: "ALLOC_H2_SUM"
+        // }
+      ];
+    }
+    if (this._mainTransactionCategory[0].options[1].value === 'schedule-h2') {
+      this.secondaryOptions[1].options = [{
+        info: "Funds received from the committee's non-federal bank account",
+        infoIcon: "TRUE",
+        name: "schedule-h3",
+        scheduleType: "sched_h2",
+        text: "Allocation Ratios",
+        type: "radio",
+        value: "ALLOC_H2_RATIO"
+      },
+      {
+        info: "Funds received from the committee's non-federal bank account",
+        infoIcon: "TRUE",
+        name: "schedule-h3",
+        scheduleType: "sched_h2",
+        text: "Allocation Ratios Summary",
+        type: "radio",
+        value: "ALLOC_H2_SUM"
+      }];
+    }
 
     this.transactionCategorySelected = true;
 

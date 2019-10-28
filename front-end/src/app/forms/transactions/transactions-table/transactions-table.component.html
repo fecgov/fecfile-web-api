@@ -36,7 +36,8 @@
       {{determineItemRange()}} of {{config.totalItems}}
     </div>
   </div>
-  <table class="table table-striped table-hover table__sortable transactions__table">
+  <!--Receipt transaction table-->
+  <table class="table table-striped table-hover table__sortable transactions__table" *ngIf="transactionCategory === 'receipts'">
     <thead>
       <tr>
         <th class="transactions__table-checkbox">
@@ -126,7 +127,7 @@
             <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
           </td>
           <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
-          <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.TransactionId}}</td>
+          <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
           <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" 
               (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''" *ngIf="isColumnVisible('name')">{{trx.name}}
               <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
@@ -153,29 +154,35 @@
                 <i class="undo-icon"></i>
               </button>
             </div>
-            <div [@fadeInOut] *ngIf="isTransactionViewActive()"
-                class="btn-group" ngbDropdown role="group"
-              aria-label="Action dropdown">
-              <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+            <div *ngIf="editMode">
+              <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                aria-label="Action dropdown">
+                <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                  <i class="ellipsis-icon"></i>
+                </button>
+                <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                  <button class="dropdown-item" (click)="editTransaction(trx)">
+                    <i class="edit-icon"></i> Edit
+                  </button>
+                  <button class="dropdown-item" (click)="printTransaction(trx)">
+                    <i class="fas fa-print"></i> Print
+                  </button>
+                  <button class="dropdown-item" (click)="cloneTransaction(trx)">
+                    <i class="far fa-copy"></i> Clone
+                  </button>
+                  <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
+                    <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" class="dropdown-item"
+                      (click)="trashTransaction(trx)">
+                      <i class="trash-icon"></i> Trash
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!editMode">
+              <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                 <i class="ellipsis-icon"></i>
               </button>
-              <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                <button class="dropdown-item" (click)="editTransaction(trx)">
-                  <i class="edit-icon"></i> Edit
-                </button>
-                <button class="dropdown-item" (click)="printTransaction(trx)">
-                  <i class="fas fa-print"></i> Print
-              </button>  
-                <button class="dropdown-item" (click)="cloneTransaction(trx)">
-                  <i class="far fa-copy"></i> Clone
-                </button>
-                <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
-                <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" 
-                  class="dropdown-item" (click)="trashTransaction(trx)">
-                  <i class="trash-icon"></i> Trash
-                </button>
-                </span>
-              </div>
             </div>
           </td>
         </tr>
@@ -208,26 +215,32 @@
                 <i class="undo-icon"></i>
               </button>
             </div>
-            <div [@fadeInOut] *ngIf="isTransactionViewActive()"
-                class="btn-group" ngbDropdown role="group"
-              aria-label="Action dropdown">
-              <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+            <div *ngIf="editMode">
+              <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                aria-label="Action dropdown">
+                <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                  <i class="ellipsis-icon"></i>
+                </button>
+                <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                  <button class="dropdown-item" (click)="editTransaction(trxChild)">
+                    <i class="edit-icon"></i> Edit
+                  </button>
+                  <button class="dropdown-item" (click)="printTransaction(trxChild)">
+                    <i class="fas fa-print"></i> Print
+                  </button>
+                  <button class="dropdown-item" (click)="cloneTransaction(trxChild)">
+                    <i class="far fa-copy"></i> Clone
+                  </button>
+                  <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                    <i class="trash-icon"></i> Trash
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!editMode">
+              <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                 <i class="ellipsis-icon"></i>
               </button>
-              <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                <button class="dropdown-item" (click)="editTransaction(trxChild)">
-                  <i class="edit-icon"></i> Edit
-                </button>
-                <button class="dropdown-item" (click)="printTransaction(trxChild)">
-                  <i class="fas fa-print"></i> Print
-              </button>  
-                <button class="dropdown-item" (click)="cloneTransaction(trxChild)">
-                  <i class="far fa-copy"></i> Clone
-                </button>
-                <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
-                  <i class="trash-icon"></i> Trash
-                </button>
-              </div>
             </div>
           </td>      
         </tr>
@@ -276,6 +289,763 @@
       </tr>
     </tbody>
   </table>
+
+  <!--Disbursements transaction table-->
+  <table class="table table-striped table-hover table__sortable transactions__table" *ngIf="transactionCategory === 'disbursements'">
+      <thead>
+        <tr>
+          <th class="transactions__table-checkbox">
+            <input 
+              [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
+              (change)="changeAllTransactionsSelected()">
+          </th>
+           <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
+            (click)="changeSortDirection('memoCode')">Memo
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
+              Amount
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
+            (click)="changeSortDirection('purposeDescription')">Purpose
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
+            </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
+            Street
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
+            State
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
+            (click)="changeSortDirection('memoText')">Memo Text
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('committeeId')" [class]="getSortClass('committeeId')"
+            (click)="changeSortDirection('committeeId')">Donor Committee ID
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('electionCode')" [class]="getSortClass('electionCode')"
+            (click)="changeSortDirection('electionCode')">Election Code
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('electionYear')" [class]="getSortClass('electionYear')"
+            (click)="changeSortDirection('electionYear')">Election Year
+          </th>
+          <th class="bulk_action">
+            <div *ngIf="editMode">
+              <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                aria-label="Action dropdown">
+                <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
+                  [disabled]="bulkActionDisabled">
+                  <i class="ellipsis-icon"></i>
+                </button>
+                <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                  <button class="dropdown-item" (click)="printAllSelected()">
+                    <i class="print-icon"></i> Print
+                  </button>
+                  <button class="dropdown-item" (click)="exportAllSelected()">
+                    <i class="file-export-icon"></i> Export
+                  </button>
+                  <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
+                    <i class="trash-icon"></i> Trash
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!editMode">
+              <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
+                <i class="ellipsis-icon"></i>
+              </button>
+            </div>
+            <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+              <button class="btn btn-sm btn-primary transactions__bulk_action_btn" 
+                (click)="deleteRecyleBin()"
+                [disabled]="bulkActionDisabled">
+                <i class="trash-icon"></i>
+              </button>
+            </div>          
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+          
+        <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
+          <tr>
+            <td>
+              <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('type')">
+              {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+            <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
+              *ngIf="isColumnVisible('name')">{{trx.name}}
+              <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+              {{trx.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trx.electionCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trx.electionYear}}</td>
+            <td>
+              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
+                  <i class="undo-icon"></i>
+                </button>
+              </div>
+              <div *ngIf="editMode">
+                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="editTransaction(trx)">
+                      <i class="edit-icon"></i> Edit
+                    </button>
+                    <button class="dropdown-item" (click)="printTransaction(trx)">
+                      <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="cloneTransaction(trx)">
+                      <i class="far fa-copy"></i> Clone
+                    </button>
+                    <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
+                      <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" class="dropdown-item"
+                        (click)="trashTransaction(trx)">
+                        <i class="trash-icon"></i> Trash
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!editMode">
+                <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
+                  <i class="ellipsis-icon"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
+            <td style="padding-left: 1.5rem;">
+              <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+                {{trxChild.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+              </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trxChild.electionCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trxChild.electionYear}}</td>
+            <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
+            <td>
+              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trxChild)">
+                  <i class="undo-icon"></i>
+                </button>
+              </div>
+              <div *ngIf="editMode">
+                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="editTransaction(trxChild)">
+                      <i class="edit-icon"></i> Edit
+                    </button>
+                    <button class="dropdown-item" (click)="printTransaction(trxChild)">
+                      <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="cloneTransaction(trxChild)">
+                      <i class="far fa-copy"></i> Clone
+                    </button>
+                    <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                      <i class="trash-icon"></i> Trash
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!editMode">
+                <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
+                  <i class="ellipsis-icon"></i>
+                </button>
+              </div>
+            </td>      
+          </tr>
+        </ng-container>
+        
+        <tr *ngIf="isTransactionViewActive()">
+          <td></td>
+          <td *ngIf="isColumnVisible('type')"></td>
+          <td *ngIf="isColumnVisible('name')"></td>
+          <td *ngIf="isColumnVisible('date')"></td>
+          <td *ngIf="isColumnVisible('memoCode')"></td>
+          <td [@fadeInOut] *ngIf="isColumnVisible('amount')">
+              <div class="transactions__total-amount-container">
+                <div class="transactions__total-amount">
+                  <b>Total</b>
+                  <i class="info-icon transactions__total-amount-tip" 
+                    ngbTooltip="Represents the total amount of transactions entered on the report. 
+                      Those transactions that are memo entries are not added into the total amount."
+                    tooltipClass="transactions__tooltip"
+                    triggers="click">
+                  </i>
+                </div>
+                <div class="transactions__total-amount-val">
+                  <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</b>
+                </div>
+              </div>
+          </td>
+          <td *ngIf="isColumnVisible('purposeDescription')"></td>
+          <td *ngIf="isColumnVisible('transactionId')"></td>
+          <td *ngIf="isColumnVisible('street')"></td>
+          <td *ngIf="isColumnVisible('city')"></td>
+          <td *ngIf="isColumnVisible('state')"></td>
+          <td *ngIf="isColumnVisible('zip')"></td>
+          <td *ngIf="isColumnVisible('memoText')"></td>
+          <td *ngIf="isColumnVisible('committeeId')"></td>
+          <td *ngIf="isColumnVisible('electionCode')"></td>
+          <td *ngIf="isColumnVisible('electionYear')"></td>
+          <td *ngIf="isRecycleBinViewActive()"></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  
+  <!--Loans and debts transaction table-->
+  <table class="table table-striped table-hover table__sortable transactions__table" *ngIf="transactionCategory === 'loans-and-debts'">
+      <thead>
+        <tr>
+          <th class="transactions__table-checkbox">
+            <input 
+              [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
+              (change)="changeAllTransactionsSelected()">
+          </th>
+           <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
+            (click)="changeSortDirection('memoCode')">Memo
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
+              Amount
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
+            (click)="changeSortDirection('purposeDescription')">Purpose
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
+            </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
+            Street
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
+            State
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
+            (click)="changeSortDirection('memoText')">Memo Text
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('committeeId')" [class]="getSortClass('committeeId')"
+            (click)="changeSortDirection('committeeId')">Donor Committee ID
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('electionCode')" [class]="getSortClass('electionCode')"
+            (click)="changeSortDirection('electionCode')">Election Code
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('electionYear')" [class]="getSortClass('electionYear')"
+            (click)="changeSortDirection('electionYear')">Election Year
+          </th>
+          <th class="bulk_action">
+            <div *ngIf="editMode">
+              <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                aria-label="Action dropdown">
+                <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
+                  [disabled]="bulkActionDisabled">
+                  <i class="ellipsis-icon"></i>
+                </button>
+                <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                  <button class="dropdown-item" (click)="printAllSelected()">
+                    <i class="print-icon"></i> Print
+                  </button>
+                  <button class="dropdown-item" (click)="exportAllSelected()">
+                    <i class="file-export-icon"></i> Export
+                  </button>
+                  <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
+                    <i class="trash-icon"></i> Trash
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!editMode">
+              <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
+                <i class="ellipsis-icon"></i>
+              </button>
+            </div>
+            <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+              <button class="btn btn-sm btn-primary transactions__bulk_action_btn" 
+                (click)="deleteRecyleBin()"
+                [disabled]="bulkActionDisabled">
+                <i class="trash-icon"></i>
+              </button>
+            </div>          
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+          
+        <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
+          <tr>
+            <td>
+              <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('type')">
+              {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+            <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
+              *ngIf="isColumnVisible('name')">{{trx.name}}
+              <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+              {{trx.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trx.electionCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trx.electionYear}}</td>
+            <td>
+              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
+                  <i class="undo-icon"></i>
+                </button>
+              </div>
+              <div *ngIf="editMode">
+                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="editTransaction(trx)">
+                      <i class="edit-icon"></i> Edit
+                    </button>
+                    <button class="dropdown-item" (click)="printTransaction(trx)">
+                      <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="cloneTransaction(trx)">
+                      <i class="far fa-copy"></i> Clone
+                    </button>
+                    <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
+                      <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" class="dropdown-item"
+                        (click)="trashTransaction(trx)">
+                        <i class="trash-icon"></i> Trash
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!editMode">
+                <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
+                  <i class="ellipsis-icon"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
+            <td style="padding-left: 1.5rem;">
+              <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('contributorEmployer')">{{trxChild.contributorEmployer}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('contributorOccupation')">{{trxChild.contributorOccupation}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
+            <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+              {{trxChild.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('aggregate')" class="transactions__amount">
+              {{trxChild.aggregate | currency:'USD':'symbol-narrow':'1.2-2'}}
+            <td>
+              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trxChild)">
+                  <i class="undo-icon"></i>
+                </button>
+              </div>
+              <div *ngIf="editMode">
+                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="editTransaction(trxChild)">
+                      <i class="edit-icon"></i> Edit
+                    </button>
+                    <button class="dropdown-item" (click)="printTransaction(trxChild)">
+                      <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="cloneTransaction(trxChild)">
+                      <i class="far fa-copy"></i> Clone
+                    </button>
+                    <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                      <i class="trash-icon"></i> Trash
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!editMode">
+                <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
+                  <i class="ellipsis-icon"></i>
+                </button>
+              </div>
+            </td>      
+          </tr>
+        </ng-container>
+        
+        <tr *ngIf="isTransactionViewActive()">
+          <td></td>
+          <td *ngIf="isColumnVisible('type')"></td>
+          <td *ngIf="isColumnVisible('transactionId')"></td>
+          <td *ngIf="isColumnVisible('name')"></td>
+          <td *ngIf="isColumnVisible('street')"></td>
+          <td *ngIf="isColumnVisible('city')"></td>
+          <td *ngIf="isColumnVisible('state')"></td>
+          <td *ngIf="isColumnVisible('zip')"></td>
+          <td *ngIf="isColumnVisible('date')"></td>
+          <td *ngIf="isColumnVisible('purposeDescription')"></td>
+          <td *ngIf="isColumnVisible('contributorEmployer')"></td>
+          <td *ngIf="isColumnVisible('contributorOccupation')"></td>
+          <td *ngIf="isColumnVisible('memoCode')"></td>
+          <td *ngIf="isColumnVisible('memoText')"></td>
+          <td *ngIf="isRecycleBinViewActive()"></td>
+          <td [@fadeInOut] *ngIf="isColumnVisible('amount')">
+              <div class="transactions__total-amount-container">
+                <div class="transactions__total-amount">
+                  <b>Total</b>
+                  <!-- <i class="info-icon transactions__total-amount-tip" ngbTooltip="Represents the total amount of transactions entered on the report. 
+                                Those transactions that are memo entries are not added into the total amount."
+                    tooltipClass="form-tooltip">
+                  </i> -->
+  
+                  <i class="info-icon transactions__total-amount-tip" 
+                    ngbTooltip="Represents the total amount of transactions entered on the report. 
+                      Those transactions that are memo entries are not added into the total amount."
+                    tooltipClass="transactions__tooltip"
+                    triggers="click">
+                  </i>
+  
+                </div>
+                <div class="transactions__total-amount-val">
+                  <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</b>
+                </div>
+              </div>
+          </td>
+          <td *ngIf="isColumnVisible('aggregate')"></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+  <!--Other transaction table-->
+  <table class="table table-striped table-hover table__sortable transactions__table" *ngIf="transactionCategory === 'other'">
+      <thead>
+        <tr>
+          <th class="transactions__table-checkbox">
+            <input 
+              [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
+              (change)="changeAllTransactionsSelected()">
+          </th>
+           <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
+            (click)="changeSortDirection('memoCode')">Memo
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
+              Amount
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
+            (click)="changeSortDirection('purposeDescription')">Purpose
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
+            </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
+            Street
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
+            State
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
+            (click)="changeSortDirection('memoText')">Memo Text
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('committeeId')" [class]="getSortClass('committeeId')"
+            (click)="changeSortDirection('committeeId')">Donor Committee ID
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('electionCode')" [class]="getSortClass('electionCode')"
+            (click)="changeSortDirection('electionCode')">Election Code
+          </th>
+          <th [@fadeInOut] *ngIf="isColumnVisible('electionYear')" [class]="getSortClass('electionYear')"
+            (click)="changeSortDirection('electionYear')">Election Year
+          </th>
+          <th class="bulk_action">
+            <div *ngIf="editMode">
+              <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                aria-label="Action dropdown">
+                <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
+                  [disabled]="bulkActionDisabled">
+                  <i class="ellipsis-icon"></i>
+                </button>
+                <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                  <button class="dropdown-item" (click)="printAllSelected()">
+                    <i class="print-icon"></i> Print
+                  </button>
+                  <button class="dropdown-item" (click)="exportAllSelected()">
+                    <i class="file-export-icon"></i> Export
+                  </button>
+                  <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
+                    <i class="trash-icon"></i> Trash
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!editMode">
+              <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
+                <i class="ellipsis-icon"></i>
+              </button>
+            </div>
+            <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+              <button class="btn btn-sm btn-primary transactions__bulk_action_btn" 
+                (click)="deleteRecyleBin()"
+                [disabled]="bulkActionDisabled">
+                <i class="trash-icon"></i>
+              </button>
+            </div>          
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+          
+        <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
+          <tr>
+            <td>
+              <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('type')">
+              {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+            <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
+              *ngIf="isColumnVisible('name')">{{trx.name}}
+              <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+              {{trx.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trx.electionCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trx.electionYear}}</td>
+            <td>
+              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
+                  <i class="undo-icon"></i>
+                </button>
+              </div>
+              <div *ngIf="editMode">
+                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="editTransaction(trx)">
+                      <i class="edit-icon"></i> Edit
+                    </button>
+                    <button class="dropdown-item" (click)="printTransaction(trx)">
+                      <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="cloneTransaction(trx)">
+                      <i class="far fa-copy"></i> Clone
+                    </button>
+                    <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
+                      <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" class="dropdown-item"
+                        (click)="trashTransaction(trx)">
+                        <i class="trash-icon"></i> Trash
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!editMode">
+                <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
+                  <i class="ellipsis-icon"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
+            <td style="padding-left: 1.5rem;">
+              <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('contributorEmployer')">{{trxChild.contributorEmployer}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('contributorOccupation')">{{trxChild.contributorOccupation}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
+            <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+              {{trxChild.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+            </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('aggregate')" class="transactions__amount">
+              {{trxChild.aggregate | currency:'USD':'symbol-narrow':'1.2-2'}}
+            <td>
+              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trxChild)">
+                  <i class="undo-icon"></i>
+                </button>
+              </div>
+              <div *ngIf="editMode">
+                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="editTransaction(trxChild)">
+                      <i class="edit-icon"></i> Edit
+                    </button>
+                    <button class="dropdown-item" (click)="printTransaction(trxChild)">
+                      <i class="fas fa-print"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="cloneTransaction(trxChild)">
+                      <i class="far fa-copy"></i> Clone
+                    </button>
+                    <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                      <i class="trash-icon"></i> Trash
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!editMode">
+                <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
+                  <i class="ellipsis-icon"></i>
+                </button>
+              </div>
+            </td>      
+          </tr>
+        </ng-container>
+        
+        <tr *ngIf="isTransactionViewActive()">
+          <td></td>
+          <td *ngIf="isColumnVisible('type')"></td>
+          <td *ngIf="isColumnVisible('transactionId')"></td>
+          <td *ngIf="isColumnVisible('name')"></td>
+          <td *ngIf="isColumnVisible('street')"></td>
+          <td *ngIf="isColumnVisible('city')"></td>
+          <td *ngIf="isColumnVisible('state')"></td>
+          <td *ngIf="isColumnVisible('zip')"></td>
+          <td *ngIf="isColumnVisible('date')"></td>
+          <td *ngIf="isColumnVisible('purposeDescription')"></td>
+          <td *ngIf="isColumnVisible('contributorEmployer')"></td>
+          <td *ngIf="isColumnVisible('contributorOccupation')"></td>
+          <td *ngIf="isColumnVisible('memoCode')"></td>
+          <td *ngIf="isColumnVisible('memoText')"></td>
+          <td *ngIf="isRecycleBinViewActive()"></td>
+          <td [@fadeInOut] *ngIf="isColumnVisible('amount')">
+              <div class="transactions__total-amount-container">
+                <div class="transactions__total-amount">
+                  <b>Total</b>
+                  <!-- <i class="info-icon transactions__total-amount-tip" ngbTooltip="Represents the total amount of transactions entered on the report. 
+                                Those transactions that are memo entries are not added into the total amount."
+                    tooltipClass="form-tooltip">
+                  </i> -->
+  
+                  <i class="info-icon transactions__total-amount-tip" 
+                    ngbTooltip="Represents the total amount of transactions entered on the report. 
+                      Those transactions that are memo entries are not added into the total amount."
+                    tooltipClass="transactions__tooltip"
+                    triggers="click">
+                  </i>
+  
+                </div>
+                <div class="transactions__total-amount-val">
+                  <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</b>
+                </div>
+              </div>
+          </td>
+          <td *ngIf="isColumnVisible('aggregate')"></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    
+  
   <hr/>
   <div *ngIf="showPagination()" class="d-flex justify-content-center transactions__table-pagination-container">
     <pagination-controls [id]="config.id" (pageChange)="getPage($event)">
@@ -292,7 +1062,8 @@
           </button>
         </div>
         <div class="modal-body">
-          <div class="container">
+          <!--transactionCategory = 'receipts'-->
+          <div class="container" *ngIf="transactionCategory === 'receipts'">
             <div class="row">
               <div class="col-md">
                 <div class="checkbox">
@@ -484,6 +1255,194 @@
                       [disabled]="getSortableColumn('amount').disabled">
                     <span [ngClass]="{'disabled-column-option':getSortableColumn('amount').disabled}">
                       Amount
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--transactionCategory = 'disbursements'-->
+          <div class="container" *ngIf="transactionCategory === 'disbursements'">
+            <div class="row">
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('type').checked" (change)="toggleVisibility('type', $event)"
+                      type="checkbox" [disabled]="getSortableColumn('type').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('type').disabled}">
+                      Type
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="col-md">
+                  <div class="checkbox">
+                    <label>
+                      <input [(ngModel)]="getSortableColumn('transactionId').checked" (change)="toggleVisibility('transactionId', $event)"
+                        type="checkbox" [disabled]="getSortableColumn('transactionId').disabled">
+                      <span [ngClass]="{'disabled-column-option':getSortableColumn('transactionId').disabled}">
+                        Transaction Id
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('state').checked" (change)="toggleVisibility('state', $event)"
+                      type="checkbox" [disabled]="getSortableColumn('state').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('state').disabled}">
+                      State
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row">              
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('committeeId').checked"
+                      (change)="toggleVisibility('committeeId', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('committeeId').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('committeeId').disabled}">
+                      Donor Committee ID
+                    </span>
+                  </label>
+                </div>                
+              </div>
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('electionCode').checked"
+                      (change)="toggleVisibility('electionCode', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('electionCode').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('electionCode').disabled}">
+                      Election Code
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('zip').checked" (change)="toggleVisibility('zip', $event)"
+                      type="checkbox" [disabled]="getSortableColumn('zip').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('zip').disabled}">
+                      Zip
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('street').checked"
+                      (change)="toggleVisibility('street', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('street').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('street').disabled}">
+                      Street
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('name').checked" (change)="toggleVisibility('name', $event)"
+                      type="checkbox" [disabled]="getSortableColumn('name').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('name').disabled}">
+                      Name
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('date').checked" (change)="toggleVisibility('date', $event)"
+                      type="checkbox" [disabled]="getSortableColumn('date').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('date').disabled}">
+                      Date
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              
+              <div class="col-md">
+                  <div class="checkbox">
+                    <label>
+                      <input [(ngModel)]="getSortableColumn('memoCode').checked"
+                        (change)="toggleVisibility('memoCode', $event)" type="checkbox"
+                        [disabled]="getSortableColumn('memoCode').disabled">
+                      <span [ngClass]="{'disabled-column-option':getSortableColumn('memoCode').disabled}">
+                        Memo
+                      </span>
+                    </label>
+                  </div>                
+              </div>
+
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('memoText').checked"
+                      (change)="toggleVisibility('memoText', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('memoText').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('memoText').disabled}">
+                      Memo Text/Description
+                    </span>
+                  </label>
+                </div>                
+              </div>
+
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('city').checked" (change)="toggleVisibility('city', $event)"
+                      type="checkbox" [disabled]="getSortableColumn('city').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('city').disabled}">
+                      City
+                    </span>
+                  </label>
+                </div>
+          </div>
+            </div>
+            <div class="row">
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('purposeDescription').checked"
+                      (change)="toggleVisibility('purposeDescription', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('purposeDescription').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('purposeDescription').disabled}">
+                      Purpose
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('amount').checked" (change)="toggleVisibility('amount', $event)"
+                      type="checkbox" [disabled]="getSortableColumn('amount').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('amount').disabled}">
+                      Amount
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('electionYear').checked"
+                      (change)="toggleVisibility('electionYear', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('electionYear').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('electionYear').disabled}">
+                      Election Year
                     </span>
                   </label>
                 </div>

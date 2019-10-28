@@ -890,7 +890,8 @@ export class SignComponent implements OnInit {
         form: {},
         direction: 'previous',
         step: 'step_3',
-        previousStep: this._step
+        previousStep: this._step,
+        edit: this.editMode
       });
 
       this._messageService.sendMessage({

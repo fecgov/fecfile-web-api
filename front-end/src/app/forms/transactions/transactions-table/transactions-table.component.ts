@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, NavigationStart, RoutesRecognized } from '@angular/router';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { TransactionModel } from '../model/transaction.model';
@@ -21,6 +21,8 @@ import { ReportTypeService } from '../../../forms/form-3x/report-type/report-typ
 import { environment } from 'src/environments/environment';
 import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
 import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
+import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { filter } from 'rxjs/operators';
 
 const transactionCategoryOptions = [];
 
@@ -68,6 +70,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public pageReceivedReports: boolean = false;
   public transactionCategories: any = [];
   public transactionCategory: string = '';
+  public committeeDetails: any;
+  public editMode: boolean = false;
 
   // ngx-pagination config
   public maxItemsPerPage = 10;
@@ -80,6 +84,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   // private keywords = [];
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
+  private _form99Details: any = {};
 
   // Local Storage Keys
   private readonly transactionSortableColumnsLSK = 'transactions.trx.sortableColumn';
@@ -125,6 +130,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private readonly maxColumnOptionReadOnly = 6;
   private allTransactionsSelected: boolean;
   private clonedTransaction: any;
+  private _previousUrl: any;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -163,8 +169,31 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
-      this.getTransactionsPage(1);
+      // _router.events.subscribe(val => {
+      //   let oldUrl = '';
+      //   let newUrl = '';
+      //   if (val instanceof NavigationEnd) {
+      //     oldUrl = val.url;
+      //   }
+      //   if (val instanceof NavigationStart) {
+      //     newUrl = val.url;
+      //   }
+
+      //   if (oldUrl !== newUrl) {
+      //     this.getTransactionsPage(1);
+      //   }
+      // });
+      // if (this.tableType === this.transactionsView) {
+        this.getPage(1);
+      // } else if (this.tableType === this.recycleBinView) {
+      //   this.getRecyclingPage(1);
+      // }
+
+      this.clonedTransaction = {};
       this.setSortableColumns();
+      if (p.edit === 'true' || p.edit === true) {
+        this.editMode = true;
+      }
     });
   }
 
@@ -172,6 +201,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
+    this.committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
     this.pageReceivedTransactions = false;
     this.pageReceivedReports = false;
 
@@ -245,6 +275,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         }
       }
     });
+    // this.getTransactionsPage(1);
   }
 
   // /**
@@ -399,6 +430,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     const serverSortColumnName = this._transactionsService.mapToSingleServerName(this.currentSortedColumnName);
 
+    let categoryType = 'receipts_tran';
+
+    if (this.transactionCategory === 'disbursements') {
+      categoryType = 'disbursements_tran';
+    } else if (this.transactionCategory === 'loans-and-debts') {
+      categoryType = 'loans_tran';
+    } else if (this.transactionCategory === 'other') {
+      categoryType = 'other_tran';
+    }
+
     this._transactionsService
       .getFormTransactions(
         this.formType,
@@ -407,7 +448,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.config.itemsPerPage,
         serverSortColumnName,
         sortedCol.descending,
-        this.filters
+        this.filters,
+        categoryType
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
@@ -421,46 +463,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this._transactionsService.addUIFileds(res);
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
-        // this.transactionsModel = transactionsModelL;
-
-        for (
-          let transactionCategorieIndex = 0;
-          transactionCategorieIndex < this.transactionCategories.length;
-          transactionCategorieIndex++
-        ) {
-          for (
-            let transactionCategoryOptionIndex = 0;
-            transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
-            transactionCategoryOptionIndex++
-          ) {
-            for (
-              let transactionCategoryOptionOptionsIndex = 0;
-              transactionCategoryOptionOptionsIndex <
-              this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
-                .length;
-              transactionCategoryOptionOptionsIndex++
-            ) {
-              for (
-                let transactionModelLindex = 0;
-                transactionModelLindex < transactionsModelL.length;
-                transactionModelLindex++
-              ) {
-                if (
-                  transactionsModelL[transactionModelLindex].transactionTypeIdentifier ===
-                    this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex]
-                      .options[transactionCategoryOptionOptionsIndex].value &&
-                  this.transactionCategory === this.transactionCategories[transactionCategorieIndex].value
-                ) {
-                  this.transactionsModel.push(transactionsModelL[transactionModelLindex]);
-                }
-              }
-            }
-          }
-        }
+        this.transactionsModel = transactionsModelL;
 
         if (this.clonedTransaction && this.clonedTransaction.hasOwnProperty('transaction_id')) {
-          for (let transactionModelIndex = 0; transactionModelIndex < this.transactionsModel.length; transactionModelIndex++) {
+          for (
+            let transactionModelIndex = 0;
+            transactionModelIndex < this.transactionsModel.length;
+            transactionModelIndex++
+          ) {
             if (this.transactionsModel[transactionModelIndex].transactionId === this.clonedTransaction.transaction_id) {
+              this.transactionsModel[transactionModelIndex].cloned = true;
               this.editTransaction(this.transactionsModel[transactionModelIndex]);
             }
           }
@@ -511,8 +523,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    // const serverSortColumnName = this._transactionsService.
-    //   mapToSingleServerName(this.currentSortedColumnName);
+    let categoryType = 'receipts_tran';
+
+    if (this.transactionCategory === 'disbursements') {
+      categoryType = 'disbursements_tran';
+    } else if (this.transactionCategory === 'loans-and-debts') {
+      categoryType = 'loans_tran';
+    } else if (this.transactionCategory === 'other') {
+      categoryType = 'other_tran';
+    }
 
     this._transactionsService
       .getUserDeletedTransactions(
@@ -522,7 +541,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.config.itemsPerPage,
         this.currentSortedColumnName,
         sortedCol.descending,
-        this.filters
+        this.filters,
+        categoryType
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
@@ -833,12 +853,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to clone
    */
   public cloneTransaction(trx: TransactionModel): void {
-    this._transactionsService.cloneTransaction(trx.transactionId).subscribe((cloneTransactionResponse: TransactionModel) => {
-      if (cloneTransactionResponse[0] && cloneTransactionResponse[0].hasOwnProperty('transaction_id')) {
-        this.getTransactionsPage(this.config.currentPage);
-        this.clonedTransaction = cloneTransactionResponse[0];
-      }
-    });
+    this._transactionsService
+      .cloneTransaction(trx.transactionId)
+      .subscribe((cloneTransactionResponse: TransactionModel) => {
+        if (cloneTransactionResponse[0] && cloneTransactionResponse[0].hasOwnProperty('transaction_id')) {
+          this.getTransactionsPage(this.config.currentPage);
+          this.clonedTransaction = cloneTransactionResponse[0];
+        }
+      });
   }
 
   /**
@@ -976,6 +998,50 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       } else if (res === 'cancel') {
       }
     });
+  }
+
+  private _setF99Details(): void {
+    if (this.committeeDetails) {
+      if (this.committeeDetails.committeeid) {
+        this._form99Details = this.committeeDetails;
+
+        this._form99Details.reason = '';
+        this._form99Details.text = '';
+        this._form99Details.signee = `${this.committeeDetails.treasurerfirstname} ${this.committeeDetails.treasurerlastname}`;
+        this._form99Details.additional_email_1 = '-';
+        this._form99Details.additional_email_2 = '-';
+        this._form99Details.created_at = '';
+        this._form99Details.is_submitted = false;
+        this._form99Details.id = '';
+
+        let formSavedObj: any = {
+          saved: false
+        };
+        localStorage.setItem(`form_99_details`, JSON.stringify(this._form99Details));
+        localStorage.setItem(`form_99_saved`, JSON.stringify(formSavedObj));
+      }
+    }
+  }
+
+  public checkIfEditMode() {
+    if (!this.editMode) {
+      this._dialogService
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning',
+          true,
+          ModalHeaderClassEnum.warningHeader,
+          null,
+          'Return to Reports'
+        )
+        .then(res => {
+          if (res === 'okay') {
+          } else if (res === 'cancel') {
+            this._router.navigate(['/reports']);
+          }
+        });
+    }
   }
 
   /**
@@ -1280,12 +1346,22 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     ];
     if (this.transactionCategory === 'disbursements') {
       defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
-      // Desc., Donor Committee ID, Election Code, Election Year
-      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', '', ''];
+      // Donor Committee ID, Election Code, Election Year
+      otherSortColumns = [
+        'transactionId',
+        'street',
+        'city',
+        'state',
+        'zip',
+        'memoText',
+        'committeeId',
+        'electionCode',
+        'electionYear'
+      ];
     } else if (this.transactionCategory === 'loans-and-debts') {
       // Balance at Close (D)
       defaultSortColumns = ['type', 'name', '', 'amount'];
-      // Purpose of Debt (D), Beginning Balance (D), Incurred Amount (D), Payment Amount (D) 
+      // Purpose of Debt (D), Beginning Balance (D), Incurred Amount (D), Payment Amount (D)
       // Loan Amount (C), Loan Payment to Date (C), Loan Balance (C), Loan Incurred Date (C), Loan Due Date (C)
       otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoCode', 'memoText', '', ''];
     } else if (this.transactionCategory === 'other') {

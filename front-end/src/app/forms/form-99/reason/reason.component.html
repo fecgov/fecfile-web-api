@@ -84,6 +84,13 @@
           </div>
         </div>
         <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12" *ngIf="showFileNameLengthError">
+            <div class="text-error text-center" *ngIf="showFileNameLengthError">
+              File name cannot exceed 100 characters.
+            </div>
+          </div>
+        </div>
+        <div class="grid-row">
           <div class="grid-row__col grid-row__col--12" *ngIf="PdfUploaded">
             <div class="text-success text-center" *ngIf="PdfUploaded">
               File has been successfully attached.
@@ -335,7 +342,7 @@
               <div class="grid-row">
                 <div class="grid-row__col grid-row__col--12">
                   <h5>
-                    {{ file ? file.name : fileNameToDisplay }}
+                    {{ file && file.name ? file.name : fileNameToDisplay }}
                     <!--<button type="button" class="btn btn-link" (click)="open(deletePDF)">-->
                     <button type="button" class="btn btn-link" (click)="deletePDFFile()" [disabled]="!this.editMode">
                     <span vertical-align="top" class="close-icon"></span>
@@ -374,8 +381,11 @@
             <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
               Previous
             </button>
-            <button class="btn btn-primary btn-right" type="submit">
+            <button *ngIf="editMode" class="btn btn-primary btn-right" type="submit">
               Save & Continue
+            </button>
+            <button *ngIf="!editMode" class="btn btn-primary btn-right" type="submit">
+              Next
             </button>
           </div>
         </div>

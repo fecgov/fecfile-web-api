@@ -1,7 +1,9 @@
 import psycopg2
 import requests
 import os
-
+import datetime
+from collections import OrderedDict
+import json
 
 # Global Variables
 _conn = None
@@ -17,17 +19,50 @@ _database = os.environ.get("DB_NAME", "fecfrontend2")
 _user = os.environ.get("DB_USER", "fecuser2")
 _password = os.environ.get("DB_PASSWD", "postgres")
 
+'''
+message_type,
+ 1-FATAL, 2-ERROR, 3-WARN, 4-INFO, 5-DEBUG, 6-TRACE
+'''
+def add_log(reportid, 
+            cmte_id, 
+            message_type, 
+            message_text, 
+            response_json, 
+            error_code, 
+            error_json, 
+            app_error,
+            host_name=os.uname()[1],
+            process_name="get_fec_number"):
+                     
+    cur = _conn.cursor()
+    cur.execute("""INSERT INTO public.upload_logs(
+                                    report_id, 
+                                    cmte_id, 
+                                    process_name, 
+                                    message_type, 
+                                    message_text, 
+                                    response_json, 
+                                    error_code, 
+                                    error_json, 
+                                    app_error, 
+                                    host_name)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                                    [reportid, cmte_id, process_name, message_type, message_text, response_json, error_code, error_json, app_error, host_name])
+    _conn.commit()
+
 def get_fec_number():
     """ query data from the vendors table """
     try:
-        print("get_reports_to_upload accessing ...")
+        print("get_fec_number accessing ...")
         _conn = psycopg2.connect(host=_host,database=_database, user=_user, password=_password)
         
         #use here one specimen committee username and password
+        cmte_id = 'C00000422'
         data_obj = {
-                    'username':'C00000422',
+                    'username':cmte_id,
                     'password':'test'
                  }
+
 
         # Get the token to access API  
         resp = requests.post("http://" + _NEXGEN_DJANGO_API_URL +
@@ -36,10 +71,20 @@ def get_fec_number():
         print("get token ...")
         if resp.ok:
             successresp=resp.json()
-            print("token/obtain API call is successfully finished...")  
+            print("token/obtain API call is successfuly finished...")  
             print(successresp)
             token=successresp['token']
             print(token)
+
+            add_log(0,
+                cmte_id, 
+                4,
+                " get_fec_number get token API operation successful", 
+                json.dumps(successresp), 
+                '',
+                '', 
+                '', 
+                ) 
 
             headers_obj = {
                             'Authorization':'JWT '+ token,
@@ -109,10 +154,31 @@ def get_fec_number():
                 print("data_obj", data_obj)
                 print("headers_obj", headers_obj)
                 resp = requests.post("http://" + _DATA_RECEIVE_API_URL +
-                                 "/v1/upload_filing", data=data_obj, headers=headers_obj)                                    
+                                 "/v1/upload_filing", data=data_obj, headers=headers_obj)      
+
+                add_log(data_row[1],
+                    data_row[0], 
+                    4,
+                    "F3X upload_filing with SubmissionId called with data_obj = "+data_obj, 
+                    '', 
+                    '',
+                    '', 
+                    '', 
+                ) 
+
                 if resp.ok:
                     successresp=resp.json()
-                  
+
+                    add_log(data_row[1],
+                        data_row[0], 
+                        4,
+                        "F3X upload_filing with SubmissionId upload_filing is successful", 
+                        json.dumps(successresp), 
+                        '',
+                        '', 
+                        '', 
+                    )
+
                     beginningImageNumber = successresp['result']['beginningImageNumber']
                     committeeId = successresp['result']['committeeId']
                     message = successresp['result']['message']
@@ -182,7 +248,17 @@ def get_fec_number():
                     _conn.commit()       
 
                     if cursor.rowcount == 0:
-                        raise Exception('Error: updating fec_id failed.')                                                           
+                        raise Exception('Error: updating fec_id failed.')
+
+                    add_log(data_row[1],
+                        data_row[0], 
+                        4,
+                        "F3X upload_filing with SubmissionId upload_filing is failed", 
+                        json.dumps(successresp), 
+                        '',
+                        '', 
+                        '', 
+                    )                                                               
             #cur.close()
 
             #Processing F99 reports 
@@ -241,9 +317,30 @@ def get_fec_number():
 
                 # call prepare_json_builders_data API to prepare Data for JSON  
                 resp = requests.post("http://" + _DATA_RECEIVE_API_URL +
-                                 "/v1/upload_filing", data=data_obj, headers=headers_obj)                                    
+                                 "/v1/upload_filing", data=data_obj, headers=headers_obj)  
+
+                add_log(data_row[1],
+                    data_row[0], 
+                    4,
+                    "F99 upload_filing with SubmissionId called with data_obj = "+data_obj, 
+                    '', 
+                    '',
+                    '', 
+                    '', 
+                )                  
+
                 if resp.ok:
                     successresp=resp.json()
+                  
+                    add_log(data_row[1],
+                        data_row[0], 
+                        4,
+                        "F99 upload_filing with SubmissionId upload_filing is successful", 
+                        json.dumps(successresp), 
+                        '',
+                        '', 
+                        '', 
+                    )
                   
                     beginningImageNumber = successresp['result']['beginningImageNumber']
                     committeeId = successresp['result']['committeeId']
@@ -313,6 +410,15 @@ def get_fec_number():
                                                                             data_row[1]])    
                     _conn.commit()       
 
+                    add_log(data_row[1],
+                        data_row[0], 
+                        4,
+                        "F99 upload_filing with SubmissionId upload_filing is failed", 
+                        json.dumps(resp.json()), 
+                        '',
+                        '', 
+                        '', 
+                    )
                     if cursor.rowcount == 0:
                         raise Exception('Error: updating fec_id failed.')   
 
@@ -326,5 +432,6 @@ def get_fec_number():
 
             
 if __name__ == '__main__':
+    _conn = psycopg2.connect(host=_host,database=_database, user=_user, password=_password)
     get_fec_number()
 

@@ -59,6 +59,7 @@ export class F3xComponent implements OnInit {
   public forceChangeSwitch = 0;
 
   private _step: string = '';
+  private _cloned: boolean = false;
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -263,6 +264,8 @@ export class F3xComponent implements OnInit {
 
           this.currentStep = e.step;
 
+          this.transactionCategory = e.transactionCategory;
+
           // Pass Transaction Type to individual-receipt
           if (this.currentStep === 'step_3') {
             // Force reload form fields even if type did not change.
@@ -276,7 +279,9 @@ export class F3xComponent implements OnInit {
             if (this.transactionType && this.transactionType === e.transactionType) {
               this._f3xMessageService.sendLoadFormFieldsMessage('');
             }
-
+            if (e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.cloned) {
+              this._cloned = true;
+            }
             // this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
             // this.transactionType = e.transactionType ? e.transactionType : '';
             this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
@@ -318,6 +323,11 @@ export class F3xComponent implements OnInit {
                     key: 'field',
                     fieldArray: e.prePopulateFieldArray
                   });
+                } else if (e.hasOwnProperty('prePopulateFromSchedD')) {
+                  this._f3xMessageService.sendPopulateFormMessage({
+                    key: 'prePopulateFromSchedD',
+                    prePopulateFromSchedD: e.prePopulateFromSchedD
+                  });
                 }
               }
             }
@@ -353,6 +363,14 @@ export class F3xComponent implements OnInit {
     }
   }
 
+  /**
+   * If a schedule component will need to accept transactions types, for example when it
+   * supports multiples, they may be set here as input into the schedule component.
+   *
+   * @param transactionTypeText
+   * @param transactionType
+   * @param scheduleType
+   */
   private _setTransactionTypeBySchedule(transactionTypeText: string, transactionType: string, scheduleType: string) {
     if (!scheduleType) {
       this.transactionType = transactionType;
@@ -364,9 +382,10 @@ export class F3xComponent implements OnInit {
       this.transactionTypeText = transactionTypeText;
       return;
     }
-    if (scheduleType.startsWith('sched_f????????')) {
+    if (scheduleType.startsWith('sched_f')) {
       this.transactionTypeSchedF = transactionType;
       this.transactionTypeTextSchedF = transactionTypeText;
+    } else if (scheduleType.startsWith('sched_c')) {
     } else {
       this.transactionType = transactionType;
       this.transactionTypeText = transactionTypeText;
@@ -382,9 +401,15 @@ export class F3xComponent implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate([`/forms/form/${this.formType}`], {
-            queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory }
-          });
+          if (this._cloned) {
+            this._router.navigate([`/forms/form/${this.formType}`], {
+              queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory, cloned: this._cloned }
+            });
+          } else {
+            this._router.navigate([`/forms/form/${this.formType}`], {
+              queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory }
+            });
+          }
         } else if (this.frm === 'preview') {
           this.step = this._step;
 
