@@ -4196,7 +4196,7 @@ def contact_entity_dict(data):
           'cand_office_state'  : is_null(data.get('candOfficeState')), 
           'cand_office_district'  : is_null(data.get('candOfficeDistrict')), 
           'ref_cand_cmte_id'  : is_null(data.get('candCmteId')), 
-          'phone_number'  : is_null(data.get('phoneNumber'),'phone_number'),
+          'phone_number'  : is_null(data.get('phone_number'),'phone_number'),
           'cand_election_year': is_null(data.get('candElectionYear'),'cand_election_year'),
           'last_update_date' : is_null(data.get('lastupdatedate')),
         }
