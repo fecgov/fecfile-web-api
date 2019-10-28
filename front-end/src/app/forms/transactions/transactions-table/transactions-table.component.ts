@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
-import { ActivatedRoute, NavigationEnd, Router, NavigationStart } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, NavigationStart, RoutesRecognized } from '@angular/router';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { TransactionModel } from '../model/transaction.model';
@@ -22,6 +22,7 @@ import { environment } from 'src/environments/environment';
 import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
 import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
 import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { filter } from 'rxjs/operators';
 
 const transactionCategoryOptions = [];
 
@@ -129,6 +130,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private readonly maxColumnOptionReadOnly = 6;
   private allTransactionsSelected: boolean;
   private clonedTransaction: any;
+  private _previousUrl: any;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -167,7 +169,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
-      this.getTransactionsPage(1);
+      this.getPage(1);
       this.clonedTransaction = {};
       this.setSortableColumns();
       if (p.edit === 'true' || p.edit === true) {
@@ -254,7 +256,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         }
       }
     });
-    this.getTransactionsPage(1);
+    // this.getTransactionsPage(1);
   }
 
   // /**
@@ -502,8 +504,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    // const serverSortColumnName = this._transactionsService.
-    //   mapToSingleServerName(this.currentSortedColumnName);
+    let categoryType = 'receipts_tran';
+
+    if (this.transactionCategory === 'disbursements') {
+      categoryType = 'disbursements_tran';
+    } else if (this.transactionCategory === 'loans-and-debts') {
+      categoryType = 'loans_tran';
+    } else if (this.transactionCategory === 'other') {
+      categoryType = 'other_tran';
+    }
 
     this._transactionsService
       .getUserDeletedTransactions(
@@ -513,7 +522,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.config.itemsPerPage,
         this.currentSortedColumnName,
         sortedCol.descending,
-        this.filters
+        this.filters,
+        categoryType
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];

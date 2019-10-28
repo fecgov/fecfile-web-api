@@ -144,6 +144,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _prePopulateFieldArray: Array<any>;
   private _committeeDetails: any;
   private _cmteTypeCategory: string;
+  private _completedCloning: boolean = false;
 
   constructor(
     private _http: HttpClient,
@@ -240,6 +241,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._employerOccupationRequired = false;
     this.memoDropdownSize = null;
     this.totalAmountReadOnly = true;
+    this._completedCloning = false;
+
+    if (localStorage.getItem('committee_details') !== null) {
+      this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
+      if (this._committeeDetails.cmte_type_category !== null) {
+        this._cmteTypeCategory = this._committeeDetails.cmte_type_category;
+      }
+    }
 
     if (localStorage.getItem('committee_details') !== null) {
       this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
@@ -1665,6 +1674,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else if (saveAction === SaveActions.saveForReturnToNewParent) {
             this.returnToParent(ScheduleActions.add);
           } else if (saveAction === SaveActions.updateOnly) {
+            this._completedCloning = true;
             this.viewTransactions();
           } else {
 
@@ -1887,7 +1897,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
-    if (!this._cloned) {
+    if (!this._cloned || this._completedCloning) {
       this.clearFormValues();
       let reportId = this._receiptService.getReportIdFromStorage(this.formType);
       console.log('reportId', reportId);

@@ -1,6 +1,6 @@
 @import '../../shared/scss/global';
 
-.sched-h2-container {
+.sched-h3-container {
   padding-right: 10px;
   .row {
     margin-left: 0;
@@ -32,11 +32,10 @@
             text-decoration: none;
           }
         }
-        .dropdown-toggle::after {
-          display:none;
-        }
-        #sched-h2__dropdown-action > button > i {
-          padding-right: 3px;
+        .dropdown-toggle {
+          &:after {
+            display: none;
+          }
         }
         .dropdown-menu {
           min-width: 0px !important;
@@ -212,17 +211,29 @@
     font: 29;
   }
 
-  .ngx-pagination .current{
-    padding: 0.1875rem 0.625rem;
-    background: #9B9B9B !important;;
-    color: #fefefe;
-    cursor: default;
+  .summary_text_amt{
+    text-align: right;
+    padding-right: 100px ;
   }
 
-  .ngx-pagination a, .ngx-pagination button {
-    color: #9B9B9B !important;;
-    display: block;
-    padding: 0.1875rem 0.625rem;
-    border-radius: 0;
-  }	
+  .summary_text_amt_level_1{
+    background-color: #979A9A  !important;
+    text-align: center;
+    height: 35px !important;
+    padding-top: 10px !important;
+    vertical-align: middle !important;
+    padding-right: 4px !important;
+    margin-top: 1px  !important;
+    //margin-bottom: 1px  !important;
+  }
+
+  .summary_text_level_3{
+    //background-color: #E5E7E9  !important;
+    padding-left: 100px !important;
+    height: 35px !important;
+    padding-top: 10px !important;
+    vertical-align: middle !important;
+    margin-top: 1px  !important;
+   // margin-bottom: 1px  !important;
+  }
 }

@@ -200,10 +200,8 @@ export class FormsService {
         formData.append('additional_email_2', form99_details.additional_email_2);
         formData.append('created_at', form99_details.created_at);
         formData.append('is_submitted', 'False');
-        /*formData.append('filename', form99_details.filename);*/
         formData.append('form_type', 'F99');
-        if (form99_details.id === '' || form99_details.id === '' || form99_details.id === null) {
-          /*data['id']="0";*/
+        if (form99_details.id === '' || form99_details.id === undefined || form99_details.id === null) {
           formData.append('id', '0');
         } else {
           formData.append('id', form99_details.id.toString());

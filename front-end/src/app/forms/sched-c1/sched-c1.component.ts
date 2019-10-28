@@ -28,7 +28,7 @@ export class SchedC1Component implements OnInit, OnChanges {
 
   public c1Form: FormGroup;
   public sectionType: string;
-  public states: [];
+  public states: any[];
   public readonly initialSection = Sections.initialSection;
   public readonly sectionA = Sections.sectionA;
   public readonly sectionB = Sections.sectionB;
@@ -159,11 +159,9 @@ export class SchedC1Component implements OnInit, OnChanges {
     switch (this.sectionType) {
       case Sections.initialSection:
         return this._checkInitialSectionValid();
-        break;
       case Sections.sectionA:
         // TODO add method for checking section for valid fields before progressing
         return true;
-        break;
       default:
         return false;
     }

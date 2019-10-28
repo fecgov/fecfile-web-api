@@ -971,6 +971,48 @@ def delete_schedH2(data):
         raise
 
 @api_view(['GET'])
+def get_h2_type_events(request):
+    """
+    load all event names for each category(direct cand support or 
+    fundraising) to populate events dropdown list
+    """
+    logger.debug('get_h2_type_events with request:{}'.format(request.query_params))
+    cmte_id = request.user.username
+    event_type = request.query_params.get('activity_event_type').strip()
+    if event_type not in ['fundraising', 'direct_cand_support']:
+        raise Exception('missing or non-valid event type value')
+    if event_type == 'findraising':
+        _sql = """
+        SELECT json_agg(t) from (
+        SELECT activity_event_name 
+        FROM   public.sched_h2 
+        WHERE  cmte_id = '{}'
+            AND fundraising = true) t;
+        """.format(cmte_id)
+    else:
+        _sql = """
+        SELECT json_agg(t) from(
+        SELECT activity_event_name 
+        FROM   public.sched_h2 
+        WHERE  cmte_id = '{}'
+            AND direct_cand_support = true) t;
+        """.format(cmte_id)
+    try:
+        with connection.cursor() as cursor:
+            logger.debug('query with _sql:{}'.format(_sql))
+            cursor.execute(_sql)
+            json_res = cursor.fetchone()[0]
+            # print(json_res)
+            if not json_res:
+                return Response([], status = status.HTTP_200_OK)
+        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
+        return Response( json_res, status = status.HTTP_200_OK)
+    except:
+        raise
+
+@api_view(['GET'])
 def get_h2_summary_table(request):
     """
     h2 summary need to be h4 transaction-based:
@@ -1445,13 +1487,13 @@ def get_sched_h3_breakdown(request):
     """
     try:
         cmte_id = request.user.username
-        if not('report_id' in request.data):
+        if not('report_id' in request.query_params):
             raise Exception('Missing Input: Report_id is mandatory')
         # handling null,none value of report_id
-        if not (check_null_value(request.data.get('report_id'))):
+        if not (check_null_value(request.query_params.get('report_id'))):
             report_id = "0"
         else:
-            report_id = check_report_id(request.data.get('report_id'))
+            report_id = check_report_id(request.query_params.get('report_id'))
         with connection.cursor() as cursor:
             cursor.execute(_sql, [report_id, cmte_id, report_id, cmte_id])
             result = cursor.fetchone()[0]
@@ -1460,7 +1502,62 @@ def get_sched_h3_breakdown(request):
         raise Exception('Error on fetching h3 break down')
         
 
+@api_view(['GET'])
+def get_h3_total_amount(request):
+    """
+    get h3 total_amount for editing purpose
+    if a event_name is provided, will get the total amount based on event name
+    if a event_type is provided, will get the total amount based on event type
+    """
+    try:
+        cmte_id = request.user.username
+        logger.debug('get_h3_total_amount with request:{}'.format(request.query_params))
+        if 'activity_event_name' in request.query_params: 
+            event_name = request.query_params.get('activity_event_name') 
+            _sql = """
+            SELECT json_agg(t) from(
+            SELECT total_amount_transferred
+            FROM   public.sched_h3 
+            WHERE  cmte_id = %s
+                AND activity_event_name = %s
+            ORDER BY receipt_date desc, create_date desc) t
+            """
+            with connection.cursor() as cursor:
+                logger.debug('query with _sql:{}'.format(_sql))
+                # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+                cursor.execute(_sql, (cmte_id, event_name))
+                json_res = cursor.fetchone()[0]
+        else:
+            event_type = request.query_params.get('activity_event_type') 
+            if not event_type:
+                raise Exception("event name or event type is required for this api")
+            _sql = """
+            SELECT json_agg(t) from(
+            SELECT total_amount_transferred
+            FROM   public.sched_h3 
+            WHERE  cmte_id = %s
+                AND activity_event_type = %s
+            ORDER BY receipt_date desc, create_date desc) t
+            """ 
+            with connection.cursor() as cursor:
+                logger.debug('query with _sql:{}'.format(_sql))
+                # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+                cursor.execute(_sql, (cmte_id, event_type))
+                json_res = cursor.fetchone()[0]
         
+            # print(json_res)
+        if not json_res:
+            return Response(
+                {
+                    "total_amount_transferred": 0
+                }, 
+                    status = status.HTTP_200_OK)
+        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
+        return Response( json_res[0], status = status.HTTP_200_OK)
+    except:
+        raise        
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH3(request):
@@ -1500,14 +1597,14 @@ def schedH3(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
+                    request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             datum = get_schedH3(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
@@ -2590,10 +2687,16 @@ def delete_schedH5(data):
 
 @api_view(['GET'])
 def get_sched_h5_breakdown(request):
+    """
+    api to get h5 sum values group by activity categories
+    request parameters: cmte_id, report_id
+    retrun:
+
+    """
     _sql = """
     SELECT json_agg(t) FROM(
         select sum(total_amount_transferred) as total,
-        sum(voter_id_amount) as viter_id,
+        sum(voter_id_amount) as voter_id,
         sum(voter_registration_amount) as voter_registration,
         sum(gotv_amount) as gotv,
         sum(generic_campaign_amount) as generic_campaign
@@ -2605,13 +2708,13 @@ def get_sched_h5_breakdown(request):
     """
     try:
         cmte_id = request.user.username
-        if not('report_id' in request.data):
+        if not('report_id' in request.query_params):
             raise Exception('Missing Input: Report_id is mandatory')
         # handling null,none value of report_id
-        if not (check_null_value(request.data.get('report_id'))):
+        if not (check_null_value(request.query_params.get('report_id'))):
             report_id = "0"
         else:
-            report_id = check_report_id(request.data.get('report_id'))
+            report_id = check_report_id(request.query_params.get('report_id'))
         with connection.cursor() as cursor:
             cursor.execute(_sql, [report_id, cmte_id])
             result = cursor.fetchone()[0]
@@ -2658,14 +2761,14 @@ def schedH5(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
+                    request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             datum = get_schedH5(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:

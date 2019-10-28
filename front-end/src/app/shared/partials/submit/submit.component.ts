@@ -90,8 +90,10 @@ export class SubmitComponent implements OnInit {
   }
 
   public goToDashboard(): void {
-    if (this._formsComponent.canDeactivate()) {
+    if (!this._checkStatus) {
       this._router.navigateByUrl('dashboard');
+    } else {
+      this._formsComponent.canDeactivate();
     }
   }
 

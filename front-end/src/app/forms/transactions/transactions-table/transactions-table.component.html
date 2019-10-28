@@ -402,6 +402,7 @@
             <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trx.electionCode}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trx.electionYear}}</td>
+            <td>
               <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
                 <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
                   <i class="undo-icon"></i>
@@ -437,30 +438,30 @@
                   <i class="ellipsis-icon"></i>
                 </button>
               </div>
+            </td>
           </tr>
           <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
             <td style="padding-left: 1.5rem;">
               <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+                {{trxChild.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+              </td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('contributorEmployer')">{{trxChild.contributorEmployer}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('contributorOccupation')">{{trxChild.contributorOccupation}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trxChild.electionCode}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trxChild.electionYear}}</td>
             <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
-              {{trxChild.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-            </td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('aggregate')" class="transactions__amount">
-              {{trxChild.aggregate | currency:'USD':'symbol-narrow':'1.2-2'}}
             <td>
               <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
                 <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trxChild)">
@@ -501,42 +502,36 @@
         <tr *ngIf="isTransactionViewActive()">
           <td></td>
           <td *ngIf="isColumnVisible('type')"></td>
-          <td *ngIf="isColumnVisible('transactionId')"></td>
           <td *ngIf="isColumnVisible('name')"></td>
-          <td *ngIf="isColumnVisible('street')"></td>
-          <td *ngIf="isColumnVisible('city')"></td>
-          <td *ngIf="isColumnVisible('state')"></td>
-          <td *ngIf="isColumnVisible('zip')"></td>
           <td *ngIf="isColumnVisible('date')"></td>
-          <td *ngIf="isColumnVisible('purposeDescription')"></td>
-          <td *ngIf="isColumnVisible('contributorEmployer')"></td>
-          <td *ngIf="isColumnVisible('contributorOccupation')"></td>
           <td *ngIf="isColumnVisible('memoCode')"></td>
-          <td *ngIf="isColumnVisible('memoText')"></td>
-          <td *ngIf="isRecycleBinViewActive()"></td>
           <td [@fadeInOut] *ngIf="isColumnVisible('amount')">
               <div class="transactions__total-amount-container">
                 <div class="transactions__total-amount">
                   <b>Total</b>
-                  <!-- <i class="info-icon transactions__total-amount-tip" ngbTooltip="Represents the total amount of transactions entered on the report. 
-                                Those transactions that are memo entries are not added into the total amount."
-                    tooltipClass="form-tooltip">
-                  </i> -->
-  
                   <i class="info-icon transactions__total-amount-tip" 
                     ngbTooltip="Represents the total amount of transactions entered on the report. 
                       Those transactions that are memo entries are not added into the total amount."
                     tooltipClass="transactions__tooltip"
                     triggers="click">
                   </i>
-  
                 </div>
                 <div class="transactions__total-amount-val">
                   <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</b>
                 </div>
               </div>
           </td>
-          <td *ngIf="isColumnVisible('aggregate')"></td>
+          <td *ngIf="isColumnVisible('purposeDescription')"></td>
+          <td *ngIf="isColumnVisible('transactionId')"></td>
+          <td *ngIf="isColumnVisible('street')"></td>
+          <td *ngIf="isColumnVisible('city')"></td>
+          <td *ngIf="isColumnVisible('state')"></td>
+          <td *ngIf="isColumnVisible('zip')"></td>
+          <td *ngIf="isColumnVisible('memoText')"></td>
+          <td *ngIf="isColumnVisible('committeeId')"></td>
+          <td *ngIf="isColumnVisible('electionCode')"></td>
+          <td *ngIf="isColumnVisible('electionYear')"></td>
+          <td *ngIf="isRecycleBinViewActive()"></td>
           <td></td>
         </tr>
       </tbody>
@@ -654,6 +649,7 @@
             <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trx.electionCode}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trx.electionYear}}</td>
+            <td>
               <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
                 <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
                   <i class="undo-icon"></i>
@@ -689,6 +685,7 @@
                   <i class="ellipsis-icon"></i>
                 </button>
               </div>
+            </td>
           </tr>
           <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
             <td style="padding-left: 1.5rem;">
@@ -906,6 +903,7 @@
             <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trx.electionCode}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trx.electionYear}}</td>
+            <td>
               <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
                 <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
                   <i class="undo-icon"></i>
@@ -941,6 +939,7 @@
                   <i class="ellipsis-icon"></i>
                 </button>
               </div>
+            </td>
           </tr>
           <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
             <td style="padding-left: 1.5rem;">
@@ -1063,6 +1062,7 @@
           </button>
         </div>
         <div class="modal-body">
+          <!--transactionCategory = 'receipts'-->
           <div class="container" *ngIf="transactionCategory === 'receipts'">
             <div class="row">
               <div class="col-md">
@@ -1261,7 +1261,7 @@
               </div>
             </div>
           </div>
-
+          <!--transactionCategory = 'disbursements'-->
           <div class="container" *ngIf="transactionCategory === 'disbursements'">
             <div class="row">
               <div class="col-md">
@@ -1385,19 +1385,7 @@
                     </label>
                   </div>                
               </div>
-  
-             <!-- <div class="col-md">
-                <div class="checkbox">
-                  <label>
-                    <input [(ngModel)]="getSortableColumn('aggregate').checked"
-                      (change)="toggleVisibility('aggregate', $event)" type="checkbox"
-                      [disabled]="getSortableColumn('aggregate').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('aggregate').disabled}">
-                      Aggregate
-                    </span>
-                  </label>
-                </div>
-              </div>-->
+
               <div class="col-md">
                 <div class="checkbox">
                   <label>
@@ -1425,30 +1413,40 @@
             </div>
             <div class="row">
               <div class="col-md">
-                    <div class="checkbox">
-                      <label>
-                        <input [(ngModel)]="getSortableColumn('purposeDescription').checked"
-                          (change)="toggleVisibility('purposeDescription', $event)" type="checkbox"
-                          [disabled]="getSortableColumn('purposeDescription').disabled">
-                        <span [ngClass]="{'disabled-column-option':getSortableColumn('purposeDescription').disabled}">
-                          Purpose
-                        </span>
-                      </label>
-                    </div>                
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('purposeDescription').checked"
+                      (change)="toggleVisibility('purposeDescription', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('purposeDescription').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('purposeDescription').disabled}">
+                      Purpose
+                    </span>
+                  </label>
+                </div>
               </div>
               <div class="col-md">
                 <div class="checkbox">
                   <label>
-                    <input [(ngModel)]="getSortableColumn('amount').checked"
-                      (change)="toggleVisibility('amount', $event)" type="checkbox"
-                      [disabled]="getSortableColumn('amount').disabled">
+                    <input [(ngModel)]="getSortableColumn('amount').checked" (change)="toggleVisibility('amount', $event)"
+                      type="checkbox" [disabled]="getSortableColumn('amount').disabled">
                     <span [ngClass]="{'disabled-column-option':getSortableColumn('amount').disabled}">
                       Amount
                     </span>
                   </label>
                 </div>
               </div>
-              <div class="col-md"></div>
+              <div class="col-md">
+                <div class="checkbox">
+                  <label>
+                    <input [(ngModel)]="getSortableColumn('electionYear').checked"
+                      (change)="toggleVisibility('electionYear', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('electionYear').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('electionYear').disabled}">
+                      Election Year
+                    </span>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -28,6 +28,8 @@ export class TransactionModel {
   toggleChild: boolean;
   child: TransactionModel[] = [];
   cloned: boolean;
+  election_code: any;
+  election_year: any;
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';

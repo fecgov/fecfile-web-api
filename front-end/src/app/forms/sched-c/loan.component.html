@@ -61,11 +61,12 @@
                 <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
                   <div [ngClass]="{ 'input-group': col?.inputGroup }">
                     <ng-container *ngIf="col?.inputGroup">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">
-                          <i [class]="col?.inputIcon" aria-hidden="true"></i>
-                        </span>
-                      </div>
+                          <div  class="input-group-append">
+                            <span class="input-group-text">
+                              <i [class]="col?.inputIcon" aria-hidden="true"></i>
+                            </span>
+                          </div>
+
                     </ng-container>
                     <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                     <input
@@ -215,6 +216,16 @@
                         : ''
                     "
                   />
+                    <!--div ng-repeat="electionType in electionTypes">
+                      <input type="checkbox" 
+                        ng-model="electionTypesSelected[electionType.name]" 
+                        ng-change="electionTypeChanged()" 
+                        ng-required="!someSelected" /> 
+                        {{electionType.name}}
+                    
+                    <div *ngFor=”let electionType of electionTypes; let i=index”>
+                        <input type=”checkbox” [formControl]="electionType"/> {{electionType.name}}
+                       </div></div>-->
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'textarea'">
                   <textarea
@@ -328,7 +339,26 @@
                     "
                   >
                   </ng-select>
-                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="col?.type === 'select' && col?.name === 'loansecured'">
+                  <ng-select #loansecuredSelect
+                    [items]="secured"
+                    (change)="handleloansecuredChange($event, col)"
+                    [style.width]="col?.width"
+                    [style.height]="col?.height"
+                    [formControlName]="col?.name"
+                    bindValue="code"
+                    bindLabel="name" 
+                    [ngClass]="
+                      frmLoan.get(col?.name)?.invalid &&
+                      (frmLoan.touched || frmLoan.dirty)
+                        ? 'state-select-error'
+                        : ''
+                    "
+                  >
+                  </ng-select>
+              </ng-container>              
+                
 
              </div>
             </div>
@@ -365,12 +395,13 @@
               <button class="btn btn-primary btn-left" type="button" (click)="loanRepayment()">
                 Loan Repayment
               </button>
-              <button *ngIf="entiyType==='ORG'" class="btn btn-primany btn-right" type="button" (click)="AddEndorser()">
-                Endorser
-              </button>
               <button class="btn btn-primany btn-right" type="button" (click)="saveLoan()">
                 Save
+                </button>
+              <button *ngIf="entityType === 'ORG'" class="btn btn-primany btn-right" type="button" (click)="AddLoanEndorser()">
+                Endorser
               </button>
+
             </div>
           </div>          
         </div>
