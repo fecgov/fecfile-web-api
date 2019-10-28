@@ -104,12 +104,23 @@
         >
         </app-sched-h1>
         <app-sched-h2
-          *ngIf="scheduleType === 'sched_h2'"
+          [hidden]="scheduleType !== 'sched_h2'"
+          [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"
           [scheduleType]="scheduleType"
           (status)="onNotify($event)"
         >
         </app-sched-h2>
+        <app-sched-h3
+          [hidden]="scheduleType !== 'sched_h3'"
+          [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >      
+        </app-sched-h3>
 
       </div>
 
