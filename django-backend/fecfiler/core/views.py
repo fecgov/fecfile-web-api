@@ -2183,6 +2183,8 @@ def filter_get_all_trans(request, param_string):
         if 'filterElectionCodes' in f_key:
             itemized_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND election_code In " + itemized_tuple
+        if 'filterElectionYearFrom' in f_key and 'filterElectionYearTo' in filt_dict.keys():
+            param_string = param_string + " AND election_year >= '" + value_d +"' AND election_year <= '" + filt_dict['filterElectionYearTo'] +"'"
     return param_string
 
 # def get_aggregate_amount(transaction_id):
