@@ -28,7 +28,9 @@ export enum FilterTypes {
   deletedDate = 'deletedDate',
   state = 'state',
   memoCode = 'memoCode',
-  itemizations = 'itemizations'
+  itemizations = 'itemizations',
+  electionCodes = 'electionCodes',
+  electionYear = 'electionYear'
 }
 
 /**
@@ -401,6 +403,56 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Election codes
+    if (this.filters.filterElectionCodes) {
+      if (this.filters.filterElectionCodes.length > 0) {
+        const electionCodesGroup = [];
+
+        // is tag showing? Then modify it is the curr position
+        // TODO put type strings in constants file as an enumeration
+        // They are also used in the filter component as well.
+
+        let electionsTag = false;
+        for (const tag of this.tagArray) {
+          if (tag.type === FilterTypes.electionCodes) {
+            electionsTag = true;
+            for (const item of filters.filterElectionCodes) {
+              electionCodesGroup.push(item);
+            }
+            tag.group = electionCodesGroup;
+          }
+        }
+        // If tag is not already showing, add it to the tag array.
+        if (!electionsTag) {
+          for (const item of filters.filterElectionCodes) {
+            electionCodesGroup.push(item);
+          }
+          this.tagArray.push({ type: FilterTypes.electionCodes, prefix: 'Election code', group: electionCodesGroup });
+        }
+      } else {
+        this.removeTagArrayItem(FilterTypes.electionCodes);
+      }
+    }
+
+    // Election year
+    if (this.filters.filterElectionYearFrom && this.filters.filterElectionYearTo) {
+      const filterYearGroup = [];
+      filterYearGroup.push({
+        filterElectionYearFrom: filters.filterElectionYearFrom,
+        filterElectionYearTo: filters.filterElectionYearTo
+      });
+      let filterYearTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.electionYear) {
+          filterYearTag = true;
+          tag.group = filterYearGroup;
+        }
+      }
+      if (!filterYearTag) {
+        this.tagArray.push({ type: FilterTypes.electionYear, prefix: 'Election year', group: filterYearGroup });
+      }
+    }
+
     console.log('tagArray: ' + JSON.stringify(this.tagArray));
 
     this.filters = filters;
@@ -519,6 +571,23 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Remove the election codes filter tag and inform the filter component to clear it.
+   */
+  public removeElectionCodesFilter(index: number, item: string) {
+    this.filters.filterElectionCodes.splice(index, 1);
+    this.removeFilter(FilterTypes.electionCodes, item);
+  }
+
+  /**
+   * Remove the election year filter tag and inform the filter component to clear it.
+   */
+  public removeElectionYearFilter() {
+    this.filters.filterElectionYearFrom = null;
+    this.filters.filterElectionYearTo = null;
+    this.removeFilter(FilterTypes.electionYear, null);
+  }
+
+  /**
    * Inform the Filter Component to clear the filter settings for the given key/value.
    *
    * @param key
@@ -570,6 +639,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       case FilterTypes.itemizations:
         this.removeItemizationsFilter(index, tagText);
         this.removeTagArrayGroupItem(type, index);
+        break;
+      case FilterTypes.electionCodes:
+        this.removeElectionCodesFilter(index, tagText);
+        this.removeTagArrayGroupItem(type, index);
+        break;
+      case FilterTypes.electionYear:
+        this.removeElectionYearFilter();
+        this.removeTagArrayItem(type);
         break;
       default:
         console.log('unexpected type received for remove tag');

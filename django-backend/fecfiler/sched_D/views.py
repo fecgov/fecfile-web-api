@@ -626,8 +626,82 @@ def get_schedD(data):
             if len(child_objs) > 0:
                 forms_obj[0]["child"] = child_objs
         else:
+            # when laod sched_d in bulk, need to do a carry-over when new report_id
+            # passed in: duplicate all non-zero sched_d items with updated report_id
+            # new transaction_id, close
+            if is_new_report(report_id, cmte_id):
+                do_carryover(report_id, cmte_id)
             forms_obj = get_list_all_schedD(report_id, cmte_id)
         return forms_obj
+    except:
+        raise
+
+
+def is_new_report(report_id, cmte_id):
+    """
+    check if a report_id is new or not
+    a report_id not exist in db will be considered new for now
+    TODO: may need to reconsider this
+    """
+    _sql = """
+    select * from public.sched_d 
+    where report_id = %s and cmte_id = %s
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id))
+            return cursor.rowcount == 0
+    except:
+        raise
+
+
+def do_carryover(report_id, cmte_id):
+    """
+    this is the function to handle debt carryover form one report to next report:
+    1. load all non-zero close_balance sched_d
+    2. update all records with new transaction_id, new report_id
+    3. copy close_balance to starting_balance, leave all other amount 0
+    """
+    _sql = """
+    insert into public.sched_d(
+					cmte_id, 
+                    report_id, 
+                    line_num,
+                    transaction_type_identifier, 
+                    transaction_id, 
+                    entity_id, 
+                    beginning_balance, 
+                    balance_at_close, 
+                    incurred_amount, 
+                    payment_amount, 
+					purpose,
+                    create_date
+					)
+					SELECT 
+					cmte_id, 
+                    %s, 
+                    line_num,
+                    transaction_type_identifier, 
+                    get_next_transaction_id('SD'), 
+                    entity_id, 
+                    balance_at_close, 
+                    0, 
+                    0, 
+                    0, 
+					purpose,
+                    now()
+            FROM public.sched_d 
+            WHERE 
+            cmte_id = %s
+            AND balance_at_close > 0 
+            AND delete_ind is distinct from 'Y' ;
+
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id))
+            if cursor.rowcount == 0:
+                logger.debug('No valid debts found.')
     except:
         raise
 

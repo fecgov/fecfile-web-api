@@ -83,7 +83,8 @@ export class TransactionsService {
     sortColumnName: string,
     descending: boolean,
     filters: TransactionFilterModel,
-    categoryType: string
+    categoryType: string,
+    trashed_flag: boolean
   ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
@@ -101,6 +102,7 @@ export class TransactionsService {
     request.sortColumnName = sortColumnName;
     request.descending = descending;
     request.category_type = categoryType;
+    request.trashed_flag = trashed_flag;
 
     if (filters) {
       request.filters = filters;

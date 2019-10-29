@@ -19,6 +19,9 @@ export class TransactionFilterModel {
     filterMemoCode: boolean;
     filterItemizations: string[];
     keywords: string[] = [];
+    filterElectionYearFrom: string;
+    filterElectionYearTo: string;
+    filterElectionCodes: string[];
 
     constructor() {
     }
