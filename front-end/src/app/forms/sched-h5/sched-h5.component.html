@@ -108,8 +108,8 @@
                     <i class="dollar-sign-icon" aria-hidden="true"></i>
                   </span>
                 </div>
-                <input class="form-control" type="text" [formControlName]="'total_tmount_of_transfer'"
-                  [attr.name]="'total_tmount_of_transfer'" [style.width]="'50%'" [style.height]="'30px'" [ngClass]="
+                <input class="form-control" type="text" [formControlName]="'total_amount_of_transfer'"
+                  [attr.name]="'total_amount_of_transfer'" [style.width]="'50%'" [style.height]="'30px'" [ngClass]="
                       frmIndividualReceipt.get('date')?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
@@ -214,7 +214,7 @@
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="forms__btn-container">
-            <button class="btn btn-primary btn-right" type="button" (click)="saveAddMre()">
+            <button class="btn btn-primary btn-right" type="button" (click)="saveAddMore()">
               Add Another Entry
             </button>
           </div>

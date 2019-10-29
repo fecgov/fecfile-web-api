@@ -419,6 +419,8 @@ def post_schedC(data):
         data['entity_id'] = entity_id
         new_transaction_id = get_next_transaction_id('SC')
         data['transaction_id'] = new_transaction_id
+        # TODO: this is a temp change for new loan only. need further discussion
+        data['loan_balance'] = data['loan_amount_original']
         logger.info('validating sched_c request data...')
         validate_sc_data(data)
         try:

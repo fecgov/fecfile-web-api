@@ -21,7 +21,7 @@ import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.
 import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedule';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
-import { SchedH2Service } from '../sched-h2/sched-h2.service';
+import { SchedH5Service } from './sched-h5.service';
 
 @Component({
   selector: 'app-sched-h5',
@@ -47,6 +47,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public showIdentifer = false;
   public h5Sum: any;
   public h5SumP: any;
+  public saveHRes: any;
 
   protected staticFormFields = [
     {
@@ -195,7 +196,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _transactionsMessageService: TransactionsMessageService,
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
-    _reportsService: ReportsService
+    _reportsService: ReportsService,
+    private _schedH5Service: SchedH5Service
   ) {
     super(
       _http,
@@ -219,6 +221,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       _transactionsService,
       _reportsService
     );
+    _schedH5Service;
   }
 
   public ngOnInit() {
@@ -276,6 +279,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public saveAndReturnToParentDebt() {
     this._setTransactionDetail();
     this.saveAndReturnToParent();
+  }
+
+  public getReportId(): string {
+
+    const reportId = localStorage.getItem('reportId');
+    return reportId ? reportId : '0';
   }
 
   public next() {
@@ -338,6 +347,77 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     } else if (this.scheduleAction === ScheduleActions.edit) {
     }
   }
+
+  /**a payload for h5
+   * {
+        "cmte_id": "C00029447",  <<
+        "report_id": 1324002,  <<
+        "transaction_type_identifier": "TRAN_FROM_NON_FED_ACC", <<
+        "transaction_id": "SH20191001000000561",
+        "account_name": "test_acct", <<
+        "receipt_date": "2019-10-30", <<
+        "total_amount_transferred": 50.0,
+        "voter_registration_amount": null, <<
+        "voter_id_amount": null,
+        "gotv_amount": 50.0,
+        "generic_campaign_amount": null,
+        "memo_code": "",
+        "memo_text": "",
+        "create_date": "2019-10-01T18:47:13.391737",
+        "last_update_date": "2019-10-01T18:47:13.391742"
+    }
+   */
+
+  public saveH5(h5_obj: any) {
+
+    this._schedH5Service.saveH5(h5_obj).subscribe(res => {
+      if (res) {
+        this.saveHRes = res;
+      }
+    });
+  }
+
+  public saveAddMore(): void {
+    //   this.doValidate();    
+    // }
+
+    // public doValidate() {
+
+    // this.schedH2.patchValue({ fundraising: this.schedH2.get('select_activity_function').value === 'f' ? true : false }, { onlySelf: true });
+    // this.schedH2.patchValue({ direct_cand_support: this.schedH2.get('select_activity_function').value === 'd' ? true : false }, { onlySelf: true });
+
+    const formObj = this.schedH5.getRawValue();
+
+    formObj['report_id'] = this.getReportId();
+    formObj['transaction_type_identifier'] = "TRAN_FROM_NON_FED_ACC";
+
+    //set corresponding amount value
+    if (this.schedH5.get('category').value === 'voter_id') {
+      formObj['voter_id_amount'] = this.schedH5.get('total_amount_of_transfer').value;
+    } else if (this.schedH5.get('category').value === 'voter_registration') {
+      formObj['voter_registration_amount'] = this.schedH5.get('total_amount_of_transfer').value;
+    } else if (this.schedH5.get('category').value === 'gotv') {
+      formObj['gotv_amount'] = this.schedH5.get('total_amount_of_transfer').value;
+    } else if (this.schedH5.get('category').value === 'generic_campaign') {
+      formObj['generic_campaign_amount'] = this.schedH5.get('total_amount_of_transfer').value;
+    }
+
+    formObj['receipt_date'] = this.schedH5.get('date').value;
+
+    // formObj['federal_percent'] = ((this.schedH2.get('federal_percent').value) / 100).toFixed(2);
+    // formObj['non_federal_percent'] = ((this.schedH2.get('non_federal_percent').value) / 100).toFixed(2);
+
+    const serializedForm = JSON.stringify(formObj);
+
+    if (this.schedH5.status === 'VALID') {
+      //  && 
+      // (this.schedH2.get('federal_percent').value + this.schedH2.get('non_federal_percent').value) === 100) {
+
+      this.saveH5(serializedForm);
+      this.schedH5.reset();
+    }
+  }
+
 
   public setH5() {
 
