@@ -119,10 +119,8 @@
         </app-sched-c>-->
         <app-sched-c1
           [hidden]="scheduleType !== 'sched_c1'"
-          [transactionTypeText]="transactionTypeTextSchedC"
-          [transactionType]="transactionTypeSchedC"
+          [forceChangeDetection]="forceChangeDetectionC1"
           [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
           (status)="onNotify($event)"
         >
         </app-sched-c1>
