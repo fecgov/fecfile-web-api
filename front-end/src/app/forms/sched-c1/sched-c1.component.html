@@ -1,3 +1,1014 @@
-<p>
-  sched-c1 works!
-</p>
+<div class="sched-c1-container">
+  <form [formGroup]="c1Form">
+    <header>
+      <div class="header-content">
+        <div class="float-left">
+          <h2>
+            Loans and Lines of Credit from Lending Institutions
+            <ng-container *ngIf="sectionType && sectionType !== initialSection">
+               - {{ formatSectionType() }} </ng-container>
+            <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container>
+          </h2>
+        </div>
+        <div class="float-right" ngbDropdown>
+          <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
+            <span class="ellipsis-icon" aria-hidden="true"></span>
+            <span class="sr-only">Click for more options</span>
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
+            <button class="dropdown-item">
+              <i class="file-import-icon" (click)="ImportTransactions()"></i> Import
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <hr />
+        </div>
+      </div>
+    </header>
+
+    <section *ngIf="sectionType === initialSection">
+      <div class="row">
+        <div class="col col-md-5">
+          <div class="form-group">
+            <label for="lending_institution">
+              Lending Institution (Lender)
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <input
+              id="lending_institution"
+              class="form-control"
+              type="text"
+              [formControlName]="'lending_institution'"
+              [attr.name]="'lending_institution'"
+              [style.width]="'100%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('lending_institution')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-5">
+          <div class="form-group">
+            <label for="mailing_address">
+              Mailing Address
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <input
+              id="mailing_address"
+              class="form-control"
+              type="text"
+              [formControlName]="'mailing_address'"
+              [attr.name]="'mailing_address'"
+              [style.width]="'100%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('mailing_address')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="city">
+              City
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <input
+              class="form-control"
+              id="city"
+              type="text"
+              [formControlName]="'city'"
+              [attr.name]="'city'"
+              [style.width]="'66%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('city')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>
+        <div class="col col-md-4">
+          <div class="form-group" [style.width]="'235px'">
+            <label for="state">
+              State
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <ng-select
+              #stateSelect
+              [items]="states"
+              class="forms__select"
+              [formControlName]="'state'"
+              bindValue="state_code"
+              bindLabel="state_code"
+              [selectOnTab]="true"
+              [ngClass]="
+                c1Form.get('state')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'forms__select-error'
+                  : ''
+              "
+            >
+              <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+                <span>{{ item.state_code + ' - ' + item.state_description }}</span>
+              </ng-template>
+            </ng-select>
+          </div>
+        </div>
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="">
+              Zip
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <input
+              class="form-control"
+              type="text"
+              [formControlName]="'zip'"
+              [attr.name]="'zip'"
+              [style.width]="'33%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('zip')?.invalid && (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <hr />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="original_loan_amount">
+              Original Loan Amount
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input
+                class="form-control"
+                id="original_loan_amount"
+                type="text"
+                [formControlName]="'original_loan_amount'"
+                [attr.name]="'original_loan_amount'"
+                [style.width]="'66%'"
+                [style.height]="'30px'"
+                [ngClass]="
+                  c1Form.get('original_loan_amount')?.invalid &&
+                  (c1Form.touched || c1Form.dirty)
+                    ? 'input-field-error'
+                    : ''
+                "
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col col-md-2">
+          <div class="form-group">
+            <label for="loan_intrest_rate">
+              Interest Rate (APR)
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <input
+                class="form-control"
+                id="loan_intrest_rate"
+                type="number"
+                max="100"
+                [formControlName]="'loan_intrest_rate'"
+                [attr.name]="'loan_intrest_rate'"
+                [style.width]="'33%'"
+                [style.height]="'30px'"
+                [ngClass]="
+                  c1Form.get('loan_intrest_rate')?.invalid &&
+                  (c1Form.touched || c1Form.dirty)
+                    ? 'input-field-error'
+                    : ''
+                "
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">
+                  <i class="percent-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="loan_incurred_date">
+              Date Incurred
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="calendar-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input
+                class="form-control"
+                id="loan_incurred_date"
+                type="date"
+                [formControlName]="'loan_incurred_date'"
+                [attr.name]="'loan_incurred_date'"
+                [style.width]="'66%'"
+                [style.height]="'30px'"
+                [ngClass]="
+                  c1Form.get('loan_incurred_date')?.invalid &&
+                  (c1Form.touched || c1Form.dirty)
+                    ? 'input-field-error'
+                    : ''
+                "
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="loan_due_date">
+              Due Date
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="calendar-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input
+                class="form-control"
+                id="loan_due_date"
+                type="date"
+                [formControlName]="'loan_due_date'"
+                [attr.name]="'loan_due_date'"
+                [style.width]="'66%'"
+                [style.height]="'30px'"
+                [ngClass]="
+                  c1Form.get('loan_due_date')?.invalid &&
+                  (c1Form.touched || c1Form.dirty)
+                    ? 'input-field-error'
+                    : ''
+                "
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <hr />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <p>Please provide your paper Loan Agreement by filing Form 99 in the C1 Agreement.</p>
+        </div>
+      </div>
+    </section>
+
+    <section *ngIf="sectionType === sectionA">
+      <div class="col coord_expenditure_text">
+        <div class="c1_verbiage_lg">Has this loan been restructured?
+          <div
+            type="button"
+            class="btn btn-info"
+            ngbTooltip="Request language from RAD"
+            tooltipClass="form-tooltip"
+          >
+            <i class="info-icon" aria-hidden="true"></i>
+            <span class="sr-only">Click here for more information</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-5">
+          <div class="form-check form-check-inline">                  
+            <label for="is_loan_restructured_y"                   
+              [ngClass]="
+              c1Form.get('is_loan_restructured')?.invalid &&
+              (c1Form.touched || c1Form.dirty)
+                ? 'input-field-label-error'
+                : ''
+              ">
+              <input
+                id="is_loan_restructured_y"
+                type="radio"
+                formControlName="is_loan_restructured"
+                value="Y"
+              />
+              Yes
+            </label>
+          </div>
+          <div class="form-check form-check-inline">                 
+            <label for="is_loan_restructured_n"
+              [ngClass]="
+              c1Form.get('is_loan_restructured')?.invalid &&
+              (c1Form.touched || c1Form.dirty)
+                ? 'input-field-label-error'
+                : ''
+            ">
+              <input
+                id="is_loan_restructured_n"
+                type="radio"
+                formControlName="is_loan_restructured"
+                value="N"
+              />
+              No
+            </label>
+          </div>
+
+        </div>            
+      </div>      
+    </section>
+
+    <section *ngIf="sectionType === sectionB">
+      <div class="row">
+        <div class="col col-md-5">
+          <div class="form-group">           
+            <div for="credit_amount_this_draw" class="section_b_label c1_verbiage_lg">
+                If this is a line of credit, the Amount of this draw is:
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col col-md-4">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">
+                <i class="dollar-sign-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              class="form-control"
+              id="credit_amount_this_draw"
+              type="text"
+              [formControlName]="'credit_amount_this_draw'"
+              [attr.name]="'credit_amount_this_draw'"
+              [style.width]="'66%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('credit_amount_this_draw')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-5">
+          <div for="total_outstanding_balance" class="section_b_label c1_verbiage_lg">
+              Total Outstanding Balance:
+            <div
+              type="button"
+              class="btn btn-info"
+              ngbTooltip="Request language from RAD"
+              tooltipClass="form-tooltip"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">Click here for more information</span>
+            </div>
+          </div>
+        </div>
+        <div class="col col-md-4">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input readonly
+                class="form-control"
+                id="total_outstanding_balance"
+                type="text"
+                [formControlName]="'total_outstanding_balance'"
+                [attr.name]="'total_outstanding_balance'"
+                [style.width]="'66%'"
+                [style.height]="'30px'"
+                [ngClass]="
+                  c1Form.get('total_outstanding_balance')?.invalid &&
+                  (c1Form.touched || c1Form.dirty)
+                    ? 'input-field-error'
+                    : ''
+                "
+              />
+            </div>          
+        </div>
+      </div>
+    </section>
+
+    <section *ngIf="sectionType === sectionC">
+      <div class="row">
+        <div class="col">
+          <div class="c1_verbiage_lg">Are other parties secondarily liable for the debt incurred?
+            <div
+              type="button"
+              class="btn btn-info"
+              ngbTooltip="Request language from RAD"
+              tooltipClass="form-tooltip"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">Click here for more information</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-5">
+          <div class="form-check form-check-inline">                  
+            <label for="other_parties_liable_y"                   
+              [ngClass]="
+              c1Form.get('other_parties_liable')?.invalid &&
+              (c1Form.touched || c1Form.dirty)
+                ? 'input-field-label-error'
+                : ''
+              ">
+              <input
+                id="other_parties_liable_y"
+                type="radio"
+                formControlName="other_parties_liable"
+                value="Y"
+              />
+              Yes
+            </label>
+          </div>
+          <div class="form-check form-check-inline">                 
+            <label for="other_parties_liable_n"
+              [ngClass]="
+              c1Form.get('other_parties_liable')?.invalid &&
+              (c1Form.touched || c1Form.dirty)
+                ? 'input-field-label-error'
+                : ''
+            ">
+              <input
+                id="other_parties_liable_n"
+                type="radio"
+                formControlName="other_parties_liable"
+                value="N"
+              />
+              No
+            </label>
+          </div>
+
+        </div>            
+      </div>
+      <div class="row">
+        <div class="col">
+          <div class="c1_verbiage_lg">(Endorsers and guarantors must be recorded on Schedule C)
+          </div>
+        </div>
+      </div>            
+    </section>
+
+    <section *ngIf="sectionType === sectionD">
+      <div class="row">
+        <div class="col col-md-6">
+          <div class="c1_verbiage_lg">Are any of the following pledged as collateral for the loan: real estate, personal property, 
+            goods, negotiable instruments, certificate of deposit, chattel papers, stocks, accounts receivable, 
+            cash on deposit, or other traditional collateral?
+            <div
+              type="button"
+              class="btn btn-info"
+              ngbTooltip="Request language from RAD"
+              tooltipClass="form-tooltip"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">Click here for more information</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-5">
+          <div class="form-check form-check-inline">                  
+            <label for="pledged_collateral_ind_y"                   
+              [ngClass]="
+              c1Form.get('pledged_collateral_ind')?.invalid &&
+              (c1Form.touched || c1Form.dirty)
+                ? 'input-field-label-error'
+                : ''
+              ">
+              <input
+                id="pledged_collateral_ind_y"
+                type="radio"
+                formControlName="pledged_collateral_ind"
+                value="Y"
+              />
+              Yes
+            </label>
+          </div>
+          <div class="form-check form-check-inline">                 
+            <label for="pledged_collateral_ind_n"
+              [ngClass]="
+              c1Form.get('pledged_collateral_ind')?.invalid &&
+              (c1Form.touched || c1Form.dirty)
+                ? 'input-field-label-error'
+                : ''
+            ">
+              <input
+                id="pledged_collateral_ind_n"
+                type="radio"
+                formControlName="pledged_collateral_ind"
+                value="N"
+              />
+              No
+            </label>
+          </div>
+
+        </div>            
+      </div> 
+    </section>
+
+    <section *ngIf="sectionType === sectionE">     
+      <div class="row">
+        <div class="col col-md-6">
+          <div class="c1_verbiage_lg">Are any future contributions or future receipts of interest income, 
+            pledged as collateral for the loan?
+            <div
+              type="button"
+              class="btn btn-info"
+              ngbTooltip="Request language from RAD"
+              tooltipClass="form-tooltip"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">Click here for more information</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-5">
+          <div class="form-check form-check-inline">                  
+            <label for="future_income_ind_y"                   
+              [ngClass]="
+              c1Form.get('future_income_ind')?.invalid &&
+              (c1Form.touched || c1Form.dirty)
+                ? 'input-field-label-error'
+                : ''
+              ">
+              <input
+                id="future_income_ind_y"
+                type="radio"
+                formControlName="future_income_ind"
+                value="Y"
+              />
+              Yes
+            </label>
+          </div>
+          <div class="form-check form-check-inline">                 
+            <label for="future_income_ind_n"
+              [ngClass]="
+              c1Form.get('future_income_ind')?.invalid &&
+              (c1Form.touched || c1Form.dirty)
+                ? 'input-field-label-error'
+                : ''
+            ">
+              <input
+                id="future_income_ind_n"
+                type="radio"
+                formControlName="future_income_ind"
+                value="N"
+              />
+              No
+            </label>
+          </div>
+
+        </div>            
+      </div>         
+    </section>
+    
+    <section *ngIf="sectionType === sectionF">
+      <div class="row">
+        <div class="col col-md-6">
+          <div class="c1_verbiage_lg">If neither of the types of collateral described above was pledged for this loan, 
+            or if the amount pledged does not equal or exceed the loan amount, state the basis 
+            upon which this loan was made and the basis on which it assures repayment.
+              <div
+              type="button"
+              class="btn btn-info"
+              ngbTooltip="Request language from RAD"
+              tooltipClass="form-tooltip"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">Click here for more information</span>
+            </div>
+          </div>
+        </div>        
+      </div>
+      <div class="row">
+        <div class="col col-md-6">
+          <textarea
+            rows="6"
+            [style.height]="'100%'"
+            [style.width]="'100%'"
+            [style.overflow]="''"
+            [attr.name]="'basis_of_loan_desc'"
+            [attr.maxlength]="'100'"
+            [formControlName]="'basis_of_loan_desc'"
+            [ngClass]="
+              c1Form.get('basis_of_loan_desc')?.invalid &&
+              (c1Form.touched || c1Form.dirty)
+                ? 'input-field-error'
+                : ''
+            "
+          ></textarea>
+        </div>            
+      </div>       
+    </section>
+
+    <section *ngIf="sectionType === sectionG">
+      <div class="row">
+        <div class="subtitle-indv">
+          <div class="col col-md-12 fieldset">Committee Treasurer</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="treasurer_last_name">
+              Last Name
+            </label>
+            <input
+              id="treasurer_last_name"
+              class="form-control"
+              type="text"
+              [formControlName]="'treasurer_last_name'"
+              [attr.name]="'treasurer_last_name'"
+              [style.width]="'75%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('treasurer_last_name')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="treasurer_first_name">
+              First Name
+            </label>
+            <input
+              id="treasurer_first_name"
+              class="form-control"
+              type="text"
+              [formControlName]="'treasurer_first_name'"
+              [attr.name]="'treasurer_first_name'"
+              [style.width]="'75%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('treasurer_first_name')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>  
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="treasurer_middle_name">
+              Middle Name (Optional)
+            </label>
+            <input
+              id="treasurer_middle_name"
+              class="form-control"
+              type="text"
+              [formControlName]="'treasurer_middle_name'"
+              [attr.name]="'treasurer_middle_name'"
+              [style.width]="'75%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('treasurer_middle_name')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>              
+      </div>
+      <div class="row">
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="treasurer_prefix">
+              Prefix (Optional)
+            </label>
+            <input
+              id="treasurer_prefix"
+              class="form-control"
+              type="text"
+              [formControlName]="'treasurer_prefix'"
+              [attr.name]="'treasurer_prefix'"
+              [style.width]="'35%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('treasurer_prefix')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="treasurer_suffix">
+              Suffix (Optional)
+            </label>
+            <input
+              id="treasurer_suffix"
+              class="form-control"
+              type="text"
+              [formControlName]="'treasurer_suffix'"
+              [attr.name]="'treasurer_suffix'"
+              [style.width]="'35%'"
+              [style.height]="'30px'"
+              [ngClass]="
+                c1Form.get('treasurer_suffix')?.invalid &&
+                (c1Form.touched || c1Form.dirty)
+                  ? 'input-field-error'
+                  : ''
+              "
+            />
+          </div>
+        </div>                
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <hr />
+        </div>
+      </div>       
+      <div class="row">
+        <div class="col col-md-4">
+          <div class="form-group">
+            <label for="treasurer_signed_date">
+              Date
+              <div
+                type="button"
+                class="btn btn-info"
+                ngbTooltip="Request language from RAD"
+                tooltipClass="form-tooltip"
+              >
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">
+                  <i class="calendar-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input
+                class="form-control"
+                id="treasurer_signed_date"
+                type="date"
+                [formControlName]="'treasurer_signed_date'"
+                [attr.name]="'treasurer_signed_date'"
+                [style.width]="'66%'"
+                [style.height]="'30px'"
+                [ngClass]="
+                  c1Form.get('treasurer_signed_date')?.invalid &&
+                  (c1Form.touched || c1Form.dirty)
+                    ? 'input-field-error'
+                    : ''
+                "
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <hr />
+        </div>
+      </div>           
+    </section>
+
+    <section *ngIf="sectionType === sectionH">
+      <div class="row">
+        <div class="col col-md-6">
+          <div class="c1_verbiage_lg">
+            Attach a signed copy of the loan agreemnet or upload the PDF copy.
+            <div
+              type="button"
+              class="btn btn-info"
+              ngbTooltip="Request language from RAD"
+              tooltipClass="form-tooltip"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">Click here for more information</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col col-md-4">
+          <div *ngIf="file === null && fileNameToDisplay === null">
+            <input #fileInput type="file" name="file" accept="application/pdf" (change)="setFile($event)" />
+          </div>
+          <!-- <button *ngIf="file === null && fileNameToDisplay === null" 
+            class="btn btn-previous btn-left" type="button" 
+            (click)="uploadFile()">
+            Upload
+          </button> -->
+        </div>
+        <!-- <div *ngIf="file === null && fileNameToDisplay === null && !editMode">
+          <input type="button" value="Choose file"/> No file chosen
+        </div> -->
+      </div>      
+    </section>
+
+    <section *ngIf="sectionType === sectionI">
+      <div class="row">
+        <div class="col col-md-8 c1_verbiage_lg section_i_verbiage_container">
+          <div>To be signed by the Lending Institution:
+            <div
+              type="button"
+              class="btn btn-info"
+              ngbTooltip="Request language from RAD"
+              tooltipClass="form-tooltip"
+            >
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">Click here for more information</span>
+            </div>
+          </div>
+          <div class="section_i_list_items">
+            <ul>
+              <li>
+                To the best of this institution's knowledge, the terms of the loan and other 
+                information regarding the extension of the loan are accurate as state above.
+              </li>
+              <li>
+                The loan was made on terms and conditions (including interest rate) no more 
+                favorable at the time than those imposed for similar extensions of credit to 
+                other borrowers of comparable credit worthiness.
+              </li>
+              <li>
+                  This institution is aware of the requirement that a loan must be made on a 
+                  basis which assures repayment, and has complied with the requirements set 
+                  forth at 11 CFR 100-82 and 100.142 in making this loan.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div col col-md-8>
+          <div class="d-inline-flex">  
+            <div class="section_i_checkbox_container">
+              <input type="checkbox"
+                class="section_i_checkbox"
+              />
+            </div>
+            <div class="c1_verbiage_sm section_i_checkbox_verbiage">
+                I acknowledge and understand the above statements and submit this information as 
+                a matter of permanent record.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>    
+
+    <footer>
+      <div class="grid-row">
+        <div class="grid-row__col grid-row__col--12"> <!--clean up these classes if not needed-->
+          <div class="forms__btn-container">
+            <button *ngIf="sectionType !== initialSection" 
+              class="btn btn-previous btn-left" type="button" 
+              (click)="showPreviousSection()">
+              Previous
+            </button>
+            <button *ngIf="sectionType !== sectionI" 
+              class="btn btn-secondary btn-right" (click)="showNextSection()">
+              Next
+            </button>  
+            <button *ngIf="sectionType === sectionI" 
+              class="btn btn-secondary btn-right" (click)="finish()">
+              Finished
+            </button>  
+            <button *ngIf="sectionType === sectionI" 
+              class="btn btn-previous btn-right" (click)="print()">
+              Print
+            </button>                                    
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </form>
+</div>

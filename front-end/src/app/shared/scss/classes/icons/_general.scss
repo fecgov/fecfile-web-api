@@ -125,6 +125,11 @@
   @extend .fa-dollar-sign;
 }
 
+.percent-icon {
+  @extend .fas;
+  @extend .fa-percent;
+}
+
 .trash-icon {
   @extend .fas;
   @extend .fa-trash;

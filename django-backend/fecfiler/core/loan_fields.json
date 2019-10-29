@@ -259,8 +259,8 @@
                    "isReadonly":false,
                    "entityGroup":null,
                    "toggle":false,
-                   "inputGroup":true,
-                   "inputIcon":"dollar-sign-icon",
+                   "inputGroup":false,
+                   "inputIcon":"",
                    "text":"Election",
                    "infoIcon":true,
                    "infoText":"Request language from RAD",
@@ -272,14 +272,14 @@
                    "validation":{
                       "required":true,
                       "max":12,
-                      "dollarAmount":true
+                      "dollarAmount":false
                    }
                 },
                 {
                    "isReadonly":false,
                    "entityGroup":null,
                    "toggle":false,
-                   "inputGroup":true,
+                   "inputGroup":false,
                    "inputIcon":"",
                    "text":"",
                    "infoIcon":true,
@@ -291,7 +291,7 @@
                    "width":"154px",
                    "validation":{
                       "required":true,
-                      "max":12,
+                      "max":30,
                       "dollarAmount":false
                    }
                 }
@@ -381,7 +381,7 @@
                    "type":"date",
                    "value":null,
                    "height":"30px",
-                   "width":"154px",
+                   "width":"100px",
                    "validation":{
                       "required":true,
                       "max":null,
@@ -401,7 +401,7 @@
                    "type":"date",
                    "value":null,
                    "height":"30px",
-                   "width":"154px",
+                   "width":"100px",
                    "validation":{
                       "required":true,
                       "max":null,
@@ -413,19 +413,19 @@
                    "entityGroup":null,
                    "toggle":false,
                    "inputGroup":true,
-                   "inputIcon":"calendar-icon",
+                   "inputIcon":"percent-sign-icon",
                    "text":"Interest Rate(APR)",
                    "infoIcon":true,
                    "infoText":"Request language from RAD",
                    "name":"loan_intrest_rate",
-                   "type":"date",
+                   "type":"text",
                    "value":null,
                    "height":"30px",
-                   "width":"154px",
+                   "width":"100px",
                    "validation":{
                       "required":true,
                       "max":null,
-                      "date":true
+                      "dollarAmount":false
                    }
                 },
                 {
@@ -437,7 +437,7 @@
                    "text":"Secured",
                    "infoIcon":true,
                    "infoText":"Request language from RAD",
-                   "name":"is_loan_secured",
+                   "name":"loansecured",
                    "type":"select",
                    "value":null,
                    "height":"30px",
@@ -778,19 +778,19 @@
                   "entityGroup":null,
                   "toggle":false,
                   "inputGroup":true,
-                  "inputIcon":"calendar-icon",
+                  "inputIcon":"percent-sign-icon",
                   "text":"Interest Rate(APR)",
                   "infoIcon":true,
                   "infoText":"Request language from RAD",
                   "name":"loan_intrest_rate",
-                  "type":"date",
+                  "type":"text",
                   "value":null,
                   "height":"30px",
                   "width":"154px",
                   "validation":{
                      "required":true,
                      "max":null,
-                     "date":true
+                     "dollarAmount":false
                   }
                },
                {
@@ -802,7 +802,7 @@
                   "text":"Secured",
                   "infoIcon":true,
                   "infoText":"Request language from RAD",
-                  "name":"is_loan_secured",
+                  "name":"loansecured",
                   "type":"select",
                   "value":null,
                   "height":"30px",
@@ -820,7 +820,7 @@
           {
              "type":"hidden",
              "name":"api_call",
-             "value":"/sb/schedB"
+             "value":"/sb/schedC"
           },
           {
              "type":"hidden",
@@ -855,31 +855,287 @@
        ],
        "entityTypes":[
           {
-             "entityType":"IND",
-             "entityTypeDescription":"Individual",
+             "name":"Individual",
+             "code":"IND",
              "group":"ind-group",
              "selected":true
           },
           {
-             "entityType":"ORG",
-             "entityTypeDescription":"Organization",
+             "name":"Banking Institution",
+             "code":"ORG",
              "group":"org-group",
              "selected":false
           }
        ],
      "electionTypes":[
           {
-             "electionType":"P",
-             "entityTypeDescription":"Primary"
+             "name":"Primary",
+             "code":"P"
           },
           {
-             "electionType":"G",
-             "entityTypeDescription":"General"
+             "name":"General",
+             "code":"G"
           },
           {
-             "electionType":"O",
-             "entityTypeDescription":"Other"
+             "name":"Other",
+             "code":"O"
           }
-       ]
+       ],
+     "secured": [
+         {
+            "Name":"Yes",
+            "code":"True"
+         },
+         {
+            "Name":"No",
+            "code":"False"
+         }
+      ],  
+     "states": [
+         {
+             "name": "Alabama",
+             "code": "AL"
+         },
+         {
+             "name": "Alaska",
+             "code": "AK"
+         },
+         {
+             "name": "Arizona",
+             "code": "AZ"
+         },
+         {
+             "name": "Arkansas",
+             "code": "AR"
+         },
+         {
+             "name": "California",
+             "code": "CA"
+         },
+         {
+             "name": "Colorado",
+             "code": "CO"
+         },
+         {
+             "name": "Connecticut",
+             "code": "CT"
+         },
+         {
+             "name": "Delaware",
+             "code": "DE"
+         },
+         {
+             "name": "District Of Columbia",
+             "code": "DC"
+         },
+         {
+             "name": "Florida",
+             "code": "FL"
+         },
+         {
+             "name": "Georgia",
+             "code": "GA"
+         },
+         {
+             "name": "Guam",
+             "code": "GU"
+         },
+         {
+             "name": "Hawaii",
+             "code": "HI"
+         },
+         {
+             "name": "Idaho",
+             "code": "ID"
+         },
+         {
+             "name": "Illinois",
+             "code": "IL"
+         },
+         {
+             "name": "Indiana",
+             "code": "IN"
+         },
+         {
+             "name": "Iowa",
+             "code": "IA"
+         },
+         {
+             "name": "Kansas",
+             "code": "KS"
+         },
+         {
+             "name": "Kentucky",
+             "code": "KY"
+         },
+         {
+             "name": "Louisiana",
+             "code": "LA"
+         },
+         {
+             "name": "Maine",
+             "code": "ME"
+         },
+         {
+             "name": "Maryland",
+             "code": "MD"
+         },
+         {
+             "name": "Massachusetts",
+             "code": "MA"
+         },
+         {
+             "name": "Michigan",
+             "code": "MI"
+         },
+         {
+             "name": "Minnesota",
+             "code": "MN"
+         },
+         {
+             "name": "Mississippi",
+             "code": "MS"
+         },
+         {
+             "name": "Missouri",
+             "code": "MO"
+         },
+         {
+             "name": "Montana",
+             "code": "MT"
+         },
+         {
+             "name": "Nebraska",
+             "code": "NE"
+         },
+         {
+             "name": "Nevada",
+             "code": "NV"
+         },
+         {
+             "name": "New Hampshire",
+             "code": "NH"
+         },
+         {
+             "name": "New Jersey",
+             "code": "NJ"
+         },
+         {
+             "name": "New Mexico",
+             "code": "NM"
+         },
+         {
+             "name": "New York",
+             "code": "NY"
+         },
+         {
+             "name": "North Carolina",
+             "code": "NC"
+         },
+         {
+             "name": "North Dakota",
+             "code": "ND"
+         },
+         {
+             "name": "Ohio",
+             "code": "OH"
+         },
+         {
+             "name": "Oklahoma",
+             "code": "OK"
+         },
+         {
+             "name": "Oregon",
+             "code": "OR"
+         },
+         {
+             "name": "Pennsylvania",
+             "code": "PA"
+         },
+         {
+             "name": "Puerto Rico",
+             "code": "PR"
+         },
+         {
+             "name": "Rhode Island",
+             "code": "RI"
+         },
+         {
+             "name": "South Carolina",
+             "code": "SC"
+         },
+         {
+             "name": "South Dakota",
+             "code": "SD"
+         },
+         {
+             "name": "Tennessee",
+             "code": "TN"
+         },
+         {
+             "name": "Texas",
+             "code": "TX"
+         },
+         {
+             "name": "Utah",
+             "code": "UT"
+         },
+         {
+             "name": "Vermont",
+             "code": "VT"
+         },
+         {
+             "name": "Virginia",
+             "code": "VA"
+         },
+         {
+             "name": "U.S. Virgin Islands",
+             "code": "VI"
+         },
+         {
+             "name": "Washington",
+             "code": "WA"
+         },
+         {
+             "name": "West Virginia",
+             "code": "WV"
+         },
+         {
+             "name": "Wisconsin",
+             "code": "WI"
+         },
+         {
+             "name": "Wyoming",
+             "code": "WY"
+         },
+         {
+             "name": "Foreign Countries",
+             "code": "ZZ"
+         },
+         {
+             "name": "American Samoa",
+             "code": "AS"
+         },
+         {
+             "name": "Northern Mariana Islands",
+             "code": "MP"
+         },
+         {
+             "name": "United States",
+             "code": "US"
+         },
+         {
+             "name": "Armed Forces Americas",
+             "code": "AA"
+         },
+         {
+             "name": "Armed Forces Europe",
+             "code": "AE"
+         },
+         {
+             "name": "Armed Forces Pacific",
+             "code": "AP"
+         }
+     ]
     }
  }
