@@ -125,8 +125,8 @@
                   </div>
                   <input class="form-control" 
                   type="text" 
-                  [formControlName]="'total_tmount_of_transfer'"
-                  [attr.name]="'total_tmount_of_transfer'"
+                  [formControlName]="'total_tmount'"
+                  [attr.name]="'total_tmount'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
                   [ngClass]="
@@ -177,9 +177,9 @@
                   <option value="" selected>Activity or Event Identifier</option>
                   <option
                       *ngFor="let identifier of identifiers"                    
-                      [value]="identifier.id"
+                      [value]="identifier.activity_event_name"
                     >
-                      {{ identifier.name }}
+                      {{ identifier.activity_event_name }}
                     </option>                                
                 </select>
               </div>
@@ -203,8 +203,8 @@
                   </div>
                   <input class="form-control" 
                   type="text" 
-                  [formControlName]="tmount"
-                  [attr.name]="'total_tmount_of_transfer'"
+                  [formControlName]="'transferred_amount'"
+                  [attr.name]="'transferred_amount'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
                   [ngClass]="
@@ -235,10 +235,12 @@
                   </div>
                   <input class="form-control" 
                   type="text" 
-                  [formControlName]="'total_tmount_of_transfer'"
-                  [attr.name]="'total_tmount'"
+                  [formControlName]="'total_amount_transferred'"
+                  [attr.name]="'total_amount_transferred'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
+                  [attr.readonly]=true
+                  [attr.value]=0.00
                   [ngClass]="
                       frmIndividualReceipt.get('date')?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -256,7 +258,7 @@
         <div class="grid-row__col grid-row__col--12">
           <div class="forms__btn-container">
             <button class="btn btn-primary btn-right" type="button" 
-              (click)="saveAddMre()">
+              (click)="saveAndAddMore()">
               Add Another Entry
             </button>               
           </div>
@@ -312,19 +314,23 @@
               </tr>
           </thead>
           <tbody>
-              <ng-container *ngFor="let report of h3Sum">
-                <tr>
+              <ng-container>
+                <tr *ngFor="let item of h3Sum | paginate: h3TableConfig">
                   <td>
                     <input type="checkbox" (click)="checkForMultiChecked($event)">
                   </td>
                   <td>
-                      <div *ngIf="report.event_type == 'fundraising'">Fundraising</div>
-                      <div *ngIf="report.event_type == 'direct_cand_suppot'">Direct Candidate Suppot</div>
+                      <div *ngIf="item.activity_event_type == 'AD'">Administrative</div>
+                      <div *ngIf="item.activity_event_type == 'GV'">Generic Voter Drive</div>
+                      <div *ngIf="item.activity_event_type == 'EA'">Exempt Activities</div>
+                      <div *ngIf="item.activity_event_type == 'DF'">Direct Fundraising</div>
+                      <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Suppot</div>
+                      <div *ngIf="item.activity_event_type == 'PC'">Public Communications Referring Only to Party(Made by PAC)</div>
                   </td>                  
-                  <td>{{ report.activity_event_name }}</td>                    
-                  <td>{{ report.date | date: 'MM/dd/yyyy' }}</td>                          
-                  <td class="summary_text_amt">{{ report.amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>                          
-                  <td class="summary_text_amt">{{ report.aggregateAmount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+                  <td>{{ item.activity_event_name }}</td>                    
+                  <td>{{ item.receipt_date | date: 'MM/dd/yyyy' }}</td>                          
+                  <td class="summary_text_amt">{{ item.transferred_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>                          
+                  <td class="summary_text_amt">{{ item.total_amount_transferred | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
 
                   <td class="bulk_action" >
                       <div [@fadeInOut]                      
@@ -335,16 +341,16 @@
                           </button>
 
                           <div id="forms__trx-dropdown-action1" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
-                              <button class="dropdown-item" (click)="viewditH2(report)">
+                              <button class="dropdown-item" (click)="viewditH3(item)">
                                   <i class="fas fa-eye"></i> View
                               </button>
-                              <button class="dropdown-item" (click)="printH2(report)">
+                              <button class="dropdown-item" (click)="printH3(item)">
                                   <i class="fas fa-print"></i> Print
                               </button>
-                              <button class="dropdown-item" (click)="editH2(report)">
+                              <button class="dropdown-item" (click)="editH3(item)">
                                   <i class="fas fa-edit"></i> Edit
                               </button>
-                              <button class="dropdown-item" (click)="trashH2(report)">
+                              <button class="dropdown-item" (click)="trashH3(item)">
                                   <i class="fas fa-trash"></i> Trash
                               </button>
                           </div>
@@ -354,6 +360,10 @@
               </ng-container>
           </tbody>
         </table>
+        <hr/>
+        <div class="d-flex justify-content-center pagination-container">
+          <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
+        </div>
       </ng-container>
     </section>
 
@@ -391,17 +401,68 @@
               </tr>
             </thead>
             <tbody>
-              <ng-container *ngFor="let report of h3SumP">
+              <ng-container *ngFor="let item of h3SumP">
                 <tr>
                   <td class="summary_text_level_3">
-                    {{ report.category }}
-                    <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    <section *ngIf="item.activity_event_type === 'AD'">
+                      Administrative
+                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                          tooltipClass="form-tooltip">
+                          <i class="info-icon" aria-hidden="true"></i>
+                          <span class="sr-only">Click here for more information</span>
+                      </button>
+                    </section>
+                    <section *ngIf="item.activity_event_type === 'GV'">
+                      Generic Voter Drive
+                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                         tooltipClass="form-tooltip">
                         <i class="info-icon" aria-hidden="true"></i>
                         <span class="sr-only">Click here for more information</span>
-                    </button>
+                      </button>
+                    </section>
+                    <section *ngIf="item.activity_event_type === 'EA'">
+                      Exempt Activities
+                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </button>
+                    </section>
+                    <section *ngIf="item.activity_event_type === 'DF'">
+                      Direct Fundraising
+                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </button>
+                    </section>
+                    <section *ngIf="item.activity_event_type === 'DC'">
+                      Direct Candidate Support
+                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </button>
+                    </section>
+                    <section *ngIf="item.activity_event_type === 'PC'">
+                      Public Communications Referring Only to Party(Made by PAC)
+                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </button>
+                    </section>
+                    <section *ngIf="item.activity_event_type === 'total'">
+                      Total Amount Transferred
+                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </button>
+                    </section>
+                    
                   </td>
-                  <td class="summary_text_amt">{{ report.amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>                    
+                  <td class="summary_text_amt">{{ item.sum | currency:'USD':'symbol-narrow':'1.2-2' }}</td>                    
                 </tr>
               </ng-container>                  
             </tbody>

@@ -85,7 +85,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _transactionsMessageService: TransactionsMessageService,
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
-    _reportsService: ReportsService,   
+    _reportsService: ReportsService,
+    private _actRoute: ActivatedRoute,
     private _schedH2Service: SchedH2Service,
   ) {    
      super(
@@ -136,6 +137,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
     this.setDefaultValues();
 
+    this.formType = this._actRoute.snapshot.paramMap.get('form_id');
+
   }
 
   pageChanged(event){
@@ -157,8 +160,22 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public getReportId(): string {
 
-    const reportId = localStorage.getItem('reportId');
-    return reportId ? reportId : '0';
+    let report_id;
+    let reportType: any = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+    if (reportType === null || typeof reportType === 'undefined') {
+      reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+    }
+
+    if(reportType) {
+      if (reportType.hasOwnProperty('reportId')) {
+        report_id = reportType.reportId;      
+      } else if (reportType.hasOwnProperty('reportid')) {      
+        report_id = reportType.reportid;
+      }
+    }
+   
+    return report_id ? report_id : '0';
+
   }
 
   public setSchedH2() {
