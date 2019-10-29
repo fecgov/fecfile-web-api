@@ -30,7 +30,8 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { LoanMessageService } from '../sched-c/service/loan-message.service';
 import { LoanModel } from '../sched-c/model/loan.model';
-//import { IndividualReceiptService } from '../../forms/form-3x/individual-receipt/individual-receipt.service';
+import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
+import { IndividualReceiptService } from '../../forms/form-3x/individual-receipt/individual-receipt.service';
 
 export enum ActiveView {
   Loans = 'Loans',
@@ -1337,7 +1338,8 @@ export class LoanComponent implements OnInit, OnDestroy {
         step: 'step_3',
         previousStep: 'step_2',
         scheduleType: 'sched_c1',
-        action: LoansActions.add
+        action: LoansActions.add,
+        forceChange: true
       };
       this.status.emit(addSubTransEmitObj);
       this._router.navigate([`/forms/form/${this._formType}`], {
