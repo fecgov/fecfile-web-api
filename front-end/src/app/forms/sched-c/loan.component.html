@@ -340,7 +340,7 @@
                   >
                   </ng-select>
               </ng-container>
-              <ng-container *ngIf="col?.type === 'select' && col?.name === 'loansecured'">
+              <!--<ng-container *ngIf="col?.type === 'select' && col?.name === 'loansecured'">
                   <ng-select #loansecuredSelect
                     [items]="secured"
                     (change)="handleloansecuredChange($event, col)"
@@ -357,9 +357,26 @@
                     "
                   >
                   </ng-select>
-              </ng-container>              
-                
+              </ng-container>  -->            
 
+              <ng-container *ngIf="col?.type === 'select' && col?.name === 'election_code'">
+                <ng-select #electioncodeSelect
+                  [items]="electionTypes"
+                  (change)="electionTypeChanged($event, col)"
+                  [style.width]="col?.width"
+                  [style.height]="col?.height"
+                  [formControlName]="col?.name"
+                  bindValue="code"
+                  bindLabel="name" 
+                  [ngClass]="
+                    frmLoan.get(col?.name)?.invalid &&
+                    (frmLoan.touched || frmLoan.dirty)
+                      ? 'state-select-error'
+                      : ''
+                  "
+                >
+                </ng-select>
+            </ng-container>         
              </div>
             </div>
             <!-- ./col -->

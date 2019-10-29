@@ -31,7 +31,7 @@ import urllib
 from django.db import connection
 import boto
 from boto.s3.key import Key
-from fecfiler.core.views import NoOPError
+from fecfiler.core.views import NoOPError, get_levin_accounts
 #import datetime as dt
 
 # API view functionality for GET DELETE and PUT
@@ -642,7 +642,6 @@ def get_committee_details(request):
             modified_output = cursor.fetchone()[0]
         if modified_output is None:
             raise NoOPError('The Committee ID: {} does not match records in Committee table'.format(cmte_id))
-
         #     for row in cursor.fetchone():
         #         # print(row)
         #         forms_obj=row[0]
@@ -670,6 +669,8 @@ def get_committee_details(request):
         #                         "cmte_filing_freq": forms_obj.get('cmte_filing_freq'),
         #                         "cmte_filed_type": forms_obj.get('cmte_filed_type'),
         #                         "created_at": forms_obj.get('create_date')}
+        levin_accounts = get_levin_accounts(cmte_id)
+        modified_output[0]['levin_accounts'] = levin_accounts
         return Response(modified_output[0], status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The get_committee_details API is throwing  an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)

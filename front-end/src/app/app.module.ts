@@ -79,7 +79,7 @@ import { DecimalPipe } from '@angular/common';
 import { UtilService } from './shared/utils/util.service';
 import { UserIdleModule } from 'angular-user-idle';
 import { SchedFComponent } from './forms/sched-f/sched-f.component';
-import { SchedH1Component } from './forms/sched-h1/sched-h1.component';
+import { SchedH1Component } from './forms/form-3x/sched-h1/sched-h1.component';
 import { SchedH2Component } from './forms/sched-h2/sched-h2.component';
 import { LoanComponent } from './forms/sched-c/loan.component';
 import { LoanService } from './forms/sched-c/service/loan.service';
@@ -89,6 +89,7 @@ import { EndorserComponent } from './forms/sched-c/endorser/endorser.component';
 import { EndorserService } from './forms/sched-c/endorser/service/endorser.service';
 import { SchedC1Component } from './forms/sched-c1/sched-c1.component';
 import { SchedH3Component } from './forms/sched-h3/sched-h3.component';
+import { SchedH5Component } from './forms/sched-h5/sched-h5.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -159,7 +160,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     LoanSummaryComponent,
     EndorserComponent,
     SchedC1Component,
-    SchedH3Component
+    SchedH3Component,
+    SchedH5Component
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [
@@ -202,4 +204,4 @@ const appInitializerFn = (appConfig: AppConfigService) => {
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AppModule {}
+export class AppModule { }

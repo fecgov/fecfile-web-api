@@ -10,6 +10,7 @@ import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.p
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
 import { map } from 'rxjs/operators';
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 
 export interface GetLoanResponse {
   loans: LoanModel[];
@@ -53,6 +54,7 @@ export class LoanService {
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService,
+    private _reportTypeService: ReportTypeService,
   ) {
     // mock out the recycle cnt
     for (let i = 0; i < 13; i++) {
@@ -639,9 +641,40 @@ export class LoanService {
    * @param      {string}           formType  The form type
    * @param      {LoansActions}  scheduleAction  The type of action to save (add, edit)
    */
-  public saveSched_C(scheduleAction: LoansActions): Observable<any> {
+  public saveSched_C(scheduleAction: LoansActions, transactionTypeIdentifier: string, subType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = '/sched_C/schedC';
+    const url: string = '/sc/schedC';
+    const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
+    const loanByCommFromIndObj: any = {
+      api_call:'/sc/schedC',
+      line_number: 13,
+      //transaction_id:'16G',
+      transaction_id:'',
+      back_ref_transaction_id: '',
+      back_ref_sched_name: '',
+      transaction_type: 'LOAN_FROM_IND',
+      transaction_type_identifier:'LOANS_OWED_BY_CMTE'
+    };
+    const loanByCommFromBankObj: any = {
+      api_call:'/sc/schedC',
+      line_number: 13,
+      //transaction_id:'16F',
+      transaction_id:'',
+      back_ref_transaction_id: '',
+      back_ref_sched_name: '',
+      transaction_type: 'LOAN_FROM_BANK',
+      transaction_type_identifier:'LOANS_OWED_BY_CMTE'
+    };
+    const loanToCommObj: any = {
+      api_call:'/sc/schedC',
+      line_number: 13,
+      transaction_id:'',
+      back_ref_transaction_id: '',
+      back_ref_sched_name: '',
+      transaction_type: 'LOAN_TO_COMM',
+      transaction_type_identifier:'LOANS_OWED_TO_CMTE'
+    };
+
     /*const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
     let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
@@ -650,19 +683,46 @@ export class LoanService {
     }*/
 
     //const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
-    const contact: any = JSON.parse(localStorage.getItem(`loanObj`));
+    const loan: any = JSON.parse(localStorage.getItem('LoanObj'));
     const formData: FormData = new FormData();
     let httpOptions = new HttpHeaders();
-
+    let loanhiddenFields: any;
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    for (const [key, value] of Object.entries(contact)) {
+
+    console.log (" saveSched_C transactionTypeIdentifier =", transactionTypeIdentifier)
+    console.log (" saveSched_C subType =", subType)
+
+    for (const [key, value] of Object.entries(loan)) {
       if (value !== null) {
         if (typeof value === 'string') {
           formData.append(key, value);
-
         }
       }
     }
+    
+    if (transactionTypeIdentifier==='LOANS_OWED_BY_CMTE'){
+      if (subType === 'IND'){
+        loanhiddenFields= loanByCommFromIndObj;
+      }else if (subType === 'ORG'){
+        loanhiddenFields= loanByCommFromBankObj;  
+      } 
+    } else if (transactionTypeIdentifier==='LOANS_OWED_TO_CMTE'){
+      loanhiddenFields= loanToCommObj;   
+    }
+
+    console.log ("loanhiddenFields", loanhiddenFields);
+
+    //Add loan hidden fields
+    for (const [key, value] of Object.entries(loanhiddenFields)) {
+      if (value !== null) {
+        if (typeof value === 'string') {
+          formData.append(key, value);
+        }
+      }
+    }
+    console.log("saveSched_C reportId =", reportId);
+
+    formData.append('report_id', reportId );
 
     if (scheduleAction === LoansActions.add) {
       return this._http

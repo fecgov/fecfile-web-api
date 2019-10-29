@@ -100,6 +100,7 @@ export class LoanComponent implements OnInit, OnDestroy {
   private _loanToEdit: LoanModel;
   private _loading: boolean = false;
   private _selectedChangeWarn: any;
+  private _transactionTypeIdentifier= '';
 
   constructor(
     private _http: HttpClient,
@@ -134,7 +135,10 @@ export class LoanComponent implements OnInit, OnDestroy {
     this._selectedEntity = null;
     this._loanToEdit = null;
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    
+    //this._transactionTypeIdentifier = this._activatedRoute.snapshot.paramMap.get('transactionTypeIdentifier');
+    this._transactionTypeIdentifier= 'LOANS_OWED_BY_CMTE';
+
+    console.log("this._transactionTypeIdentifier",  this._transactionTypeIdentifier)
     /*localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');*/
     
@@ -587,7 +591,7 @@ export class LoanComponent implements OnInit, OnDestroy {
 
   public electionTypeChanged(entityOption: any, col: any) {
   }
-
+  
     /**
    * Goes to the previous step.
    */
@@ -1327,6 +1331,15 @@ export class LoanComponent implements OnInit, OnDestroy {
     if ( this.entityType === 'IND'){ 
       this.doValidateLoan();
       console.log("Accessing sched_c loans...");
+      const addSubTransEmitObj: any = {
+        form: {},
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2',
+        scheduleType: 'sched_c',
+        action: LoansActions.add
+      };
+      this.status.emit(addSubTransEmitObj);
       let reportId = this._receiptService.getReportIdFromStorage(this._formType);
       this._router.navigate([`/forms/form/${this._formType}`], {
               queryParams: { step: 'loansummary', reportId: reportId }
@@ -1407,7 +1420,7 @@ export class LoanComponent implements OnInit, OnDestroy {
       // There is a race condition with populating hiddenFields
       // and receiving transaction data to edit from the message service.
       // If editing, set transaction ID at this point to avoid race condition issue.
-      if (this._loanToEdit) {
+      /*if (this._loanToEdit) {
         this.hiddenFields.forEach((el: any) => {
           if (el.name === 'transaction_id') {
             el.value = this._loanToEdit.transaction_id;
@@ -1417,7 +1430,7 @@ export class LoanComponent implements OnInit, OnDestroy {
 
       this.hiddenFields.forEach(el => {
         LoanObj[el.name] = el.value;
-      });
+      });*/
 
       // If entity ID exist, the transaction will be added to the existing entity by the API
       // Otherwise it will create a new Entity.
@@ -1428,7 +1441,7 @@ export class LoanComponent implements OnInit, OnDestroy {
       console.log("LoanObj =", JSON.stringify(LoanObj));
 
       localStorage.setItem('LoanObj', JSON.stringify(LoanObj));
-      this._LoansService.saveSched_C(this.scheduleAction).subscribe(res => {
+      this._LoansService.saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, this.entityType).subscribe(res => {
         if (res) {
           console.log('_LoansService.saveContact res', res);
           this._loanToEdit = null;
