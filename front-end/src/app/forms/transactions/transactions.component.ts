@@ -28,7 +28,9 @@ export enum FilterTypes {
   deletedDate = 'deletedDate',
   state = 'state',
   memoCode = 'memoCode',
-  itemizations = 'itemizations'
+  itemizations = 'itemizations',
+  electionCodes = 'electionCodes',
+  electionYear = 'electionYear'
 }
 
 /**
@@ -398,6 +400,56 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
       } else {
         this.removeTagArrayItem(FilterTypes.itemizations);
+      }
+    }
+
+    // Election codes
+    if (this.filters.filterElectionCodes) {
+      if (this.filters.filterElectionCodes.length > 0) {
+        const electionCodesGroup = [];
+
+        // is tag showing? Then modify it is the curr position
+        // TODO put type strings in constants file as an enumeration
+        // They are also used in the filter component as well.
+
+        let electionsTag = false;
+        for (const tag of this.tagArray) {
+          if (tag.type === FilterTypes.electionCodes) {
+            electionsTag = true;
+            for (const item of filters.filterElectionCodes) {
+              electionCodesGroup.push(item);
+            }
+            tag.group = electionCodesGroup;
+          }
+        }
+        // If tag is not already showing, add it to the tag array.
+        if (!electionsTag) {
+          for (const item of filters.filterElectionCodes) {
+            electionCodesGroup.push(item);
+          }
+          this.tagArray.push({ type: FilterTypes.electionCodes, prefix: 'Election code', group: electionCodesGroup });
+        }
+      } else {
+        this.removeTagArrayItem(FilterTypes.electionCodes);
+      }
+    }
+
+    // Election year
+    if (this.filters.filterElectionYearFrom && this.filters.filterElectionYearTo) {
+      const filterYearGroup = [];
+      filterYearGroup.push({
+        filterElectionYearFrom: filters.filterElectionYearFrom,
+        filterElectionYearTo: filters.filterElectionYearTo
+      });
+      let filterYearTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.electionYear) {
+          filterYearTag = true;
+          tag.group = filterYearTag;
+        }
+      }
+      if (!filterYearTag) {
+        this.tagArray.push({ type: FilterTypes.electionYear, prefix: 'Election year', group: filterYearGroup });
       }
     }
 

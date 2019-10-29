@@ -22,6 +22,7 @@ import { TransactionsFilterTypeComponent } from './filter-type/transactions-filt
 import { Subscription } from 'rxjs/Subscription';
 import { FilterTypes, ActiveView } from '../transactions.component';
 import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
+import { ActivatedRoute } from '@angular/router';
 
 /**
  * A component for filtering transactions located in the sidebar.
@@ -110,9 +111,16 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public isHideStateFilter: boolean;
   public isHideMemoFilter: boolean;
   public isHideItemizationFilter: boolean;
+  public isHideElectionCode: boolean;
+  public isHideElectionYear: boolean;
   public transactionCategories: any = [];
   public states: any = [];
   public itemizations: any = [];
+  public electionCodes: any = [
+    { option: 'primary', selected: false },
+    { option: 'general', selected: false },
+    { option: 'other', selected: false }
+  ];
   public filterCategoriesText = '';
   public filterAmountMin: number;
   public filterAmountMax: number;
@@ -123,10 +131,16 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public filterDeletedDateFrom: Date = null;
   public filterDeletedDateTo: Date = null;
   public filterMemoCode = false;
+  public filterElectionCode = false;
+  public filterElectionYearFrom: string;
+  public filterElectionYearTo: string;
   public dateFilterValidation: ValidationErrorModel;
   public deletedDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
   public aggregateAmountFilterValidation: ValidationErrorModel;
+  public yearFilterValidation: ValidationErrorModel;
+  public transactionCategory: string = '';
+  public editMode: boolean = false;
 
   /**
    * Subscription for removing selected filters.
@@ -147,7 +161,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   constructor(
     private _transactionsService: TransactionsService,
     private _transactionsMessageService: TransactionsMessageService,
-    private _transactionTypeService: TransactionTypeService
+    private _transactionTypeService: TransactionTypeService,
+    private _activatedRoute: ActivatedRoute
   ) {
     this.removeFilterSubscription = this._transactionsMessageService
       .getRemoveFilterMessage()
@@ -176,6 +191,16 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             console.log('unexpected ActiveView received: ' + message);
         }
       });
+
+    _activatedRoute.queryParams.subscribe(p => {
+      this.transactionCategory = p.transactionCategory;
+      if (p.edit === 'true' || p.edit === true) {
+        this.editMode = true;
+      }
+      if (p.transactionCategory) {
+        this.transactionCategory = p.transactionCategory;
+      }
+    });
   }
 
   /**
@@ -201,6 +226,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.isHideStateFilter = true;
     this.isHideMemoFilter = true;
     this.isHideItemizationFilter = true;
+    this.isHideElectionCode = true;
+    this.isHideElectionYear = true;
 
     this.initValidationErrors();
 
@@ -281,6 +308,14 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
   public toggleItemizationFilterItem() {
     this.isHideItemizationFilter = !this.isHideItemizationFilter;
+  }
+
+  public toggleElectionCodeFilterItem() {
+    this.isHideElectionCode = !this.isHideElectionCode;
+  }
+
+  public toggleElectionYearFilterItem() {
+    this.isHideElectionYear = !this.isHideElectionYear;
   }
 
   /**
@@ -438,6 +473,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       filters.filterMemoCode = this.filterMemoCode;
       modified = true;
     }
+
+    if (this.filterElectionYearFrom && this.filterElectionYearTo) {
+      filters.filterElectionYearFrom = this.filterElectionYearFrom;
+      filters.filterElectionYearTo = this.filterElectionYearTo;
+      modified = true;
+    }
     console.log('itemizations = ', this.itemizations);
     const filterItemizations = [];
     for (const I of this.itemizations) {
@@ -449,6 +490,17 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       }
     }
     filters.filterItemizations = filterItemizations;
+    console.log('filters.filterItemizations =', filters.filterItemizations);
+
+    const filterElectionCodes = [];
+    for (const I of this.electionCodes) {
+      if (I.selected) {
+        console.log('I.electionCode', I.option);
+        filterElectionCodes.push(I.option);
+        modified = true;
+      }
+    }
+    filters.filterElectionCodes = filterElectionCodes;
     console.log('filters.filterItemizations =', filters.filterItemizations);
 
     filters.show = modified;
@@ -693,6 +745,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.deletedDateFilterValidation = new ValidationErrorModel(null, false);
     this.amountFilterValidation = new ValidationErrorModel(null, false);
     this.aggregateAmountFilterValidation = new ValidationErrorModel(null, false);
+    this.yearFilterValidation = new ValidationErrorModel(null, false);
   }
 
   /**
@@ -779,6 +832,42 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       return false;
     }
 
+    if (this.filterElectionYearFrom !== null && this.filterElectionYearTo === null) {
+      this.amountFilterValidation.isError = true;
+      this.amountFilterValidation.message = 'Election year from is required';
+      this.isHideElectionYear = false;
+      return false;
+    }
+    if (this.filterElectionYearTo !== null && this.filterElectionYearFrom === null) {
+      this.yearFilterValidation.isError = true;
+      this.yearFilterValidation.message = 'Election year to is required';
+      this.isHideElectionYear = false;
+      return false;
+    }
+
+    let intfilterElectionYearFrom = parseInt(this.filterElectionYearFrom);
+    let intfilterElectionYearTo = parseInt(this.filterElectionYearTo);
+    if (intfilterElectionYearFrom > intfilterElectionYearTo) {
+      this.yearFilterValidation.isError = true;
+      this.yearFilterValidation.message = 'Maximum is less than Minimum';
+      this.isHideElectionYear = false;
+      return false;
+    }
+    if (!(/^\d{4}$/.test(this.filterElectionYearFrom)) || !(/^\d{4}$/.test(this.filterElectionYearTo))) {
+      this.yearFilterValidation.isError = true;
+      this.yearFilterValidation.message = 'Must be a valid year';
+      this.isHideElectionYear = false;
+      return false;
+    }
+    if (this.filterElectionYearTo !== null && this.filterElectionYearFrom !== null) {
+      this.filterElectionYearFrom = this.filterElectionYearFrom.toString();
+      this.filterElectionYearTo = this.filterElectionYearTo.toString();
+    }
+    if (this.filterElectionYearTo === '' && this.filterElectionYearFrom === '') {
+      this.filterElectionYearFrom = null;
+      this.filterElectionYearTo = null;
+    }
+
     return true;
   }
 
@@ -833,6 +922,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
               }
             }
             break;
+          case FilterTypes.electionYear:
+              this.filterElectionYearFrom = null;
+              this.filterElectionYearTo = null;
+              break;
           default:
             console.log('unexpected key for remove filter = ' + message.key);
         }

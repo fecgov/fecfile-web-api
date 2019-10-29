@@ -41,9 +41,9 @@
     <thead>
       <tr>
         <th class="transactions__table-checkbox">
-          <input 
-            [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
-            (change)="changeAllTransactionsSelected()">
+          <div *ngIf="editMode">
+            <input [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox" (change)="changeAllTransactionsSelected()">
+          </div>
         </th>
          <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
         </th>
