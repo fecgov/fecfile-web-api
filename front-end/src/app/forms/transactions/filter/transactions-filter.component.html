@@ -298,7 +298,7 @@
             <ul class="transactions__filter-type-list">
               <li *ngFor="let electionCode of electionCodes">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="{{ electionCode?.selected }}" 
+                  <input class="form-check-input" type="checkbox" id="{{ electionCode?.option }}" 
                     [(ngModel)]="electionCode.selected">
                   <label class="form-check-label" for="{{ electionCode?.selected }}">
                     {{electionCode.option | titlecase}}</label>

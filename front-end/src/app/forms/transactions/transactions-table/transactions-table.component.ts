@@ -430,7 +430,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         serverSortColumnName,
         sortedCol.descending,
         this.filters,
-        categoryType
+        categoryType,
+        false
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
@@ -515,7 +516,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
 
     this._transactionsService
-      .getUserDeletedTransactions(
+      .getFormTransactions(
         this.formType,
         this.reportId,
         page,
@@ -523,7 +524,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.currentSortedColumnName,
         sortedCol.descending,
         this.filters,
-        categoryType
+        categoryType,
+        true
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];

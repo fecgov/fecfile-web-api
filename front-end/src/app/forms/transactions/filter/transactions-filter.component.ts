@@ -542,6 +542,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.filterDeletedDateFrom = null;
     this.filterDeletedDateTo = null;
     this.filterMemoCode = false;
+
+    this.filterElectionCode = null;
+    for (const s of this.electionCodes) {
+      s.selected = false;
+    }
+    this.filterElectionYearFrom = null;
+    this.filterElectionYearTo = null;
   }
 
   /**
@@ -832,13 +839,21 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    if (this.filterElectionYearFrom !== null && this.filterElectionYearTo === null) {
+    if (
+      this.filterElectionYearFrom !== null &&
+      this.filterElectionYearFrom !== undefined &&
+      (this.filterElectionYearTo === null || this.filterElectionYearTo === undefined)
+    ) {
       this.amountFilterValidation.isError = true;
       this.amountFilterValidation.message = 'Election year from is required';
       this.isHideElectionYear = false;
       return false;
     }
-    if (this.filterElectionYearTo !== null && this.filterElectionYearFrom === null) {
+    if (
+      this.filterElectionYearTo !== null &&
+      this.filterElectionYearTo !== undefined &&
+      (this.filterElectionYearFrom === null || this.filterElectionYearFrom === undefined)
+    ) {
       this.yearFilterValidation.isError = true;
       this.yearFilterValidation.message = 'Election year to is required';
       this.isHideElectionYear = false;
@@ -853,13 +868,19 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       this.isHideElectionYear = false;
       return false;
     }
-    if (!(/^\d{4}$/.test(this.filterElectionYearFrom)) || !(/^\d{4}$/.test(this.filterElectionYearTo))) {
+    if (
+      this.filterElectionYearTo !== null &&
+      this.filterElectionYearFrom !== null &&
+      (this.filterElectionYearTo !== undefined && this.filterElectionYearFrom !== undefined) &&
+      (!/^\d{4}$/.test(this.filterElectionYearFrom) || !/^\d{4}$/.test(this.filterElectionYearTo))
+    ) {
       this.yearFilterValidation.isError = true;
       this.yearFilterValidation.message = 'Must be a valid year';
       this.isHideElectionYear = false;
       return false;
     }
-    if (this.filterElectionYearTo !== null && this.filterElectionYearFrom !== null) {
+    if (this.filterElectionYearTo !== null && this.filterElectionYearFrom !== null &&
+      this.filterElectionYearTo !== undefined && this.filterElectionYearFrom !== undefined) {
       this.filterElectionYearFrom = this.filterElectionYearFrom.toString();
       this.filterElectionYearTo = this.filterElectionYearTo.toString();
     }
@@ -922,10 +943,17 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
               }
             }
             break;
+          case FilterTypes.electionCodes:
+            for (const electionCode of this.electionCodes) {
+              if (electionCode.option === message.value) {
+                electionCode.selected = false;
+              }
+            }
+            break;
           case FilterTypes.electionYear:
-              this.filterElectionYearFrom = null;
-              this.filterElectionYearTo = null;
-              break;
+            this.filterElectionYearFrom = null;
+            this.filterElectionYearTo = null;
+            break;
           default:
             console.log('unexpected key for remove filter = ' + message.key);
         }

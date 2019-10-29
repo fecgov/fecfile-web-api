@@ -445,7 +445,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       for (const tag of this.tagArray) {
         if (tag.type === FilterTypes.electionYear) {
           filterYearTag = true;
-          tag.group = filterYearTag;
+          tag.group = filterYearGroup;
         }
       }
       if (!filterYearTag) {
@@ -571,6 +571,23 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Remove the election codes filter tag and inform the filter component to clear it.
+   */
+  public removeElectionCodesFilter(index: number, item: string) {
+    this.filters.filterElectionCodes.splice(index, 1);
+    this.removeFilter(FilterTypes.electionCodes, item);
+  }
+
+  /**
+   * Remove the election year filter tag and inform the filter component to clear it.
+   */
+  public removeElectionYearFilter() {
+    this.filters.filterElectionYearFrom = null;
+    this.filters.filterElectionYearTo = null;
+    this.removeFilter(FilterTypes.electionYear, null);
+  }
+
+  /**
    * Inform the Filter Component to clear the filter settings for the given key/value.
    *
    * @param key
@@ -622,6 +639,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       case FilterTypes.itemizations:
         this.removeItemizationsFilter(index, tagText);
         this.removeTagArrayGroupItem(type, index);
+        break;
+      case FilterTypes.electionCodes:
+        this.removeElectionCodesFilter(index, tagText);
+        this.removeTagArrayGroupItem(type, index);
+        break;
+      case FilterTypes.electionYear:
+        this.removeElectionYearFilter();
+        this.removeTagArrayItem(type);
         break;
       default:
         console.log('unexpected type received for remove tag');

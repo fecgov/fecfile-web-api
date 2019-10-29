@@ -161,7 +161,7 @@
                           (click)="removeTag(tag.type, i, gTag)"
                         >
                           <i class="fas fa-window-close transactions__close-tag"></i>
-                          <span *ngIf="tag.type !== 'amount' && tag.type !== 'aggregateAmount' && tag.type !== 'date'">
+                          <span *ngIf="tag.type !== 'amount' && tag.type !== 'aggregateAmount' && tag.type !== 'date' && tag.type !== 'electionYear'">
                             <span *ngIf="tag.prefix">{{ tag.prefix }}: </span>{{ gTag }}
                           </span>
                           <span *ngIf="tag.type === 'date'"
@@ -176,6 +176,11 @@
                             >{{ tag.prefix }}:
                             {{ gTag.filterAggregateAmountMin | currency: 'USD':'symbol-narrow':'1.2-2' }} -
                             {{ gTag.filterAggregateAmountMax | currency: 'USD':'symbol-narrow':'1.2-2' }}
+                          </span>
+                          <span *ngIf="tag.type === 'electionYear'"
+                            >{{ tag.prefix }}:
+                            {{ gTag.filterElectionYearFrom }} -
+                            {{ gTag.filterElectionYearTo }}
                           </span>
                         </button>
                         <span class="transactions__btn-search-filter-join" *ngIf="i < tag.group.length - 1">
