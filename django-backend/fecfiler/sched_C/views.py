@@ -844,38 +844,80 @@ def get_outstanding_loans(request):
     3. cumulative payemnt to date
     4. outstanding balance
     5. due date
+    adding transaction_types to get transaction_type specific loans
+    valid ransction_type values:
+    LOANS_OWED_BY_CMTE
+    LOANS_OWED_TO_CMTE
     """
+    valid_transaction_types = [
+        'LOANS_OWED_BY_CMTE',
+        'LOANS_OWED_TO_CMTE',
+    ]
     logger.debug('POST request received.')
     try:
         cmte_id = request.user.username
-        _sql = """
-        SELECT Json_agg(t) 
-            FROM   (SELECT 
-                        e.entity_name,
-                        e.entity_type, 
-                        e.last_name,
-                        e.first_name,
-                        e.middle_name,
-                        e.preffix,
-                        e.suffix, 
-                        c.loan_amount_original, 
-                        c.loan_payment_to_date, 
-                        c.loan_balance, 
-                        c.loan_due_date 
-                    FROM   public.sched_c c, 
-                        public.entity e 
-                    WHERE c.cmte_id = %s
-                    AND c.entity_id = e.entity_id 
-                    AND c.loan_balance > 0
-                    ) t
-        """
-        with connection.cursor() as cursor:
-            cursor.execute(_sql, [cmte_id])
-            json_result = cursor.fetchone()[0] 
-            if not json_result:
-                return Response('No loans found')
-            else:
-                return Response(json_result, status=status.HTTP_200_OK)
+        if 'transaction_type_identifier' in request.query_params:
+            tran_type = request.query_params.get('transaction_type_identifier')
+            if not tran_type in valid_transaction_types: 
+                raise Exception('Error: invalid transaction types.')
+            _sql = """
+                SELECT Json_agg(t) 
+                FROM   (SELECT 
+                            e.entity_name,
+                            e.entity_type, 
+                            e.last_name,
+                            e.first_name,
+                            e.middle_name,
+                            e.preffix,
+                            e.suffix, 
+                            c.loan_amount_original, 
+                            c.loan_payment_to_date, 
+                            c.loan_balance, 
+                            c.loan_due_date,
+                            c.transaction_type_identifier 
+                        FROM   public.sched_c c, 
+                            public.entity e 
+                        WHERE c.cmte_id = %s
+                        AND c.transaction_type_identifier = %s
+                        AND c.entity_id = e.entity_id 
+                        AND c.loan_balance > 0
+                        ) t
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, tran_type])
+                json_result = cursor.fetchone()[0] 
+            
+        else:
+            _sql = """
+                SELECT Json_agg(t) 
+                    FROM   (SELECT 
+                                e.entity_name,
+                                e.entity_type, 
+                                e.last_name,
+                                e.first_name,
+                                e.middle_name,
+                                e.preffix,
+                                e.suffix, 
+                                c.loan_amount_original, 
+                                c.loan_payment_to_date, 
+                                c.loan_balance, 
+                                c.loan_due_date,
+                                c.transaction_type_identifier
+                            FROM   public.sched_c c, 
+                                public.entity e 
+                            WHERE c.cmte_id = %s
+                            AND c.entity_id = e.entity_id 
+                            AND c.loan_balance > 0
+                            ) t
+                """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id])
+                json_result = cursor.fetchone()[0] 
+
+        if not json_result:
+            return Response([], status=status.HTTP_200_OK)
+        else:
+            return Response(json_result, status=status.HTTP_200_OK)
 
     except:
         raise
