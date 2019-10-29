@@ -141,8 +141,13 @@ def schedC_sql_dict(data):
         # TODO: disable this line for now and wait for db update
         # datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             # data.get('transaction_type_identifier'))
+
+        #no need to have dummy data   
+        '''
         datum['line_number'] = 'DUMMY'
         datum['transaction_type'] = 'DUMMY'
+        '''
+        
         return datum
 
     except:
@@ -246,9 +251,9 @@ def put_sql_schedC(data):
             data.get('election_other_description', ''),
             data.get('loan_amount_original', None),
             data.get('loan_payment_to_date', None),
-            data.get('loan_balance', None),
+            data.get('loan_amount_original', None), #adding loan_balance as loan_amount_original
             data.get('loan_incurred_date', None),
-            data.get('loan_due_date', None),
+            data.get('loan_due_date', None), 
             data.get('loan_intrest_rate', ''),
             data.get('is_loan_secured', ''),
             data.get('is_personal_funds', ''),
@@ -722,6 +727,8 @@ def schedC(request):
     """
     sched_c1 api supporting POST, GET, DELETE, PUT
     """
+
+    print("request obj =", request)
 
     # create new sched_c1 transaction
     if request.method == 'POST':

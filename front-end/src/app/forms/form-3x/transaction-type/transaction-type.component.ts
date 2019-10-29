@@ -163,10 +163,10 @@ export class TransactionTypeComponent implements OnInit {
         window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
       }
 
-      if (this.transactionType !== 'LOAN_FROM_IND_BANK' && this.scheduleType !== 'sched_c') {
+      if (this.transactionType !== 'LOAN_FROM_IND_BANK' && this.transactionType !== 'LOAN_SUMMARY' ){
         // Send message to form (indv-receipt) to clear form field vals if they are still populated.
         this._f3xMessageService.sendInitFormMessage('');
-      }
+      }  
       // TODO temp - get val from getCategoryTypes API called in f3x comp.
       // let scheduleType = 'sched_a';
       // if (this.transactionType === 'DEBT_TO_VENDOR') {
@@ -179,13 +179,19 @@ export class TransactionTypeComponent implements OnInit {
       console.log("this.transactionCategory", this.transactionCategory);
       console.log("this.scheduleType", this.scheduleType);
 
-      if (this.transactionType === 'LOAN_FROM_IND_BANK' && this.scheduleType === 'sched_c') {
+      if (this.transactionType === 'LOAN_FROM_IND_BANK' && this.scheduleType === 'sched_c'){
         console.log("Accessing sched_c loans...");
         let reportId = this._receiptService.getReportIdFromStorage(this._formType);
         this._router.navigate([`/forms/form/${this._formType}`], {
-          queryParams: { step: 'loan', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory }
+          queryParams: { step: 'loan', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory, transactionTypeIdentifier: 'LOANS_OWED_BY_CMTE'}
         });
-      } else {
+      }else if (this.transactionType === 'LOAN_SUMMARY' ){
+        console.log("Accessing sched_c loans summary...");
+        let reportId = this._receiptService.getReportIdFromStorage(this._formType);
+        this._router.navigate([`/forms/form/${this._formType}`], {
+          queryParams: { step: 'loansummary', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory,  transactionTypeIdentifier: 'LOANS_OWED_BY_CMTE'}
+        });
+      }  else {
         this.status.emit({
           form: this.frmOption,
           direction: 'next',

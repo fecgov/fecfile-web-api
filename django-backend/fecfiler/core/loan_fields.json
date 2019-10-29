@@ -265,13 +265,13 @@
                    "infoIcon":true,
                    "infoText":"Request language from RAD",
                    "name":"election_code",
-                   "type":"checkbox",
+                   "type":"select",
                    "value":null,
                    "height":"30px",
                    "width":"100px",
                    "validation":{
                       "required":true,
-                      "max":12,
+                      "max":1,
                       "dollarAmount":false
                    }
                 },
@@ -426,26 +426,6 @@
                       "required":true,
                       "max":null,
                       "dollarAmount":false
-                   }
-                },
-                {
-                   "isReadonly":false,
-                   "entityGroup":null,
-                   "toggle":false,
-                   "inputGroup":true,
-                   "inputIcon":"calendar-icon",
-                   "text":"Secured",
-                   "infoIcon":true,
-                   "infoText":"Request language from RAD",
-                   "name":"loansecured",
-                   "type":"select",
-                   "value":null,
-                   "height":"30px",
-                   "width":"80px",
-                   "validation":{
-                      "required":true,
-                      "max":3,
-                      "alphaNumeric":true
                    }
                 }
              ]
@@ -625,18 +605,18 @@
                   "entityGroup":null,
                   "toggle":false,
                   "inputGroup":true,
-                  "inputIcon":"dollar-sign-icon",
+                  "inputIcon":"",
                   "text":"Election",
                   "infoIcon":true,
                   "infoText":"Request language from RAD",
                   "name":"election_code",
-                  "type":"checkbox",
+                  "type":"select",
                   "value":null,
                   "height":"30px",
                   "width":"154px",
                   "validation":{
                      "required":true,
-                     "max":12,
+                     "max":1,
                      "dollarAmount":true
                   }
                },
@@ -792,28 +772,8 @@
                      "max":null,
                      "dollarAmount":false
                   }
-               },
-               {
-                  "isReadonly":false,
-                  "entityGroup":null,
-                  "toggle":false,
-                  "inputGroup":true,
-                  "inputIcon":"calendar-icon",
-                  "text":"Secured",
-                  "infoIcon":true,
-                  "infoText":"Request language from RAD",
-                  "name":"loansecured",
-                  "type":"select",
-                  "value":null,
-                  "height":"30px",
-                  "width":"80px",
-                  "validation":{
-                     "required":true,
-                     "max":3,
-                     "alphaNumeric":true
-                  }
                }
-            ]
+             ]
          }
       ],
        "hiddenFields":[
