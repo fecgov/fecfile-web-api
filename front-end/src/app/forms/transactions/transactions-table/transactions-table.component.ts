@@ -1371,10 +1371,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'loanPaymentToDate'
       ];
     } else if (this.transactionCategory === 'other') {
-      // Schedule
-      defaultSortColumns = ['', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
-      // Activity or Event Identifier
-      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', '', ''];
+      defaultSortColumns = ['schedule', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
+      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', 'eventId'];
     }
 
     this.sortableColumns = [];
