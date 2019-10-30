@@ -659,6 +659,10 @@ def post_schedB(datum):
             trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
         datum["transaction_id"] = transaction_id
+
+        #checking if beneficiary cmte id exists then copying entity name to beneficiary committee name as they both are the same
+        if 'beneficiary_cmte_id' in datum and datum.get('beneficiary_cmte_id') not in ['', ' ', None, 'none', 'null', 'None']:
+          datum['beneficiary_cmte_name'] = datum.get('entity_name')
         try:
             post_sql_schedB(
                 datum.get("cmte_id"),
@@ -793,6 +797,10 @@ def put_schedB(datum):
         # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         # entity_id = entity_data.get("entity_id")
         # datum["entity_id"] = entity_id
+
+        #checking if beneficiary cmte id exists then copying entity name to beneficiary committee name as they both are the same
+        if 'beneficiary_cmte_id' in datum and datum.get('beneficiary_cmte_id') not in ['', ' ', None, 'none', 'null', 'None']:
+          datum['beneficiary_cmte_name'] = datum.get('entity_name')
         try:
             put_sql_schedB(
                 datum.get("cmte_id"),
