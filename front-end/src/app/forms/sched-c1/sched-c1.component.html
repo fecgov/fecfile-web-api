@@ -1,3 +1,6 @@
+<ng-template #rt let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
 <div class="sched-c1-container">
   <form [formGroup]="c1Form">
     <header>
@@ -388,7 +391,7 @@
             <label for="is_loan_restructured_y"                   
               [ngClass]="
               c1Form.get('is_loan_restructured')?.invalid &&
-              (c1Form.touched || c1Form.dirty)
+              (c1Form.touched)
                 ? 'input-field-label-error'
                 : ''
               ">
@@ -405,7 +408,7 @@
             <label for="is_loan_restructured_n"
               [ngClass]="
               c1Form.get('is_loan_restructured')?.invalid &&
-              (c1Form.touched || c1Form.dirty)
+              (c1Form.touched)
                 ? 'input-field-label-error'
                 : ''
             ">
@@ -458,7 +461,7 @@
               [style.height]="'30px'"
               [ngClass]="
                 c1Form.get('credit_amount_this_draw')?.invalid &&
-                (c1Form.touched || c1Form.dirty)
+                (c1Form.touched)
                   ? 'input-field-error'
                   : ''
               "
@@ -496,12 +499,6 @@
                 [attr.name]="'total_outstanding_balance'"
                 [style.width]="'66%'"
                 [style.height]="'30px'"
-                [ngClass]="
-                  c1Form.get('total_outstanding_balance')?.invalid &&
-                  (c1Form.touched || c1Form.dirty)
-                    ? 'input-field-error'
-                    : ''
-                "
               />
             </div>          
         </div>
@@ -530,7 +527,7 @@
             <label for="other_parties_liable_y"                   
               [ngClass]="
               c1Form.get('other_parties_liable')?.invalid &&
-              (c1Form.touched || c1Form.dirty)
+              (c1Form.touched)
                 ? 'input-field-label-error'
                 : ''
               ">
@@ -547,7 +544,7 @@
             <label for="other_parties_liable_n"
               [ngClass]="
               c1Form.get('other_parties_liable')?.invalid &&
-              (c1Form.touched || c1Form.dirty)
+              (c1Form.touched)
                 ? 'input-field-label-error'
                 : ''
             ">
@@ -595,7 +592,7 @@
             <label for="pledged_collateral_ind_y"                   
               [ngClass]="
               c1Form.get('pledged_collateral_ind')?.invalid &&
-              (c1Form.touched || c1Form.dirty)
+              (c1Form.touched)
                 ? 'input-field-label-error'
                 : ''
               ">
@@ -612,7 +609,7 @@
             <label for="pledged_collateral_ind_n"
               [ngClass]="
               c1Form.get('pledged_collateral_ind')?.invalid &&
-              (c1Form.touched || c1Form.dirty)
+              (c1Form.touched)
                 ? 'input-field-label-error'
                 : ''
             ">
@@ -653,7 +650,7 @@
             <label for="future_income_ind_y"                   
               [ngClass]="
               c1Form.get('future_income_ind')?.invalid &&
-              (c1Form.touched || c1Form.dirty)
+              (c1Form.touched)
                 ? 'input-field-label-error'
                 : ''
               ">
@@ -670,7 +667,7 @@
             <label for="future_income_ind_n"
               [ngClass]="
               c1Form.get('future_income_ind')?.invalid &&
-              (c1Form.touched || c1Form.dirty)
+              (c1Form.touched)
                 ? 'input-field-label-error'
                 : ''
             ">
@@ -718,7 +715,7 @@
             [formControlName]="'basis_of_loan_desc'"
             [ngClass]="
               c1Form.get('basis_of_loan_desc')?.invalid &&
-              (c1Form.touched || c1Form.dirty)
+              (c1Form.touched)
                 ? 'input-field-error'
                 : ''
             "
@@ -749,10 +746,16 @@
               [style.height]="'30px'"
               [ngClass]="
                 c1Form.get('treasurer_last_name')?.invalid &&
-                (c1Form.touched || c1Form.dirty)
+                (c1Form.touched)
                   ? 'input-field-error'
                   : ''
               "
+              (selectItem)="handleSelectedIndividual($event)"
+              id="typeahead-template-last-name"
+              [ngbTypeahead]="searchLastName" 
+              [focusFirst]=false
+              [resultTemplate]="rt" 
+              [inputFormatter]="formatterLastName"
             />
           </div>
         </div>
@@ -771,10 +774,16 @@
               [style.height]="'30px'"
               [ngClass]="
                 c1Form.get('treasurer_first_name')?.invalid &&
-                (c1Form.touched || c1Form.dirty)
+                (c1Form.touched)
                   ? 'input-field-error'
                   : ''
               "
+              (selectItem)="handleSelectedIndividual($event)"
+              id="typeahead-template-first-name"
+              [ngbTypeahead]="searchFirstName" 
+              [focusFirst]=false
+              [resultTemplate]="rt" 
+              [inputFormatter]="formatterFirstName"
             />
           </div>
         </div>  
@@ -793,7 +802,7 @@
               [style.height]="'30px'"
               [ngClass]="
                 c1Form.get('treasurer_middle_name')?.invalid &&
-                (c1Form.touched || c1Form.dirty)
+                (c1Form.touched)
                   ? 'input-field-error'
                   : ''
               "
@@ -817,7 +826,7 @@
               [style.height]="'30px'"
               [ngClass]="
                 c1Form.get('treasurer_prefix')?.invalid &&
-                (c1Form.touched || c1Form.dirty)
+                (c1Form.touched)
                   ? 'input-field-error'
                   : ''
               "
@@ -839,7 +848,7 @@
               [style.height]="'30px'"
               [ngClass]="
                 c1Form.get('treasurer_suffix')?.invalid &&
-                (c1Form.touched || c1Form.dirty)
+                (c1Form.touched)
                   ? 'input-field-error'
                   : ''
               "
@@ -883,7 +892,7 @@
                 [style.height]="'30px'"
                 [ngClass]="
                   c1Form.get('treasurer_signed_date')?.invalid &&
-                  (c1Form.touched || c1Form.dirty)
+                  (c1Form.touched)
                     ? 'input-field-error'
                     : ''
                 "
@@ -902,8 +911,11 @@
     <section *ngIf="sectionType === sectionH">
       <div class="row">
         <div class="col col-md-6">
-          <div class="c1_verbiage_lg">
-            Attach a signed copy of the loan agreemnet or upload the PDF copy.
+          <div class="c1_verbiage_lg" 
+            [ngClass]="c1Form.get('file_upload')?.invalid && (c1Form.touched) 
+              ? 'input-field-label-error': ''
+            ">
+            Attach a signed copy of the loan agreement or upload the PDF copy.
             <div
               type="button"
               class="btn btn-info"
@@ -916,10 +928,21 @@
           </div>
         </div>
       </div>
+      <!-- <div class="row">
+        <div [ngClass]="c1Form.get('file_upload')?.invalid && (c1Form.touched)" 
+          class="col col-md-8" 
+          style="color: red"
+        >
+          Please choose a file to upload.
+        </div>
+      </div> -->
       <div class="row">
         <div class="col col-md-4">
           <div *ngIf="file === null && fileNameToDisplay === null">
-            <input #fileInput type="file" name="file" accept="application/pdf" (change)="setFile($event)" />
+            <input #fileInput type="file" 
+              name="file" 
+              accept="application/pdf, *.txt" 
+              (change)="setFile($event)" />
           </div>
           <!-- <button *ngIf="file === null && fileNameToDisplay === null" 
             class="btn btn-previous btn-left" type="button" 
@@ -967,18 +990,29 @@
           </div>
         </div>
       </div>
+      <!-- <div *ngIf="c1Form.get('final_authorization')?.invalid && (c1Form.touched)" 
+        class="row"> 
+          <div class="col" style="color: red">Please check the box before finalizing</div>
+      </div> -->
       <div class="row">
         <div col col-md-8>
           <div class="d-inline-flex">  
             <div class="section_i_checkbox_container">
-              <input type="checkbox"
+              <input 
+                id="final_authorization"
+                type="checkbox"
                 class="section_i_checkbox"
+                formControlName="final_authorization"
               />
             </div>
-            <div class="c1_verbiage_sm section_i_checkbox_verbiage">
+            <label for="final_authorization" class="c1_verbiage_sm section_i_checkbox_verbiage"
+              [ngClass]="c1Form.get('final_authorization')?.invalid && (c1Form.touched) 
+                ? 'input-field-label-error': ''
+              "
+            >
                 I acknowledge and understand the above statements and submit this information as 
                 a matter of permanent record.
-            </div>
+          </label>
           </div>
         </div>
       </div>

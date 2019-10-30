@@ -56,7 +56,7 @@ export class F3xComponent implements OnInit {
   public isShowFilters = false;
   public formType: string = '';
   public scheduleAction: ScheduleActions;
-  public forceChangeSwitch = 0;
+  public forceChangeDetectionC1: Date;
 
   private _step: string = '';
   private _cloned: boolean = false;
@@ -295,6 +295,16 @@ export class F3xComponent implements OnInit {
             // this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
             // this.transactionType = e.transactionType ? e.transactionType : '';
             this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
+
+            // to force change detetion on a child component, set a date field used as input().
+            if (e.forceChange) {
+              switch (this.scheduleType) {
+                case 'sched_c1':
+                  this.forceChangeDetectionC1 = new Date();
+                  break;
+                default:
+              }
+            }            
 
             if (e.action) {
               if (e.action in ScheduleActions) {

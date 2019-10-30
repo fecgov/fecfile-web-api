@@ -3,6 +3,10 @@ import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms'
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { alphaNumeric } from 'src/app/shared/utils/forms/validation/alpha-numeric.validator';
+import { Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
+import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 
 export enum Sections {
   initialSection = 'initial_section',
@@ -24,6 +28,7 @@ export enum Sections {
 })
 export class SchedC1Component implements OnInit, OnChanges {
   @Input() scheduleAction: ScheduleActions;
+  @Input() forceChangeDetection: Date;
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   public c1Form: FormGroup;
@@ -42,7 +47,11 @@ export class SchedC1Component implements OnInit, OnChanges {
   public file: any = null;
   public fileNameToDisplay: string = null;
 
-  constructor(private _fb: FormBuilder, private _contactsService: ContactsService) {}
+  constructor(
+    private _fb: FormBuilder,
+    private _contactsService: ContactsService,
+    private _typeaheadService: TypeaheadService
+  ) {}
 
   public ngOnInit() {
     this.sectionType = Sections.initialSection;
@@ -52,6 +61,9 @@ export class SchedC1Component implements OnInit, OnChanges {
 
   public ngOnChanges(changes: SimpleChanges) {
     this._clearFormValues();
+    if (this.scheduleAction === ScheduleActions.edit) {
+      // TODO populate form using API response from schedC.
+    }
   }
 
   public formatSectionType() {
@@ -83,35 +95,73 @@ export class SchedC1Component implements OnInit, OnChanges {
    * Validate section before proceeding to the next.
    */
   public showNextSection() {
+    // Mark as touched if user clicks next on an untouched, invalid form
+    // to display fields in error.
+    this.c1Form.markAsTouched();
+
     switch (this.sectionType) {
       case Sections.initialSection:
         if (this._checkSectionValid()) {
+          // mark as untouched so fields on new section/screen do not show as invalid
+          this.c1Form.markAsUntouched();
           this.sectionType = Sections.sectionA;
         }
         break;
       case Sections.sectionA:
-        this.sectionType = Sections.sectionB;
+        if (this._checkSectionValid()) {
+          // mark as untouched so fields on new section/screen do not show as invalid
+          this.c1Form.markAsUntouched();
+          this.sectionType = Sections.sectionB;
+        }
         break;
       case Sections.sectionB:
-        this.sectionType = Sections.sectionC;
+        if (this._checkSectionValid()) {
+          // mark as untouched so fields on new section/screen do not show as invalid
+          this.c1Form.markAsUntouched();
+          this.sectionType = Sections.sectionC;
+        }
         break;
       case Sections.sectionC:
-        this.sectionType = Sections.sectionD;
+        if (this._checkSectionValid()) {
+          // mark as untouched so fields on new section/screen do not show as invalid
+          this.c1Form.markAsUntouched();
+          this.sectionType = Sections.sectionD;
+        }
         break;
       case Sections.sectionD:
-        this.sectionType = Sections.sectionE;
+        if (this._checkSectionValid()) {
+          // mark as untouched so fields on new section/screen do not show as invalid
+          this.c1Form.markAsUntouched();
+          this.sectionType = Sections.sectionE;
+        }
         break;
       case Sections.sectionE:
-        this.sectionType = Sections.sectionF;
+        if (this._checkSectionValid()) {
+          // mark as untouched so fields on new section/screen do not show as invalid
+          this.c1Form.markAsUntouched();
+          this.sectionType = Sections.sectionF;
+        }
         break;
       case Sections.sectionF:
-        this.sectionType = Sections.sectionG;
+        if (this._checkSectionValid()) {
+          // mark as untouched so fields on new section/screen do not show as invalid
+          this.c1Form.markAsUntouched();
+          this.sectionType = Sections.sectionG;
+        }
         break;
       case Sections.sectionG:
-        this.sectionType = Sections.sectionH;
+        if (this._checkSectionValid()) {
+          // mark as untouched so fields on new section/screen do not show as invalid
+          this.c1Form.markAsUntouched();
+          this.sectionType = Sections.sectionH;
+        }
         break;
       case Sections.sectionH:
-        this.sectionType = Sections.sectionI;
+        if (this._checkSectionValid()) {
+          // mark as untouched so fields on new section/screen do not show as invalid
+          this.c1Form.markAsUntouched();
+          this.sectionType = Sections.sectionI;
+        }
         break;
       default:
         this.sectionType = Sections.initialSection;
@@ -160,22 +210,149 @@ export class SchedC1Component implements OnInit, OnChanges {
       case Sections.initialSection:
         return this._checkInitialSectionValid();
       case Sections.sectionA:
-        // TODO add method for checking section for valid fields before progressing
-        return true;
+        return this._checkSectionAValid();
+      case Sections.sectionB:
+        return this._checkSectionBValid();
+      case Sections.sectionC:
+        return this._checkSectionCValid();
+      case Sections.sectionD:
+        return this._checkSectionDValid();
+      case Sections.sectionE:
+        return this._checkSectionEValid();
+      case Sections.sectionF:
+        return this._checkSectionFValid();
+      case Sections.sectionG:
+        return this._checkSectionGValid();
+      case Sections.sectionH:
+        return this._checkSectionHValid();
       default:
-        return false;
+        return true;
     }
   }
 
   private _checkInitialSectionValid(): boolean {
-    // TODO check for valid form fields
+    // comment out for ease of dev testing - add back later.
+    if (!this._checkFormFieldIsValid('lending_institution')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('mailing_address')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('city')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('state')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('zip')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('original_loan_amount')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('loan_intrest_rate')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('loan_incurred_date')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('loan_due_date')) {
+      return false;
+    }
     return true;
+  }
+
+  private _checkSectionAValid(): boolean {
+    if (!this._checkFormFieldIsValid('is_loan_restructured')) {
+      return false;
+    }
+    return true;
+  }
+
+  private _checkSectionBValid(): boolean {
+    if (!this._checkFormFieldIsValid('credit_amount_this_draw')) {
+      return false;
+    }
+    return true;
+  }
+
+  private _checkSectionCValid(): boolean {
+    if (!this._checkFormFieldIsValid('other_parties_liable')) {
+      return false;
+    }
+    return true;
+  }
+
+  private _checkSectionDValid(): boolean {
+    if (!this._checkFormFieldIsValid('pledged_collateral_ind')) {
+      return false;
+    }
+    return true;
+  }
+
+  private _checkSectionEValid(): boolean {
+    if (!this._checkFormFieldIsValid('future_income_ind')) {
+      return false;
+    }
+    return true;
+  }
+
+  private _checkSectionFValid(): boolean {
+    if (!this._checkFormFieldIsValid('basis_of_loan_desc')) {
+      return false;
+    }
+    return true;
+  }
+
+  private _checkSectionGValid(): boolean {
+    if (!this._checkFormFieldIsValid('treasurer_last_name')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('treasurer_first_name')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('treasurer_middle_name')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('treasurer_prefix')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('treasurer_suffix')) {
+      return false;
+    }
+    if (!this._checkFormFieldIsValid('treasurer_signed_date')) {
+      return false;
+    }
+    return true;
+  }
+
+  private _checkSectionHValid(): boolean {
+    if (!this._checkFormFieldIsValid('file_upload')) {
+      return false;
+    }
+    return true;
+  }
+
+  private _checkSectionIValid(): boolean {
+    if (!this._checkFormFieldIsValid('final_authorization')) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Returns true if the field is valid.
+   * @param fieldName name of control to check for validity
+   */
+  private _checkFormFieldIsValid(fieldName: string): boolean {
+    if (this.c1Form.contains(fieldName)) {
+      return this.c1Form.get(fieldName).valid;
+    }
   }
 
   private _getStates() {
     this._contactsService.getStates().subscribe(res => {
       this.states = res;
-      // this._setFormGroup();
     });
   }
 
@@ -204,7 +381,9 @@ export class SchedC1Component implements OnInit, OnChanges {
       treasurer_middle_name: new FormControl(null, [Validators.maxLength(20), alphaNumericFn]),
       treasurer_prefix: new FormControl(null, [Validators.maxLength(10), alphaNumericFn]),
       treasurer_suffix: new FormControl(null, [Validators.maxLength(10), alphaNumericFn]),
-      treasurer_signed_date: new FormControl(null, [Validators.required])
+      treasurer_signed_date: new FormControl(null, [Validators.required]),
+      file_upload: new FormControl(null, [Validators.required]),
+      final_authorization: new FormControl(null, [Validators.requiredTrue])
     });
   }
 
@@ -213,7 +392,11 @@ export class SchedC1Component implements OnInit, OnChanges {
   }
 
   public finish() {
-    alert('Finish not yet implemented');
+    if (this._checkSectionIValid()) {
+      alert('Finish not yet implemented');
+    } else {
+      this.c1Form.markAsTouched();
+    }
   }
 
   public uploadFile() {
@@ -223,5 +406,109 @@ export class SchedC1Component implements OnInit, OnChanges {
 
   private _clearFormValues() {
     this.c1Form.reset();
+  }
+
+  // type ahead start
+  // type ahead start
+  // type ahead start
+
+  /**
+   *
+   * @param $event
+   */
+  public handleSelectedIndividual($event: NgbTypeaheadSelectItemEvent) {
+    // TODO set entity id? in formGroup
+    const entity = $event.item;
+    this.c1Form.patchValue({ treasurer_last_name: entity.last_name }, { onlySelf: true });
+    this.c1Form.patchValue({ treasurer_first_name: entity.first_name }, { onlySelf: true });
+    this.c1Form.patchValue({ treasurer_middle_name: entity.middle_name }, { onlySelf: true });
+    this.c1Form.patchValue({ treasurer_prefix: entity.prefix }, { onlySelf: true });
+    this.c1Form.patchValue({ treasurer_suffix: entity.suffix }, { onlySelf: true });
+  }
+
+  /**
+   * Format an entity to display in the type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadItem(result: any) {
+    const lastName = result.last_name ? result.last_name.trim() : '';
+    const firstName = result.first_name ? result.first_name.trim() : '';
+    const street1 = result.street_1 ? result.street_1.trim() : '';
+    const street2 = result.street_2 ? result.street_2.trim() : '';
+
+    return `${lastName}, ${firstName}, ${street1}, ${street2}`;
+  }
+
+  /**
+   * Search for entities/contacts when last name input value changes.
+   */
+  searchLastName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'last_name');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
+   * Search for entities/contacts when first name input value changes.
+   */
+  searchFirstName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'first_name');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the last name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterLastName = (x: { last_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.last_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * format the value to display in the input field once selected from the typeahead.
+   *
+   * For some reason this gets called for all typeahead fields despite the binding in the
+   * template to the first name field.  In these cases return x to retain the value in the
+   * input for the other typeahead fields.
+   */
+  formatterFirstName = (x: { first_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.first_name;
+    } else {
+      return x;
+    }
+  };
+
+  // type ahead end
+  // type ahead end
+  // type ahead end
+
+  public setFile(e: any): void {
+    if (e.target.files[0]) {
+      this.c1Form.patchValue({ file_upload: e.target.files[0] }, { onlySelf: true });
+    }
   }
 }
