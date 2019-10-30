@@ -57,6 +57,7 @@ export class F3xComponent implements OnInit {
   public formType: string = '';
   public scheduleAction: ScheduleActions;
   public forceChangeDetectionC1: Date;
+  public allTransactions: boolean = false;
 
   private _step: string = '';
   private _cloned: boolean = false;
@@ -82,6 +83,11 @@ export class F3xComponent implements OnInit {
       }
       if (p.reportId && p.reportId !== '0') {
         this._reportId = p.reportId;
+      }
+      if (p.allTransactions === true || p.allTransactions === 'true') {
+        this.allTransactions = true;
+      } else {
+        this.allTransactions = false;
       }
     });
   }

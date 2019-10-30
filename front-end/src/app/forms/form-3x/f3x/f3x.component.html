@@ -1,7 +1,7 @@
 <div class="forms__wizard" *ngIf="!loadingData">
   <!--div class="form__sidebar" *ngIf="step !== 'financial_summary'">-->
   <div class="form__sidebar">
-    <div [hidden]="step !== 'step_1'">
+    <div [hidden]="step !== 'step_1'" *ngIf="!allTransactions">
       <report-type-sidebar
         title="Report Coverage Dates"
         (status)="onNotify($event)"
@@ -29,6 +29,7 @@
         [transactionCategories]="transactionCategories"
         (status)="onNotify($event)"
         [hidden]="isShowFilters"
+        *ngIf="!allTransactions"
       >
       </transaction-sidebar>
       <app-transactions-filter [hidden]="!isShowFilters" title="Filters" [formType]="formType">
@@ -42,7 +43,7 @@
       'hide-alerts': step === 'step_6'
     }"
   >
-    <div class="form__steps">
+    <div class="form__steps" *ngIf="!allTransactions">
       <app-steps
         [steps]="[
           { text: 'Report', step: 'step_1', edit: editMode },

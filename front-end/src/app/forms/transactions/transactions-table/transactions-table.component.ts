@@ -85,6 +85,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
   private _form99Details: any = {};
+  private _allTransactions: boolean = false;
 
   // Local Storage Keys
   private readonly transactionSortableColumnsLSK = 'transactions.trx.sortableColumn';
@@ -174,6 +175,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.setSortableColumns();
       if (p.edit === 'true' || p.edit === true) {
         this.editMode = true;
+      }
+      if (p.allTransactions === true || p.allTransactions === 'true') {
+        this._allTransactions = true;
+        this.ngOnInit();
+        this.getPage(1);
+      } else {
+        this._allTransactions = false;
       }
     });
   }
@@ -350,12 +358,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     switch (this.tableType) {
       case this.transactionsView:
+      default:
         this.getTransactionsPage(page);
         break;
       case this.recycleBinView:
         this.getRecyclingPage(page);
-        break;
-      default:
         break;
     }
   }
@@ -385,7 +392,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param page the page containing the transactions to get
    */
   public getTransactionsPage(page: number): void {
-    if (!this.reportId) {
+    if (!this.reportId && !this._allTransactions) {
       return;
     }
     this.config.currentPage = page;
@@ -431,7 +438,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         sortedCol.descending,
         this.filters,
         categoryType,
-        false
+        false,
+        this._allTransactions
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
@@ -473,7 +481,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         step: this._activatedRoute.snapshot.queryParams.step,
         reportId: this._activatedRoute.snapshot.queryParams.reportId,
         edit: this._activatedRoute.snapshot.queryParams.edit,
-        transactionCategory: transactionCategory
+        transactionCategory: transactionCategory,
+        allTransactions: this._allTransactions
       }
     });
   }
@@ -525,7 +534,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         sortedCol.descending,
         this.filters,
         categoryType,
-        true
+        true,
+        this._allTransactions
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];

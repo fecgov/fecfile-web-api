@@ -84,7 +84,8 @@ export class TransactionsService {
     descending: boolean,
     filters: TransactionFilterModel,
     categoryType: string,
-    trashed_flag: boolean
+    trashed_flag: boolean,
+    allTransactionsFlag: boolean
   ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
@@ -96,7 +97,10 @@ export class TransactionsService {
     // const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
 
     const request: any = {};
-    request.reportid = reportId;
+    if (!allTransactionsFlag) {
+      request.reportid = reportId;
+    }
+
     request.page = page;
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
