@@ -85,7 +85,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
   private _form99Details: any = {};
-  private _allTransactions: boolean = false;
+  public _allTransactions: boolean = false;
 
   // Local Storage Keys
   private readonly transactionSortableColumnsLSK = 'transactions.trx.sortableColumn';

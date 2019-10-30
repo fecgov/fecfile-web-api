@@ -45,6 +45,8 @@
             <input [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox" (change)="changeAllTransactionsSelected()">
           </div>
         </th>
+        <th [@fadeInOut] *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
+        </th>
          <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
@@ -132,6 +134,7 @@
           <td>
             <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
           </td>
+          <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
           <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" 
@@ -196,6 +199,7 @@
           <td style="padding-left: 1.5rem;">
             <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
           </td>
+          <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
@@ -254,6 +258,7 @@
       
       <tr *ngIf="isTransactionViewActive()">
         <td></td>
+        <td *ngIf="_allTransactions"></td>
         <td *ngIf="isColumnVisible('type')"></td>
         <td *ngIf="isColumnVisible('transactionId')"></td>
         <td *ngIf="isColumnVisible('name')"></td>
@@ -304,6 +309,8 @@
             <input 
               [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
               (change)="changeAllTransactionsSelected()">
+          </th>
+          <th [@fadeInOut] *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
           </th>
            <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
           </th>
@@ -387,6 +394,7 @@
             <td>
               <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
+            <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')">
               {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
             <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
@@ -450,6 +458,7 @@
             <td style="padding-left: 1.5rem;">
               <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
+            <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
@@ -507,6 +516,7 @@
         
         <tr *ngIf="isTransactionViewActive()">
           <td></td>
+          <td *ngIf="_allTransactions"></td>
           <td *ngIf="isColumnVisible('type')"></td>
           <td *ngIf="isColumnVisible('name')"></td>
           <td *ngIf="isColumnVisible('date')"></td>
@@ -551,6 +561,8 @@
             <input 
               [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
               (change)="changeAllTransactionsSelected()">
+          </th>
+          <th [@fadeInOut] *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
           </th>
            <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Transaction Type
           </th>
@@ -649,6 +661,7 @@
             <td>
               <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
+            <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')">
               {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
             <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
@@ -717,6 +730,7 @@
             <td style="padding-left: 1.5rem;">
               <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
+            <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">
               {{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
             <td [@fadeInOut]
@@ -828,7 +842,8 @@
               [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
               (change)="changeAllTransactionsSelected()">
           </th>
-          
+          <th [@fadeInOut] *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
+          </th>
           <th [@fadeInOut] *ngIf="isColumnVisible('schedule')" [class]="getSortClass('schedule')" (click)="changeSortDirection('schedule')">Schedule
           </th>
            <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Transaction Type
@@ -910,6 +925,7 @@
             <td>
               <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
+            <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trx.schedule}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')">
               {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
@@ -972,6 +988,7 @@
             <td style="padding-left: 1.5rem;">
               <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
+            <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trxChild.schedule}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
@@ -1027,6 +1044,7 @@
         
         <tr *ngIf="isTransactionViewActive()">
           <td></td>
+          <td *ngIf="_allTransactions"></td>
           <td *ngIf="isColumnVisible('schedule')"></td>
           <td *ngIf="isColumnVisible('type')"></td>
           <td *ngIf="isColumnVisible('name')"></td>
