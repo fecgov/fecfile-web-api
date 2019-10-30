@@ -39,6 +39,7 @@ export class TransactionModel {
   loanIncurredDate: any;
   loanPaymentAmt: any;
   loanPaymentToDate: any;
+  reportType: any;
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
@@ -75,6 +76,7 @@ export class TransactionModel {
     this.loanIncurredDate = transaction.loanIncurredDate ? transaction.loanIncurredDate : '';
     this.loanPaymentAmt = transaction.loanPaymentAmt ? transaction.loanPaymentAmt : '';
     this.loanPaymentToDate = transaction.loanPaymentToDate ? transaction.loanPaymentToDate : '';
+    this.reportType = transaction.reportType ? transaction.reportType : '';
     this.selected = transaction.selected;
     this.itemized = transaction.itemized;
     this.reportStatus = transaction.reportStatus;
