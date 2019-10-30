@@ -862,6 +862,9 @@ def do_carryover(report_id, cmte_id):
             cursor.execute(_sql, (report_id, cmte_id))
             if cursor.rowcount == 0:
                 logger.debug('No valid debts found.')
+            logger.debug(
+                'debt carryover done with report_id {}'.format(report_id))
+            logger.debug('total carryover debts:{}'.format(cursor.rowcount))
     except:
         raise
 
