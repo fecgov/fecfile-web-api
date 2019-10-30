@@ -114,6 +114,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public isHideElectionCode: boolean;
   public isHideElectionYear: boolean;
   public isHideloanClosingBalanceFilter: boolean;
+  public isHideScheduleFilter: boolean;
   public transactionCategories: any = [];
   public states: any = [];
   public itemizations: any = [];
@@ -139,6 +140,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public filterElectionCode = false;
   public filterElectionYearFrom: string;
   public filterElectionYearTo: string;
+  public filterSchedule: string;
   public dateFilterValidation: ValidationErrorModel;
   public deletedDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
@@ -237,6 +239,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.isHideItemizationFilter = true;
     this.isHideElectionCode = true;
     this.isHideElectionYear = true;
+    this.isHideScheduleFilter = true;
 
     this.initValidationErrors();
 
@@ -310,6 +313,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   public toggleMemoFilterItem() {
     this.isHideMemoFilter = !this.isHideMemoFilter;
+  }
+
+   /**
+   * Toggle visibility of the Schedule filter
+   */
+  public toggleScheduleFilterItem() {
+    this.isHideScheduleFilter = !this.isHideScheduleFilter;
   }
 
   /**
@@ -533,7 +543,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       }
     }
     filters.filterElectionCodes = filterElectionCodes;
-    console.log('filters.filterItemizations =', filters.filterItemizations);
+
+    filters.filterSchedule = this.filterSchedule;
 
     filters.show = modified;
     this._transactionsMessageService.sendApplyFiltersMessage({ filters: filters, isClearKeyword: isClearKeyword });
@@ -586,6 +597,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     }
     this.filterElectionYearFrom = null;
     this.filterElectionYearTo = null;
+    this.filterSchedule = null;
   }
 
   /**
@@ -1021,9 +1033,9 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             this.filterLoanAmountMax = null;
             break;
           case FilterTypes.loanClosingBalance:
-              this.filterLoanClosingBalanceMin = null;
-              this.filterLoanClosingBalanceMax = null;
-              break;
+            this.filterLoanClosingBalanceMin = null;
+            this.filterLoanClosingBalanceMax = null;
+            break;
           case FilterTypes.memoCode:
             this.filterMemoCode = false;
             break;
@@ -1044,6 +1056,9 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
           case FilterTypes.electionYear:
             this.filterElectionYearFrom = null;
             this.filterElectionYearTo = null;
+            break;
+          case FilterTypes.schedule:
+            this.filterSchedule = null;
             break;
           default:
             console.log('unexpected key for remove filter = ' + message.key);
