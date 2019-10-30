@@ -272,13 +272,14 @@ def schedD_sql_dict(data):
     """
     valid_fields = [
         "transaction_type_identifier",
-        "entity_id",
         "purpose",
         "beginning_balance",
         "incurred_amount",
         "payment_amount",
         "balance_at_close",
         "line_number",
+        "back_ref_transaction_id",
+        "back_ref_sched_name",
         # entity_data
         "entity_id",
         "entity_type",
@@ -481,8 +482,10 @@ def post_sql_schedD(data):
                                     incurred_amount,
                                     payment_amount,
                                     balance_at_close,
+                                    back_ref_transaction_id,
+                                    back_ref_sched_name,
                                     create_date)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         _v = (
             data.get("cmte_id"),
@@ -496,6 +499,8 @@ def post_sql_schedD(data):
             data.get("incurred_amount"),
             data.get("payment_amount"),
             data.get("balance_at_close"),
+            data.get("back_ref_transaction_id"),
+            data.get("back_ref_sched_name"),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -518,6 +523,8 @@ def put_sql_schedD(data):
                 balance_at_close = %s,
                 incurred_amount = %s,
                 payment_amount = %s,
+                back_ref_transaction_id = %s,
+                back_ref_sched_name = %s,
                 last_update_date = %s
             WHERE transaction_id = %s 
             AND report_id = %s 
@@ -533,6 +540,8 @@ def put_sql_schedD(data):
         data.get("balance_at_close"),
         data.get("incurred_amount"),
         data.get("payment_amount"),
+        data.get("back_ref_transaction_id"),
+        data.get("back_ref_sched_name"),
         datetime.datetime.now(),
         data.get("transaction_id"),
         data.get("report_id"),
@@ -661,6 +670,7 @@ def do_carryover(report_id, cmte_id):
     1. load all non-zero close_balance sched_d
     2. update all records with new transaction_id, new report_id
     3. copy close_balance to starting_balance, leave all other amount 0
+    4. insert into db
     """
     _sql = """
     insert into public.sched_d(
@@ -675,6 +685,7 @@ def do_carryover(report_id, cmte_id):
                     incurred_amount, 
                     payment_amount, 
 					purpose,
+                    back_ref_transaction_id,
                     create_date
 					)
 					SELECT 
@@ -689,6 +700,7 @@ def do_carryover(report_id, cmte_id):
                     0, 
                     0, 
 					purpose,
+                    transaction_id,
                     now()
             FROM public.sched_d 
             WHERE 
@@ -726,6 +738,8 @@ def get_list_all_schedD(report_id, cmte_id):
                     balance_at_close, 
                     incurred_amount, 
                     payment_amount, 
+                    back_ref_transaction_id,
+                    back_ref_sched_name,
                     last_update_date
             FROM public.sched_d 
             WHERE report_id = %s 
@@ -787,7 +801,13 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
                     transaction_type_identifier,
                     transaction_id,
                     entity_id,
-                    balance_at_close as beginning_balance,
+                    beginning_balance, 
+                    balance_at_close, 
+                    incurred_amount, 
+                    payment_amount, 
+                    back_ref_transaction_id,
+                    back_ref_sched_name,
+                    balance_at_close,
                     last_update_date
             FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
             AND transaction_id = %s AND delete_ind is distinct from 'Y'
