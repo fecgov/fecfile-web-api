@@ -311,9 +311,36 @@ def schedD_sql_dict(data):
         )
         logger.debug(line_num)
         valid_data["line_number"] = line_num
-        return valid_data
+        if valid_transaction_amounts(data):
+            return valid_data
+        else:
+            raise Exception('transaction amounts does not add up together.')
     except:
         raise Exception("invalid request data.")
+
+
+def valid_transaction_amounts(data):
+    """
+    make sure transaction amounts add up
+    beginning_balance + incurred_amount - payment == balance_at_close
+    """
+    beginning_balance = data.get('beginning_balance')
+    if not beginning_balance:
+        beginning_balance = 0
+    balance_at_close = data.get('balance_at_close')
+    if not balance_at_close:
+        balance_at_close = 0
+    incurred_amount = data.get('incurred_amount')
+    if not incurred_amount:
+        incurred_amount = 0
+    payment_amount = data.get('payment_amount')
+    if not payment_amount:
+        payment_amount = 0
+    return (
+        float(beginning_balance) +
+        float(incurred_amount) -
+        float(payment_amount)
+    ) == float(balance_at_close)
 
 
 def put_schedD(datum):
@@ -357,19 +384,140 @@ def put_schedD(datum):
         #     entity_data = post_entities(datum)
         # entity_id = entity_data.get('entity_id')
         # datum['entity_id'] = entity_id
+        cmte_id = datum.get('cmte_id')
+        report_id = datum.get('report_id')
+        current_close_balance = float(datum.get('balance_at_close'))
+        existing_close_balance = float(get_existing_close_balance(
+            cmte_id,
+            report_id,
+            transaction_id))
         try:
             put_sql_schedD(datum)
+            # do downstream proprgation if necessary
+            if not existing_close_balance == current_close_balance:
+                do_downstream_propagation(
+                    transaction_id,
+                    current_close_balance
+                )
         except Exception as e:
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get(
-                    "cmte_id"), "entity_id": entity_id}
+                get_data = {
+                    "cmte_id": datum.get("cmte_id"),
+                    "entity_id": entity_id
+                }
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedD function is throwing an error: " + str(e)
             )
         return datum
+    except:
+        raise
+
+
+def get_existing_close_balance(cmte_id, report_id, transaction_id):
+    """
+    fetch existing close balance in the db for current transaction
+    """
+    _sql = """
+    select balance_at_close
+    from public.sched_d
+    where cmte_id = %s
+    and report_id = %s
+    and transaction_id = %s
+    """
+    _v = (cmte_id, report_id, transaction_id)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _v)
+            return cursor.fetchone()[0]
+    except:
+        raise
+
+
+def has_downstream_child(transaction_id):
+    """
+    check if current sched_d transaction has other carry over child or not
+    """
+    _sql = """
+    select * from public.sched_d 
+    where back_ref_transaction_id = %s
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (transaction_id))
+            return cursor.rowcount != 0
+    except:
+        raise
+
+
+def update_child(transaction_id, new_beginning_balance, new_close_balance):
+    """
+    update child transaction beginning balance and close balance
+    """
+    _sql = """
+            UPDATE public.sched_d
+            SET beginning_balance = %s,
+                balance_at_close = %s,
+                last_update_date = %s
+            WHERE transaction_id = %s 
+            AND delete_ind is distinct from 'Y';
+        """
+    _v = (
+        new_close_balance,
+        new_close_balance,
+        datetime.datetime.now(),
+        transaction_id
+    )
+    logger.debug('update child sched_d with values: {}'.format(_v))
+    do_transaction(_sql, _v)
+
+
+def do_downstream_propagation(transaction_id, new_balance):
+    """
+
+    1. query child amount fileds
+    2. re-calcualte close_balance
+    3. save new value: beginning balance and close balance
+    4. return child transaction id and new close balance for propagation
+
+    """
+    logger.debug('doing downstream propagation updates...')
+    logger.debug('current transaction id:{}'.format(transaction_id))
+    logger.debug('current balance:{}'.format(new_balance))
+
+    _sql = """
+        SELECT transaction_id, incurred_amount, payment_amount
+        FROM public.sched_d 
+        WHERE back_ref_transaction_id = '{}'
+            AND delete_ind is distinct from 'Y'
+    """.format(transaction_id)
+    try:
+        new_beginning_balance = new_balance
+        with connection.cursor() as cursor:
+            cursor.execute(_sql)
+
+            # no child found anymore, return; propagation update done
+            if cursor.rowcount == 0:
+                logger.debug('no child found any more.')
+                return
+
+            child_tran = cursor.fetchone()
+
+            child_id = child_tran[0]
+            logger.debug('child id:{}'.format(child_id))
+            incurred_amt = child_tran[1]
+            payment_amt = child_tran[2]
+            new_close_balance = (
+                float(new_beginning_balance) +
+                float(incurred_amt) -
+                float(payment_amt)
+            )
+            logger.debug('new close balance:{}'.format(new_close_balance))
+            update_child(child_id, new_beginning_balance, new_close_balance)
+            # recrusive update
+            do_downstream_propagation(child_id, new_close_balance)
     except:
         raise
 
