@@ -234,7 +234,7 @@
           </i>
         </div>
         <div class="card-body" [@openClose]="!isHideloanClosingBalanceFilter ? 'open' : 'closed'">
-          <div *ngIf="loanClosingBalanceFilterValidation.isError" class="text-error text-center">
+          <div *ngIf="loanClosingBalanceFilterValidation?.isError" class="text-error text-center">
             {{ loanClosingBalanceFilterValidation.message }}
           </div>            
           <label for="filter-amount-min">Minimum</label>
