@@ -1027,6 +1027,8 @@ def schedB(request):
             cmte_id = request.user.username
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
+            if not('transaction_type_identifier' in request.data):
+                raise Exception("Missing Input: transaction_type_identifier")
             # handling null,none value of report_id
             # TODO: can report_id be 0? what does it mean?
             if not (check_null_value(request.data.get("report_id"))):
