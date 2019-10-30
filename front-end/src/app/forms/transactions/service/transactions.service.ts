@@ -368,6 +368,36 @@ export class TransactionsService {
       case 'itemized':
         name = 'itemized';
         break;
+      case 'election_code':
+        name = 'electionCode';
+        break;
+      case 'loan_amount':
+        name = 'loanAmount';
+        break;
+      case 'loan_balance':
+        name = 'loanBalance';
+        break;
+      case 'loan_beginning_balance':
+        name = 'loanBeginningBalance';
+        break;
+      case 'loan_closing_balance':
+        name = 'loanClosingBalance';
+        break;
+      case 'loan_due_date':
+        name = 'loanDueDate';
+        break;
+        case 'loan_incurred_amt':
+        name = 'loanIncurredAmt';
+        break;
+        case 'loan_incurred_date':
+        name = 'loanIncurredDate';
+        break;
+        case 'loan_payment_amt':
+        name = 'loanPaymentAmt';
+        break;
+        case 'loan_payment_to_date':
+        name = 'loanPaymentToDate';
+        break;
       default:
     }
     return name ? name : '';
@@ -474,7 +504,10 @@ export class TransactionsService {
           'transaction_date_ui',
           'deleted_date_ui',
           'zip_code_ui',
-          'itemized'
+          'itemized',
+          'election_code',
+          'election_year',
+          ''
         ];
 
         for (let keyword of filters.keywords) {
@@ -823,7 +856,15 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.deletedDate = row.deleted_date ? row.deleted_date : null;
   model.itemized = row.itemized;
   model.reportStatus = row.reportStatus;
-  model.election_code = row.electionCode;
-  model.election_year = row.electionYear;
-
+  model.electionCode = row.election_code;
+  model.electionYear = row.election_year;
+  model.loanAmount = row.loan_amount;
+  model.loanBalance = row.loan_balance;
+  model.loanBeginningBalance = row.loan_beginning_balance;
+  model.loanClosingBalance = row.loan_closing_balance;
+  model.loanDueDate = row.loan_due_date;
+  model.loanIncurredAmt = row.loan_incurred_amt;
+  model.loanIncurredDate = row.loan_incurred_date;
+  model.loanPaymentAmt = row.loan_payment_amt;
+  model.loanPaymentToDate = row.loan_payment_to_date;
 }

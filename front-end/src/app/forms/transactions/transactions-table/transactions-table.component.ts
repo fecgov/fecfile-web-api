@@ -1329,7 +1329,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     ];
     if (this.transactionCategory === 'disbursements') {
       defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
-      // Donor Committee ID, Election Code, Election Year
       otherSortColumns = [
         'transactionId',
         'street',
@@ -1342,11 +1341,25 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'electionYear'
       ];
     } else if (this.transactionCategory === 'loans-and-debts') {
-      // Balance at Close (D)
-      defaultSortColumns = ['type', 'name', '', 'amount'];
-      // Purpose of Debt (D), Beginning Balance (D), Incurred Amount (D), Payment Amount (D)
-      // Loan Amount (C), Loan Payment to Date (C), Loan Balance (C), Loan Incurred Date (C), Loan Due Date (C)
-      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoCode', 'memoText', '', ''];
+      defaultSortColumns = ['type', 'name', 'loanClosingBalance', 'loanBalance'];
+      otherSortColumns = [
+        'transactionId',
+        'street',
+        'city',
+        'state',
+        'zip',
+        'memoCode',
+        'memoText',
+        'purposeDescription',
+        'loanBeginningBalance',
+        'loanAmount',
+        'loanClosingBalance',
+        'loanDueDate',
+        'loanIncurredAmt',
+        'loanIncurredDate',
+        'loanPaymentAmt',
+        'loanPaymentToDate'
+      ];
     } else if (this.transactionCategory === 'other') {
       // Schedule
       defaultSortColumns = ['', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];

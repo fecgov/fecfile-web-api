@@ -30,7 +30,9 @@ export enum FilterTypes {
   memoCode = 'memoCode',
   itemizations = 'itemizations',
   electionCodes = 'electionCodes',
-  electionYear = 'electionYear'
+  electionYear = 'electionYear',
+  loanAmount = 'loanAmount',
+  loanClosingBalance = 'loanClosingBalance'
 }
 
 /**
