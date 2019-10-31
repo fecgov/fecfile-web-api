@@ -1337,7 +1337,14 @@ export class LoanComponent implements OnInit, OnDestroy {
     }
   }
 
-  public loanRepayment(): void {}
+   public loanRepayment(): void {
+    // this.doValidateLoan(); //is this needed ZS-TODO
+    console.log("Loading loan repayment form");
+    let reportId = this._receiptService.getReportIdFromStorage(this._formType);
+    this._router.navigate([`/forms/form/${this._formType}`], {
+             queryParams: { step: 'loanpayment', reportId: reportId }
+           });
+  }
 
   public AddLoanEndorser(): void {}
 
