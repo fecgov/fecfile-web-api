@@ -20,7 +20,8 @@
         step === 'reports' ||
         step === 'step_4' ||
         step === 'loansummary' ||
-        step === 'loan'
+        step === 'loan' ||
+        step === 'loanpayment'
       "
     >
       <transaction-sidebar
@@ -178,7 +179,7 @@
       <div class="form_step" [hidden]="step !== 'loanendorsersummary'">
         <app-loanendorsersummary> </app-loanendorsersummary>
       </div>
-      <div class="form_step" [hidden]="step !== 'loanpayment'">
+      <div class="form_step" [hidden]="step !== 'loanpayment'" *ngIf="step === 'loanpayment'">
         <app-loanpayment> </app-loanpayment>
       </div>
       <div class="form_step" [hidden]="step !== 'loanreceipt'">

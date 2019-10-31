@@ -1,3 +1,4 @@
+import { LoanpaymentComponent } from './forms/sched-c/loanpayment/loanpayment.component';
 import { HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -161,7 +162,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     EndorserComponent,
     SchedC1Component,
     SchedH3Component,
-    SchedH5Component
+    SchedH5Component, 
+    LoanpaymentComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [
