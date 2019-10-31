@@ -445,6 +445,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
 
     if (this.scheduleAction === ScheduleActions.add) {
+      
+      this.frmIndividualReceipt.patchValue({ total_amount: '120'}, { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ fed_share_amount: '60'}, { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ non_fed_share_amount: '60'}, { onlySelf: true });
+
       this.frmIndividualReceipt.patchValue({ beginning_balance: this._decimalPipe.transform(0, '.2-2') },
         { onlySelf: true });
       this.frmIndividualReceipt.patchValue({ payment_amount: this._decimalPipe.transform(0, '.2-2') },
@@ -819,7 +824,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (!this.frmIndividualReceipt.contains('total_amount')) {
       return;
     }
-    let totalAmount = this.frmIndividualReceipt.get('total_amount').value;
+    let totalAmount = '100'; //this.frmIndividualReceipt.get('total_amount').value;
     if (!totalAmount) {
       return;
     }

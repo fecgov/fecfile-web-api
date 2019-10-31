@@ -83,21 +83,23 @@
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_3'">
-        <f3x-individual-receipt
-          [hidden]="
-            scheduleType !== 'sched_a' &&
-            scheduleType !== 'sched_b' &&
-            scheduleType !== 'sched_d' &&
-            scheduleType !== 'sched_h4' &&
-            scheduleType !== 'sched_h6'
-          "
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
-        </f3x-individual-receipt>
+        <div [hidden]="transactionType === 'ALLOC_H4_TYPES' || transactionType === 'ALLOC_H4_SUM'">
+          <f3x-individual-receipt
+            [hidden]="
+              scheduleType !== 'sched_a' &&
+              scheduleType !== 'sched_b' &&
+              scheduleType !== 'sched_d' &&
+              scheduleType !== 'sched_h4' &&
+              scheduleType !== 'sched_h6'              
+            "
+            [transactionTypeText]="transactionTypeText"
+            [transactionType]="transactionType"
+            [scheduleAction]="scheduleAction"
+            [scheduleType]="scheduleType"
+            (status)="onNotify($event)"
+          >
+          </f3x-individual-receipt>
+        </div>
         <app-sched-f
           [hidden]="scheduleType !== 'sched_f'"
           [transactionTypeText]="transactionTypeTextSchedF"
@@ -152,6 +154,15 @@
           [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
           (status)="onNotify($event)">
         </app-sched-h5>
+        <app-sched-h4          
+          [hidden]="transactionType !== 'ALLOC_H4_TYPES' && transactionType !== 'ALLOC_H4_SUM'"
+          [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >      
+        </app-sched-h4>
 
       </div>
 
