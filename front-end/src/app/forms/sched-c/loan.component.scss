@@ -101,6 +101,10 @@
             }
           }
 
+          .ng-select.ng-select-single .ng-select-container {
+            height: 44px;
+          }
+
           /**
            * Custom CSS for state dropdown component.
            */

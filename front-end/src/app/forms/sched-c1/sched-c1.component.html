@@ -205,7 +205,7 @@
       <div class="row">
         <div class="col col-md-4">
           <div class="form-group">
-            <label for="original_loan_amount">
+            <label for="loan_amount">
               Original Loan Amount
               <div
                 type="button"
@@ -225,18 +225,19 @@
               </div>
               <input
                 class="form-control"
-                id="original_loan_amount"
+                id="loan_amount"
                 type="text"
-                [formControlName]="'original_loan_amount'"
-                [attr.name]="'original_loan_amount'"
+                [formControlName]="'loan_amount'"
+                [attr.name]="'loan_amount'"
                 [style.width]="'66%'"
                 [style.height]="'30px'"
                 [ngClass]="
-                  c1Form.get('original_loan_amount')?.invalid &&
+                  c1Form.get('loan_amount')?.invalid &&
                   (c1Form.touched || c1Form.dirty)
                     ? 'input-field-error'
                     : ''
                 "
+                (blur)="handleOnBlurEvent($event, 'loan_amount')"
               />
             </div>
           </div>
@@ -465,6 +466,7 @@
                   ? 'input-field-error'
                   : ''
               "
+              (blur)="handleOnBlurEvent($event, 'credit_amount_this_draw')"
             />
           </div>
         </div>

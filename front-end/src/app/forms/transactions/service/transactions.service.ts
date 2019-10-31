@@ -84,7 +84,8 @@ export class TransactionsService {
     descending: boolean,
     filters: TransactionFilterModel,
     categoryType: string,
-    trashed_flag: boolean
+    trashed_flag: boolean,
+    allTransactionsFlag: boolean
   ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
@@ -96,7 +97,10 @@ export class TransactionsService {
     // const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
 
     const request: any = {};
-    request.reportid = reportId;
+    if (!allTransactionsFlag) {
+      request.reportid = reportId;
+    }
+
     request.page = page;
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
@@ -294,6 +298,7 @@ export class TransactionsService {
     model.amount = row.contribution_amount;
     model.aggregate = row.contribution_aggregate;
     model.entityId = row.entity_id;
+    model.reportType = row.report_type;
   }
 
   /**
@@ -314,6 +319,9 @@ export class TransactionsService {
 
     name = appFieldName;
     switch (appFieldName) {
+      case 'reportType':
+        name = 'report_type';
+        break;
       case 'type':
         name = 'transaction_type_desc';
         break;
@@ -386,16 +394,16 @@ export class TransactionsService {
       case 'loan_due_date':
         name = 'loanDueDate';
         break;
-        case 'loan_incurred_amt':
+      case 'loan_incurred_amt':
         name = 'loanIncurredAmt';
         break;
-        case 'loan_incurred_date':
+      case 'loan_incurred_date':
         name = 'loanIncurredDate';
         break;
-        case 'loan_payment_amt':
+      case 'loan_payment_amt':
         name = 'loanPaymentAmt';
         break;
-        case 'loan_payment_to_date':
+      case 'loan_payment_to_date':
         name = 'loanPaymentToDate';
         break;
       default:
@@ -413,6 +421,7 @@ export class TransactionsService {
     if (!model) {
       return serverObject;
     }
+    serverObject.report_type = model.reportType;
     serverObject.entity_id = model.entityId;
     serverObject.transaction_type_desc = model.type;
     serverObject.transaction_type_identifier = model.transactionTypeIdentifier;
@@ -834,6 +843,7 @@ export class TransactionsService {
   }
 }
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
+  model.reportType = row.report_type;
   model.type = row.transaction_type_desc;
   model.entityId = row.entity_id;
   model.transactionTypeIdentifier = row.transaction_type_identifier;
