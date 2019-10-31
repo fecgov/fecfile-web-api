@@ -444,7 +444,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._listenForAggregateChanges();
     }
 
-    if (this.scheduleAction === ScheduleActions.add) {
+    if (this.scheduleAction === ScheduleActions.add) {      
       this.frmIndividualReceipt.patchValue({ beginning_balance: this._decimalPipe.transform(0, '.2-2') },
         { onlySelf: true });
       this.frmIndividualReceipt.patchValue({ payment_amount: this._decimalPipe.transform(0, '.2-2') },
@@ -822,7 +822,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (!this.frmIndividualReceipt.contains('total_amount')) {
       return;
     }
-    let totalAmount = this.frmIndividualReceipt.get('total_amount').value;
+    let totalAmount = '100'; //this.frmIndividualReceipt.get('total_amount').value;
     if (!totalAmount) {
       return;
     }
