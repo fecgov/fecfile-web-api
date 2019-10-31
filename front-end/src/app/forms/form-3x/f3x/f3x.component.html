@@ -185,7 +185,7 @@
       <div class="form_step" [hidden]="step !== 'loan'">
         <app-sched-c-loans (status)="onNotify($event)"> </app-sched-c-loans>
       </div>
-      <div class="form_step" [hidden]="step !== 'loansummary'">
+      <div class="form_step" [hidden]="step !== 'loansummary'" *ngIf="step ==='loansummary'">
         <app-loansummary> </app-loansummary>
       </div>
       <div class="form_step" [hidden]="step !== 'loanendorsersummary'">
