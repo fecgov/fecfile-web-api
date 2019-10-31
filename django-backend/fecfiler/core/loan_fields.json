@@ -290,7 +290,7 @@
             "height": "30px",
             "width": "100%",
             "validation": {
-              "required": true,
+              "required": false,
               "max": 20,
               "dollarAmount": false
             }
@@ -441,7 +441,7 @@
             "type": "select",
             "value": null,
             "height": "100%",
-            "width": "235px",
+            "width": "100%",
             "validation": {
               "required": true,
               "max": 4,
@@ -617,6 +617,52 @@
         ]
       },
       {
+        "colClassName": "col col-md-2",
+        "seperator": true,
+        "cols": [
+          {
+            "isReadonly": false,
+            "entityGroup": null,
+            "toggle": false,
+            "inputGroup": false,
+            "inputIcon": "",
+            "text": "Election",
+            "infoIcon": true,
+            "infoText": "Request language from RAD",
+            "name": "election_code",
+            "type": "select",
+            "value": null,
+            "height": "100%",
+            "width": "100%",
+            "validation": {
+              "required": true,
+              "max": 1,
+              "dollarAmount": false
+            }
+          },
+          {
+            "isReadonly": false,
+            "entityGroup": null,
+            "toggle": false,
+            "inputGroup": false,
+            "inputIcon": "",
+            "text": "Election Other Description",
+            "infoIcon": true,
+            "infoText": "Request language from RAD",
+            "name": "election_other_description",
+            "type": "text",
+            "value": null,
+            "height": "30px",
+            "width": "100%",
+            "validation": {
+              "required": false,
+              "max": 20,
+              "dollarAmount": false
+            }
+          }
+        ]
+      },
+      {
         "colClassName": "col col-md-4",
         "seperator": true,
         "cols": [
@@ -666,7 +712,7 @@
             "toggle": false,
             "inputGroup": true,
             "inputIcon": "dollar-sign-icon",
-            "text": "Outstanding balance at close of perriod",
+            "text": "Outstanding balance at close of period",
             "infoIcon": true,
             "infoText": "Request language from RAD",
             "name": "loan_payment_to_date",
@@ -752,14 +798,14 @@
             "toggle": false,
             "inputGroup": false,
             "inputIcon": "",
-            "text": "secured",
-            "infoIcon": false,
+            "text": "Secured",
+            "infoIcon": true,
             "infoText": null,
             "name": "secured",
             "type": "select",
             "value": null,
             "height": "30px",
-            "width": "235px",
+            "width": "100%",
             "validation": {
               "required": true,
               "max": 4,
