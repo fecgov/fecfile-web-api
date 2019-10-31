@@ -24,6 +24,7 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     transaction_exists,
+    update_sched_d_parent,
 )
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
@@ -1765,6 +1766,24 @@ def schedH4_sql_dict(data):
     except:
         raise Exception('invalid request data.')
 
+def get_existing_h4_total(cmte_id, transaction_id):
+    """
+    fetch existing close balance in the db for current transaction
+    """
+    _sql = """
+    select total_amount
+    from public.sched_h4
+    where cmte_id = %s
+    and transaction_id = %s
+    """
+    _v = (cmte_id, transaction_id)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _v)
+            return cursor.fetchone()[0]
+    except:
+        raise
+
 
 def put_schedH4(data):
     """
@@ -1795,9 +1814,24 @@ def put_schedH4(data):
         data["entity_id"] = entity_id
         data['payee_entity_id'] = entity_id
         #check_transaction_id(data.get('transaction_id'))
+
+        existing_total = get_existing_h4_total(
+            data.get('cmte_id'),
+            data.get('transaction_id')
+        )
         try:
             put_sql_schedH4(data)
             update_activity_event_amount_ytd(data)
+                        
+            # if debt payment, update parent sched_d
+            if data.get('transaction_type_identifier') == 'ALLOC_EXP_DEBT':
+                if float(existing_total) != float(data.get('total_amount')):
+                    update_sched_d_parent(
+                        data.get('cmte_id'),
+                        data.get('back_ref_transaction_id'),
+                        data.get('total_amount'),
+                        existing_total
+                    )
         except Exception as e:
             if roll_back:
                 entity_data = put_entities(prev_entity_list[0])
@@ -2062,6 +2096,14 @@ def post_schedH4(data):
         try:
             post_sql_schedH4(data)
             update_activity_event_amount_ytd(data)
+
+            # sched_d debt payment, need to update parent
+            if data.get('transaction_type_identifier') == 'ALLOC_EXP_DEBT':
+                update_sched_d_parent(
+                    data.get('cmte_id'),
+                    data.get('back_ref_transaction_id'),
+                    data.get('total_amount')
+                )
         except Exception as e:
             if roll_back:
                 entity_data = put_entities(prev_entity_list[0])
@@ -2927,6 +2969,25 @@ def schedH6_sql_dict(data):
     except:
         raise Exception('invalid request data.')
 
+
+def get_existing_h6_total(cmte_id, transaction_id):
+    """
+    fetch existing close balance in the db for current transaction
+    """
+    _sql = """
+    select total_fed_levin_amount
+    from public.sched_h6
+    where cmte_id = %s
+    and transaction_id = %s
+    """
+    _v = (cmte_id, transaction_id)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _v)
+            return cursor.fetchone()[0]
+    except:
+        raise
+
 def put_schedH6(data):
     """
     update sched_H6 item
@@ -2950,9 +3011,24 @@ def put_schedH6(data):
             entity_data = post_entities(data)
             roll_back = False
         #check_transaction_id(data.get('transaction_id'))
+        existing_total = get_existing_h6_total(
+            data.get('cmte_id'),
+            data.get('transaction_id')
+        )
         try:
             put_sql_schedH6(data)
             update_activity_event_amount_ytd_h6(data)
+
+            # if debt payment, update parent sched_d
+            if data.get('transaction_type_identifier') == 'ALLOC_FEA_DISB_DEBT':
+                if float(existing_total) != float(data.get('total_fed_levin_amount')):
+                    update_sched_d_parent(
+                        data.get('cmte_id'),
+                        data.get('back_ref_transaction_id'),
+                        data.get('total_fed_levin_amount'),
+                        existing_total
+                    )
+
         except Exception as e:
             if roll_back:
                 entity_data = put_entities(prev_entity_list[0])
@@ -3198,6 +3274,12 @@ def post_schedH6(data):
         try:
             post_sql_schedH6(data)
             update_activity_event_amount_ytd_h6(data)
+            if data.get('transaction_type_identifier') == 'ALLOC_FEA_DISB_DEBT':
+                update_sched_d_parent(
+                    data.get('cmte_id'),
+                    data.get('back_ref_transaction_id'),
+                    data.get('total_fed_levin_amount')
+                )
         except Exception as e:
             if roll_back:
                 entity_data = put_entities(prev_entity_list[0])
