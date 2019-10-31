@@ -7,19 +7,10 @@ import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-
-export enum Sections {
-  initialSection = 'initial_section',
-  sectionA = 'section_a',
-  sectionB = 'section_b',
-  sectionC = 'section_c',
-  sectionD = 'section_d',
-  sectionE = 'section_e',
-  sectionF = 'section_f',
-  sectionG = 'section_g',
-  sectionH = 'section_h',
-  sectionI = 'section_i'
-}
+import { SchedC1Service } from './service/sched-c1.service';
+import { DecimalPipe } from '@angular/common';
+import { Sections } from './sections.enum';
+import { UtilService } from 'src/app/shared/utils/util.service';
 
 @Component({
   selector: 'app-sched-c1',
@@ -27,6 +18,7 @@ export enum Sections {
   styleUrls: ['./sched-c1.component.scss']
 })
 export class SchedC1Component implements OnInit, OnChanges {
+  @Input() formType: string;
   @Input() scheduleAction: ScheduleActions;
   @Input() forceChangeDetection: Date;
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
@@ -46,11 +38,18 @@ export class SchedC1Component implements OnInit, OnChanges {
   public readonly sectionI = Sections.sectionI;
   public file: any = null;
   public fileNameToDisplay: string = null;
+  // TODO check requirements for each amount field.
+  public _contributionAmountMax = 14;
+
+  public fieldLoanAmount = { name: 'loan_amount' };
 
   constructor(
     private _fb: FormBuilder,
     private _contactsService: ContactsService,
-    private _typeaheadService: TypeaheadService
+    private _typeaheadService: TypeaheadService,
+    private _schedC1Service: SchedC1Service,
+    private _decimalPipe: DecimalPipe,
+    private _utilService: UtilService
   ) {}
 
   public ngOnInit() {
@@ -247,7 +246,7 @@ export class SchedC1Component implements OnInit, OnChanges {
     if (!this._checkFormFieldIsValid('zip')) {
       return false;
     }
-    if (!this._checkFormFieldIsValid('original_loan_amount')) {
+    if (!this._checkFormFieldIsValid('loan_amount')) {
       return false;
     }
     if (!this._checkFormFieldIsValid('loan_intrest_rate')) {
@@ -365,7 +364,7 @@ export class SchedC1Component implements OnInit, OnChanges {
       city: new FormControl(null, [Validators.required, Validators.maxLength(100), alphaNumericFn]),
       state: new FormControl(null, [Validators.required, Validators.maxLength(2)]),
       zip: new FormControl(null, [Validators.required, Validators.maxLength(10), alphaNumericFn]),
-      original_loan_amount: new FormControl(null, [Validators.required, Validators.maxLength(12)]),
+      loan_amount: new FormControl(null, [Validators.required, Validators.maxLength(12)]),
       loan_intrest_rate: new FormControl(null, [Validators.required, Validators.maxLength(2)]),
       loan_incurred_date: new FormControl(null, [Validators.required]),
       loan_due_date: new FormControl(null, [Validators.required]),
@@ -385,6 +384,34 @@ export class SchedC1Component implements OnInit, OnChanges {
       file_upload: new FormControl(null, [Validators.required]),
       final_authorization: new FormControl(null, [Validators.requiredTrue])
     });
+
+    // No validation for dev ONLY!!
+    // this.c1Form = this._fb.group({
+    //   lending_institution: new FormControl(null),
+    //   mailing_address: new FormControl(null),
+    //   city: new FormControl(null),
+    //   state: new FormControl(null),
+    //   zip: new FormControl(null),
+    //   loan_amount: new FormControl(null),
+    //   loan_intrest_rate: new FormControl(null),
+    //   loan_incurred_date: new FormControl(null),
+    //   loan_due_date: new FormControl(null),
+    //   is_loan_restructured: new FormControl(null),
+    //   credit_amount_this_draw: new FormControl(null),
+    //   total_outstanding_balance: new FormControl(null),
+    //   other_parties_liable: new FormControl(null),
+    //   pledged_collateral_ind: new FormControl(null),
+    //   future_income_ind: new FormControl(null),
+    //   basis_of_loan_desc: new FormControl(null),
+    //   treasurer_last_name: new FormControl(null),
+    //   treasurer_first_name: new FormControl(null),
+    //   treasurer_middle_name: new FormControl(null),
+    //   treasurer_prefix: new FormControl(null),
+    //   treasurer_suffix: new FormControl(null),
+    //   treasurer_signed_date: new FormControl(null),
+    //   file_upload: new FormControl(null),
+    //   final_authorization: new FormControl(null)
+    // });
   }
 
   public print() {
@@ -394,8 +421,40 @@ export class SchedC1Component implements OnInit, OnChanges {
   public finish() {
     if (this._checkSectionIValid()) {
       alert('Finish not yet implemented');
+
+      if (this.c1Form.valid) {
+        const formData = {};
+        this._prepareFormDataForApi(formData);
+        this._schedC1Service.saveScheduleC1(this.formType, this.scheduleAction, formData).subscribe(res => {
+          console.log();
+        });
+      } else {
+        console.log('Errors exist on previous screens.');
+      }
     } else {
       this.c1Form.markAsTouched();
+    }
+  }
+
+  private _prepareFormDataForApi(formData: any) {
+    for (const field in this.c1Form.controls) {
+      if (field === 'loan_amount' || field === 'credit_amount_this_draw') {
+        let amount = this.c1Form.get(field).value;
+        amount = amount.replace(/,/g, ``);
+        formData[field] = amount;
+      } else if (field === 'file_upload') {
+        const file = this.c1Form.get(field).value;
+        // formData[field] = file.blob????
+      } else if (field === 'loan_incurred_date' || field === 'loan_due_date') {
+        formData[field] = this._utilService.formatDate(this.c1Form.get(field).value);
+      } else if (field === 'is_loan_restructured') {
+      } else if (field === '') {
+      } else if (field === '') {
+      } else {
+        if (this.c1Form.contains(field)) {
+          formData[field] = this.c1Form.get(field).value;
+        }
+      }
     }
   }
 
@@ -509,6 +568,62 @@ export class SchedC1Component implements OnInit, OnChanges {
   public setFile(e: any): void {
     if (e.target.files[0]) {
       this.c1Form.patchValue({ file_upload: e.target.files[0] }, { onlySelf: true });
+    }
+  }
+
+  public handleOnBlurEvent($event: any, fieldName: string) {
+    this._formatAmount($event, fieldName, false);
+  }
+
+  // These 2 methods are duplicated from AbstractSchedule and should be made as shared utility
+  // methods.
+
+  private _formatAmount(e: any, fieldName: string, negativeAmount: boolean) {
+    let contributionAmount: string = e.target.value;
+
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+
+    // determine if negative, truncate if > max
+    contributionAmount = this._transformAmount(contributionAmount, this._contributionAmountMax);
+
+    let contributionAmountNum = parseFloat(contributionAmount);
+    // Amount is converted to negative for Return / Void / Bounced
+    if (negativeAmount) {
+      contributionAmountNum = -Math.abs(contributionAmountNum);
+      // this._contributionAmount = String(contributionAmountNum);
+    }
+
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
+    const patch = {};
+    patch[fieldName] = amountValue;
+    this.c1Form.patchValue(patch, { onlySelf: true });
+  }
+
+  /**
+   * Allow for negative sign and don't allow more than the max
+   * number of digits.
+   */
+  private _transformAmount(amount: string, max: number): string {
+    if (!amount) {
+      return amount;
+    } else if (amount.length > 0 && amount.length <= max) {
+      return amount;
+    } else {
+      // Need to handle negative sign, decimal and max digits
+      if (amount.substring(0, 1) === '-') {
+        if (amount.length === max || amount.length === max + 1) {
+          return amount;
+        } else {
+          return amount.substring(0, max + 2);
+        }
+      } else {
+        const result = amount.substring(0, max + 1);
+        return result;
+      }
     }
   }
 }
