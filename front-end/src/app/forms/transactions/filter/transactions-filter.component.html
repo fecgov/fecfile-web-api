@@ -276,7 +276,7 @@
         </div>
       </div> 
 
-      <div class="card">
+      <div class="card" *ngIf="transactionCategory === 'receipts'">
           <div class="card-header transactions__filter-title" (click)="toggleAggregateAmountFilterItem()" *ngIf="transactionCategory === 'receipts'">
             Aggregate Amount
             <i class="float-right" aria-hidden="true" 
@@ -442,6 +442,26 @@
               aria-describedby="filter-max-amount"
             >                        
           </div>          
+        </div>
+      </div>
+      <div class="card" *ngIf="transactionCategory === 'other'">
+        <div class="card-header transactions__filter-title" (click)="toggleScheduleFilterItem()">
+          Schedule
+          <i class="float-right" aria-hidden="true" [ngClass]="toggleFilterDirection(isHideScheduleFilter)">
+          </i>
+        </div>
+        <div class="card-body" 
+          [@openCloseScroll]="determineScrollState()">            
+          <div class="input-group py-1 transacions__filter-scroll-to-input">
+            <input class="form-control" [(ngModel)]="filterSchedule" type="text" 
+              placeholder="Search Schedule" aria-label="Search">
+            <div class="input-group-append">
+              <span class="input-group-text">
+                  <!-- <i class="search-icon text-grey" aria-hidden="true"></i> no longer working?-->
+                  <i class="fas fa-search text-grey" aria-hidden="true"></i>
+              </span>
+            </div>              
+          </div>
         </div>
       </div>
     </div> 

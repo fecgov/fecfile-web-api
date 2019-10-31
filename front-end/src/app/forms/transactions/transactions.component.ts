@@ -32,7 +32,8 @@ export enum FilterTypes {
   electionCodes = 'electionCodes',
   electionYear = 'electionYear',
   loanAmount = 'loanAmount',
-  loanClosingBalance = 'loanClosingBalance'
+  loanClosingBalance = 'loanClosingBalance',
+  schedule = 'schedule'
 }
 
 /**
@@ -330,6 +331,25 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Closing loan balance
+    if (filters.filterLoanClosingBalanceMin && filters.filterLoanClosingBalanceMax) {
+      const amountGroup = [];
+      amountGroup.push({
+        filterLoanClosingBalanceMin: filters.filterLoanClosingBalanceMin,
+        filterLoanClosingBalanceMax: filters.filterLoanClosingBalanceMax
+      });
+      let amtTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.loanClosingBalance) {
+          amtTag = true;
+          tag.group = amountGroup;
+        }
+      }
+      if (!amtTag) {
+        this.tagArray.push({ type: FilterTypes.amount, prefix: 'Balance at close', group: amountGroup });
+      }
+    }
+
     // State
     if (this.filters.filterStates.length > 0) {
       const stateGroup = [];
@@ -455,6 +475,23 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Schedule
+    if (this.filters.filterSchedule) {
+      // if memo tag showing, do nothing.  If not showing, add it.
+      let scheduleTag = false;
+      const scheduleGroup = [];
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.schedule) {
+          scheduleTag = true;
+          scheduleGroup.push(filters.filterSchedule);
+          break;
+        }
+      }
+      if (!scheduleTag) {
+        this.tagArray.push({ type: FilterTypes.schedule, prefix: 'Schedule', group: scheduleGroup });
+      }
+    }
+
     console.log('tagArray: ' + JSON.stringify(this.tagArray));
 
     this.filters = filters;
@@ -559,6 +596,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.removeFilter(FilterTypes.aggregateAmount, null);
   }
 
+  /**
+   * Remove the Loan Closing Balance filter tag and inform the filter component to clear it.
+   */
+  public removeLoanClosingBalanceFilter() {
+    this.filters.filterLoanClosingBalanceMin = null;
+    this.filters.filterLoanClosingBalanceMax = null;
+    this.removeFilter(FilterTypes.loanClosingBalance, null);
+  }
+
   public removeMemoFilter() {
     this.filters.filterMemoCode = false;
     this.removeFilter(FilterTypes.memoCode, null);
@@ -587,6 +633,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.filters.filterElectionYearFrom = null;
     this.filters.filterElectionYearTo = null;
     this.removeFilter(FilterTypes.electionYear, null);
+  }
+
+  /**
+   * Remove the schedule filter tag and inform the filter component to clear it.
+   */
+  public removeScheduleFilter() {
+    this.filters.filterSchedule = null;
+    this.removeFilter(FilterTypes.schedule, null);
   }
 
   /**
@@ -630,6 +684,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.removeAggregateAmountFilter();
         this.removeTagArrayItem(type);
         break;
+      case FilterTypes.loanClosingBalance:
+        this.removeLoanClosingBalanceFilter();
+        this.removeTagArrayItem(type);
+        break;
       case FilterTypes.keyword:
         this.removeSearchText(tagText);
         this.removeSearchTagArrayItem(tagText);
@@ -648,6 +706,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         break;
       case FilterTypes.electionYear:
         this.removeElectionYearFilter();
+        this.removeTagArrayItem(type);
+        break;
+      case FilterTypes.schedule:
+        this.removeScheduleFilter();
         this.removeTagArrayItem(type);
         break;
       default:

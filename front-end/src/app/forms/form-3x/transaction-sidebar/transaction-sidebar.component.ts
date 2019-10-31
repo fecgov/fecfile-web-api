@@ -43,6 +43,7 @@ export class TransactionSidebarComponent implements OnInit {
   public loansanddebtsTotal: number = 0.0;
   public othersTotal: number = 0.0;
   public reportId: number;
+  public allTransactions: boolean = false;
 
   private _formType: string = '';
   public transactionCategory: string = '';
@@ -70,6 +71,12 @@ export class TransactionSidebarComponent implements OnInit {
     _activatedRoute.queryParams.subscribe(p => {
       if (p.transactionCategory) {
         this.itemSelected = p.transactionCategory;
+      }
+
+      if (p.allTransactions === true || p.allTransactions === 'true') {
+        this.allTransactions = true;
+      } else {
+        this.allTransactions = false;
       }
     });
   }

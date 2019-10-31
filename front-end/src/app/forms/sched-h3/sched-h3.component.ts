@@ -128,7 +128,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     //this.setActivityOrEventIdentifier();
 
     this.h3TableConfig = {
-      itemsPerPage: 3,
+      itemsPerPage: 8,
       currentPage: 1,
       totalItems: 8
     };

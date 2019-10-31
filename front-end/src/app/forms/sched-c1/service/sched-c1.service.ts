@@ -38,6 +38,8 @@ export class SchedC1Service {
       if (value !== null) {
         if (typeof value === 'string') {
           formData.append(key, value);
+        } else if (value.hasOwnProperty('filename')) {
+          // TODO add the BLOB
         }
       }
     }

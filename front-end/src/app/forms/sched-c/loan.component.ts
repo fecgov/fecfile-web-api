@@ -84,13 +84,13 @@ export class LoanComponent implements OnInit, OnDestroy {
   public entityTypes: any = [];
   public officeSought: any = [];
   public officeState: any = [];
-  public electionTypesSelected: any =[];
-  public electionTypes: any =[];
-  public secured: any =[];
-  
-  public entityType: string = 'IND';
+  public electionTypesSelected: any = [];
+  public electionTypes: any = [];
+  public secured: any = [];
 
-  private _formType: string = '';
+  public entityType = 'IND';
+
+  private _formType = '';
   private _transactionTypePrevious: string = null;
   private _contributionAggregateValue = 0.0;
   private _selectedEntity: any;
@@ -100,7 +100,7 @@ export class LoanComponent implements OnInit, OnDestroy {
   private _loanToEdit: LoanModel;
   private _loading: boolean = false;
   private _selectedChangeWarn: any;
-  private _transactionTypeIdentifier= '';
+  private _transactionTypeIdentifier = '';
 
   constructor(
     private _http: HttpClient,
@@ -126,9 +126,11 @@ export class LoanComponent implements OnInit, OnDestroy {
       //this.getFormFields();
     });
 
-    this._loadFormFieldsSubscription = this._LoanSumamrysMessageService.getLoadFormFieldsMessage().subscribe(message => {
-      //this.getFormFields();
-    });
+    this._loadFormFieldsSubscription = this._LoanSumamrysMessageService
+      .getLoadFormFieldsMessage()
+      .subscribe(message => {
+        //this.getFormFields();
+      });
   }
 
   ngOnInit(): void {
@@ -136,14 +138,14 @@ export class LoanComponent implements OnInit, OnDestroy {
     this._loanToEdit = null;
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     //this._transactionTypeIdentifier = this._activatedRoute.snapshot.paramMap.get('transactionTypeIdentifier');
-    this._transactionTypeIdentifier= 'LOANS_OWED_BY_CMTE';
+    this._transactionTypeIdentifier = 'LOANS_OWED_BY_CMTE';
 
-    console.log("this._transactionTypeIdentifier",  this._transactionTypeIdentifier)
+    console.log('this._transactionTypeIdentifier', this._transactionTypeIdentifier);
     /*localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');*/
-    
+
     //localStorage.removeItem('LoanSumamrysaved');
-    
+
     this._messageService.clearMessage();
 
     /*this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
@@ -267,8 +269,7 @@ export class LoanComponent implements OnInit, OnDestroy {
     return formValidators;
   }
 
-  
-   /**
+  /**
    * Prevent user from keying in more than the max allowed by the API.
    * HTML max must allow for commas, decimals and negative sign and therefore
    * this is needed to enforce digit limitation.  This method will remove
@@ -292,14 +293,14 @@ export class LoanComponent implements OnInit, OnDestroy {
   }
 
   private formatAmountForAPI(contributionAmount): string {
-   /*  // default to 0 when no value
+    /*  // default to 0 when no value
     contributionAmount = contributionAmount ? contributionAmount : '0';
     // remove commas
     contributionAmount = contributionAmount.replace(/,/g, ``);
     // determine if negative, truncate if > max
     contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
     return contributionAmount; */
-    return "";
+    return '';
   }
 
   /**
@@ -330,7 +331,7 @@ export class LoanComponent implements OnInit, OnDestroy {
    * Gets the transaction type.
    */
   private _getTransactionType(): void {
-   /*  const transactionType: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
+    /*  const transactionType: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
 
     if (typeof transactionType === 'object') {
       if (transactionType !== null) {
@@ -431,8 +432,8 @@ export class LoanComponent implements OnInit, OnDestroy {
    *
    * @param stateOption the state selected in the dropdown.
    */
-  
-   /*public handleStateChange(stateOption: any, col: any) {
+
+  /*public handleStateChange(stateOption: any, col: any) {
     console.log("handleStateChange stateOption", stateOption);
     if (this._selectedEntity) {
       //this.showWarn(col.text);
@@ -454,7 +455,6 @@ export class LoanComponent implements OnInit, OnDestroy {
     }
   }*/
 
-
   /*public handleStateChange(stateOption: any, col: any) {
    
     if (this._selectedEntity) {
@@ -465,19 +465,18 @@ export class LoanComponent implements OnInit, OnDestroy {
     }
   } commented on 10052019*/
 
-
   public handleStateChange(stateOption: any, col: any) {
-      if (this._selectedEntity) {
-        this.showWarn(col.text, 'state');
-        this.frmLoan.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
-      } else {
-        this.frmLoan.patchValue({ state: stateOption.code }, { onlySelf: true });
-     }
+    if (this._selectedEntity) {
+      this.showWarn(col.text, 'state');
+      this.frmLoan.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
+    } else {
+      this.frmLoan.patchValue({ state: stateOption.code }, { onlySelf: true });
+    }
   }
 
   private showWarn(fieldLabel: string, name: string) {
     if (this._selectedChangeWarn[name] === name) {
-        return;
+      return;
     }
 
     //const message = `Please note that if you update contact information it will be updated in the Loan file.`;
@@ -487,10 +486,9 @@ export class LoanComponent implements OnInit, OnDestroy {
   }
 
   public handleCandOfficeChange(candOfficeOption: any, col: any) {
-
     if (this._selectedEntity) {
       //this.showWarn(col.text);
-      this.frmLoan.patchValue({ candOffice: this._selectedEntity.candOffice}, { onlySelf: true });
+      this.frmLoan.patchValue({ candOffice: this._selectedEntity.candOffice }, { onlySelf: true });
     } else {
       let officeCode = null;
       if (candOfficeOption.$ngOptionLabel) {
@@ -502,16 +500,15 @@ export class LoanComponent implements OnInit, OnDestroy {
           }
         }
       }
-      
+
       this.frmLoan.patchValue({ candOffice: officeCode }, { onlySelf: true });
     }
   }
-  
-  public handleOfficeStateChange(officeStateOption: any, col: any) {
 
+  public handleOfficeStateChange(officeStateOption: any, col: any) {
     if (this._selectedEntity) {
       //this.showWarn(col.text);
-      this.frmLoan.patchValue({ candOfficeState: this._selectedEntity.candOfficeState}, { onlySelf: true });
+      this.frmLoan.patchValue({ candOfficeState: this._selectedEntity.candOfficeState }, { onlySelf: true });
     } else {
       let officeStateCode = null;
       if (officeStateOption.$ngOptionLabel) {
@@ -523,7 +520,7 @@ export class LoanComponent implements OnInit, OnDestroy {
           }
         }
       }
-      
+
       this.frmLoan.patchValue({ candOfficeState: officeStateCode }, { onlySelf: true });
     }
   }
@@ -553,7 +550,7 @@ export class LoanComponent implements OnInit, OnDestroy {
   }*/
 
   public handleTypeChange(entityOption: any, col: any) {
-    console.log(" handleTypeChange entityOption", entityOption);
+    console.log(' handleTypeChange entityOption', entityOption);
     this.entityType = entityOption.code;
     if (this._selectedEntity) {
       // this.showWarn(col.text);
@@ -577,7 +574,7 @@ export class LoanComponent implements OnInit, OnDestroy {
     }
   }
   public handleloansecuredChange(entityOption: any, col: any) {
-    console.log(" handleloansecuredChange entityOption", entityOption);
+    console.log(' handleloansecuredChange entityOption', entityOption);
     //this.entityType = entityOption.code;
     if (this._selectedEntity) {
       // this.showWarn(col.text);
@@ -587,12 +584,12 @@ export class LoanComponent implements OnInit, OnDestroy {
       this.frmLoan.patchValue({ is_loan_secured: entityOption.code }, { onlySelf: true });
     }
   }
-  
 
   public electionTypeChanged(entityOption: any, col: any) {
+    console.log();
   }
-  
-    /**
+
+  /**
    * Goes to the previous step.
    */
   public previousStep(): void {
@@ -607,7 +604,6 @@ export class LoanComponent implements OnInit, OnDestroy {
    * @deprecated
    */
   public receiveTypeaheadData(loan: any, fieldName: string): void {
-
     if (fieldName === 'first_name') {
       this.frmLoan.patchValue({ last_name: loan.last_name }, { onlySelf: true });
       this.frmLoan.controls['last_name'].setValue({ last_name: loan.last_name }, { onlySelf: true });
@@ -627,7 +623,7 @@ export class LoanComponent implements OnInit, OnDestroy {
     this.frmLoan.patchValue({ state: loan.state }, { onlySelf: true });
     this.frmLoan.patchValue({ entity_type: loan.entity_type }, { onlySelf: true });
     this.frmLoan.patchValue({ zip_code: loan.zip_code }, { onlySelf: true });
-   
+
     this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
     this.frmLoan.patchValue({ election_code: loan.election_code }, { onlySelf: true });
     this.frmLoan.patchValue({ election_other_description: loan.election_other_description }, { onlySelf: true });
@@ -649,10 +645,9 @@ export class LoanComponent implements OnInit, OnDestroy {
     this.frmLoan.patchValue({ lender_cand_district: loan.lender_cand_district }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });
-
   }
 
-/**
+  /**
    * Format an entity to display in the type ahead.
    *
    * @param result formatted item in the typeahead list
@@ -772,7 +767,7 @@ export class LoanComponent implements OnInit, OnDestroy {
     this.frmLoan.patchValue({ state: loan.state }, { onlySelf: true });
     this.frmLoan.patchValue({ entity_type: loan.entity_type }, { onlySelf: true });
     this.frmLoan.patchValue({ zip_code: loan.zip_code }, { onlySelf: true });
-   
+
     this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
     this.frmLoan.patchValue({ election_code: loan.election_code }, { onlySelf: true });
     this.frmLoan.patchValue({ election_other_description: loan.election_other_description }, { onlySelf: true });
@@ -794,13 +789,14 @@ export class LoanComponent implements OnInit, OnDestroy {
     this.frmLoan.patchValue({ lender_cand_district: loan.lender_cand_district }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });
-
   }
 
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
     const loan = $event.item;
     this._selectedEntity = this._utilService.deepClone(loan);
     //this.frmLoan.patchValue({ type: loan.type }, { onlySelf: true });
+    this.frmLoan.patchValue({ last_name: loan.last_name }, { onlySelf: true });
+    this.frmLoan.patchValue({ first_name: loan.first_name }, { onlySelf: true });
     this.frmLoan.patchValue({ middle_name: loan.middle_name }, { onlySelf: true });
     this.frmLoan.patchValue({ prefix: loan.prefix }, { onlySelf: true });
     this.frmLoan.patchValue({ suffix: loan.suffix }, { onlySelf: true });
@@ -810,7 +806,7 @@ export class LoanComponent implements OnInit, OnDestroy {
     this.frmLoan.patchValue({ state: loan.state }, { onlySelf: true });
     this.frmLoan.patchValue({ entity_type: loan.entity_type }, { onlySelf: true });
     this.frmLoan.patchValue({ zip_code: loan.zip_code }, { onlySelf: true });
-   
+
     this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
     this.frmLoan.patchValue({ election_code: loan.election_code }, { onlySelf: true });
     this.frmLoan.patchValue({ election_other_description: loan.election_other_description }, { onlySelf: true });
@@ -832,12 +828,10 @@ export class LoanComponent implements OnInit, OnDestroy {
     this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });
 
-
     //this.frmLoan.patchValue({ phoneNumber: loan.phoneNumber }, { onlySelf: true });
     //this.frmLoan.patchValue({ candOffice: loan.candOffice }, { onlySelf: true });
     //this.frmLoan.patchValue({ candOfficeState: loan.candOfficeState }, { onlySelf: true });
     //this.frmLoan.patchValue({ candOfficeDistrict: loan.candOfficeDistrict }, { onlySelf: true });
-
 
     let transactionTypeIdentifier = '';
     // Use this if transaction_tye_identifier is to come from dynamic form data
@@ -853,7 +847,6 @@ export class LoanComponent implements OnInit, OnDestroy {
 
     //const reportId = this.getReportIdFromStorage();
   }
-
 
   /**
    * Search for entities/LoanSumamrys when last name input value changes.
@@ -993,8 +986,7 @@ export class LoanComponent implements OnInit, OnDestroy {
           return this._typeaheadService.getContacts(searchTextUpper, 'cand_id');
         }
       })
-    )
-
+    );
 
   /**
    * format the value to display in the input field once selected from the typeahead.
@@ -1099,7 +1091,7 @@ export class LoanComponent implements OnInit, OnDestroy {
     } else {
       return x;
     }
-  }
+  };
 
   /**
    * format the value to display in the input field once selected from the typeahead.
@@ -1118,8 +1110,10 @@ export class LoanComponent implements OnInit, OnDestroy {
 
   private getFormFields(): void {
     this._LoansService.get_sched_c_loan_dynamic_forms_fields().subscribe(res => {
+      // TODO Temporarily hijacking the API response with JSON until ready.
+      // res = schedCDynamicFormResponse;
+
       if (res) {
-        console.log('getFormFields res =', res);
         if (res.hasOwnProperty('data')) {
           if (typeof res.data === 'object') {
             /*if (res.data.hasOwnProperty('formFields')) {
@@ -1133,7 +1127,7 @@ export class LoanComponent implements OnInit, OnDestroy {
               if (Array.isArray(res.data.individualFormFields)) {
                 this.individualFormFields = res.data.individualFormFields;
                 this.formFields = res.data.individualFormFields;
-                console.log("this.individualFormFields =", this.individualFormFields);
+                console.log('this.individualFormFields =', this.individualFormFields);
                 this._setForm(res.data.individualFormFields);
               }
             }
@@ -1147,7 +1141,7 @@ export class LoanComponent implements OnInit, OnDestroy {
             if (res.data.hasOwnProperty('OrganizationFormFields')) {
               if (Array.isArray(res.data.OrganizationFormFields)) {
                 this.organizationFormFields = res.data.OrganizationFormFields;
-                console.log("this.organizationFormFields =", this.organizationFormFields);
+                console.log('this.organizationFormFields =', this.organizationFormFields);
               }
             }
 
@@ -1184,25 +1178,23 @@ export class LoanComponent implements OnInit, OnDestroy {
             if (res.data.hasOwnProperty('entityTypes')) {
               if (Array.isArray(res.data.entityTypes)) {
                 this.entityTypes = res.data.entityTypes;
-                console.log("this.entityTypes", this.entityTypes);
+                console.log('this.entityTypes', this.entityTypes);
               }
             }
 
             if (res.data.hasOwnProperty('electionTypes')) {
               if (Array.isArray(res.data.electionTypes)) {
                 this.electionTypes = res.data.electionTypes;
-                console.log("this.electionTypes", this.electionTypes);
-              }
-            }
-            
-            if (res.data.hasOwnProperty('secured')) {
-              if (Array.isArray(res.data.secured)) {
-                this.secured = res.data.secured;
-                console.log("this.secured", this.secured);
+                console.log('this.electionTypes', this.electionTypes);
               }
             }
 
-            
+            if (res.data.hasOwnProperty('secured')) {
+              if (Array.isArray(res.data.secured)) {
+                this.secured = res.data.secured;
+                console.log('this.secured', this.secured);
+              }
+            }
 
             /*if (res.data.hasOwnProperty('officeSought')) {
               if (Array.isArray(res.data.officeSought)) {
@@ -1292,7 +1284,6 @@ export class LoanComponent implements OnInit, OnDestroy {
         this.frmLoan.patchValue({ lender_cand_district: loan.lender_cand_district }, { onlySelf: true });
         this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
         this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });*/
-    
       }
     }
   }
@@ -1304,13 +1295,13 @@ export class LoanComponent implements OnInit, OnDestroy {
   }*/
 
   public loadDynamiceFormFields(): void {
-    console.log(" loadDynamiceFormFields this.entityType", this.entityType);
+    console.log(' loadDynamiceFormFields this.entityType', this.entityType);
     if (this.entityType === 'IND') {
       this.formFields = this.individualFormFields;
     } else if (this.entityType === 'ORG') {
       this.formFields = this.organizationFormFields;
     }
-    console.log(" loadDynamiceFormFields this.entityType", this.entityType);
+    console.log(' loadDynamiceFormFields this.entityType', this.entityType);
     this._setForm(this.formFields);
   }
 
@@ -1318,33 +1309,18 @@ export class LoanComponent implements OnInit, OnDestroy {
     this.frmLoan.reset();
     this._router.navigate([`/LoanSumamrys`]);
   }
-  
+
   public viewLoan(): void {
-    
-    if (this.frmLoan.dirty || this.frmLoan.touched){
+    if (this.frmLoan.dirty || this.frmLoan.touched) {
       localStorage.setItem('LoanSumamrysaved', JSON.stringify({ saved: false }));
     }
     this._router.navigate([`/LoanSumamrys`]);
   }
 
   public saveLoan(): void {
-    if ( this.entityType === 'IND'){ 
+    if (this.entityType === 'IND') {
       this.doValidateLoan();
-      console.log("Accessing sched_c loans...");
-      const addSubTransEmitObj: any = {
-        form: {},
-        direction: 'next',
-        step: 'step_3',
-        previousStep: 'step_2',
-        scheduleType: 'sched_c',
-        action: LoansActions.add
-      };
-      this.status.emit(addSubTransEmitObj);
-      let reportId = this._receiptService.getReportIdFromStorage(this._formType);
-      this._router.navigate([`/forms/form/${this._formType}`], {
-              queryParams: { step: 'loansummary', reportId: reportId }
-            });
-     }else if(this.entityType === 'ORG'){
+    } else if (this.entityType === 'ORG') {
       const addSubTransEmitObj: any = {
         form: {},
         direction: 'next',
@@ -1358,7 +1334,7 @@ export class LoanComponent implements OnInit, OnDestroy {
       this._router.navigate([`/forms/form/${this._formType}`], {
         queryParams: { step: 'step_3' }
       });
-     }
+    }
   }
 
    public loanRepayment(): void {
@@ -1370,10 +1346,8 @@ export class LoanComponent implements OnInit, OnDestroy {
            });
   }
 
-  public AddLoanEndorser(): void {
-    
-  }
-  
+  public AddLoanEndorser(): void {}
+
   public isFieldName(fieldName: string, nameString: string): boolean {
     return fieldName === nameString || fieldName === this._childFieldNamePrefix + nameString;
   }
@@ -1382,10 +1356,7 @@ export class LoanComponent implements OnInit, OnDestroy {
    * Vaidates the form on submit.
    */
   public doValidateLoan() {
-    console.log("doValidateLoan called");
-    console.log("this.frmLoan.valid", this.frmLoan.valid);
     if (this.frmLoan.valid) {
-      console.log("doValidateLoan loan valid");
       const LoanObj: any = {};
 
       for (const field in this.frmLoan.controls) {
@@ -1423,50 +1394,65 @@ export class LoanComponent implements OnInit, OnDestroy {
         }
       }
 
-      // There is a race condition with populating hiddenFields
-      // and receiving transaction data to edit from the message service.
-      // If editing, set transaction ID at this point to avoid race condition issue.
-      /*if (this._loanToEdit) {
-        this.hiddenFields.forEach((el: any) => {
-          if (el.name === 'transaction_id') {
-            el.value = this._loanToEdit.transaction_id;
-          }
-        });
-      }
-
-      this.hiddenFields.forEach(el => {
-        LoanObj[el.name] = el.value;
-      });*/
-
       // If entity ID exist, the transaction will be added to the existing entity by the API
       // Otherwise it will create a new Entity.
       if (this._selectedEntity) {
         LoanObj.entity_id = this._selectedEntity.entity_id;
       }
       LoanObj.entity_type = this.entityType;
-      console.log("LoanObj =", JSON.stringify(LoanObj));
+      console.log('LoanObj =', JSON.stringify(LoanObj));
 
       localStorage.setItem('LoanObj', JSON.stringify(LoanObj));
-      this._LoansService.saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, this.entityType).subscribe(res => {
-        if (res) {
-          console.log('_LoansService.saveContact res', res);
-          this._loanToEdit = null;
-          this.frmLoan.reset();
-          this._selectedEntity = null;
-          localStorage.removeItem(LoanObj);
-          /*if (callFrom === 'viewLoan') {
+      this._LoansService
+        .saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, this.entityType)
+        .subscribe(res => {
+          if (res) {
+            console.log('_LoansService.saveContact res', res);
+            this._loanToEdit = null;
+            this.frmLoan.reset();
+            this._selectedEntity = null;
+            localStorage.removeItem(LoanObj);
+            /*if (callFrom === 'viewLoan') {
             this._router.navigate([`/LoanSumamrys`]);
           }*/
-          localStorage.setItem('Loansaved', JSON.stringify({ saved: true }));
-          //window.scrollTo(0, 0);
-        }
-      });
+            localStorage.setItem('Loansaved', JSON.stringify({ saved: true }));
+            //window.scrollTo(0, 0);
+
+            this.frmLoan.reset();
+            this._gotoSummary();
+          }
+        });
     } else {
       this.frmLoan.markAsDirty();
       this.frmLoan.markAsTouched();
       localStorage.setItem('Loansaved', JSON.stringify({ saved: false }));
       window.scrollTo(0, 0);
+
+      const invalid = [];
+      const controls = this.frmLoan.controls;
+      for (const name in controls) {
+        if (controls[name].invalid) {
+          invalid.push(name);
+          console.log('invalid form field on submit = ' + name);
+        }
+      }
     }
+  }
+
+  private _gotoSummary() {
+    const addSubTransEmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c',
+      action: LoansActions.add
+    };
+    this.status.emit(addSubTransEmitObj);
+    const reportId = this._receiptService.getReportIdFromStorage(this._formType);
+    this._router.navigate([`/forms/form/${this._formType}`], {
+      queryParams: { step: 'loansummary', reportId: reportId }
+    });
   }
 
   /**
@@ -1496,4 +1482,37 @@ export class LoanComponent implements OnInit, OnDestroy {
       return true;
   }
  }*/
+
+  public determineColClass(row: any, col: any) {
+    if (col.name === 'election_other_description') {
+      return 'col col-md-4';
+    }
+    return row.colClassName;
+  }
+
+  public isToggleShow(col: any) {
+    // don't show election description unless other is selected from dropdown.
+    if (col.name === 'election_other_description') {
+      let showOtherDesc = false;
+      if (this.frmLoan.contains('election_code')) {
+        if (this.frmLoan.get('election_code').value === 'O') {
+          showOtherDesc = true;
+        }
+      }
+      return showOtherDesc;
+    }
+
+    return true;
+  }
+
+  /**
+   * Select elements width is set on the form-group level not the select element
+   * as done with text and date fields.
+   */
+  public setSelectTypeWidth(col: any) {
+    if (col.type === 'select') {
+      return col.width;
+    }
+    return null;
+  }
 }
