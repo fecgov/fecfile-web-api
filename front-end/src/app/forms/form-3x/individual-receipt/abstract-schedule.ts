@@ -444,12 +444,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._listenForAggregateChanges();
     }
 
-    if (this.scheduleAction === ScheduleActions.add) {
-      
-      this.frmIndividualReceipt.patchValue({ total_amount: '120'}, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ fed_share_amount: '60'}, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ non_fed_share_amount: '60'}, { onlySelf: true });
-
+    if (this.scheduleAction === ScheduleActions.add) {      
       this.frmIndividualReceipt.patchValue({ beginning_balance: this._decimalPipe.transform(0, '.2-2') },
         { onlySelf: true });
       this.frmIndividualReceipt.patchValue({ payment_amount: this._decimalPipe.transform(0, '.2-2') },
