@@ -504,3 +504,4 @@ export class TransactionTypeComponent implements OnInit {
 
   
 }
+
