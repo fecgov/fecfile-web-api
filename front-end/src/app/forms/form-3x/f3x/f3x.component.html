@@ -1,7 +1,7 @@
 <div class="forms__wizard" *ngIf="!loadingData">
   <!--div class="form__sidebar" *ngIf="step !== 'financial_summary'">-->
   <div class="form__sidebar">
-    <div [hidden]="step !== 'step_1'">
+    <div [hidden]="step !== 'step_1'" *ngIf="!allTransactions">
       <report-type-sidebar
         title="Report Coverage Dates"
         (status)="onNotify($event)"
@@ -18,7 +18,10 @@
         step === 'financial_summary' ||
         step === 'transactions' ||
         step === 'reports' ||
-        step === 'step_4'
+        step === 'step_4' ||
+        step === 'loansummary' ||
+        step === 'loan' ||
+        step === 'loanpayment'
       "
     >
       <transaction-sidebar
@@ -27,6 +30,7 @@
         [transactionCategories]="transactionCategories"
         (status)="onNotify($event)"
         [hidden]="isShowFilters"
+        *ngIf="!allTransactions"
       >
       </transaction-sidebar>
       <app-transactions-filter [hidden]="!isShowFilters" title="Filters" [formType]="formType">
@@ -40,12 +44,12 @@
       'hide-alerts': step === 'step_6'
     }"
   >
-    <div class="form__steps">
+    <div class="form__steps" *ngIf="!allTransactions">
       <app-steps
         [steps]="[
           { text: 'Report', step: 'step_1', edit: editMode },
           { text: 'Type', step: 'step_2', edit: editMode },
-          { text: 'Form', step: 'step_3', edit: editMode },
+          { text: 'Form', step: 'step_3', edit: editMode, transactionCategory: transactionCategory },
           { text: 'Preview', step: 'step_4', edit: editMode },
           { text: 'Sign', step: 'step_5', edit: editMode },
           { text: 'Submit', step: 'step_6', edit: editMode }
@@ -81,21 +85,23 @@
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_3'">
-        <f3x-individual-receipt
-          [hidden]="
-            scheduleType !== 'sched_a' &&
-            scheduleType !== 'sched_b' &&
-            scheduleType !== 'sched_d' &&
-            scheduleType !== 'sched_h4' &&
-            scheduleType !== 'sched_h6'
-          "
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
-        </f3x-individual-receipt>
+        <div [hidden]="transactionType === 'ALLOC_H4_TYPES' || transactionType === 'ALLOC_H4_SUM'">
+          <f3x-individual-receipt
+            [hidden]="
+              scheduleType !== 'sched_a' &&
+              scheduleType !== 'sched_b' &&
+              scheduleType !== 'sched_d' &&
+              scheduleType !== 'sched_h4' &&
+              scheduleType !== 'sched_h6'              
+            "
+            [transactionTypeText]="transactionTypeText"
+            [transactionType]="transactionType"
+            [scheduleAction]="scheduleAction"
+            [scheduleType]="scheduleType"
+            (status)="onNotify($event)"
+          >
+          </f3x-individual-receipt>
+        </div>
         <app-sched-f
           [hidden]="scheduleType !== 'sched_f'"
           [transactionTypeText]="transactionTypeTextSchedF"
@@ -105,6 +111,59 @@
           (status)="onNotify($event)"
         >
         </app-sched-f>
+
+        <!--<app-sched-c
+          [hidden]="scheduleType !== 'sched_c'"
+          [transactionTypeText]="transactionTypeTextSchedC"
+          [transactionType]="transactionTypeSchedC"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >
+        </app-sched-c>-->
+
+        <app-sched-c1
+          [hidden]="scheduleType !== 'sched_c1'"
+          [forceChangeDetection]="forceChangeDetectionC1"
+          [scheduleAction]="scheduleAction"
+          (status)="onNotify($event)"
+        >
+        </app-sched-c1>
+        <app-sched-c2
+          [hidden]="scheduleType !== 'sched_c2'"
+          [transactionTypeText]="transactionTypeTextSchedC"
+          [transactionType]="transactionTypeSchedC"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >
+        </app-sched-c2>
+
+        <app-sched-h1 *ngIf="scheduleType === 'sched_h1'" [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType" (status)="onNotify($event)">
+        </app-sched-h1>
+        <app-sched-h2 [hidden]="scheduleType !== 'sched_h2'" [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
+        </app-sched-h2>
+        <app-sched-h3 [hidden]="scheduleType !== 'sched_h3'" [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
+        </app-sched-h3>
+        <app-sched-h5 [hidden]="scheduleType !== 'sched_h5'" [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
+        </app-sched-h5>
+        <app-sched-h4          
+          [hidden]="transactionType !== 'ALLOC_H4_TYPES' && transactionType !== 'ALLOC_H4_SUM'"
+          [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >      
+        </app-sched-h4>
+
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_4'">
@@ -122,6 +181,24 @@
       <div class="form_step" [hidden]="step !== 'transactions' && step !== 'reports'">
         <app-transactions (sidebarSwitch)="switchSidebar($event)" (showTransaction)="onNotify($event)">
         </app-transactions>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loan'">
+        <app-sched-c-loans (status)="onNotify($event)"> </app-sched-c-loans>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loansummary'" *ngIf="step ==='loansummary'">
+        <app-loansummary> </app-loansummary>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loanendorsersummary'">
+        <app-loanendorsersummary> </app-loanendorsersummary>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loanpayment'" *ngIf="step === 'loanpayment'">
+        <app-loanpayment> </app-loanpayment>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loanreceipt'">
+        <app-loanreceipt> </app-loanreceipt>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loanendorser'">
+        <app-loanendorser> </app-loanendorser>
       </div>
     </div>
   </div>

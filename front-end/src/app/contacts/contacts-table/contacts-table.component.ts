@@ -650,7 +650,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    * @param ctn the Contact to edit
    */
   public editContact(ctn: ContactModel): void {
-    alert('Edit Contact is not yet supported');
+    this._contactsMessageService.sendEditContactMessage(ctn);
   }
 
 

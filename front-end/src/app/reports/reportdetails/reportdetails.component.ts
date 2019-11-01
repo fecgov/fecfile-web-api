@@ -424,7 +424,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
  
           //if(next) {
             max.amend_show = true;
-            max.amend_max = 'up';
+            max.amend_max = 'down'; //'up';
           //}
 
         }
@@ -439,9 +439,33 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     let pre = report;
     pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
 
+    if(pre && report.amend_max === 'up') {
+      this.reportsModel = this.reportsModel.filter(function(item) {
+        return item !== pre
+      })
+
+      let indexReport = this.reportsModel.indexOf(report);
+      if (indexReport > -1) {
+        this.reportsModel.splice(indexReport + 1, 0, pre);
+      }
+    }
+
     while(pre) {
+      let rop = pre;
+
       pre.amend_show = !pre.amend_show;
       pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
+
+      if(pre && report.amend_max === 'up') {
+        this.reportsModel = this.reportsModel.filter(function(item) {
+          return item !== pre
+        })
+
+        let indexRep = this.reportsModel.indexOf(rop);
+        if (indexRep > -1) {
+          this.reportsModel.splice(indexRep + 1, 0, pre);
+        }
+      }
     }
     
   }
@@ -957,7 +981,7 @@ public printReport(report: reportModel): void{
       });
 
       setTimeout(() => {
-        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1' } });
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', reportId: report.report_id } });
       }, 1500);
     } else if (report.form_type === 'F3X') {
       this._reportsService
@@ -975,7 +999,7 @@ public printReport(report: reportModel): void{
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
         this._router.navigate([`/forms/form/${formType}`], {
-          queryParams: { step: 'reports', reportId: report.report_id }
+          queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'receipts'  }
         });
       }, 1500);
     }

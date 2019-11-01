@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, ViewEncapsulation, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContactsMessageService } from './service/contacts-message.service';
 import { ContactFilterModel } from './model/contacts-filter.model';
@@ -51,6 +51,7 @@ export enum FilterTypes {
 export class ContactsComponent implements OnInit, OnDestroy {
   @Output() sidebarSwitch: EventEmitter<any> = new EventEmitter<any>();
   @Output() showContact: EventEmitter<any> = new EventEmitter<any>();
+  @Input() status: any;
 
   public formType = '';
   public reportId = '0';
@@ -664,6 +665,12 @@ export class ContactsComponent implements OnInit, OnDestroy {
   private doSearch() {
     this.filters.keywords = this.searchTextArray;
     this._contactsMessageService.sendDoKeywordFilterSearchMessage(this.filters);
+  }
+
+  public onNotify(e): void {    
+    if(!e.editView){
+      this.view = ActiveView.contacts
+    }
   }
 
 }

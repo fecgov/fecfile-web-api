@@ -24,7 +24,8 @@
           <h2>
             Form 3X
             <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
-            <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container>
+            <ng-container *ngIf="scheduleAction === editScheduleAction && !cloned"> / Edit </ng-container>
+            <ng-container *ngIf="scheduleAction === editScheduleAction && cloned"> / Clone </ng-container>
           </h2>
         </div>
         <div class="float-right" ngbDropdown>
@@ -95,6 +96,7 @@
                           && col?.name !== 'child*donor_cmte_id'" -->
                           <!-- (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
                                     ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)" -->
+                        <!-- [attr.readonly]="(col.type === 'text' && col?.isReadonly) || isTotalAmountReadOnly(col) ?  true : null"                                     -->
                         <input *ngIf="col?.name !== 'first_name' 
                                 && col?.name !== 'last_name'
                                 && !isFieldName(col?.name, 'cand_first_name')
@@ -107,7 +109,7 @@
                                 && !isFieldName(col?.name, 'beneficiary_cand_id') 
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
-                          [attr.readonly]="(col.type === 'text' && col?.isReadonly) ? true : null"
+                          [attr.readonly]="isFieldReadOnly(col)"
                           [attr.value]="col?.value"
                           [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount') 
                                         || isFieldName(col?.name, 'contribution_aggregate'))? col?.validation?.max + 5: col?.validation?.max"
@@ -330,7 +332,7 @@
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">
                       <ng-select #entityTypeSelect 
                         [items]="entityTypes" 
-                        (change)="handleEntityTypeChange($event, col)"
+                        (change)="handleEntityTypeChange($event)"
                         class="forms__select entity-type-select" 
                         [formControlName]="col?.name" 
                         bindValue="entityType"
@@ -344,11 +346,10 @@
                           ">
                       </ng-select>
                     </ng-container>
-                    <!-- (change)="handleActivityEventTypeChange($event, col)" -->
-                    <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
+                    <!-- <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
                       <ng-select #activityEventTypeSelect 
                         [items]="activityEventTypes" 
-                  
+                        (change)="handleActivityEventTypeChange($event, col)"
                         class="forms__select activity-event-type-select" 
                         [formControlName]="col?.name" 
                         bindValue="activityEventType"
@@ -361,7 +362,43 @@
                               : ''
                           ">
                       </ng-select>
-                    </ng-container>                     
+                    </ng-container> -->
+                    <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_type')">
+                      <ng-select #activityEventTypeSelect 
+                        [items]="activityEventTypes" 
+                        (change)="handleActivityEventTypeChange($event, col)"
+                        class="forms__select activity-event-type-select" 
+                        [formControlName]="col?.name" 
+                        bindValue="eventType"
+                        bindLabel="eventTypeDescription" 
+                        [selectOnTab]="true"
+                        [ngClass]="
+                            frmIndividualReceipt.get(col?.name)?.invalid &&
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                              ? 'forms__select-error'
+                              : ''
+                          ">
+                      </ng-select>                     
+                    </ng-container>
+                    <ng-container 
+                      *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_name')
+                        && activityEventNames"
+                    >
+                      <ng-select #activityEventNameSelect 
+                        [items]="activityEventNames" 
+                        class="forms__select activity-event-name-select" 
+                        [formControlName]="col?.name" 
+                        bindValue="activityEventType"
+                        bindLabel="activityEventDescription" 
+                        [selectOnTab]="true"
+                        [ngClass]="
+                            frmIndividualReceipt.get(col?.name)?.invalid &&
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                              ? 'forms__select-error'
+                              : ''
+                          ">
+                      </ng-select>
+                    </ng-container>                                         
                     <ng-container *ngIf="col?.type === 'select' && 
                           (isFieldName(col?.name, 'levin_account_id'))">
                       <ng-select #levinAccountSelect 
@@ -408,7 +445,8 @@
         </ng-container>
         <app-sub-transactions-table [hidden]="!isShowChildTransactions()" 
           [subTransactions]="subTransactions"
-          [formType]="formType">
+          [formType]="formType"
+          [subTransactionsTableType]="subTransactionsTableType">
         </app-sub-transactions-table>
         <div class="forms__btn-container">
           <button *ngIf="!subTransactionInfo?.isEarmark &&
@@ -424,7 +462,7 @@
               <button class="btn btn-primary dropdown-toggle" id="jfMemoDropdown" ngbDropdownToggle>
                 <i class="plus-icon-circle" aria-hidden="true"></i>
                 <ng-container *ngIf="transactionType === 'DEBT_TO_VENDOR'; else jfTransferMemo">
-                  Make a Payment to Debt
+                  Make a Payment on Debt
                 </ng-container>
                 <ng-template #jfTransferMemo>Add JF Transfer Memo</ng-template>
                 

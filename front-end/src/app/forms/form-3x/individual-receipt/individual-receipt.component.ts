@@ -74,6 +74,7 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
   @Output() status: EventEmitter<any>;
 
   public formType: string;
+  public cloned: boolean;
 
   constructor(
     _http: HttpClient,
@@ -119,6 +120,9 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
       _transactionsService,
       _reportsService
     );
+    _activatedRoute.queryParams.subscribe(p => {
+      this.cloned = p.cloned ? true : false;
+    });
   }
 
   public ngOnInit() {

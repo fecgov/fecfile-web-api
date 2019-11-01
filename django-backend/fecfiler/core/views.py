@@ -223,7 +223,7 @@ def check_list_cvg_dates(args):
     
         forms_obj = []
         with connection.cursor() as cursor: 
-            cursor.execute("SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' ORDER BY report_id DESC", [cmte_id, form_type])
+            cursor.execute("SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC", [cmte_id, form_type])
 
             if len(args) == 4:
                 for row in cursor.fetchall():
@@ -340,13 +340,13 @@ def check_report_id(report_id):
 """
 **************************************************** FUNCTIONS - REPORTS *************************************************************
 """
-def post_sql_report(report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, due_date, status, email_1, email_2, additional_email_1, additional_email_2):
+def post_sql_report(report_id, cmte_id, form_type, amend_ind, amend_number, report_type, cvg_start_date, cvg_end_date, due_date, status, email_1, email_2, additional_email_1, additional_email_2):
 
     try:
         with connection.cursor() as cursor:
             # INSERT row into Reports table
-            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2])                                          
+            cursor.execute("""INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, amend_number, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2)
+                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",[report_id, cmte_id, form_type, amend_ind, amend_number, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2])                                          
     except Exception:
         raise
 
@@ -423,8 +423,13 @@ def put_sql_report(report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, e
                 cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                                 [report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, email_2, additional_email_1, additional_email_2, status, report_id, cmte_id])
             elif status=="Submitted":
+                # print(cvg_start_dt)
+                # print(cvg_end_dt)
+                # print(status)
+                # print(report_type)
                 cursor.execute("""UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s, filed_date = last_update_date WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                                 [report_type,  cvg_start_dt, cvg_end_dt, due_date,  email_1, email_2, additional_email_1, additional_email_2, status, report_id, cmte_id])
+                # print(cursor.query)
 
             if (cursor.rowcount == 0):
                 raise Exception('The Report ID: {} does not exist in Reports table'.format(report_id))
@@ -508,7 +513,7 @@ def delete_sql_form3x(report_id, cmte_id):
 """
 ********************************************************** API FUNCTIONS - REPORTS *******************************************************************
 """
-def post_reports(data):
+def post_reports(data, reportid=None):
     try:
         check_mandatory_fields_report(data)
         cmte_id = data.get('cmte_id')
@@ -523,13 +528,17 @@ def post_reports(data):
         check_form_type(form_type)
         args = [cmte_id, form_type, cvg_start_dt, cvg_end_dt]
         forms_obj = []
+        if reportid:
+            args.append(reportid)
         if not (cvg_start_dt is None or cvg_end_dt is None):
             forms_obj = check_list_cvg_dates(args)
+        # print(forms_obj)
+        # print('just in post_reports')
         if len(forms_obj)== 0:
             report_id = get_next_report_id()
             data['report_id'] = str(report_id)
             try:
-                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+                post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('amend_number'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
 
             except Exception as e:
                 # Resetting Report ID
@@ -539,9 +548,14 @@ def post_reports(data):
             try:
                 #Insert data into Form 3X table
                 if data.get('form_type') == "F3X":
+                    # print('here1')
                     check_mandatory_fields_form3x(data)
-                    post_sql_form3x(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'))                                            
+                    # print('here2')
+                    post_sql_form3x(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('election_code'), data.get('date_of_election'), data.get('state_of_election'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('coh_bop'))
+                    # print('here3')
+                # print('here3.5')
                 output = get_reports(data)
+                # print('here4')
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -590,12 +604,14 @@ def put_reports(data):
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj)== 0:
             old_list_report = get_list_report(report_id, cmte_id)
+            # print(old_list_report)
+            # print(data.get('status'))
             put_sql_report(data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_date'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'), data.get('status'), data.get('report_id'), cmte_id)
             old_dict_report = old_list_report[0]
-            prev_report_type = old_dict_report.get('report_type')
-            prev_cvg_start_dt = old_dict_report.get('cvg_start_date')
-            prev_cvg_end_dt = old_dict_report.get('cvg_end_date')
-            prev_last_update_date = old_dict_report.get('last_update_date')
+            prev_report_type = old_dict_report.get('reporttype')
+            prev_cvg_start_dt = old_dict_report.get('cvgstartdate')
+            prev_cvg_end_dt = old_dict_report.get('cvgenddate')
+            prev_last_update_date = datetime.datetime.now()
                                            
             try:
                 if data.get('form_type') == "F3X":
@@ -1607,7 +1623,6 @@ def autolookup_search_contacts(request):
         for key, value in query_params.items():
             if key in allowed_params:
                 order_string = str(key)
-                parameters = [committee_id, committee_id]
                 param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
                 # if cand_q:
                 #     query_string = """
@@ -1635,6 +1650,7 @@ def autolookup_search_contacts(request):
                 # print('haha')
                 # print('cmte-id' in list(request.query_params.items()))
                 if 'cmte_id' in request.query_params:
+                    parameters = [committee_id]
                     query_string = """
                         SELECT json_agg(t) FROM 
                         (SELECT 
@@ -1659,7 +1675,7 @@ def autolookup_search_contacts(request):
                         e.delete_ind,
                         e.create_date,
                         e.last_update_date
-                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000') 
+                        FROM public.entity e WHERE e.cmte_id in ('C00000000') 
                         AND substr(e.ref_cand_cmte_id,1,1)='C'
                         AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                         """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
@@ -1668,6 +1684,7 @@ def autolookup_search_contacts(request):
                     or 'cand_first_name' in request.query_params
                     or 'cand_last_name' in request.query_params
                     ):
+                    parameters = [committee_id]
                     query_string = """
                         SELECT json_agg(t) FROM 
                         (SELECT 
@@ -1693,11 +1710,12 @@ def autolookup_search_contacts(request):
                         e.cand_office_state,
                         e.cand_office_district,
                         e.cand_election_year
-                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000') 
+                        FROM public.entity e WHERE e.cmte_id in ('C00000000') 
                         AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                         AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                         """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
                 else:
+                    parameters = [committee_id, committee_id]
                     query_string = """
                         SELECT json_agg(t) FROM 
                         (SELECT 
@@ -1722,7 +1740,7 @@ def autolookup_search_contacts(request):
                         e.delete_ind,
                         e.create_date,
                         e.last_update_date
-                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                        FROM public.entity e WHERE e.cmte_id in (%s)
                         AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                         """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
 
@@ -1942,6 +1960,211 @@ END - GET ALL TRANSACTIONS API - CORE APP
 TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FNE 875 - BY  Yeswanth Kumar Tella
 **********************************************************************************************************************************************
 """
+
+
+def get_query_string(category_type,cmte_id,param_string):
+    query_string = ''
+    if category_type == 'disbursements_tran':
+        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_disbursements_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string 
+
+    elif category_type == 'loans_tran':
+        query_string = ''
+        # query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_loans_debts_transactions_view
+        #                     where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+
+    elif category_type == 'other_tran':
+        query_string = ''
+        # query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_other_transactions_view
+        #                     where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+
+    elif category_type == 'receipts_tran':
+        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_receipts_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string 
+    elif category_type == 'SL-A':
+        query_string += """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_receipts_transactions_view
+                            where cmte_id='""" + cmte_id + """' AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC') """ + param_string
+    else:
+        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_receipts_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string 
+
+    return query_string
+
+
+def get_child_query_string(category_type):
+
+    query_view = ''
+    if category_type == 'disbursements_tran':
+        query_view = """
+                        SELECT json_agg(t) FROM
+                        (SELECT report_type,
+                                transaction_type, 
+                                transaction_type_desc, 
+                                transaction_id, 
+                                api_call, 
+                                name, 
+                                street_1, 
+                                street_2, 
+                                city, 
+                                state, 
+                                zip_code, 
+                                transaction_date, 
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, 
+                                purpose_description, 
+                                occupation, 
+                                employer, 
+                                memo_code, 
+                                memo_text,
+                                election_code,
+                                election_year,
+                                beneficiary_cmte_id,
+                                election_other_description,
+                                itemized, 
+                                transaction_type_identifier, 
+                                entity_id,
+                                back_ref_transaction_id 
+                        FROM all_disbursements_transactions_view
+                    """
+
+    elif category_type == 'other_tran':
+        query_view = """
+                        SELECT json_agg(t) FROM
+                        (SELECT report_type,
+                                activity_event_identifier,
+                                schedule,
+                                transaction_type, 
+                                transaction_type_desc, 
+                                transaction_id, 
+                                api_call, 
+                                name, 
+                                street_1, 
+                                street_2, 
+                                city, 
+                                state, 
+                                zip_code, 
+                                transaction_date,
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt,
+                                purpose_description, 
+                                occupation, 
+                                employer,
+                                election_code,
+                                election_other_description,
+                                memo_code, 
+                                memo_text, 
+                                itemized, 
+                                transaction_type_identifier, 
+                                entity_id,
+                                back_ref_transaction_id 
+                        FROM all_other_transactions_view
+                    """
+
+    elif category_type == 'receipts_tran':
+        query_view = """
+                        SELECT json_agg(t) FROM
+                        (SELECT report_type,
+                                transaction_type, 
+                                transaction_type_desc, 
+                                transaction_id, 
+                                api_call, 
+                                name, 
+                                street_1, 
+                                street_2, 
+                                city, 
+                                state, 
+                                zip_code, 
+                                transaction_date, 
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt,
+                                purpose_description, 
+                                occupation, 
+                                employer,
+                                election_code,
+                                election_other_description,
+                                memo_code, 
+                                memo_text, 
+                                itemized, 
+                                transaction_type_identifier, 
+                                entity_id,
+                                back_ref_transaction_id 
+                        FROM all_receipts_transactions_view
+                        """
+    
+    else:
+        query_view = """
+                        SELECT json_agg(t) FROM
+                        (SELECT report_type,
+                                transaction_type, 
+                                transaction_type_desc, 
+                                transaction_id, 
+                                api_call, 
+                                name, 
+                                street_1, 
+                                street_2, 
+                                city, 
+                                state, 
+                                zip_code, 
+                                transaction_date, 
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt,
+                                purpose_description, 
+                                occupation, 
+                                employer,
+                                election_code,
+                                election_other_description, 
+                                memo_code, 
+                                memo_text, 
+                                itemized, 
+                                transaction_type_identifier, 
+                                entity_id,
+                                back_ref_transaction_id 
+                        FROM all_receipts_transactions_view
+                        """
+        
+    return query_view
+
+
+def get_trans_query(category_type, cmte_id, param_string):
+    query_string = ''
+    
+    if category_type == 'disbursements_tran':
+        query_string = """SELECT report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, election_year, election_other_description,transaction_type_identifier, entity_id from all_disbursements_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ 
+                            AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
+                            """
+    elif category_type == 'receipts_tran':
+        query_string = """SELECT report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_receipts_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ 
+                            AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
+                            """
+    elif category_type == 'loans_tran':
+        query_string = """SELECT report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, purpose_description, loan_amount, loan_payment_to_date, loan_balance, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id from all_loans_debts_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ """
+
+    elif category_type == 'other_tran':
+        query_string = """SELECT schedule, report_type, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_other_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
+                            AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
+                            """
+    else:
+        query_string = """SELECT report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_receipts_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """
+                            AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
+                            """
+    return query_string
+
+
+
 def filter_get_all_trans(request, param_string):
     if request.method == 'GET':
         return param_string
@@ -1969,6 +2192,11 @@ def filter_get_all_trans(request, param_string):
         if 'filterItemizations' in f_key:
             itemized_tuple = "('"+"','".join(value_d)+"')"
             param_string = param_string + " AND itemized In " + itemized_tuple
+        if 'filterElectionCodes' in f_key:
+            itemized_tuple = "('"+"','".join(value_d)+"')"
+            param_string = param_string + " AND election_code In " + itemized_tuple
+        if 'filterElectionYearFrom' in f_key and 'filterElectionYearTo' in filt_dict.keys():
+            param_string = param_string + " AND election_year >= '" + value_d +"' AND election_year <= '" + filt_dict['filterElectionYearTo'] +"'"
     return param_string
 
 # def get_aggregate_amount(transaction_id):
@@ -1981,101 +2209,86 @@ def filter_get_all_trans(request, param_string):
 #         return False
 #         raise Exception('The aggregate_amount function is throwing an error: ' + str(e))
 
-def load_child_transactions(cmte_id, report_id):
+def load_child_transactions(cmte_id, report_id, ctgry_type):
     """
     a helper function to query and load all child transactions
     """
+    query_string = get_child_query_string(ctgry_type)
     if report_id is None:
-        child_query_string = """
-        SELECT json_agg(t) FROM
-            (SELECT transaction_type, 
-                    transaction_type_desc, 
-                    transaction_id, 
-                    api_call, 
-                    name, 
-                    street_1, 
-                    street_2, 
-                    city, 
-                    state, 
-                    zip_code, 
-                    transaction_date, 
-                    transaction_amount, 
-                    aggregate_amt, 
-                    purpose_description, 
-                    occupation, 
-                    employer, 
-                    memo_code, 
-                    memo_text, 
-                    itemized, 
-                    transaction_type_identifier, 
-                    entity_id,
-                    back_ref_transaction_id 
-            FROM all_transactions_view
-            WHERE cmte_id = %s AND back_ref_transaction_id IS NOT NULL
-            AND delete_ind is distinct from 'Y') t;
-            """
+        child_query_string = query_string + """ WHERE cmte_id = %s AND NOT(back_ref_transaction_id IS NULL OR back_ref_transaction_id = '')
+                        AND delete_ind is distinct from 'Y') t;
+                    """
     else:
-        child_query_string = """
-        SELECT json_agg(t) FROM
-            (SELECT transaction_type, 
-                    transaction_type_desc, 
-                    transaction_id, 
-                    api_call, 
-                    name, 
-                    street_1, 
-                    street_2, 
-                    city, 
-                    state, 
-                    zip_code, 
-                    transaction_date, 
-                    transaction_amount, 
-                    aggregate_amt, 
-                    purpose_description, 
-                    occupation, 
-                    employer, 
-                    memo_code, 
-                    memo_text, 
-                    itemized, 
-                    transaction_type_identifier, 
-                    entity_id,
-                    back_ref_transaction_id 
-            FROM all_transactions_view
-            WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id IS NOT NULL
+        child_query_string = query_string + """ WHERE report_id = %s AND cmte_id = %s AND NOT(back_ref_transaction_id iIS NULL OR back_ref_transaction_id = '')
             AND delete_ind is distinct from 'Y') t;
             """
     child_dic = {}
+
+    #child_query_view = get_query_view(ctgry_type)
     try:
         with connection.cursor() as cursor:
             if report_id is None:
                 cursor.execute(child_query_string, [cmte_id])
             else:
                 cursor.execute(child_query_string, (report_id, cmte_id))
-            # print(cursor.query)
-            child_list = cursor.fetchone()[0]
+            child_list = cursor.fetchone()
+            if child_list and ctgry_type!= 'loans_tran':
+                if child_list[0]:
+                    return child_list[0]
+                else:
+                    return []
+            else:
+                return []
             # TODO : update null value, NOT SURE it is necessary
             # just go with parent function
-            if child_list:
-                for child in child_list:
-                    for i in child:
-                        if not child[i] and i not in ['transaction_amount', 'aggregate_amt']:
-                            child[i] = ''
-                        elif not child[i]:
-                            child[i] = 0
-                    if child['back_ref_transaction_id'] not in child_dic:
-                        child_dic[child['back_ref_transaction_id']] = [child]
-                    else:
-                        child_dic[child['back_ref_transaction_id']].append(child)
+            # if child_list:
+            #     for child in child_list:
+            #         for i in child:
+            #             if not child[i] and i not in ['transaction_amount', 'aggregate_amt']:
+            #                 child[i] = ''
+            #             elif not child[i]:
+            #                 child[i] = 0
+            #         if child['back_ref_transaction_id'] not in child_dic:
+            #             child_dic[child['back_ref_transaction_id']] = [child]
+            #         else:
+            #             child_dic[child['back_ref_transaction_id']].append(child)
     except Exception as e:
         # logger.debug("loading child errors:" + str(e))
         raise
     # logger.debug('child dictionary loaded with {} items'.format(child_dic))
-    return child_dic
+    # return child_dic
+
+def superceded_report_id_list(report_id):
+    try:
+        report_list = []
+        report_list.append(str(report_id))
+        reportId = [0]
+        print(report_list)
+        while True:
+            print('in loop')
+            with connection.cursor() as cursor:
+                query_string = """SELECT previous_report_id FROM public.reports WHERE report_id = %s AND form_type = 'F3X' AND delete_ind is distinct FROM 'Y' """
+                cursor.execute(query_string, [report_id])
+                reportId = cursor.fetchone()
+            print(reportId)
+            if reportId is None:
+                break
+            elif reportId[0] is None:
+                break
+            else:
+                report_list.append(str(reportId[0]))
+                report_id = reportId[0]
+        print(report_list)
+        return report_list
+    except Exception as e:
+        raise
 
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
         # print("request.data: ", request.data)
         cmte_id = request.user.username
+        ctgry_type = request.data.get('category_type')
         report_id = None
         param_string = ""
         page_num = int(request.data.get('page', 1))
@@ -2094,6 +2307,10 @@ def get_all_transactions(request):
             descending = 'DESC'
         else:
             descending = 'ASC'
+
+        # if not ctgry_type or ctgry_type in ['',"", "null", "none"]:
+        #     return Response("The get_all_transactions API 'category_type' is, mandatory" , status=status.HTTP_400_BAD_REQUEST)
+
         # if 'order_params' in request.query_params:
         #     order_string = request.query_params.get('order_params')
         # else:
@@ -2145,46 +2362,75 @@ def get_all_transactions(request):
 
         # ADDED the below code to access transactions across reports and based on categoryType
         if 'reportid' in request.data and str(request.data.get('reportid')) not in ['',"", "null", "none"]:
-            report_id = request.data.get('reportid')
-            param_string += " AND report_id='" + str(request.data.get('reportid')) + "'"
-        if 'categoryType' in request.data and str(request.data.get('categoryType')) not in ['',"", "null", "none"]:
-            if request.data.get('categoryType') == "SL-A":
-                param_string += " AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC')"
-            else:
-                param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
+            report_list = superceded_report_id_list(request.data.get('reportid'))
+            param_string += " AND report_id in ('{}')".format("', '".join(report_list))
 
-        query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
-                           where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+        # if 'categoryType' in request.data and str(request.data.get('categoryType')) not in ['',"", "null", "none"]:
+        #     if request.data.get('categoryType') == "SL-A":
+        #         param_string += " AND transaction_type_identifier in ('LEVIN_PARTN_MEMO', 'LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC')"
+        #     else:
+        #         param_string += " AND category_type='" + str(request.data.get('categoryType')) + "'"
+        if 'trashed_flag' in request.data and request.data.get('trashed_flag') in [True, 'True', 'true']:
+                param_string += " AND delete_ind = 'Y'"
+        else:
+            param_string += " AND delete_ind is distinct from 'Y'"
+        query_string = get_query_string(ctgry_type,cmte_id,param_string)
+        sum_trans = None
+
+        if query_string != '':
+            with connection.cursor() as cursor:
+                cursor.execute(query_string)
+                # print(cursor.query)
+                result = cursor.fetchone()
+                count = result[0]
+                sum_trans = result[1]
+
+        # query_string = """SELECT count(*) total_transactions,sum((case when memo_code is null then transaction_amount else 0 end)) total_transaction_amount from all_transactions_view
+        #                    where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'"""
+
                            # + """ ORDER BY """ + order_string
         # print(query_string)
-        with connection.cursor() as cursor:
-            cursor.execute(query_string)
-            # print(cursor.query)
-            result = cursor.fetchone()
-            count = result[0]
-            sum_trans = result[1]
+        
         filters_post = request.data.get('filters', {})
         memo_code_d = filters_post.get('filterMemoCode', False)
         if str(memo_code_d).lower() == 'true':
             param_string = param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
 
-        child_tran_dic = load_child_transactions(cmte_id, report_id)
+        # child_tran_dic = load_child_transactions(cmte_id, report_id, ctgry_type )
+        child_tran_list = load_child_transactions(cmte_id, report_id, ctgry_type )
         # update in FNE-1524: only load non-child transaction, child transaction will add as
         # a 'child' element to their parent
-        trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
-                                    where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
-                                    AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
-                                    """
+
+        # trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, transaction_type_identifier, entity_id from all_transactions_view
+        #                             where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
+        #                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
+        #                             """
+        #query_view = get_query_view(ctgry_type)
+        trans_query_string = get_trans_query(ctgry_type,cmte_id, param_string)
+
+        # trans_query_string = """SELECT transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, transaction_amount, aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id as donar_cmte_id, election_code, election_year, transaction_type_identifier, entity_id from """+ query_view +"""
+        #                             where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
+        #                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
+        #                             """
+
+
                                     # + """ ORDER BY """ + order_string
         # print("trans_query_string: ",trans_query_string)
         # import ipdb;ipdb.set_trace()
         if sortcolumn and sortcolumn != 'default':
             trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
         elif sortcolumn == 'default':
-            trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
+            if ctgry_type == 'disbursements_tran':
+                trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
+            elif ctgry_type == 'receipts_tran':
+                trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC"""
+            elif ctgry_type == 'loans_tran':
+                 trans_query_string = trans_query_string + """ ORDER BY name ASC, loan_incurred_date  ASC"""
+            elif ctgry_type == 'other_tran':
+                trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
+
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
-            # print(cursor.query)
             for row in cursor.fetchall():
                 data_row = list(row)
                 # forms_obj=data_row[0]
@@ -2194,16 +2440,29 @@ def get_all_transactions(request):
                     status_value = status.HTTP_200_OK
                 else:
                     logger.debug('total transactions loaded:{}'.format(len(forms_obj)))
-                    for d in forms_obj:
-                        if d['transaction_id'] in child_tran_dic:
-                            logger.debug('child found for transaction:{}'.format(d['transaction_id']))
-                            d['child'] = child_tran_dic.get(d['transaction_id'])
-                            # print('***'+str(d))
-                        for i in d:
-                            if not d[i] and i not in ['transaction_amount', 'aggregate_amt']:
-                                d[i] = ''
-                            elif not d[i]:
-                                d[i] = 0
+                    logger.debug('child transactions loaded:{}'.format(len(child_tran_list)))
+                    for child in child_tran_list:
+                        parent_flag = False
+                        for parent in forms_obj:
+                            if child.get('back_ref_transaction_id') == parent.get('transaction_id'):
+                                parent_flag = True
+                                if 'child' not in parent:
+                                    parent['child'] = []
+                                parent['child'].append(child)
+                                break
+                        if not parent_flag:
+                            forms_obj.append(child)
+
+                    # for d in forms_obj:
+                    #     if d['transaction_id'] in child_tran_dic:
+                    #         logger.debug('child found for transaction:{}'.format(d['transaction_id']))
+                    #         d['child'] = child_tran_dic.get(d['transaction_id'])
+                    #         # print('***'+str(d))
+                    #     for i in d:
+                    #         if not d[i] and i not in ['transaction_amount', 'aggregate_amt']:
+                    #             d[i] = ''
+                    #         elif not d[i]:
+                    #             d[i] = 0
                         #agg_amount = get_aggregate_amount(d['transaction_id'])
                         #d['aggregate_amount'] =round(agg_amount, 2)   
                     status_value = status.HTTP_200_OK
@@ -2214,13 +2473,15 @@ def get_all_transactions(request):
         if paginator.num_pages < page_num:
             page_num = paginator.num_pages
         forms_obj = paginator.page(page_num)
-        json_result = {'transactions': list(forms_obj), 'totalAmount': sum_trans, 'totalTransactionCount': total_count,
+        json_result = {'transactions': list(forms_obj), 'totalTransactionCount': total_count,
                     'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
+
+        if sum_trans:
+            json_result['totalAmount'] = sum_trans
         # json_result = { 'transactions': forms_obj, 'totalAmount': sum_trans, 'totalTransactionCount': count}
         return Response(json_result, status=status_value)
     except Exception as e:
         return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
 
 """
 *****************************************************************************************************************************
@@ -2375,7 +2636,6 @@ def get_all_trashed_transactions(request):
         return Response(json_result, status=status_value)
     except Exception as e:
         return Response("The get_all_trashed_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
 """
 ******************************************************************************************************************************
 END - GET ALL TRASHED TRANSACTIONS API - CORE APP
@@ -3955,23 +4215,23 @@ def contact_entity_dict(data):
           'entity_id' : is_null(data.get('id')),   
           'entity_type'  : is_null(data.get('entity_type')), 
           'entity_name'  : is_null(data.get('entity_name')), 
-          'first_name'  : is_null(data.get('firstName')), 
-          'last_name'  : is_null(data.get('lastName')), 
-          'middle_name' : is_null(data.get('middleName')), 
-          'preffix'  : is_null(data.get('preffix')), 
+          'first_name'  : is_null(data.get('first_name')), 
+          'last_name'  : is_null(data.get('last_name')), 
+          'middle_name' : is_null(data.get('middle_name')), 
+          'preffix'  : is_null(data.get('prefix')), 
           'suffix' : is_null(data.get('suffix')), 
-          'street_1'  : is_null(data.get('street1')), 
-          'street_2'  : is_null(data.get('street2')), 
+          'street_1'  : is_null(data.get('street_1')), 
+          'street_2'  : is_null(data.get('street_2')), 
           'city'  : is_null(data.get('city')),  
           'state' : is_null(data.get('state')), 
-          'zip_code' : is_null(data.get('zip')), 
+          'zip_code' : is_null(data.get('zip_code')), 
           'occupation'  : is_null(data.get('occupation')), 
           'employer' : is_null(data.get('employer')), 
           'cand_office'  : is_null(data.get('candOffice')), 
           'cand_office_state'  : is_null(data.get('candOfficeState')), 
           'cand_office_district'  : is_null(data.get('candOfficeDistrict')), 
           'ref_cand_cmte_id'  : is_null(data.get('candCmteId')), 
-          'phone_number'  : is_null(data.get('phoneNumber'),'phone_number'),
+          'phone_number'  : is_null(data.get('phone_number'),'phone_number'),
           'cand_election_year': is_null(data.get('candElectionYear'),'cand_election_year'),
           'last_update_date' : is_null(data.get('lastupdatedate')),
         }
@@ -4030,7 +4290,7 @@ def put_contact_data(data):
                 data.get('cand_office', ""),
                 data.get('cand_office_state', ""),
                 data.get('cand_office_district', ""),
-                data.get('phone_number'),
+                data.get('phone_number', None),
                 data.get('cand_election_year', None),
                 datetime.datetime.now(),
                 data.get('entity_id'),
@@ -4093,7 +4353,9 @@ def contacts(request):
             put_contact_data(datum)
             print ("datum", datum)
             output = get_entities(datum)
-            return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
+            dict_data = output[0]
+            dict_data['phone_number'] = str(dict_data['phone_number']) if dict_data.get('phone_number') else ''
+            return JsonResponse(dict_data, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             return Response("The contacts API - PUT is throwing an exception: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
@@ -4839,10 +5101,11 @@ def get_reports_data(report_id):
         #print('here',forms_obj)
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [report_id])
+            # print(cursor.query)
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-
+        # print(forms_obj)
         if forms_obj is None:
             pass
             #raise NoOPError('The committeeid ID: {} does not exist or is deleted'.format(cmte_id))   
@@ -4851,14 +5114,14 @@ def get_reports_data(report_id):
         raise
 
 
-def insert_sql_report(dict_data):
-    try:
-        sql = "INSERT INTO public.reports (" + ", ".join(dict_data.keys()) + ") VALUES (" + ", ".join(["%("+k+")s" for k in dict_data]) + ");"
-        with connection.cursor() as cursor:
-            # INSERT row into Reports table
-            cursor.execute(sql,dict_data)                                          
-    except Exception:
-        raise
+# def insert_sql_report(dict_data):
+#     try:
+#         sql = "INSERT INTO public.reports (" + ", ".join(dict_data.keys()) + ") VALUES (" + ", ".join(["%("+k+")s" for k in dict_data]) + ");"
+#         with connection.cursor() as cursor:
+#             # INSERT row into Reports table
+#             cursor.execute(sql,dict_data)                                          
+#     except Exception:
+#         raise
 
 
 
@@ -4867,11 +5130,11 @@ def create_amended(reportid):
         data_dict = get_reports_data(reportid)
         if data_dict:
             #data = data[0]
-            report_id = get_next_report_id()
+            # report_id = get_next_report_id()
 
             for data in data_dict:
                 #print(data)
-                data['report_id'] = report_id
+                # data['report_id'] = report_id
 
                 #post_sql_report(reports_obj(''))
                 data['amend_ind'] = 'A'
@@ -4881,11 +5144,21 @@ def create_amended(reportid):
                 del data['report_seq']
                 data['status'] = 'Saved'
                 #print(data,'here')
-                insert_sql_report(data)
-                #print(data)
+                data['cvg_start_dt'] = datetime.datetime.strptime(data['cvg_start_date'], '%Y-%m-%d').date()
+                data['cvg_end_dt'] = datetime.datetime.strptime(data['cvg_end_date'], '%Y-%m-%d').date()
+                # print('just before post_reports')
+                created_data = post_reports(data, reportid)
+                if type(created_data) is list:                    
+                    raise Exception ('coverage dates already cover a existing report id')
+                elif type(created_data) is dict:
+                    print(created_data)
+                # print('just after post_reports')
+                # print(data)
 
                 with connection.cursor() as cursor:
-                    cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[report_id, reportid]) 
+                    cursor.execute("""UPDATE public.reports SET superceded_report_id = %s WHERE report_id = %s """,[created_data['reportid'], reportid])
+                    cursor.execute("""UPDATE public.reports SET previous_report_id = %s WHERE report_id = %s """,[ reportid, created_data['reportid']])
+
 
                 return data
 
@@ -5328,3 +5601,107 @@ def new_report_update_date(request):
             )
     return Response({"result" : "success"}, status=status.HTTP_200_OK)
 
+"""
+********************************************************************************************************************************
+GET REPORT STATUS SPRINT-23 - FNE 1064 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_report_status(request):
+
+    try:
+        cmte_id = request.user.username
+        report_id =request.query_params.get('report_id')
+        form_type =request.query_params.get('form_type')
+        
+        with connection.cursor() as cursor:
+            forms_obj= {}
+
+            if form_type == "F99":    
+                cursor.execute("SELECT id as report_id, fec_status, fec_id FROM public.forms_committeeinfo  WHERE committeeid = %s AND id = %s", [cmte_id, report_id])
+            elif form_type == "F3X":
+                cursor.execute("SELECT report_id, fec_status, fec_id FROM public.reports  WHERE cmte_id = %s AND report_id = %s", [cmte_id, report_id])
+            
+            for row in cursor.fetchall():
+                data_row = list(row)
+
+                if (data_row[1] == '' or data_row[1] == None):
+                        forms_obj = {
+                        'report_id':data_row[0],
+                        'fec_status':'',
+                        'fec_id':''
+                        }
+                else:
+                    forms_obj = {
+                        'report_id':data_row[0],
+                        'fec_status':data_row[1],
+                        'fec_id':data_row[2]
+                         }
+
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_report_status API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+"""
+********************************************************************************************************************************
+GET LOAN ENDORSER DYNAMIC FORM FIELDS API- CORE APP - SPRINT 23 - FNE 1502 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_sched_c_endorser_dynamic_forms_fields(request):
+
+    try:
+
+        with open(os.path.dirname(__file__) + "/loan_endorser_fields.json", encoding='utf-8', errors='ignore') as loan_endorser_json_file:
+            data_obj = json.load(loan_endorser_json_file)
+                
+        if not bool(data_obj):
+            return Response("Loan Endorser dynamice fields json file is missing...!", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("The get_sched_c_endorser_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+********************************************************************************************************************************
+GET LOAN  DYNAMIC FORM FIELDS API- CORE APP - SPRINT 23 - FNE 1501 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_sched_c_loan_dynamic_forms_fields(request):
+
+    try:
+        print("get_sched_c_loan_dynamic_forms_fields called...")
+        with open(os.path.dirname(__file__) + "/loan_fields.json", encoding='utf-8', errors='ignore') as loans_json_file:
+            data_obj = json.load(loans_json_file)
+                
+        if not bool(data_obj):
+            return Response("Loan dynamice fields json file is missing...!", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("The get_sched_c_loan_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+********************************************************************************************************************************
+GET LOAN REPAYMENT DYNAMIC FORM FIELDS API- CORE APP - SPRINT 23 - FNE 1503 - BY MAHENDRA MARATHE
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_sched_c_loanPayment_dynamic_forms_fields(request):
+
+    try:
+
+        with open(os.path.dirname(__file__) + "/loan_endorser_fields.json", encoding='utf-8', errors='ignore') as loan_repayment_json_file:
+            data_obj = json.load(loan_repayment_json_file)
+                
+        if not bool(data_obj):
+            return Response("Loan Repayment dynamice fields json file is missing...!", status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        return Response("The get_sched_c_loanPayment_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+# """

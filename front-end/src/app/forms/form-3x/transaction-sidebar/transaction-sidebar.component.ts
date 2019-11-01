@@ -43,6 +43,7 @@ export class TransactionSidebarComponent implements OnInit {
   public loansanddebtsTotal: number = 0.0;
   public othersTotal: number = 0.0;
   public reportId: number;
+  public allTransactions: boolean = false;
 
   private _formType: string = '';
   public transactionCategory: string = '';
@@ -70,6 +71,12 @@ export class TransactionSidebarComponent implements OnInit {
     _activatedRoute.queryParams.subscribe(p => {
       if (p.transactionCategory) {
         this.itemSelected = p.transactionCategory;
+      }
+
+      if (p.allTransactions === true || p.allTransactions === 'true') {
+        this.allTransactions = true;
+      } else {
+        this.allTransactions = false;
       }
     });
   }
@@ -155,6 +162,29 @@ export class TransactionSidebarComponent implements OnInit {
                       };
                       localStorage.setItem(`form_${this._formType}_totals`, JSON.stringify(totals));
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        if (res.hasOwnProperty('formType')) {
+          if (typeof res.formType === 'string') {
+            if (res.formType === this._formType) {
+              if (res.hasOwnProperty('totals')) {
+                if (typeof res.totals === 'object') {
+                  if (res.totals.hasOwnProperty('Loans/Debts')) {
+                      if (typeof res.totals['Loans/Debts'] === 'number') {
+                        this.loansanddebtsTotal = res.totals['Loans/Debts'];
+                        const totals: any = {
+                          receipts: this.receiptsTotal,
+                          cashOnHand : this.cashOnHandTotal,
+                          disbursements: this.disbursementsTotal,
+                          loansanddebtsTotal: this.loansanddebtsTotal
+                        };
+                        localStorage.setItem(`form_${this._formType}_totals`, JSON.stringify(totals));
+                      }
                   }
                 }
               }

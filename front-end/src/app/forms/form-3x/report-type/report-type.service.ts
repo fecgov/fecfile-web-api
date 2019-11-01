@@ -710,4 +710,24 @@ export class ReportTypeService {
     }
    
   }
+
+  public getReportIdFromStorage(formType: string) {
+    let reportId = '0';
+    let form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+
+    if (form3XReportType === null || typeof form3XReportType === 'undefined') {
+      form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+    }
+
+    console.log('viewTransactions form3XReportType', form3XReportType);
+
+    if (typeof form3XReportType === 'object' && form3XReportType !== null) {
+      if (form3XReportType.hasOwnProperty('reportId')) {
+        reportId = form3XReportType.reportId;
+      } else if (form3XReportType.hasOwnProperty('reportid')) {
+        reportId = form3XReportType.reportid;
+      }
+    }
+    return reportId;
+  }
 }

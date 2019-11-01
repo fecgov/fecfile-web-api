@@ -25,6 +25,7 @@ export class F99Component implements OnInit {
   public frm: any;
   public direction: string;
   public editMode: boolean = true;
+  public reportId: number;
   public step: string = 'step_1';
   public currentStep: string = 'step_1';
   public previousStep: string = '';
@@ -95,9 +96,10 @@ export class F99Component implements OnInit {
               localStorage.removeItem(`form_${this._formType}_saved`);
             }
           } else {
-            if(this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
+            if (this._activatedRoute.snapshot.queryParams.step !== this.currentStep) {
               this.currentStep = this._activatedRoute.snapshot.queryParams.step;
               this.step = this._activatedRoute.snapshot.queryParams.step;
+              this.reportId = this._activatedRoute.snapshot.queryParams.reportId;
             }
             window.scrollTo(0, 0);
           }
@@ -164,16 +166,19 @@ export class F99Component implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
 
-          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode, refresh: this.editMode } });
+          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, reportId: this.reportId,
+            edit: this.editMode, refresh: this.editMode } });
         } else if (this.frm === 'preview') {
           this.step = this._step;
 
-          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode, refresh: this.editMode } });
+          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, reportId: this.reportId,
+            edit: this.editMode, refresh: this.editMode } });
         }
       } else if (this.direction === 'previous') {
         this.step = this._step;
 
-        this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, edit: this.editMode, refresh: this.editMode } });
+        this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, reportId: this.reportId,
+          edit: this.editMode, refresh: this.editMode } });
       }
     }
   }
@@ -194,8 +199,14 @@ export class F99Component implements OnInit {
 
     this.currentStep = e.step;
 
-    if (e.refresh) {
+    if (e.refresh && e.edit !== false) {
       this.editMode = e.refresh;
+    } else if (e.edit !== null) {
+      this.editMode = e.edit;
+    }
+
+    if (e.reportId) {
+      this.reportId = e.reportId;
     }
 
     this.canContinue();

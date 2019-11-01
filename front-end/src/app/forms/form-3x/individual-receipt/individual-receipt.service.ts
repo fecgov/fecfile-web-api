@@ -338,10 +338,7 @@ export class IndividualReceiptService {
     });
   }
 
-  public getFedNonFedPercentage(
-    amount: string,
-    activityEvent: string
-  ): Observable<any> {
+  public getFedNonFedPercentage__(amount: string, activityEvent: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sh1/get_h1_percentage';
     let httpOptions = new HttpHeaders();
@@ -365,12 +362,43 @@ export class IndividualReceiptService {
     });
   }
 
+  public getFedNonFedPercentage(amount: string, activityEvent: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/sh1/get_fed_nonfed_share';
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    if (committeeDetails) {
+      if (committeeDetails.cmte_type_category) {
+        params = params.append('cmte_type_category', committeeDetails.cmte_type_category);
+      }
+    }
+
+    params = params.append('calendar_year', new Date().getFullYear().toString());
+    if (amount) {
+      params = params.append('total_amount', amount.toString());
+    }
+    if (activityEvent) {
+      params = params.append('activity_event_type', 'administrative');
+    }
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+  }
+
   /**
    * Obtain the Report ID from local storage.
    */
   public getReportIdFromStorage(formType: string) {
     let reportId = '0';
     let form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    const reportIdFromLocalStorage = localStorage.getItem('reportId');
 
     if (form3XReportType === null || typeof form3XReportType === 'undefined') {
       form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
@@ -384,6 +412,8 @@ export class IndividualReceiptService {
       } else if (form3XReportType.hasOwnProperty('reportid')) {
         reportId = form3XReportType.reportid;
       }
+    } else if (reportIdFromLocalStorage !== null && reportIdFromLocalStorage !== undefined && reportIdFromLocalStorage !== '0') {
+      reportId = reportIdFromLocalStorage;
     }
     return reportId;
   }

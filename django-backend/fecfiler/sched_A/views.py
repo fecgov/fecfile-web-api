@@ -3,7 +3,7 @@ import json
 import logging
 import os
 from decimal import Decimal
-
+from django.utils import timezone
 import requests
 import copy
 from functools import lru_cache
@@ -233,7 +233,11 @@ def check_decimal(value):
             """Invalid Input: Expecting a decimal value like 18.11, 24.07. 
             Input received: {}""".format(value))
 
-
+# @api_view(['GET'])
+# def date_print(request):
+#   print(datetime.datetime.now())
+#   print(timezone.now())
+#   return Response('SUCCESS', status=status.HTTP_200_OK)
 
 # TODO: update this function to take one argument of data_dic
 def post_sql_schedA(cmte_id, 
@@ -733,6 +737,9 @@ def post_schedA(datum):
             trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
         datum['transaction_id'] = transaction_id
+        #checking if donor cmte id exists then copying entity name to donor committee name as they both are the same
+        if 'donor_cmte_id' in datum and datum.get('donor_cmte_id') not in ['', ' ', None, 'none', 'null', 'None']:
+          datum['donor_cmte_name'] = datum.get('entity_name')
         try:
             logger.debug('saving sched_a transaction with data:{}'.format(datum))
             post_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), check_decimal(datum.get(
@@ -870,6 +877,9 @@ def put_schedA(datum):
             entity_data = post_entities(datum)
         entity_id = entity_data.get('entity_id')
         datum['entity_id'] = entity_id
+        #checking if donor cmte id exists then copying entity name to donor committee name as they both are the same
+        if 'donor_cmte_id' in datum and datum.get('donor_cmte_id') not in ['', ' ', None, 'none', 'null', 'None']:
+          datum['donor_cmte_name'] = datum.get('entity_name')
         try:
             put_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get(
                 'contribution_amount'), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'))

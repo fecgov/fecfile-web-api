@@ -1,0 +1,37 @@
+// .non-connected-committee-container input {
+//     width: 100%;
+//     clear: both;
+//   }
+
+// form  { display: table;      }
+// ng-container    { display: table-row;  }
+
+// .text  { display: table-row;  }
+// label { display: table-cell; }
+// input { display: table-cell; }
+header {
+  // margin-left:15px;
+  width:80%;
+  display: block;
+  margin-left: 15px;
+  // margin-right: auto15;
+}
+button {
+  // right: 10px;
+  margin: 15px;
+}
+.radio {
+  margin:15px;
+}
+.form-group {
+  margin:10px;
+}
+input[type="text"]
+{
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+ng-container {
+  margin-top: 15px;
+}

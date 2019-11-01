@@ -11,6 +11,7 @@ import { ReportFilterModel } from 'src/app/reports/model/report-filter.model';
 import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.pipe';
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
+import { RequestOptions } from '@angular/http';
 
 /*export interface GetReportsResponse {
   reports: reportModel[];
@@ -24,6 +25,7 @@ export class FormsService {
   private _filterPipe: FilterPipe;
   private _zipCodePipe: ZipCodePipe;
   private _datePipe: DatePipe;
+  private _stopCanDeactivate: boolean = false;
 
   constructor(private _http: HttpClient, private _cookieService: CookieService) {
     this._orderByPipe = new OrderByPipe();
@@ -157,7 +159,7 @@ export class FormsService {
         formData.append('is_submitted', 'False');
         formData.append('filename', form99_details.filename);
         formData.append('form_type', 'F99');
-        if (form99_details.id === '' || form99_details.id === '' || form99_details.id === null) {
+        if (form99_details.id === '' || form99_details.id === '' || form99_details.id === null || form99_details.id === undefined) {
           /*data['id']="0";*/
           formData.append('id', '0');
         } else {
@@ -198,10 +200,8 @@ export class FormsService {
         formData.append('additional_email_2', form99_details.additional_email_2);
         formData.append('created_at', form99_details.created_at);
         formData.append('is_submitted', 'False');
-        /*formData.append('filename', form99_details.filename);*/
         formData.append('form_type', 'F99');
-        if (form99_details.id === '' || form99_details.id === '' || form99_details.id === null) {
-          /*data['id']="0";*/
+        if (form99_details.id === '' || form99_details.id === undefined || form99_details.id === null) {
           formData.append('id', '0');
         } else {
           formData.append('id', form99_details.id.toString());
@@ -344,7 +344,7 @@ export class FormsService {
         formData.append('is_submitted', 'False');
         /*formData.append('filename', form99_details.filename);*/
         formData.append('form_type', 'F99');
-        if (form99_details.id === '' || form99_details.id === '' || form99_details.id === null) {
+        if (form99_details.id === '' || form99_details.id === '' || form99_details.id === null || form99_details.id === undefined) {
           /*data['id']="0";*/
           formData.append('id', '0');
         } else {
@@ -447,10 +447,15 @@ export class FormsService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
+    let form99_details: form99;
     if (form_type === '99') {
-      let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
+      if (formObj && Object.entries(formObj).length !== 0) {
+        form99_details = formObj;
+      } else {
+        form99_details = JSON.parse(localStorage.getItem('form_99_details'));
+      }
 
+      delete form99_details.file;
       url = '/f99/update_f99_info';
       data = form99_details;
 
@@ -466,7 +471,7 @@ export class FormsService {
       .pipe(
         map(res => {
           if (res) {
-            return true;
+            return res;
           }
           return false;
         })
@@ -625,9 +630,12 @@ export class FormsService {
     if (form_type === '99') {
       let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
 
+      delete form99_details.file;
       url = '/f99/update_print_f99';
       data = form99_details;
-
+      // if (data.file) {
+      //   delete data.file;
+      // }
       data['form_type'] = 'F99';
 
       console.log('PreviewForm_Preview_Screen form99_details', form99_details);
@@ -656,6 +664,45 @@ export class FormsService {
           return false;
         })
       );
+  }
+
+  public get_report_status(form_type, report_id): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    // let params = new FormData(JSON.parse(localStorage.getItem('form_99_details')));
+    let params = new FormData();
+    let reportId = localStorage.getItem('form_99_details.id');
+    const formType = 'F' + form_type;
+
+    if (formType === 'F3X') {
+      let formF3X_ReportInfo: form3XReport = JSON.parse(localStorage.getItem(`form_${form_type}_ReportInfo`));
+      reportId = formF3X_ReportInfo.reportId;
+    }
+
+    params.append('report_id', reportId);
+    params.append('form_type', formType);
+
+    const url = '/core/get_report_status?form_type=' + formType + '&report_id=' + reportId;
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    })
+    .pipe(
+      map(res => {
+        if (res) {
+          this._stopCanDeactivate = res['fec_status'] === 'Accepted' ? false : true;
+        } else {
+          this._stopCanDeactivate = false;
+        }
+      })
+    );
+  }
+
+  public checkCanDeactivate() {
+    return this._stopCanDeactivate;
   }
 
   public get_filed_form_types(): Observable<any> {

@@ -5,22 +5,23 @@
 >
   <thead>
     <tr>
-      <th>Name</th>
+      <th *ngIf="subTransactionsTableType === 'sched_d'">Transaction Type</th>
+      <th>{{ subTransactionsTableType === 'sched_d' ? 'Payee Name' : 'Name' }}</th>
       <th>Date</th>
       <th>Amount</th>
-      <th>Aggregate</th>
+      <th *ngIf="subTransactionsTableType !== 'sched_d'">Aggregate</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let trx of transactionsModel">
+      <td *ngIf="subTransactionsTableType === 'sched_d'">{{ trx.type }}</td>
       <td>{{ trx.name }}</td>
-      <!-- <td>{{ determineName() }}</td> -->
       <td>{{ trx.date | date: 'MM/dd/yyyy' }}</td>
       <td class="transactions__amount">
         {{ trx.amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
       </td>
-      <td class="transactions__amount">
+      <td *ngIf="subTransactionsTableType !== 'sched_d'" class="transactions__amount">
         {{ trx.aggregate | currency: 'USD':'symbol-narrow':'1.2-2' }}
       </td>
 

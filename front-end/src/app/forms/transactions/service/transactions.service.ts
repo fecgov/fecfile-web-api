@@ -82,7 +82,10 @@ export class TransactionsService {
     itemsPerPage: number,
     sortColumnName: string,
     descending: boolean,
-    filters: TransactionFilterModel
+    filters: TransactionFilterModel,
+    categoryType: string,
+    trashed_flag: boolean,
+    allTransactionsFlag: boolean
   ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
@@ -94,11 +97,16 @@ export class TransactionsService {
     // const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
 
     const request: any = {};
-    request.reportid = reportId;
+    if (!allTransactionsFlag) {
+      request.reportid = reportId;
+    }
+
     request.page = page;
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
     request.descending = descending;
+    request.category_type = categoryType;
+    request.trashed_flag = trashed_flag;
 
     if (filters) {
       request.filters = filters;
@@ -160,7 +168,8 @@ export class TransactionsService {
     itemsPerPage: number,
     sortColumnName: string,
     descending: boolean,
-    filters: TransactionFilterModel
+    filters: TransactionFilterModel,
+    categoryType: string
   ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
@@ -175,6 +184,7 @@ export class TransactionsService {
     request.itemsPerPage = itemsPerPage;
     request.sortColumnName = sortColumnName;
     request.descending = descending;
+    request.category_type = categoryType;
 
     if (filters) {
       request.filters = filters;
@@ -288,6 +298,7 @@ export class TransactionsService {
     model.amount = row.contribution_amount;
     model.aggregate = row.contribution_aggregate;
     model.entityId = row.entity_id;
+    model.reportType = row.report_type;
   }
 
   /**
@@ -308,6 +319,9 @@ export class TransactionsService {
 
     name = appFieldName;
     switch (appFieldName) {
+      case 'reportType':
+        name = 'report_type';
+        break;
       case 'type':
         name = 'transaction_type_desc';
         break;
@@ -362,6 +376,36 @@ export class TransactionsService {
       case 'itemized':
         name = 'itemized';
         break;
+      case 'election_code':
+        name = 'electionCode';
+        break;
+      case 'loan_amount':
+        name = 'loanAmount';
+        break;
+      case 'loan_balance':
+        name = 'loanBalance';
+        break;
+      case 'loan_beginning_balance':
+        name = 'loanBeginningBalance';
+        break;
+      case 'loan_closing_balance':
+        name = 'loanClosingBalance';
+        break;
+      case 'loan_due_date':
+        name = 'loanDueDate';
+        break;
+      case 'loan_incurred_amt':
+        name = 'loanIncurredAmt';
+        break;
+      case 'loan_incurred_date':
+        name = 'loanIncurredDate';
+        break;
+      case 'loan_payment_amt':
+        name = 'loanPaymentAmt';
+        break;
+      case 'loan_payment_to_date':
+        name = 'loanPaymentToDate';
+        break;
       default:
     }
     return name ? name : '';
@@ -377,6 +421,7 @@ export class TransactionsService {
     if (!model) {
       return serverObject;
     }
+    serverObject.report_type = model.reportType;
     serverObject.entity_id = model.entityId;
     serverObject.transaction_type_desc = model.type;
     serverObject.transaction_type_identifier = model.transactionTypeIdentifier;
@@ -468,7 +513,10 @@ export class TransactionsService {
           'transaction_date_ui',
           'deleted_date_ui',
           'zip_code_ui',
-          'itemized'
+          'itemized',
+          'election_code',
+          'election_year',
+          ''
         ];
 
         for (let keyword of filters.keywords) {
@@ -795,6 +843,7 @@ export class TransactionsService {
   }
 }
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
+  model.reportType = row.report_type;
   model.type = row.transaction_type_desc;
   model.entityId = row.entity_id;
   model.transactionTypeIdentifier = row.transaction_type_identifier;
@@ -817,4 +866,15 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.deletedDate = row.deleted_date ? row.deleted_date : null;
   model.itemized = row.itemized;
   model.reportStatus = row.reportStatus;
+  model.electionCode = row.election_code;
+  model.electionYear = row.election_year;
+  model.loanAmount = row.loan_amount;
+  model.loanBalance = row.loan_balance;
+  model.loanBeginningBalance = row.loan_beginning_balance;
+  model.loanClosingBalance = row.loan_closing_balance;
+  model.loanDueDate = row.loan_due_date;
+  model.loanIncurredAmt = row.loan_incurred_amt;
+  model.loanIncurredDate = row.loan_incurred_date;
+  model.loanPaymentAmt = row.loan_payment_amt;
+  model.loanPaymentToDate = row.loan_payment_to_date;
 }
