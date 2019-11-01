@@ -248,6 +248,10 @@ export class LoanComponent implements OnInit, OnDestroy {
       formValidators.push(alphaNumeric());
     }
 
+    if (fieldName === 'zip_code') {
+      formValidators.push(alphaNumeric());
+    }
+
     if (validators) {
       for (const validation of Object.keys(validators)) {
         if (validation === 'required') {
@@ -585,8 +589,26 @@ export class LoanComponent implements OnInit, OnDestroy {
     }
   }
 
-  public electionTypeChanged(entityOption: any, col: any) {
+  public electionTypeChanged(electionOption: any, col: any) {
     console.log();
+    if (!electionOption.code) {
+      return;
+    }
+
+    // Election Other Description is required when Election is Other.
+    const electionControl = this.frmLoan.get('election_other_description');
+
+    if (electionOption.code === 'O') {
+      // TODO need to store validations for election other desc in a class variable
+      // or programatically rebuild from the dynamic form call otherwise they
+      // will need to be manually added here as they are now.
+      // FormControl validations can't be amended, they must be reset completely.
+      electionControl.setValidators([Validators.required, Validators.maxLength(20)]);
+      electionControl.updateValueAndValidity();
+    } else {
+      electionControl.setValidators([Validators.maxLength(20)]);
+      electionControl.updateValueAndValidity();
+    }
   }
 
   /**
@@ -1486,6 +1508,10 @@ export class LoanComponent implements OnInit, OnDestroy {
   public determineColClass(row: any, col: any) {
     if (col.name === 'election_other_description') {
       return 'col col-md-4';
+    } else if (col.name === 'loan_intrest_rate') {
+      return 'col col-md-2';
+    } else if (col.name === 'secured') {
+      return 'col col-md-1';
     }
     return row.colClassName;
   }
