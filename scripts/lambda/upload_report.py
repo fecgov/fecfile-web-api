@@ -146,7 +146,7 @@ def get_reports_to_upload():
                     data_row[0],  
                     4,
                     "F3X prepare_json_builders_data after the call",
-                    json.dumps(resp),
+                    json.dumps(resp.json()),
                     '',
                     '', 
                     '', 
