@@ -11,6 +11,7 @@ import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
 import { map } from 'rxjs/operators';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
+import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
 
 export interface GetLoanResponse {
   loans: LoanModel[];
@@ -23,10 +24,10 @@ export interface GetLoanResponse {
   'total pages': number;
 }
 
-export enum LoansActions {
-  add = 'add',
-  edit = 'edit'
-}
+// export enum ScheduleActions {
+//   add = 'add',
+//   edit = 'edit',
+// }
 
 @Injectable({
   providedIn: 'root'
@@ -613,7 +614,33 @@ export class LoanService {
 
    }
 
-    /**
+  /**
+   * Gets the saved transaction data for the schedule.
+   *
+   * @param      {string}  reportId  The report Id
+   * @param      {string}  transactionId   The Transaction Id
+   * @param      {string}  apiCall   This parameter derives the API call
+   */
+  public getDataSchedule(reportId: string, transactionId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/sc/schedC`;
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let params = new HttpParams();
+    params = params.append('report_id', reportId);
+    if (transactionId) {
+      params = params.append('transaction_id', transactionId);
+    }
+
+    return this._http.get(url, {
+      headers: httpOptions,
+      params: params
+    });
+  }
+
+  /**
    * Gets the schedule after submitted.
    *
    * @param      {string}  formType  The form type
@@ -639,9 +666,9 @@ export class LoanService {
    * Saves a schedule.
    *
    * @param      {string}           formType  The form type
-   * @param      {LoansActions}  scheduleAction  The type of action to save (add, edit)
+   * @param      {ScheduleActions}  scheduleAction  The type of action to save (add, edit)
    */
-  public saveSched_C(scheduleAction: LoansActions, transactionTypeIdentifier: string, subType: string): Observable<any> {
+  public saveSched_C(scheduleAction: ScheduleActions, transactionTypeIdentifier: string, subType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/sc/schedC';
     const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
@@ -724,7 +751,7 @@ export class LoanService {
 
     formData.append('report_id', reportId );
 
-    if (scheduleAction === LoansActions.add) {
+    if (scheduleAction === ScheduleActions.add) {
       return this._http
         .post(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions
@@ -738,7 +765,7 @@ export class LoanService {
             return false;
           })
         );
-    } else if (scheduleAction === LoansActions.edit) {
+    } else if (scheduleAction === ScheduleActions.edit) {
       return this._http
         .put(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions

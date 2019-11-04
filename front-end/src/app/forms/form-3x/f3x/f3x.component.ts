@@ -58,7 +58,9 @@ export class F3xComponent implements OnInit {
   public formType: string = '';
   public scheduleAction: ScheduleActions;
   public scheduleCAction: ScheduleActions;
+  // public forceChangeDetectionC: Date;
   public forceChangeDetectionC1: Date;
+
   public allTransactions: boolean = false;
 
   private _step: string = '';
@@ -304,19 +306,8 @@ export class F3xComponent implements OnInit {
             ) {
               this._cloned = true;
             }
-            // this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
-            // this.transactionType = e.transactionType ? e.transactionType : '';
-            this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
 
-            // to force change detetion on a child component, set a date field used as input().
-            if (e.forceChange) {
-              switch (this.scheduleType) {
-                case 'sched_c1':
-                  this.forceChangeDetectionC1 = new Date();
-                  break;
-                default:
-              }
-            }
+            this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
 
             if (e.action) {
               if (e.action in ScheduleActions) {
@@ -327,6 +318,11 @@ export class F3xComponent implements OnInit {
             if (!this.scheduleAction) {
               this.scheduleAction = ScheduleActions.add;
             }
+
+            if (this._handleScheduleC()) {
+              return;
+            }
+
             // Coming from transactions, the event may contain the transaction data
             // with an action to allow for view or edit.
 
@@ -378,6 +374,9 @@ export class F3xComponent implements OnInit {
                 transactionTypeText = transactionModel.type;
                 transactionType = transactionModel.transactionTypeIdentifier;
               }
+              // } else if (this.scheduleAction === ScheduleActions.loanSummary) {
+              //   this.scheduleType = 'sched_c_loan_summary';
+              //   this.scheduleCAction = ScheduleActions.loanSummary;
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
@@ -426,6 +425,41 @@ export class F3xComponent implements OnInit {
         }
       }
     }
+  }
+
+  /**
+   * Handle Schedule C forms.
+   * @returns true if schedule C and should stop processing
+   */
+  private _handleScheduleC(): boolean {
+    let finish = false;
+    if (
+      this.scheduleType === 'sched_c' ||
+      this.scheduleType === 'sched_c_loan_summary' ||
+      this.scheduleType === 'sched_c_loan_payment' ||
+      this.scheduleType === 'sched_c1'
+    ) {
+      if (this.scheduleType === 'sched_c') {
+        if (this.scheduleAction === ScheduleActions.add) {
+          // this.forceChangeDetectionC = new Date();
+          this.scheduleCAction = ScheduleActions.add;
+        } else if ((this.scheduleAction = ScheduleActions.edit)) {
+          // TODO once API provides scheduleType in transaction table object
+          // move logic where dectecting schedC using apiCall here.
+          // Could hard code a conversion from apiCall value to sched_c in the
+          // transaction table component until then.
+        }
+      } else if (this.scheduleType === 'sched_c_loan_summary') {
+        this.scheduleType = 'sched_c_loan_summary';
+        this.scheduleCAction = ScheduleActions.loanSummary;
+      } else if (this.scheduleType === 'sched_c_loan_payment') {
+      } else if (this.scheduleType === 'sched_c1') {
+        this.forceChangeDetectionC1 = new Date();
+      }
+      this.canContinue();
+      finish = true;
+    }
+    return finish;
   }
 
   /**

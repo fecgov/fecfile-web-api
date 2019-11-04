@@ -253,7 +253,7 @@ export class IndividualReceiptService {
   }
 
   /**
-   * Gets the schedule after submitted.
+   * Gets the saved transaction data for the schedule.
    *
    * @param      {string}  reportId  The report Id
    * @param      {string}  transactionId   The Transaction Id
