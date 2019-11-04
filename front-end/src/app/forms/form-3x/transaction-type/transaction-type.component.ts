@@ -69,7 +69,7 @@ export class TransactionTypeComponent implements OnInit {
     private _dialogService: DialogService,
     private _transactionTypeService: TransactionTypeService,
     private _reportTypeService: ReportTypeService,
-    private _f3xMessageService: F3xMessageService,
+    private _f3xMessageService: F3xMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -102,7 +102,7 @@ export class TransactionTypeComponent implements OnInit {
         this.childOptionsListClick(setTargetVal.value);
         this.doValidateOption();
       }
-      this._transactionCategory = p.transactionCategory ? p.transactionCategory : ''; 
+      this._transactionCategory = p.transactionCategory ? p.transactionCategory : '';
     });
   }
 
@@ -161,47 +161,54 @@ export class TransactionTypeComponent implements OnInit {
         window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
       }
 
-      if (this.transactionType !== 'LOAN_FROM_IND_BANK' && this.transactionType !== 'LOAN_SUMMARY' ){
+      if (this.transactionType !== 'LOAN_FROM_IND_BANK' && this.transactionType !== 'LOAN_SUMMARY') {
         // Send message to form (indv-receipt) to clear form field vals if they are still populated.
         this._f3xMessageService.sendInitFormMessage('');
-      }  
-      // TODO temp - get val from getCategoryTypes API called in f3x comp.
-      // let scheduleType = 'sched_a';
-      // if (this.transactionType === 'DEBT_TO_VENDOR') {
-      //   scheduleType = 'sched_h';
+      }
+
+      // if (this.transactionType === 'LOAN_FROM_IND_BANK' && this.scheduleType === 'sched_c'){
+      //   console.log("Accessing sched_c loans...");
+      //   let reportId = this._reportTypeService.getReportIdFromStorage(this._formType);
+      //   this._router.navigate([`/forms/form/${this._formType}`], {
+      //     queryParams: { step: 'loan', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory, transactionTypeIdentifier: 'LOANS_OWED_BY_CMTE'}
+      //   });
+      // }else if (this.transactionType === 'LOAN_SUMMARY' ){
+      //   console.log("Accessing sched_c loans summary...");
+      //   let reportId = this._reportTypeService.getReportIdFromStorage(this._formType);
+      //   this._router.navigate([`/forms/form/${this._formType}`], {
+      //     queryParams: { step: 'loansummary', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory,  transactionTypeIdentifier: 'LOANS_OWED_BY_CMTE'}
+      //   });
+      // }  else {
+      //   this.status.emit({
+      //     form: this.frmOption,
+      //     direction: 'next',
+      //     step: 'step_3',
+      //     previousStep: 'step_2',
+      //     action: ScheduleActions.add,
+      //     transactionTypeText: this.transactionTypeText,
+      //     transactionType: this.transactionType,
+      //     transactionCategory: this._transactionCategory,
+      //     scheduleType: this.scheduleType
+      //   });
       // }
 
-
-      console.log("this.transactionTypeText", this.transactionTypeText);
-      console.log("this.transactionType", this.transactionType);
-      console.log("this.transactionCategory", this.transactionCategory);
-      console.log("this.scheduleType", this.scheduleType);
-
-      if (this.transactionType === 'LOAN_FROM_IND_BANK' && this.scheduleType === 'sched_c'){
-        console.log("Accessing sched_c loans...");
-        let reportId = this._reportTypeService.getReportIdFromStorage(this._formType);
-        this._router.navigate([`/forms/form/${this._formType}`], {
-          queryParams: { step: 'loan', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory, transactionTypeIdentifier: 'LOANS_OWED_BY_CMTE'}
-        });
-      }else if (this.transactionType === 'LOAN_SUMMARY' ){
-        console.log("Accessing sched_c loans summary...");
-        let reportId = this._reportTypeService.getReportIdFromStorage(this._formType);
-        this._router.navigate([`/forms/form/${this._formType}`], {
-          queryParams: { step: 'loansummary', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory,  transactionTypeIdentifier: 'LOANS_OWED_BY_CMTE'}
-        });
-      }  else {
-        this.status.emit({
-          form: this.frmOption,
-          direction: 'next',
-          step: 'step_3',
-          previousStep: 'step_2',
-          action: ScheduleActions.add,
-          transactionTypeText: this.transactionTypeText,
-          transactionType: this.transactionType,
-          transactionCategory: this._transactionCategory,
-          scheduleType: this.scheduleType
-        });
+      // TODO This should come from the API transaction category.
+      if (this.transactionType === 'LOAN_SUMMARY' && this.scheduleType === 'sched_c') {
+        this.scheduleType = 'sched_c_loan_summary';
       }
+
+      this.status.emit({
+        form: this.frmOption,
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2',
+        action: ScheduleActions.add,
+        transactionTypeText: this.transactionTypeText,
+        transactionType: this.transactionType,
+        transactionCategory: this._transactionCategory,
+        scheduleType: this.scheduleType
+      });
+
       return 1;
     } else {
       if (!this.tranasctionCategoryVal) {
@@ -281,16 +288,17 @@ export class TransactionTypeComponent implements OnInit {
 
     this.secondaryOptions = this._mainTransactionCategory[0].options;
     if (this._mainTransactionCategory[0].options[0].value === 'schedule-h1') {
-      this.secondaryOptions[0].options = [{
-        info: "Funds received from the committee's non-federal bank account",
-        infoIcon: "TRUE",
-        name: "schedule-h1",
-        scheduleType: "sched_h1",
-        text: "Allocation Ratios",
-        type: "radio",
-        // value: ""
-        value: "ALLOC_H1"
-      }
+      this.secondaryOptions[0].options = [
+        {
+          info: "Funds received from the committee's non-federal bank account",
+          infoIcon: 'TRUE',
+          name: 'schedule-h1',
+          scheduleType: 'sched_h1',
+          text: 'Allocation Ratios',
+          type: 'radio',
+          // value: ""
+          value: 'ALLOC_H1'
+        }
         // {
         //   info: "Funds received from the committee's non-federal bank account",
         //   infoIcon: "TRUE",
@@ -303,119 +311,127 @@ export class TransactionTypeComponent implements OnInit {
       ];
     }
     if (this._mainTransactionCategory[0].options[1].value === 'schedule-h2') {
-      this.secondaryOptions[1].options = [{
-        info: "Funds received from the committee's non-federal bank account",
-        infoIcon: "TRUE",
-        name: "schedule-h3",
-        scheduleType: "sched_h2",
-        text: "Allocation Ratios",
-        type: "radio",
-        value: "ALLOC_H2_RATIO"
-      },
-      {
-        info: "Funds received from the committee's non-federal bank account",
-        infoIcon: "TRUE",
-        name: "schedule-h3",
-        scheduleType: "sched_h2",
-        text: "Allocation Ratios Summary",
-        type: "radio",
-        value: "ALLOC_H2_SUM"
-      }];
+      this.secondaryOptions[1].options = [
+        {
+          info: "Funds received from the committee's non-federal bank account",
+          infoIcon: 'TRUE',
+          name: 'schedule-h3',
+          scheduleType: 'sched_h2',
+          text: 'Allocation Ratios',
+          type: 'radio',
+          value: 'ALLOC_H2_RATIO'
+        },
+        {
+          info: "Funds received from the committee's non-federal bank account",
+          infoIcon: 'TRUE',
+          name: 'schedule-h3',
+          scheduleType: 'sched_h2',
+          text: 'Allocation Ratios Summary',
+          type: 'radio',
+          value: 'ALLOC_H2_SUM'
+        }
+      ];
     }
 
-       //for h3
-       if (this._mainTransactionCategory[0].options[2].value === 'schedule-h3') {
-        this.secondaryOptions[2].options = [{
-          info: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal Activity",
-          infoIcon: "TRUE",
-          name: "schedule-h3",
-          scheduleType: "sched_h3",
-          text: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal Activity",
-          type: "radio",
-          value: "ALLOC_H3_RATIO"
+    //for h3
+    if (this._mainTransactionCategory[0].options[2].value === 'schedule-h3') {
+      this.secondaryOptions[2].options = [
+        {
+          info: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal Activity',
+          infoIcon: 'TRUE',
+          name: 'schedule-h3',
+          scheduleType: 'sched_h3',
+          text: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal Activity',
+          type: 'radio',
+          value: 'ALLOC_H3_RATIO'
         },
         {
-          info: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Summary",
-          infoIcon: "TRUE",
-          name: "schedule-h3",
-          scheduleType: "sched_h3",
-          text: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Summary",
-          type: "radio",
-          value: "ALLOC_H3_SUM"
+          info: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Summary',
+          infoIcon: 'TRUE',
+          name: 'schedule-h3',
+          scheduleType: 'sched_h3',
+          text: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Summary',
+          type: 'radio',
+          value: 'ALLOC_H3_SUM'
         },
         {
-          info: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Period Totals",
-          infoIcon: "TRUE",
-          name: "schedule-h3",
-          scheduleType: "sched_h3",
-          text: "Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Period Totals",
-          type: "radio",
-          value: "ALLOC_H3_SUM_P"
-        }];
-      }
-  
-      //for h4
-      if (this._mainTransactionCategory[0].options[3].value === 'schedule-h4') {
-        this.secondaryOptions[3].options = [{
-          info: "Disbursements Types",
-          infoIcon: "TRUE",
-          name: "schedule-h4",
-          scheduleType: "sched_h4",
-          text: "Disbursements Types",
-          type: "radio",
-          value: "ALLOC_H4_TYPES"
+          info: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Period Totals',
+          infoIcon: 'TRUE',
+          name: 'schedule-h3',
+          scheduleType: 'sched_h3',
+          text: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Period Totals',
+          type: 'radio',
+          value: 'ALLOC_H3_SUM_P'
+        }
+      ];
+    }
+
+    //for h4
+    if (this._mainTransactionCategory[0].options[3].value === 'schedule-h4') {
+      this.secondaryOptions[3].options = [
+        {
+          info: 'Disbursements Types',
+          infoIcon: 'TRUE',
+          name: 'schedule-h4',
+          scheduleType: 'sched_h4',
+          text: 'Disbursements Types',
+          type: 'radio',
+          value: 'ALLOC_H4_TYPES'
         },
         {
-          info: "Disbursements from Allocated Federal / Nonfederal Activity",
-          infoIcon: "TRUE",
-          name: "schedule-h4",
-          scheduleType: "sched_h4",
-          text: "Disbursements from Allocated Federal / Nonfederal Activity",
-          type: "radio",
-          value: "ALLOC_EXP_DEBT"
+          info: 'Disbursements from Allocated Federal / Nonfederal Activity',
+          infoIcon: 'TRUE',
+          name: 'schedule-h4',
+          scheduleType: 'sched_h4',
+          text: 'Disbursements from Allocated Federal / Nonfederal Activity',
+          type: 'radio',
+          value: 'ALLOC_EXP_DEBT'
         },
         {
-          info: "Disbursements for Allocated Federal/Nonfederal Activity Summary",
-          infoIcon: "TRUE",
-          name: "schedule-h4",
-          scheduleType: "sched_h4",
-          text: "Disbursements for Allocated Federal/Nonfederal Activity Summary",
-          type: "radio",
-          value: "ALLOC_H4_SUM"
-        }];
-      }
-  
-      if (this._mainTransactionCategory[0].options[4].value === 'schedule-h5') {
-        this.secondaryOptions[4].options = [{
-          info: "Transfers of Levin Funds Received for Allocated Federal Election Activity",
-          infoIcon: "TRUE",
-          name: "schedule-h5",
-          scheduleType: "sched_h5",
-          text: "Transfers of Levin Funds Received for Allocated Federal Election Activity",
-          type: "radio",
-          value: "ALLOC_H5_RATIO"
+          info: 'Disbursements for Allocated Federal/Nonfederal Activity Summary',
+          infoIcon: 'TRUE',
+          name: 'schedule-h4',
+          scheduleType: 'sched_h4',
+          text: 'Disbursements for Allocated Federal/Nonfederal Activity Summary',
+          type: 'radio',
+          value: 'ALLOC_H4_SUM'
+        }
+      ];
+    }
+
+    if (this._mainTransactionCategory[0].options[4].value === 'schedule-h5') {
+      this.secondaryOptions[4].options = [
+        {
+          info: 'Transfers of Levin Funds Received for Allocated Federal Election Activity',
+          infoIcon: 'TRUE',
+          name: 'schedule-h5',
+          scheduleType: 'sched_h5',
+          text: 'Transfers of Levin Funds Received for Allocated Federal Election Activity',
+          type: 'radio',
+          value: 'ALLOC_H5_RATIO'
         },
         {
-          info: "Transfers from Levin Funds for Allocated Federal Election Activity",
-          infoIcon: "TRUE",
-          name: "schedule-h5",
-          scheduleType: "sched_h5",
-          text: "Transfers from Levin Funds for Allocated Federal Election Activity",
-          type: "radio",
-          value: "ALLOC_H5_SUM"
+          info: 'Transfers from Levin Funds for Allocated Federal Election Activity',
+          infoIcon: 'TRUE',
+          name: 'schedule-h5',
+          scheduleType: 'sched_h5',
+          text: 'Transfers from Levin Funds for Allocated Federal Election Activity',
+          type: 'radio',
+          value: 'ALLOC_H5_SUM'
         },
         {
-          info: "Total For Breakdown of Transfers Received - Levin Funds",
-          infoIcon: "TRUE",
-          name: "schedule-h5",
-          scheduleType: "sched_h5",
-          text: "Total For Breakdown of Transfers Received - Levin Funds",
-          type: "radio",
-          value: "ALLOC_H5_SUM_P"
-        }];
-      }
-  
-      /*if (this._mainTransactionCategory[0].options[5].value === 'schedule-h6') {
+          info: 'Total For Breakdown of Transfers Received - Levin Funds',
+          infoIcon: 'TRUE',
+          name: 'schedule-h5',
+          scheduleType: 'sched_h5',
+          text: 'Total For Breakdown of Transfers Received - Levin Funds',
+          type: 'radio',
+          value: 'ALLOC_H5_SUM_P'
+        }
+      ];
+    }
+
+    /*if (this._mainTransactionCategory[0].options[5].value === 'schedule-h6') {
         this.secondaryOptions[5].options = [
           {
             info: "Disbursements from Allocated Federal/Levin Activity",
@@ -436,7 +452,7 @@ export class TransactionTypeComponent implements OnInit {
             value: "ALLOC_H4_SUM"
           }];
       }*/
-  
+
     this.transactionCategorySelected = true;
 
     this.transactionTypeFailed = false;
@@ -501,6 +517,4 @@ export class TransactionTypeComponent implements OnInit {
         });
     }
   }
-
-  
 }

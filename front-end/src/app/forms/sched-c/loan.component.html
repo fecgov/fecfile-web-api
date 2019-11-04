@@ -21,13 +21,11 @@
   <form [formGroup]="frmLoan">
     <header>
       <div class="header-content">
-        <!--<div class="float-left">-->
-          <h1>
-            F3x | Schedule-C | Loan
-          </h1>
-          <br />
-        <!--</div>-->
-       </div>
+        <h1>
+          F{{formType}} / Schedule-C / Loan
+        </h1>
+        <br />
+      </div>
 
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
@@ -412,17 +410,40 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <button class="btn btn-secondary-gray btn-left" type="button" (click)="loanRepayment()">
-                Loan Repayment
-              </button>
-              <button class="btn btn-secondary btn-right" type="button" (click)="saveLoan()">
-                Save
+              <ng-template *ngIf="scheduleAction === editScheduleAction; then editButtons; else addButtons">
+              </ng-template>
+              <ng-template #addButtons>
+                <button class="btn btn-previous btn-left" type="button"
+                  (click)="previousStep()">
+                  Previous
                 </button>
-              <button *ngIf="entityType === 'ORG'" class="btn btn-secondary-gray btn-right" type="button" 
-                (click)="AddLoanEndorser()">
-                Endorser
-              </button>
-
+                <button class="btn btn-secondary btn-right" type="button" (click)="saveLoan()">
+                  Save
+                </button>
+                <button *ngIf="entityType === 'ORG'" class="btn btn-secondary btn-right" type="button" 
+                  (click)="AddLoanEndorser()">
+                  Endorser
+                </button>
+                <button class="btn btn-secondary btn-right" type="button" (click)="loanRepayment()">
+                  Loan Repayment
+                </button>                
+              </ng-template>
+              <ng-template #editButtons>
+                <button class="btn btn-previous btn-left" type="button"
+                  (click)="viewTransactions()">
+                  Cancel
+                </button>
+                <button class="btn btn-secondary btn-right" type="button" (click)="saveLoan()">
+                  Save
+                </button>
+                <button *ngIf="entityType === 'ORG'" class="btn btn-secondary btn-right" type="button" 
+                  (click)="AddLoanEndorser()">
+                  Endorser
+                </button>
+                <button class="btn btn-secondary btn-right" type="button" (click)="loanRepayment()">
+                  Loan Repayment
+                </button>  
+              </ng-template>
             </div>
           </div>          
         </div>
