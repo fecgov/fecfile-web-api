@@ -151,13 +151,24 @@ def get_reports_to_upload():
                     '', 
                     '', 
                     )     
-
-                if resp.ok:
+                successresp=resp.json()
+                if successresp["Response"] =='Success':
                     successresp=resp.json()
 
                     print("prepare_json_builders_data call is successfuly finished...")  
+
+                    add_log(data_row[1],
+                                        data_row[0],  
+                                        4,
+                                        "prepare_json_builders_data call is successfuly finished ", 
+                                        '', 
+                                        '',
+                                        '', 
+                                        '', 
+                                    )  
+
                     print(successresp)
-                    if successresp['Response'].encode('utf-8')=='Success':
+                    if successresp["Response"] =='Success':
                         # call create_json_builders which internally call Data Reciever API
 
                         data_obj = {
@@ -178,6 +189,17 @@ def get_reports_to_upload():
 
                         resp = requests.post("http://" + _NEXGEN_DJANGO_API_URL +
                                     "/core/create_json_builders", data=data_obj, headers=headers_obj)
+                        
+                        add_log(data_row[1],
+                                        data_row[0],  
+                                        4,
+                                        "F3X create_json_builders call with data_obj ", 
+                                        json.dumps(resp.json()),
+                                        '',
+                                        '', 
+                                        '', 
+                                    ) 
+
                         if resp.ok:
                             successresp=resp.json()
                             print("create_json_builders call is successfuly finished...")  
@@ -193,7 +215,7 @@ def get_reports_to_upload():
                                         '', 
                                     )  
 
-                            if successresp['result']['status'].encode('utf-8')=='PROCESSING':
+                            if successresp["result"]["status"].encode('utf-8')=='PROCESSING':
                                 # update submission_id in report table 
                                 cur.execute("""UPDATE public.reports 
                                                 SET submission_id = %s, 
@@ -207,7 +229,7 @@ def get_reports_to_upload():
                                 add_log(data_row[1],
                                         data_row[0],  
                                         4,
-                                        "create_json_builders operation successful with submission_id " + resp['result']['submissionId'], 
+                                        "create_json_builders operation successful with submission_id ", 
                                         json.dumps(successresp), 
                                         '',
                                         '', 
@@ -222,7 +244,7 @@ def get_reports_to_upload():
                             add_log(data_row[1],
                                 data_row[0], 
                                 4,
-                                "create_json_builders operation failed with submission_id "+ resp['result']['submissionId'],
+                                "create_json_builders operation failed with submission_id ",
                                 json.dumps(resp.json()),
                                 '',
                                 '', 
