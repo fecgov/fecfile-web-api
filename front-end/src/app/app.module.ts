@@ -165,7 +165,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     SchedH3Component,
     SchedH5Component, 
     LoanpaymentComponent,
-    SchedH4Component
+    SchedH4Component,
+    LoanpaymentComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [

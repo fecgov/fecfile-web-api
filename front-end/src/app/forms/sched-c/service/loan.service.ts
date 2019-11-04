@@ -91,7 +91,7 @@ export class LoanService {
 
     
     return this._http
-      .post(
+      .get(
         `${environment.apiUrl}${url}`,
         {
           headers: httpOptions

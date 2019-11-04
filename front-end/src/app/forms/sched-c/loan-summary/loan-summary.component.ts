@@ -60,7 +60,9 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   @Input()
   public tableType: string;
 
-  public LoanModel: Array<LoanModel>;
+  //TODO-ZS -- change "any" to LoanModel when using actual data
+  public LoanModel: Array<any>;
+
   public totalAmount: number;
   public LoanView = ActiveView.loanSummary
   public recycleBinView = ActiveView.recycleBin;
@@ -68,7 +70,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public bulkActionCounter = 0;
 
   // ngx-pagination config
-  public maxItemsPerPage = 10;
+  public maxItemsPerPage = 100;
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
@@ -81,15 +83,15 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 
 
   // Local Storage Keys
-  private readonly contactSortableColumnsLSK =
+  private readonly loanSortableColumnsLSK =
     'Loan.ctn.sortableColumn';
   private readonly recycleSortableColumnsLSK =
     'Loan.recycle.sortableColumn';
-  private readonly contactCurrentSortedColLSK =
+  private readonly loanCurrentSortedColLSK =
     'Loan.ctn.currentSortedColumn';
   private readonly recycleCurrentSortedColLSK =
     'Loan.recycle.currentSortedColumn';
-  private readonly contactPageLSK =
+  private readonly loanPageLSK =
     'Loan.ctn.page';
   private readonly recyclePageLSK =
     'Loan.recycle.page';
@@ -146,11 +148,11 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.keywordFilterSearchSubscription = this._LoanMessageService.getDoKeywordFilterSearchMessage()
       .subscribe(
         message => {
-            this.getPage(this.config.currentPage)
+          this.getPage(this.config.currentPage)
         }
       );
 
-      }
+  }
   /**
    * Initialize the component.
    */
@@ -162,7 +164,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     };
     this.config = paginateConfig;
     // this.config.currentPage = 1;
-    this.tableType=ActiveView.loanSummary;
+    this.tableType = ActiveView.loanSummary;
 
     this.getCachedValues();
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
@@ -173,7 +175,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       }
     }
 
-    
+
     this.getPage(this.config.currentPage);
   }
 
@@ -204,7 +206,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         break;
       case this.recycleBinView:
         this.getRecyclingPage(page);
-        this.maxColumnOption=6;
+        this.maxColumnOption = 6;
         break;
       default:
         break;
@@ -218,7 +220,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the Loan to get
 	 */
   public getLoanPage(page: number): void {
-    
+
     this.config.currentPage = page;
 
     let sortedCol: SortableColumnModel =
@@ -241,7 +243,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       mapToSingleServerName(this.currentSortedColumnName);
 
     this._LoanService.getLoan()
-      .subscribe((res: GetLoanResponse) => {
+    //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
+      .subscribe((res: any) => {
+
+        // res=this.tempApiResponse;
         console.log(" getLoanPage res =", res)
         this.LoanModel = [];
 
@@ -251,12 +256,24 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
           this.config.currentPage = 1;
         }
 
+
+        //TODO - ZS -- this is temporary fix to map fields to the right attributes until service response is fixed
+        res.forEach(element => {
+          if(element.entity_type==='IND'){
+            element.name = `${element.last_name}, ${element.first_name}`;
+          }
+          else if(element.entity_type==='ORG'){
+            element.name = element.entity_name;
+          }
+        });
         this._LoanService.addUIFileds(res);
         this._LoanService.mockApplyFilters(res);
-        const LoanModelL = this._LoanService.mapFromServerFields(res.loans);
+        const LoanModelL = this._LoanService.mapFromServerFields(res);
         this.LoanModel = LoanModelL;
 
-        //this.config.totalItems = res.totalLoanCount ? res.totalLoanCount : 0;
+      
+
+        this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
         this.numberOfPages = res.totalPages;
         this.allLoanSelected = false;
       });
@@ -326,7 +343,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         this.allLoanSelected = false;
 
 
-        
+
       });
   }
 
@@ -559,7 +576,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * Link all Loan selected by the user.
    */
   public linkAllSelected(): void {
-    alert('Link multiple contact requirements have not been finalized');
+    alert('Link multiple loan requirements have not been finalized');
   }
 
 
@@ -567,229 +584,46 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * Trash all Loan selected by the user.
    */
   public trashAllSelected(): void {
-   /* let conIds = '';
-    const selectedLoan: Array<LoanModel> = [];
-    for (const con of this.LoanModel) {
-      if (con.selected && con.activeTransactionsCnt === 0) {
-        selectedLoan.push(con);
-        conIds += con.id + ', ';
-      }
-    }
+    /* let conIds = '';
+     const selectedLoan: Array<LoanModel> = [];
+     for (const con of this.LoanModel) {
+       if (con.selected && con.activeTransactionsCnt === 0) {
+         selectedLoan.push(con);
+         conIds += con.id + ', ';
+       }
+     }
+ 
+     conIds = conIds.substr(0, conIds.length - 2);
+ 
+     this._dialogService
+       .confirm('You are about to delete these Loan.   ' + conIds, ConfirmModalComponent, 'Warning!')
+       .then(res => {
+         if (res === 'okay') {
+           this._LoanService
+             .trashOrRestoreLoan('trash', selectedLoan)
+             .subscribe((res: GetLoanResponse) => {
+               this.getLoanPage(this.config.currentPage);
+ 
+               let afterMessage = '';
+               if (selectedLoan.length === 1) {
+                 afterMessage = `Transaction ${selectedLoan[0].id}
+                   has been successfully deleted and sent to the recycle bin.`;
+               } else {
+                 afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + conIds;
+               }
+ 
+               this._dialogService.confirm(
+                 afterMessage,
+                 ConfirmModalComponent,
+                 'Success!',
+                 false,
+                 ModalHeaderClassEnum.successHeader
+               );
+             });
+         } else if (res === 'cancel') {
+         }
+       });*/
 
-    conIds = conIds.substr(0, conIds.length - 2);
-
-    this._dialogService
-      .confirm('You are about to delete these Loan.   ' + conIds, ConfirmModalComponent, 'Warning!')
-      .then(res => {
-        if (res === 'okay') {
-          this._LoanService
-            .trashOrRestoreLoan('trash', selectedLoan)
-            .subscribe((res: GetLoanResponse) => {
-              this.getLoanPage(this.config.currentPage);
-
-              let afterMessage = '';
-              if (selectedLoan.length === 1) {
-                afterMessage = `Transaction ${selectedLoan[0].id}
-                  has been successfully deleted and sent to the recycle bin.`;
-              } else {
-                afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + conIds;
-              }
-
-              this._dialogService.confirm(
-                afterMessage,
-                ConfirmModalComponent,
-                'Success!',
-                false,
-                ModalHeaderClassEnum.successHeader
-              );
-            });
-        } else if (res === 'cancel') {
-        }
-      });*/
-
-  }
-
-
-  /**
-   * Clone the contact selected by the user.
-   *
-   * @param ctn the Contact to clone
-   */
-  public cloneContact(ctn: LoanModel): void {
-    alert('Clone Contact is not yet supported');
-  }
-
-
-  /**
-   * Link the contact selected by the user.
-   *
-   * @param ctn the Contact to link
-   */
-  public linkContact(ctn: LoanModel): void {
-    alert('Link requirements have not been finalized');
-  }
-
-
-  /**
-   * View the contact selected by the user.
-   *
-   * @param ctn the Contact to view
-   */
-  public viewContact(ctn: LoanModel): void {
-    alert('View Contact is not yet supported');
-  }
-
-/**
-   * View the contact selected by the user.
-   *
-   * @param ctn the Contact to view
-   */
-  public viewActivity(ctn: LoanModel): void {
-    alert('View Activity is not yet supported');
-  }
-
-  /**
-   * Edit the contact selected by the user.
-   *
-   * @param ctn the Contact to edit
-   */
-  public editContact(ctn: LoanModel): void {
-    alert('Edit Contact is not yet supported');
-  }
-
-
-  /**
-   * Trash the contact selected by the user.
-   *
-   * @param ctn the Contact to trash
-   */
-  public trashContact(ctn: LoanModel): void {
-    /*this._dialogService
-      .confirm('You are about to delete this contact ' + ctn.id + '.', ConfirmModalComponent, 'Warning!')
-      .then(res => {
-        if (res === 'okay') {
-          this._LoanService
-            .trashOrRestoreLoan('trash', [ctn])
-            .subscribe((res: GetLoanResponse) => {
-              if (res['result'] === 'success') {
-                this.getLoanPage(this.config.currentPage);
-                this._dialogService.confirm(
-                  'Contact has been successfully deleted and sent to recycle bin. ' + ctn.id,
-                  ConfirmModalComponent,
-                  'Success!',
-                  false,
-                  ModalHeaderClassEnum.successHeader
-                );
-              } else
-              {
-                this._dialogService.confirm(
-                  'Contact has not been successfully deleted and sent to recycle bin. ' + ctn.id,
-                  ConfirmModalComponent,
-                  'Warning!',
-                  false,
-                  ModalHeaderClassEnum.errorHeader
-                );
-              }
-            });
-        } else if (res === 'cancel') {
-        }
-      });*/
-  }
-
-
-
-  /**
-   * Restore a trashed contact from the recyle bin.
-   *
-   * @param ctn the Contact to restore
-   */
-  public restoreContact(ctn: LoanModel): void {
-    /*this._dialogService
-      .confirm('You are about to restore contact ' + ctn.id + '.', ConfirmModalComponent, 'Warning!')
-      .then(res => {
-        if (res === 'okay') {
-          // this._transactionsService.restoreTransaction(trx)
-          //   .subscribe((res: GetTransactionsResponse) => {
-          this._LoanService
-            .trashOrRestoreLoan('restore', [ctn])
-            .subscribe((res: GetLoanResponse) => {
-              this.getRecyclingPage(this.config.currentPage);
-              this._dialogService.confirm(
-                'Contact ' + ctn.id + ' has been restored!',
-                ConfirmModalComponent,
-                'Success!',
-                false,
-                ModalHeaderClassEnum.successHeader
-              );
-            });
-        } else if (res === 'cancel') {
-        }
-      });*/
-  }
-
-  /**
-   * Delete selected Loan from the the recyle bin.
-   *
-   * @param ctn the Contact to delete
-   */
-  public deleteRecyleBin(): void {
-
-    /*let beforeMessage = '';
-    // if (this.bulkActionCounter === 1) {
-    //   let id = '';
-    //   for (const ctn of this.LoanModel) {
-    //     if (ctn.selected) {
-    //       id = ctn.id;
-    //     }
-    //   }
-    //   beforeMessage = (id !== '') ?
-    //     'Are you sure you want to permanently delete Contact ' + id + '?' :
-    //     'Are you sure you want to permanently delete this Contact?';
-    // } else {
-    //   beforeMessage = 'Are you sure you want to permanently delete these Loan?';
-    // }
-
-    let cntIds = '';
-    const selectedLoan: Array<LoanModel> = [];
-    for (const ctn of this.LoanModel) {
-      if (ctn.selected) {
-        selectedLoan.push(ctn);
-        cntIds += ctn.id + ', ';
-      }
-    }
-
-    cntIds = cntIds.substr(0, cntIds.length - 2);
-
-    if (selectedLoan.length === 1) {
-      beforeMessage = 'Are you sure you want to permanently delete Contact ' +
-        selectedLoan[0].id + '?';
-    } else {
-      beforeMessage = 'Are you sure you want to permanently delete these Loan?' + cntIds;
-    }
-
-    this._dialogService
-      .confirm(beforeMessage,
-        ConfirmModalComponent,
-        'Caution!')
-      .then(res => {
-        if (res === 'okay') {
-          this._LoanService.deleteRecycleBinContact(selectedLoan)
-            .subscribe((res: GetLoanResponse) => {
-              this.getRecyclingPage(this.config.currentPage);
-
-              let afterMessage = '';
-              if (selectedLoan.length === 1) {
-                  afterMessage = `Contact ${selectedLoan[0].id} has been successfully deleted`;
-              } else {
-                afterMessage = 'Loan have been successfully deleted.'+ cntIds;
-              }
-              this._dialogService
-                .confirm(afterMessage,
-                  ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
-           });
-        } else if (res === 'cancel') {
-        }
-      });*/
   }
 
 
@@ -844,7 +678,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   /**
    * Check/Uncheck all Loan in the table.
    */
-  public changeAllLoanSelected() {
+  public changeAllLoanSummrysSelected() {
 
     // TODO Iterating over the trsnactionsModel and setting the selected prop
     // works when we have server-side pagination as the model will only contain
@@ -922,9 +756,9 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.applyFiltersCache();
     switch (this.tableType) {
       case this.LoanView:
-        this.applyColCache(this.contactSortableColumnsLSK);
-        this.applyCurrentSortedColCache(this.contactCurrentSortedColLSK);
-        this.applyCurrentPageCache(this.contactPageLSK);
+        this.applyColCache(this.loanSortableColumnsLSK);
+        this.applyCurrentSortedColCache(this.loanCurrentSortedColLSK);
+        this.applyCurrentPageCache(this.loanPageLSK);
         break;
       case this.recycleBinView:
         this.applyColCache(this.recycleSortableColumnsLSK);
@@ -943,7 +777,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * need to be applied to the Recycling Bin table.
    */
   private applyColumnsSelected() {
-    const key = this.contactSortableColumnsLSK;
+    const key = this.loanSortableColumnsLSK;
     const sortableColumnsJson: string | null = localStorage.getItem(key);
     if (localStorage.getItem(key) != null) {
       const ctnCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
@@ -960,7 +794,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    */
   private applyFiltersCache() {
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
-    
+
   }
 
 
@@ -1006,15 +840,15 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   private applyCurrentPageCache(key: string) {
     const currentPageCache: string =
       localStorage.getItem(key);
-      if (currentPageCache) {
-        if (this._utilService.isNumber(currentPageCache)) {
-          this.config.currentPage = this._utilService.toInteger(currentPageCache);
-        } else {
-          this.config.currentPage = 1;
-        }
+    if (currentPageCache) {
+      if (this._utilService.isNumber(currentPageCache)) {
+        this.config.currentPage = this._utilService.toInteger(currentPageCache);
       } else {
         this.config.currentPage = 1;
       }
+    } else {
+      this.config.currentPage = 1;
+    }
   }
 
 
@@ -1026,27 +860,27 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 
     switch (this.tableType) {
       case this.LoanView:
-        this.setCacheValuesforView(this.contactSortableColumnsLSK,
-          this.contactCurrentSortedColLSK, this.contactPageLSK);
-          this.contactPageLSK
+        this.setCacheValuesforView(this.loanSortableColumnsLSK,
+          this.loanCurrentSortedColLSK, this.loanPageLSK);
+        this.loanPageLSK
         break;
       case this.recycleBinView:
         this.setCacheValuesforView(this.recycleSortableColumnsLSK,
           this.recycleCurrentSortedColLSK, this.recyclePageLSK);
-          this.recyclePageLSK
+        this.recyclePageLSK
         break;
       default:
         break;
     }
   }
 
- /**
-   * Set the currently sorted column and current page in the cache.
-   *
-   * @param columnsKey the column settings key for the cache
-   * @param sortedColKey currently sorted column key for the cache
-   * @param pageKey current page key from the cache
-   */
+  /**
+    * Set the currently sorted column and current page in the cache.
+    *
+    * @param columnsKey the column settings key for the cache
+    * @param sortedColKey currently sorted column key for the cache
+    * @param pageKey current page key from the cache
+    */
   private setCacheValuesforView(columnsKey: string, sortedColKey: string,
     pageKey: string) {
 
@@ -1054,7 +888,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     localStorage.setItem(columnsKey,
       JSON.stringify(this.sortableColumns));
 
-     const currentSortedCol = this._tableService.getColumnByName(
+    const currentSortedCol = this._tableService.getColumnByName(
       this.currentSortedColumnName, this.sortableColumns);
     localStorage.setItem(sortedColKey, JSON.stringify(this.sortableColumns));
 
@@ -1069,10 +903,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
-    
+
     const defaultSortColumns = ['name', 'loan_amount_original', 'loan_payment_to_date', 'loan_balance', 'loan_due_date'];
     const otherSortColumns = [];
-  
+
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
@@ -1121,7 +955,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     // this.currentSortedColumnName = this._tableService.setSortDirection('default',
     //   this.sortableColumns, false);
 
-    // When default, the backend will sort by name and contact date
+    // When default, the backend will sort by name and loan date
     this.currentSortedColumnName = 'default';
   }
 
@@ -1135,6 +969,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-  
+
 
 }
