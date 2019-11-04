@@ -1193,7 +1193,8 @@ def schedH3_sql_dict(data):
 
     """
     valid_fields = [
-
+            'cmte_id',
+            'report_id',
             'transaction_type_identifier',
             'back_ref_transaction_id',
             'back_ref_sched_name',
@@ -1328,18 +1329,18 @@ def post_sql_schedH3(data):
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
-            data.get('transaction_type_identifier', ''),
+            data.get('transaction_type_identifier'),
             data.get('transaction_id'),
-            data.get('back_ref_transaction_id', ''),
-            data.get('back_ref_sched_name', ''),
-            data.get('account_name', ''),
-            data.get('activity_event_type', ''),
-            data.get('activity_event_name', ''),
-            data.get('receipt_date', None),
-            data.get('total_amount_transferred', None),
-            data.get('transferred_amount', None),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('account_name'),
+            data.get('activity_event_type'),
+            data.get('activity_event_name'),
+            data.get('receipt_date'),
+            data.get('total_amount_transferred'),
+            data.get('transferred_amount'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(), 
             datetime.datetime.now(),   
          )
@@ -1360,12 +1361,61 @@ def get_schedH3(data):
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedH3(report_id, cmte_id, transaction_id)
+            for _obj in forms_obj:
+                child_list = get_child_schedH3(transaction_id, report_id, cmte_id)
+                _obj['child'] = child_list
         else:
             forms_obj = get_list_all_schedH3(report_id, cmte_id)
+            for _obj in forms_obj:
+                transaction_id = _obj.get('transaction_id')
+                child_list = get_child_schedH3(transaction_id, report_id, cmte_id)
+                _obj['child'] = child_list
         return forms_obj
     except:
         raise
 
+def get_child_schedH3(transaction_id, report_id, cmte_id):
+    """
+    load all child transaction for each parent H3
+    """
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            transaction_type_identifier,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            account_name,
+            activity_event_type,
+            activity_event_name,
+            receipt_date,
+            total_amount_transferred,
+            transferred_amount,
+            memo_code,
+            memo_text,
+            delete_ind,
+            create_date ,
+            last_update_date
+            FROM public.sched_h3
+            WHERE report_id = %s 
+            AND cmte_id = %s
+            AND back_ref_transaction_id = %s
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            schedH3_list = cursor.fetchone()[0]
+            if schedH3_list is None:
+                raise NoOPError('No sched_H3 transaction found for report_id {} and cmte_id: {}'.format(
+                    report_id, cmte_id))
+            # merged_list = []
+            # for dictH3 in schedH3_list:
+            #     merged_list.append(dictH3)
+        return schedH3_list
+    except Exception:
+        raise
 
 def get_list_all_schedH3(report_id, cmte_id):
 
@@ -1582,9 +1632,26 @@ def schedH3(request):
                 datum['transaction_id'] = check_transaction_id(
                     request.data.get('transaction_id'))
                 data = put_schedH3(datum)
+                if 'child' in request.data:
+                    for _c in request.data['child']:
+                        parent_data = data 
+                        _c.update(parent_data)
+                        _c['back_ref_transaction_id'] = parent_data['transaction_id']
+                        _c = schedH3_sql_dict(request.data)
+                        put_schedH3(_c) 
             else:
-                print(datum)
+                # print(datum)
+                logger.debug('saving h3 with data {}'.format(datum))
                 data = post_schedH3(datum)
+                logger.debug('parent data saved:{}'.format(data))
+                if 'child' in request.data:
+                    for _c in request.data['child']:
+                        child_data = data 
+                        child_data.update(_c)
+                        child_data['back_ref_transaction_id'] = data['transaction_id']
+                        child_data = schedH3_sql_dict(child_data)
+                        logger.debug('saving child transaction with data {}'.format(child_data))
+                        post_schedH3(child_data) 
             # Associating child transactions to parent and storing them to DB
 
             output = get_schedH3(data)
