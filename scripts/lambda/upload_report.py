@@ -152,7 +152,7 @@ def get_reports_to_upload():
                     '', 
                     )     
 
-                if resp.ok:
+                if resp['Response'].encode('utf-8')=='Success':
                     successresp=resp.json()
 
                     print("prepare_json_builders_data call is successfuly finished...")  
