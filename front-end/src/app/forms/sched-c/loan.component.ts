@@ -7,7 +7,8 @@ import {
   Output,
   ViewEncapsulation,
   ViewChild,
-  OnDestroy
+  OnDestroy,
+  SimpleChanges
 } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -51,14 +52,12 @@ export enum LoansActions {
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None
 })
+// TODO a lot of the methods here were copied from AbsractSchedule and need to be deleted if not used.
 export class LoanComponent implements OnInit, OnDestroy {
-  @Output() status: EventEmitter<any> = new EventEmitter<any>();
-  @Input() selectedOptions: any = {};
-  @Input() formOptionsVisible: boolean = false;
-  @Input() transactionTypeText = '';
-  @Input() transactionType = '';
-  //@Input() scheduleAction: LoansActions = null;
+
   @Input() scheduleAction: LoansActions = LoansActions.add;
+  @Input() transactionDetail: any;
+  @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   /**
    * Subscription for pre-populating the form for view or edit.
@@ -157,20 +156,13 @@ export class LoanComponent implements OnInit, OnDestroy {
     this.getFormFields();
 
     this.entityType = 'IND';
-    //this.loadDynamiceFormFields();
-    //this.formFields = this.individualFormFields;
-    //console.log(" this.formFields",  this.formFields);
-
-    //this._setForm(this.formFields);
-    this.frmLoan = this._fb.group({});
-    if (this.selectedOptions) {
-      if (this.selectedOptions.length >= 1) {
-        this.formVisible = true;
-      }
-    }
   }
 
-  public ngDoCheck(): void {}
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (this.scheduleAction === LoansActions.edit) {
+      this._prePopulateFormForEditOrView(this.transactionDetail);
+    }
+  }
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
@@ -850,24 +842,11 @@ export class LoanComponent implements OnInit, OnDestroy {
     this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });
 
-    //this.frmLoan.patchValue({ phoneNumber: loan.phoneNumber }, { onlySelf: true });
-    //this.frmLoan.patchValue({ candOffice: loan.candOffice }, { onlySelf: true });
-    //this.frmLoan.patchValue({ candOfficeState: loan.candOfficeState }, { onlySelf: true });
-    //this.frmLoan.patchValue({ candOfficeDistrict: loan.candOfficeDistrict }, { onlySelf: true });
-
     let transactionTypeIdentifier = '';
-    // Use this if transaction_tye_identifier is to come from dynamic form data
-    // currently it's called to early to detect type changes as it happens in step 1 / report type
-    // for (const field of this.hiddenFields) {
-    //   if (field.name === 'transaction_type_identifier') {
-    //     transactionTypeIdentifier = field.value;
-    //   }
-    // }
 
     // default to indiv-receipt for sprint 17 - use input field in sprint 18.
     transactionTypeIdentifier = 'INDV_REC';
 
-    //const reportId = this.getReportIdFromStorage();
   }
 
   /**
@@ -1138,13 +1117,7 @@ export class LoanComponent implements OnInit, OnDestroy {
       if (res) {
         if (res.hasOwnProperty('data')) {
           if (typeof res.data === 'object') {
-            /*if (res.data.hasOwnProperty('formFields')) {
-                  if (Array.isArray(res.data.formFields)) {
-                    this.formFields = res.data.formFields;
 
-                    this._setForm(this.formFields);
-                  }
-                }*/
             if (res.data.hasOwnProperty('individualFormFields')) {
               if (Array.isArray(res.data.individualFormFields)) {
                 this.individualFormFields = res.data.individualFormFields;
@@ -1153,12 +1126,6 @@ export class LoanComponent implements OnInit, OnDestroy {
                 this._setForm(res.data.individualFormFields);
               }
             }
-
-            /*if (res.data.hasOwnProperty('committeeFormFields')) {
-              if (Array.isArray(res.data.committeeFormFields)) {
-                this.committeeFormFields = res.data.committeeFormFields;
-              }
-            }*/
 
             if (res.data.hasOwnProperty('OrganizationFormFields')) {
               if (Array.isArray(res.data.OrganizationFormFields)) {
@@ -1185,18 +1152,6 @@ export class LoanComponent implements OnInit, OnDestroy {
               }
             }
 
-            /*if (res.data.hasOwnProperty('prefixes')) {
-              if (Array.isArray(res.data.prefixes)) {
-                this.prefixes = res.data.prefixes;
-              }
-            }
-
-            if (res.data.hasOwnProperty('suffixes')) {
-              if (Array.isArray(res.data.suffixes)) {
-                this.suffixes = res.data.suffixes;
-              }
-            }*/
-
             if (res.data.hasOwnProperty('entityTypes')) {
               if (Array.isArray(res.data.entityTypes)) {
                 this.entityTypes = res.data.entityTypes;
@@ -1217,18 +1172,6 @@ export class LoanComponent implements OnInit, OnDestroy {
                 console.log('this.secured', this.secured);
               }
             }
-
-            /*if (res.data.hasOwnProperty('officeSought')) {
-              if (Array.isArray(res.data.officeSought)) {
-                this.officeSought = res.data.officeSought;
-              }
-            }
-
-            if (res.data.hasOwnProperty('officeState')) {
-              if (Array.isArray(res.data.officeState)) {
-                this.officeState = res.data.officeState;
-              }
-            }*/
 
             if (res.data.hasOwnProperty('titles')) {
               if (Array.isArray(res.data.titles)) {
@@ -1275,46 +1218,9 @@ export class LoanComponent implements OnInit, OnDestroy {
         this.frmLoan.patchValue({ city: formData.city }, { onlySelf: true });
         this.frmLoan.patchValue({ state: formData.state }, { onlySelf: true });
         this.frmLoan.patchValue({ zip_code: formData.zip }, { onlySelf: true });
-
-        /*this.frmLoan.patchValue({ middle_name: loan.middle_name }, { onlySelf: true });
-        this.frmLoan.patchValue({ prefix: loan.prefix }, { onlySelf: true });
-        this.frmLoan.patchValue({ suffix: loan.suffix }, { onlySelf: true });
-        this.frmLoan.patchValue({ street_1: loan.street_1 }, { onlySelf: true });
-        this.frmLoan.patchValue({ street_2: loan.street_2 }, { onlySelf: true });
-        this.frmLoan.patchValue({ city: loan.city }, { onlySelf: true });
-        this.frmLoan.patchValue({ state: loan.state }, { onlySelf: true });
-        this.frmLoan.patchValue({ entity_type: loan.entity_type }, { onlySelf: true });
-        this.frmLoan.patchValue({ zip_code: loan.zip_code }, { onlySelf: true });
-       
-        this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
-        this.frmLoan.patchValue({ election_code: loan.election_code }, { onlySelf: true });
-        this.frmLoan.patchValue({ election_other_description: loan.election_other_description }, { onlySelf: true });
-        this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
-        this.frmLoan.patchValue({ loan_payment_to_date: loan.loan_payment_to_date }, { onlySelf: true });
-        this.frmLoan.patchValue({ loan_balance: loan.loan_balance }, { onlySelf: true });
-        this.frmLoan.patchValue({ loan_incurred_date: loan.loan_incurred_date }, { onlySelf: true });
-        this.frmLoan.patchValue({ loan_due_date: loan.loan_due_date }, { onlySelf: true });
-        this.frmLoan.patchValue({ loan_intrest_rate: loan.loan_intrest_rate }, { onlySelf: true });
-        this.frmLoan.patchValue({ lender_cand_last_name: loan.lender_cand_last_name }, { onlySelf: true });
-        this.frmLoan.patchValue({ lender_cand_first_name: loan.lender_cand_first_name }, { onlySelf: true });
-        this.frmLoan.patchValue({ lender_cand_middle_name: loan.lender_cand_middle_name }, { onlySelf: true });
-    
-        this.frmLoan.patchValue({ lender_cand_prefix: loan.lender_cand_prefix }, { onlySelf: true });
-        this.frmLoan.patchValue({ lender_cand_suffix: loan.lender_cand_suffix }, { onlySelf: true });
-        this.frmLoan.patchValue({ lender_cand_office: loan.lender_cand_office }, { onlySelf: true });
-        this.frmLoan.patchValue({ lender_cand_state: loan.lender_cand_state }, { onlySelf: true });
-        this.frmLoan.patchValue({ lender_cand_district: loan.lender_cand_district }, { onlySelf: true });
-        this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
-        this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });*/
       }
     }
   }
-
-  /*public selectTypeChange(e): void {
-    this.entityType = e.target.value;
-    this.loadDynamiceFormFields();
-    console.log('selectTypeChange this.entityType = ', this.entityType);
-  }*/
 
   public loadDynamiceFormFields(): void {
     console.log(' loadDynamiceFormFields this.entityType', this.entityType);
@@ -1540,5 +1446,9 @@ export class LoanComponent implements OnInit, OnDestroy {
       return col.width;
     }
     return null;
+  }
+
+  private _prePopulateFormForEditOrView(transactionDetail: any) {
+    alert('populate form');
   }
 }

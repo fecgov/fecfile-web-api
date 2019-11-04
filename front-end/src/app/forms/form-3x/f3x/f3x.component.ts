@@ -52,10 +52,12 @@ export class F3xComponent implements OnInit {
   public transactionType = '';
   public transactionTypeTextSchedF = '';
   public transactionTypeSchedF = '';
+  public transactionDetailSchedC: any;
   public scheduleType = '';
   public isShowFilters = false;
   public formType: string = '';
   public scheduleAction: ScheduleActions;
+  public scheduleCAction: ScheduleActions;
   public forceChangeDetectionC1: Date;
   public allTransactions: boolean = false;
 
@@ -295,7 +297,11 @@ export class F3xComponent implements OnInit {
             if (this.transactionType && this.transactionType === e.transactionType) {
               this._f3xMessageService.sendLoadFormFieldsMessage('');
             }
-            if (e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.cloned) {
+            if (
+              e.transactionDetail &&
+              e.transactionDetail.transactionModel &&
+              e.transactionDetail.transactionModel.cloned
+            ) {
               this._cloned = true;
             }
             // this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
@@ -310,7 +316,7 @@ export class F3xComponent implements OnInit {
                   break;
                 default:
               }
-            }            
+            }
 
             if (e.action) {
               if (e.action in ScheduleActions) {
@@ -328,17 +334,50 @@ export class F3xComponent implements OnInit {
             let transactionType = '';
 
             if (this.scheduleAction === ScheduleActions.edit) {
-              // message the child component rather than sending data as input because
-              // ngOnChanges fires when the form fields are changed, thereby reseting the
-              // fields to the previous value.  Result is fields can't be changed.
-              e.transactionDetail.action = this.scheduleAction;
-              this._f3xMessageService.sendPopulateFormMessage({
-                key: 'fullForm',
-                transactionModel: e.transactionDetail
-              });
-              const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
-              transactionTypeText = transactionModel.type;
-              transactionType = transactionModel.transactionTypeIdentifier;
+              // Sched C uses change detection for populating form for edit.
+              // Have API add scheduleType to transactions table - using apiCall until then
+
+              let apiCall = null;
+              if (e.transactionDetail) {
+                if (e.transactionDetail.transactionModel) {
+                  if (e.transactionDetail.transactionModel.hasOwnProperty('apiCall')) {
+                    apiCall = e.transactionDetail.transactionModel.apiCall;
+                  }
+                }
+              }
+              if (apiCall === '/sc/schedC') {
+                // use a schedC specific field to reduce unwanted change detection in Sched C.
+                // this.step = 'loan';
+                this.scheduleType = 'sched_c';
+                this.scheduleCAction = ScheduleActions.edit;
+                this.transactionDetailSchedC = e.transactionDetail.transactionModel;
+
+                // this._router.navigate([`/forms/form/${this.formType}`], {
+                //   queryParams: {
+                //     step: 'loan',
+                //     reportId: this._reportId,
+                //     edit: this.editMode,
+                //     transactionCategory: '',
+                //     transactionTypeIdentifier: ''
+                //   }
+                // });
+              } else if (apiCall === '/sc/schedC1') {
+                alert('edit C1 not yet supported');
+              } else if (apiCall === '/sc/schedF') {
+                alert('edit schedule F not yet supported');
+              } else {
+                // message the child component rather than sending data as input because
+                // ngOnChanges fires when the form fields are changed, thereby reseting the
+                // fields to the previous value.  Result is fields can't be changed.
+                e.transactionDetail.action = this.scheduleAction;
+                this._f3xMessageService.sendPopulateFormMessage({
+                  key: 'fullForm',
+                  transactionModel: e.transactionDetail
+                });
+                const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+                transactionTypeText = transactionModel.type;
+                transactionType = transactionModel.transactionTypeIdentifier;
+              }
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
@@ -430,7 +469,12 @@ export class F3xComponent implements OnInit {
 
           if (this._cloned) {
             this._router.navigate([`/forms/form/${this.formType}`], {
-              queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory, cloned: this._cloned }
+              queryParams: {
+                step: this.step,
+                edit: this.editMode,
+                transactionCategory: this.transactionCategory,
+                cloned: this._cloned
+              }
             });
           } else {
             this._router.navigate([`/forms/form/${this.formType}`], {
