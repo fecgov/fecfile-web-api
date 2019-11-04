@@ -151,13 +151,24 @@ def get_reports_to_upload():
                     '', 
                     '', 
                     )     
-
-                if resp['Response'].encode('utf-8')=='Success':
+                successresp=resp.json()
+                if successresp["Response"] =='Success':
                     successresp=resp.json()
 
                     print("prepare_json_builders_data call is successfuly finished...")  
+
+                    add_log(data_row[1],
+                                        data_row[0],  
+                                        4,
+                                        "prepare_json_builders_data call is successfuly finished ", 
+                                        '', 
+                                        '',
+                                        '', 
+                                        '', 
+                                    )  
+
                     print(successresp)
-                    if successresp['Response'].encode('utf-8')=='Success':
+                    if successresp["Response"] =='Success':
                         # call create_json_builders which internally call Data Reciever API
 
                         data_obj = {
@@ -193,7 +204,7 @@ def get_reports_to_upload():
                                         '', 
                                     )  
 
-                            if successresp['result']['status'].encode('utf-8')=='PROCESSING':
+                            if successresp["result"]["status"].encode('utf-8')=='PROCESSING':
                                 # update submission_id in report table 
                                 cur.execute("""UPDATE public.reports 
                                                 SET submission_id = %s, 
