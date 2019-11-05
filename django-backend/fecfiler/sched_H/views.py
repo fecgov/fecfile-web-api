@@ -1020,6 +1020,8 @@ def get_h2_summary_table(request):
     all the calendar-year based h2 need to show up for current report as long as
     a live h4 transaction refering this h2 exist:
     h2 report goes with h4, not h2 report_id
+
+    update: all h2 items with current report_id need to show up
     """
     logger.debug('get_h2_summary_table with request:{}'.format(request.query_params))
     _sql = """
@@ -1034,12 +1036,24 @@ def get_h2_summary_table(request):
         federal_percent, 
         non_federal_percent 
     FROM   public.sched_h2 
-    WHERE  cmte_id = %s
+    WHERE  cmte_id = %s AND delete_ind is distinct from 'Y'
         AND activity_event_name IN (
             SELECT activity_event_identifier 
             FROM   public.sched_h4 
             WHERE  report_id = %s
-            AND cmte_id = %s)) t;
+            AND cmte_id = %s)
+    UNION SELECT activity_event_name, 
+        ( CASE fundraising 
+            WHEN true THEN 'fundraising' 
+            ELSE 'direct_cand_suppot' 
+            END )  AS event_type, 
+        DATE(create_date) AS date, 
+        ratio_code, 
+        federal_percent, 
+        non_federal_percent 
+    FROM   public.sched_h2 
+    WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
+            ) t;
     """
     try:
         cmte_id = request.user.username
@@ -1047,7 +1061,7 @@ def get_h2_summary_table(request):
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
             logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-            cursor.execute(_sql, (cmte_id, report_id, cmte_id))
+            cursor.execute(_sql, (cmte_id, report_id, cmte_id, cmte_id, report_id))
             json_res = cursor.fetchone()[0]
             print(json_res)
             if not json_res:
