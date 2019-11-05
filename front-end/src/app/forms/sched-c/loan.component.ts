@@ -1536,6 +1536,19 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this._setEntityTypeDefault();
   }
 
+  /**
+   * Determine if fields is read only.  If it should
+   * be read only return true else null.  Null will
+   * remove HTML attribute readonly whereas setting it to
+   * false will not remove readonly from DOM and fields remain in readonly.
+   */
+  public isFieldReadOnly(col: any) {
+    if (col.type === 'text' && col.isReadonly) {
+      return true;
+    }
+    return null;
+  }
+
     /**
    * Navigate to the Transactions.
    */
