@@ -418,6 +418,16 @@ def create_json_builders(request):
             print("data_obj = ", data_obj)
             print("file_obj = ", file_obj)
 
+            add_log(report_id,
+                cmte_id, 
+                4,
+                " create_json_builders calling data Validatior with data_obj", 
+                json.dumps(data_obj.json()), 
+                '',
+                '', 
+                '' 
+                ) 
+
             resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL +
                                  "/v1/upload_filing", data=data_obj, files=file_obj)
 
@@ -428,3 +438,34 @@ def create_json_builders(request):
             return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response("The create_json_builders is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+'''
+message_type,
+ 1-FATAL, 2-ERROR, 3-WARN, 4-INFO, 5-DEBUG, 6-TRACE
+'''
+def add_log(reportid, 
+            cmte_id, 
+            message_type, 
+            message_text, 
+            response_json, 
+            error_code, 
+            error_json, 
+            app_error,
+            host_name=os.uname()[1],
+            process_name="create_json_builders"):
+
+     with connection.cursor() as cursor:
+        cursor.execute("""INSERT INTO public.upload_logs(
+                                        report_id, 
+                                        cmte_id, 
+                                        process_name, 
+                                        message_type, 
+                                        message_text, 
+                                        response_json, 
+                                        error_code, 
+                                        error_json, 
+                                        app_error, 
+                                        host_name)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                                        [reportid, cmte_id, process_name, message_type, message_text, response_json, error_code, error_json, app_error, host_name])
+
