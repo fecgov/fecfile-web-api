@@ -253,7 +253,7 @@ export class IndividualReceiptService {
   }
 
   /**
-   * Gets the schedule after submitted.
+   * Gets the saved transaction data for the schedule.
    *
    * @param      {string}  reportId  The report Id
    * @param      {string}  transactionId   The Transaction Id
@@ -398,6 +398,7 @@ export class IndividualReceiptService {
   public getReportIdFromStorage(formType: string) {
     let reportId = '0';
     let form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    const reportIdFromLocalStorage = localStorage.getItem('reportId');
 
     if (form3XReportType === null || typeof form3XReportType === 'undefined') {
       form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
@@ -411,6 +412,8 @@ export class IndividualReceiptService {
       } else if (form3XReportType.hasOwnProperty('reportid')) {
         reportId = form3XReportType.reportid;
       }
+    } else if (reportIdFromLocalStorage !== null && reportIdFromLocalStorage !== undefined && reportIdFromLocalStorage !== '0') {
+      reportId = reportIdFromLocalStorage;
     }
     return reportId;
   }

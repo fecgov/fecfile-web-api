@@ -128,7 +128,7 @@
           </div>          
         </div>
       </div> 
-      <div class="card">
+      <div class="card" *ngIf="transactionCategory === 'receipts' || transactionCategory === 'disbursements'">
         <div class="card-header transactions__filter-title" (click)="toggleAmountFilterItem()">
           Amount
           <i class="float-right" aria-hidden="true" 
@@ -176,16 +176,114 @@
             >                        
           </div>          
         </div>
+      </div>
+      <div class="card" *ngIf="transactionCategory === 'loans-and-debts'">
+        <div class="card-header transactions__filter-title" (click)="toggleAmountFilterItem()">
+          Loan Amount
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideAmountFilter)">
+          </i>
+        </div>
+        <div class="card-body" [@openClose]="!isHideAmountFilter ? 'open' : 'closed'">
+          <div *ngIf="amountFilterValidation.isError" class="text-error text-center">
+            {{ amountFilterValidation.message }}
+          </div>            
+          <label for="filter-amount-min">Minimum</label>
+          <div class="input-group transactions__filter-multi-input">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-amount-min">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="number"
+              min="0" value="0"
+              name="minamount"
+              [(ngModel)]="filterLoanAmountMin"
+              class="form-control"
+              id="filter-amount-min"
+              aria-label="Filter Min Amount"
+              aria-describedby="filter-min-amount"
+            >                        
+          </div>
+          <label for="filter-amount-max">Maximum</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-max-amount">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="number"
+              name="maxamount"
+              min="0" value="0"
+              [(ngModel)]="filterLoanAmountMax"
+              class="form-control"
+              id="filter-amount-max"
+              aria-label="Filter Max Amount"
+              aria-describedby="filter-max-amount"
+            >                        
+          </div>          
+        </div>
+      </div>
+      <div class="card" *ngIf="transactionCategory === 'loans-and-debts'">
+        <div class="card-header transactions__filter-title" (click)="toggleBalanceAtCloseFilterItem()">
+          Balance at Close
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideloanClosingBalanceFilter)">
+          </i>
+        </div>
+        <div class="card-body" [@openClose]="!isHideloanClosingBalanceFilter ? 'open' : 'closed'">
+          <div *ngIf="loanClosingBalanceFilterValidation?.isError" class="text-error text-center">
+            {{ loanClosingBalanceFilterValidation.message }}
+          </div>            
+          <label for="filter-amount-min">Minimum</label>
+          <div class="input-group transactions__filter-multi-input">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-amount-min">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="number"
+              min="0" value="0"
+              name="minamount"
+              [(ngModel)]="filterLoanAmountMin"
+              class="form-control"
+              id="filter-amount-min"
+              aria-label="Filter Min Amount"
+              aria-describedby="filter-min-amount"
+            >                        
+          </div>
+          <label for="filter-amount-max">Maximum</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-max-amount">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="number"
+              name="maxamount"
+              min="0" value="0"
+              [(ngModel)]="filterLoanAmountMax"
+              class="form-control"
+              id="filter-amount-max"
+              aria-label="Filter Max Amount"
+              aria-describedby="filter-max-amount"
+            >                        
+          </div>          
+        </div>
       </div> 
 
-      <div class="card">
-          <div class="card-header transactions__filter-title" (click)="toggleAggregateAmountFilterItem()">
+      <div class="card" *ngIf="transactionCategory === 'receipts'">
+          <div class="card-header transactions__filter-title" (click)="toggleAggregateAmountFilterItem()" *ngIf="transactionCategory === 'receipts'">
             Aggregate Amount
             <i class="float-right" aria-hidden="true" 
               [ngClass]="toggleFilterDirection(isHideAggregateAmountFilter)">
             </i>
           </div>
-          <div class="card-body" [@openClose]="!isHideAggregateAmountFilter ? 'open' : 'closed'">
+          <div class="card-body" [@openClose]="!isHideAggregateAmountFilter ? 'open' : 'closed'" *ngIf="transactionCategory === 'receipts'">
             <div *ngIf="aggregateAmountFilterValidation.isError" class="text-error text-center">
               {{ aggregateAmountFilterValidation.message }}
             </div>            
@@ -265,7 +363,7 @@
               </div>
         </div>
       </div> 
-      <div class="card">
+      <div class="card" *ngIf="transactionCategory === 'receipts' || transactionCategory === 'disbursements'">
         <div class="card-header transactions__filter-title" (click)="toggleItemizationFilterItem()">
           Itemization
           <i class="float-right" aria-hidden="true" 
@@ -287,7 +385,85 @@
           </div>
         </div>
       </div>
-
+      <div class="card" *ngIf="transactionCategory === 'disbursements'">
+        <div class="card-header transactions__filter-title" (click)="toggleElectionCodeFilterItem()">
+          Election Code
+          <i class="float-right" aria-hidden="true" [ngClass]="toggleFilterDirection(isHideElectionCode)">
+          </i>
+        </div>
+        <div class="card-body" [@openCloseScroll]="!isHideElectionCode ? 'open' : 'closed'">
+          <div class="transactions__filter-type-list-body">
+            <ul class="transactions__filter-type-list">
+              <li *ngFor="let electionCode of electionCodes">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="{{ electionCode?.option }}" 
+                    [(ngModel)]="electionCode.selected">
+                  <label class="form-check-label" for="{{ electionCode?.selected }}">
+                    {{electionCode.option | titlecase}}</label>
+                 </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="card" *ngIf="transactionCategory === 'disbursements'">
+        <div class="card-header transactions__filter-title" (click)="toggleElectionYearFilterItem()">
+          Election Year
+          <i class="float-right" aria-hidden="true" [ngClass]="toggleFilterDirection(isHideElectionYear)">
+          </i>
+        </div>
+        <div class="card-body" [@openClose]="!isHideElectionYear ? 'open' : 'closed'">
+          <div *ngIf="yearFilterValidation.isError" class="text-error text-center">
+            {{ yearFilterValidation.message }}
+          </div>            
+          <label for="filter-amount-min">From</label>
+          <div class="input-group transactions__filter-multi-input">
+            <input
+              type="number"
+              min="1901" value="1901"
+              name="minamount"
+              [(ngModel)]="filterElectionYearFrom"
+              class="form-control"
+              id="filter-amount-min"
+              aria-label="Filter Min Amount"
+              aria-describedby="filter-min-amount"
+            >                        
+          </div>
+          <label for="filter-amount-max">To</label>
+          <div class="input-group">
+            <input
+              type="number"
+              name="maxamount"
+              min="1901" value="1901"
+              [(ngModel)]="filterElectionYearTo"
+              class="form-control"
+              id="filter-amount-max"
+              aria-label="Filter Max Amount"
+              aria-describedby="filter-max-amount"
+            >                        
+          </div>          
+        </div>
+      </div>
+      <div class="card" *ngIf="transactionCategory === 'other'">
+        <div class="card-header transactions__filter-title" (click)="toggleScheduleFilterItem()">
+          Schedule
+          <i class="float-right" aria-hidden="true" [ngClass]="toggleFilterDirection(isHideScheduleFilter)">
+          </i>
+        </div>
+        <div class="card-body" 
+          [@openCloseScroll]="determineScrollState()">            
+          <div class="input-group py-1 transacions__filter-scroll-to-input">
+            <input class="form-control" [(ngModel)]="filterSchedule" type="text" 
+              placeholder="Search Schedule" aria-label="Search">
+            <div class="input-group-append">
+              <span class="input-group-text">
+                  <!-- <i class="search-icon text-grey" aria-hidden="true"></i> no longer working?-->
+                  <i class="fas fa-search text-grey" aria-hidden="true"></i>
+              </span>
+            </div>              
+          </div>
+        </div>
+      </div>
     </div> 
   </section>
   <footer>

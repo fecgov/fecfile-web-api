@@ -85,6 +85,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
   private _form99Details: any = {};
+  public _allTransactions: boolean = false;
 
   // Local Storage Keys
   private readonly transactionSortableColumnsLSK = 'transactions.trx.sortableColumn';
@@ -169,30 +170,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
-      // _router.events.subscribe(val => {
-      //   let oldUrl = '';
-      //   let newUrl = '';
-      //   if (val instanceof NavigationEnd) {
-      //     oldUrl = val.url;
-      //   }
-      //   if (val instanceof NavigationStart) {
-      //     newUrl = val.url;
-      //   }
-
-      //   if (oldUrl !== newUrl) {
-      //     this.getTransactionsPage(1);
-      //   }
-      // });
-      // if (this.tableType === this.transactionsView) {
-        this.getPage(1);
-      // } else if (this.tableType === this.recycleBinView) {
-      //   this.getRecyclingPage(1);
-      // }
-
+      this.getPage(1);
       this.clonedTransaction = {};
       this.setSortableColumns();
       if (p.edit === 'true' || p.edit === true) {
         this.editMode = true;
+      }
+      if (p.allTransactions === true || p.allTransactions === 'true') {
+        this._allTransactions = true;
+        this.ngOnInit();
+        this.getPage(1);
+      } else {
+        this._allTransactions = false;
       }
     });
   }
@@ -369,12 +358,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     switch (this.tableType) {
       case this.transactionsView:
+      default:
         this.getTransactionsPage(page);
         break;
       case this.recycleBinView:
         this.getRecyclingPage(page);
-        break;
-      default:
         break;
     }
   }
@@ -404,7 +392,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param page the page containing the transactions to get
    */
   public getTransactionsPage(page: number): void {
-    if (!this.reportId) {
+    if (!this.reportId && !this._allTransactions) {
       return;
     }
     this.config.currentPage = page;
@@ -449,7 +437,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         serverSortColumnName,
         sortedCol.descending,
         this.filters,
-        categoryType
+        categoryType,
+        false,
+        this._allTransactions
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
@@ -491,7 +481,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         step: this._activatedRoute.snapshot.queryParams.step,
         reportId: this._activatedRoute.snapshot.queryParams.reportId,
         edit: this._activatedRoute.snapshot.queryParams.edit,
-        transactionCategory: transactionCategory
+        transactionCategory: transactionCategory,
+        allTransactions: this._allTransactions
       }
     });
   }
@@ -534,7 +525,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
 
     this._transactionsService
-      .getUserDeletedTransactions(
+      .getFormTransactions(
         this.formType,
         this.reportId,
         page,
@@ -542,7 +533,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.currentSortedColumnName,
         sortedCol.descending,
         this.filters,
-        categoryType
+        categoryType,
+        true,
+        this._allTransactions
       )
       .subscribe((res: GetTransactionsResponse) => {
         this.transactionsModel = [];
@@ -1346,7 +1339,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     ];
     if (this.transactionCategory === 'disbursements') {
       defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
-      // Donor Committee ID, Election Code, Election Year
       otherSortColumns = [
         'transactionId',
         'street',
@@ -1359,16 +1351,28 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'electionYear'
       ];
     } else if (this.transactionCategory === 'loans-and-debts') {
-      // Balance at Close (D)
-      defaultSortColumns = ['type', 'name', '', 'amount'];
-      // Purpose of Debt (D), Beginning Balance (D), Incurred Amount (D), Payment Amount (D)
-      // Loan Amount (C), Loan Payment to Date (C), Loan Balance (C), Loan Incurred Date (C), Loan Due Date (C)
-      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoCode', 'memoText', '', ''];
+      defaultSortColumns = ['type', 'name', 'loanClosingBalance', 'loanBalance'];
+      otherSortColumns = [
+        'transactionId',
+        'street',
+        'city',
+        'state',
+        'zip',
+        'memoCode',
+        'memoText',
+        'purposeDescription',
+        'loanBeginningBalance',
+        'loanAmount',
+        'loanClosingBalance',
+        'loanDueDate',
+        'loanIncurredAmt',
+        'loanIncurredDate',
+        'loanPaymentAmt',
+        'loanPaymentToDate'
+      ];
     } else if (this.transactionCategory === 'other') {
-      // Schedule
-      defaultSortColumns = ['', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
-      // Activity or Event Identifier
-      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', '', ''];
+      defaultSortColumns = ['schedule', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
+      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', 'eventId'];
     }
 
     this.sortableColumns = [];

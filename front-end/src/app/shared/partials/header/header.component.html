@@ -36,29 +36,27 @@
                 >
                 Tools
                 </button>
-                <div
-                  class="secondary-dropdown-menu tools"
-                  aria-labelledby="dropdownTools"
-                  ngbDropdownMenu
-                >
-                  
-                    <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_transactions']">
-                      Import Transactions
-                    </a>
-                    <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_names']">
-                      Import Names
-                    </a>
-  
-                    <a class="dropdown-item" draggable="false" [routerLink]="['/tools_export_names']">
-                      Export Names
-                    </a>
-  
-                      <a class="dropdown-item" draggable="false" [routerLink]="['/tools_merge_names']">
-                      Merge Names
-                    </a>
-                      <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">
-                      Create Backup
-                      </a>
+                <div class="secondary-dropdown-menu tools" aria-labelledby="dropdownTools" ngbDropdownMenu>
+                  <a class="dropdown-item" draggable="false" [routerLink]="['/forms/form/3X']" [queryParams]="{step: 'transactions', transactionCategory: 'receipts', allTransactions: true}">
+                    All Transactions
+                  </a>
+                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_transactions']">
+                    Import Transactions
+                  </a>
+                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_names']">
+                    Import Names
+                  </a>
+                
+                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_export_names']">
+                    Export Names
+                  </a>
+                
+                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_merge_names']">
+                    Merge Names
+                  </a>
+                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">
+                    Create Backup
+                  </a>
                 </div>
               </div>
             </li>

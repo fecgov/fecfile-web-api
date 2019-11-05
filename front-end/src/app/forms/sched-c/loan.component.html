@@ -21,13 +21,11 @@
   <form [formGroup]="frmLoan">
     <header>
       <div class="header-content">
-        <!--<div class="float-left">-->
-          <h1>
-            F3x | Schedule-C | Loan
-          </h1>
-          <br />
-        <!--</div>-->
-       </div>
+        <h1>
+          F{{formType}} / Schedule-C / Loan
+        </h1>
+        <br />
+      </div>
 
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
@@ -45,15 +43,16 @@
       <ng-container *ngFor="let row of formFields; let i = index">
       <div class="row" *ngIf="row.cols">
           <ng-container *ngIf="row.cols | isArray">
-            <div [class]="row.colClassName" *ngFor="let col of row.cols">
-              <div class="form-group">
+            <ng-container *ngFor="let col of row.cols">
+            <div [class]="determineColClass(row, col)" *ngIf="isToggleShow(col)">
+              <div class="form-group" [style.width]="setSelectTypeWidth(col)">
                 <label [for]="col?.name">
                   {{ col?.text }}
-                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                  <div type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                     tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
                     <i class="info-icon" aria-hidden="true"></i>
                     <span class="sr-only">Click here for more information</span>
-                </button>
+                </div>
                   <ng-container *ngIf="!col?.validation?.required">
                     (Optional)
                   </ng-container>
@@ -61,11 +60,12 @@
                 <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">
                   <div [ngClass]="{ 'input-group': col?.inputGroup }">
                     <ng-container *ngIf="col?.inputGroup">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">
-                          <i [class]="col?.inputIcon" aria-hidden="true"></i>
-                        </span>
-                      </div>
+                          <div  class="input-group-append">
+                            <span class="input-group-text">
+                              <i [class]="col?.inputIcon" aria-hidden="true"></i>
+                            </span>
+                          </div>
+
                     </ng-container>
                     <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                     <input
@@ -215,6 +215,16 @@
                         : ''
                     "
                   />
+                    <!--div ng-repeat="electionType in electionTypes">
+                      <input type="checkbox" 
+                        ng-model="electionTypesSelected[electionType.name]" 
+                        ng-change="electionTypeChanged()" 
+                        ng-required="!someSelected" /> 
+                        {{electionType.name}}
+                    
+                    <div *ngFor=”let electionType of electionTypes; let i=index”>
+                        <input type=”checkbox” [formControl]="electionType"/> {{electionType.name}}
+                       </div></div>-->
                 </ng-container>
                 <ng-container *ngIf="col?.type === 'textarea'">
                   <textarea
@@ -323,15 +333,53 @@
                     [ngClass]="
                       frmLoan.get(col?.name)?.invalid &&
                       (frmLoan.touched || frmLoan.dirty)
-                        ? 'state-select-error'
+                        ? 'forms__select-error'
                         : ''
                     "
                   >
                   </ng-select>
-                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="col?.type === 'select' && col?.name === 'secured'">
+                <ng-select #securedSelect
+                  id="secured"
+                  [items]="secured"
+                  [style.width]="col?.width"
+                  [style.height]="col?.height"
+                  [formControlName]="col?.name"
+                  bindValue="code"
+                  bindLabel="name" 
+                  [ngClass]="
+                    frmLoan.get(col?.name)?.invalid &&
+                    (frmLoan.touched || frmLoan.dirty)
+                      ? 'forms__select-error'
+                      : ''
+                  "
+                >
+                </ng-select>
+              </ng-container>           
 
+              <ng-container *ngIf="col?.type === 'select' && col?.name === 'election_code'">
+                <ng-select #electioncodeSelect
+                  id="election"
+                  [items]="electionTypes"
+                  (change)="electionTypeChanged($event, col)"
+                  [style.width]="col?.width"
+                  [style.height]="col?.height"
+                  [formControlName]="col?.name"
+                  bindValue="code"
+                  bindLabel="name" 
+                  [ngClass]="
+                    frmLoan.get(col?.name)?.invalid &&
+                    (frmLoan.touched || frmLoan.dirty)
+                      ? 'forms__select-error'
+                      : ''
+                  "
+                >
+              </ng-select>
+            </ng-container>         
              </div>
             </div>
+            </ng-container>
             <!-- ./col -->
           </ng-container>
       </div>
@@ -344,9 +392,9 @@
           </div>
         </ng-container>
       </ng-container> 
-      <div class="row" >
-        Please provide your paper Loan agreement by filling form 99 in the C1 Agrrement  
-    </div>   
+      <div class="row">  
+        <div class="col">Please provide your paper Loan agreement by filling form 99 in the C1 Agrrement</div>
+      </div>   
     </section>
 
     <footer>
@@ -362,15 +410,40 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <button class="btn btn-primary btn-left" type="button" (click)="loanRepayment()">
-                Loan Repayment
-              </button>
-              <button *ngIf="entiyType==='ORG'" class="btn btn-primany btn-right" type="button" (click)="AddEndorser()">
-                Endorser
-              </button>
-              <button class="btn btn-primany btn-right" type="button" (click)="saveLoan()">
-                Save
-              </button>
+              <ng-template *ngIf="scheduleAction === editScheduleAction; then editButtons; else addButtons">
+              </ng-template>
+              <ng-template #addButtons>
+                <button class="btn btn-previous btn-left" type="button"
+                  (click)="previousStep()">
+                  Previous
+                </button>
+                <button class="btn btn-secondary btn-right" type="button" (click)="saveLoan()">
+                  Save
+                </button>
+                <button *ngIf="entityType === 'ORG'" class="btn btn-secondary btn-right" type="button" 
+                  (click)="AddLoanEndorser()">
+                  Endorser
+                </button>
+                <button class="btn btn-secondary btn-right" type="button" (click)="loanRepayment()">
+                  Loan Repayment
+                </button>                
+              </ng-template>
+              <ng-template #editButtons>
+                <button class="btn btn-previous btn-left" type="button"
+                  (click)="viewTransactions()">
+                  Cancel
+                </button>
+                <button class="btn btn-secondary btn-right" type="button" (click)="saveLoan()">
+                  Save
+                </button>
+                <button *ngIf="entityType === 'ORG'" class="btn btn-secondary btn-right" type="button" 
+                  (click)="AddLoanEndorser()">
+                  Endorser
+                </button>
+                <button class="btn btn-secondary btn-right" type="button" (click)="loanRepayment()">
+                  Loan Repayment
+                </button>  
+              </ng-template>
             </div>
           </div>          
         </div>

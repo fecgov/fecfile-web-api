@@ -63,7 +63,7 @@ export class SchedH1Component implements OnInit {
       // formData.append('report_id', reportType.reportId);
     } else if (reportType.hasOwnProperty('reportid')) {
       // formData.append('report_id', reportType.reportid);
-      h1_obj['report_id'] = reportType.reportId;
+      h1_obj['report_id'] = reportType.reportid;
     }
     console.log(reportType.reportid)
     // formData.append('federal_percent', '0.45');

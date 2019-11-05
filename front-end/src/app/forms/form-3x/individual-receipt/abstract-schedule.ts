@@ -144,6 +144,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _prePopulateFieldArray: Array<any>;
   private _committeeDetails: any;
   private _cmteTypeCategory: string;
+  private _completedCloning: boolean = false;
 
   constructor(
     private _http: HttpClient,
@@ -240,6 +241,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._employerOccupationRequired = false;
     this.memoDropdownSize = null;
     this.totalAmountReadOnly = true;
+    this._completedCloning = false;
+
+    if (localStorage.getItem('committee_details') !== null) {
+      this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
+      if (this._committeeDetails.cmte_type_category !== null) {
+        this._cmteTypeCategory = this._committeeDetails.cmte_type_category;
+      }
+    }
 
     if (localStorage.getItem('committee_details') !== null) {
       this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
@@ -435,7 +444,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._listenForAggregateChanges();
     }
 
-    if (this.scheduleAction === ScheduleActions.add) {
+    if (this.scheduleAction === ScheduleActions.add) {      
       this.frmIndividualReceipt.patchValue({ beginning_balance: this._decimalPipe.transform(0, '.2-2') },
         { onlySelf: true });
       this.frmIndividualReceipt.patchValue({ payment_amount: this._decimalPipe.transform(0, '.2-2') },
@@ -509,7 +518,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           if (validators[validation]) {
             // occuaption and employer will be required dpending on aggregate
             if (fieldName !== 'employer' && fieldName !== 'occupation') {
-              formValidators.push(Validators.required);
+              // if (fieldName === 'incurred_amount' && this.scheduleAction === ScheduleActions.edit) {
+              //   // not required but not optinal when editing
+              // } else {
+              //   formValidators.push(Validators.required);
+              // }
+              if (this.scheduleAction === ScheduleActions.edit) {
+                formValidators.push(Validators.required);
+              }
             } else {
               this._employerOccupationRequired = true;
             }
@@ -806,7 +822,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (!this.frmIndividualReceipt.contains('total_amount')) {
       return;
     }
-    let totalAmount = this.frmIndividualReceipt.get('total_amount').value;
+    let totalAmount = '100'; //this.frmIndividualReceipt.get('total_amount').value;
     if (!totalAmount) {
       return;
     }
@@ -1661,6 +1677,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else if (saveAction === SaveActions.saveForReturnToNewParent) {
             this.returnToParent(ScheduleActions.add);
           } else if (saveAction === SaveActions.updateOnly) {
+            this._completedCloning = true;
             this.viewTransactions();
           } else {
 
@@ -1883,7 +1900,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Navigate to the Transactions.
    */
   public viewTransactions(): void {
-    if (!this._cloned) {
+    if (!this._cloned || this._completedCloning) {
       this.clearFormValues();
       let reportId = this._receiptService.getReportIdFromStorage(this.formType);
       console.log('reportId', reportId);

@@ -139,10 +139,16 @@ def schedC_sql_dict(data):
     try:
         datum =  { k: v for k, v in data.items() if k in valid_fields }
         # TODO: disable this line for now and wait for db update
-        # datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
-            # data.get('transaction_type_identifier'))
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        datum['transaction_type'] = ''
+
+        #no need to have dummy data   
+        '''
         datum['line_number'] = 'DUMMY'
         datum['transaction_type'] = 'DUMMY'
+        '''
+        
         return datum
 
     except:
@@ -239,31 +245,31 @@ def put_sql_schedC(data):
               AND delete_ind is distinct from 'Y';
         """
     _v = (
-            data.get('transaction_type', ''),
-            data.get('transaction_type_identifier', ''),
-            data.get('entity_id', ''),
-            data.get('election_code', ''),
-            data.get('election_other_description', ''),
-            data.get('loan_amount_original', None),
-            data.get('loan_payment_to_date', None),
-            data.get('loan_balance', None),
-            data.get('loan_incurred_date', None),
-            data.get('loan_due_date', None),
-            data.get('loan_intrest_rate', ''),
-            data.get('is_loan_secured', ''),
-            data.get('is_personal_funds', ''),
-            data.get('lender_cmte_id', ''),
-            data.get('lender_cand_id', ''),
-            data.get('lender_cand_last_name', ''),
-            data.get('lender_cand_first_name', ''),
-            data.get('lender_cand_middle_name', ''),
-            data.get('lender_cand_prefix', ''),
-            data.get('lender_cand_suffix', ''),
-            data.get('lender_cand_office', ''),
-            data.get('lender_cand_state', ''),
-            data.get('lender_cand_district', None),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('transaction_type'),
+            data.get('transaction_type_identifier'),
+            data.get('entity_id'),
+            data.get('election_code'),
+            data.get('election_other_description'),
+            data.get('loan_amount_original'),
+            data.get('loan_payment_to_date'),
+            data.get('loan_balance'), #adding loan_balance as loan_amount_original
+            data.get('loan_incurred_date'),
+            data.get('loan_due_date'), 
+            data.get('loan_intrest_rate'),
+            data.get('is_loan_secured'),
+            data.get('is_personal_funds'),
+            data.get('lender_cmte_id'),
+            data.get('lender_cand_id'),
+            data.get('lender_cand_last_name'),
+            data.get('lender_cand_first_name'),
+            data.get('lender_cand_middle_name'),
+            data.get('lender_cand_prefix'),
+            data.get('lender_cand_suffix'),
+            data.get('lender_cand_office'),
+            data.get('lender_cand_state'),
+            data.get('lender_cand_district'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -419,6 +425,8 @@ def post_schedC(data):
         data['entity_id'] = entity_id
         new_transaction_id = get_next_transaction_id('SC')
         data['transaction_id'] = new_transaction_id
+        # TODO: this is a temp change for new loan only. need further discussion
+        # data['loan_balance'] = data['loan_amount_original']
         logger.info('validating sched_c request data...')
         validate_sc_data(data)
         try:
@@ -627,13 +635,28 @@ def get_list_all_schedC(report_id, cmte_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            schedC2_list = cursor.fetchone()[0]
-            if schedC2_list is None:
+            schedC_list = cursor.fetchone()[0]
+            if schedC_list is None:
                 raise NoOPError('No sched_c1 transaction found for report_id {} and cmte_id: {}'.format(
                     report_id, cmte_id))
             merged_list = []
-            for dictC2 in schedC2_list:
-                merged_list.append(dictC2)
+            for item in schedC_list:
+                entity_id = item.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                # cand_entity = {}
+                # if item.get("beneficiary_cand_entity_id"):
+                #     cand_data = {
+                #         "entity_id": item.get("beneficiary_cand_entity_id"),
+                #         "cmte_id": cmte_id,
+                #     }
+                #     cand_entity = get_entities(cand_data)[0]
+                #     cand_entity = candify_it(cand_entity)
+
+                merged_dict = {**item, **dictEntity}
+                merged_list.append(merged_dict)
+                # merged_list.append(dictC2)
         return merged_list
     except Exception:
         raise
@@ -684,8 +707,22 @@ def get_list_schedC(report_id, cmte_id, transaction_id):
                 raise NoOPError('No sched_c transaction found for transaction_id {}'.format(
                     transaction_id))
             merged_list = []
-            for dictC in schedC_list:
-                merged_list.append(dictC)
+            for item in schedC_list:
+                entity_id = item.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                # cand_entity = {}
+                # if item.get("beneficiary_cand_entity_id"):
+                #     cand_data = {
+                #         "entity_id": item.get("beneficiary_cand_entity_id"),
+                #         "cmte_id": cmte_id,
+                #     }
+                #     cand_entity = get_entities(cand_data)[0]
+                #     cand_entity = candify_it(cand_entity)
+                merged_dict = {**item, **dictEntity}
+                merged_list.append(merged_dict)
+                # merged_list.append(dictC)
         return merged_list
     except Exception:
         raise
@@ -720,6 +757,8 @@ def schedC(request):
     """
     sched_c1 api supporting POST, GET, DELETE, PUT
     """
+
+    print("request obj =", request)
 
     # create new sched_c1 transaction
     if request.method == 'POST':
@@ -844,38 +883,80 @@ def get_outstanding_loans(request):
     3. cumulative payemnt to date
     4. outstanding balance
     5. due date
+    adding transaction_types to get transaction_type specific loans
+    valid ransction_type values:
+    LOANS_OWED_BY_CMTE
+    LOANS_OWED_TO_CMTE
     """
+    valid_transaction_types = [
+        'LOANS_OWED_BY_CMTE',
+        'LOANS_OWED_TO_CMTE',
+    ]
     logger.debug('POST request received.')
     try:
         cmte_id = request.user.username
-        _sql = """
-        SELECT Json_agg(t) 
-            FROM   (SELECT 
-                        e.entity_name,
-                        e.entity_type, 
-                        e.last_name,
-                        e.first_name,
-                        e.middle_name,
-                        e.preffix,
-                        e.suffix, 
-                        c.loan_amount_original, 
-                        c.loan_payment_to_date, 
-                        c.loan_balance, 
-                        c.loan_due_date 
-                    FROM   public.sched_c c, 
-                        public.entity e 
-                    WHERE c.cmte_id = %s
-                    AND c.entity_id = e.entity_id 
-                    AND c.loan_balance > 0
-                    ) t
-        """
-        with connection.cursor() as cursor:
-            cursor.execute(_sql, [cmte_id])
-            json_result = cursor.fetchone()[0] 
-            if not json_result:
-                return Response('No loans found')
-            else:
-                return Response(json_result, status=status.HTTP_200_OK)
+        if 'transaction_type_identifier' in request.query_params:
+            tran_type = request.query_params.get('transaction_type_identifier')
+            if not tran_type in valid_transaction_types: 
+                raise Exception('Error: invalid transaction types.')
+            _sql = """
+                SELECT Json_agg(t) 
+                FROM   (SELECT 
+                            e.entity_name,
+                            e.entity_type, 
+                            e.last_name,
+                            e.first_name,
+                            e.middle_name,
+                            e.preffix,
+                            e.suffix, 
+                            c.loan_amount_original, 
+                            c.loan_payment_to_date, 
+                            c.loan_balance, 
+                            c.loan_due_date,
+                            c.transaction_type_identifier 
+                        FROM   public.sched_c c, 
+                            public.entity e 
+                        WHERE c.cmte_id = %s
+                        AND c.transaction_type_identifier = %s
+                        AND c.entity_id = e.entity_id 
+                        AND c.loan_balance > 0
+                        ) t
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, tran_type])
+                json_result = cursor.fetchone()[0] 
+            
+        else:
+            _sql = """
+                SELECT Json_agg(t) 
+                    FROM   (SELECT 
+                                e.entity_name,
+                                e.entity_type, 
+                                e.last_name,
+                                e.first_name,
+                                e.middle_name,
+                                e.preffix,
+                                e.suffix, 
+                                c.loan_amount_original, 
+                                c.loan_payment_to_date, 
+                                c.loan_balance, 
+                                c.loan_due_date,
+                                c.transaction_type_identifier
+                            FROM   public.sched_c c, 
+                                public.entity e 
+                            WHERE c.cmte_id = %s
+                            AND c.entity_id = e.entity_id 
+                            AND c.loan_balance > 0
+                            ) t
+                """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id])
+                json_result = cursor.fetchone()[0] 
+
+        if not json_result:
+            return Response([], status=status.HTTP_200_OK)
+        else:
+            return Response(json_result, status=status.HTTP_200_OK)
 
     except:
         raise

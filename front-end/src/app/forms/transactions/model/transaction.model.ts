@@ -28,8 +28,18 @@ export class TransactionModel {
   toggleChild: boolean;
   child: TransactionModel[] = [];
   cloned: boolean;
-  election_code: any;
-  election_year: any;
+  electionCode: any;
+  electionYear: any;
+  loanAmount: any;
+  loanBalance: any;
+  loanBeginningBalance: any;
+  loanClosingBalance: any;
+  loanDueDate: any;
+  loanIncurredAmt: any;
+  loanIncurredDate: any;
+  loanPaymentAmt: any;
+  loanPaymentToDate: any;
+  reportType: any;
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
@@ -55,6 +65,18 @@ export class TransactionModel {
     this.contributorOccupation = transaction.contributorOccupation ? transaction.contributorOccupation : '';
     this.memoCode = transaction.memoCode ? transaction.memoCode : '';
     this.memoText = transaction.memoText ? transaction.memoText : '';
+    this.electionCode = transaction.electionCode ? transaction.electionCode : '';
+    this.electionYear = transaction.electionYear ? transaction.electionYear : '';
+    this.loanAmount = transaction.loanAmount ? transaction.loanAmount : '';
+    this.loanBalance = transaction.loanBalance ? transaction.loanBalance : '';
+    this.loanBeginningBalance = transaction.loanBeginningBalance ? transaction.loanBeginningBalance : '';
+    this.loanClosingBalance = transaction.loanClosingBalance ? transaction.loanClosingBalance : '';
+    this.loanDueDate = transaction.loanDueDate ? transaction.loanDueDate : '';
+    this.loanIncurredAmt = transaction.loanIncurredAmt ? transaction.loanIncurredAmt : '';
+    this.loanIncurredDate = transaction.loanIncurredDate ? transaction.loanIncurredDate : '';
+    this.loanPaymentAmt = transaction.loanPaymentAmt ? transaction.loanPaymentAmt : '';
+    this.loanPaymentToDate = transaction.loanPaymentToDate ? transaction.loanPaymentToDate : '';
+    this.reportType = transaction.reportType ? transaction.reportType : '';
     this.selected = transaction.selected;
     this.itemized = transaction.itemized;
     this.reportStatus = transaction.reportStatus;
