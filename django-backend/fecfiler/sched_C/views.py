@@ -635,13 +635,28 @@ def get_list_all_schedC(report_id, cmte_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            schedC2_list = cursor.fetchone()[0]
-            if schedC2_list is None:
+            schedC_list = cursor.fetchone()[0]
+            if schedC_list is None:
                 raise NoOPError('No sched_c1 transaction found for report_id {} and cmte_id: {}'.format(
                     report_id, cmte_id))
             merged_list = []
-            for dictC2 in schedC2_list:
-                merged_list.append(dictC2)
+            for item in schedC_list:
+                entity_id = item.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                # cand_entity = {}
+                # if item.get("beneficiary_cand_entity_id"):
+                #     cand_data = {
+                #         "entity_id": item.get("beneficiary_cand_entity_id"),
+                #         "cmte_id": cmte_id,
+                #     }
+                #     cand_entity = get_entities(cand_data)[0]
+                #     cand_entity = candify_it(cand_entity)
+
+                merged_dict = {**item, **dictEntity}
+                merged_list.append(merged_dict)
+                # merged_list.append(dictC2)
         return merged_list
     except Exception:
         raise
@@ -692,8 +707,22 @@ def get_list_schedC(report_id, cmte_id, transaction_id):
                 raise NoOPError('No sched_c transaction found for transaction_id {}'.format(
                     transaction_id))
             merged_list = []
-            for dictC in schedC_list:
-                merged_list.append(dictC)
+            for item in schedC_list:
+                entity_id = item.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                # cand_entity = {}
+                # if item.get("beneficiary_cand_entity_id"):
+                #     cand_data = {
+                #         "entity_id": item.get("beneficiary_cand_entity_id"),
+                #         "cmte_id": cmte_id,
+                #     }
+                #     cand_entity = get_entities(cand_data)[0]
+                #     cand_entity = candify_it(cand_entity)
+                merged_dict = {**item, **dictEntity}
+                merged_list.append(merged_dict)
+                # merged_list.append(dictC)
         return merged_list
     except Exception:
         raise
