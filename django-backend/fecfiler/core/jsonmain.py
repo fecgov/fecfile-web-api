@@ -288,13 +288,31 @@ def get_child_identifer(identifier, form_type):
 @api_view(["POST"])
 def create_json_builders(request):
     try:
+        print("request",request)
         MANDATORY_INPUTS = ['report_id', 'call_from']
         error_string = ""
         output = {}
         transaction_flag = False
 
         transaction_id_list = []
+
+        committeeId = request.data.get('committeeId')
+        password = request.data.get('password')
+        formType = request.data.get('formType')
+        newAmendIndicator =  request.data.get('newAmendIndicator')
+        report_id =  request.data.get('report_id')
+        reportSequence =  request.data.get('reportSequence')
+        emailAddress1 =  request.data.get('emailAddress1')
+        reportType =  request.data.get('reportType')
+        coverageStartDate =  request.data.get('coverageStartDate')
+        coverageEndDate =  request.data.get('coverageEndDate')
+        originalFECId =  request.data.get('originalFECId')
+        backDoorCode =  request.data.get('backDoorCode')
+        emailAddress2 =  request.data.get('emailAddress2')
+        wait =  request.data.get('wait')
+
         # Handling Mandatory Inputs required
+        
         for field in MANDATORY_INPUTS:
             if field not in request.data or request.data.get(field) in [None, 'null', '', ""]:
                 error_string += ','.join(field)
@@ -302,7 +320,7 @@ def create_json_builders(request):
             raise Exception(
                 'The following inputs are mandatory for this API: ' + error_string)
         # Assiging data passed through request
-        report_id = request.data.get('report_id')
+        #report_id = request.data.get('report_id')
         call_from = request.data.get('call_from')
         cmte_id = request.user.username
         # Checking for transaction ids in the request
@@ -398,20 +416,20 @@ def create_json_builders(request):
 
         elif call_from == "Submit":
             # data_obj = request
-            data_obj = {'committeeId': request.data.get('committeeId'),
-                        'password': request.data.get('password'),
-                        'formType': request.data.get('formType'),
-                        'newAmendIndicator': request.data.get('newAmendIndicator'),
-                        'report_id': request.data.get('report_id'),
-                        'reportSequence': request.data.get('reportSequence'),
-                        'emailAddress1': request.data.get('emailAddress1'),
-                        'reportType': request.data.get('reportType'),
-                        'coverageStartDate': request.data.get('coverageStartDate'),
-                        'coverageEndDate': request.data.get('coverageEndDate'),
-                        'originalFECId': request.data.get('originalFECId'),
-                        'backDoorCode': request.data.get('backDoorCode'),
-                        'emailAddress2': request.data.get('emailAddress2'),
-                        'wait': request.data.get('wait')
+            data_obj = {'committeeId': committeeId,
+                        'password': password,
+                        'formType': formType,
+                        'newAmendIndicator': newAmendIndicator,
+                        'report_id': report_id,
+                        'reportSequence': reportSequence,
+                        'emailAddress1': emailAddress1,
+                        'reportType': reportType,
+                        'coverageStartDate': coverageStartDate,
+                        'coverageEndDate': coverageEndDate,
+                        'originalFECId': originalFECId,
+                        'backDoorCode': backDoorCode,
+                        'emailAddress2': emailAddress2,
+                        'wait': wait
                         }
             file_obj = {'fecDataFile': ('data.json', open(
                 tmp_path, 'rb'), 'application/json')}
