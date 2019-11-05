@@ -245,31 +245,31 @@ def put_sql_schedC(data):
               AND delete_ind is distinct from 'Y';
         """
     _v = (
-            data.get('transaction_type', ''),
-            data.get('transaction_type_identifier', ''),
-            data.get('entity_id', ''),
-            data.get('election_code', ''),
-            data.get('election_other_description', ''),
-            data.get('loan_amount_original', None),
-            data.get('loan_payment_to_date', None),
-            data.get('loan_amount_original', None), #adding loan_balance as loan_amount_original
-            data.get('loan_incurred_date', None),
-            data.get('loan_due_date', None), 
-            data.get('loan_intrest_rate', ''),
-            data.get('is_loan_secured', ''),
-            data.get('is_personal_funds', ''),
-            data.get('lender_cmte_id', ''),
-            data.get('lender_cand_id', ''),
-            data.get('lender_cand_last_name', ''),
-            data.get('lender_cand_first_name', ''),
-            data.get('lender_cand_middle_name', ''),
-            data.get('lender_cand_prefix', ''),
-            data.get('lender_cand_suffix', ''),
-            data.get('lender_cand_office', ''),
-            data.get('lender_cand_state', ''),
-            data.get('lender_cand_district', None),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('transaction_type'),
+            data.get('transaction_type_identifier'),
+            data.get('entity_id'),
+            data.get('election_code'),
+            data.get('election_other_description'),
+            data.get('loan_amount_original'),
+            data.get('loan_payment_to_date'),
+            data.get('loan_balance'), #adding loan_balance as loan_amount_original
+            data.get('loan_incurred_date'),
+            data.get('loan_due_date'), 
+            data.get('loan_intrest_rate'),
+            data.get('is_loan_secured'),
+            data.get('is_personal_funds'),
+            data.get('lender_cmte_id'),
+            data.get('lender_cand_id'),
+            data.get('lender_cand_last_name'),
+            data.get('lender_cand_first_name'),
+            data.get('lender_cand_middle_name'),
+            data.get('lender_cand_prefix'),
+            data.get('lender_cand_suffix'),
+            data.get('lender_cand_office'),
+            data.get('lender_cand_state'),
+            data.get('lender_cand_district'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -426,7 +426,7 @@ def post_schedC(data):
         new_transaction_id = get_next_transaction_id('SC')
         data['transaction_id'] = new_transaction_id
         # TODO: this is a temp change for new loan only. need further discussion
-        data['loan_balance'] = data['loan_amount_original']
+        # data['loan_balance'] = data['loan_amount_original']
         logger.info('validating sched_c request data...')
         validate_sc_data(data)
         try:
@@ -635,13 +635,28 @@ def get_list_all_schedC(report_id, cmte_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            schedC2_list = cursor.fetchone()[0]
-            if schedC2_list is None:
+            schedC_list = cursor.fetchone()[0]
+            if schedC_list is None:
                 raise NoOPError('No sched_c1 transaction found for report_id {} and cmte_id: {}'.format(
                     report_id, cmte_id))
             merged_list = []
-            for dictC2 in schedC2_list:
-                merged_list.append(dictC2)
+            for item in schedC_list:
+                entity_id = item.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                # cand_entity = {}
+                # if item.get("beneficiary_cand_entity_id"):
+                #     cand_data = {
+                #         "entity_id": item.get("beneficiary_cand_entity_id"),
+                #         "cmte_id": cmte_id,
+                #     }
+                #     cand_entity = get_entities(cand_data)[0]
+                #     cand_entity = candify_it(cand_entity)
+
+                merged_dict = {**item, **dictEntity}
+                merged_list.append(merged_dict)
+                # merged_list.append(dictC2)
         return merged_list
     except Exception:
         raise
@@ -692,8 +707,22 @@ def get_list_schedC(report_id, cmte_id, transaction_id):
                 raise NoOPError('No sched_c transaction found for transaction_id {}'.format(
                     transaction_id))
             merged_list = []
-            for dictC in schedC_list:
-                merged_list.append(dictC)
+            for item in schedC_list:
+                entity_id = item.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                # cand_entity = {}
+                # if item.get("beneficiary_cand_entity_id"):
+                #     cand_data = {
+                #         "entity_id": item.get("beneficiary_cand_entity_id"),
+                #         "cmte_id": cmte_id,
+                #     }
+                #     cand_entity = get_entities(cand_data)[0]
+                #     cand_entity = candify_it(cand_entity)
+                merged_dict = {**item, **dictEntity}
+                merged_list.append(merged_dict)
+                # merged_list.append(dictC)
         return merged_list
     except Exception:
         raise
