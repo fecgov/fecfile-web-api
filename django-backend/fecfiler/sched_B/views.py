@@ -33,6 +33,7 @@ from fecfiler.core.transaction_util import (
     transaction_exists,
     update_parent_purpose,
     update_sched_d_parent,
+    update_sched_c_parent,
 )
 
 logger = logging.getLogger(__name__)
@@ -102,6 +103,7 @@ SCHED_L_B_TRAN_TYPES = [
 ]
 
 SCHED_D_CHILD_LIST = ['OTH_DISB_DEBT', 'OPEXP_DEBT']
+SCHED_C_CHILD_LIST = ['LOAN_REPAY_MADE']
 
 # adding election_year field needed by front end
 REQT_ELECTION_YR = ""
@@ -714,6 +716,12 @@ def post_schedB(datum):
                     datum.get('back_ref_transaction_id'),
                     datum.get('expenditure_amount')
                     )
+            if datum.get('transaction_type_identifier') in SCHED_C_CHILD_LIST:
+                update_sched_c_parent(
+                    datum.get('cmte_id'),
+                    datum.get('back_ref_transaction_id'),
+                    datum.get('expenditure_amount')
+                )
         except Exception as e:
             if "entity_id" in datum:
                 entity_data = put_entities(prev_entity_list[0])
