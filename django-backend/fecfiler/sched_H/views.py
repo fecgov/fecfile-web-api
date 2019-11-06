@@ -1022,6 +1022,8 @@ def get_h2_summary_table(request):
     h2 report goes with h4, not h2 report_id
 
     update: all h2 items with current report_id need to show up
+    added report 0 items (this is a temp update - 
+    TODO: need to remove report 0 items later on)
     """
     logger.debug('get_h2_summary_table with request:{}'.format(request.query_params))
     _sql = """
@@ -1053,6 +1055,17 @@ def get_h2_summary_table(request):
         non_federal_percent 
     FROM   public.sched_h2 
     WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
+    UNION SELECT activity_event_name, 
+        ( CASE fundraising 
+            WHEN true THEN 'fundraising' 
+            ELSE 'direct_cand_suppot' 
+            END )  AS event_type, 
+        DATE(create_date) AS date, 
+        ratio_code, 
+        federal_percent, 
+        non_federal_percent 
+    FROM   public.sched_h2 
+    WHERE  cmte_id = %s AND report_id = 0 AND delete_ind is distinct from 'Y'
             ) t;
     """
     try:
@@ -1061,7 +1074,7 @@ def get_h2_summary_table(request):
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
             logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-            cursor.execute(_sql, (cmte_id, report_id, cmte_id, cmte_id, report_id))
+            cursor.execute(_sql, (cmte_id, report_id, cmte_id, cmte_id, report_id, cmte_id))
             json_res = cursor.fetchone()[0]
             print(json_res)
             if not json_res:
@@ -1535,6 +1548,9 @@ def delete_schedH3(data):
 
 @api_view(['GET'])
 def get_sched_h3_breakdown(request):
+    """
+    get h3 breakdown values for each event type and sum of all event types
+    """
     _sql = """
     SELECT json_agg(t) FROM(
     SELECT activity_event_type, sum(total_amount_transferred) 
