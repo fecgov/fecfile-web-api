@@ -1683,54 +1683,7 @@ def get_h3_summary(request):
                     _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'])
                 else:
                     pass
-            # return _sum
             return Response( _sum, status = status.HTTP_200_OK)
-
-        # logger.debug('get_h3_summary with request:{}'.format(request.query_params))
-        # if 'activity_event_name' in request.query_params: 
-        #     event_name = request.query_params.get('activity_event_name') 
-        #     _sql = """
-        #     SELECT json_agg(t) from(
-        #     SELECT total_amount_transferred
-        #     FROM   public.sched_h3 
-        #     WHERE  cmte_id = %s
-        #         AND activity_event_name = %s
-        #     ORDER BY receipt_date desc, create_date desc) t
-        #     """
-        #     with connection.cursor() as cursor:
-        #         logger.debug('query with _sql:{}'.format(_sql))
-        #         # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-        #         cursor.execute(_sql, (cmte_id, event_name))
-        #         json_res = cursor.fetchone()[0]
-        # else:
-        #     event_type = request.query_params.get('activity_event_type') 
-        #     if not event_type:
-        #         raise Exception("event name or event type is required for this api")
-        #     _sql = """
-        #     SELECT json_agg(t) from(
-        #     SELECT total_amount_transferred
-        #     FROM   public.sched_h3 
-        #     WHERE  cmte_id = %s
-        #         AND activity_event_type = %s
-        #     ORDER BY receipt_date desc, create_date desc) t
-        #     """ 
-        #     with connection.cursor() as cursor:
-        #         logger.debug('query with _sql:{}'.format(_sql))
-        #         # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-        #         cursor.execute(_sql, (cmte_id, event_type))
-        #         json_res = cursor.fetchone()[0]
-        
-        #     # print(json_res)
-        # if not json_res:
-        #     return Response(
-                # {
-                #     "total_amount_transferred": 0
-                # }, 
-                #     status = status.HTTP_200_OK)
-        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
-        # start_dt = datetime.date(int(calendar_year), 1, 1)
-        # end_dt = datetime.date(int(calendar_year), 12, 31)
-        # return Response( json_res[0], status = status.HTTP_200_OK)
     except:
         raise 
 
@@ -1745,21 +1698,23 @@ def get_h3_total_amount(request):
     """
     try:
         cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
         logger.debug('get_h3_total_amount with request:{}'.format(request.query_params))
         if 'activity_event_name' in request.query_params: 
             event_name = request.query_params.get('activity_event_name') 
             _sql = """
             SELECT json_agg(t) from(
-            SELECT total_amount_transferred
+            SELECT sum(transferred_amount) as aggregate_amount
             FROM   public.sched_h3 
             WHERE  cmte_id = %s
-                AND activity_event_name = %s
-            ORDER BY receipt_date desc, create_date desc) t
+                AND report_id = %s
+                    AND activity_event_name = %s
+            ) t
             """
             with connection.cursor() as cursor:
                 logger.debug('query with _sql:{}'.format(_sql))
                 # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-                cursor.execute(_sql, (cmte_id, event_name))
+                cursor.execute(_sql, (cmte_id, report_id, event_name))
                 json_res = cursor.fetchone()[0]
         else:
             event_type = request.query_params.get('activity_event_type') 
@@ -1767,16 +1722,17 @@ def get_h3_total_amount(request):
                 raise Exception("event name or event type is required for this api")
             _sql = """
             SELECT json_agg(t) from(
-            SELECT total_amount_transferred
+            SELECT sum(transferred_amount) as aggregate_amount
             FROM   public.sched_h3 
             WHERE  cmte_id = %s
+            AND report_id = %s
                 AND activity_event_type = %s
-            ORDER BY receipt_date desc, create_date desc) t
+            ) t
             """ 
             with connection.cursor() as cursor:
                 logger.debug('query with _sql:{}'.format(_sql))
                 # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-                cursor.execute(_sql, (cmte_id, event_type))
+                cursor.execute(_sql, (cmte_id, report_id, event_type))
                 json_res = cursor.fetchone()[0]
         
             # print(json_res)
