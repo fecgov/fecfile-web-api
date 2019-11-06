@@ -1797,7 +1797,6 @@ def schedC2_sql_dict(data):
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
         return datum
-
     except:
         raise Exception('invalid request data.')
 

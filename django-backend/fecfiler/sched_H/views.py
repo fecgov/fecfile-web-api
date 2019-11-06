@@ -1390,13 +1390,17 @@ def get_schedH3(data):
             forms_obj = get_list_schedH3(report_id, cmte_id, transaction_id)
             for _obj in forms_obj:
                 child_list = get_child_schedH3(transaction_id, report_id, cmte_id)
-                _obj['child'] = child_list
+                if child_list:
+                    _obj['child'] = child_list
         else:
             forms_obj = get_list_all_schedH3(report_id, cmte_id)
+            print('---')
+            print(forms_obj)
             for _obj in forms_obj:
                 transaction_id = _obj.get('transaction_id')
                 child_list = get_child_schedH3(transaction_id, report_id, cmte_id)
-                _obj['child'] = child_list
+                if child_list:
+                    _obj['child'] = child_list
         return forms_obj
     except:
         raise
@@ -1434,9 +1438,9 @@ def get_child_schedH3(transaction_id, report_id, cmte_id):
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
             schedH3_list = cursor.fetchone()[0]
-            if schedH3_list is None:
-                raise NoOPError('No sched_H3 transaction found for report_id {} and cmte_id: {}'.format(
-                    report_id, cmte_id))
+            # if schedH3_list is None:
+            #     raise NoOPError('No sched_H3 transaction found for report_id {} and cmte_id: {}'.format(
+            #         report_id, cmte_id))
             # merged_list = []
             # for dictH3 in schedH3_list:
             #     merged_list.append(dictH3)
@@ -1472,14 +1476,19 @@ def get_list_all_schedH3(report_id, cmte_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            schedH3_list = cursor.fetchone()[0]
-            if schedH3_list is None:
-                raise NoOPError('No sched_H3 transaction found for report_id {} and cmte_id: {}'.format(
-                    report_id, cmte_id))
-            merged_list = []
-            for dictH3 in schedH3_list:
-                merged_list.append(dictH3)
-        return merged_list
+            print(_sql)
+            # cursor.execute(_sql)
+            return cursor.fetchone()[0]
+            
+        #     print(schedH3_list)
+        #     if schedH3_list:
+        #     # if not schedH3_list:
+        #         raise NoOPError('No sched_H3 transaction found for report_id {} and cmte_id: {}'.format(
+        #             report_id, cmte_id))
+        #     merged_list = []
+        #     for dictH3 in schedH3_list:
+        #         merged_list.append(dictH3)
+        # return merged_list
     except Exception:
         raise
 
