@@ -1591,6 +1591,149 @@ def get_sched_h3_breakdown(request):
     except Exception as e:
         raise Exception('Error on fetching h3 break down')
         
+def load_h3_aggregate_amount(cmte_id, report_id):
+    """
+    query and caclcualte event_type or event_name based on aggregate amount 
+    for current report
+    """
+
+    aggregate_dic = {}
+    _sql = """
+    SELECT json_agg(t) FROM(
+            SELECT activity_event_name as event, 
+                   SUM(transferred_amount) as sum
+            FROM   public.sched_h3 
+            WHERE  cmte_id = %s
+                AND report_id = %s
+            GROUP BY activity_event_name
+            UNION
+            SELECT activity_event_type as event, 
+                   SUM(transferred_amount) as sum
+            FROM   public.sched_h3 
+            WHERE  cmte_id = %s
+                AND report_id = %s
+            GROUP BY activity_event_type
+            ) t
+    """.format(cmte_id, report_id, cmte_id, report_id)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
+            # cursor.execute(_sql)
+            for _rec in cursor.fetchone()[0]:
+                aggregate_dic[_rec['event']] = _rec['sum']
+        return aggregate_dic
+    except:
+        raise
+            
+
+
+
+@api_view(['GET'])
+def get_h3_summary(request):
+    """
+    get h3 summary for enabling summary page
+    if a event_name is provided, will get the aggreaget amount based on event_name
+    if no name provided, will get the aggregate amount based on event type
+    1. load all child items only
+    2. add aggregate amount
+    3. report_id based.
+
+    # TODO: what is gonna happen when people click edit button? 
+    """
+    try:
+        
+
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
+
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            transaction_type_identifier,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            account_name,
+            activity_event_type,
+            activity_event_name,
+            receipt_date,
+            total_amount_transferred,
+            transferred_amount,
+            memo_code,
+            memo_text,
+            delete_ind,
+            create_date ,
+            last_update_date
+            FROM public.sched_h3
+            WHERE report_id = %s AND cmte_id = %s
+            AND back_ref_transaction_id is not null
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id))
+            # print(_sql)
+            # cursor.execute(_sql)
+            _sum = cursor.fetchone()[0] 
+            for _rec in _sum:
+                if _rec['activity_event_name']:
+                    _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'])
+                elif _rec['activity_event_type']:
+                    _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'])
+                else:
+                    pass
+            # return _sum
+            return Response( _sum, status = status.HTTP_200_OK)
+
+        # logger.debug('get_h3_summary with request:{}'.format(request.query_params))
+        # if 'activity_event_name' in request.query_params: 
+        #     event_name = request.query_params.get('activity_event_name') 
+        #     _sql = """
+        #     SELECT json_agg(t) from(
+        #     SELECT total_amount_transferred
+        #     FROM   public.sched_h3 
+        #     WHERE  cmte_id = %s
+        #         AND activity_event_name = %s
+        #     ORDER BY receipt_date desc, create_date desc) t
+        #     """
+        #     with connection.cursor() as cursor:
+        #         logger.debug('query with _sql:{}'.format(_sql))
+        #         # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+        #         cursor.execute(_sql, (cmte_id, event_name))
+        #         json_res = cursor.fetchone()[0]
+        # else:
+        #     event_type = request.query_params.get('activity_event_type') 
+        #     if not event_type:
+        #         raise Exception("event name or event type is required for this api")
+        #     _sql = """
+        #     SELECT json_agg(t) from(
+        #     SELECT total_amount_transferred
+        #     FROM   public.sched_h3 
+        #     WHERE  cmte_id = %s
+        #         AND activity_event_type = %s
+        #     ORDER BY receipt_date desc, create_date desc) t
+        #     """ 
+        #     with connection.cursor() as cursor:
+        #         logger.debug('query with _sql:{}'.format(_sql))
+        #         # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+        #         cursor.execute(_sql, (cmte_id, event_type))
+        #         json_res = cursor.fetchone()[0]
+        
+        #     # print(json_res)
+        # if not json_res:
+        #     return Response(
+                # {
+                #     "total_amount_transferred": 0
+                # }, 
+                #     status = status.HTTP_200_OK)
+        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
+        # return Response( json_res[0], status = status.HTTP_200_OK)
+    except:
+        raise 
+
 
 @api_view(['GET'])
 def get_h3_total_amount(request):
@@ -1598,6 +1741,7 @@ def get_h3_total_amount(request):
     get h3 total_amount for editing purpose
     if a event_name is provided, will get the total amount based on event name
     if a event_type is provided, will get the total amount based on event type
+    # TODO: this api need to be updated to calcuate a aggreaget amount
     """
     try:
         cmte_id = request.user.username
