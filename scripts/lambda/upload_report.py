@@ -48,7 +48,16 @@ def add_log(reportid,
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                                     [reportid, cmte_id, process_name, message_type, message_text, response_json, error_code, error_json, app_error, host_name])
     _conn.commit()
-    
+
+def date_format(pdate):
+    try:
+        if pdate == None or pdate in ["none", "null", " ", ""]:
+            return None
+        pdate = datetime.datetime.strptime(pdate, '%m/%d/%Y').date()
+        return pdate
+    except:
+        raise
+
 def get_reports_to_upload():
     """ query data from the vendors table """
     try:
@@ -92,7 +101,24 @@ def get_reports_to_upload():
             #Processing F3X reports
             # pick reports with status = Uploaded
             
-            cur.execute("""SELECT cmte_id, report_id, form_type 
+            cur.execute("""SELECT cmte_id, 
+                                report_id,
+                                form_type,
+                                amend_ind,
+                                amend_number,
+                                cmte_id,
+                                report_type,
+                                cvg_start_date,
+                                cvg_end_date,
+                                fec_id,
+                                fec_accepted_date,
+                                fec_status,
+                                email_1,
+                                email_2,
+                                additional_email_1,
+                                additional_email_2,
+                                report_seq
+
                         FROM   public.reports 
                         WHERE  status = 'Uploaded' 
                         ORDER BY last_update_date asc""")
@@ -172,8 +198,20 @@ def get_reports_to_upload():
                         # call create_json_builders which internally call Data Reciever API
 
                         data_obj = {
-                                    'committeeId':data_row[0],
-                                    'report_id':data_row[1],
+                                   'committeeId': data_row[0],
+                                    'password': 'test',
+                                    'formType': data_row[2],
+                                    'newAmendIndicator': data_row[3],
+                                    'report_id': data_row[1],
+                                    'reportSequence': data_row[16],
+                                    'emailAddress1': data_row[12],
+                                    'reportType': data_row[6],
+                                    'coverageStartDate': data_row[7],
+                                    'coverageEndDate': data_row[8],
+                                    'originalFECId': data_row[9],
+                                    'backDoorCode': '',
+                                    'emailAddress2': data_row[13],
+                                    'wait': 'False',
                                     'call_from':'Submit'
                                    }
 
@@ -194,7 +232,7 @@ def get_reports_to_upload():
                                         data_row[0],  
                                         4,
                                         "F3X create_json_builders call with data_obj ", 
-                                        resp.json(),
+                                        json.loads(resp),
                                         '',
                                         '', 
                                         '', 
@@ -209,13 +247,13 @@ def get_reports_to_upload():
                                         data_row[0],  
                                         4,
                                         "create_json_builders operation successful ", 
-                                        json.dumps(successresp),
+                                        json.loads(resp),
                                         '',
                                         '', 
                                         '', 
                                     )  
 
-                            if successresp["result"]["status"].encode('utf-8')=='PROCESSING':
+                            if successresp["result"]["status"]=='PROCESSING':
                                 # update submission_id in report table 
                                 cur.execute("""UPDATE public.reports 
                                                 SET submission_id = %s, 
@@ -230,7 +268,7 @@ def get_reports_to_upload():
                                         data_row[0],  
                                         4,
                                         "create_json_builders operation successful with submission_id ", 
-                                        json.dumps(successresp), 
+                                        json.loads(resp), 
                                         '',
                                         '', 
                                         '' 
@@ -245,7 +283,7 @@ def get_reports_to_upload():
                                 data_row[0], 
                                 4,
                                 "create_json_builders operation failed with submission_id ",
-                                resp.json(),
+                                json.loads(resp),
                                 '',
                                 '', 
                                 ''
@@ -259,7 +297,7 @@ def get_reports_to_upload():
                                         data_row[0],  
                                         4,
                                         "create_json_builders operation failed with submission_id ", 
-                                        resp.json(), 
+                                        json.loads(resp),
                                         '',
                                         '', 
                                         '' )
@@ -303,7 +341,7 @@ def get_reports_to_upload():
                                     data_row[0],  
                                     4,
                                     "F99 create_json_builders operation successful with submission_id "+ resp['result']['submissionId'], 
-                                    successresp, 
+                                    json.dumps(resp.json()),
                                     '',
                                     '', 
                                     '' )     
