@@ -93,7 +93,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private _transactionTypePrevious: string = null;
   private _contributionAggregateValue = 0.0;
   private _selectedEntity: any;
-  private _contributionAmountMax: number;
+  private _contributionAmountMax = 12;
   //private entityType: string = 'IND';
   private readonly _childFieldNamePrefix = 'child*';
   private _loanToEdit: LoanModel;
