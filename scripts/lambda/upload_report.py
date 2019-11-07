@@ -48,7 +48,16 @@ def add_log(reportid,
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                                     [reportid, cmte_id, process_name, message_type, message_text, response_json, error_code, error_json, app_error, host_name])
     _conn.commit()
-    
+
+def date_format(pdate):
+    try:
+        if pdate == None or pdate in ["none", "null", " ", ""]:
+            return None
+        pdate = datetime.datetime.strptime(pdate, '%m/%d/%Y').date()
+        return pdate
+    except:
+        raise
+
 def get_reports_to_upload():
     """ query data from the vendors table """
     try:
@@ -223,7 +232,7 @@ def get_reports_to_upload():
                                         data_row[0],  
                                         4,
                                         "F3X create_json_builders call with data_obj ", 
-                                        resp.json(),
+                                        json.dumps(resp.json()),
                                         '',
                                         '', 
                                         '', 
@@ -274,7 +283,7 @@ def get_reports_to_upload():
                                 data_row[0], 
                                 4,
                                 "create_json_builders operation failed with submission_id ",
-                                resp.json(),
+                                json.dumps(resp.json()),
                                 '',
                                 '', 
                                 ''
@@ -288,7 +297,7 @@ def get_reports_to_upload():
                                         data_row[0],  
                                         4,
                                         "create_json_builders operation failed with submission_id ", 
-                                        resp.json(), 
+                                        json.dumps(resp.json()),
                                         '',
                                         '', 
                                         '' )
@@ -332,7 +341,7 @@ def get_reports_to_upload():
                                     data_row[0],  
                                     4,
                                     "F99 create_json_builders operation successful with submission_id "+ resp['result']['submissionId'], 
-                                    successresp, 
+                                    json.dumps(resp.json()),
                                     '',
                                     '', 
                                     '' )     
