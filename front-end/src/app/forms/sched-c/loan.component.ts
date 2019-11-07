@@ -1,3 +1,4 @@
+import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
 import {
   Component,
   EventEmitter,
@@ -254,7 +255,11 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           }
         } else if (validation === 'max') {
           if (validators[validation] !== null) {
-            formValidators.push(Validators.maxLength(validators[validation]));
+            if( fieldName === 'loan_amount_original'){
+              formValidators.push(validateAmount());
+            }else{
+              formValidators.push(Validators.maxLength(validators[validation]));
+            }
           }
         }
       }
@@ -284,6 +289,72 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         e.target.value = e.target.value.substring(0, e.target.value.length - 1);
       }
     }
+  }
+
+  /**
+   * Updates the contribution aggregate field once contribution ammount is entered.
+   *
+   * @param      {Object}  e         The event object.
+   * @param      {string}  fieldName The name of the field
+   */
+  public contributionAmountChange(e: any, fieldName: string, negativeAmount: boolean): void {
+    // const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    let contributionAmount: string = e.target.value;
+
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+
+    // determine if negative, truncate if > max
+    // contributionAmount = this._transformAmount(contributionAmount, this._contributionAmountMax);
+
+    // let contributionAggregate: string = null;
+    // if (isChildForm) {
+    //   this._contributionAmountChlid = contributionAmount;
+    //   contributionAggregate = String(this._contributionAggregateValueChild);
+    // } else {
+    //   this._contributionAmount = contributionAmount;
+    //   contributionAggregate = String(this._contributionAggregateValue);
+    // }
+
+    let contributionAmountNum = parseFloat(contributionAmount);
+    // Amount is converted to negative for Return / Void / Bounced
+    if (negativeAmount) {
+      contributionAmountNum = -Math.abs(contributionAmountNum);
+      // this._contributionAmount = String(contributionAmountNum);
+    }
+
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
+
+      if(this.frmLoan.get('loan_amount_original')) {
+        this.frmLoan.patchValue({ loan_amount_original: amountValue }, { onlySelf: true });
+      } 
+      // else if(this.frmLoan.get('contribution_amount')){
+      //   this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
+      // }
+    // let transactionDate = null;
+    // if (this.frmIndividualReceipt.get('contribution_date')) {
+    //   transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
+    // }
+    // const aggregateValue: string = this._receiptService.determineAggregate(
+    //   this._contributionAggregateValue,
+    //   contributionAmountNum,
+    //   this.scheduleAction,
+    //   this.memoCode,
+    //   this._selectedEntity,
+    //   this._transactionToEdit,
+    //   this.transactionType,
+    //   this._isSubOfParent(),
+    //   transactionDate
+    // );
+
+    // if (isChildForm) {
+    //   this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': aggregateValue }, { onlySelf: true });
+    // } else {
+    //   this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+    // }
   }
 
   private formatAmountForAPI(contributionAmount): string {
@@ -580,25 +651,25 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public electionTypeChanged(electionOption: any, col: any) {
-    console.log();
-    if (!electionOption.code) {
-      return;
-    }
+    // console.log();
+    // if (!electionOption.code) {
+    //   return;
+    // }
 
-    // Election Other Description is required when Election is Other.
-    const electionControl = this.frmLoan.get('election_other_description');
+    // // Election Other Description is required when Election is Other.
+    // const electionControl = this.frmLoan.get('election_other_description');
 
-    if (electionOption.code === 'O') {
-      // TODO need to store validations for election other desc in a class variable
-      // or programatically rebuild from the dynamic form call otherwise they
-      // will need to be manually added here as they are now.
-      // FormControl validations can't be amended, they must be reset completely.
-      electionControl.setValidators([Validators.required, Validators.maxLength(20)]);
-      electionControl.updateValueAndValidity();
-    } else {
-      electionControl.setValidators([Validators.maxLength(20)]);
-      electionControl.updateValueAndValidity();
-    }
+    // if (electionOption.code === 'O') {
+    //   // TODO need to store validations for election other desc in a class variable
+    //   // or programatically rebuild from the dynamic form call otherwise they
+    //   // will need to be manually added here as they are now.
+    //   // FormControl validations can't be amended, they must be reset completely.
+    //   electionControl.setValidators([Validators.required, Validators.maxLength(20)]);
+    //   electionControl.updateValueAndValidity();
+    // } else {
+    //   electionControl.setValidators([Validators.maxLength(20)]);
+    //   electionControl.updateValueAndValidity();
+    // }
   }
 
   /**
@@ -1245,7 +1316,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
   public saveLoan(): void {
     if (this.entityType === 'IND') {
-      this.doValidateLoan();
+      this.doValidateLoan('loanSummary');
     } else if (this.entityType === 'ORG') {
       const c1EmitObj: any = {
         form: {},
@@ -1256,15 +1327,19 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         action: ScheduleActions.add,
       };
       this.status.emit(c1EmitObj);
-      // this._router.navigate([`/forms/form/${this._formType}`], {
-      //   queryParams: { step: 'step_3' }
-      // });
     }
   }
 
-   public loanRepayment(): void {
-    // this.doValidateLoan(); //is this needed ZS-TODO - smahal, I think yes.  Most likely need to validate
-    // loan before allowing a payment on it.
+
+  public onSaveLoan(loanRepaymentRoute = false): void{
+    if(loanRepaymentRoute){
+      this.doValidateLoan('loanRepayment');
+    }else{
+      this.saveLoan();
+    }
+  }
+
+  private _goToLoanRepayment() {
     const loanRepaymentEmitObj: any = {
       form: {},
       direction: 'next',
@@ -1274,13 +1349,6 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       action: ScheduleActions.add,
     };
     this.status.emit(loanRepaymentEmitObj);
-
-
-    // console.log("Loading loan repayment form");
-    // let reportId = this._receiptService.getReportIdFromStorage(this._formType);
-    // this._router.navigate([`/forms/form/${this._formType}`], {
-    //   queryParams: { step: 'loanpayment', reportId: reportId }
-    // });
   }
 
   public AddLoanEndorser(): void {}
@@ -1292,7 +1360,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   /**
    * Vaidates the form on submit.
    */
-  public doValidateLoan() {
+  public doValidateLoan(nextScreen:string) {
     if (this.frmLoan.valid) {
       const LoanObj: any = {};
 
@@ -1356,7 +1424,11 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
             //window.scrollTo(0, 0);
 
             this._clearFormValues();
-            this._gotoSummary();
+            if(nextScreen === 'loanSummary'){
+              this._gotoSummary();
+            }else if(nextScreen === 'loanRepayment'){
+              this._goToLoanRepayment();
+            }
           }
         });
     } else {

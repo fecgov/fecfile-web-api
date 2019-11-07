@@ -130,6 +130,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   private columnOptionCount = 0;
   private maxColumnOption = 5;
   private allLoanSelected: boolean;
+  private currentPageNumber: number = 1;
 
   constructor(
     private _LoanService: LoanService,
@@ -159,8 +160,8 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     const paginateConfig: PaginationInstance = {
       id: 'forms__ctn-table-pagination',
-      itemsPerPage: this.maxItemsPerPage,
-      currentPage: 1
+      itemsPerPage: 10,
+      currentPage: this.currentPageNumber
     };
     this.config = paginateConfig;
     // this.config.currentPage = 1;
@@ -179,6 +180,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.getPage(this.config.currentPage);
   }
 
+  public goToPage(pageEvent: any){
+    console.log(pageEvent);
+    this.currentPageNumber = pageEvent;
+  }
 
   /**
    * A method to run when component is destroyed.
@@ -366,10 +371,12 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 	 */
   public changeSortDirection(colName: string): void {
     this.currentSortedColumnName = this._tableService.changeSortDirection(colName, this.sortableColumns);
+    const direction = this._tableService.getBinarySortDirection(colName, this.sortableColumns);
 
     // TODO this could be done client side or server side.
     // call server for page data in new direction
-    this.getPage(this.config.currentPage);
+    // this.getPage(this.config.currentPage);
+    this.LoanModel = this._LoanService.sortLoan(this.LoanModel, this.currentSortedColumnName, direction);
   }
 
 
