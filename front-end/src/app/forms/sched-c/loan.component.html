@@ -81,7 +81,7 @@
                       [attr.value]="col?.value"
                       [maxlength]="col?.name === 'contribution_amount' ? col?.validation?.max + 5: col?.validation?.max"
                       [formControlName]="col?.name"
-                      (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
+                      (blur)="handleOnBlurEvent($event, col)"
                       [ngClass]="
                         frmLoan.get(col?.name)?.invalid &&
                         (frmLoan.touched || frmLoan.dirty)

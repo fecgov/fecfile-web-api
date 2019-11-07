@@ -1549,6 +1549,64 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     return null;
   }
 
+  public handleOnBlurEvent($event: any, col: any) {
+    if (this.isFieldName(col.name, 'loan_amount_original')) {
+      this._formatAmount($event, col.name, col.validation.dollarAmountNegative);
+    }
+  }
+
+  // These 2 methods are duplicated from AbstractSchedule and should be made as shared utility
+  // methods.
+
+  private _formatAmount(e: any, fieldName: string, negativeAmount: boolean) {
+    let contributionAmount: string = e.target.value;
+
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+
+    // determine if negative, truncate if > max
+    contributionAmount = this._transformAmount(contributionAmount, this._contributionAmountMax);
+
+    let contributionAmountNum = parseFloat(contributionAmount);
+    // Amount is converted to negative for Return / Void / Bounced
+    if (negativeAmount) {
+      contributionAmountNum = -Math.abs(contributionAmountNum);
+      // this._contributionAmount = String(contributionAmountNum);
+    }
+
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
+    const patch = {};
+    patch[fieldName] = amountValue;
+    this.frmLoan.patchValue(patch, { onlySelf: true });
+  }
+
+  /**
+   * Allow for negative sign and don't allow more than the max
+   * number of digits.
+   */
+  private _transformAmount(amount: string, max: number): string {
+    if (!amount) {
+      return amount;
+    } else if (amount.length > 0 && amount.length <= max) {
+      return amount;
+    } else {
+      // Need to handle negative sign, decimal and max digits
+      if (amount.substring(0, 1) === '-') {
+        if (amount.length === max || amount.length === max + 1) {
+          return amount;
+        } else {
+          return amount.substring(0, max + 2);
+        }
+      } else {
+        const result = amount.substring(0, max + 1);
+        return result;
+      }
+    }
+  }
+
     /**
    * Navigate to the Transactions.
    */
