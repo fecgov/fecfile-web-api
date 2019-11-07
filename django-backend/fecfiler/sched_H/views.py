@@ -1773,11 +1773,11 @@ def schedH3(request):
                 data = put_schedH3(datum)
                 if 'child' in request.data:
                     for _c in request.data['child']:
-                        parent_data = data 
-                        _c.update(parent_data)
-                        _c['back_ref_transaction_id'] = parent_data['transaction_id']
-                        _c = schedH3_sql_dict(request.data)
-                        put_schedH3(_c) 
+                        child_data = data 
+                        child_data.update(_c)
+                        child_data['back_ref_transaction_id'] = parent_data['transaction_id']
+                        child_data = schedH3_sql_dict(child_data)
+                        put_schedH3(child_data) 
             else:
                 # print(datum)
                 logger.debug('saving h3 with data {}'.format(datum))
@@ -2759,7 +2759,7 @@ def post_schedH5(data):
     try:
         # check_mandatory_fields_SH5(datum, MANDATORY_FIELDS_SCHED_H5)
         data['transaction_id'] = get_next_transaction_id('SH5')
-        print(data)
+        # print(data)
         validate_sh5_data(data)
         try:
             post_sql_schedH5(data)
@@ -2973,7 +2973,7 @@ def get_sched_h5_breakdown(request):
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH5(request):
-    
+
     if request.method == 'POST':
         try:
             cmte_id = request.user.username
@@ -2993,9 +2993,25 @@ def schedH5(request):
                 datum['transaction_id'] = check_transaction_id(
                     request.data.get('transaction_id'))
                 data = put_schedH5(datum)
+                if 'child' in request.data:
+                    for _c in request.data['child']:
+                        child_data = data 
+                        child_data.update(_c)
+                        child_data['back_ref_transaction_id'] = data['transaction_id']
+                        child_data = schedH5_sql_dict(child_data)
+                        logger.debug('saving child transaction with data {}'.format(child_data))
+                        put_schedH5(child_data) 
             else:
                 print(datum)
                 data = post_schedH5(datum)
+                if 'child' in request.data:
+                    for _c in request.data['child']:
+                        child_data = data 
+                        child_data.update(_c)
+                        child_data['back_ref_transaction_id'] = data['transaction_id']
+                        child_data = schedH5_sql_dict(child_data)
+                        logger.debug('saving child transaction with data {}'.format(child_data))
+                        post_schedH5(child_data) 
             # Associating child transactions to parent and storing them to DB
 
             output = get_schedH5(data)
@@ -3073,6 +3089,14 @@ def schedH5(request):
             #     output = get_schedB(data)
             # else:
             data = put_schedH5(datum)
+            if 'child' in request.data:
+                for _c in request.data['child']:
+                    child_data = data 
+                    child_data.update(_c)
+                    child_data['back_ref_transaction_id'] = data['transaction_id']
+                    child_data = schedH5_sql_dict(child_data)
+                    logger.debug('saving child transaction with data {}'.format(child_data))
+                    put_schedH5(child_data) 
             # output = get_schedA(data)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
         except Exception as e:
