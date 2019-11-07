@@ -77,11 +77,11 @@
                       [style.height]="col?.height"
                       [attr.type]="col?.type"
                       [attr.name]="col?.name"                      
-                      [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
+                      [attr.readonly]="isFieldReadOnly(col)"
                       [attr.value]="col?.value"
                       [maxlength]="col?.name === 'contribution_amount' ? col?.validation?.max + 5: col?.validation?.max"
                       [formControlName]="col?.name"
-                      (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
+                      (blur)="handleOnBlurEvent($event, col)"
                       [ngClass]="
                         frmLoan.get(col?.name)?.invalid &&
                         (frmLoan.touched || frmLoan.dirty)
@@ -358,6 +358,7 @@
                 </ng-select>
               </ng-container>           
 
+              <!-- needed for F3P but not F3X -->
               <ng-container *ngIf="col?.type === 'select' && col?.name === 'election_code'">
                 <ng-select #electioncodeSelect
                   id="election"
