@@ -92,7 +92,24 @@ def get_reports_to_upload():
             #Processing F3X reports
             # pick reports with status = Uploaded
             
-            cur.execute("""SELECT cmte_id, report_id, form_type 
+            cur.execute("""SELECT cmte_id, 
+                                report_id,
+                                form_type,
+                                amend_ind,
+                                amend_number,
+                                cmte_id,
+                                report_type,
+                                cvg_start_date,
+                                cvg_end_date,
+                                fec_id,
+                                fec_accepted_date,
+                                fec_status,
+                                email_1,
+                                email_2,
+                                additional_email_1,
+                                additional_email_2,
+                                report_seq
+
                         FROM   public.reports 
                         WHERE  status = 'Uploaded' 
                         ORDER BY last_update_date asc""")
@@ -172,8 +189,20 @@ def get_reports_to_upload():
                         # call create_json_builders which internally call Data Reciever API
 
                         data_obj = {
-                                    'committeeId':data_row[0],
-                                    'report_id':data_row[1],
+                                   'committeeId': data_row[0],
+                                    'password': 'test',
+                                    'formType': data_row[2],
+                                    'newAmendIndicator': data_row[3],
+                                    'report_id': data_row[1],
+                                    'reportSequence': data_row[16],
+                                    'emailAddress1': data_row[12],
+                                    'reportType': data_row[6],
+                                    'coverageStartDate': data_row[7],
+                                    'coverageEndDate': data_row[8],
+                                    'originalFECId': data_row[9],
+                                    'backDoorCode': '',
+                                    'emailAddress2': data_row[13],
+                                    'wait': 'False',
                                     'call_from':'Submit'
                                    }
 
@@ -215,7 +244,7 @@ def get_reports_to_upload():
                                         '', 
                                     )  
 
-                            if successresp["result"]["status"].encode('utf-8')=='PROCESSING':
+                            if successresp["result"]["status"]=='PROCESSING':
                                 # update submission_id in report table 
                                 cur.execute("""UPDATE public.reports 
                                                 SET submission_id = %s, 
