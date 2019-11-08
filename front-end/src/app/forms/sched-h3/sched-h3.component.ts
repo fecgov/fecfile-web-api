@@ -388,6 +388,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     formObj['transaction_type_identifier'] = 'TRAN_FROM_NON_FED_ACC';
     formObj['activity_event_type'] = this.schedH3.get('category').value;
 
+    delete formObj.total_amount_transferred;
+
     if(this.schedH3.status === 'VALID') {     
       this.h3Entries.push(formObj);
       this.h3EntryTableConfig.totalItems = this.h3Entries.length;
