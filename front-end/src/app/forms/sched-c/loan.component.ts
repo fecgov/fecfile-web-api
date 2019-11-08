@@ -1,3 +1,5 @@
+import { ContributionDateValidator } from './../../shared/utils/forms/validation/contribution-date.validator';
+import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
 import {
   Component,
   EventEmitter,
@@ -101,6 +103,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private _selectedChangeWarn: any;
   private _transactionTypeIdentifier: string;
   private _transactionCategory: string;
+  private cvgStartDate: string;
+  private cvgEndDate: string;
+  private currentLoanData: any;
 
   constructor(
     private _http: HttpClient,
@@ -118,6 +123,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     private _receiptService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _transactionsMessageService: TransactionsMessageService,
+    private _contributionDateValidator: ContributionDateValidator
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -135,6 +141,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
+
     this._selectedEntity = null;
     this._loanToEdit = null;
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -161,9 +168,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
+
+    //TODO - ZS . Check! at this point the frmLoan is not set so this doesnt do anything. 
     if (this.scheduleAction === ScheduleActions.edit) {
       this._prePopulateFormForEdit(this.transactionDetail);
     } else if (this.scheduleAction === ScheduleActions.add) {
+      //if add, no transaction detaila are available to populate cumulative loans and outstanding balances, 
+      // so set them in the UI to initial values
       this._clearFormValues();
     }
   }
@@ -208,6 +219,17 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
     this.frmLoan = new FormGroup(formGroup);
 
+    if (this.scheduleAction === ScheduleActions.edit) {
+      this._prePopulateFormForEdit(this.transactionDetail); //TODO -ZS .. clean this up to fillup all fields (see notes in ngONCHanges)
+    } else if (this.scheduleAction === ScheduleActions.add) {
+      this._clearFormValues();
+
+      //if add, no transaction detaila are available to populate cumulative loans and outstanding balances, 
+      // so set them in the UI to initial values
+      this.frmLoan.patchValue({ loan_balance: this._decimalPipe.transform(0, '.2-2')});
+      this.frmLoan.patchValue({ loan_payment_to_date: this._decimalPipe.transform(0, '.2-2')});
+    }
+
     this._setEntityTypeDefault();
   }
 
@@ -242,6 +264,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       formValidators.push(alphaNumeric());
     }
 
+    if (fieldName === 'loan_incurred_date') {
+      const formType = JSON.parse(localStorage.getItem('form_3X_report_type'));
+      this.cvgStartDate = formType.cvgStartDate;
+      this.cvgEndDate = formType.cvgEndDate;
+      formValidators.push(this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate)); //TODO-ZS  -- do null checks. 
+    }
+
     if (validators) {
       for (const validation of Object.keys(validators)) {
         if (validation === 'required') {
@@ -254,7 +283,11 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           }
         } else if (validation === 'max') {
           if (validators[validation] !== null) {
-            formValidators.push(Validators.maxLength(validators[validation]));
+            if (fieldName === 'loan_amount_original') {
+              formValidators.push(validateAmount());
+            } else {
+              formValidators.push(Validators.maxLength(validators[validation]));
+            }
           }
         }
       }
@@ -284,6 +317,86 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         e.target.value = e.target.value.substring(0, e.target.value.length - 1);
       }
     }
+  }
+
+  /**
+   * Updates the contribution aggregate field once contribution ammount is entered.
+   *
+   * @param      {Object}  e         The event object.
+   * @param      {string}  fieldName The name of the field
+   */
+  public contributionAmountChange(e: any, fieldName: string, negativeAmount: boolean): void {
+    // const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    let contributionAmount: string = e.target.value;
+
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+
+    // determine if negative, truncate if > max
+    // contributionAmount = this._transformAmount(contributionAmount, this._contributionAmountMax);
+
+    // let contributionAggregate: string = null;
+    // if (isChildForm) {
+    //   this._contributionAmountChlid = contributionAmount;
+    //   contributionAggregate = String(this._contributionAggregateValueChild);
+    // } else {
+    //   this._contributionAmount = contributionAmount;
+    //   contributionAggregate = String(this._contributionAggregateValue);
+    // }
+
+    let contributionAmountNum = parseFloat(contributionAmount);
+    // Amount is converted to negative for Return / Void / Bounced
+    if (negativeAmount) {
+      contributionAmountNum = -Math.abs(contributionAmountNum);
+      // this._contributionAmount = String(contributionAmountNum);
+    }
+
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
+
+    if (this.frmLoan.get('loan_amount_original')) {
+      this.frmLoan.patchValue({ loan_amount_original: amountValue }, { onlySelf: true });
+
+      
+      if ("add" === this.scheduleAction) {
+        this.frmLoan.patchValue({ loan_balance: amountValue }, { onlySelf: true });
+      }
+      else {
+        //calculate balance and updated fields
+        let currentOutstandingBalance = this.currentLoanData.loan_balance;
+        currentOutstandingBalance = parseFloat(currentOutstandingBalance.toString().replace(/,/g, ``));
+        let currentLoanAmountFromDB = this.currentLoanData.loan_amount_original;
+        let newOutstandingBalance = contributionAmountNum - currentLoanAmountFromDB + currentOutstandingBalance;
+        this.frmLoan.patchValue({ loan_balance: this._decimalPipe.transform(newOutstandingBalance, '.2-2') }, { onlySelf: true });
+      }
+
+    }
+    // else if(this.frmLoan.get('contribution_amount')){
+    //   this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
+    // }
+    // let transactionDate = null;
+    // if (this.frmIndividualReceipt.get('contribution_date')) {
+    //   transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
+    // }
+    // const aggregateValue: string = this._receiptService.determineAggregate(
+    //   this._contributionAggregateValue,
+    //   contributionAmountNum,
+    //   this.scheduleAction,
+    //   this.memoCode,
+    //   this._selectedEntity,
+    //   this._transactionToEdit,
+    //   this.transactionType,
+    //   this._isSubOfParent(),
+    //   transactionDate
+    // );
+
+    // if (isChildForm) {
+    //   this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': aggregateValue }, { onlySelf: true });
+    // } else {
+    //   this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+    // }
   }
 
   private formatAmountForAPI(contributionAmount): string {
@@ -580,25 +693,25 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public electionTypeChanged(electionOption: any, col: any) {
-    console.log();
-    if (!electionOption.code) {
-      return;
-    }
+    // console.log();
+    // if (!electionOption.code) {
+    //   return;
+    // }
 
-    // Election Other Description is required when Election is Other.
-    const electionControl = this.frmLoan.get('election_other_description');
+    // // Election Other Description is required when Election is Other.
+    // const electionControl = this.frmLoan.get('election_other_description');
 
-    if (electionOption.code === 'O') {
-      // TODO need to store validations for election other desc in a class variable
-      // or programatically rebuild from the dynamic form call otherwise they
-      // will need to be manually added here as they are now.
-      // FormControl validations can't be amended, they must be reset completely.
-      electionControl.setValidators([Validators.required, Validators.maxLength(20)]);
-      electionControl.updateValueAndValidity();
-    } else {
-      electionControl.setValidators([Validators.maxLength(20)]);
-      electionControl.updateValueAndValidity();
-    }
+    // if (electionOption.code === 'O') {
+    //   // TODO need to store validations for election other desc in a class variable
+    //   // or programatically rebuild from the dynamic form call otherwise they
+    //   // will need to be manually added here as they are now.
+    //   // FormControl validations can't be amended, they must be reset completely.
+    //   electionControl.setValidators([Validators.required, Validators.maxLength(20)]);
+    //   electionControl.updateValueAndValidity();
+    // } else {
+    //   electionControl.setValidators([Validators.maxLength(20)]);
+    //   electionControl.updateValueAndValidity();
+    // }
   }
 
   /**
@@ -1245,7 +1358,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
   public saveLoan(): void {
     if (this.entityType === 'IND') {
-      this.doValidateLoan();
+      this.doValidateLoan('loanSummary');
     } else if (this.entityType === 'ORG') {
       const c1EmitObj: any = {
         form: {},
@@ -1256,15 +1369,19 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         action: ScheduleActions.add,
       };
       this.status.emit(c1EmitObj);
-      // this._router.navigate([`/forms/form/${this._formType}`], {
-      //   queryParams: { step: 'step_3' }
-      // });
     }
   }
 
-   public loanRepayment(): void {
-    // this.doValidateLoan(); //is this needed ZS-TODO - smahal, I think yes.  Most likely need to validate
-    // loan before allowing a payment on it.
+
+  public onSaveLoan(loanRepaymentRoute = false): void {
+    if (loanRepaymentRoute) {
+      this.doValidateLoan('loanRepayment');
+    } else {
+      this.saveLoan();
+    }
+  }
+
+  private _goToLoanRepayment() {
     const loanRepaymentEmitObj: any = {
       form: {},
       direction: 'next',
@@ -1274,16 +1391,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       action: ScheduleActions.add,
     };
     this.status.emit(loanRepaymentEmitObj);
-
-
-    // console.log("Loading loan repayment form");
-    // let reportId = this._receiptService.getReportIdFromStorage(this._formType);
-    // this._router.navigate([`/forms/form/${this._formType}`], {
-    //   queryParams: { step: 'loanpayment', reportId: reportId }
-    // });
   }
 
-  public AddLoanEndorser(): void {}
+  public AddLoanEndorser(): void { }
 
   public isFieldName(fieldName: string, nameString: string): boolean {
     return fieldName === nameString || fieldName === this._childFieldNamePrefix + nameString;
@@ -1292,7 +1402,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   /**
    * Vaidates the form on submit.
    */
-  public doValidateLoan() {
+  public doValidateLoan(nextScreen: string) {
     if (this.frmLoan.valid) {
       const LoanObj: any = {};
 
@@ -1326,8 +1436,18 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
             LoanObj[field] = typeAheadField;
           }
           // }
-        } else {
+        } else if (field === 'loan_amount_original' || field === 'loan_payment_to_date' || field === 'loan_balance') {
+          let amount = LoanObj[field] = this.frmLoan.get(field);
+          if (amount.value) {
+            LoanObj[field] = amount.value.replace(/,/g, ``);
+          }
+        }
+        else {
           LoanObj[field] = this.frmLoan.get(field).value;
+        }
+        //also add transactionId if available (edit route)
+        if(this.transactionDetail && this.transactionDetail.transactionId){
+          LoanObj['transaction_id'] = this.transactionDetail.transactionId;
         }
       }
 
@@ -1337,6 +1457,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         LoanObj.entity_id = this._selectedEntity.entity_id;
       }
       LoanObj.entity_type = this.entityType;
+      LoanObj['is_loan_secured'] = this.frmLoan.get('secured').value;
       console.log('LoanObj =', JSON.stringify(LoanObj));
 
       localStorage.setItem('LoanObj', JSON.stringify(LoanObj));
@@ -1356,7 +1477,11 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
             //window.scrollTo(0, 0);
 
             this._clearFormValues();
-            this._gotoSummary();
+            if (nextScreen === 'loanSummary') {
+              this._gotoSummary();
+            } else if (nextScreen === 'loanRepayment') {
+              this._goToLoanRepayment();
+            }
           }
         });
     } else {
@@ -1470,6 +1595,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       if (Array.isArray(res)) {
         if (res.length > 0) {
           loanData = res[0];
+          this.currentLoanData = loanData;
         }
       }
       if (!loanData) {
@@ -1478,38 +1604,47 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       // TODO need entity_type from API - inferring from entity ID until it is provided.
       let entityType = null;
       if (loanData.hasOwnProperty('entity_id')) {
-        this._selectedEntity = {entity_id: loanData.entity_id};
+        this._selectedEntity = { entity_id: loanData.entity_id };
         if (this.frmLoan.contains('entity_type')) {
           entityType = loanData.entity_id.startsWith('IND') ? 'IND' : 'ORG';
-          this.frmLoan.patchValue({entity_type: entityType}, { onlySelf: true });
+          this.frmLoan.patchValue({ entity_type: entityType }, { onlySelf: true });
           this._selectedEntity.entity_type = entityType;
         }
       }
 
       if (entityType === 'IND') {
-        this._patchForm(loanData, 'last_name', 'lender_cand_last_name');
-        this._patchForm(loanData, 'first_name', 'lender_cand_first_name');
-        this._patchForm(loanData, 'middle_name', 'lender_cand_middle_name');
-        this._patchForm(loanData, 'prefix', 'lender_cand_prefix');
-        this._patchForm(loanData, 'suffix', 'lender_cand_suffix');
+        this._patchForm(loanData, 'last_name');
+        this._patchForm(loanData, 'first_name');
+        this._patchForm(loanData, 'middle_name');
+        this._patchForm(loanData, 'prefix');
+        this._patchForm(loanData, 'suffix');
       }
 
       if (entityType === 'ORG') {
-        // TODO determine API name for ORG
+        this._patchForm(loanData, 'entity_name');
       }
 
-      // TODO API needs to provide the address fields
-      this._patchForm(loanData, 'state', 'lender_cand_state');
+      this._patchForm(loanData, 'street_1');
+      this._patchForm(loanData, 'street_2');
+      this._patchForm(loanData, 'state');
+      this._patchForm(loanData, 'city');
+      this._patchForm(loanData, 'zip_code');
+
 
       this._patchForm(loanData, 'election_code');
       this._patchForm(loanData, 'election_other_description');
-      this._patchForm(loanData, 'loan_amount_original');
-      this._patchForm(loanData, 'loan_payment_to_date');
-      this._patchForm(loanData, 'loan_balance');
       this._patchForm(loanData, 'loan_incurred_date');
       this._patchForm(loanData, 'loan_due_date');
       this._patchForm(loanData, 'loan_intrest_rate');
       this._patchForm(loanData, 'secured', 'is_loan_secured');
+      
+      // this._decimalPipe.transform(contributionAmountNum, '.2-2');
+      this.frmLoan.patchValue({loan_amount_original: this._decimalPipe.transform(loanData.loan_amount_original, '.2-2')})
+      this.frmLoan.patchValue({loan_payment_to_date: this._decimalPipe.transform(loanData.loan_payment_to_date, '.2-2')})
+      this.frmLoan.patchValue({loan_balance: this._decimalPipe.transform(loanData.loan_balance, '.2-2')})
+      // this._patchForm(loanData, 'loan_amount_original');
+      // this._patchForm(loanData, 'loan_payment_to_date');
+      // this._patchForm(loanData, 'loan_balance');
     });
   }
 
@@ -1607,29 +1742,31 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-    /**
-   * Navigate to the Transactions.
-   */
+  /**
+ * Navigate to the Transactions.
+ */
   public viewTransactions(): void {
 
     // TODO Do we need to add support for cloning as with AbstractSchedule?
 
-      this._clearFormValues();
-      let reportId = this._receiptService.getReportIdFromStorage(this.formType);
-      console.log('reportId', reportId);
+    this._clearFormValues();
+    let reportId = this._receiptService.getReportIdFromStorage(this.formType);
+    console.log('reportId', reportId);
 
-      if (!reportId) {
-        reportId = '0';
+    if (!reportId) {
+      reportId = '0';
+    }
+    localStorage.setItem(`form_${this.formType}_view_transaction_screen`, 'Yes');
+    localStorage.setItem('Transaction_Table_Screen', 'Yes');
+    this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
+
+    // TODO when should editMode be true/false?
+    this._router.navigate([`/forms/form/${this.formType}`], {
+      queryParams: {
+        step: 'transactions', reportId: reportId, edit: true,
+        transactionCategory: this._transactionCategory
       }
-      localStorage.setItem(`form_${this.formType}_view_transaction_screen`, 'Yes');
-      localStorage.setItem('Transaction_Table_Screen', 'Yes');
-      this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
-
-      // TODO when should editMode be true/false?
-      this._router.navigate([`/forms/form/${this.formType}`], {
-        queryParams: { step: 'transactions', reportId: reportId, edit: true,
-        transactionCategory: this._transactionCategory }
-      });
+    });
 
 
     // if (!this._cloned || this._completedCloning) {
