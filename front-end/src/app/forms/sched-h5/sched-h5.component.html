@@ -59,13 +59,15 @@
                   <span class="sr-only">Click here for more information</span>
                 </button>
               </label>
-              <input class="form-control" type="text" [formControlName]="'account_name'" [attr.name]="'account_name'"
-                [style.width]="'90%'" [style.height]="'30px'" [ngClass]="
-                  frmIndividualReceipt.get('activity_event_name')?.invalid &&
-                  (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                    ? 'input-field-error'
-                    : ''
-                " />
+              <select id="" formControlName="account_name" class="form-control">                    
+                <option value="" selected>Select account name</option>
+                <option
+                  *ngFor="let item of levinAccountsies"                    
+                  [value]="item.levin_account_name"
+                >
+                  {{ item.levin_account_name }}
+                </option>                  
+            </select>
             </div>
           </div>
           <div class="col col-md-4">
@@ -83,7 +85,7 @@
                     <i class="calendar-icon" aria-hidden="true"></i>
                   </span>
                 </div>
-                <input class="form-control" type="date" [formControlName]="'date'" [attr.name]="'date'"
+                <input class="form-control" type="date" [formControlName]="'receipt_date'" [attr.name]="'receipt_date'"
                   [style.width]="'50%'" [style.height]="'30px'" [ngClass]="
                       frmIndividualReceipt.get('date')?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -108,8 +110,11 @@
                     <i class="dollar-sign-icon" aria-hidden="true"></i>
                   </span>
                 </div>
-                <input class="form-control" type="text" [formControlName]="'total_amount_of_transfer'"
-                  [attr.name]="'total_amount_of_transfer'" [style.width]="'50%'" [style.height]="'30px'" [ngClass]="
+                <input class="form-control" type="text" 
+                  [formControlName]="'total_amount_transferred'"                  
+                  [attr.name]="'total_amount_transferred'" [style.width]="'50%'" [style.height]="'30px'" 
+                  [attr.readonly]=true
+                  [ngClass]="
                       frmIndividualReceipt.get('date')?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
@@ -134,81 +139,91 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div [hidden]="showPart2" class="paragraph">
-        <div *ngIf="showIdentifer" class="row">
+        <div class="row">
           <div class="col col-md-4">
-            <div class="form-group">
-              <label for="account_name">
-                {{ totalName }}
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div *ngIf="showIdentiferSelect">
-                <select id="" formControlName="activity_event_name" class="form-control"
-                  (change)="selectActivityFunctionChange($event)">
-                  <option value="" selected>Activity or Event Identifier</option>
-                  <option *ngFor="let identifier of identifiers" [value]="identifier.id">
-                    {{ identifier.name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="col col-md-4">
-            <div class="form-group">
+            <div class="form-group">                    
               <label for="">
                 Amount
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
+                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
                 </button>
               </label>
               <div class="row input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="filter-max-amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
-                  </span>
-                </div>
-                <input class="form-control" type="text" [formControlName]="tmount"
-                  [attr.name]="'total_tmount_of_transfer'" [style.width]="'50%'" [style.height]="'30px'" [ngClass]="
+                  <div class="input-group-prepend">
+                      <span class="input-group-text" id="filter-max-amount">
+                          <i class="dollar-sign-icon" aria-hidden="true"></i>
+                      </span>
+                  </div>
+                  <input class="form-control" 
+                  type="text"
+                  [formControlName]="'transferred_amount'"
+                  [attr.name]="'transferred_amount'"
+                  [style.width]="'50%'" 
+                  [style.height]="'30px'"
+                  [ngClass]="
                       frmIndividualReceipt.get('date')?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
-                  " />
-              </div>
-            </div>
-          </div>
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="">
-                Total Amount of {{ totalName }}
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="row input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="filter-max-amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
-                  </span>
-                </div>
-                <input class="form-control" type="text" [formControlName]="'total_tmount_of_transfer'"
-                  [attr.name]="'total_tmount'" [style.width]="'50%'" [style.height]="'30px'" [ngClass]="
-                      frmIndividualReceipt.get('date')?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'input-field-error'
-                      : ''
-                  " />
+                  "
+                  />
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div>
+          <ng-container>
+              <table class="table table-striped table-hover table__sortable">
+                <thead>
+                  <tr>
+                    <th [@fadeInOut]>
+                    </th>
+                    <th [@fadeInOut] (click)="changeSortDirection('date')">Date
+                      <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>
+                    <th [@fadeInOut] (click)="changeSortDirection('transfer_type')">Transfer Type
+                      <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>
+                    <th [@fadeInOut] (click)="changeSortDirection('account_name')">Account Name
+                      <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>
+      
+                    <th [@fadeInOut] (click)="changeSortDirection('transfer_amount')">Transfer Amount
+                      <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>
+                    <!-- <th [@fadeInOut] (click)="changeSortDirection('federal_percent')">Aggregate Amount -->
+                    <!-- <i class="fa fa-sort" aria-hidden="false"></i> -->
+                    <!-- </th> -->
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngFor="let report of h5Entries | paginate: h5EntryTableConfig">
+                    <tr>
+                      <td>
+                        <input type="checkbox" (click)="checkForMultiChecked($event)">
+                      </td>                      
+                      <td>{{ report.receipt_date | date: 'MM/dd/yyyy' }}</td>
+                      <td>
+                        <div *ngIf="report.category  == 'voter_id'">Voter ID</div>
+                        <div *ngIf="report.category  == 'voter_registration'">Voter Registration</div>
+                        <div *ngIf="report.category  == 'generic_campaign'">Generic Campaign Activities</div>
+                        <div *ngIf="report.category  == 'gotv'">GOTV</div>                        
+                      </td>
+                      <td>{{ report.account_name }}</td>
+                      <td class="summary_text_amt">{{ report.transferred_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>                      
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+              <hr/>
+              <div class="d-flex justify-content-center">
+                <pagination-controls (pageChange)="entryPageChanged($event)"></pagination-controls>
+              </div>
+            </ng-container>
       </div>
 
       <div class="grid-row">
@@ -233,6 +248,10 @@
               <a class="btn btn-primary btn-right" (click)="returnToSum()">
                 Summary
               </a>
+              <button class="btn btn-previous btn-right" type="button"
+                (click)="addEntries()">                  
+                Add
+              </button>    
             </div>
           </div>
         </div>
@@ -275,7 +294,7 @@
                 <!-- <div *ngIf="report.event_type == 'direct_cand_suppot'">Direct Candidate Suppot</div> -->
                 <!-- </td>  -->
                 <!-- <td>{{ report.activity_event_name }}</td> -->
-                <td>{{ report.date | date: 'MM/dd/yyyy' }}</td>
+                <td>{{ report.receipt_date | date: 'MM/dd/yyyy' }}</td>
                 <td>{{ report.transfer_type }}</td>
                 <td>{{ report.account_name }}</td>
                 <td class="summary_text_amt">{{ report.transfer_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>

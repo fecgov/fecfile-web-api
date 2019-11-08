@@ -290,7 +290,7 @@
             "height": "30px",
             "width": "154px",
             "validation": {
-              "required": true,
+              "required": false,
               "max": 12,
               "dollarAmount": true
             }
@@ -608,7 +608,7 @@
             "height": "30px",
             "width": "154px",
             "validation": {
-              "required": true,
+              "required": false,
               "max": 12,
               "dollarAmount": true
             }

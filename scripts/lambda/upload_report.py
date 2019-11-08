@@ -232,14 +232,14 @@ def get_reports_to_upload():
                                         data_row[0],  
                                         4,
                                         "F3X create_json_builders call with data_obj ", 
-                                        json.loads(resp),
+                                        json.dumps(resp),
                                         '',
                                         '', 
                                         '', 
                                     ) 
 
                         if resp.ok:
-                            successresp=resp.json()
+                            successresp=resp
                             print("create_json_builders call is successfuly finished...")  
                             print(successresp)     
 

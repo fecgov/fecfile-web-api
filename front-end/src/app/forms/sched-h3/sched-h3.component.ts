@@ -48,11 +48,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public showIdentifer = false;
   public h3Sum: any;
   public h3SumP: any;
+  public h3Entries = [];
+  public h3Ratios: any;
+  public showAggregateAmount = false;
 
   public h3Subscription: Subscription;
   public saveHRes: any;
 
   public h3TableConfig: any;
+  public h3EntryTableConfig: any;
 
   constructor(
     _http: HttpClient,
@@ -76,7 +80,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
     private _actRoute: ActivatedRoute,
-    private _schedH3Service: SchedH3Service
+    private _schedH3Service: SchedH3Service,
+    private _individualReceiptService: IndividualReceiptService
   ) {
     super(
       _http,
@@ -101,6 +106,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       _reportsService      
     );
     _schedH3Service;
+    _individualReceiptService;
   }
 
   public ngOnInit() {
@@ -132,11 +138,20 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       currentPage: 1,
       totalItems: 8
     };
+    this.h3EntryTableConfig = {
+      itemsPerPage: 3,
+      currentPage: 1,
+      totalItems: 3
+    };
+    
 
     this.setH3Sum();
     this.setH3SumP();
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
+
+    this.h3Ratios = {};
+    this.h3Ratios['child'] = [];
     
   }
 
@@ -152,6 +167,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   pageChanged(event){
     this.h3TableConfig.currentPage = event;
+  }
+  entryPageChanged(event){
+    this.h3EntryTableConfig.currentPage = event;
   }
 
   /**
@@ -188,12 +206,12 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.schedH3 = new FormGroup({
       account_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
-      date: new FormControl(''),
+      receipt_date: new FormControl(''),
       total_amount_transferred: new FormControl(''),
       category: new FormControl(''),
       activity_event_name: new FormControl(''),
       transferred_amount: new FormControl(''),
-      total_amount: new FormControl('')
+      aggregate_amount: new FormControl('')
     });
   }
 
@@ -230,6 +248,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   
   public setActivityOrEventIdentifier(category: string) {
 
+    this.identifiers = [];
     this.h3Subscription = 
       this._schedH3Service.getActivityOrEventIdentifiers(category)
       .subscribe(res =>
@@ -239,37 +258,19 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
           }
         }
       ); 
-    /*  
-    this.identifiers = [      
-      {
-        "id":"chicago_mens_rotary",
-        "name":"Chicago Men's Rotary"
-      },
-      {
-        "id":"detroid_mens_dinnner_club",
-        "name":"Detroid Men's Dinnner Club"
-      },
-      {
-        "id":"chicago_wommens_league",
-        "name":"Chicago Women's League"
-      },
-      {
-        "id":"junior_board_shop_of_tallahasse",
-        "name":"Junior Board Shop of Tallahasse"
-      }
-    ]
-    */
+
   }
 
   public getTotalAmount(activity_event_type: string) {
 
     this.schedH3.patchValue({total_tmount_of_transfer: 0}, { onlySelf: true });
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
     this.h3Subscription = 
-      this._schedH3Service.getTotalAmount(activity_event_type)
+      this._schedH3Service.getTotalAmount(activity_event_type, reportId)
       .subscribe(res =>
         {
           if(res) {            
-            this.schedH3.patchValue({total_amount_transferred: res.total_amount_transferred}, { onlySelf: true });
+            this.schedH3.patchValue({aggregate_amount: res.aggregate_amount}, { onlySelf: true });
           }
         }
       ); 
@@ -278,7 +279,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToSum(): void {
-    this.transactionType = 'ALLOC_H3_SUM';    
+    this.transactionType = 'ALLOC_H3_SUM';
+    this.setH3Sum();
   }
 
   public returnToAdd(): void {
@@ -300,235 +302,52 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     
     if(this.schedH3.get('category').value === 'AD') {
       this.totalName = 'Administrative';
-      this.getTotalAmount('AD');      
-      this.showIdentiferSelect = false
+      this.showIdentiferSelect = false;
+      this.showAggregateAmount = false;
     }else if(this.schedH3.get('category').value === 'GV') {
       this.totalName = 'Generic Voter Drive';
-      this.getTotalAmount('GV');
-      this.showIdentiferSelect = false
+      this.showIdentiferSelect = false;
+      this.showAggregateAmount = false;
     }else if(this.schedH3.get('category').value === 'EA') {
       this.totalName = 'Exempt Activities';
-      this.getTotalAmount('EA');
       this.showIdentiferSelect = false
+      this.showAggregateAmount = false;
     }else if(this.schedH3.get('category').value === 'DF') {
       this.totalName = 'Activity or Event Identifier';
       this.setActivityOrEventIdentifier('fundraising');
-      this.showIdentiferSelect = true
+      this.showIdentiferSelect = true;
+      this.showAggregateAmount = true;
     }else if(this.schedH3.get('category').value === 'DC') {
       this.totalName = 'Activity or Event Identifier';
       this.setActivityOrEventIdentifier('direct_can_support');
       this.showIdentiferSelect = true;
+      this.showAggregateAmount = true;
     }else if(this.schedH3.get('category').value === 'PC') {
       this.totalName = 'Public Communications';
-      this.getTotalAmount('PC');
-      this.showIdentiferSelect = false
+      this.showIdentiferSelect = false;
+      this.showAggregateAmount = false;
     }
     
   }
 
   public selectActivityOrEventChange(e) {
-    this._schedH3Service.getTotalAmount(this.schedH3.get('category').value);
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    this._schedH3Service.getTotalAmount(this.schedH3.get('category').value, reportId);
   }
 
   public setH3Sum() {
+
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
     
-    this.h3Subscription = this._schedH3Service.getSummary(this.getReportId()).subscribe(res =>
+    //this.h3Subscription = this._schedH3Service.getSummary(this.getReportId()).subscribe(res =>
+    this.h3Subscription = this._schedH3Service.getSummary(reportId).subscribe(res =>
       {        
         if(res) {          
           this.h3Sum =  res;         
           this.h3TableConfig.totalItems = res.length;
         }
-      });
-     
-    /*  
-    this.h3Sum = [
-      {
-        "transfer_type": "DF",
-        "activity_event_name" : "Farmington Country Club Gala",
-        "date": "04/21/2016",
-        "amount": "21309.42",
-        "aggregateAmount": "4509.21"
-    },
-    {
-        "transfer_type": "DC",
-        "activity_event_name" : "Chicago's Men's Rotary Club",
-        "date": "04/21/2016",
-        "amount": "21309.42",
-        "aggregateAmount": "4509.21"
-    },
-    {
-        "transfer_type": "AD",
-        "activity_event_name" : "Chicago's Men's Rotary Club",
-        "date": "03/20/2016",
-        "amount": "3394.99",
-        "aggregateAmount": "2340.92"
-    },
-    {
-        "transfer_type": "GV",
-        "activity_event_name" : "Trenton Rally",
-        "date": "03/14/2016",
-        "amount": "5209.44",
-        "aggregateAmount": "2491.00"
-    }
+      });   
     
-    ]
-    */
-   /*
-   this.h3Sum = [
-    {
-        "cmte_id": "C00029447",
-        "report_id": 1324002,
-        "transaction_type_identifier": "TRAN_FROM_NON_FED_ACC",
-        "transaction_id": "SH20191001000000559",
-        "back_ref_transaction_id": "",
-        "back_ref_sched_name": "",
-        "account_name": "",
-        "activity_event_type": "DF",
-        "activity_event_name": "fund raising 20190919",
-        "receipt_date": "2019-10-30",
-        "total_amount_transferred": 60.0,
-        "transferred_amount": 40.0,
-        "memo_code": "",
-        "memo_text": "",
-        "delete_ind": null,
-        "create_date": "2019-10-01T15:25:36.109899",
-        "last_update_date": "2019-10-01T15:25:36.10991"
-    },
-    {
-        "cmte_id": "C00029447",
-        "report_id": 1324002,
-        "transaction_type_identifier": "TRAN_FROM_NON_FED_ACC",
-        "transaction_id": "SH20191001000000560",
-        "back_ref_transaction_id": "",
-        "back_ref_sched_name": "",
-        "account_name": "",
-        "activity_event_type": "DF",
-        "activity_event_name": "fund raising 20190919",
-        "receipt_date": "2019-10-30",
-        "total_amount_transferred": 50.0,
-        "transferred_amount": 10.0,
-        "memo_code": "",
-        "memo_text": "",
-        "delete_ind": null,
-        "create_date": "2019-10-01T15:25:56.800353",
-        "last_update_date": "2019-10-01T15:25:56.800358"
-    },
-    {
-        "cmte_id": "C00029447",
-        "report_id": 1324002,
-        "transaction_type_identifier": "TRAN_FROM_NON_FED_ACC",
-        "transaction_id": "SH20191028000000635",
-        "back_ref_transaction_id": "",
-        "back_ref_sched_name": "",
-        "account_name": "test111",
-        "activity_event_type": "DC",
-        "activity_event_name": "event1",
-        "receipt_date": null,
-        "total_amount_transferred": 200.0,
-        "transferred_amount": 100.0,
-        "memo_code": "",
-        "memo_text": "",
-        "delete_ind": null,
-        "create_date": "2019-10-28T09:25:39.298349",
-        "last_update_date": "2019-10-28T09:25:39.298555"
-    },
-    {
-        "cmte_id": "C00029447",
-        "report_id": 1324002,
-        "transaction_type_identifier": "TRAN_FROM_NON_FED_ACC",
-        "transaction_id": "SH20191029000000642",
-        "back_ref_transaction_id": "",
-        "back_ref_sched_name": "",
-        "account_name": "test111",
-        "activity_event_type": "DC",
-        "activity_event_name": "event1",
-        "receipt_date": null,
-        "total_amount_transferred": 200.0,
-        "transferred_amount": 100.0,
-        "memo_code": "",
-        "memo_text": "",
-        "delete_ind": null,
-        "create_date": "2019-10-28T21:30:19.447973",
-        "last_update_date": "2019-10-28T21:30:19.448119"
-    },
-    {
-      "cmte_id": "C00029447",
-      "report_id": 1324002,
-      "transaction_type_identifier": "TRAN_FROM_NON_FED_ACC",
-      "transaction_id": "SH20191001000000559",
-      "back_ref_transaction_id": "",
-      "back_ref_sched_name": "",
-      "account_name": "",
-      "activity_event_type": "DF",
-      "activity_event_name": "fund raising 20190919",
-      "receipt_date": "2019-10-30",
-      "total_amount_transferred": 60.0,
-      "transferred_amount": 40.0,
-      "memo_code": "",
-      "memo_text": "",
-      "delete_ind": null,
-      "create_date": "2019-10-01T15:25:36.109899",
-      "last_update_date": "2019-10-01T15:25:36.10991"
-    },
-    {
-        "cmte_id": "C00029447",
-        "report_id": 1324002,
-        "transaction_type_identifier": "TRAN_FROM_NON_FED_ACC",
-        "transaction_id": "SH20191001000000560",
-        "back_ref_transaction_id": "",
-        "back_ref_sched_name": "",
-        "account_name": "",
-        "activity_event_type": "DF",
-        "activity_event_name": "fund raising 20190919",
-        "receipt_date": "2019-10-30",
-        "total_amount_transferred": 50.0,
-        "transferred_amount": 10.0,
-        "memo_code": "",
-        "memo_text": "",
-        "delete_ind": null,
-        "create_date": "2019-10-01T15:25:56.800353",
-        "last_update_date": "2019-10-01T15:25:56.800358"
-    },
-    {
-        "cmte_id": "C00029447",
-        "report_id": 1324002,
-        "transaction_type_identifier": "TRAN_FROM_NON_FED_ACC",
-        "transaction_id": "SH20191028000000635",
-        "back_ref_transaction_id": "",
-        "back_ref_sched_name": "",
-        "account_name": "test111",
-        "activity_event_type": "DC",
-        "activity_event_name": "event1",
-        "receipt_date": null,
-        "total_amount_transferred": 200.0,
-        "transferred_amount": 100.0,
-        "memo_code": "",
-        "memo_text": "",
-        "delete_ind": null,
-        "create_date": "2019-10-28T09:25:39.298349",
-        "last_update_date": "2019-10-28T09:25:39.298555"
-    },
-    {
-        "cmte_id": "C00029447",
-        "report_id": 1324002,
-        "transaction_type_identifier": "TRAN_FROM_NON_FED_ACC",
-        "transaction_id": "SH20191029000000642",
-        "back_ref_transaction_id": "",
-        "back_ref_sched_name": "",
-        "account_name": "test111",
-        "activity_event_type": "DC",
-        "activity_event_name": "event1",
-        "receipt_date": null,
-        "total_amount_transferred": 200.0,
-        "transferred_amount": 100.0,
-        "memo_code": "",
-        "memo_text": "",
-        "delete_ind": null,
-        "create_date": "2019-10-28T21:30:19.447973",
-        "last_update_date": "2019-10-28T21:30:19.448119"
-    }
-    ]
-    */
   }
 
   public setH3SumP() {
@@ -538,40 +357,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         if(res) {          
           this.h3SumP =  res;          
         }
-      });
-     
-    /*  
-    this.h3SumP = [
-      {
-        "activity_event_type": "AD",
-        "sum": 8093320.00
-      },
-      {        
-        "activity_event_type": "GV",
-        "sum": 2037000.00
-      },
-      {        
-        "activity_event_type": "EA",
-        "sum":  502300.00
-      },
-      {        
-        "activity_event_type": "DF",
-        "sum":  43320301.00
-      },
-      {        
-        "activity_event_type": "DC",
-        "sum":  34507.78
-      },
-      {        
-        "activity_event_type": "PC",
-        "sum":  4200.00
-      },
-      {        
-        "activity_event_type": "total",
-        "sum":  52304200.00
-      }
-    ]
-    */
+      });     
+
   }
 
   public saveAndAddMore(): void {
@@ -580,18 +367,51 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public doValidate() {
 
+    //this.h3Ratios = {};
+
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    
+    this.h3Ratios['report_id'] = reportId;
+    this.h3Ratios.transaction_type_identifier = 'TRAN_FROM_NON_FED_ACC';
+    
+    //this.h3Ratios.total_amount_transferred = this.schedH3.get('total_amount_transferred').value;
+
     const formObj = this.schedH3.getRawValue();
 
+    const accountName = this.schedH3.get('account_name').value;
+    const receipt_date = this.schedH3.get('receipt_date').value;
+    
+    const total_amount_transferred = Number(this.schedH3.get('total_amount_transferred').value) 
+      + Number(this.schedH3.get('transferred_amount').value);
+    this.h3Ratios.total_amount_transferred = total_amount_transferred;
+ 
     formObj['report_id'] = this.getReportId();
     formObj['transaction_type_identifier'] = 'TRAN_FROM_NON_FED_ACC';
     formObj['activity_event_type'] = this.schedH3.get('category').value;
-    
-    const serializedForm = JSON.stringify(formObj);
 
-    
-    if(this.schedH3.status === 'VALID') {
-      this.saveH3Ratio(serializedForm);      
+    delete formObj.total_amount_transferred;
+
+    if(this.schedH3.status === 'VALID') {     
+      this.h3Entries.push(formObj);
+      this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+      this.h3Ratios.child.push(formObj);
+
       this.schedH3.reset();
+      
+      this.schedH3.patchValue({account_name: accountName}, { onlySelf: true });
+      this.schedH3.patchValue({receipt_date: receipt_date}, { onlySelf: true });
+
+      this.schedH3.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
+
+      if(this.showAggregateAmount) {
+        const aggregate_amount = Number(this.schedH3.get('aggregate_amount').value) + Number(this.schedH3.get('transferred_amount').value);
+        this.schedH3.patchValue({aggregate_amount: aggregate_amount}, { onlySelf: true });
+      }else {
+        this.schedH3.patchValue({aggregate_amount: 0}, { onlySelf: true });
+      }
+      
+      this.schedH3.patchValue({category: ''}, { onlySelf: true });
+      this.showIdentifer = false;
     }
   }
 
@@ -600,8 +420,31 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this._schedH3Service.saveH3Ratio(ratio).subscribe(res => {
       if (res) {        
         this.saveHRes = res;
+        this.h3Entries = [];
       }
     });
+  }
+
+  public addEntries() {
+    const serializedForm = JSON.stringify(this.h3Ratios);
+    this.saveH3Ratio(serializedForm);
+  }
+
+  //(keyup)="handleAmountKeyup($event, col)"
+  public handleAmountKeyup(e: any) {
+    let val = e.target.value;
+
+    const total_amount_transferred = Number(this.schedH3.get('total_amount_transferred').value) 
+      + Number(e.target.value);
+
+    this.schedH3.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
+
+    if(this.showAggregateAmount) {
+      const aggregate_amount = Number(this.schedH3.get('aggregate_amount').value) + Number(e.target.value);
+      this.schedH3.patchValue({aggregate_amount: aggregate_amount}, { onlySelf: true });
+    }else {
+      this.schedH3.patchValue({aggregate_amount: 0}, { onlySelf: true });
+    }
   }
 
 }

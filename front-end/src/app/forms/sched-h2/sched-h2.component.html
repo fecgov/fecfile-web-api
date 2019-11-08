@@ -280,10 +280,10 @@
                             <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
         
                                 <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-                                    <i class="ellipsis-icon"></i>
+                                    <i class="fas fa-ellipsis-h"></i>
                                 </button>
 
-                                <div id="sched-h2__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                                <div id="sched-h2__dropdown-action" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                                     <button class="dropdown-item">
                                         <i class="fas fa-eye"></i> View
                                     </button>
@@ -305,7 +305,7 @@
                 </tbody>
             </table>              
             <hr/>
-            <div class="d-flex justify-content-center contacts__table-pagination-container">
+            <div class="d-flex justify-content-center pagination-container">
               <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
             </div>
         </ng-container>

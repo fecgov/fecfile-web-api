@@ -253,7 +253,11 @@
     display: block;
     padding: 0.1875rem 0.625rem;
     border-radius: 0;
-  }	
+  }
+  
+  .dropdown-toggle:after {
+    border: none;
+  }
 }
 
 
