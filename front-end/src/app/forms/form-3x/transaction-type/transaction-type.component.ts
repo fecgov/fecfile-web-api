@@ -310,7 +310,9 @@ export class TransactionTypeComponent implements OnInit {
         // }
       ];
     }
-    if (this._mainTransactionCategory[0].options[1].value === 'schedule-h2') {
+
+    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    if (committeeDetails.cmte_type_category === 'PTY' && this._mainTransactionCategory[0].options[1].value === 'schedule-h2') {
       this.secondaryOptions[1].options = [
         {
           info: "Funds received from the committee's non-federal bank account",
