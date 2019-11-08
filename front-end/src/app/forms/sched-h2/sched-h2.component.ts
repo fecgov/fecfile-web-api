@@ -88,6 +88,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _reportsService: ReportsService,
     private _actRoute: ActivatedRoute,
     private _schedH2Service: SchedH2Service,
+    private _individualReceiptService: IndividualReceiptService,
   ) {    
      super(
       _http,
@@ -112,6 +113,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       _reportsService
     );
     _schedH2Service;
+    _individualReceiptService;
   }
 
 
@@ -125,7 +127,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       this.loaded = true;
     }, 2000);
 
-    this.getH2Sum(this.getReportId());
+    //this.getH2Sum(this.getReportId());
+    this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
     
     this.setSchedH2();
 
@@ -139,6 +142,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
 
+    //this.transactionType = 'ALLOC_H2_RATIO';
   }
 
   pageChanged(event){
@@ -206,7 +210,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
     const formObj = this.schedH2.getRawValue();
 
-    formObj['report_id'] = 0;
+    //formObj['report_id'] = 0;
+    formObj['report_id'] = this._individualReceiptService.getReportIdFromStorage(this.formType);
     formObj['transaction_type_identifier'] = "ALLOC_H2_RATIO";
     
     formObj['federal_percent'] = ((this.schedH2.get('federal_percent').value) / 100).toFixed(2);
@@ -244,7 +249,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
  
   public returnToSum(): void {
     this.transactionType = 'ALLOC_H2_SUM';
-    this.getH2Sum(this.getReportId());
+    //this.getH2Sum(this.getReportId());
+    this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+
   }
 
   public returnToAdd(): void {

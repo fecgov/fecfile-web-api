@@ -224,5 +224,45 @@
     display: block;
     padding: 0.1875rem 0.625rem;
     border-radius: 0;
-  }	
+  }
+
+  /** hide the dropdown caret **/
+  .dropdown-toggle:after {
+    border: none;
+  }
+ 
+  .bulk_action {
+    text-align: left;
+  }
+
+  .dropdown-menu {
+    min-width: 6em;
+  }
+/*
+.dropdown-menu {
+  min-width: 0px !important;
+  &.show {
+    .dropdown-item {
+      &:focus,
+      &:hover,
+      &:active,
+      &:visited {
+        background-color: $white;
+        color: $black;
+        cursor: pointer;
+        outline: none;
+      }
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  }
+
+  .dropdown-toggle {
+    &:after {
+      display:none;
+    }
+  }
+*/  
 }
