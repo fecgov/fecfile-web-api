@@ -279,7 +279,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToSum(): void {
-    this.transactionType = 'ALLOC_H3_SUM';    
+    this.transactionType = 'ALLOC_H3_SUM';
+    this.setH3Sum();
   }
 
   public returnToAdd(): void {
