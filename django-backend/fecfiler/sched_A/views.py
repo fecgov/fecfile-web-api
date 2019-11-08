@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
-                                 undo_delete_entities)
+                                 undo_delete_entities, superceded_report_id_list)
 
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -289,28 +289,29 @@ def post_sql_schedA(cmte_id,
 def get_list_schedA(report_id, cmte_id, transaction_id = None, include_deleted_trans_flag = False):
 
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
             # GET single row from schedA table
             if transaction_id:
                 if not include_deleted_trans_flag:
                     query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+                                    FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list))
                 else:
                     query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s"""
+                                    FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format("', '".join(report_list))
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
-                            """) t""", [report_id, cmte_id, transaction_id])
+                            """) t""", [cmte_id, transaction_id])
             else:
                 if not include_deleted_trans_flag:
                     query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+                                FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC""".format("', '".join(report_list))
                 else:
                     query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s ORDER BY transaction_id DESC"""
+                                FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s ORDER BY transaction_id DESC""".format("', '".join(report_list))
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
-                           query_string + """) t""", [report_id, cmte_id])
+                           query_string + """) t""", [cmte_id])
             schedA_list = cursor.fetchone()[0]
             if not schedA_list:
                 raise NoOPError(
@@ -336,14 +337,15 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
     load all child scjed_a items for this transaction
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
 
             # GET child rows from schedA table
             query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                            FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
+                            FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list))
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
-                           """) t""", [report_id, cmte_id, transaction_id])
+                           """) t""", [cmte_id, transaction_id])
 
             for row in cursor.fetchall():
                 # forms_obj.append(data_row)
