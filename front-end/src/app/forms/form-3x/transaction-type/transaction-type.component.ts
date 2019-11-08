@@ -287,7 +287,8 @@ export class TransactionTypeComponent implements OnInit {
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
 
     this.secondaryOptions = this._mainTransactionCategory[0].options;
-    if (this._mainTransactionCategory[0].options[0].value === 'schedule-h1') {
+    
+    /*if (this._mainTransactionCategory[0].options[0].value === 'schedule-h1') {
       this.secondaryOptions[0].options = [
         {
           info: "Funds received from the committee's non-federal bank account",
@@ -299,15 +300,7 @@ export class TransactionTypeComponent implements OnInit {
           // value: ""
           value: 'ALLOC_H1'
         }
-        // {
-        //   info: "Funds received from the committee's non-federal bank account",
-        //   infoIcon: "TRUE",
-        //   name: "schedule-h3",
-        //   scheduleType: "sched_h2",
-        //   text: "Allocation Ratios Summary",
-        //   type: "radio",
-        //   value: "ALLOC_H2_SUM"
-        // }
+
       ];
     }
 
@@ -431,29 +424,9 @@ export class TransactionTypeComponent implements OnInit {
           value: 'ALLOC_H5_SUM_P'
         }
       ];
-    }
+    } */
 
-    /*if (this._mainTransactionCategory[0].options[5].value === 'schedule-h6') {
-        this.secondaryOptions[5].options = [
-          {
-            info: "Disbursements from Allocated Federal/Levin Activity",
-            infoIcon: "TRUE",
-            name: "schedule-h6",
-            scheduleType: "sched_h6",
-            text: "Disbursements from Allocated Federal/Levin Activity",
-            type: "radio",
-            value: "ALLOC_EXP_DEBT"
-          },
-          {
-            info: "Disbursements for Allocated Federal/Levin Activity Summary",
-            infoIcon: "TRUE",
-            name: "schedule-h6",
-            scheduleType: "sched_h6",
-            text: "Disbursements for Allocated Federal/Levin Activity Summary",
-            type: "radio",
-            value: "ALLOC_H4_SUM"
-          }];
-      }*/
+    
 
     this.transactionCategorySelected = true;
 
