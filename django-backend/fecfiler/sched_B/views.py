@@ -26,6 +26,7 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
     save_cand_entity,
+    superceded_report_id_list,
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,

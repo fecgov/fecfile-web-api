@@ -2219,18 +2219,16 @@ def load_child_transactions(cmte_id, report_id, ctgry_type):
                         AND delete_ind is distinct from 'Y') t;
                     """
     else:
-        child_query_string = query_string + """ WHERE report_id = %s AND cmte_id = %s AND NOT(back_ref_transaction_id iIS NULL OR back_ref_transaction_id = '')
+        report_list = superceded_report_id_list(report_id)
+        child_query_string = query_string + """ WHERE report_id in ('{}') AND cmte_id = %s AND NOT(back_ref_transaction_id iIS NULL OR back_ref_transaction_id = '')
             AND delete_ind is distinct from 'Y') t;
-            """
+            """.format("', '".join(report_list))
     child_dic = {}
 
     #child_query_view = get_query_view(ctgry_type)
     try:
         with connection.cursor() as cursor:
-            if report_id is None:
-                cursor.execute(child_query_string, [cmte_id])
-            else:
-                cursor.execute(child_query_string, (report_id, cmte_id))
+            cursor.execute(child_query_string, [cmte_id])
             child_list = cursor.fetchone()
             if child_list and ctgry_type!= 'loans_tran':
                 if child_list[0]:

@@ -1773,11 +1773,11 @@ def schedH3(request):
                 data = put_schedH3(datum)
                 if 'child' in request.data:
                     for _c in request.data['child']:
-                        child_data = data 
-                        child_data.update(_c)
-                        child_data['back_ref_transaction_id'] = parent_data['transaction_id']
-                        child_data = schedH3_sql_dict(child_data)
-                        put_schedH3(child_data) 
+                        parent_data = data 
+                        _c.update(parent_data)
+                        _c['back_ref_transaction_id'] = parent_data['transaction_id']
+                        _c = schedH3_sql_dict(request.data)
+                        put_schedH3(_c) 
             else:
                 # print(datum)
                 logger.debug('saving h3 with data {}'.format(datum))
@@ -2759,7 +2759,7 @@ def post_schedH5(data):
     try:
         # check_mandatory_fields_SH5(datum, MANDATORY_FIELDS_SCHED_H5)
         data['transaction_id'] = get_next_transaction_id('SH5')
-        # print(data)
+        print(data)
         validate_sh5_data(data)
         try:
             post_sql_schedH5(data)
@@ -2819,7 +2819,8 @@ def post_sql_schedH5(data):
 
 def get_schedH5(data):
     """
-    load sched_H5 data based on cmte_id, report_id and transaction_id
+    load sched_H5 data based on cmte_id, report_id and/or transaction_id
+    all child transactions will also be loaded
     """
     try:
         cmte_id = data.get('cmte_id')
@@ -2827,12 +2828,54 @@ def get_schedH5(data):
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedH5(report_id, cmte_id, transaction_id)
+            for _obj in forms_obj:
+                child_list = get_child_schedH5(transaction_id, report_id, cmte_id)
+                if child_list:
+                    _obj['child'] = child_list
         else:
             forms_obj = get_list_all_schedH5(report_id, cmte_id)
+            for _obj in forms_obj:
+                child_list = get_child_schedH5(transaction_id, report_id, cmte_id)
+                if child_list:
+                    _obj['child'] = child_list
         return forms_obj
     except:
         raise
 
+def get_child_schedH5(transaction_id, report_id, cmte_id):
+    """
+    load all child transaction for each parent H5
+    """
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            transaction_type_identifier ,
+            transaction_id,
+            account_name,
+            receipt_date,
+            total_amount_transferred,
+            voter_registration_amount,
+            voter_id_amount,
+            gotv_amount,
+            generic_campaign_amount,
+            memo_code,
+            memo_text ,
+            create_date,
+            last_update_date
+            FROM public.sched_h5
+            WHERE report_id = %s 
+            AND cmte_id = %s
+            AND back_ref_transaction_id = %s
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            schedH5_list = cursor.fetchone()[0]
+        return schedH5_list
+    except Exception:
+        raise
 
 def get_list_all_schedH5(report_id, cmte_id):
 
@@ -2860,14 +2903,14 @@ def get_list_all_schedH5(report_id, cmte_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            schedH5_list = cursor.fetchone()[0]
-            if schedH5_list is None:
-                raise NoOPError('No sched_H5 transaction found for report_id {} and cmte_id: {}'.format(
-                    report_id, cmte_id))
-            merged_list = []
-            for dictH5 in schedH5_list:
-                merged_list.append(dictH5)
-        return merged_list
+            return cursor.fetchone()[0]
+        #     if schedH5_list is None:
+        #         raise NoOPError('No sched_H5 transaction found for report_id {} and cmte_id: {}'.format(
+        #             report_id, cmte_id))
+        #     merged_list = []
+        #     for dictH5 in schedH5_list:
+        #         merged_list.append(dictH5)
+        # return merged_list
     except Exception:
         raise
 
@@ -2897,14 +2940,7 @@ def get_list_schedH5(report_id, cmte_id, transaction_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
-            schedH5_list = cursor.fetchone()[0]
-            if schedH5_list is None:
-                raise NoOPError('No sched_H5 transaction found for transaction_id {}'.format(
-                    transaction_id))
-            merged_list = []
-            for dictH5 in schedH5_list:
-                merged_list.append(dictH5)
-        return merged_list
+            return cursor.fetchone()[0]
     except Exception:
         raise
 
@@ -2973,7 +3009,7 @@ def get_sched_h5_breakdown(request):
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH5(request):
-
+    
     if request.method == 'POST':
         try:
             cmte_id = request.user.username
@@ -2993,25 +3029,9 @@ def schedH5(request):
                 datum['transaction_id'] = check_transaction_id(
                     request.data.get('transaction_id'))
                 data = put_schedH5(datum)
-                if 'child' in request.data:
-                    for _c in request.data['child']:
-                        child_data = data 
-                        child_data.update(_c)
-                        child_data['back_ref_transaction_id'] = data['transaction_id']
-                        child_data = schedH5_sql_dict(child_data)
-                        logger.debug('saving child transaction with data {}'.format(child_data))
-                        put_schedH5(child_data) 
             else:
                 print(datum)
                 data = post_schedH5(datum)
-                if 'child' in request.data:
-                    for _c in request.data['child']:
-                        child_data = data 
-                        child_data.update(_c)
-                        child_data['back_ref_transaction_id'] = data['transaction_id']
-                        child_data = schedH5_sql_dict(child_data)
-                        logger.debug('saving child transaction with data {}'.format(child_data))
-                        post_schedH5(child_data) 
             # Associating child transactions to parent and storing them to DB
 
             output = get_schedH5(data)
@@ -3089,14 +3109,6 @@ def schedH5(request):
             #     output = get_schedB(data)
             # else:
             data = put_schedH5(datum)
-            if 'child' in request.data:
-                for _c in request.data['child']:
-                    child_data = data 
-                    child_data.update(_c)
-                    child_data['back_ref_transaction_id'] = data['transaction_id']
-                    child_data = schedH5_sql_dict(child_data)
-                    logger.debug('saving child transaction with data {}'.format(child_data))
-                    put_schedH5(child_data) 
             # output = get_schedA(data)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
         except Exception as e:
