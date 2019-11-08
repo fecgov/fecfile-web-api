@@ -28,6 +28,8 @@ from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_c1_child_transactions,
     get_sched_c2_child_transactions,
+    get_sched_c2_child,
+    get_sched_c1_child,
 )
 
 # Create your views here.
@@ -567,13 +569,13 @@ def get_schedC(data):
             logger.debug('getting all sched_c1 childs...')
             childC1_forms_obj = get_sched_c1_child_transactions(
                 report_id, cmte_id, transaction_id)
-            print(childC1_forms_obj)
+            # print(childC1_forms_obj)
             for obj in childC1_forms_obj:
                 obj.update(API_CALL_SC1)
             logger.debug('getting all sched_c2 childs...')
             childC2_forms_obj = get_sched_c2_child_transactions(
                 report_id, cmte_id, transaction_id)
-            print(childC2_forms_obj)
+            # print(childC2_forms_obj)
             for obj in childC2_forms_obj:
                 obj.update(API_CALL_SC2)
 
@@ -909,6 +911,7 @@ def get_outstanding_loans(request):
                             e.middle_name,
                             e.preffix,
                             e.suffix, 
+                            c.transaction_id,
                             c.loan_amount_original, 
                             c.loan_payment_to_date, 
                             c.loan_balance, 
@@ -937,6 +940,7 @@ def get_outstanding_loans(request):
                                 e.middle_name,
                                 e.preffix,
                                 e.suffix, 
+                                c.transaction_id,
                                 c.loan_amount_original, 
                                 c.loan_payment_to_date, 
                                 c.loan_balance, 
@@ -956,6 +960,22 @@ def get_outstanding_loans(request):
         if not json_result:
             return Response([], status=status.HTTP_200_OK)
         else:
+            for tran in json_result:
+                transaction_id = tran.get('transaction_id')
+                childC1_forms_obj = get_sched_c1_child(
+                    cmte_id, transaction_id)
+                # print(childC1_forms_obj)
+                for obj in childC1_forms_obj:
+                    obj.update(API_CALL_SC1)
+                logger.debug('getting all sched_c2 childs...')
+                childC2_forms_obj = get_sched_c2_child(
+                    cmte_id, transaction_id)
+                # print(childC2_forms_obj)
+                for obj in childC2_forms_obj:
+                    obj.update(API_CALL_SC2)
+                child_tran = childC1_forms_obj + childC2_forms_obj
+                if child_tran:
+                    tran['child'] = child_tran
             return Response(json_result, status=status.HTTP_200_OK)
 
     except:
