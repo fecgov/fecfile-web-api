@@ -1,3 +1,4 @@
+import { ContributionDateValidator } from './../../shared/utils/forms/validation/contribution-date.validator';
 import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
 import {
   Component,
@@ -94,7 +95,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private _transactionTypePrevious: string = null;
   private _contributionAggregateValue = 0.0;
   private _selectedEntity: any;
-  private _contributionAmountMax: number;
+  private _contributionAmountMax = 12;
   //private entityType: string = 'IND';
   private readonly _childFieldNamePrefix = 'child*';
   private _loanToEdit: LoanModel;
@@ -102,6 +103,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private _selectedChangeWarn: any;
   private _transactionTypeIdentifier: string;
   private _transactionCategory: string;
+  private cvgStartDate: string;
+  private cvgEndDate: string;
+  private currentLoanData: any;
 
   constructor(
     private _http: HttpClient,
@@ -119,6 +123,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     private _receiptService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _transactionsMessageService: TransactionsMessageService,
+    private _contributionDateValidator: ContributionDateValidator
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -136,6 +141,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
+
     this._selectedEntity = null;
     this._loanToEdit = null;
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -162,9 +168,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
+
+    //TODO - ZS . Check! at this point the frmLoan is not set so this doesnt do anything. 
     if (this.scheduleAction === ScheduleActions.edit) {
       this._prePopulateFormForEdit(this.transactionDetail);
     } else if (this.scheduleAction === ScheduleActions.add) {
+      //if add, no transaction detaila are available to populate cumulative loans and outstanding balances, 
+      // so set them in the UI to initial values
       this._clearFormValues();
     }
   }
@@ -209,6 +219,17 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
     this.frmLoan = new FormGroup(formGroup);
 
+    if (this.scheduleAction === ScheduleActions.edit) {
+      this._prePopulateFormForEdit(this.transactionDetail); //TODO -ZS .. clean this up to fillup all fields (see notes in ngONCHanges)
+    } else if (this.scheduleAction === ScheduleActions.add) {
+      this._clearFormValues();
+
+      //if add, no transaction detaila are available to populate cumulative loans and outstanding balances, 
+      // so set them in the UI to initial values
+      this.frmLoan.patchValue({ loan_balance: this._decimalPipe.transform(0, '.2-2')});
+      this.frmLoan.patchValue({ loan_payment_to_date: this._decimalPipe.transform(0, '.2-2')});
+    }
+
     this._setEntityTypeDefault();
   }
 
@@ -243,6 +264,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       formValidators.push(alphaNumeric());
     }
 
+    if (fieldName === 'loan_incurred_date') {
+      const formType = JSON.parse(localStorage.getItem('form_3X_report_type'));
+      this.cvgStartDate = formType.cvgStartDate;
+      this.cvgEndDate = formType.cvgEndDate;
+      formValidators.push(this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate)); //TODO-ZS  -- do null checks. 
+    }
+
     if (validators) {
       for (const validation of Object.keys(validators)) {
         if (validation === 'required') {
@@ -255,9 +283,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           }
         } else if (validation === 'max') {
           if (validators[validation] !== null) {
-            if( fieldName === 'loan_amount_original'){
+            if (fieldName === 'loan_amount_original') {
               formValidators.push(validateAmount());
-            }else{
+            } else {
               formValidators.push(Validators.maxLength(validators[validation]));
             }
           }
@@ -328,12 +356,26 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
     const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
 
-      if(this.frmLoan.get('loan_amount_original')) {
-        this.frmLoan.patchValue({ loan_amount_original: amountValue }, { onlySelf: true });
-      } 
-      // else if(this.frmLoan.get('contribution_amount')){
-      //   this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
-      // }
+    if (this.frmLoan.get('loan_amount_original')) {
+      this.frmLoan.patchValue({ loan_amount_original: amountValue }, { onlySelf: true });
+
+      
+      if ("add" === this.scheduleAction) {
+        this.frmLoan.patchValue({ loan_balance: amountValue }, { onlySelf: true });
+      }
+      else {
+        //calculate balance and updated fields
+        let currentOutstandingBalance = this.currentLoanData.loan_balance;
+        currentOutstandingBalance = parseFloat(currentOutstandingBalance.toString().replace(/,/g, ``));
+        let currentLoanAmountFromDB = this.currentLoanData.loan_amount_original;
+        let newOutstandingBalance = contributionAmountNum - currentLoanAmountFromDB + currentOutstandingBalance;
+        this.frmLoan.patchValue({ loan_balance: this._decimalPipe.transform(newOutstandingBalance, '.2-2') }, { onlySelf: true });
+      }
+
+    }
+    // else if(this.frmLoan.get('contribution_amount')){
+    //   this.frmIndividualReceipt.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
+    // }
     // let transactionDate = null;
     // if (this.frmIndividualReceipt.get('contribution_date')) {
     //   transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
@@ -1331,10 +1373,10 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
-  public onSaveLoan(loanRepaymentRoute = false): void{
-    if(loanRepaymentRoute){
+  public onSaveLoan(loanRepaymentRoute = false): void {
+    if (loanRepaymentRoute) {
       this.doValidateLoan('loanRepayment');
-    }else{
+    } else {
       this.saveLoan();
     }
   }
@@ -1351,7 +1393,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.status.emit(loanRepaymentEmitObj);
   }
 
-  public AddLoanEndorser(): void {}
+  public AddLoanEndorser(): void { }
 
   public isFieldName(fieldName: string, nameString: string): boolean {
     return fieldName === nameString || fieldName === this._childFieldNamePrefix + nameString;
@@ -1360,7 +1402,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   /**
    * Vaidates the form on submit.
    */
-  public doValidateLoan(nextScreen:string) {
+  public doValidateLoan(nextScreen: string) {
     if (this.frmLoan.valid) {
       const LoanObj: any = {};
 
@@ -1394,8 +1436,18 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
             LoanObj[field] = typeAheadField;
           }
           // }
-        } else {
+        } else if (field === 'loan_amount_original' || field === 'loan_payment_to_date' || field === 'loan_balance') {
+          let amount = LoanObj[field] = this.frmLoan.get(field);
+          if (amount.value) {
+            LoanObj[field] = amount.value.replace(/,/g, ``);
+          }
+        }
+        else {
           LoanObj[field] = this.frmLoan.get(field).value;
+        }
+        //also add transactionId if available (edit route)
+        if(this.transactionDetail && this.transactionDetail.transactionId){
+          LoanObj['transaction_id'] = this.transactionDetail.transactionId;
         }
       }
 
@@ -1405,6 +1457,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         LoanObj.entity_id = this._selectedEntity.entity_id;
       }
       LoanObj.entity_type = this.entityType;
+      LoanObj['is_loan_secured'] = this.frmLoan.get('secured').value;
       console.log('LoanObj =', JSON.stringify(LoanObj));
 
       localStorage.setItem('LoanObj', JSON.stringify(LoanObj));
@@ -1424,9 +1477,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
             //window.scrollTo(0, 0);
 
             this._clearFormValues();
-            if(nextScreen === 'loanSummary'){
+            if (nextScreen === 'loanSummary') {
               this._gotoSummary();
-            }else if(nextScreen === 'loanRepayment'){
+            } else if (nextScreen === 'loanRepayment') {
               this._goToLoanRepayment();
             }
           }
@@ -1542,6 +1595,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       if (Array.isArray(res)) {
         if (res.length > 0) {
           loanData = res[0];
+          this.currentLoanData = loanData;
         }
       }
       if (!loanData) {
@@ -1550,38 +1604,47 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       // TODO need entity_type from API - inferring from entity ID until it is provided.
       let entityType = null;
       if (loanData.hasOwnProperty('entity_id')) {
-        this._selectedEntity = {entity_id: loanData.entity_id};
+        this._selectedEntity = { entity_id: loanData.entity_id };
         if (this.frmLoan.contains('entity_type')) {
           entityType = loanData.entity_id.startsWith('IND') ? 'IND' : 'ORG';
-          this.frmLoan.patchValue({entity_type: entityType}, { onlySelf: true });
+          this.frmLoan.patchValue({ entity_type: entityType }, { onlySelf: true });
           this._selectedEntity.entity_type = entityType;
         }
       }
 
       if (entityType === 'IND') {
-        this._patchForm(loanData, 'last_name', 'lender_cand_last_name');
-        this._patchForm(loanData, 'first_name', 'lender_cand_first_name');
-        this._patchForm(loanData, 'middle_name', 'lender_cand_middle_name');
-        this._patchForm(loanData, 'prefix', 'lender_cand_prefix');
-        this._patchForm(loanData, 'suffix', 'lender_cand_suffix');
+        this._patchForm(loanData, 'last_name');
+        this._patchForm(loanData, 'first_name');
+        this._patchForm(loanData, 'middle_name');
+        this._patchForm(loanData, 'prefix');
+        this._patchForm(loanData, 'suffix');
       }
 
       if (entityType === 'ORG') {
-        // TODO determine API name for ORG
+        this._patchForm(loanData, 'entity_name');
       }
 
-      // TODO API needs to provide the address fields
-      this._patchForm(loanData, 'state', 'lender_cand_state');
+      this._patchForm(loanData, 'street_1');
+      this._patchForm(loanData, 'street_2');
+      this._patchForm(loanData, 'state');
+      this._patchForm(loanData, 'city');
+      this._patchForm(loanData, 'zip_code');
+
 
       this._patchForm(loanData, 'election_code');
       this._patchForm(loanData, 'election_other_description');
-      this._patchForm(loanData, 'loan_amount_original');
-      this._patchForm(loanData, 'loan_payment_to_date');
-      this._patchForm(loanData, 'loan_balance');
       this._patchForm(loanData, 'loan_incurred_date');
       this._patchForm(loanData, 'loan_due_date');
       this._patchForm(loanData, 'loan_intrest_rate');
       this._patchForm(loanData, 'secured', 'is_loan_secured');
+      
+      // this._decimalPipe.transform(contributionAmountNum, '.2-2');
+      this.frmLoan.patchValue({loan_amount_original: this._decimalPipe.transform(loanData.loan_amount_original, '.2-2')})
+      this.frmLoan.patchValue({loan_payment_to_date: this._decimalPipe.transform(loanData.loan_payment_to_date, '.2-2')})
+      this.frmLoan.patchValue({loan_balance: this._decimalPipe.transform(loanData.loan_balance, '.2-2')})
+      // this._patchForm(loanData, 'loan_amount_original');
+      // this._patchForm(loanData, 'loan_payment_to_date');
+      // this._patchForm(loanData, 'loan_balance');
     });
   }
 
@@ -1608,29 +1671,102 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this._setEntityTypeDefault();
   }
 
-    /**
-   * Navigate to the Transactions.
+  /**
+   * Determine if fields is read only.  If it should
+   * be read only return true else null.  Null will
+   * remove HTML attribute readonly whereas setting it to
+   * false will not remove readonly from DOM and fields remain in readonly.
    */
+  public isFieldReadOnly(col: any) {
+    if (col.type === 'text' && col.isReadonly) {
+      return true;
+    }
+    return null;
+  }
+
+  public handleOnBlurEvent($event: any, col: any) {
+    if (this.isFieldName(col.name, 'loan_amount_original')) {
+      this._formatAmount($event, col.name, col.validation.dollarAmountNegative);
+    }
+  }
+
+  // These 2 methods are duplicated from AbstractSchedule and should be made as shared utility
+  // methods.
+
+  private _formatAmount(e: any, fieldName: string, negativeAmount: boolean) {
+    let contributionAmount: string = e.target.value;
+
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+
+    // determine if negative, truncate if > max
+    contributionAmount = this._transformAmount(contributionAmount, this._contributionAmountMax);
+
+    let contributionAmountNum = parseFloat(contributionAmount);
+    // Amount is converted to negative for Return / Void / Bounced
+    if (negativeAmount) {
+      contributionAmountNum = -Math.abs(contributionAmountNum);
+      // this._contributionAmount = String(contributionAmountNum);
+    }
+
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
+    const patch = {};
+    patch[fieldName] = amountValue;
+    this.frmLoan.patchValue(patch, { onlySelf: true });
+  }
+
+  /**
+   * Allow for negative sign and don't allow more than the max
+   * number of digits.
+   */
+  private _transformAmount(amount: string, max: number): string {
+    if (!amount) {
+      return amount;
+    } else if (amount.length > 0 && amount.length <= max) {
+      return amount;
+    } else {
+      // Need to handle negative sign, decimal and max digits
+      if (amount.substring(0, 1) === '-') {
+        if (amount.length === max || amount.length === max + 1) {
+          return amount;
+        } else {
+          return amount.substring(0, max + 2);
+        }
+      } else {
+        const result = amount.substring(0, max + 1);
+        return result;
+      }
+    }
+  }
+
+  /**
+ * Navigate to the Transactions.
+ */
   public viewTransactions(): void {
 
     // TODO Do we need to add support for cloning as with AbstractSchedule?
 
-      this._clearFormValues();
-      let reportId = this._receiptService.getReportIdFromStorage(this.formType);
-      console.log('reportId', reportId);
+    this._clearFormValues();
+    let reportId = this._receiptService.getReportIdFromStorage(this.formType);
+    console.log('reportId', reportId);
 
-      if (!reportId) {
-        reportId = '0';
+    if (!reportId) {
+      reportId = '0';
+    }
+    localStorage.setItem(`form_${this.formType}_view_transaction_screen`, 'Yes');
+    localStorage.setItem('Transaction_Table_Screen', 'Yes');
+    this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
+
+    // TODO when should editMode be true/false?
+    this._router.navigate([`/forms/form/${this.formType}`], {
+      queryParams: {
+        step: 'transactions', reportId: reportId, edit: true,
+        transactionCategory: this._transactionCategory
       }
-      localStorage.setItem(`form_${this.formType}_view_transaction_screen`, 'Yes');
-      localStorage.setItem('Transaction_Table_Screen', 'Yes');
-      this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
-
-      // TODO when should editMode be true/false?
-      this._router.navigate([`/forms/form/${this.formType}`], {
-        queryParams: { step: 'transactions', reportId: reportId, edit: true,
-        transactionCategory: this._transactionCategory }
-      });
+    });
 
 
     // if (!this._cloned || this._completedCloning) {

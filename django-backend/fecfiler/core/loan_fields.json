@@ -251,7 +251,6 @@
           }
         ]
       },
-
       {
         "colClassName": "col col-md-4",
         "seperator": true,
@@ -277,7 +276,7 @@
             }
           },
           {
-            "isReadonly": false,
+            "isReadonly": true,
             "entityGroup": null,
             "toggle": false,
             "inputGroup": true,
@@ -291,13 +290,13 @@
             "height": "30px",
             "width": "154px",
             "validation": {
-              "required": true,
+              "required": false,
               "max": 12,
               "dollarAmount": true
             }
           },
           {
-            "isReadonly": false,
+            "isReadonly": true,
             "entityGroup": null,
             "toggle": false,
             "inputGroup": true,
@@ -595,7 +594,7 @@
             }
           },
           {
-            "isReadonly": false,
+            "isReadonly": true,
             "entityGroup": null,
             "toggle": false,
             "inputGroup": true,
@@ -609,13 +608,13 @@
             "height": "30px",
             "width": "154px",
             "validation": {
-              "required": true,
+              "required": false,
               "max": 12,
               "dollarAmount": true
             }
           },
           {
-            "isReadonly": false,
+            "isReadonly": true,
             "entityGroup": null,
             "toggle": false,
             "inputGroup": true,
@@ -623,7 +622,7 @@
             "text": "Outstanding balance at close of period",
             "infoIcon": true,
             "infoText": "Request language from RAD",
-            "name": "loan_payment_to_date",
+            "name": "loan_balance",
             "type": "text",
             "value": null,
             "height": "30px",

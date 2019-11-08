@@ -185,7 +185,7 @@ export class LoanpaymentComponent implements OnInit {
 
       formData.append('cmte_id', committeeDetails.committeeid);
       formData.append('transaction_type_identifier', 'LOAN_REPAY_MADE');
-
+      formData.append('back_ref_transaction_id', this.transactionDetail.transactionId);
       console.log();
 
       for (const [key, value] of Object.entries(this.form.controls)){
@@ -196,8 +196,8 @@ export class LoanpaymentComponent implements OnInit {
         }
       }
 
-      formData.append('expenditure_date', this.utilService.formatDate(this.form.value.expenditure_date));
-      formData.append('expenditure_amount', this.removeCommas(this.form.value.expenditure_amount));
+      formData.set('expenditure_date', this.utilService.formatDate(this.form.value.expenditure_date));
+      formData.set('expenditure_amount', this.removeCommas(this.form.value.expenditure_amount));
       if (this.form.value.memoCode) {
         formData.append('memo_code', 'X');
       }

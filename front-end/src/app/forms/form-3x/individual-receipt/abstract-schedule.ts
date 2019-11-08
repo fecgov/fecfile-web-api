@@ -977,7 +977,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
 
   /**
-   * Return true id readonly else null to remove readonly attribute from DOM.
+   * Return true if readonly else null to remove readonly attribute from DOM.
    */
   private _isTotalAmountReadOnly(col: any): boolean {
     if (col.name !== 'total_amount') {

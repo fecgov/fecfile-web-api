@@ -1,4 +1,4 @@
-<ng-template #rt let-r="result" let-t="term">
+<!-- <ng-template #rt let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
 </ng-template>
 <ng-template #rtOrg let-r="result" let-t="term">
@@ -15,7 +15,7 @@
 </ng-template>
 <ng-template #rtCandidate let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
-</ng-template>
+</ng-template> -->
 
 <div class="add_new_loan-container">
   <form [formGroup]="frmLoan">
@@ -72,13 +72,11 @@
                           && col?.name !== 'last_name'
                           && col?.name !== 'entity_name'" class="form-control" [style.width]="col?.width"
                         [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
-                        [attr.readonly]="col?.name === 'contribution_aggregate' && col.type === 'text' ? true : null"
-                        [attr.value]="col?.value"
+                        [attr.readonly]="isFieldReadOnly(col)" [attr.value]="col?.value"
                         [maxlength]="col?.name === 'loan_amount_original' ? null : col?.validation?.max"
                         [formControlName]="col?.name"
                         (blur)="col?.name === 'loan_amount_original' ? contributionAmountChange($event) : null"
-                        [ngClass]="
-                        frmLoan.get(col?.name)?.invalid &&
+                        [ngClass]="frmLoan.get(col?.name)?.invalid &&
                         (frmLoan.touched || frmLoan.dirty)
                           ? 'input-field-error'
                           : ''
@@ -144,6 +142,16 @@
                           Only numerical values are allowed.
                         </div>
                       </ng-container>
+                      <ng-container *ngIf="frmLoan.get(col?.name).errors">
+                        <div class="text-error text-left"
+                          *ngIf="frmLoan.get(col?.name).errors['contributionDateInvalid']">
+                          The date entered falls outside of the report coverage period. Transactions for this report
+                          should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
+                          need to add a transaction with a date that falls outside of the coverage period for this
+                          report, you will need to check the memo code box.
+                        </div>
+                      </ng-container>
+
 
                     </div>
                   </ng-container>
@@ -261,18 +269,24 @@
                     </ng-select>
                   </ng-container>
 
-                  <ng-container *ngIf="col?.type === 'select' && col?.name === 'election_code'">
-                    <ng-select #electioncodeSelect id="election" [items]="electionTypes"
-                      (change)="electionTypeChanged($event, col)" [style.width]="col?.width"
-                      [style.height]="col?.height" [formControlName]="col?.name" bindValue="code" bindLabel="name"
-                      [ngClass]="
+                  <!-- <ng-container *ngIf="col?.type === 'select' && col?.name === 'election_code'">
+                <ng-select #electioncodeSelect
+                  id="election"
+                  [items]="electionTypes"
+                  (change)="electionTypeChanged($event, col)"
+                  [style.width]="col?.width"
+                  [style.height]="col?.height"
+                  [formControlName]="col?.name"
+                  bindValue="code"
+                  bindLabel="name" 
+                  [ngClass]="
                     frmLoan.get(col?.name)?.invalid &&
                     (frmLoan.touched || frmLoan.dirty)
                       ? 'forms__select-error'
                       : ''
                   ">
                     </ng-select>
-                  </ng-container>
+                  </ng-container> -->
                 </div>
               </div>
             </ng-container>
