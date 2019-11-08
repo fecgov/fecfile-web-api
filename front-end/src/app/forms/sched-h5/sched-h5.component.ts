@@ -409,6 +409,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public returnToSum(): void {
     this.transactionType = 'ALLOC_H5_SUM';
+    this.setH5Sum();
   }
 
   public returnToAdd(): void {
