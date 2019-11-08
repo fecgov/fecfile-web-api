@@ -1,7 +1,7 @@
 import logging
 from functools import lru_cache
 from django.db import connection
-from fecfiler.core.views import get_entities, NoOPError
+from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
 import datetime
 
 logger = logging.getLogger(__name__)
@@ -607,6 +607,7 @@ def get_sched_b_transactions(
     load sched_b transactions
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
             # GET child rows from schedB table
             if transaction_id:
@@ -624,14 +625,14 @@ def get_sched_b_transactions(
                                         beneficiary_cand_entity_id,
                                         aggregate_amt,
                                         create_date
-                FROM public.sched_b WHERE report_id = %s 
+                FROM public.sched_b WHERE report_id in ('{}')
                 AND cmte_id = %s 
                 AND transaction_id = %s 
                 AND delete_ind is distinct from 'Y'
-                """
+                """.format("', '".join(report_list))
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                    [report_id, cmte_id, transaction_id],
+                    [cmte_id, transaction_id],
                 )
             elif back_ref_transaction_id:
                 query_string = """
@@ -645,14 +646,14 @@ def get_sched_b_transactions(
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
-                WHERE report_id = %s 
+                WHERE report_id in ('{}')
                 AND cmte_id = %s 
                 AND back_ref_transaction_id = %s 
                 AND delete_ind is distinct from 'Y'
-                """
+                """.format("', '".join(report_list))
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                    [report_id, cmte_id, back_ref_transaction_id],
+                    [cmte_id, back_ref_transaction_id],
                 )
             else:
                 query_string = """
@@ -666,13 +667,13 @@ def get_sched_b_transactions(
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
-                WHERE report_id = %s 
+                WHERE report_id in ('{}')
                 AND cmte_id = %s 
                 AND delete_ind is distinct from 'Y'
-                """
+                """.format("', '".join(report_list))
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                    [report_id, cmte_id],
+                    [cmte_id],
                 )
             return post_process_it(cursor, cmte_id, report_id, back_ref_transaction_id)
     except Exception:
