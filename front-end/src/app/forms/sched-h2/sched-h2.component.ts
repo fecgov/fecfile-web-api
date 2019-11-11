@@ -64,7 +64,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public saveHRes: any;
 
   public tableConfig: any;
-   
+  public receiptDateErr = false;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -89,6 +90,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     private _actRoute: ActivatedRoute,
     private _schedH2Service: SchedH2Service,
     private _individualReceiptService: IndividualReceiptService,
+    private _uService: UtilService,
   ) {    
      super(
       _http,
@@ -114,6 +116,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     );
     _schedH2Service;
     _individualReceiptService;
+    _uService;
   }
 
 
@@ -142,6 +145,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
 
+    this.schedH2.patchValue({ select_activity_function: ''}, { onlySelf: true });
     //this.transactionType = 'ALLOC_H2_RATIO';
   }
 
@@ -185,7 +189,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public setSchedH2() {
     this.schedH2 = new FormGroup({      
       activity_event_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
-      date: new FormControl(''),
+      receipt_date: new FormControl(''),
       select_activity_function: new FormControl('', Validators.required),
       fundraising: new FormControl('', Validators.required),
       direct_cand_support: new FormControl('', Validators.required),
@@ -256,6 +260,41 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public returnToAdd(): void {
     this.transactionType = 'ALLOC_H2_RATIO';    
+  }
+
+  public receiptDateChanged(receiptDate: string) {
+
+    const formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
+    let cvgStartDate = formInfo.cvgStartDate;
+    let cvgEndDate = formInfo.cvgEndDate;
+
+    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgEndDate)) ||
+      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgStartDate)))) {     
+      this.receiptDateErr = true;
+    } else {
+      this.receiptDateErr = false;
+    }
+
+  }
+  public handleDateFieldKeyup() {
+    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    alert("hello");
+  }
+
+  public handleFedPercentFieldKeyup(e) {
+    if(e.target.value <= 100) {
+      this.schedH2.patchValue({ non_federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
+    }else {
+      this.schedH2.patchValue({ non_federal_percent: 0}, { onlySelf: true });
+    }
+  }
+
+  public handleNonFedPercentFieldKeyup(e) {
+    if(e.target.value <= 100) {
+      this.schedH2.patchValue({ federal_percent: Number(100 - e.target.value)}, { onlySelf: true });   
+    }else {
+      this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true }); 
+    }  
   }
   
 }
