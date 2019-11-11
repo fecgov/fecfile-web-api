@@ -1306,6 +1306,9 @@ def validate_sh3_data(data):
     validate sH3 json data
     """
     check_mandatory_fields_SH3(data)
+    # TODO: temp_change
+    if not data.get('total_amount_transferred'):
+        data['total_amount_transferred'] = 0
 
 
 def post_schedH3(data):
@@ -1325,6 +1328,7 @@ def post_schedH3(data):
         except Exception as e:
             raise Exception(
                 'The post_sql_schedH3 function is throwing an error: ' + str(e))
+        logger.debug('data saved successfully.')
         return data
     except:
         raise
@@ -1641,8 +1645,6 @@ def get_h3_summary(request):
     # TODO: what is gonna happen when people click edit button? 
     """
     try:
-        
-
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
         aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
@@ -1668,7 +1670,7 @@ def get_h3_summary(request):
             create_date ,
             last_update_date
             FROM public.sched_h3
-            WHERE report_id = %s AND cmte_id = %s
+            WHERE (report_id = %s or report_id = 0) AND cmte_id = %s
             AND back_ref_transaction_id is not null
             AND delete_ind is distinct from 'Y') t
             """
@@ -1791,6 +1793,7 @@ def schedH3(request):
                         child_data = schedH3_sql_dict(child_data)
                         logger.debug('saving child transaction with data {}'.format(child_data))
                         post_schedH3(child_data) 
+                        logger.debug('child transaction saved.')
             # Associating child transactions to parent and storing them to DB
 
             output = get_schedH3(data)
