@@ -319,7 +319,7 @@ export class F3xComponent implements OnInit {
               this.scheduleAction = ScheduleActions.add;
             }
 
-            if (this._handleScheduleC()) {
+            if (this._handleScheduleC(e.transactionDetail)) {
               return;
             }
 
@@ -431,7 +431,7 @@ export class F3xComponent implements OnInit {
    * Handle Schedule C forms.
    * @returns true if schedule C and should stop processing
    */
-  private _handleScheduleC(): boolean {
+  private _handleScheduleC(transactionDetail:any): boolean {
     let finish = false;
     if (
       this.scheduleType === 'sched_c' ||
@@ -458,6 +458,8 @@ export class F3xComponent implements OnInit {
       }
       this.canContinue();
       finish = true;
+      //setting the transaction detail for @input in 'add' scenario for loan payment 
+      this.transactionDetailSchedC = transactionDetail.transactionModel;
     }
     return finish;
   }

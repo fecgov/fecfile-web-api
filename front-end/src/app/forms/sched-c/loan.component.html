@@ -1,24 +1,12 @@
-<!-- <ng-template #rt let-r="result" let-t="term">
+<ng-template #rt let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
 </ng-template>
 <ng-template #rtOrg let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
 </ng-template>
-<ng-template #rtCommitteeId let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
-</ng-template>
-<ng-template #rtCandidateId let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
-</ng-template>
-<ng-template #rtCommitteeName let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
-</ng-template>
-<ng-template #rtCandidate let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
-</ng-template> -->
 
 <div class="add_new_loan-container">
-  <form [formGroup]="frmLoan">
+  <form [formGroup]="frmLoan" *ngIf="frmLoan">
     <header>
       <div class="header-content">
         <h1>
@@ -79,8 +67,7 @@
                         [ngClass]="frmLoan.get(col?.name)?.invalid &&
                         (frmLoan.touched || frmLoan.dirty)
                           ? 'input-field-error'
-                          : ''
-                      " (keyup)="handleFormFieldKeyup($event, col)" />
+                          : ''"  />
                       <input *ngIf="col?.name === 'last_name'" class="form-control" [style.width]="col?.width"
                         [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                         [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
@@ -213,36 +200,6 @@
                       <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
                         <span>{{ item.code + ' - ' + item.name }}</span>
                       </ng-template>
-                    </ng-select>
-                  </ng-container>
-
-                  <ng-container *ngIf="col?.type === 'select' && col?.name === 'office_Sought'">
-                    <ng-select (change)="handleCandOfficeChange($event, col)" class="state-select"
-                      [style.width]="col?.width" [style.height]="col?.height" [formControlName]="col?.name"
-                      bindValue="code" bindLabel="name" [ngClass]="
-                      frmLoan.get(col?.name)?.invalid &&
-                      (frmLoan.touched || frmLoan.dirty)
-                        ? 'state-select-error'
-                        : ''
-                    ">
-                      <ng-option *ngFor="let item1 of officeSought" [ngValue]="item1">
-                        {{ item1.code }} - {{ item1.name }}
-                      </ng-option>
-                    </ng-select>
-                  </ng-container>
-
-                  <ng-container *ngIf="col?.type === 'select' && col?.name === 'Office_State'">
-                    <ng-select (change)="handleOfficeStateChange($event, col)" class="state-select"
-                      [style.width]="col?.width" [style.height]="col?.height" [formControlName]="col?.name"
-                      bindValue="code" bindLabel="name" [ngClass]="
-                      frmLoan.get(col?.name)?.invalid &&
-                      (frmLoan.touched || frmLoan.dirty)
-                        ? 'state-select-error'
-                        : ''
-                    ">
-                      <ng-option *ngFor="let item2 of states" [ngValue]="item2">
-                        {{ item2.code }} - {{ item2.name }}
-                      </ng-option>
                     </ng-select>
                   </ng-container>
 
