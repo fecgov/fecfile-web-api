@@ -232,7 +232,7 @@ def get_reports_to_upload():
                                         data_row[0],  
                                         4,
                                         "F3X create_json_builders call with data_obj ", 
-                                        json.dumps(resp),
+                                        resp,
                                         '',
                                         '', 
                                         '', 
@@ -283,7 +283,7 @@ def get_reports_to_upload():
                                 data_row[0], 
                                 4,
                                 "create_json_builders operation failed with submission_id ",
-                                json.loads(resp),
+                                resp,
                                 '',
                                 '', 
                                 ''
