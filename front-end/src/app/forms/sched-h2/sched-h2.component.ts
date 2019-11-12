@@ -66,6 +66,11 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public tableConfig: any;
   public receiptDateErr = false;
 
+  public cvgStartDate: any;
+  public cvgEndDate: any;
+
+  public isSubmit = false;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -146,7 +151,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
 
     this.schedH2.patchValue({ select_activity_function: ''}, { onlySelf: true });
-    //this.transactionType = 'ALLOC_H2_RATIO';
+   
   }
 
   pageChanged(event){
@@ -223,11 +228,14 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     
     const serializedForm = JSON.stringify(formObj);
 
+    this.isSubmit = true;
+
     if(this.schedH2.status === 'VALID' && 
         (this.schedH2.get('federal_percent').value + this.schedH2.get('non_federal_percent').value) === 100) {
 
       this.saveH2Ratio(serializedForm);      
       this.schedH2.reset();
+      this.isSubmit = false;
     }
   }
 
@@ -252,35 +260,43 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   }
  
   public returnToSum(): void {
+
+    this.saveAndAddMore();
+
+    this.isSubmit = false;
+
+    this.schedH2.reset();
+
     this.transactionType = 'ALLOC_H2_SUM';
-    //this.getH2Sum(this.getReportId());
+
+    this.receiptDateErr = false;
+   
     this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
 
   }
 
   public returnToAdd(): void {
-    this.transactionType = 'ALLOC_H2_RATIO';    
+    this.transactionType = 'ALLOC_H2_RATIO';
+
+    this.receiptDateErr = false;  
   }
 
   public receiptDateChanged(receiptDate: string) {
 
     const formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
-    let cvgStartDate = formInfo.cvgStartDate;
-    let cvgEndDate = formInfo.cvgEndDate;
+    this.cvgStartDate = formInfo.cvgStartDate;
+    this.cvgEndDate = formInfo.cvgEndDate;
 
-    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgStartDate)))) {     
+    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
+      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
       this.receiptDateErr = true;
+      this.schedH2.controls['receipt_date'].setErrors({'incorrect': true});  
     } else {
       this.receiptDateErr = false;
     }
 
   }
-  public handleDateFieldKeyup() {
-    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-    alert("hello");
-  }
-
+ 
   public handleFedPercentFieldKeyup(e) {
     if(e.target.value <= 100) {
       this.schedH2.patchValue({ non_federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
@@ -291,7 +307,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public handleNonFedPercentFieldKeyup(e) {
     if(e.target.value <= 100) {
-      this.schedH2.patchValue({ federal_percent: Number(100 - e.target.value)}, { onlySelf: true });   
+      this.schedH2.patchValue({ federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true }); 
     }  

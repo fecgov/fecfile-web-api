@@ -64,7 +64,7 @@
                 type="text" 
                 formControlName="activity_event_name"
                 [ngClass]="schedH2.get('activity_event_name')?.invalid &&
-                  (schedH2.touched || schedH2.dirty)
+                  (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error' : ''"
               >
               <div class="text-error text-left"
@@ -98,8 +98,8 @@
               </div>
               <div class="text-error text-left"
                 *ngIf="receiptDateErr"
-              >
-                Date is out of the coverage period.
+              >                
+                The date entered falls outside of the report coverage period. Transactions for this report should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you need to add a transaction with a date that falls outside of the coverage period for this report, you will need to check the memo code box.
               </div>
             </div>
           </div>        
@@ -110,8 +110,8 @@
             <div class="form-group">
                 <select id="" formControlName="select_activity_function" class="form-control" 
                 (change)="selectActivityFunctionChange($event)"
-                [ngClass]="schedH2.get('select_activity_function') &&
-                  (schedH2.touched || schedH2.dirty)?.invalid 
+                [ngClass]="schedH2.get('select_activity_function')?.invalid  &&
+                  (schedH2.touched || schedH2.dirty) && isSubmit 
                      ? 'input-field-error' : ''"
                 >           
                     <option [ngValue]="null" selected>Select Activity Function</option>
@@ -135,19 +135,19 @@
               <div class="col-md-4">
                   <input type="radio" formControlName="ratio_code" value="n">
                   <label [ngClass]="schedH2.get('ratio_code')?.invalid &&
-                      (schedH2.touched || schedH2.dirty)
+                      (schedH2.touched || schedH2.dirty)  && isSubmit 
                     ? 'input-field-error' : ''" >New</label>
               </div>
               <div class="col-md-4">
                   <input type="radio" formControlName="ratio_code" value="r">
                   <label [ngClass]="schedH2.get('ratio_code')?.invalid &&
-                      (schedH2.touched || schedH2.dirty)
+                      (schedH2.touched || schedH2.dirty)  && isSubmit 
                     ? 'input-field-error' : ''">Revised</label> 
               </div>
               <div class="col-md-4">
                   <input type="radio" formControlName="ratio_code" value="s">
                   <label [ngClass]="schedH2.get('ratio_code')?.invalid &&
-                      (schedH2.touched || schedH2.dirty)
+                      (schedH2.touched || schedH2.dirty)  && isSubmit 
                     ? 'input-field-error' : ''">RevisedSame as Previously Reported</label>                 
               </div>
             </div>
@@ -163,7 +163,7 @@
                     type="number" 
                     formControlName="federal_percent"
                     [ngClass]="schedH2.get('federal_percent')?.invalid &&
-                      (schedH2.touched || schedH2.dirty)
+                      (schedH2.touched || schedH2.dirty)  && isSubmit 
                           ? 'input-field-error' : ''"                      
                     (keyup)="handleFedPercentFieldKeyup($event)"
                   >
@@ -188,7 +188,7 @@
                         type="number" 
                         formControlName="non_federal_percent"
                         [ngClass]="schedH2.get('non_federal_percent')?.invalid &&
-                          (schedH2.touched || schedH2.dirty)
+                          (schedH2.touched || schedH2.dirty)  && isSubmit 
                             ? 'input-field-error' : ''"
                         (keyup)="handleNonFedPercentFieldKeyup($event)"
                       >

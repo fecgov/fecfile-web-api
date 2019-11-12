@@ -238,20 +238,77 @@ GET DYNAMIC FORM FIELDS API- CORE APP - SPRINT 7 - FNE 526 - BY PRAVEEN JINKA
 def get_dynamic_forms_fields(request):
 
     try:
+        cmte_id = request.user.username
+        form_type = request.query_params.get('form_type')
+        transaction_type = request.query_params.get('transaction_type')
+        if 'reportId' in request.query_params and request.query_params.get('reportId') not in ('',"", None, " ", "None", "null"):
+            report_id = request.query_params.get('reportId')
+        else:
+            report_id = 0
+        forms_obj = {}
         with connection.cursor() as cursor:
-
-            cmte_id = request.user.username
-            form_type = request.query_params.get('form_type')
-            transaction_type = request.query_params.get('transaction_type')
-            forms_obj = {}            
             cursor.execute("select form_fields from dynamic_forms_view where form_type = %s and transaction_type = %s", [form_type, transaction_type])
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-                
-        if not bool(forms_obj):
-            return Response("No entries were found for the form_type: {} and transaction type: {} for this committee".format(form_type, transaction_type), status=status.HTTP_400_BAD_REQUEST)                              
-        
+        # print(forms_obj)
+        if bool(forms_obj):
+            if transaction_type in ['ALLOC_EXP','ALLOC_EXP_VOID','ALLOC_EXP_CC_PAY','ALLOC_EXP_STAF_REIM','ALLOC_EXP_PMT_TO_PROL', 'ALLOC_EXP_DEBT']:
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT cmte_type_category FROM public.committee_master WHERE cmte_id = %s", [cmte_id])
+                    cmte_type_categories = cursor.fetchone()
+                if cmte_type_categories:
+                    cmte_type_category = cmte_type_categories[0]
+                    if cmte_type_category:
+                        for events in forms_obj['data']['committeeTypeEvents']:
+                            for eventTypes in events['eventTypes']:
+                                if eventTypes['eventType'] in ['PC', 'AD', 'GV']:
+                                    query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                    if eventTypes['eventType'] == 'PC':
+                                        query_string += " AND public_communications = true"
+                                    elif eventTypes['eventType'] == 'AD':
+                                        query_string += " AND administrative = true"
+                                    elif eventTypes['eventType'] == 'GV':
+                                        query_string += " AND generic_voter_drive = true"
+                                    with connection.cursor() as cursor:
+                                        cursor.execute(query_string, [cmte_id,report_id])
+                                        count = cursor.fetchone()
+                                        print(cursor.query)
+                                    print(eventTypes['eventType'] + "count: "+str(count[0]))
+                                    if count[0] == 0:
+                                        eventTypes['hasValue'] = False
+                                    else:
+                                        eventTypes['hasValue'] = True
+                                elif eventTypes['eventType'] in ['DF', 'DC']:
+                                    query_string = """SELECT json_agg(t) FROM (SELECT '{}' AS "activityEventType", transaction_id AS "transactionId", activity_event_name AS "activityEventDescription" 
+                                            FROM public.sched_h2 WHERE cmte_id = %s AND {} AND delete_ind IS DISTINCT FROM 'Y') AS t"""
+                                    if eventTypes['eventType'] == 'DF':
+                                        query_string = query_string.format("DF","fundraising = true")
+                                    elif eventTypes['eventType'] == 'DC':
+                                        query_string = query_string.format("DC","direct_cand_support = true")
+                                    with connection.cursor() as cursor:
+                                        cursor.execute(query_string, [cmte_id])
+                                        print(cursor.query)
+                                        activityEventTypes = cursor.fetchone()
+                                    # print(eventTypes['eventType'] + 'activityEventTypes: '+ str(activityEventTypes[0]))
+                                    if activityEventTypes and activityEventTypes[0]:
+                                        eventTypes['activityEventTypes'] = activityEventTypes[0]
+                                        eventTypes['hasValue'] = True
+                                    else:
+                                        eventTypes['hasValue'] = False
+                                elif eventTypes['eventType'] in ['VR', 'VI', 'GO', 'GC', 'EA']:
+                                    query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                    with connection.cursor() as cursor:
+                                        cursor.execute(query_string, [cmte_id,report_id])
+                                        count = cursor.fetchone()
+                                        print(cursor.query)
+                                    print(eventTypes['eventType'] + "count: "+str(count[0]))
+                                    if count[0] == 0:
+                                        eventTypes['hasValue'] = False
+                                    else:
+                                        eventTypes['hasValue'] = True
+        else:
+            return Response("No entries were found for the form_type: {} and transaction type: {} for this committee".format(form_type, transaction_type), status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("The get_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)

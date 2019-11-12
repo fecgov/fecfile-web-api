@@ -67,8 +67,8 @@
                 [style.width]="'90%'" 
                 [style.height]="'30px'"
                 [ngClass]="
-                  frmIndividualReceipt.get('activity_event_name')?.invalid &&
-                  (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                  schedH3.get('account_name')?.invalid &&
+                  (schedH3.touched || schedH3.dirty) && isSubmit
                     ? 'input-field-error'
                     : ''
                 " 
@@ -97,13 +97,19 @@
                   [attr.name]="'receipt_date'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
+                  (change)="receiptDateChanged($event.target.value)" 
                   [ngClass]="
-                      frmIndividualReceipt.get('receipt_date')?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      schedH3.get('receipt_date')?.invalid &&
+                      (schedH3.touched || schedH3.dirty)
                       ? 'input-field-error'
                       : ''
                   "
                   />
+              </div>
+              <div class="text-error text-left"
+                *ngIf="receiptDateErr"
+              >
+              The date entered falls outside of the report coverage period. Transactions for this report should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you need to add a transaction with a date that falls outside of the coverage period for this report, you will need to check the memo code box.
               </div>
             </div>
           </div>
@@ -174,7 +180,7 @@
                 </button>
               </label>
               <div *ngIf="showIdentiferSelect">
-                <select id="" formControlName="activity_event_name" class="form-control" (change)="selectActivityFunctionChange($event)">                    
+                <select id="" formControlName="activity_event_name" class="form-control" (change)="selectActivityOrEventChange($event)">                    
                   <option value="" selected>Activity or Event Identifier</option>
                   <option
                       *ngFor="let identifier of identifiers"                    
@@ -208,6 +214,7 @@
                   [attr.name]="'transferred_amount'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
+                  (keyup)="handleAmountKeyup($event)"
                   [ngClass]="
                       frmIndividualReceipt.get('date')?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)

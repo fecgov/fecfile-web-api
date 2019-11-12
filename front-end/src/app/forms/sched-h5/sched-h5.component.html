@@ -59,7 +59,14 @@
                   <span class="sr-only">Click here for more information</span>
                 </button>
               </label>
-              <select id="" formControlName="account_name" class="form-control">                    
+              <select id="" formControlName="account_name" class="form-control"
+                  [ngClass]="
+                    schedH5.get('account_name')?.invalid &&
+                    (schedH5.touched || schedH5.dirty) && isSubmit
+                      ? 'input-field-error'
+                      : ''
+                  " 
+              >                    
                 <option value="" selected>Select account name</option>
                 <option
                   *ngFor="let item of levinAccountsies"                    
@@ -86,12 +93,19 @@
                   </span>
                 </div>
                 <input class="form-control" type="date" [formControlName]="'receipt_date'" [attr.name]="'receipt_date'"
-                  [style.width]="'50%'" [style.height]="'30px'" [ngClass]="
-                      frmIndividualReceipt.get('date')?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                  [style.width]="'50%'" [style.height]="'30px'" 
+                  (change)="receiptDateChanged($event.target.value)"
+                  [ngClass]="
+                    schedH5.get('receipt_date')?.invalid &&
+                      (schedH5.touched || schedH5.dirty)
                       ? 'input-field-error'
                       : ''
                   " />
+              </div>
+              <div class="text-error text-left"
+                *ngIf="receiptDateErr"
+              >
+              The date entered falls outside of the report coverage period. Transactions for this report should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you need to add a transaction with a date that falls outside of the coverage period for this report, you will need to check the memo code box.
               </div>
             </div>
           </div>
