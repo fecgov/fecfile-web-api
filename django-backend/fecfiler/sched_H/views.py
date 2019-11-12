@@ -89,8 +89,9 @@ def schedH1_sql_dict(data):
             'senate_only', 
             'non_pres_and_non_senate', 
             'federal_percent', 
-            'non_federal_percent', 
-            'adminstrative'
+            'non_federal_percent',
+            'election_year', 
+            'administrative'
             'generic_voter_drive', 
             'public_communications',
     ]
@@ -133,7 +134,8 @@ def put_sql_schedH1(data):
                 non_pres_and_non_senate = %s, 
                 federal_percent = %s, 
                 non_federal_percent = %s, 
-                adminstrative = %s,
+                election_year = %s,
+                administrative = %s,
                 generic_voter_drive = %s, 
                 public_communications = %s,
                 last_update_date = %s
@@ -150,7 +152,8 @@ def put_sql_schedH1(data):
             data.get('non_pres_and_non_senate'),
             data.get('federal_percent'),
             data.get('non_federal_percent'),
-            data.get('adminstrative'),
+            data.get('election_year'),
+            data.get('administrative'),
             data.get('generic_voter_drive'),
             data.get('public_communications'),
             datetime.datetime.now(),
@@ -218,13 +221,14 @@ def post_sql_schedH1(data):
             non_pres_and_non_senate, 
             federal_percent, 
             non_federal_percent, 
-            adminstrative,
+            election_year,
+            administrative,
             generic_voter_drive, 
             public_communications,
             create_date
             )
         VALUES ({}); 
-        """.format(','.join(['%s']*16))
+        """.format(','.join(['%s']*17))
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
@@ -238,7 +242,8 @@ def post_sql_schedH1(data):
             data.get('non_pres_and_non_senate'),
             data.get('federal_percent'),
             data.get('non_federal_percent'),
-            data.get('adminstrative'),
+            data.get('election_year'),
+            data.get('administrative'),
             data.get('generic_voter_drive'),
             data.get('public_communications'),
             datetime.datetime.now(),   
@@ -304,7 +309,8 @@ def get_list_all_schedH1(report_id, cmte_id):
             non_pres_and_non_senate, 
             federal_percent, 
             non_federal_percent, 
-            adminstrative,
+            election_year,
+            administrative,
             generic_voter_drive, 
             public_communications,
             create_date ,
@@ -346,7 +352,8 @@ def get_list_schedH1(report_id, cmte_id, transaction_id):
             non_pres_and_non_senate, 
             federal_percent, 
             non_federal_percent, 
-            adminstrative,
+            election_year,
+            administrative,
             generic_voter_drive, 
             public_communications,
             create_date ,
@@ -565,10 +572,6 @@ def get_fed_nonfed_share(request):
         else: # need to go to h1 for ratios
             activity_event_type = request.query_params.get('activity_event_type')
 
-            # # TODO: need to db change to fix this typo
-            # if activity_event_type == 'administrative':
-            #     activity_event_type = 'adminstrative'
-
             if not activity_event_type:
                 raise Exception('Error: event type is required.')
             
@@ -590,7 +593,7 @@ def get_fed_nonfed_share(request):
                 # if not activity_event_type:
                     # return Response('Error: event type is required for this committee.')
                 event_type_code = {
-                    "AD" : "adminstrative", # TODO: need to fix this typo
+                    "AD" : "administrative", # TODO: need to fix this typo
                     "GV" : "generic_voter_drive",
                     "PC" : "public_communications",
                 }
