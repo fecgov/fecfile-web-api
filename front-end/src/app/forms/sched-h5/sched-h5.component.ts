@@ -61,6 +61,11 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public receiptDateErr = false;
 
+  public cvgStartDate: any;
+  public cvgEndDate: any;
+
+  public isSubmit = false;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -334,6 +339,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
    
     const serializedForm = JSON.stringify(formObj);
 
+    this.isSubmit = true;
+
     if (this.schedH5.status === 'VALID') {
 
       this.schedH5.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
@@ -344,6 +351,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
       this.schedH5.patchValue({category: ''}, { onlySelf: true });
       this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true });
+
+      this.isSubmit = false;
 
       //this.saveH5(serializedForm);
       //this.schedH5.reset();
@@ -414,6 +423,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToSum(): void {
+    this.isSubmit = false;
+    this.schedH5.reset();
+    this.h5Entries = [];
+
     this.transactionType = 'ALLOC_H5_SUM';
     this.setH5Sum();
   }
@@ -554,11 +567,11 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public receiptDateChanged(receiptDate: string) {
 
     const formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
-    let cvgStartDate = formInfo.cvgStartDate;
-    let cvgEndDate = formInfo.cvgEndDate;
+    this.cvgStartDate = formInfo.cvgStartDate;
+    this.cvgEndDate = formInfo.cvgEndDate;
 
-    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgStartDate)))) {     
+    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
+      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
       this.receiptDateErr = true;
       this.schedH5.controls['receipt_date'].setErrors({'incorrect': true});
     } else {

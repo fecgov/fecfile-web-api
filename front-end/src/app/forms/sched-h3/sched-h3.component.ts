@@ -60,6 +60,11 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public receiptDateErr = false;
 
+  public cvgStartDate: any;
+  public cvgEndDate: any;
+
+  public isSubmit = false;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -156,6 +161,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.h3Ratios = {};
     this.h3Ratios['child'] = [];
+
+    this.schedH3.patchValue({ category: ''}, { onlySelf: true });
     
   }
 
@@ -283,12 +290,34 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToSum(): void {
+
+    this.isSubmit = false;
+    this.schedH3.reset();
+    this.h3Entries = [];
+    
+    /*
+    this.schedH3.patchValue({account_name: ''}, { onlySelf: true });  
+    this.schedH3.patchValue({receipt_date: ''}, { onlySelf: true });   
+    this.schedH3.patchValue({total_amount_transferred: ''}, { onlySelf: true });
+    this.h3Entries = [];
+    this.schedH3.patchValue({ category: ''}, { onlySelf: true });
+    this.schedH3.markAsUntouched()
+    this.showIdentifer = false;
+    
+    this.schedH3.patchValue({ activity_event_name: ''}, { onlySelf: true });
+    this.schedH3.patchValue({ transferred_amount: ''}, { onlySelf: true });
+    this.schedH3.patchValue({ aggregate_amount: ''}, { onlySelf: true });
+    */
+
+    this.receiptDateErr = false;
+
     this.transactionType = 'ALLOC_H3_SUM';
     this.setH3Sum();
   }
 
   public returnToAdd(): void {
-    this.transactionType = 'ALLOC_H3_RATIO';    
+    this.transactionType = 'ALLOC_H3_RATIO';
+    this.receiptDateErr = false;
   }
 
   //to test for privous
@@ -404,12 +433,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     delete formObj.total_amount_transferred;
 
+    this.isSubmit = true;
+
     if(this.schedH3.status === 'VALID') {     
       this.h3Entries.push(formObj);
       this.h3EntryTableConfig.totalItems = this.h3Entries.length;
       this.h3Ratios.child.push(formObj);
 
       this.schedH3.reset();
+      this.isSubmit = false;
       
       this.schedH3.patchValue({account_name: accountName}, { onlySelf: true });
       this.schedH3.patchValue({receipt_date: receipt_date}, { onlySelf: true });
@@ -466,11 +498,11 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public receiptDateChanged(receiptDate: string) {
 
     const formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
-    let cvgStartDate = formInfo.cvgStartDate;
-    let cvgEndDate = formInfo.cvgEndDate;
+    this.cvgStartDate = formInfo.cvgStartDate;
+    this.cvgEndDate = formInfo.cvgEndDate;
 
-    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgStartDate)))) {     
+    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
+      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
       this.receiptDateErr = true;
       this.schedH3.controls['receipt_date'].setErrors({'incorrect': true});
     } else {
