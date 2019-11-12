@@ -518,12 +518,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           if (validators[validation]) {
             // occuaption and employer will be required dpending on aggregate
             if (fieldName !== 'employer' && fieldName !== 'occupation') {
-              // if (fieldName === 'incurred_amount' && this.scheduleAction === ScheduleActions.edit) {
-              //   // not required but not optinal when editing
-              // } else {
-              //   formValidators.push(Validators.required);
-              // }
-              if (this.scheduleAction === ScheduleActions.edit) {
+              if (fieldName === 'incurred_amount' && this.scheduleAction === ScheduleActions.edit) {
+                // not required but not optinal when editing
+              } else {
                 formValidators.push(Validators.required);
               }
             } else {
@@ -942,10 +939,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
     const patch = {};
     patch[fieldName] = amountValue;
-    this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+    if (this.frmIndividualReceipt) {
+      this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+    }
   }
 
   public handleActivityEventTypeChange($event: any, col: any) {
+
+    if (!$event) {
+      return;
+    }
 
     if ($event.activityEventTypes) {
       this.activityEventNames = $event.activityEventTypes;
@@ -3045,46 +3048,50 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       hiddenField.value = trx[prop];
                     }
                   }
-                  if (this.frmIndividualReceipt.get(prop)) {
-                    if (this.isFieldName(prop, 'contribution_aggregate')) {
-                      this._contributionAggregateValue = trx[prop];
-                    }
-                    if (this.isFieldName(prop, 'activity_event_type')) {
-                      if (trx[prop] !== null || trx[prop] !== 'Select') {
-                        this.totalAmountReadOnly = false;
-                      }
-                    }
-                    if (this.isFieldName(prop, 'memo_code')) {
-                      const memoCodeValue = trx[prop];
-                      if (memoCodeValue === this._memoCodeValue) {
-                        const isChildField = prop.startsWith(this._childFieldNamePrefix) ? true : false;
-                        if (isChildField) {
-                          this.memoCodeChild = true;
-                        } else {
-                          this.memoCode = true;
+                  if (this.frmIndividualReceipt) {
+                    if (this.frmIndividualReceipt.contains(prop)) {
+                      if (this.frmIndividualReceipt.get(prop)) {
+                        if (this.isFieldName(prop, 'contribution_aggregate')) {
+                          this._contributionAggregateValue = trx[prop];
                         }
-                      }
-                    }
-                    if (this.isFieldName(prop, 'purpose_description')) {
-                      const preTextHiddenField = this._findHiddenField('name', 'pretext');
-                      let preText = '';
-                      if (preTextHiddenField) {
-                        preText = preTextHiddenField.value ? preTextHiddenField.value : '';
-                      }
-                      if (preText) {
-                        // remove it from the input field.  It will be readded on save.
-                        if (trx[prop]) {
-                          if (typeof trx[prop] === 'string') {
-                            if (trx[prop].startsWith(preText)) {
-                              trx[prop] = trx[prop].replace(preText, '');
+                        if (this.isFieldName(prop, 'activity_event_type')) {
+                          if (trx[prop] !== null || trx[prop] !== 'Select') {
+                            this.totalAmountReadOnly = false;
+                          }
+                        }
+                        if (this.isFieldName(prop, 'memo_code')) {
+                          const memoCodeValue = trx[prop];
+                          if (memoCodeValue === this._memoCodeValue) {
+                            const isChildField = prop.startsWith(this._childFieldNamePrefix) ? true : false;
+                            if (isChildField) {
+                              this.memoCodeChild = true;
+                            } else {
+                              this.memoCode = true;
                             }
                           }
                         }
+                        if (this.isFieldName(prop, 'purpose_description')) {
+                          const preTextHiddenField = this._findHiddenField('name', 'pretext');
+                          let preText = '';
+                          if (preTextHiddenField) {
+                            preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+                          }
+                          if (preText) {
+                            // remove it from the input field.  It will be readded on save.
+                            if (trx[prop]) {
+                              if (typeof trx[prop] === 'string') {
+                                if (trx[prop].startsWith(preText)) {
+                                  trx[prop] = trx[prop].replace(preText, '');
+                                }
+                              }
+                            }
+                          }
+                        }
+                        const patch = {};
+                        patch[prop] = trx[prop];
+                        this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
                       }
                     }
-                    const patch = {};
-                    patch[prop] = trx[prop];
-                    this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
                   }
                   if (prop === 'entity_id') {
                     this._selectedEntity = {};
