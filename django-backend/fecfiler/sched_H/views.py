@@ -526,6 +526,9 @@ def get_fed_nonfed_share(request):
             if PAC, get activity based ratio
         grad event_type-based aggregation value from h4
     calculate fed and non-fed share based on ratio and update aggregate value
+
+    update 20191112: 'election year' added to table - calendar year will match to
+    election_year in db. 
     """
 
     logger.debug('get_fed_nonfed_share with request:{}'.format(request.query_params))
@@ -544,12 +547,13 @@ def get_fed_nonfed_share(request):
             from public.sched_h2 
             where cmte_id = %s 
             and activity_event_name = %s
-            and create_date between %s and %s
+            and election_year = %s
+            and delete_ind is distinct from 'Y'
             """
             with connection.cursor() as cursor:
                 logger.debug('query with _sql:{}'.format(_sql))
                 logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
-                cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
+                cursor.execute(_sql, (cmte_id, event_name, calendar_year))
                 if not cursor.rowcount:
                     raise Exception('Error: no h1 data found.')
                 fed_percent = float(cursor.fetchone()[0])
@@ -560,6 +564,7 @@ def get_fed_nonfed_share(request):
             where cmte_id = %s 
             and activity_event_identifier = %s
             and create_date between %s and %s
+            and delete_ind is distinct from 'Y'
             order by create_date desc, last_update_date desc;
             """
             with connection.cursor() as cursor:
@@ -578,13 +583,14 @@ def get_fed_nonfed_share(request):
             if cmte_type_category == 'PTY':
                 _sql = """
                 select federal_percent from public.sched_h1
-                where create_date between %s and %s
+                where election_year = %s
                 and cmte_id = %s
+                and delete_ind is distinct from 'Y'
                 order by create_date desc, last_update_date desc
                 """
                 logger.debug('sql for query h1:{}'.format(_sql))
                 with connection.cursor() as cursor:
-                    cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                    cursor.execute(_sql, (calendar_year, cmte_id))
                     if not cursor.rowcount:
                         raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
@@ -602,7 +608,7 @@ def get_fed_nonfed_share(request):
                     return Response('Error: activity type not valid')
                 _sql = """
                 select federal_percent from public.sched_h1
-                where create_date between %s and %s
+                where election_year = %s
                 and cmte_id = %s
                 """
                 activity_part = """and {} = true """.format(h1_event_type)
@@ -610,7 +616,7 @@ def get_fed_nonfed_share(request):
                 _sql = _sql + activity_part + order_part
                 logger.debug('sql for query h1:{}'.format(_sql))
                 with connection.cursor() as cursor:
-                    cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                    cursor.execute(_sql, (calendar_year, cmte_id))
                     if not cursor.rowcount:
                         raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
@@ -662,17 +668,17 @@ def get_h1_percentage(request):
         if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
             raise Exception ('Missing Input: calendar_year is mandatory')
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
-        start_dt = datetime.date(int(calendar_year), 1, 1)
-        end_dt = datetime.date(int(calendar_year), 12, 31)
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
         _sql = """
             select json_agg(t) from
             (select federal_percent, non_federal_percent from public.sched_h1
-            where create_date between %s and %s
+            where election_year = %s
             and cmte_id = %s
             order by create_date desc, last_update_date desc) t
         """
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+            cursor.execute(_sql, (calendar_year, cmte_id))
             # print('rows:{}'.format(cursor.rowcount))
             json_data = cursor.fetchone()[0]
             # print(json_data)
