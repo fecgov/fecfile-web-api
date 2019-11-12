@@ -4308,7 +4308,7 @@ def contact_sql_dict(data):
           'first_name'  : is_null(data.get('first_name')), 
           'last_name'  : is_null(data.get('last_name')), 
           'middle_name' : is_null(data.get('middle_name')), 
-          'preffix'  : is_null(data.get('preffix')), 
+          'preffix'  : is_null(data.get('prefix')), 
           'suffix' : is_null(data.get('suffix')), 
           'street_1'  : is_null(data.get('street_1')), 
           'street_2'  : is_null(data.get('street_2')), 
@@ -4546,20 +4546,20 @@ def get_list_contact(cmte_id, entity_id = None, name_select_flag = False, entity
             #This Flag seperates whether I need only entity name or first_name, last_name
             if not name_select_flag:
                 if isinstance(entity_id, list):
-                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND entity_id in ('{}') AND delete_ind is distinct from 'Y'""".format("', '".join(entity_id))
 
                     cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
                                 """) t""", [cmte_id])
                 # GET single row from entity table
                 elif entity_id:
-                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'"""
 
                     cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
                                 """) t""", [cmte_id, entity_id])
                 else:
-                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
 
                     cursor.execute("""SELECT json_agg(t) FROM (""" +
@@ -4569,7 +4569,7 @@ def get_list_contact(cmte_id, entity_id = None, name_select_flag = False, entity
                     query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 else:
-                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
                                query_string + """) t""", [cmte_id])

@@ -250,7 +250,7 @@ export class ContactsService {
       model.zip = row.zip;
       model.employer = row.employer;
       model.occupation = row.occupation;
-      model.phoneNumber = row.phoneNumber;
+      model.phoneNumber = row.phone_number;
       model.entity_name = row.entity_name;
       model.candOffice = row.candOffice;
       model.candOfficeState = row.candOfficeState
