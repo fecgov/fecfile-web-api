@@ -323,7 +323,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       this.showAggregateAmount = true;
     }else if(this.schedH3.get('category').value === 'DC') {
       this.totalName = 'Activity or Event Identifier';
-      this.setActivityOrEventIdentifier('direct_can_support');
+      this.setActivityOrEventIdentifier('direct_cand_support');
       this.showIdentiferSelect = true;
       this.showAggregateAmount = true;
     }else if(this.schedH3.get('category').value === 'PC') {
