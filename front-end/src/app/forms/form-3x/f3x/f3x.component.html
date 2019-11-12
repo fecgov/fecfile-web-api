@@ -122,7 +122,8 @@
         </app-sched-c-loans>
 
         <app-loansummary 
-          *ngIf="scheduleType === 'sched_c_loan_summary'">          
+          *ngIf="scheduleType === 'sched_c_loan_summary'"
+          (status)="onNotify($event)">          
         </app-loansummary>
 
         <app-loanpayment

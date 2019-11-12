@@ -102,8 +102,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private _transactionCategory: string;
   private cvgStartDate: string;
   private cvgEndDate: string;
-  private currentLoanData: any;
+  private currentLoanData: any;0
   private _selectedEntityId: any;
+  private typeChangeEventOccured = false;
 
   constructor(
     private _http: HttpClient,
@@ -137,15 +138,24 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this._transactionCategory = 'loans-and-debts';
     this._messageService.clearMessage();
     this.getFormFields();
+
+//ngChange
+    if (this.scheduleAction === ScheduleActions.edit) {
+      // this._prePopulateFormForEdit(this.transactionDetail);
+    } else if (this.scheduleAction === ScheduleActions.add) {
+      this._clearFormValues();
+    }
+
+
     this.entityType = 'IND';
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    if (this.scheduleAction === ScheduleActions.edit) {
+  /*   if (this.scheduleAction === ScheduleActions.edit) {
       this._prePopulateFormForEdit(this.transactionDetail);
     } else if (this.scheduleAction === ScheduleActions.add) {
       this._clearFormValues();
-    }
+    } */
   }
 
   public ngOnDestroy(): void {
@@ -167,7 +177,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan = new FormGroup(formGroup);
 
     if (this.scheduleAction === ScheduleActions.edit) {
-      this._prePopulateFormForEdit(this.transactionDetail);
+      // this._prePopulateFormForEdit(this.transactionDetail);
     } else if (this.scheduleAction === ScheduleActions.add) {
       this._clearFormValues();
 
@@ -351,15 +361,39 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
 
   public handleTypeChange(entityOption: any, col: any) {
+    // this is just a flag to distinguish what caused the loadDynamicFormFields() method to be invoked,
+    // as it can be invoked during initial form population during edit or during change event
+    // on ngselect 
+    this.typeChangeEventOccured = true; 
+    
     console.log(' handleTypeChange entityOption', entityOption);
     this.entityType = entityOption.code;
     // if (this._selectedEntity) {
     // this.frmLoan.patchValue({ entity_type: this._selectedEntity.entity_type }, { onlySelf: true });
     // } else {
+    // this.loadDynamiceFormFields();
     this.frmLoan.patchValue({ entity_type: entityOption.code }, { onlySelf: true });
-    this.loadDynamiceFormFields();
+    if(this.scheduleAction === ScheduleActions.edit){
+      this._prePopulateFormForEdit(this.transactionDetail);
+    }
+    else{
+      this.loadDynamiceFormFields();
+    }
+
     // }
   }
+
+  /*  public handleTypeChange(entityOption: any, col: any) {
+     console.log(" handleTypeChange entityOption", entityOption);
+     this.entityType = entityOption.code;
+     if (this._selectedEntity) {
+       // this.showWarn(col.text);
+       this.frmLoan.patchValue({ entity_type: this._selectedEntity.entity_type }, { onlySelf: true });
+     } else {
+       this.loadDynamiceFormFields();
+       this.frmLoan.patchValue({ entity_type: entityOption.code }, { onlySelf: true });
+     }
+   } */
 
   /*  public handleloansecuredChange(entityOption: any, col: any) {
      console.log(' handleloansecuredChange entityOption', entityOption);
@@ -683,9 +717,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
             if (res.data.hasOwnProperty('individualFormFields')) {
               if (Array.isArray(res.data.individualFormFields)) {
                 this.individualFormFields = res.data.individualFormFields;
-                this.formFields = res.data.individualFormFields;
+                // this.formFields = res.data.individualFormFields;
                 console.log('this.individualFormFields =', this.individualFormFields);
-                this._setForm(res.data.individualFormFields);
+                //this._setForm(res.data.individualFormFields);
               }
             }
 
@@ -731,6 +765,15 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
             this._loading = false;
           } // typeof res.data
         } // res.hasOwnProperty('data')
+      
+        if (this.scheduleAction === ScheduleActions.edit) {
+          this._prePopulateFormForEdit(this.transactionDetail);
+        }
+        else{
+          //set Default on "add"
+          this.formFields = this.individualFormFields;
+          this._setForm(this.individualFormFields);
+        }
       } // res
     });
   }
@@ -797,8 +840,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       scheduleType: 'sched_c_loan_payment',
       action: ScheduleActions.add,
       transactionDetail: {
-        transactionModel : {
-          transactionId: this._transactionId, 
+        transactionModel: {
+          transactionId: this._transactionId,
           entityId: this._selectedEntityId
         }
       }
@@ -984,44 +1027,58 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       }
       // TODO need entity_type from API - inferring from entity ID until it is provided.
       let entityType = null;
-      if (loanData.hasOwnProperty('entity_id')) {
-        this._selectedEntity = { entity_id: loanData.entity_id };
-        if (this.frmLoan.contains('entity_type')) {
-          entityType = loanData.entity_id.startsWith('IND') ? 'IND' : 'ORG';
-          this.frmLoan.patchValue({ entity_type: entityType }, { onlySelf: true });
-          this._selectedEntity.entity_type = entityType;
-        }
-      }
+      // if (loanData.hasOwnProperty('entity_id')) {
+      this._selectedEntity = { entity_id: loanData.entity_id };
+      // if (this.frmLoan.contains('entity_type')) {
 
+      if(this.typeChangeEventOccured){
+        entityType = this.entityType;
+
+            // once this._prePopulateFormForEdit, change flag back to false for next iteration
+    this.typeChangeEventOccured = false;
+      }
+      else{
+        entityType = loanData.entity_type;
+      }
+      // }
+      // }
+      
       if (entityType === 'IND') {
+        this.formFields = this.individualFormFields;
+        this._setForm(this.individualFormFields);
         this._patchForm(loanData, 'last_name');
         this._patchForm(loanData, 'first_name');
         this._patchForm(loanData, 'middle_name');
         this._patchForm(loanData, 'prefix');
         this._patchForm(loanData, 'suffix');
       }
-
+      
       if (entityType === 'ORG') {
+        this.formFields = this.organizationFormFields;
+        this._setForm(this.organizationFormFields);
         this._patchForm(loanData, 'entity_name');
       }
-
+      
       this._patchForm(loanData, 'street_1');
       this._patchForm(loanData, 'street_2');
       this._patchForm(loanData, 'state');
       this._patchForm(loanData, 'city');
       this._patchForm(loanData, 'zip_code');
-
-
+      
+      
       this._patchForm(loanData, 'election_code');
       this._patchForm(loanData, 'election_other_description');
       this._patchForm(loanData, 'loan_incurred_date');
       this._patchForm(loanData, 'loan_due_date');
       this._patchForm(loanData, 'loan_intrest_rate');
       this._patchForm(loanData, 'secured', 'is_loan_secured');
-
+      
       this.frmLoan.patchValue({ loan_amount_original: this._decimalPipe.transform(loanData.loan_amount_original, '.2-2') })
       this.frmLoan.patchValue({ loan_payment_to_date: this._decimalPipe.transform(loanData.loan_payment_to_date, '.2-2') })
       this.frmLoan.patchValue({ loan_balance: this._decimalPipe.transform(loanData.loan_balance, '.2-2') })
+      
+      this.frmLoan.patchValue({ entity_type: entityType }, { onlySelf: true });
+      this._selectedEntity.entity_type = entityType;
     });
   }
 

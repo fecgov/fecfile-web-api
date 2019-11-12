@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
+import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
 
 export enum ActiveView {
   loanSummary = 'loanSummary',
@@ -59,6 +60,8 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 
   @Input()
   public tableType: string;
+
+  @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   //TODO-ZS -- change "any" to LoanModel when using actual data
   public LoanModel: Array<any>;
@@ -926,31 +929,29 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
+  public editLoanPayment(loan:any){
+    console.log(loan);
+    this._goToLoanRepayment(loan);
+  }
 
-  /*private setSortableColumns(): void {
-    const defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
-    const otherSortColumns = [
-      'transactionId',
-      'street',
-      'city',
-      'state',
-      'zip',
-      'purposeDescription',
-      'contributorEmployer',
-      'contributorOccupation',
-      'memoText'
-    ];
 
-    this.sortableColumns = [];
-    for (const field of defaultSortColumns) {
-      this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
-    }
-    for (const field of otherSortColumns) {
-      this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
-    }
-    this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
-  }*/
-
+  private _goToLoanRepayment(loan:any) {
+    const loanRepaymentEmitObj: any = {
+      form: {},
+      direction: 'next', //TODO-zs -- does this need to be changed?
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c_loan_payment',
+      action: ScheduleActions.edit,
+      transactionDetail: {
+        transactionModel : {
+          transactionId: loan.transaction_id, 
+          entityId: loan.entity_id
+        }
+      }
+    };
+    this.status.emit(loanRepaymentEmitObj);
+  }
 
   /**
    * Set the UI to show the default column sorted in the default direction.
