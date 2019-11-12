@@ -271,16 +271,13 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgEndDate)) ||
       this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgStartDate)))) {     
       this.receiptDateErr = true;
+      this.schedH2.controls['receipt_date'].setErrors({'incorrect': true});  
     } else {
       this.receiptDateErr = false;
     }
 
   }
-  public handleDateFieldKeyup() {
-    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-    alert("hello");
-  }
-
+ 
   public handleFedPercentFieldKeyup(e) {
     if(e.target.value <= 100) {
       this.schedH2.patchValue({ non_federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
@@ -291,7 +288,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public handleNonFedPercentFieldKeyup(e) {
     if(e.target.value <= 100) {
-      this.schedH2.patchValue({ federal_percent: Number(100 - e.target.value)}, { onlySelf: true });   
+      this.schedH2.patchValue({ federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true }); 
     }  
