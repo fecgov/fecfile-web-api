@@ -59,6 +59,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public levinAccountsies: any;
 
+  public receiptDateErr = false;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -81,7 +83,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
     private _schedH5Service: SchedH5Service,
-    private _individualReceiptService: IndividualReceiptService
+    private _individualReceiptService: IndividualReceiptService,
+    private _uService: UtilService,
   ) {
     super(
       _http,
@@ -107,6 +110,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     );
     _schedH5Service;
     _individualReceiptService;
+    _uService;
   }
 
   public ngOnInit() {
@@ -307,7 +311,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
           + Number(this.schedH5.get('transferred_amount').value);
     this.h5Ratios.total_amount_transferred = total_amount_transferred;
     
-    this.schedH5.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
+    //this.schedH5.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
     
 
     formObj['report_id'] = reportId;
@@ -331,6 +335,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     const serializedForm = JSON.stringify(formObj);
 
     if (this.schedH5.status === 'VALID') {
+
+      this.schedH5.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
      
       this.h5Entries.push(formObj);
       this.h5EntryTableConfig.totalItems = this.h5Entries.length;
@@ -349,7 +355,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.schedH5 = new FormGroup({
       account_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
-      receipt_date: new FormControl(''),
+      receipt_date: new FormControl('', Validators.required),
       total_amount_transferred: new FormControl(''),
       category: new FormControl(''),
       transferred_amount: new FormControl('')
@@ -543,6 +549,22 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public addEntries() {
     const serializedForm = JSON.stringify(this.h5Ratios);
     this.saveH5(serializedForm);
+  }
+
+  public receiptDateChanged(receiptDate: string) {
+
+    const formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
+    let cvgStartDate = formInfo.cvgStartDate;
+    let cvgEndDate = formInfo.cvgEndDate;
+
+    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgEndDate)) ||
+      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(cvgStartDate)))) {     
+      this.receiptDateErr = true;
+      this.schedH5.controls['receipt_date'].setErrors({'incorrect': true});
+    } else {
+      this.receiptDateErr = false;
+    }
+
   }
 
 }
