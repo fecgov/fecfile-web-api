@@ -28,7 +28,7 @@
       </div>
 
       <!-- Individual Name Row -->
-      <div class="row" *ngIf="f?.control?.controls?.entity_type?.value === 'IND'">
+      <div class="row" [hidden]="selectedEntity !== 'IND'">
         <div class="form-group col col-md-3">
           <label for="last_Name">Last Name
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
@@ -60,21 +60,21 @@
       </div>
 
       <!-- Organization Name Row -->
-      <div class="row" *ngIf="f?.control?.controls?.entity_type?.value === 'ORG'">
+      <div class="row" [hidden]="selectedEntity !== 'ORG'">
         <div class="form-group col col-md-3">
-          <label for="entity_name">Banking Institution
+          <label for="entity_Name">Banking Institution
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <input ngModel type="text" class="form-control" id="entity_name" name="entity_name" maxlength="200" required
+          <input ngModel type="text" class="form-control" id="entity_Name" name="entity_Name" maxlength="200" required
             disabled>
         </div>
       </div>
 
       <!-- Prefix/Suffix Row -->
-      <div class="row" *ngIf="f?.control?.controls?.entity_type?.value === 'IND'">
+      <div class="row" [hidden]="selectedEntity !== 'IND'">
         <div class="form-group col col-md-3 ">
           <label for="prefix">Prefix (Optional)</label>
           <input ngModel type="text" class="form-control" id="prefix" name="prefix" style="width: 98px;" maxlength="10"
