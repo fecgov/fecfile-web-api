@@ -672,11 +672,12 @@ export class LoanService {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/sc/schedC';
     const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
+    const loan: any = JSON.parse(localStorage.getItem('LoanObj'));
     const loanByCommFromIndObj: any = {
       api_call:'/sc/schedC',
       line_number: 13,
       //transaction_id:'16G',
-      transaction_id:'',
+      transaction_id:loan.transaction_id,
       back_ref_transaction_id: '',
       back_ref_sched_name: '',
       transaction_type: 'LOAN_FROM_IND',
@@ -686,7 +687,7 @@ export class LoanService {
       api_call:'/sc/schedC',
       line_number: 13,
       //transaction_id:'16F',
-      transaction_id:'',
+      transaction_id:loan.transaction_id,
       back_ref_transaction_id: '',
       back_ref_sched_name: '',
       transaction_type: 'LOAN_FROM_BANK',
@@ -710,7 +711,6 @@ export class LoanService {
     }*/
 
     //const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
-    const loan: any = JSON.parse(localStorage.getItem('LoanObj'));
     const formData: FormData = new FormData();
     let httpOptions = new HttpHeaders();
     let loanhiddenFields: any;

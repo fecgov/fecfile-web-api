@@ -1306,6 +1306,9 @@ def validate_sh3_data(data):
     validate sH3 json data
     """
     check_mandatory_fields_SH3(data)
+    # TODO: temp_change
+    if not data.get('total_amount_transferred'):
+        data['total_amount_transferred'] = 0
 
 
 def post_schedH3(data):
@@ -1325,6 +1328,7 @@ def post_schedH3(data):
         except Exception as e:
             raise Exception(
                 'The post_sql_schedH3 function is throwing an error: ' + str(e))
+        logger.debug('data saved successfully.')
         return data
     except:
         raise
@@ -1641,8 +1645,6 @@ def get_h3_summary(request):
     # TODO: what is gonna happen when people click edit button? 
     """
     try:
-        
-
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
         aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
@@ -1668,7 +1670,7 @@ def get_h3_summary(request):
             create_date ,
             last_update_date
             FROM public.sched_h3
-            WHERE report_id = %s AND cmte_id = %s
+            WHERE (report_id = %s or report_id = 0) AND cmte_id = %s
             AND back_ref_transaction_id is not null
             AND delete_ind is distinct from 'Y') t
             """
@@ -1791,6 +1793,7 @@ def schedH3(request):
                         child_data = schedH3_sql_dict(child_data)
                         logger.debug('saving child transaction with data {}'.format(child_data))
                         post_schedH3(child_data) 
+                        logger.debug('child transaction saved.')
             # Associating child transactions to parent and storing them to DB
 
             output = get_schedH3(data)
@@ -2833,17 +2836,19 @@ def get_schedH5(data):
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedH5(report_id, cmte_id, transaction_id)
-            for _obj in forms_obj:
-                child_list = get_child_schedH5(transaction_id, report_id, cmte_id)
-                if child_list:
-                    _obj['child'] = child_list
+            if forms_obj:
+                for _obj in forms_obj:
+                    child_list = get_child_schedH5(transaction_id, report_id, cmte_id)
+                    if child_list:
+                        _obj['child'] = child_list
         else:
             forms_obj = get_list_all_schedH5(report_id, cmte_id)
-            for _obj in forms_obj:
-                transaction_id = _obj.get('transaction_id')
-                child_list = get_child_schedH5(transaction_id, report_id, cmte_id)
-                if child_list:
-                    _obj['child'] = child_list
+            if forms_obj:
+                for _obj in forms_obj:
+                    transaction_id = _obj.get('transaction_id')
+                    child_list = get_child_schedH5(transaction_id, report_id, cmte_id)
+                    if child_list:
+                        _obj['child'] = child_list
         return forms_obj
     except:
         raise
@@ -2975,6 +2980,61 @@ def delete_schedH5(data):
     except Exception as e:
         raise
 
+@api_view(['GET'])
+def get_h5_summary(request):
+    """
+    get h5 summary for enabling summary page
+    1. load only child items
+    3. report_id based.
+
+    # TODO: what is gonna happen when people click edit button? 
+    """
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
+
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            transaction_id,
+            account_name,
+            receipt_date,
+            coalesce(
+                voter_registration_amount,
+                voter_id_amount,
+                gotv_amount,
+                generic_campaign_amount) as transfer_amount,
+            (
+                CASE 
+                WHEN  voter_registration_amount > 0  
+                THEN 'Voter Registration'
+                WHEN  voter_id_amount > 0 
+                THEN 'Voter ID'
+                WHEN  gotv_amount > 0
+                THEN 'GOTV'
+                ELSE 'Generic Campaign'
+                END
+            ) AS transfer_type
+            FROM public.sched_h5
+            WHERE report_id = %s AND cmte_id = %s
+            AND back_ref_transaction_id is not null
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, (report_id, cmte_id))
+            # print(_sql)
+            # cursor.execute(_sql)
+            _sum = cursor.fetchone()[0] 
+            # for _rec in _sum:
+            #     if _rec['activity_event_name']:
+            #         _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'])
+            #     elif _rec['activity_event_type']:
+            #         _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'])
+            #     else:
+            #         pass
+            return Response( _sum, status = status.HTTP_200_OK)
+    except:
+        raise 
 
 @api_view(['GET'])
 def get_sched_h5_breakdown(request):
