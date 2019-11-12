@@ -186,6 +186,11 @@ export class LoanpaymentComponent implements OnInit {
       formData.append('cmte_id', committeeDetails.committeeid);
       formData.append('transaction_type_identifier', 'LOAN_REPAY_MADE');
       formData.append('back_ref_transaction_id', this.transactionDetail.transactionId);
+      
+      if(this.transactionDetail.entityId){
+        formData.append('entity_id', this.transactionDetail.entityId);
+      }
+
       console.log();
 
       for (const [key, value] of Object.entries(this.form.controls)){
