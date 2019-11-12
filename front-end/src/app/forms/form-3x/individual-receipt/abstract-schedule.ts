@@ -822,7 +822,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (!this.frmIndividualReceipt.contains('total_amount')) {
       return;
     }
-    let totalAmount = '100'; //this.frmIndividualReceipt.get('total_amount').value;
+    // let totalAmount = '100';
+    let totalAmount = this.frmIndividualReceipt.get('total_amount').value;
     if (!totalAmount) {
       return;
     }
@@ -909,6 +910,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             scheduleType: scheduleType,
             action: ScheduleActions.add
           };
+          if (scheduleType === 'sched_h2') {
+            emitObj.transactionType = 'ALLOC_H2_RATIO';
+            emitObj.transactionTypeText = 'Allocation Ratios';
+          }
           this.status.emit(emitObj);
         }
       });
@@ -942,19 +947,35 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public handleActivityEventTypeChange($event: any, col: any) {
 
-    // const eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
-    // if (!eventTypeVal) {
-
-    // }
-    // if (eventTypeVal === 'Select') {
-    //   this.totalAmountReadOnly = true;
-    // } else {
-    //   this.totalAmountReadOnly = false;
-    // }
-
-    if ($event.activityEventNames) {
-      this.activityEventNames = $event.activityEventNames;
+    if ($event.activityEventTypes) {
+      this.activityEventNames = $event.activityEventTypes;
     }
+
+    let eventTypeVal = null;
+    if (this.frmIndividualReceipt.contains('activity_event_type')) {
+      eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
+    }
+    if (!eventTypeVal) {
+      this.totalAmountReadOnly = true;
+    } else {
+      this.totalAmountReadOnly = false;
+    }
+
+    // } else {
+    //   this.totalAmountReadOnly = true;
+    //   if (this.activityEventNames) {
+    //     let eventName = null;
+    //     if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+    //       eventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
+    //     }
+    //     if (eventName) {
+    //       // TODO why is the value 'Select' when no value has been chosen?
+    //       if (eventName !== 'Select') {
+    //         this.totalAmountReadOnly = false;
+    //       }
+    //     }
+    //   }
+    // }
 
     this._getFedNonFedPercentage();
   }
@@ -971,6 +992,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     if (col.name === 'total_amount') {
       return this._isTotalAmountReadOnly(col);
+    }
+    return null;
+  }
+
+  public isSelectFieldReadOnly(col: any) {
+    if (col.type === 'select' && col.isReadonly) {
+      if (this.frmIndividualReceipt.contains(col.name)) {
+        this.frmIndividualReceipt.get(col.name).disable();
+      }
+      return true;
     }
     return null;
   }
@@ -2698,21 +2729,36 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.electionTypes = res.data.electionTypes;
               }
             }
-            if (res.data.hasOwnProperty('activityEventTypes')) {
-              if (Array.isArray(res.data.electionTypes)) {
-                this.activityEventTypes = res.data.activityEventTypes;
-                if (this._cmteTypeCategory) {
+            // TODO no longer needed now that we have committeeTypeEvents
+            // if (res.data.hasOwnProperty('activityEventTypes')) {
+            //   if (Array.isArray(res.data.activityEventTypes)) {
+            //     this.activityEventTypes = res.data.activityEventTypes;
+            //     if (this._cmteTypeCategory) {
 
-                  if (committeeEventTypes.committeeTypeEvents) {
-                    for (const committeeTypeEvent of committeeEventTypes.committeeTypeEvents) {
-                      if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
-                        this.activityEventTypes = committeeTypeEvent.eventTypes;
-                      }
+            //       if (committeeEventTypes.committeeTypeEvents) {
+            //         for (const committeeTypeEvent of committeeEventTypes.committeeTypeEvents) {
+            //           if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
+            //             this.activityEventTypes = committeeTypeEvent.eventTypes;
+            //           }
+            //         }
+            //       }
+            //     }
+            //   }
+            // }
+
+            if (res.data.hasOwnProperty('committeeTypeEvents')) {
+              if (Array.isArray(res.data.committeeTypeEvents)) {
+                const committeeTypeEvents = res.data.committeeTypeEvents;
+                if (this._cmteTypeCategory) {
+                  for (const committeeTypeEvent of committeeTypeEvents) {
+                    if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
+                      this.activityEventTypes = committeeTypeEvent.eventTypes;
                     }
                   }
                 }
               }
             }
+
             if (res.data.hasOwnProperty('titles')) {
               if (Array.isArray(res.data.titles)) {
                 this.titles = res.data.titles;
@@ -3226,19 +3272,27 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
-   * Determine if the field should be shown when the org type is toggled.
+   * Determine if the field should be shown.
    */
   public isToggleShow(col: any) {
-    if (!this.selectedEntityType) {
-      return true;
-    }
-    if (!col.toggle) {
-      return true;
-    }
-    if (this.selectedEntityType.group === col.entityGroup || !col.entityGroup) {
-      return true;
+    if (col.name === 'activity_event_identifier') {
+      if (this.activityEventNames) {
+        return true;
+      } else {
+        return false;
+      }
     } else {
-      return false;
+      if (!this.selectedEntityType) {
+        return true;
+      }
+      if (!col.toggle) {
+        return true;
+      }
+      if (this.selectedEntityType.group === col.entityGroup || !col.entityGroup) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 
