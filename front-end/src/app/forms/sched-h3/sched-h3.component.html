@@ -68,7 +68,7 @@
                 [style.height]="'30px'"
                 [ngClass]="
                   schedH3.get('account_name')?.invalid &&
-                  (schedH3.touched || schedH3.dirty)
+                  (schedH3.touched || schedH3.dirty) && isSubmit
                     ? 'input-field-error'
                     : ''
                 " 
@@ -109,7 +109,7 @@
               <div class="text-error text-left"
                 *ngIf="receiptDateErr"
               >
-                Date is out of the coverage period.
+              The date entered falls outside of the report coverage period. Transactions for this report should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you need to add a transaction with a date that falls outside of the coverage period for this report, you will need to check the memo code box.
               </div>
             </div>
           </div>
