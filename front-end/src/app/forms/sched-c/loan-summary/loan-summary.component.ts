@@ -931,17 +931,17 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 
   public editLoanPayment(loan:any){
     console.log(loan);
-    this._goToLoanRepayment(loan);
+    this._goToLoan(loan);
   }
 
 
-  private _goToLoanRepayment(loan:any) {
+  private _goToLoan(loan:any) {
     const loanRepaymentEmitObj: any = {
       form: {},
       direction: 'next', //TODO-zs -- does this need to be changed?
       step: 'step_3',
       previousStep: 'step_2',
-      scheduleType: 'sched_c_loan_payment',
+      scheduleType: 'sched_c',
       action: ScheduleActions.edit,
       transactionDetail: {
         transactionModel : {
