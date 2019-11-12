@@ -40,9 +40,16 @@ def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
                 logger.debug('parent not found')
                 raise Exception('error: sched_c parent missing')
             data = cursor.fetchone()
+
             # beginning_balance = data[0]
             payment_amount = data[0]
+            # take care of null value issue for new loan
+            if not payment_amount:
+                payment_amount = 0
             balance_at_close = data[1]
+            logger.debug('loan current payment amt:{}'.format(payment_amount))
+            logger.debug(
+                'loan current payment amt:{}'.format(balance_at_close))
             new_payment_amount = (
                 float(payment_amount) +
                 float(new_payment) -
