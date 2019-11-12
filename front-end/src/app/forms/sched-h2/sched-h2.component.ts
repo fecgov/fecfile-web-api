@@ -64,7 +64,13 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public saveHRes: any;
 
   public tableConfig: any;
-   
+  public receiptDateErr = false;
+
+  public cvgStartDate: any;
+  public cvgEndDate: any;
+
+  public isSubmit = false;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -89,6 +95,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     private _actRoute: ActivatedRoute,
     private _schedH2Service: SchedH2Service,
     private _individualReceiptService: IndividualReceiptService,
+    private _uService: UtilService,
   ) {    
      super(
       _http,
@@ -114,6 +121,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     );
     _schedH2Service;
     _individualReceiptService;
+    _uService;
   }
 
 
@@ -142,7 +150,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
 
-    //this.transactionType = 'ALLOC_H2_RATIO';
+    this.schedH2.patchValue({ select_activity_function: ''}, { onlySelf: true });
+   
   }
 
   pageChanged(event){
@@ -185,7 +194,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public setSchedH2() {
     this.schedH2 = new FormGroup({      
       activity_event_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
-      date: new FormControl(''),
+      receipt_date: new FormControl(''),
       select_activity_function: new FormControl('', Validators.required),
       fundraising: new FormControl('', Validators.required),
       direct_cand_support: new FormControl('', Validators.required),
@@ -219,11 +228,14 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     
     const serializedForm = JSON.stringify(formObj);
 
+    this.isSubmit = true;
+
     if(this.schedH2.status === 'VALID' && 
         (this.schedH2.get('federal_percent').value + this.schedH2.get('non_federal_percent').value) === 100) {
 
       this.saveH2Ratio(serializedForm);      
       this.schedH2.reset();
+      this.isSubmit = false;
     }
   }
 
@@ -248,14 +260,57 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   }
  
   public returnToSum(): void {
+
+    this.saveAndAddMore();
+
+    this.isSubmit = false;
+
+    this.schedH2.reset();
+
     this.transactionType = 'ALLOC_H2_SUM';
-    //this.getH2Sum(this.getReportId());
+
+    this.receiptDateErr = false;
+   
     this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
 
   }
 
   public returnToAdd(): void {
-    this.transactionType = 'ALLOC_H2_RATIO';    
+    this.transactionType = 'ALLOC_H2_RATIO';
+
+    this.receiptDateErr = false;  
+  }
+
+  public receiptDateChanged(receiptDate: string) {
+
+    const formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
+    this.cvgStartDate = formInfo.cvgStartDate;
+    this.cvgEndDate = formInfo.cvgEndDate;
+
+    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
+      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
+      this.receiptDateErr = true;
+      this.schedH2.controls['receipt_date'].setErrors({'incorrect': true});  
+    } else {
+      this.receiptDateErr = false;
+    }
+
+  }
+ 
+  public handleFedPercentFieldKeyup(e) {
+    if(e.target.value <= 100) {
+      this.schedH2.patchValue({ non_federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
+    }else {
+      this.schedH2.patchValue({ non_federal_percent: 0}, { onlySelf: true });
+    }
+  }
+
+  public handleNonFedPercentFieldKeyup(e) {
+    if(e.target.value <= 100) {
+      this.schedH2.patchValue({ federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
+    }else {
+      this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true }); 
+    }  
   }
   
 }
