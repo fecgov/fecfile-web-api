@@ -427,6 +427,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH5.reset();
     this.h5Entries = [];
 
+    this.receiptDateErr = false;
+
     this.transactionType = 'ALLOC_H5_SUM';
     this.setH5Sum();
   }
