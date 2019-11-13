@@ -1,5 +1,5 @@
 import { NgForm } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { environment } from '../../../../environments/environment';
@@ -14,7 +14,9 @@ import { ActivatedRoute } from '@angular/router';
 })
 
 
-export class SchedH1Component implements OnInit { 
+export class SchedH1Component implements OnInit {
+  @Output() status: EventEmitter<any> = new EventEmitter<any>();
+
   public formType = '';
 
   constructor(
@@ -112,6 +114,7 @@ export class SchedH1Component implements OnInit {
         console.log(res);
         f.value.message = 'h1 saved.'
         f.reset();
+        this.previousStep();
       });
   }
 
@@ -129,6 +132,14 @@ export class SchedH1Component implements OnInit {
     }else {
       f.controls.federal_share.setValue(0);
     }
+  }
+
+  public previousStep(): void {
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_2'
+    });
   }
 
 }
