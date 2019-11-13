@@ -284,7 +284,7 @@ export class LoanpaymentComponent implements OnInit {
       direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
-      scheduleType: 'sched_c_loan_summary',
+      scheduleType: 'sched_c_ls',
       // action: ScheduleActions.add,
     };
     this.status.emit(loanRepaymentEmitObj);

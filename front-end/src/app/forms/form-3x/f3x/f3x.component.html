@@ -121,8 +121,16 @@
         >
         </app-sched-c-loans>
 
+        <app-loanendorser 
+          *ngIf="scheduleType === 'sched_c_en'"
+          [formType]="'3X'"
+          [scheduleAction]="scheduleCAction"
+          [transactionDetail]="transactionDetailSchedC"
+          (status)="onNotify($event)">
+        </app-loanendorser>
+          
         <app-loansummary 
-          *ngIf="scheduleType === 'sched_c_loan_summary'"
+          *ngIf="scheduleType === 'sched_c_ls' || scheduleType === 'sched_c_lo'"
           (status)="onNotify($event)">          
         </app-loansummary>
 
@@ -141,6 +149,8 @@
           (status)="onNotify($event)"
         >
         </app-sched-c1>
+
+        
 
         <!-- <app-sched-c2
           [hidden]="scheduleType !== 'sched_c2'"
@@ -228,9 +238,7 @@
       <div class="form_step" [hidden]="step !== 'loanreceipt'">
         <app-loanreceipt> </app-loanreceipt>
       </div>
-      <div class="form_step" [hidden]="step !== 'loanendorser'">
-        <app-loanendorser> </app-loanendorser>
-      </div>
+
     </div>
   </div>
   <!-- ./form__container -->

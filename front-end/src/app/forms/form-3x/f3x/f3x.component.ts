@@ -375,7 +375,7 @@ export class F3xComponent implements OnInit {
                 transactionType = transactionModel.transactionTypeIdentifier;
               }
               // } else if (this.scheduleAction === ScheduleActions.loanSummary) {
-              //   this.scheduleType = 'sched_c_loan_summary';
+              //   this.scheduleType = 'sched_c_ls';
               //   this.scheduleCAction = ScheduleActions.loanSummary;
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
@@ -435,7 +435,7 @@ export class F3xComponent implements OnInit {
     let finish = false;
     if (
       this.scheduleType === 'sched_c' ||
-      this.scheduleType === 'sched_c_loan_summary' ||
+      this.scheduleType === 'sched_c_ls' ||
       this.scheduleType === 'sched_c_loan_payment' ||
       this.scheduleType === 'sched_c1'
     ) {
@@ -450,8 +450,8 @@ export class F3xComponent implements OnInit {
           // transaction table component until then.
           this.scheduleCAction = ScheduleActions.edit;
         }
-      } else if (this.scheduleType === 'sched_c_loan_summary') {
-        this.scheduleType = 'sched_c_loan_summary';
+      } else if (this.scheduleType === 'sched_c_ls') {
+        this.scheduleType = 'sched_c_ls';
         this.scheduleCAction = ScheduleActions.loanSummary;
       } else if (this.scheduleType === 'sched_c_loan_payment') {
       } else if (this.scheduleType === 'sched_c1') {
@@ -460,7 +460,9 @@ export class F3xComponent implements OnInit {
       this.canContinue();
       finish = true;
       //setting the transaction detail for @input in 'add' scenario for loan payment 
-      this.transactionDetailSchedC = transactionDetail.transactionModel;
+      if(transactionDetail){
+        this.transactionDetailSchedC = transactionDetail.transactionModel;
+      }
     }
     return finish;
   }

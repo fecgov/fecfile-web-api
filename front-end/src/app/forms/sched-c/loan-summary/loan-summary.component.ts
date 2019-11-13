@@ -930,7 +930,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   }
 
   public editLoanPayment(loan:any){
-    console.log(loan);
     this._goToLoan(loan);
   }
 
@@ -945,6 +944,24 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       action: ScheduleActions.edit,
       transactionDetail: {
         transactionModel : {
+          transactionId: loan.transaction_id, 
+          entityId: loan.entity_id
+        }
+      }
+    };
+    this.status.emit(loanRepaymentEmitObj);
+  }
+
+  public goToLoanRepayment(loan:any) {
+    const loanRepaymentEmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c_loan_payment',
+      action: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
           transactionId: loan.transaction_id, 
           entityId: loan.entity_id
         }
