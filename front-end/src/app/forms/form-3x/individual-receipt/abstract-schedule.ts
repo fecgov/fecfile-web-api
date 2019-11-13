@@ -3326,7 +3326,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.memoCodeChild = false;
     this._readOnlyMemoCode = false;
     this._readOnlyMemoCodeChild = false;
-    this.frmIndividualReceipt.reset();
+    if(this.frmIndividualReceipt){
+      this.frmIndividualReceipt.reset();
+    }
     if (this.frmIndividualReceipt.contains('entity_type')) {
       this.selectedEntityType = this._entityTypeDefault;
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
