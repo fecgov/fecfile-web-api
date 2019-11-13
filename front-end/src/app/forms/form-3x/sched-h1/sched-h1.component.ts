@@ -36,9 +36,16 @@ export class SchedH1Component implements OnInit {
     //console.log(localStorage.getItem('cmte_type_category'));
     // return true;
 
-    const cmteDetails = JSON.parse(localStorage.getItem(`committee_details`));    
+    let ispac = false;
+    if (localStorage.getItem('committee_details') !== null) {
+      let cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+      if(cmteDetails.cmte_type_category === 'PAC') {
+        ispac = true;
+      }
+    }  
     //return localStorage.getItem('cmte_type_category') === 'PAC';
-    return cmteDetails.cmte_type_category === 'PAC';
+  
+    return ispac;
   }
 
   saveH1(f: NgForm) {
