@@ -202,6 +202,19 @@ def validate_sh1_data(data):
     check_mandatory_fields_SH1(data)
     validate_federal_nonfed_ratio(data)
 
+def cmte_type(cmte_id):
+    """
+    to know if the cmte is PAC or PTY and determine the flag values for administrative, generic_voter_drive, public_communications
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into schedH3 table
+            cursor.execute("""SELECT cmte_type_category FROM public.committee_master WHERE cmte_id=%s""",[cmte_id])
+            cmte_type_tuple = cursor.fetchone()
+            return cmte_type_tuple[0]
+    except Exception as err:
+        raise Exception(f'cmte_type function is throwing an error: {err}')
+
 def post_sql_schedH1(data):
     """
     save a new sched_h1 item
@@ -419,6 +432,11 @@ def schedH1(request):
             datum = schedH1_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+
+            if cmte_type(cmte_id) == 'PTY':
+                datum['administrative'] = True
+                datum['generic_voter_drive'] = True
+                datum['public_communications'] = True
 
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
