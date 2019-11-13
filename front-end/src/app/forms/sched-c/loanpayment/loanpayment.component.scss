@@ -79,8 +79,9 @@
           }
           textarea {
             &.form-control {
-            //   overflow: scroll;
-              width: 400px;
+              resize: none;
+              width: 450px;
+              height: 150px;
             }
           }
           label {

@@ -122,7 +122,7 @@
         </app-sched-c-loans>
 
         <app-loansummary 
-          *ngIf="scheduleType === 'sched_c_loan_summary'"
+          *ngIf="scheduleType === 'sched_c_ls' || scheduleType === 'sched_c_lo'"
           (status)="onNotify($event)">          
         </app-loansummary>
 

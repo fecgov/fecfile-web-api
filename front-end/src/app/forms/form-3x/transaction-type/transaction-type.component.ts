@@ -194,7 +194,7 @@ export class TransactionTypeComponent implements OnInit {
 
       // TODO This should come from the API transaction category.
       if (this.transactionType === 'LOAN_SUMMARY' && this.scheduleType === 'sched_c') {
-        this.scheduleType = 'sched_c_loan_summary';
+        this.scheduleType = 'sched_c_ls';
       }
 
       this.status.emit({
