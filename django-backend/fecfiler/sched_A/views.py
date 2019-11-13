@@ -51,6 +51,20 @@ MANDATORY_FIELDS_AGGREGATE = ['transaction_type_identifier', 'contribution_date'
 # list of transaction_type for child sched_b items
 CHILD_SCHED_B_TYPES = []
 
+PTY_AGGREGATE_TYPES_HQ = ['IND_NP_HQ_ACC','PARTY_NP_HQ_ACC','PAC_NP_HQ_ACC','TRIB_NP_HQ_ACC','EAR_REC_HQ_ACC','JF_TRAN_NP_HQ_IND_MEMO',
+                'JF_TRAN_NP_HQ_PAC_MEMO','JF_TRAN_NP_HQ_TRIB_MEMO','OPEXP_HQ_ACC_REG_REF','OPEXP_HQ_ACC_IND_REF','OPEXP_HQ_ACC_TRIB_REF']
+
+PTY_AGGREGATE_TYPES_CO = ['IND_NP_CONVEN_ACC','PARTY_NP_CONVEN_ACC','PAC_NP_CONVEN_ACC','TRIB_NP_CONVEN_ACC','EAR_REC_CONVEN_ACC',
+                'JF_TRAN_NP_CONVEN_IND_MEMO','JF_TRAN_NP_CONVEN_PAC_MEMO','JF_TRAN_NP_CONVEN_TRIB_MEMO','OPEXP_CONV_ACC_REG_REF',
+                'OPEXP_CONV_ACC_TRIB_REF','OPEXP_CONV_ACC_IND_REF']
+
+PTY_AGGREGATE_TYPES_NPRE = ['IND_NP_RECNT_ACC','TRIB_NP_RECNT_ACC','PARTY_NP_RECNT_ACC','PAC_NP_RECNT_ACC','EAR_REC_RECNT_ACC',
+                'JF_TRAN_NP_RECNT_IND_MEMO','JF_TRAN_NP_RECNT_PAC_MEMO','JF_TRAN_NP_RECNT_TRIB_MEMO','OTH_DISB_NP_RECNT_REG_REF',
+                'OTH_DISB_NP_RECNT_TRIB_REF','OTH_DISB_NP_RECNT_IND_REF']
+
+PTY_AGGREGATE_TYPES_RE = ['IND_RECNT_REC','PARTY_RECNT_REC','PAC_RECNT_REC','TRIB_RECNT_REC']
+
+PAC_AGGREGATE_TYPES_1 = ['IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC', 'BUS_LAB_NON_CONT_ACC']
 
 # list of all transaction type identifiers that should
 # have single column storage in DB
@@ -475,25 +489,28 @@ def func_aggregate_amount(contribution_date, transaction_type_identifier, entity
     try:
         with connection.cursor() as cursor:
 
-            if transaction_type_identifier in ['IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC', 'BUS_LAB_NON_CONT_ACC']:
-
-                cursor.execute("""SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s 
-    AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
-    AND contribution_date <= %s::date
-    AND ((back_ref_transaction_id IS NULL AND memo_code IS NULL) OR (back_ref_transaction_id IS NOT NULL))
-    AND delete_ind is distinct FROM 'Y' 
-    ORDER BY contribution_date DESC, create_date DESC;""", [entity_id, transaction_type_identifier, cmte_id, contribution_date, contribution_date])
-
+            if transaction_type_identifier in PTY_AGGREGATE_TYPES_HQ:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PTY_AGGREGATE_TYPES_HQ))
+            elif transaction_type_identifier in PTY_AGGREGATE_TYPES_CO:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PTY_AGGREGATE_TYPES_CO))
+            elif transaction_type_identifier in PTY_AGGREGATE_TYPES_NPRE:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PTY_AGGREGATE_TYPES_NPRE))
+            elif transaction_type_identifier in PTY_AGGREGATE_TYPES_RE:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PTY_AGGREGATE_TYPES_RE))
+            elif transaction_type_identifier in PAC_AGGREGATE_TYPES_1:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PAC_AGGREGATE_TYPES_1))
             else:
+              params = """ AND transaction_type_identifier NOT IN ('{}')""".format("', '".join(PAC_AGGREGATE_TYPES_1 + PTY_AGGREGATE_TYPES_HQ 
+                      + PTY_AGGREGATE_TYPES_CO + PTY_AGGREGATE_TYPES_NPRE + PTY_AGGREGATE_TYPES_RE))
 
-                cursor.execute("""SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s AND cmte_id = %s 
+            query_string = """SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s {} AND cmte_id = %s 
     AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
     AND contribution_date <= %s::date
     AND ((back_ref_transaction_id IS NULL AND memo_code IS NULL) OR (back_ref_transaction_id IS NOT NULL))
     AND delete_ind is distinct FROM 'Y' 
-    AND transaction_type_identifier NOT IN ('IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC', 'BUS_LAB_NON_CONT_ACC')
-    ORDER BY contribution_date DESC, create_date DESC;""", [entity_id, cmte_id, contribution_date, contribution_date])  
+    ORDER BY contribution_date DESC, create_date DESC;""".format(params)
 
+            cursor.execute(query_string, [entity_id, cmte_id, contribution_date, contribution_date])
             result = cursor.fetchone()
         if result is None:
           aggregate_amt = 0
@@ -629,36 +646,32 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         NPRE_aggregate_amount = 0
         RE_aggregate_amount = 0
         REMAIN_aggregate_amount = 0
-        cmte_type = cmte_type(cmte_id)
+        committee_type = cmte_type(cmte_id)
         for transaction in transactions_list:
             # checking in reports table if the delete_ind flag is false for the corresponding report
             if transaction[5] != 'Y':
-                if (cmte_type == 'PAC') and transaction[8] in ['IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC', 'BUS_LAB_NON_CONT_ACC']:
-                    if transaction[6] != 'X':
+                # checking if the back_ref_transaction_id is null or not. 
+                # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
+                if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
+                    if (committee_type == 'PAC') and transaction[8] in PAC_AGGREGATE_TYPES_1:
                         PAC_aggregate_amount += transaction[0]
-                    aggregate_amount = PAC_aggregate_amount
-                elif (cmte_type == 'PTY') and transaction[8] in []:
-                    if transaction[6] != 'X':
+                        print(PAC_aggregate_amount)
+                        aggregate_amount = PAC_aggregate_amount
+                    elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_HQ:
                         HQ_aggregate_amount += transaction[0]
-                    aggregate_amount = HQ_aggregate_amount
-                elif (cmte_type == 'PTY') and transaction[8] in []:
-                    if transaction[6] != 'X':
+                        aggregate_amount = HQ_aggregate_amount
+                    elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_CO:
                         CO_aggregate_amount += transaction[0]
-                    aggregate_amount = CO_aggregate_amount
-                elif (cmte_type == 'PTY') and transaction[8] in []:
-                    if transaction[6] != 'X':
+                        aggregate_amount = CO_aggregate_amount
+                    elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_NPRE:
                         NPRE_aggregate_amount += transaction[0]
-                    aggregate_amount = NPRE_aggregate_amount
-                elif (cmte_type == 'PTY') and transaction[8] in []:
-                    if transaction[6] != 'X':
+                        aggregate_amount = NPRE_aggregate_amount
+                    elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_RE:
                         RE_aggregate_amount += transaction[0]
-                    aggregate_amount = RE_aggregate_amount
-                else:
-                    # checking if the back_ref_transaction_id is null or not. 
-                    # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
-                    if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
+                        aggregate_amount = RE_aggregate_amount
+                    else:
                         REMAIN_aggregate_amount += transaction[0]
-                    aggregate_amount = REMAIN_aggregate_amount
+                        aggregate_amount = REMAIN_aggregate_amount
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
                 # if str(report_id) == str(transaction[2]):
                 if contribution_date <= transaction[4]:
