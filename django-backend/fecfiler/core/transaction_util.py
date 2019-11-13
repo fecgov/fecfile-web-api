@@ -867,6 +867,9 @@ def cmte_type(cmte_id):
             # Insert data into schedH3 table
             cursor.execute("""SELECT cmte_type_category FROM public.committee_master WHERE cmte_id=%s""",[cmte_id])
             cmte_type_tuple = cursor.fetchone()
-            return cmte_type_tuple[0]
+            if cmte_type_tuple:
+                return cmte_type_tuple[0]
+            else:
+                raise Exception('The cmte_id: {} does not exist in committee master table.'.format(cmte_id))
     except Exception as err:
         raise Exception(f'cmte_type function is throwing an error: {err}')

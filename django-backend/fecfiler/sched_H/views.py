@@ -212,8 +212,10 @@ def election_year(report_id):
             # Insert data into schedH3 table
             cursor.execute("""SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s""",[report_id])
             election_year_tuple = cursor.fetchone()
-            print(election_year_tuple[0])
-            return election_year_tuple[0]
+            if election_year_tuple:
+                return election_year_tuple[0]
+            else:
+                raise Exception('The report_id: {} does not exist in reports table.'.format(report_id))
     except Exception as err:
         raise Exception(f'election_year function is throwing an error: {err}')
 
