@@ -215,6 +215,20 @@ def cmte_type(cmte_id):
     except Exception as err:
         raise Exception(f'cmte_type function is throwing an error: {err}')
 
+def election_year(report_id):
+    """
+    To get the election year from reports Table
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into schedH3 table
+            cursor.execute("""SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s""",[report_id])
+            election_year_tuple = cursor.fetchone()
+            print(election_year_tuple[0])
+            return election_year_tuple[0]
+    except Exception as err:
+        raise Exception(f'election_year function is throwing an error: {err}')
+
 def post_sql_schedH1(data):
     """
     save a new sched_h1 item
@@ -432,6 +446,7 @@ def schedH1(request):
             datum = schedH1_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            datum['election_year'] = election_year(report_id)
 
             if cmte_type(cmte_id) == 'PTY':
                 datum['administrative'] = True
