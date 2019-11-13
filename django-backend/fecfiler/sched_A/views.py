@@ -24,6 +24,7 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     update_parent_purpose,
+    cmte_type,
 )
 
 from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
@@ -622,25 +623,36 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         transactions_list = list_all_transactions_entity(
             aggregate_start_date, aggregate_end_date, entity_id, cmte_id)
         aggregate_amount = 0
-        IND_aggregate_amount = 0
-        OTH_aggregate_amount = 0
-        BUS_aggregate_amount = 0
+        PAC_aggregate_amount = 0
+        HQ_aggregate_amount = 0
+        CO_aggregate_amount = 0
+        NPRE_aggregate_amount = 0
+        RE_aggregate_amount = 0
         REMAIN_aggregate_amount = 0
+        cmte_type = cmte_type(cmte_id)
         for transaction in transactions_list:
             # checking in reports table if the delete_ind flag is false for the corresponding report
             if transaction[5] != 'Y':
-                if transaction[8] in ['IND_REC_NON_CONT_ACC']:
+                if (cmte_type == 'PAC') and transaction[8] in ['IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC', 'BUS_LAB_NON_CONT_ACC']:
                     if transaction[6] != 'X':
-                        IND_aggregate_amount += transaction[0]
-                    aggregate_amount = IND_aggregate_amount
-                elif transaction[8] in ['OTH_CMTE_NON_CONT_ACC']:
+                        PAC_aggregate_amount += transaction[0]
+                    aggregate_amount = PAC_aggregate_amount
+                elif (cmte_type == 'PTY') and transaction[8] in []:
                     if transaction[6] != 'X':
-                        OTH_aggregate_amount += transaction[0]
-                    aggregate_amount = OTH_aggregate_amount
-                elif transaction[8] in ['BUS_LAB_NON_CONT_ACC']:
+                        HQ_aggregate_amount += transaction[0]
+                    aggregate_amount = HQ_aggregate_amount
+                elif (cmte_type == 'PTY') and transaction[8] in []:
                     if transaction[6] != 'X':
-                        BUS_aggregate_amount += transaction[0]
-                    aggregate_amount = BUS_aggregate_amount
+                        CO_aggregate_amount += transaction[0]
+                    aggregate_amount = CO_aggregate_amount
+                elif (cmte_type == 'PTY') and transaction[8] in []:
+                    if transaction[6] != 'X':
+                        NPRE_aggregate_amount += transaction[0]
+                    aggregate_amount = NPRE_aggregate_amount
+                elif (cmte_type == 'PTY') and transaction[8] in []:
+                    if transaction[6] != 'X':
+                        RE_aggregate_amount += transaction[0]
+                    aggregate_amount = RE_aggregate_amount
                 else:
                     # checking if the back_ref_transaction_id is null or not. 
                     # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
