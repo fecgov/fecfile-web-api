@@ -897,7 +897,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
-      scheduleType: 'sched_c_loan_summary',
+      scheduleType: 'sched_c_ls',
       action: ScheduleActions.loanSummary
     };
     this.status.emit(summaryEmitObj);
