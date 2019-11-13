@@ -91,7 +91,7 @@ def schedH1_sql_dict(data):
             'federal_percent', 
             'non_federal_percent',
             'election_year', 
-            'administrative'
+            'administrative',
             'generic_voter_drive', 
             'public_communications',
     ]
@@ -206,6 +206,7 @@ def post_sql_schedH1(data):
     """
     save a new sched_h1 item
     """
+    logger.debug('post sql h1 with data:{}'.format(data))
     try:
         _sql = """
         INSERT INTO public.sched_h1 (
@@ -251,6 +252,7 @@ def post_sql_schedH1(data):
         with connection.cursor() as cursor:
             # Insert data into schedH3 table
             cursor.execute(_sql, _v)
+            logger.info('h1 saved.')
     except Exception:
         raise
 
@@ -413,6 +415,7 @@ def schedH1(request):
             else:
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
+            logger.debug('filtering and validating h1 data:{}'.format(request.data))
             datum = schedH1_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
@@ -424,6 +427,7 @@ def schedH1(request):
                 data = put_schedH1(datum)
             else:
                 # print(datum)
+                logger.debug('h1 data after validation:{}'.format(datum))
                 data = post_schedH1(datum)
             # Associating child transactions to parent and storing them to DB
 
