@@ -803,7 +803,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this._formatAmount({ target: { value: balanceAtClose.toString() } },
       'balance_at_close', false);
-    // this.frmIndividualReceipt.patchValue({ 'balance_at_close': balanceAtClose }, { onlySelf: true });
   }
 
   /**
@@ -819,7 +818,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (!this.frmIndividualReceipt.contains('total_amount')) {
       return;
     }
-    // let totalAmount = '100';
+
     let totalAmount = this.frmIndividualReceipt.get('total_amount').value;
     if (!totalAmount) {
       return;
@@ -838,8 +837,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           res.toLowerCase().includes('no valid h1 data found') ||
           res.toLowerCase().includes('no valid h2 data found')
         ) {
-          this._handleNoH1H2(res);
-          return;
+          // this._handleNoH1H2(res);
+          // return;
         }
       }
 
@@ -859,17 +858,50 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     },
     errorRes => {
-      console.log('error caught getting h1 percentage' + errorRes);
-      if (errorRes.error) {
-        this._handleNoH1H2(errorRes.error);
-      }
     });
   }
 
   /**
    * Present user with H1/H2 required before making Debt payment.
    */
-  private _handleNoH1H2(msg: string) {
+  private _handleNoH1H2(activityEventScheduleType: string) {
+
+    // Default to H1 if not provided
+    if (!activityEventScheduleType) {
+      activityEventScheduleType = 'sched_h1';
+    }
+
+    // Hard Coding DF/DC  => H2 for now.  Once dynamic forms provides schedule in activityEventTypes
+    // const activityEventType = this.frmIndividualReceipt.get('activity_event_type').value;
+    // const scheduleName = (activityEventType === 'DF' || activityEventType === 'DC') ? 'H2' : 'H1';
+    // const scheduleType = (activityEventType === 'DF' || activityEventType === 'DC') ? 'sched_h2' : 'sched_h1';
+
+    const scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
+    const scheduleType = activityEventScheduleType;
+
+    const message = `Please add Schedule ${scheduleName} before proceeding with adding the ` +
+      `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
+    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
+      const emitObj: any = {
+        form: this.frmIndividualReceipt,
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2',
+        scheduleType: scheduleType,
+        action: ScheduleActions.add
+      };
+      if (scheduleType === 'sched_h2') {
+        emitObj.transactionType = 'ALLOC_H2_RATIO';
+        emitObj.transactionTypeText = 'Allocation Ratios';
+      }
+      this.status.emit(emitObj);
+    });
+  }
+
+  /**
+   * Present user with H1/H2 required before making Debt payment.
+   */
+  private _handleNoH1H2_OLD(msg: string) {
     if (typeof msg !== 'string') {
       return;
     }
@@ -889,30 +921,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       const message = `Please add Schedule ${scheduleName} before proceeding with adding the ` +
         `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
       this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
-        if (res === 'okay') {
 
-          // // TODO this proves a new sched can be viewed.  Need to go to h1 or h2
-          // // based on the event type selected.
-          // this.clearFormValues();
-          // this.scheduleType = 'sched_h6';
-          // this.transactionType = 'ALLOC_FEA_DISB_DEBT';
-          // this.transactionTypeText = 'Allocated FEA Debt Payment (H6 Test until H1/H2 is ready!)';
-          // window.scrollTo(0, 0);
-
-          const emitObj: any = {
-            form: this.frmIndividualReceipt,
-            direction: 'next',
-            step: 'step_3',
-            previousStep: 'step_2',
-            scheduleType: scheduleType,
-            action: ScheduleActions.add
-          };
-          if (scheduleType === 'sched_h2') {
-            emitObj.transactionType = 'ALLOC_H2_RATIO';
-            emitObj.transactionTypeText = 'Allocation Ratios';
-          }
-          this.status.emit(emitObj);
+        const emitObj: any = {
+          form: this.frmIndividualReceipt,
+          direction: 'next',
+          step: 'step_3',
+          previousStep: 'step_2',
+          scheduleType: scheduleType,
+          action: ScheduleActions.add
+        };
+        if (scheduleType === 'sched_h2') {
+          emitObj.transactionType = 'ALLOC_H2_RATIO';
+          emitObj.transactionTypeText = 'Allocation Ratios';
         }
+        this.status.emit(emitObj);
       });
     }
   }
@@ -944,10 +966,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   * Handle a change to the Activity Event select.
+   */
   public handleActivityEventTypeChange($event: any, col: any) {
 
     if (!$event) {
+      this.frmIndividualReceipt.patchValue({ activity_event_identifier: null }, { onlySelf: true });
+      this.activityEventNames = null;
       return;
+    }
+
+    // TODO remove ! - just for dev test until API is ready
+    // this._handleNoH1H2('sched_h1');
+
+    if ($event.hasOwnProperty('hasValue')) {
+      if ($event.hasValue === false) {
+        if ($event.hasOwnProperty('scheduleType')) {
+          this._handleNoH1H2($event.scheduleType);
+        } else {
+          this._handleNoH1H2(null);
+        }
+      }
     }
 
     if ($event.activityEventTypes) {
@@ -980,7 +1020,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     //   }
     // }
 
-    this._getFedNonFedPercentage();
+    // this._getFedNonFedPercentage();
   }
 
   /**
