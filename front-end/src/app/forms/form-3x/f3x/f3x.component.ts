@@ -460,7 +460,9 @@ export class F3xComponent implements OnInit {
       this.canContinue();
       finish = true;
       //setting the transaction detail for @input in 'add' scenario for loan payment 
-      this.transactionDetailSchedC = transactionDetail.transactionModel;
+      if(transactionDetail){
+        this.transactionDetailSchedC = transactionDetail.transactionModel;
+      }
     }
     return finish;
   }
