@@ -898,47 +898,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     });
   }
 
-  /**
-   * Present user with H1/H2 required before making Debt payment.
-   */
-  private _handleNoH1H2_OLD(msg: string) {
-    if (typeof msg !== 'string') {
-      return;
-    }
-
-    // Hard Coding DF/DC  => H2 for now.  Once dynamic forms provides schedule in activityEventTypes
-    const activityEventType = this.frmIndividualReceipt.get('activity_event_type').value;
-    const scheduleName = (activityEventType === 'DF' || activityEventType === 'DC') ? 'H2' : 'H1';
-    const scheduleType = (activityEventType === 'DF' || activityEventType === 'DC') ? 'sched_h2' : 'sched_h1';
-
-    // TODO decide on a specific code or message for not found.
-    // Handling various versions from API until then.
-    if (msg.toLowerCase().includes('no h1 data found') ||
-        msg.toLowerCase().includes('no h2 data found') ||
-        msg.toLowerCase().includes('no valid h1 data found') ||
-        msg.toLowerCase().includes('no valid h2 data found')
-        ) {
-      const message = `Please add Schedule ${scheduleName} before proceeding with adding the ` +
-        `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
-      this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
-
-        const emitObj: any = {
-          form: this.frmIndividualReceipt,
-          direction: 'next',
-          step: 'step_3',
-          previousStep: 'step_2',
-          scheduleType: scheduleType,
-          action: ScheduleActions.add
-        };
-        if (scheduleType === 'sched_h2') {
-          emitObj.transactionType = 'ALLOC_H2_RATIO';
-          emitObj.transactionTypeText = 'Allocation Ratios';
-        }
-        this.status.emit(emitObj);
-      });
-    }
-  }
-
   private _formatAmount(e: any, fieldName: string, negativeAmount: boolean) {
     let contributionAmount: string = e.target.value;
 
@@ -1307,16 +1266,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
     const isChildField = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
-    // if (
-    //   this.isFieldName(col.name, 'cand_last_name') ||
-    //   this.isFieldName(col.name, 'cand_first_name') ||
-    //   this.isFieldName(col.name, 'cand_middle_name') ||
-    //   this.isFieldName(col.name, 'cand_prefix') ||
-    //   this.isFieldName(col.name, 'cand_suffix') ||
-    //   this.isFieldName(col.name, 'cand_office') ||
-    //   this.isFieldName(col.name, 'cand_office_state') ||
-    //   this.isFieldName(col.name, 'cand_office_district')
-    // ) {
     if (this._isCandidateField(col)) {
       if (isChildField) {
         if (this._selectedCandidateChild) {
