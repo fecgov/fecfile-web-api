@@ -1823,7 +1823,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                     COALESCE(t1.non_pres_and_non_senate, '''') AS "nonPresidentialAndNonSenate",
                     COALESCE(t1.federal_percent, 0.0) AS "federalPercent",
                     COALESCE(t1.non_federal_percent, 0.0) AS "nonFederalPercent",
-                    COALESCE(t1.adminstrative, '''') AS "adminstrative",
+                    COALESCE(t1.administrative, '''') AS "administrative",
                     COALESCE(t1.generic_voter_drive, '''') AS "genericVoterDrive",
                     COALESCE(t1.public_communications, '''') AS "publicCommunications"
                     FROM public.sched_h1 t1
