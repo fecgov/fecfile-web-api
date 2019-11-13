@@ -453,6 +453,11 @@ def schedH1(request):
                 datum['generic_voter_drive'] = True
                 datum['public_communications'] = True
 
+            if cmte_type(cmte_id) == 'PTY':
+                datum['administrative'] = True
+                datum['generic_voter_drive'] = True
+                datum['public_communications'] = True
+
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
                 datum['transaction_id'] = check_transaction_id(
