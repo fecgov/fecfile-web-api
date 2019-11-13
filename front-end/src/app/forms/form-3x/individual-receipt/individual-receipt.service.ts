@@ -32,16 +32,23 @@ export class IndividualReceiptService {
    */
   public getDynamicFormFields(formType: string, transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
+    const url = `${environment.apiUrl}/core/get_dynamic_forms_fields`;
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
-    let formData: FormData = new FormData();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     params = params.append('form_type', `F${formType}`);
     params = params.append('transaction_type', transactionType);
+
+    // H4/H6 require report ID for determining H1/H2 exists
+    if (transactionType === 'ALLOC_EXP_DEBT' || transactionType === 'ALLOC_FEA_DISB_DEBT') {
+      const reportId = this.getReportIdFromStorage(formType);
+      if (reportId) {
+        params = params.append('reportId', reportId);
+      }
+    }
 
     return this._http.get(url, {
       headers: httpOptions,
@@ -412,7 +419,11 @@ export class IndividualReceiptService {
       } else if (form3XReportType.hasOwnProperty('reportid')) {
         reportId = form3XReportType.reportid;
       }
-    } else if (reportIdFromLocalStorage !== null && reportIdFromLocalStorage !== undefined && reportIdFromLocalStorage !== '0') {
+    } else if (
+      reportIdFromLocalStorage !== null &&
+      reportIdFromLocalStorage !== undefined &&
+      reportIdFromLocalStorage !== '0'
+    ) {
       reportId = reportIdFromLocalStorage;
     }
     return reportId;
