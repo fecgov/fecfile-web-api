@@ -4,16 +4,16 @@ import { MessageService } from './../../../shared/services/MessageService/messag
 import { LoanService } from './../service/loan.service';
 import { UtilService } from './../../../shared/utils/util.service';
 import { Component, OnInit, ViewChild, AfterViewChecked, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
-import { NgForm, Validators } from '@angular/forms';
+import { NgForm, Validators, FormControl } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
 import { environment } from '../../../../environments/environment';
 import { map } from 'rxjs/operators';
-import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { validateContributionAmount } from '../../../shared/utils/forms/validation/amount.validator';
+import { ContributionDateValidator } from '../../../shared/utils/forms/validation/contribution-date.validator';
 
 @Component({
   selector: 'app-loanpayment',
@@ -56,31 +56,59 @@ export class LoanpaymentComponent implements OnInit {
     this.getStates();
   }
   
+
+  isIndividual(){
+    if(this.form.control.get('entity_type').value === 'IND'){
+      return true;
+    }
+    return false;
+  }
   
   private getLoanRepaymentData() {
     
     const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
     this._loanService.getDataSchedule(reportId, this.transactionDetail.transactionId).subscribe(res => {
       res = res[0];
+      this.selectedEntity = res.entity_type;
+
+      this.form.control.patchValue({ 'entity_type': res.entity_type });
       this.form.control.patchValue({ 'last_Name': res.last_name });
       this.form.control.patchValue({ 'first_Name': res.first_name });
       this.form.control.patchValue({ 'middle_Name': res.middle_name });
       this.form.control.patchValue({ 'suffix': res.suffix });
       this.form.control.patchValue({ 'prefix': res.prefix });
+      this.form.control.patchValue({ 'entity_Name': res.entity_name });
       this.form.control.patchValue({ 'street_1': res.street_1 });
       this.form.control.patchValue({ 'street_2': res.street_2 });
       this.form.control.patchValue({ 'city': res.city });
       this.form.control.patchValue({ 'zip': res.zip_code });
       this.form.control.patchValue({ 'state': res.state });
-      this.form.control.patchValue({ 'entity_type': res.entity_type });
-
       this.outstandingLoanBalance = Number(res.loan_balance);
+
+      //remove unnecessary form controls
+      this.removeUnnecessaryFormControls();
       
       //validators have to be set after getting current loan metadata to enfore max contribution amount
       this.setupValidators();
 
     })
 
+  }
+
+  /**
+   * This method is used to remove unnecessary form controls from the from group to keep validations simple
+   */
+  private removeUnnecessaryFormControls() {
+    if (this.selectedEntity !== 'IND') {
+      this.form.control.removeControl('last_Name');
+      this.form.control.removeControl('first_Name');
+      this.form.control.removeControl('middle_Name');
+      this.form.control.removeControl('prefix');
+      this.form.control.removeControl('suffix');
+    }
+    if (this.selectedEntity !== 'ORG') {
+      this.form.control.removeControl('entity_Name');
+    }
   }
 
   private getStates() {
@@ -109,13 +137,10 @@ export class LoanpaymentComponent implements OnInit {
     this.form.controls['expenditure_amount'].updateValueAndValidity();
   }
 
-  test(form) {
-    console.log(form);
-  }
-
   handleTypeChange(event, form: any) {
     console.log(event);
     form.entity = event.code;
+    this.selectedEntity = event.code;
   }
 
   validateForm() {

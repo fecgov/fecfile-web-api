@@ -89,8 +89,9 @@ def schedH1_sql_dict(data):
             'senate_only', 
             'non_pres_and_non_senate', 
             'federal_percent', 
-            'non_federal_percent', 
-            'adminstrative'
+            'non_federal_percent',
+            'election_year', 
+            'administrative',
             'generic_voter_drive', 
             'public_communications',
     ]
@@ -133,7 +134,8 @@ def put_sql_schedH1(data):
                 non_pres_and_non_senate = %s, 
                 federal_percent = %s, 
                 non_federal_percent = %s, 
-                adminstrative = %s,
+                election_year = %s,
+                administrative = %s,
                 generic_voter_drive = %s, 
                 public_communications = %s,
                 last_update_date = %s
@@ -150,7 +152,8 @@ def put_sql_schedH1(data):
             data.get('non_pres_and_non_senate'),
             data.get('federal_percent'),
             data.get('non_federal_percent'),
-            data.get('adminstrative'),
+            data.get('election_year'),
+            data.get('administrative'),
             data.get('generic_voter_drive'),
             data.get('public_communications'),
             datetime.datetime.now(),
@@ -203,6 +206,7 @@ def post_sql_schedH1(data):
     """
     save a new sched_h1 item
     """
+    logger.debug('post sql h1 with data:{}'.format(data))
     try:
         _sql = """
         INSERT INTO public.sched_h1 (
@@ -218,13 +222,14 @@ def post_sql_schedH1(data):
             non_pres_and_non_senate, 
             federal_percent, 
             non_federal_percent, 
-            adminstrative,
+            election_year,
+            administrative,
             generic_voter_drive, 
             public_communications,
             create_date
             )
         VALUES ({}); 
-        """.format(','.join(['%s']*16))
+        """.format(','.join(['%s']*17))
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
@@ -238,7 +243,8 @@ def post_sql_schedH1(data):
             data.get('non_pres_and_non_senate'),
             data.get('federal_percent'),
             data.get('non_federal_percent'),
-            data.get('adminstrative'),
+            data.get('election_year'),
+            data.get('administrative'),
             data.get('generic_voter_drive'),
             data.get('public_communications'),
             datetime.datetime.now(),   
@@ -246,6 +252,7 @@ def post_sql_schedH1(data):
         with connection.cursor() as cursor:
             # Insert data into schedH3 table
             cursor.execute(_sql, _v)
+            logger.info('h1 saved.')
     except Exception:
         raise
 
@@ -304,7 +311,8 @@ def get_list_all_schedH1(report_id, cmte_id):
             non_pres_and_non_senate, 
             federal_percent, 
             non_federal_percent, 
-            adminstrative,
+            election_year,
+            administrative,
             generic_voter_drive, 
             public_communications,
             create_date ,
@@ -346,7 +354,8 @@ def get_list_schedH1(report_id, cmte_id, transaction_id):
             non_pres_and_non_senate, 
             federal_percent, 
             non_federal_percent, 
-            adminstrative,
+            election_year,
+            administrative,
             generic_voter_drive, 
             public_communications,
             create_date ,
@@ -406,6 +415,7 @@ def schedH1(request):
             else:
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
+            logger.debug('filtering and validating h1 data:{}'.format(request.data))
             datum = schedH1_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
@@ -417,6 +427,7 @@ def schedH1(request):
                 data = put_schedH1(datum)
             else:
                 # print(datum)
+                logger.debug('h1 data after validation:{}'.format(datum))
                 data = post_schedH1(datum)
             # Associating child transactions to parent and storing them to DB
 
@@ -519,6 +530,9 @@ def get_fed_nonfed_share(request):
             if PAC, get activity based ratio
         grad event_type-based aggregation value from h4
     calculate fed and non-fed share based on ratio and update aggregate value
+
+    update 20191112: 'election year' added to table - calendar year will match to
+    election_year in db. 
     """
 
     logger.debug('get_fed_nonfed_share with request:{}'.format(request.query_params))
@@ -537,12 +551,13 @@ def get_fed_nonfed_share(request):
             from public.sched_h2 
             where cmte_id = %s 
             and activity_event_name = %s
-            and create_date between %s and %s
+            and election_year = %s
+            and delete_ind is distinct from 'Y'
             """
             with connection.cursor() as cursor:
                 logger.debug('query with _sql:{}'.format(_sql))
                 logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
-                cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
+                cursor.execute(_sql, (cmte_id, event_name, calendar_year))
                 if not cursor.rowcount:
                     raise Exception('Error: no h1 data found.')
                 fed_percent = float(cursor.fetchone()[0])
@@ -553,6 +568,7 @@ def get_fed_nonfed_share(request):
             where cmte_id = %s 
             and activity_event_identifier = %s
             and create_date between %s and %s
+            and delete_ind is distinct from 'Y'
             order by create_date desc, last_update_date desc;
             """
             with connection.cursor() as cursor:
@@ -565,23 +581,20 @@ def get_fed_nonfed_share(request):
         else: # need to go to h1 for ratios
             activity_event_type = request.query_params.get('activity_event_type')
 
-            # # TODO: need to db change to fix this typo
-            # if activity_event_type == 'administrative':
-            #     activity_event_type = 'adminstrative'
-
             if not activity_event_type:
                 raise Exception('Error: event type is required.')
             
             if cmte_type_category == 'PTY':
                 _sql = """
                 select federal_percent from public.sched_h1
-                where create_date between %s and %s
+                where election_year = %s
                 and cmte_id = %s
+                and delete_ind is distinct from 'Y'
                 order by create_date desc, last_update_date desc
                 """
                 logger.debug('sql for query h1:{}'.format(_sql))
                 with connection.cursor() as cursor:
-                    cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                    cursor.execute(_sql, (calendar_year, cmte_id))
                     if not cursor.rowcount:
                         raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
@@ -590,7 +603,7 @@ def get_fed_nonfed_share(request):
                 # if not activity_event_type:
                     # return Response('Error: event type is required for this committee.')
                 event_type_code = {
-                    "AD" : "adminstrative", # TODO: need to fix this typo
+                    "AD" : "administrative", # TODO: need to fix this typo
                     "GV" : "generic_voter_drive",
                     "PC" : "public_communications",
                 }
@@ -599,7 +612,7 @@ def get_fed_nonfed_share(request):
                     return Response('Error: activity type not valid')
                 _sql = """
                 select federal_percent from public.sched_h1
-                where create_date between %s and %s
+                where election_year = %s
                 and cmte_id = %s
                 """
                 activity_part = """and {} = true """.format(h1_event_type)
@@ -607,7 +620,7 @@ def get_fed_nonfed_share(request):
                 _sql = _sql + activity_part + order_part
                 logger.debug('sql for query h1:{}'.format(_sql))
                 with connection.cursor() as cursor:
-                    cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+                    cursor.execute(_sql, (calendar_year, cmte_id))
                     if not cursor.rowcount:
                         raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
@@ -659,17 +672,17 @@ def get_h1_percentage(request):
         if not('calendar_year' in request.query_params and check_null_value(request.query_params.get('calendar_year'))):
             raise Exception ('Missing Input: calendar_year is mandatory')
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
-        start_dt = datetime.date(int(calendar_year), 1, 1)
-        end_dt = datetime.date(int(calendar_year), 12, 31)
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
         _sql = """
             select json_agg(t) from
             (select federal_percent, non_federal_percent from public.sched_h1
-            where create_date between %s and %s
+            where election_year = %s
             and cmte_id = %s
             order by create_date desc, last_update_date desc) t
         """
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (start_dt, end_dt, cmte_id))
+            cursor.execute(_sql, (calendar_year, cmte_id))
             # print('rows:{}'.format(cursor.rowcount))
             json_data = cursor.fetchone()[0]
             # print(json_data)

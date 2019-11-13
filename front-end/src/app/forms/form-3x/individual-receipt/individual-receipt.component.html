@@ -125,6 +125,7 @@
                         <input *ngIf="col?.name === 'last_name'" class="form-control" [style.width]="col?.width"
                           [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -137,6 +138,7 @@
                         <input *ngIf="col?.name === 'first_name'" class="form-control" [style.width]="col?.width"
                           [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -301,6 +303,7 @@
                         bindValue="code" 
                         bindLabel="code" 
                         [selectOnTab]="true"
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -338,6 +341,7 @@
                         bindValue="entityType"
                         bindLabel="entityTypeDescription" 
                         [selectOnTab]="true"
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -381,7 +385,7 @@
                       </ng-select>                     
                     </ng-container>
                     <ng-container 
-                      *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_name')
+                      *ngIf="col?.type === 'select' && isFieldName(col?.name, 'activity_event_identifier')
                         && activityEventNames"
                     >
                       <ng-select #activityEventNameSelect 

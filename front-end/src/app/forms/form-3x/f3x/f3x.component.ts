@@ -448,6 +448,7 @@ export class F3xComponent implements OnInit {
           // move logic where dectecting schedC using apiCall here.
           // Could hard code a conversion from apiCall value to sched_c in the
           // transaction table component until then.
+          this.scheduleCAction = ScheduleActions.edit;
         }
       } else if (this.scheduleType === 'sched_c_loan_summary') {
         this.scheduleType = 'sched_c_loan_summary';
