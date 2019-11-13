@@ -492,7 +492,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
      * This block adds zip code, and contribution date validation.
      * Required for occupation and employer will be dependent on aggregate.
      */
-    if (this.isFieldName(fieldName, 'zip_code')) {
+    if (this.isFieldName(fieldName, 'zip_code') ||
+        this.isFieldName(fieldName, 'zip_co_exp')) {
       formValidators.push(alphaNumeric());
     } else if (this.isFieldName(fieldName, 'contribution_date') || this.isFieldName(fieldName, 'expenditure_date')) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
