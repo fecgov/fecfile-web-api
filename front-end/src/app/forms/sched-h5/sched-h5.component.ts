@@ -171,6 +171,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this._setTransactionDetail();
   }
 
+  ngDoCheck() {
+    this.status.emit({
+      otherSchedHTransactionType: this.transactionType
+    });
+  }
+
   public ngOnDestroy(): void {
     super.ngOnDestroy();
   }

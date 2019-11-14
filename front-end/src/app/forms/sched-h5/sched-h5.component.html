@@ -298,7 +298,7 @@
             </tr>
           </thead>
           <tbody>
-            <ng-container *ngFor="let report of h5Sum">
+            <ng-container *ngFor="let report of h5Sum | paginate: h5TableConfig">
               <tr>
                 <td>
                   <input type="checkbox" (click)="checkForMultiChecked($event)">
@@ -341,6 +341,10 @@
             </ng-container>
           </tbody>
         </table>
+        <hr/>
+          <div class="d-flex justify-content-center pagination-controls">
+            <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
+          </div>
       </ng-container>
     </section>
 

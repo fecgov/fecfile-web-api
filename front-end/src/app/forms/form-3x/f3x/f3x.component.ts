@@ -423,6 +423,8 @@ export class F3xComponent implements OnInit {
             this._step = e.step;
           }
         }
+      } else if(e.hasOwnProperty('otherSchedHTransactionType')){        
+        this.transactionType = e.otherSchedHTransactionType;
       }
     }
   }
