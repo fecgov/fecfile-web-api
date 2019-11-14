@@ -49,6 +49,7 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
 import { entityTypes, committeeEventTypes } from './entity-types-json';
 import { ScheduleActions } from './schedule-actions.enum';
+import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
 
 
 export enum SaveActions {
@@ -107,6 +108,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public memoDropdownSize = null;
   public totalAmountReadOnly: boolean;
 
+  protected abstractScheduleComponent: AbstractScheduleParentEnum;
   protected isInit = false;
   protected formFieldsPrePopulated = false;
   protected staticFormFields = null;
@@ -176,7 +178,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         // See message sender for mesage properties
         switch (message.key) {
           case 'fullForm':
-            this._prePopulateFormForEditOrView(message.transactionModel);
+            // only load form for the AbstractSchudule parent in the view
+            if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+              this._prePopulateFormForEditOrView(message.transactionModel);
+            }
             break;
           case 'field':
             // set the field array to class variable to be referenced once the formGroup
@@ -2723,22 +2728,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.electionTypes = res.data.electionTypes;
               }
             }
-            // TODO no longer needed now that we have committeeTypeEvents
-            // if (res.data.hasOwnProperty('activityEventTypes')) {
-            //   if (Array.isArray(res.data.activityEventTypes)) {
-            //     this.activityEventTypes = res.data.activityEventTypes;
-            //     if (this._cmteTypeCategory) {
-
-            //       if (committeeEventTypes.committeeTypeEvents) {
-            //         for (const committeeTypeEvent of committeeEventTypes.committeeTypeEvents) {
-            //           if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
-            //             this.activityEventTypes = committeeTypeEvent.eventTypes;
-            //           }
-            //         }
-            //       }
-            //     }
-            //   }
-            // }
 
             if (res.data.hasOwnProperty('committeeTypeEvents')) {
               if (Array.isArray(res.data.committeeTypeEvents)) {
