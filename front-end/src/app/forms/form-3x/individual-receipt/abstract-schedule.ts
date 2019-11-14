@@ -1866,6 +1866,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Return to the parent transaction from sub tran.
    */
   public returnToParent(scheduleAction: ScheduleActions): void {
+    this.clearFormValues();
     let transactionModel = this._parentTransactionModel;
     if (!transactionModel) {
       transactionModel = new TransactionModel({});
@@ -3326,7 +3327,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.memoCodeChild = false;
     this._readOnlyMemoCode = false;
     this._readOnlyMemoCodeChild = false;
-    if(this.frmIndividualReceipt){
+    if (this.frmIndividualReceipt) {
       this.frmIndividualReceipt.reset();
     }
     if (this.frmIndividualReceipt.contains('entity_type')) {
@@ -3334,6 +3335,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
     }
     this.memoDropdownSize = null;
+    this.activityEventNames = null;
   }
 
   private toggleValidationIndOrg(entityType: string) {
