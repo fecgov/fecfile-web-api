@@ -1,3 +1,5 @@
+import { ReportTypeService } from './../form-3x/report-type/report-type.service';
+import { LoanService } from './../sched-c/service/loan.service';
 import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
@@ -21,6 +23,7 @@ export class SchedC1Component implements OnInit, OnChanges {
   @Input() formType: string;
   @Input() scheduleAction: ScheduleActions;
   @Input() forceChangeDetection: Date;
+  @Input() transactionDetail: any;
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   public c1Form: FormGroup;
@@ -40,7 +43,7 @@ export class SchedC1Component implements OnInit, OnChanges {
   public fileNameToDisplay: string = null;
   // TODO check requirements for each amount field.
   public _contributionAmountMax = 14;
-
+  public existingData: any;
   public fieldLoanAmount = { name: 'loan_amount' };
 
   constructor(
@@ -49,13 +52,61 @@ export class SchedC1Component implements OnInit, OnChanges {
     private _typeaheadService: TypeaheadService,
     private _schedC1Service: SchedC1Service,
     private _decimalPipe: DecimalPipe,
-    private _utilService: UtilService
+    private _utilService: UtilService, 
+    private _loanService: LoanService,
+    private _reportTypeService: ReportTypeService
   ) {}
 
   public ngOnInit() {
     this.sectionType = Sections.initialSection;
     this._getStates();
+    this._getExistingLoanData();
     this._setFormGroup();
+  }
+
+  /* private _setFormGroup() {
+    const alphaNumericFn = alphaNumeric();
+
+    this.c1Form = this._fb.group({
+      lending_institution: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+      mailing_address: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+      city: new FormControl(null, [Validators.required, Validators.maxLength(100), alphaNumericFn]),
+      state: new FormControl('', [Validators.required, Validators.maxLength(2)]),
+      zip: new FormControl(null, [Validators.required, Validators.maxLength(10), alphaNumericFn]),
+      loan_amount: new FormControl(null, [Validators.required, Validators.maxLength(12)]),
+      loan_intrest_rate: new FormControl(null, [Validators.required, Validators.maxLength(2)]),
+      loan_incurred_date: new FormControl(null, [Validators.required]),
+      loan_due_date: new FormControl(null, [Validators.required]),
+      is_loan_restructured: new FormControl(null, [Validators.required]),
+      credit_amount_this_draw: new FormControl(null, [Validators.required, Validators.maxLength(12)]),
+      total_outstanding_balance: new FormControl(null),
+      other_parties_liable: new FormControl(null, [Validators.required]),
+      pledged_collateral_ind: new FormControl(null, [Validators.required]),
+      future_income_ind: new FormControl(null, [Validators.required]),
+      basis_of_loan_desc: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+      file_upload: new FormControl(null, [Validators.required]),
+      final_authorization: new FormControl(null, [Validators.requiredTrue])
+    }); */
+
+  private _getExistingLoanData() {
+    const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
+    this._loanService.getDataSchedule(reportId, this.transactionDetail.transactionId).subscribe(res => {
+      res = res[0];
+      this.c1Form.patchValue({lending_institution : res.entity_name});
+      this.c1Form.patchValue({mailing_address : res.street_2 ? `${res.street_1} ${res.street_2}` : res.street_1});
+      this.c1Form.patchValue({city : res.city});
+      this.c1Form.patchValue({state : res.state});
+      this.c1Form.patchValue({zip : res.zip_code});
+      this.c1Form.get('state').updateValueAndValidity();
+      this.c1Form.patchValue({loan_amount : this._decimalPipe.transform(res.loan_amount_original, '.2-2')});
+      this.c1Form.patchValue({loan_intrest_rate : res.loan_intrest_rate});
+      this.c1Form.patchValue({loan_incurred_date : res.loan_incurred_date});
+      this.c1Form.patchValue({loan_due_date : res.loan_due_date});
+      
+      this.c1Form.patchValue({credit_amount_this_draw : this._decimalPipe.transform(res.loan_amount_original, '.2-2')});
+      this.c1Form.patchValue({total_outstanding_balance : this._decimalPipe.transform(res.loan_balance, '.2-2')});
+      
+    });
   }
 
   public ngOnChanges(changes: SimpleChanges) {
@@ -100,6 +151,10 @@ export class SchedC1Component implements OnInit, OnChanges {
 
     switch (this.sectionType) {
       case Sections.initialSection:
+          
+      //disabled ng-select is showing valid = false as well as invalid=false
+      //enable it right before proceeding forward
+      this.c1Form.controls['state'].enable();
         if (this._checkSectionValid()) {
           // mark as untouched so fields on new section/screen do not show as invalid
           this.c1Form.markAsUntouched();
@@ -173,6 +228,8 @@ export class SchedC1Component implements OnInit, OnChanges {
   public showPreviousSection() {
     switch (this.sectionType) {
       case Sections.sectionA:
+        //disable the state form control back. 
+        this.c1Form.controls['state'].disable();
         this.sectionType = Sections.initialSection;
         break;
       case Sections.sectionB:
@@ -344,7 +401,7 @@ export class SchedC1Component implements OnInit, OnChanges {
    * @param fieldName name of control to check for validity
    */
   private _checkFormFieldIsValid(fieldName: string): boolean {
-    if (this.c1Form.contains(fieldName)) {
+    if (this.c1Form.get(fieldName)) {
       return this.c1Form.get(fieldName).valid;
     }
   }
@@ -362,10 +419,10 @@ export class SchedC1Component implements OnInit, OnChanges {
       lending_institution: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       mailing_address: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       city: new FormControl(null, [Validators.required, Validators.maxLength(100), alphaNumericFn]),
-      state: new FormControl(null, [Validators.required, Validators.maxLength(2)]),
+      state: new FormControl({value:'', disabled: true}),
       zip: new FormControl(null, [Validators.required, Validators.maxLength(10), alphaNumericFn]),
       loan_amount: new FormControl(null, [Validators.required, Validators.maxLength(12)]),
-      loan_intrest_rate: new FormControl(null, [Validators.required, Validators.maxLength(2)]),
+      loan_intrest_rate: new FormControl(null, [Validators.required]),
       loan_incurred_date: new FormControl(null, [Validators.required]),
       loan_due_date: new FormControl(null, [Validators.required]),
       is_loan_restructured: new FormControl(null, [Validators.required]),

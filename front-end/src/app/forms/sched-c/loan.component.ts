@@ -754,6 +754,12 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       previousStep: 'step_2',
       scheduleType: 'sched_c1',
       action: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
+          transactionId: this._transactionId,
+          entityId: this._selectedEntityId
+        }
+      }
     };
     this.status.emit(c1EmitObj);
   }
