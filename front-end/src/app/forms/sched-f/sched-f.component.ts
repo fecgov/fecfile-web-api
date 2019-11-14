@@ -312,10 +312,9 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
    * @param fieldName name of control to check for validity
    */
   private _checkFormFieldIsValid(fieldName: string): boolean {
-    // if (this.frmIndividualReceipt.contains(fieldName)) {
-    //   return this.frmIndividualReceipt.get(fieldName).valid;
-    // }
-    return true;
+    if (this.frmIndividualReceipt.contains(fieldName)) {
+      return this.frmIndividualReceipt.get(fieldName).valid;
+    }
   }
 
   private _setTransactionDetail() {
