@@ -104,6 +104,8 @@
         </div>
         <app-sched-f
           [hidden]="scheduleType !== 'sched_f'"
+          [formType]="'3X'"
+          [forceChangeDetection]="forceChangeDetectionFDebtPayment"
           [transactionTypeText]="transactionTypeTextSchedF"
           [transactionType]="transactionTypeSchedF"
           [scheduleAction]="scheduleFAction"

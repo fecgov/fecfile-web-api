@@ -21,6 +21,7 @@ import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.
 import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedule';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
+import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 /**
  * Schedule F is a sub-transaction of Schedule D.
@@ -32,12 +33,13 @@ import { TransactionModel } from '../transactions/model/transaction.model';
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe]
 })
 export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+  @Input() formType: string;
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
+  @Input() forceChangeDetection: Date;
   @Output() status: EventEmitter<any>;
 
-  public formType: string;
   public showPart2: boolean;
   public loaded = false;
 
@@ -49,6 +51,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
       seperator: false,
       cols: [
         {
+          staticField: true,
           name: 'coord_expenditure_yn',
           value: null,
           validation: {
@@ -56,6 +59,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
           }
         },
         {
+          staticField: true,
           preText: null,
           setEntityIdTo: 'entity_id',
           isReadonly: false,
@@ -79,6 +83,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
           }
         },
         {
+          staticField: true,
           preText: null,
           setEntityIdTo: 'entity_id',
           isReadonly: false,
@@ -102,6 +107,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
           }
         },
         {
+          staticField: true,
           name: 'subordinate_com_id',
           value: null,
           validation: {
@@ -111,6 +117,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
           }
         },
         {
+          staticField: true,
           name: 'subordinate_com_name',
           value: null,
           validation: {
@@ -120,6 +127,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
           }
         },
         {
+          staticField: true,
           name: 'street_1_co_exp',
           value: null,
           validation: {
@@ -139,6 +147,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
           }
         },
         {
+          staticField: true,
           name: 'city_co_exp',
           value: null,
           validation: {
@@ -148,6 +157,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
           }
         },
         {
+          staticField: true,
           name: 'state_co_exp',
           value: null,
           validation: {
@@ -157,6 +167,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
           }
         },
         {
+          staticField: true,
           name: 'zip_co_exp',
           value: null,
           validation: {
@@ -216,20 +227,15 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnInit() {
-    this.formType = '3X';
     this.formFieldsPrePopulated = true;
-    // this.formFields = this._staticFormFields;
+    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedFComponent;
     super.ngOnInit();
     this.showPart2 = false;
-    this.transactionType = 'OPEXP'; // 'INDV_REC';
-    // this.transactionTypeText = 'Coordinated Party Expenditure Debt to Vendor';
-    super.ngOnChanges(null);
     this._setTransactionDetail();
-    console.log();
 
     // temp code - waiting until dynamic forms completes and loads the formGroup
     // before rendering the static fields, otherwise validation error styling
-    // is not working (input-error-field class).  If dynamic forms deliver,
+    // is not working (input-error-field class).  If dynamic forms deliver
     // the static fields, then remove this or set a flag when formGroup is ready
     setTimeout(() => {
       this.loaded = true;
@@ -237,10 +243,9 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    this.transactionType = 'OPEXP';
-    this.formType = '3X';
     this.showPart2 = false;
     this._setTransactionDetail();
+    super.ngOnChanges(changes);
 
     if (this._prePopulateFromSchedDData && this.scheduleAction === ScheduleActions.addSubTransaction) {
       this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
@@ -307,27 +312,54 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
    * @param fieldName name of control to check for validity
    */
   private _checkFormFieldIsValid(fieldName: string): boolean {
-    if (this.frmIndividualReceipt.contains(fieldName)) {
-      return this.frmIndividualReceipt.get(fieldName).valid;
-    }
+    // if (this.frmIndividualReceipt.contains(fieldName)) {
+    //   return this.frmIndividualReceipt.get(fieldName).valid;
+    // }
+    return true;
   }
 
   private _setTransactionDetail() {
-    this.subTransactionInfo = {
-      transactionType: 'DEBT_TO_VENDOR',
-      transactionTypeDescription: 'Debt to Vendor',
-      scheduleType: 'sched_d',
-      subTransactionType: 'OPEXP_DEBT',
-      subScheduleType: 'sched_b',
-      subTransactionTypeDescription: 'Operating Expenditure Debt to Vendor',
-      api_call: '/sd/schedD',
-      isParent: false,
-      isEarmark: false
-    };
+    // this.subTransactionInfo = {
+    //   transactionType: 'DEBT_TO_VENDOR',
+    //   transactionTypeDescription: 'Debt to Vendor',
+    //   scheduleType: 'sched_d',
+    //   subTransactionType: 'COEXP_PARTY_DEBT',
+    //   subScheduleType: 'sched_f',
+    //   subTransactionTypeDescription: 'Coordinated Party Expenditure (SF)',
+    //   api_call: '/sd/schedD',
+    //   isParent: false,
+    //   isEarmark: false
+    // };
 
     if (this.scheduleAction === ScheduleActions.addSubTransaction) {
       this.clearFormValues();
     } else if (this.scheduleAction === ScheduleActions.edit) {
+    }
+  }
+
+  /**
+   * @override the Base class method.
+   *
+   * Determine if the field should be shown.
+   * Don't show fields from the first screen by checking
+   * the showPart2 for true.  If showPart2, determine which fields
+   * to be shown based on the entity type selected.
+   */
+  public isToggleShow(col: any) {
+    if (col.staticField) {
+      return false;
+    } else {
+      if (!this.selectedEntityType) {
+        return true;
+      }
+      if (!col.toggle) {
+        return true;
+      }
+      if (this.selectedEntityType.group === col.entityGroup || !col.entityGroup) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 }
