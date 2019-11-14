@@ -1018,7 +1018,7 @@ def get_h2_type_events(request):
     event_type = request.query_params.get('activity_event_type').strip()
     if event_type not in ['fundraising', 'direct_cand_support']:
         raise Exception('missing or non-valid event type value')
-    if event_type == 'findraising':
+    if event_type == 'fundraising':
         _sql = """
         SELECT json_agg(t) from (
         SELECT activity_event_name 
