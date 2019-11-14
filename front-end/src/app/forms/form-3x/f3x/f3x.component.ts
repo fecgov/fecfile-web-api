@@ -58,6 +58,7 @@ export class F3xComponent implements OnInit {
   public formType: string = '';
   public scheduleAction: ScheduleActions;
   public scheduleCAction: ScheduleActions;
+  public scheduleFAction: ScheduleActions;
   // public forceChangeDetectionC: Date;
   public forceChangeDetectionC1: Date;
 
@@ -491,6 +492,7 @@ export class F3xComponent implements OnInit {
     if (scheduleType.startsWith('sched_f')) {
       this.transactionTypeSchedF = transactionType;
       this.transactionTypeTextSchedF = transactionTypeText;
+      this.scheduleFAction = this.scheduleAction;
     } else if (scheduleType.startsWith('sched_c')) {
     } else {
       this.transactionType = transactionType;

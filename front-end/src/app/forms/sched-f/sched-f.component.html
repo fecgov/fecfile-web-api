@@ -88,7 +88,6 @@
                   No
                 </label>
               </div>
-
             </div>            
           </div>
           <div class="row">
@@ -274,6 +273,7 @@
                   [attr.name]="'zip_co_exp'"
                   [style.width]="'33%'" 
                   [style.height]="'30px'"
+                  [maxlength]="'10'"
                   [ngClass]="
                     frmIndividualReceipt.get('zip_co_exp')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -281,6 +281,17 @@
                       : ''
                   "                
                 />
+                <div class="error-text" *ngIf="
+                  (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
+                  frmIndividualReceipt.get('zip_co_exp').invalid
+                ">
+                  <ng-container *ngIf="frmIndividualReceipt.get('zip_co_exp').errors">
+                    <div class="text-error text-left"
+                      *ngIf="frmIndividualReceipt.get('zip_co_exp').errors?.nonAlphaNumeric">
+                      Alphanumeric characters only.
+                    </div>
+                  </ng-container>
+                </div>
               </div>
             </div>                
           </div>                     
