@@ -147,6 +147,7 @@
         <app-sched-c1
           *ngIf="scheduleType === 'sched_c1'"
           [forceChangeDetection]="forceChangeDetectionC1"
+          [transactionDetail]="transactionDetailSchedC" 
           [scheduleAction]="scheduleAction"
           (status)="onNotify($event)"
         >

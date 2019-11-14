@@ -163,6 +163,12 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.formType = '3X';    
   }
 
+  ngDoCheck() {
+    this.status.emit({
+      otherSchedHTransactionType: this.transactionType
+    });
+  }
+
   public ngOnDestroy(): void {
     super.ngOnDestroy();
   }
@@ -312,6 +318,6 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true }); 
     }  
   }
-  
+
 }
 

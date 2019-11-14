@@ -172,6 +172,12 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.showPart2 = false;    
   }
 
+  ngDoCheck() {
+    this.status.emit({
+      otherSchedHTransactionType: this.transactionType
+    });
+  }
+
   public ngOnDestroy(): void {
     super.ngOnDestroy();
   }
