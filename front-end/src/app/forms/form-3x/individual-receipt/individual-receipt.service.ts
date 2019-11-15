@@ -369,7 +369,7 @@ export class IndividualReceiptService {
     });
   }
 
-  public getFedNonFedPercentage(amount: string, activityEvent: string): Observable<any> {
+  public getFedNonFedPercentage(amount: string, activityEvent: string, activityEventName: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sh1/get_fed_nonfed_share';
     let httpOptions = new HttpHeaders();
@@ -391,6 +391,9 @@ export class IndividualReceiptService {
     }
     if (activityEvent) {
       params = params.append('activity_event_type', activityEvent);
+    }
+    if (activityEventName) {
+      params = params.append('activity_event_identifier', activityEventName);
     }
 
     return this._http.get(`${environment.apiUrl}${url}`, {
