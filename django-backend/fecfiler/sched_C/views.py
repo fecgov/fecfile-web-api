@@ -150,10 +150,8 @@ def schedC_sql_dict(data):
         datum['transaction_type'] = ''
 
         #no need to have dummy data   
-        # '''
-        datum['line_number'] = 'DUMMY'
-        datum['transaction_type'] = 'DUMMY'
-        # '''
+        # datum['line_number'] = 'DUMMY'
+        # datum['transaction_type'] = 'DUMMY'
         
         return datum
 
@@ -1037,6 +1035,8 @@ def schedC1_sql_dict(data):
         datum =  {k: v for k, v in data.items() if k in valid_fields}
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
+        datum['line_number'] = 'DUMMY'
+        datum['transaction_type'] = 'DUMMY'
         return datum
     except:
         raise Exception('invalid request data.')
