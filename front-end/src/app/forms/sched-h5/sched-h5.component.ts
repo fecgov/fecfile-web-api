@@ -578,8 +578,11 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.cvgStartDate = formInfo.cvgStartDate;
     this.cvgEndDate = formInfo.cvgEndDate;
 
+    let startDate =  new Date(this.cvgStartDate);
+    startDate.setDate(startDate.getDate() - 1);
+
     if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
+      this._uService.compareDatesAfter((new Date(receiptDate)), startDate))) {     
       this.receiptDateErr = true;
       this.schedH5.controls['receipt_date'].setErrors({'incorrect': true});
     } else {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -23,12 +23,25 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
 import { Observable, Subscription } from 'rxjs';
 import { SchedH3Service } from './sched-h3.service';
+import { style, animate, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-sched-h3',
   templateUrl: './sched-h3.component.html',
   styleUrls: ['./sched-h3.component.scss'],
-  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe]
+  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
+  encapsulation: ViewEncapsulation.None,
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate(500, style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate(0, style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class SchedH3Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionTypeText: string;
@@ -507,8 +520,11 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.cvgStartDate = formInfo.cvgStartDate;
     this.cvgEndDate = formInfo.cvgEndDate;
 
+    let startDate =  new Date(this.cvgStartDate);
+    startDate.setDate(startDate.getDate() - 1);
+
     if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
+      this._uService.compareDatesAfter((new Date(receiptDate)), startDate))) {      
       this.receiptDateErr = true;
       this.schedH3.controls['receipt_date'].setErrors({'incorrect': true});
     } else {
