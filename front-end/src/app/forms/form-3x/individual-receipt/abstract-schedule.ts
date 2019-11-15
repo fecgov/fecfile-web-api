@@ -150,7 +150,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   constructor(
     private _http: HttpClient,
-    private _fb: FormBuilder,
+    protected _fb: FormBuilder,
     private _formService: FormsService,
     private _receiptService: IndividualReceiptService,
     private _contactsService: ContactsService,
@@ -197,7 +197,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             // has been loaded by the get dynamic fields API call.
             if (message) {
               if (message.prePopulateFromSchedD) {
-                this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
+                // only load form for the AbstractSchudule parent in the view
+                if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+                  this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
+                }
               }
             }
             break;
