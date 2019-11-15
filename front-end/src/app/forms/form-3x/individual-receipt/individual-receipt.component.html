@@ -563,7 +563,7 @@
                   </button>
                   <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
                     (click)="saveAndReturnToParent()">
-                    Return to {{ subTransactionInfo.transactionTypeDescription }}
+                    Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
                   </a>
                   <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="viewTransactions()">
                     View Transactions
