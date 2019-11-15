@@ -582,7 +582,6 @@ def get_fed_nonfed_share(request):
             from public.sched_h2 
             where cmte_id = %s 
             and activity_event_name = %s
-            and election_year = %s
             and delete_ind is distinct from 'Y'
             """
             with connection.cursor() as cursor:
