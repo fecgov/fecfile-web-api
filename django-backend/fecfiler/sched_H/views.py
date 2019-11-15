@@ -1075,7 +1075,7 @@ def get_h2_summary_table(request):
             WHEN true THEN 'fundraising' 
             ELSE 'direct_cand_suppot' 
             END )  AS event_type, 
-        DATE(create_date) AS date, 
+        DATE(create_date) AS receipt_date, 
         ratio_code, 
         federal_percent, 
         non_federal_percent 
@@ -1091,7 +1091,7 @@ def get_h2_summary_table(request):
             WHEN true THEN 'fundraising' 
             ELSE 'direct_cand_suppot' 
             END )  AS event_type, 
-        DATE(create_date) AS date, 
+        DATE(create_date) AS receipt_date, 
         ratio_code, 
         federal_percent, 
         non_federal_percent 
