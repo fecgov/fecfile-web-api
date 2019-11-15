@@ -88,21 +88,22 @@
                   No
                 </label>
               </div>
-
             </div>            
           </div>
           <div class="row">
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="">
+                <label for="designated_com_id">
                   Designating Committee ID Number
                 </label>
                 <input class="form-control" 
                   type="text" 
                   [formControlName]="'designated_com_id'"
                   [attr.name]="'designated_com_id'"
+                  id="designated_com_id"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
+                  [maxlength]="'9'"
                   [ngClass]="
                     frmIndividualReceipt.get('designated_com_id')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -114,15 +115,17 @@
             </div>
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="">
+                <label for="designated_com_name">
                   Designating Committee Name
                 </label>
                 <input class="form-control" 
                   type="text" 
                   [formControlName]="'designated_com_name'"
                   [attr.name]="'designated_com_name'"
+                  id="designated_com_name"
                   [style.width]="'100%'" 
                   [style.height]="'30px'"
+                  [maxlength]="'200'"
                   [ngClass]="
                     frmIndividualReceipt.get('designated_com_name')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -136,15 +139,17 @@
           <div class="row">
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="">
+                <label for="subordinate_com_id">
                   Subordinate Committee ID Number
                 </label>
                 <input class="form-control" 
                   type="text" 
                   [formControlName]="'subordinate_com_id'"
                   [attr.name]="'subordinate_com_id'"
+                  id="subordinate_com_id"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
+                  [maxlength]="'9'"
                   [ngClass]="
                     frmIndividualReceipt.get('subordinate_com_id')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -165,6 +170,8 @@
                   [attr.name]="'subordinate_com_name'"
                   [style.width]="'100%'" 
                   [style.height]="'30px'"
+                  [maxlength]="'200'"
+                  id="subordinate_com_name"
                   [ngClass]="
                     frmIndividualReceipt.get('subordinate_com_name')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -178,7 +185,7 @@
           <div class="row">
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="">
+                <label for="street_1_co_exp">
                   Street 1
                 </label>
                 <input class="form-control" 
@@ -186,7 +193,9 @@
                   [formControlName]="'street_1_co_exp'"
                   [attr.name]="'street_1_co_exp'"
                   [style.width]="'80%'" 
+                  id="street_1_co_exp"
                   [style.height]="'30px'"
+                  [maxlength]="'34'"
                   [ngClass]="
                     frmIndividualReceipt.get('street_1_co_exp')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -198,7 +207,7 @@
             </div>
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="">
+                <label for="street_2_co_exp">
                     Street 2 (Optional)
                 </label>
                 <input class="form-control" 
@@ -207,6 +216,8 @@
                   [attr.name]="'street_2_co_exp'"
                   [style.width]="'80%'" 
                   [style.height]="'30px'"
+                  id="street_2_co_exp"
+                  [maxlength]="'34'"
                   [ngClass]="
                     frmIndividualReceipt.get('street_2_co_exp')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -220,15 +231,17 @@
           <div class="row">
             <div class="col col-md-4">
               <div class="form-group">
-                <label for="">
+                <label for="city_co_exp">
                   City
                 </label>
                 <input class="form-control" 
                   type="text" 
                   [formControlName]="'city_co_exp'"
                   [attr.name]="'city_co_exp'"
+                  id="city_co_exp"
                   [style.width]="'66%'" 
                   [style.height]="'30px'"
+                  [maxlength]="'30'"
                   [ngClass]="
                     frmIndividualReceipt.get('city_co_exp')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -240,14 +253,14 @@
             </div>
             <div class="col col-md-4">
               <div class="form-group" [style.width]="'235px'">
-                <label for="">
+                <label for="state_co_exp">
                     State
                 </label>
-                <!-- (change)="handleStateChange($event, col)" -->
                 <ng-select #stateSelect 
                   [items]="states"                   
                   class="forms__select" 
                   [formControlName]="'state_co_exp'" 
+                  id="state_co_exp"
                   bindValue="code" 
                   bindLabel="code" 
                   [selectOnTab]="true"
@@ -265,15 +278,17 @@
             </div>
             <div class="col col-md-4">
               <div class="form-group">
-                <label for="">
+                <label for="zip_co_exp">
                     Zip
                 </label>
                 <input class="form-control" 
                   type="text" 
                   [formControlName]="'zip_co_exp'"
                   [attr.name]="'zip_co_exp'"
+                  id="zip_co_exp"
                   [style.width]="'33%'" 
                   [style.height]="'30px'"
+                  [maxlength]="'10'"
                   [ngClass]="
                     frmIndividualReceipt.get('zip_co_exp')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -281,6 +296,17 @@
                       : ''
                   "                
                 />
+                <div class="error-text" *ngIf="
+                  (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
+                  frmIndividualReceipt.get('zip_co_exp').invalid
+                ">
+                  <ng-container *ngIf="frmIndividualReceipt.get('zip_co_exp').errors">
+                    <div class="text-error text-left"
+                      *ngIf="frmIndividualReceipt.get('zip_co_exp').errors?.nonAlphaNumeric">
+                      Alphanumeric characters only.
+                    </div>
+                  </ng-container>
+                </div>
               </div>
             </div>                
           </div>                     

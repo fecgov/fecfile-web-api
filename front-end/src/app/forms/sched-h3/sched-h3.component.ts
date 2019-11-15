@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -23,12 +23,25 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
 import { Observable, Subscription } from 'rxjs';
 import { SchedH3Service } from './sched-h3.service';
+import { style, animate, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-sched-h3',
   templateUrl: './sched-h3.component.html',
   styleUrls: ['./sched-h3.component.scss'],
-  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe]
+  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
+  encapsulation: ViewEncapsulation.None,
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate(500, style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate(0, style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class SchedH3Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionTypeText: string;
@@ -89,7 +102,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     private _actRoute: ActivatedRoute,
     private _schedH3Service: SchedH3Service,
     private _individualReceiptService: IndividualReceiptService,
-    private _uService: UtilService,
+    private _uService: UtilService,    
+    private _formBuilder: FormBuilder
   ) {
     super(
       _http,
@@ -116,6 +130,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _schedH3Service;
     _individualReceiptService;
     _uService;
+    _formBuilder;
   }
 
   public ngOnInit() {
@@ -170,6 +185,12 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
     this.showPart2 = false;    
+  }
+
+  ngDoCheck() {
+    this.status.emit({
+      otherSchedHTransactionType: this.transactionType
+    });
   }
 
   public ngOnDestroy(): void {
@@ -291,8 +312,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public returnToSum(): void {
 
+    this.addEntries();
+
     this.isSubmit = false;
     this.schedH3.reset();
+
+    this.schedH3 = this._formBuilder.group({
+      category: ['']
+    });
+
     this.h3Entries = [];
     
     /*
@@ -316,6 +344,13 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToAdd(): void {
+    this.showIdentifer = false;
+    
+    this.schedH3.reset();
+    this.schedH3 = this._formBuilder.group({
+      category: ['']
+    });
+
     this.transactionType = 'ALLOC_H3_RATIO';
     this.receiptDateErr = false;
   }
@@ -501,8 +536,11 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.cvgStartDate = formInfo.cvgStartDate;
     this.cvgEndDate = formInfo.cvgEndDate;
 
+    let startDate =  new Date(this.cvgStartDate);
+    startDate.setDate(startDate.getDate() - 1);
+
     if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
+      this._uService.compareDatesAfter((new Date(receiptDate)), startDate))) {      
       this.receiptDateErr = true;
       this.schedH3.controls['receipt_date'].setErrors({'incorrect': true});
     } else {

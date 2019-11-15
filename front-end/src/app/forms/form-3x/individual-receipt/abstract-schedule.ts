@@ -49,6 +49,7 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
 import { entityTypes, committeeEventTypes } from './entity-types-json';
 import { ScheduleActions } from './schedule-actions.enum';
+import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
 
 
 export enum SaveActions {
@@ -107,6 +108,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public memoDropdownSize = null;
   public totalAmountReadOnly: boolean;
 
+  protected abstractScheduleComponent: AbstractScheduleParentEnum;
   protected isInit = false;
   protected formFieldsPrePopulated = false;
   protected staticFormFields = null;
@@ -176,7 +178,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         // See message sender for mesage properties
         switch (message.key) {
           case 'fullForm':
-            this._prePopulateFormForEditOrView(message.transactionModel);
+            // only load form for the AbstractSchudule parent in the view
+            if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+              this._prePopulateFormForEditOrView(message.transactionModel);
+            }
             break;
           case 'field':
             // set the field array to class variable to be referenced once the formGroup
@@ -492,7 +497,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
      * This block adds zip code, and contribution date validation.
      * Required for occupation and employer will be dependent on aggregate.
      */
-    if (this.isFieldName(fieldName, 'zip_code')) {
+    if (this.isFieldName(fieldName, 'zip_code') ||
+        this.isFieldName(fieldName, 'zip_co_exp')) {
       formValidators.push(alphaNumeric());
     } else if (this.isFieldName(fieldName, 'contribution_date') || this.isFieldName(fieldName, 'expenditure_date')) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
@@ -1865,6 +1871,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Return to the parent transaction from sub tran.
    */
   public returnToParent(scheduleAction: ScheduleActions): void {
+    this.clearFormValues();
     let transactionModel = this._parentTransactionModel;
     if (!transactionModel) {
       transactionModel = new TransactionModel({});
@@ -2721,22 +2728,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.electionTypes = res.data.electionTypes;
               }
             }
-            // TODO no longer needed now that we have committeeTypeEvents
-            // if (res.data.hasOwnProperty('activityEventTypes')) {
-            //   if (Array.isArray(res.data.activityEventTypes)) {
-            //     this.activityEventTypes = res.data.activityEventTypes;
-            //     if (this._cmteTypeCategory) {
-
-            //       if (committeeEventTypes.committeeTypeEvents) {
-            //         for (const committeeTypeEvent of committeeEventTypes.committeeTypeEvents) {
-            //           if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
-            //             this.activityEventTypes = committeeTypeEvent.eventTypes;
-            //           }
-            //         }
-            //       }
-            //     }
-            //   }
-            // }
 
             if (res.data.hasOwnProperty('committeeTypeEvents')) {
               if (Array.isArray(res.data.committeeTypeEvents)) {
@@ -3325,7 +3316,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.memoCodeChild = false;
     this._readOnlyMemoCode = false;
     this._readOnlyMemoCodeChild = false;
-    if(this.frmIndividualReceipt){
+    if (this.frmIndividualReceipt) {
       this.frmIndividualReceipt.reset();
     }
     if (this.frmIndividualReceipt.contains('entity_type')) {
@@ -3333,6 +3324,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
     }
     this.memoDropdownSize = null;
+    this.activityEventNames = null;
   }
 
   private toggleValidationIndOrg(entityType: string) {

@@ -101,6 +101,7 @@ def schedH1_sql_dict(data):
         datum = {k: v for k, v in data.items() if k in valid_h1_fields}
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
+        # print(datum)
         return datum
     except:
         raise Exception('invalid h1 request data.')
@@ -208,6 +209,9 @@ def election_year(report_id):
     To get the election year from reports Table
     """
     try:
+        # TODO: handle the case of report_id = 0 
+        # if not report_id:
+            # return None
         with connection.cursor() as cursor:
             # Insert data into schedH3 table
             cursor.execute("""SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s""",[report_id])
@@ -436,8 +440,12 @@ def schedH1(request):
             datum = schedH1_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
-            datum['election_year'] = election_year(report_id)
-
+            # print('----')
+            if (not report_id) or (report_id == '0'):
+                datum['election_year'] = None
+            else:    
+                datum['election_year'] = election_year(report_id)
+            # print('....')
             if cmte_type(cmte_id) == 'PTY':
                 datum['administrative'] = True
                 datum['generic_voter_drive'] = True
@@ -1018,7 +1026,7 @@ def get_h2_type_events(request):
     event_type = request.query_params.get('activity_event_type').strip()
     if event_type not in ['fundraising', 'direct_cand_support']:
         raise Exception('missing or non-valid event type value')
-    if event_type == 'findraising':
+    if event_type == 'fundraising':
         _sql = """
         SELECT json_agg(t) from (
         SELECT activity_event_name 
@@ -1058,8 +1066,6 @@ def get_h2_summary_table(request):
     h2 report goes with h4, not h2 report_id
 
     update: all h2 items with current report_id need to show up
-    added report 0 items (this is a temp update - 
-    TODO: need to remove report 0 items later on)
     """
     logger.debug('get_h2_summary_table with request:{}'.format(request.query_params))
     _sql = """
@@ -1069,7 +1075,7 @@ def get_h2_summary_table(request):
             WHEN true THEN 'fundraising' 
             ELSE 'direct_cand_suppot' 
             END )  AS event_type, 
-        DATE(create_date) AS date, 
+        DATE(create_date) AS receipt_date, 
         ratio_code, 
         federal_percent, 
         non_federal_percent 
@@ -1085,23 +1091,12 @@ def get_h2_summary_table(request):
             WHEN true THEN 'fundraising' 
             ELSE 'direct_cand_suppot' 
             END )  AS event_type, 
-        DATE(create_date) AS date, 
+        DATE(create_date) AS receipt_date, 
         ratio_code, 
         federal_percent, 
         non_federal_percent 
     FROM   public.sched_h2 
     WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
-    UNION SELECT activity_event_name, 
-        ( CASE fundraising 
-            WHEN true THEN 'fundraising' 
-            ELSE 'direct_cand_suppot' 
-            END )  AS event_type, 
-        DATE(create_date) AS date, 
-        ratio_code, 
-        federal_percent, 
-        non_federal_percent 
-    FROM   public.sched_h2 
-    WHERE  cmte_id = %s AND report_id = 0 AND delete_ind is distinct from 'Y'
             ) t;
     """
     try:
@@ -1110,7 +1105,7 @@ def get_h2_summary_table(request):
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
             logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-            cursor.execute(_sql, (cmte_id, report_id, cmte_id, cmte_id, report_id, cmte_id))
+            cursor.execute(_sql, (cmte_id, report_id, cmte_id, cmte_id, report_id))
             json_res = cursor.fetchone()[0]
             # print(json_res)
             if not json_res:
@@ -1659,8 +1654,10 @@ def load_h3_aggregate_amount(cmte_id, report_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
             # cursor.execute(_sql)
-            for _rec in cursor.fetchone()[0]:
-                aggregate_dic[_rec['event']] = _rec['sum']
+            records = cursor.fetchone()[0]
+            if records:
+                for _rec in records:
+                    aggregate_dic[_rec['event']] = _rec['sum']
         return aggregate_dic
     except:
         raise
@@ -1716,9 +1713,9 @@ def get_h3_summary(request):
             _sum = cursor.fetchone()[0] 
             for _rec in _sum:
                 if _rec['activity_event_name']:
-                    _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'])
+                    _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'], 0)
                 elif _rec['activity_event_type']:
-                    _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'])
+                    _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
                 else:
                     pass
             return Response( _sum, status = status.HTTP_200_OK)

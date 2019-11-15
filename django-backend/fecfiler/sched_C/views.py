@@ -665,6 +665,11 @@ def get_list_all_schedC(report_id, cmte_id):
 
 
 def get_list_schedC(report_id, cmte_id, transaction_id):
+    """
+    note: we are not loading loans based on report_id as loan
+    is not tied to report id for reporting purpose
+    """
+
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -700,10 +705,10 @@ def get_list_schedC(report_id, cmte_id, transaction_id):
             memo_text,
             last_update_date
             FROM public.sched_c
-            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
+            WHERE cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
             """
-            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            cursor.execute(_sql, (cmte_id, transaction_id))
             schedC_list = cursor.fetchone()[0]
             if schedC_list is None:
                 raise NoOPError('No sched_c transaction found for transaction_id {}'.format(
