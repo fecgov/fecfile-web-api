@@ -150,10 +150,10 @@ def schedC_sql_dict(data):
         datum['transaction_type'] = ''
 
         #no need to have dummy data   
-        '''
+        # '''
         datum['line_number'] = 'DUMMY'
         datum['transaction_type'] = 'DUMMY'
-        '''
+        # '''
         
         return datum
 
