@@ -401,6 +401,7 @@ export class F3xComponent implements OnInit {
                 } else if (e.hasOwnProperty('prePopulateFromSchedD')) {
                   this._f3xMessageService.sendPopulateFormMessage({
                     key: 'prePopulateFromSchedD',
+                    abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
                     prePopulateFromSchedD: e.prePopulateFromSchedD
                   });
                 }
@@ -434,7 +435,7 @@ export class F3xComponent implements OnInit {
             this._step = e.step;
           }
         }
-      } else if(e.hasOwnProperty('otherSchedHTransactionType')){        
+      } else if (e.hasOwnProperty('otherSchedHTransactionType')) {
         this.transactionType = e.otherSchedHTransactionType;
       }
     }
@@ -491,6 +492,15 @@ export class F3xComponent implements OnInit {
       this.transactionTypeSchedF = e.transactionType ? e.transactionType : '';
       this.transactionTypeTextSchedF = e.transactionTypeText ? e.transactionTypeText : '';
       this.forceChangeDetectionFDebtPayment = new Date();
+      if (this.scheduleFAction === ScheduleActions.addSubTransaction) {
+        if (e.hasOwnProperty('prePopulateFromSchedD')) {
+          this._f3xMessageService.sendPopulateFormMessage({
+            key: 'prePopulateFromSchedD',
+            abstractScheduleComponent: AbstractScheduleParentEnum.schedFComponent,
+            prePopulateFromSchedD: e.prePopulateFromSchedD
+          });
+        }
+      }
       this.canContinue();
       finish = true;
     }
