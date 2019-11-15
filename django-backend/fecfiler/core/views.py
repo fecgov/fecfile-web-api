@@ -280,12 +280,12 @@ def get_dynamic_forms_fields(request):
                                     else:
                                         eventTypes['hasValue'] = True
                                 elif eventTypes['eventType'] in ['DF', 'DC']:
-                                    query_string = """SELECT json_agg(t) FROM (SELECT '{}' AS "activityEventType", transaction_id AS "transactionId", activity_event_name AS "activityEventDescription" 
+                                    query_string = """SELECT json_agg(t) FROM (SELECT activity_event_name AS "activityEventType", transaction_id AS "transactionId", activity_event_name AS "activityEventDescription" 
                                             FROM public.sched_h2 WHERE cmte_id = %s AND {} AND delete_ind IS DISTINCT FROM 'Y') AS t"""
                                     if eventTypes['eventType'] == 'DF':
-                                        query_string = query_string.format("DF","fundraising = true")
+                                        query_string = query_string.format("fundraising = true")
                                     elif eventTypes['eventType'] == 'DC':
-                                        query_string = query_string.format("DC","direct_cand_support = true")
+                                        query_string = query_string.format("direct_cand_support = true")
                                     with connection.cursor() as cursor:
                                         cursor.execute(query_string, [cmte_id])
                                         print(cursor.query)

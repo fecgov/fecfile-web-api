@@ -129,21 +129,22 @@ def schedF_sql_dict(data):
             'purpose',
             'category_code',
             'payee_cmte_id',
-            'payee_cand_id',
-            'payee_cand_last_name',
-            'payee_cand_fist_name',
-            'payee_cand_middle_name',
-            'payee_cand_prefix',
-            'payee_cand_suffix',
-            'payee_cand_office',
-            'payee_cand_state',
-            'payee_cand_district',
             'memo_code',
             'memo_text',
             
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        output = {k: v for k, v in data.items() if k in valid_fields}
+        output['payee_cand_id'] = data.get('beneficiary_cand_id')
+        output['payee_cand_last_name'] = data.get('cand_last_name')
+        output['payee_cand_fist_name'] = data.get('cand_first_name')
+        output['payee_cand_middle_name'] = data.get('cand_middle_name')
+        output['payee_cand_prefix'] = data.get('cand_prefix')
+        output['payee_cand_suffix'] = data.get('cand_suffix')
+        output['payee_cand_office'] = data.get('cand_office')
+        output['payee_cand_state'] = data.get('cand_office_state')
+        output['payee_cand_district'] = data.get('cand_office_district')
+        return output
     except:
         raise Exception('invalid request data.')
 
@@ -412,15 +413,15 @@ def get_list_all_schedF(report_id, cmte_id):
             purpose,
             category_code,
             payee_cmte_id,
-            payee_cand_id,
-            payee_cand_last_name,
-            payee_cand_fist_name,
-            payee_cand_middle_name,
-            payee_cand_prefix,
-            payee_cand_suffix,
-            payee_cand_office,
-            payee_cand_state,
-            payee_cand_district,
+            payee_cand_id as beneficiary_cand_id,
+            payee_cand_last_name as cand_last_name,
+            payee_cand_fist_name as cand_first_name,
+            payee_cand_middle_name as cand_middle_name,
+            payee_cand_prefix as cand_prefix,
+            payee_cand_suffix as cand_suffix,
+            payee_cand_office as cand_office,
+            payee_cand_state as cand_office_state,
+            payee_cand_district as cand_office_district,
             memo_code,
             memo_text,
             delete_ind,
@@ -471,15 +472,15 @@ def get_list_schedF(report_id, cmte_id, transaction_id):
             purpose,
             category_code,
             payee_cmte_id,
-            payee_cand_id,
-            payee_cand_last_name,
-            payee_cand_fist_name,
-            payee_cand_middle_name,
-            payee_cand_prefix,
-            payee_cand_suffix,
-            payee_cand_office,
-            payee_cand_state,
-            payee_cand_district,
+            payee_cand_id as beneficiary_cand_id,
+            payee_cand_last_name as cand_last_name,
+            payee_cand_fist_name as cand_first_name,
+            payee_cand_middle_name as cand_middle_name,
+            payee_cand_prefix as cand_prefix,
+            payee_cand_suffix as cand_suffix,
+            payee_cand_office as cand_office,
+            payee_cand_state as cand_office_state,
+            payee_cand_district as cand_office_district,
             memo_code,
             memo_text,
             delete_ind,
