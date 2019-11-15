@@ -38,8 +38,12 @@ logger = logging.getLogger(__name__)
 # TODO: need to back_ref_transaction_id for c1 and c2
 # both pointing to a sched_c item - need to code to enforce this after the db update is done
 MANDATORY_FIELDS_SCHED_C2 = ['cmte_id', 'report_id', 'transaction_id']
-MANDATORY_FIELDS_SCHED_C1 = ['cmte_id', 'report_id',
-                             'line_number', 'transaction_type', 'transaction_id']
+MANDATORY_FIELDS_SCHED_C1 = [
+    'cmte_id', 
+    'report_id',
+    'transaction_type_identifier', 
+    'transaction_id'
+    ]
 MANDATORY_FIELDS_SCHED_C = [
     'cmte_id', 
     'report_id',
