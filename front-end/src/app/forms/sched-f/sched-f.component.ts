@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
 import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
@@ -22,6 +22,7 @@ import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedul
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
+import { schedFstaticFormFields } from './static-form-fields.json';
 
 /**
  * Schedule F is a sub-transaction of Schedule D.
@@ -43,142 +44,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   public showPart2: boolean;
   public loaded = false;
 
-  protected staticFormFields = [
-    {
-      childForm: false,
-      childFormTitle: null,
-      colClassName: 'col col-md-4',
-      seperator: false,
-      cols: [
-        {
-          staticField: true,
-          name: 'coord_expenditure_yn',
-          value: null,
-          validation: {
-            required: true
-          }
-        },
-        {
-          staticField: true,
-          preText: null,
-          setEntityIdTo: 'entity_id',
-          isReadonly: false,
-          entityGroup: 'org-group',
-          toggle: true,
-          inputGroup: false,
-          inputIcon: '',
-          text: 'Organization Name',
-          infoIcon: false,
-          infoText: 'Request language from RAD',
-          name: 'designated_com_id',
-          type: 'text',
-          value: null,
-          scroll: false,
-          height: '30px',
-          width: '200px',
-          validation: {
-            required: true,
-            max: 9,
-            alphaNumeric: true
-          }
-        },
-        {
-          staticField: true,
-          preText: null,
-          setEntityIdTo: 'entity_id',
-          isReadonly: false,
-          entityGroup: 'org-group',
-          toggle: true,
-          inputGroup: false,
-          inputIcon: '',
-          text: 'Organization Name',
-          infoIcon: false,
-          infoText: 'Request language from RAD',
-          name: 'designated_com_name',
-          type: 'text',
-          value: null,
-          scroll: false,
-          height: '30px',
-          width: '200px',
-          validation: {
-            required: true,
-            max: 200,
-            alphaNumeric: true
-          }
-        },
-        {
-          staticField: true,
-          name: 'subordinate_com_id',
-          value: null,
-          validation: {
-            required: true,
-            max: 9,
-            alphaNumeric: true
-          }
-        },
-        {
-          staticField: true,
-          name: 'subordinate_com_name',
-          value: null,
-          validation: {
-            required: true,
-            max: 200,
-            alphaNumeric: true
-          }
-        },
-        {
-          staticField: true,
-          name: 'street_1_co_exp',
-          value: null,
-          validation: {
-            required: true,
-            max: 34,
-            alphaNumeric: true
-          }
-        },
-        {
-          staticField: true,
-          name: 'street_2_co_exp',
-          value: null,
-          validation: {
-            required: false,
-            max: 34,
-            alphaNumeric: true
-          }
-        },
-        {
-          staticField: true,
-          name: 'city_co_exp',
-          value: null,
-          validation: {
-            required: true,
-            max: 30,
-            alphaNumeric: true
-          }
-        },
-        {
-          staticField: true,
-          name: 'state_co_exp',
-          value: null,
-          validation: {
-            required: true,
-            max: 2,
-            alphaNumeric: true
-          }
-        },
-        {
-          staticField: true,
-          name: 'zip_co_exp',
-          value: null,
-          validation: {
-            required: true,
-            max: 10,
-            alphaNumeric: true
-          }
-        }
-      ]
-    }
-  ];
+  protected staticFormFields = schedFstaticFormFields;
 
   constructor(
     _http: HttpClient,
@@ -227,8 +93,11 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnInit() {
+    this.frmIndividualReceipt = this._fb.group({});
     this.formFieldsPrePopulated = true;
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedFComponent;
+    this.transactionType = 'COEXP_PARTY_DEBT';
+    this.transactionTypeText = 'Coordinated Party Expenditure Debt to Vendor';
     super.ngOnInit();
     this.showPart2 = false;
     this._setTransactionDetail();
@@ -237,6 +106,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     // before rendering the static fields, otherwise validation error styling
     // is not working (input-error-field class).  If dynamic forms deliver
     // the static fields, then remove this or set a flag when formGroup is ready
+    super.ngOnChanges(null);
     setTimeout(() => {
       this.loaded = true;
     }, 2000);
@@ -245,7 +115,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   public ngOnChanges(changes: SimpleChanges) {
     this.showPart2 = false;
     this._setTransactionDetail();
-    super.ngOnChanges(changes);
 
     if (this._prePopulateFromSchedDData && this.scheduleAction === ScheduleActions.addSubTransaction) {
       this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
@@ -300,6 +169,8 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     if (!this._checkFormFieldIsValid('zip_co_exp')) {
       return;
     }
+    this.frmIndividualReceipt.markAsUntouched();
+    this.frmIndividualReceipt.markAsPristine();
     this.showPart2 = true;
   }
 
@@ -315,20 +186,21 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     if (this.frmIndividualReceipt.contains(fieldName)) {
       return this.frmIndividualReceipt.get(fieldName).valid;
     }
+    // return true;
   }
 
   private _setTransactionDetail() {
-    // this.subTransactionInfo = {
-    //   transactionType: 'DEBT_TO_VENDOR',
-    //   transactionTypeDescription: 'Debt to Vendor',
-    //   scheduleType: 'sched_d',
-    //   subTransactionType: 'COEXP_PARTY_DEBT',
-    //   subScheduleType: 'sched_f',
-    //   subTransactionTypeDescription: 'Coordinated Party Expenditure (SF)',
-    //   api_call: '/sd/schedD',
-    //   isParent: false,
-    //   isEarmark: false
-    // };
+    this.subTransactionInfo = {
+      transactionType: 'DEBT_TO_VENDOR',
+      transactionTypeDescription: 'Debt to Vendor',
+      scheduleType: 'sched_d',
+      subTransactionType: 'COEXP_PARTY_DEBT',
+      subScheduleType: 'sched_f',
+      subTransactionTypeDescription: 'Coordinated Party Expenditure (SF)',
+      api_call: '/sd/schedD',
+      isParent: false,
+      isEarmark: false
+    };
 
     if (this.scheduleAction === ScheduleActions.addSubTransaction) {
       this.clearFormValues();

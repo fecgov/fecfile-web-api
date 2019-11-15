@@ -150,7 +150,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   constructor(
     private _http: HttpClient,
-    private _fb: FormBuilder,
+    protected _fb: FormBuilder,
     private _formService: FormsService,
     private _receiptService: IndividualReceiptService,
     private _contactsService: ContactsService,
@@ -197,7 +197,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             // has been loaded by the get dynamic fields API call.
             if (message) {
               if (message.prePopulateFromSchedD) {
-                this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
+                // only load form for the AbstractSchudule parent in the view
+                if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+                  this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
+                }
               }
             }
             break;
@@ -438,6 +441,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     if (this.frmIndividualReceipt.get('election_code')) {
       this.frmIndividualReceipt.patchValue({ election_code: null }, { onlySelf: true });
+    }
+    // selects are defaulting to value = "Select" - set to null.
+    if (this.frmIndividualReceipt.contains('activity_event_type')) {
+      this.frmIndividualReceipt.patchValue({ activity_event_type: null }, { onlySelf: true });
+    }
+    if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+      this.frmIndividualReceipt.patchValue({ activity_event_identifier: null }, { onlySelf: true });
     }
     const childElectCodeName = this._childFieldNamePrefix + 'election_code';
     if (this.frmIndividualReceipt.contains(childElectCodeName)) {
@@ -832,9 +842,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (typeof totalAmount === 'string') {
       totalAmount = totalAmount.replace(/,/g, ``);
     }
-    const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
+    // const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
-    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
+    let activityEvent = null;
+    if (this.frmIndividualReceipt.contains('activity_event_type')) {
+      activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
+    }
+
+    let activityEventName = null;
+    if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+      activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
+    }
+
+    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName)
+      .subscribe(res => {
 
       // TODO remove this if H1/H2 not found goes back to retuning a non-200 http code.
       if (typeof res === 'string') {
@@ -942,9 +963,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    // TODO remove ! - just for dev test until API is ready
-    // this._handleNoH1H2('sched_h1');
-
     if ($event.hasOwnProperty('hasValue')) {
       if ($event.hasValue === false) {
         if ($event.hasOwnProperty('scheduleType')) {
@@ -963,29 +981,32 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.frmIndividualReceipt.contains('activity_event_type')) {
       eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
     }
+
+    // Don't allow a total amount to be entered if the required activity event and activity name
+    // are not set.  For event types requiring the 2nd dropdown, activityEventNames will have data.
     if (!eventTypeVal) {
+      this.totalAmountReadOnly = true;
+    } else {
+      let activityEventIdentifier = null;
+      if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+        activityEventIdentifier = this.frmIndividualReceipt.get('activity_event_identifier').value;
+      }
+        activityEventIdentifier = this.frmIndividualReceipt.get('activity_event_identifier').value;
+      if (activityEventIdentifier) {
+        this.totalAmountReadOnly = false;
+      } else {
+        this.totalAmountReadOnly = true;
+      }
+    }
+  }
+
+  public handleActivityEventNameChange($event: any, col: any) {
+
+    if (!$event) {
       this.totalAmountReadOnly = true;
     } else {
       this.totalAmountReadOnly = false;
     }
-
-    // } else {
-    //   this.totalAmountReadOnly = true;
-    //   if (this.activityEventNames) {
-    //     let eventName = null;
-    //     if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
-    //       eventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
-    //     }
-    //     if (eventName) {
-    //       // TODO why is the value 'Select' when no value has been chosen?
-    //       if (eventName !== 'Select') {
-    //         this.totalAmountReadOnly = false;
-    //       }
-    //     }
-    //   }
-    // }
-
-    // this._getFedNonFedPercentage();
   }
 
   /**

@@ -48,6 +48,8 @@
       </header>
   
       <section *ngIf="loaded">
+      <!-- <section *ngIf="formFields && frmIndividualReceipt"> -->
+          
         <div [hidden]="showPart2" class="paragraph">
           <div class="col coord_expenditure_text">
             <h3>Has filer been designated to make a Coordinated Expenditure?</h3>
@@ -338,7 +340,7 @@
                         <span class="sr-only">Click here for more information</span>
                       </div>
 
-                      <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'
+                      <ng-container *ngIf="!col?.validation?.required && col?.name !== 'aggregate_general_elec_exp'
                                             && !col.staticField">
                         (Optional)
                       </ng-container>
@@ -385,6 +387,7 @@
                         <input *ngIf="col?.name === 'last_name'" class="form-control" [style.width]="col?.width"
                           [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -397,6 +400,7 @@
                         <input *ngIf="col?.name === 'first_name'" class="form-control" [style.width]="col?.width"
                           [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -533,7 +537,9 @@
                         [style.overflow]="col.scroll ? col.scroll : null" [attr.name]="col?.name"
                         [attr.maxlength]="col?.validation?.max" [formControlName]="col?.name"></textarea>
                     </ng-container>
-                    <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office')">
+                    <ng-container *ngIf="col?.type === 'select' && 
+                        (isFieldName(col?.name, 'payee_cand_office') ||
+                         isFieldName(col?.name, 'cand_office'))">
                       <ng-select #candOfficeTypeSelect 
                         [items]="candidateOfficeTypes"
                         (change)="handleCandOfficeChange($event, col)" 
@@ -552,14 +558,17 @@
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && 
                           (isFieldName(col?.name, 'state') ||
-                          isFieldName(col?.name, 'cand_office_state'))">
+                           isFieldName(col?.name, 'payee_cand_state') ||
+                           isFieldName(col?.name, 'cand_office_state'))"
+                    >
                       <ng-select #stateSelect 
                         [items]="states" 
                         (change)="handleStateChange($event, col)"
                         class="forms__select" 
                         [formControlName]="col?.name" 
                         bindValue="code" 
-                        bindLabel="code" 
+                        bindLabel="code"
+                        [readonly]="isSelectFieldReadOnly(col)" 
                         [selectOnTab]="true"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -597,6 +606,7 @@
                         [formControlName]="col?.name" 
                         bindValue="entityType"
                         bindLabel="entityTypeDescription" 
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [selectOnTab]="true"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&

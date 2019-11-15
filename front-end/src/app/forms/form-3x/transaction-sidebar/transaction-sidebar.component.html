@@ -7,26 +7,41 @@
     <div class="search">
       <button class="fa fa-search" (click)="selectedTypeAheadValue(itemSelected)"></button>
       <ng-template #rt let-r="result" let-t="term">
-        {{ r.text}}
+        {{ r.text }}
       </ng-template>
       <div id="scrollable-dropdown-menu">
-        <input type="search" #instance="ngbTypeahead" placeholder="Search by type" aria-label="Search by type"
-          [(ngModel)]="itemSelected" [ngbTypeahead]="searchByType" [resultTemplate]="rt" [inputFormatter]="formatter"
-          (focus)="focus$.next($event.target.value)" placement="right">
+        <input
+          type="search"
+          #instance="ngbTypeahead"
+          placeholder="Search by type"
+          aria-label="Search by type"
+          [(ngModel)]="itemSelected"
+          [ngbTypeahead]="searchByType"
+          [resultTemplate]="rt"
+          [inputFormatter]="formatter"
+          (focus)="focus$.next($event.target.value)"
+          placement="right"
+        />
       </div>
     </div>
     <!-- </ng-container> -->
   </header>
-  <section class ="paragraph">
+  <section class="paragraph">
     <!-- <ng-container *ngIf="step === 'step_2' || step === 'step_3'"> -->
     <ul class="form-sidebar__links">
       <li
-        [ngClass]="(itemSelected === categoryType?.value) ? 'form-sidebar-item selected' : 'form-sidebar-item'"
+        [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
         *ngFor="let categoryType of transactionCategories"
         (click)="optionsListClick(categoryType?.text)"
       >
         <div class="float-left">
-          <button type="button" id="{{ categoryType?.text }}" class="btn btn-link" value="{{ categoryType?.value }}" (click)="selectItem($event)">
+          <button
+            type="button"
+            id="{{ categoryType?.text }}"
+            class="btn btn-link"
+            value="{{ categoryType?.value }}"
+            (click)="selectItem($event)"
+          >
             <i class="plus-icon" aria-hidden="true"></i>
             {{ categoryType?.text }}
           </button>
@@ -36,13 +51,14 @@
         </ng-container>
         <ng-container *ngIf="categoryType?.value === 'disbursements'">
           <span class="float-right amount"> ${{ disbursementsTotal | number: '1.2-2' }} </span>
-        </ng-container>     
+        </ng-container>
         <ng-container *ngIf="categoryType?.value === 'loans-and-debts'">
           <span class="float-right amount"> ${{ loansanddebtsTotal | number: '1.2-2' }} </span>
-        </ng-container>            
+        </ng-container>
         <ng-container *ngIf="categoryType?.value === 'other'">
-          <span class="float-right amount"> ${{ othersTotal | number: '1.2-2' }} </span>
-        </ng-container>     
+          <!-- <span class="float-right amount"> ${{ othersTotal | number: '1.2-2' }} </span> -->
+          <span class="float-right amount"></span>
+        </ng-container>
       </li>
     </ul>
     <!-- </ng-container> -->
@@ -67,43 +83,51 @@
       </ul>
     </ng-container> -->
   </section>
-  <footer >
+  <footer>
     <div class="form-sidebar__item">
       <div class="form-sidebar-item__text">
         Cash on Hand
       </div>
-      <div class="form-sidebar-item__value">
-        ${{cashOnHandTotal | number: '1.2-2'}}
-      </div>
+      <div class="form-sidebar-item__value">${{ cashOnHandTotal | number: '1.2-2' }}</div>
     </div>
     <div class="form-sidebar__btns">
       <div class="btn-row">
-          <div class="btn-toolbar">
-            <button
-            style = "align-self:stretch;"
+        <div class="btn-toolbar">
+          <button
+            style="align-self:stretch;"
             type="button"
             class="btn btn-secondary-dark-gray mr-2"
             [routerLink]="['/forms/form/', '3X']"
-            [queryParams]="{step: 'transactions', reportId: reportId, edit: editMode, transactionCategory: 'receipts'}"
+            [queryParams]="{
+              step: 'transactions',
+              reportId: reportId,
+              edit: editMode,
+              transactionCategory: 'receipts'
+            }"
           >
             All Transactions
           </button>
           <button
-          style = "align-self:stretch;"
-          type="button"
-          class="btn btn-secondary-gray"
-          (click)="viewSummary()"
-          [routerLink]="['/forms/form/', '3X']"
-          [queryParams]="{ step: 'financial_summary', edit: editMode }"
-        >
-          Summary
-        </button> 
-            </div>
-       
+            style="align-self:stretch;"
+            type="button"
+            class="btn btn-secondary-gray"
+            (click)="viewSummary()"
+            [routerLink]="['/forms/form/', '3X']"
+            [queryParams]="{ step: 'financial_summary', edit: editMode }"
+          >
+            Summary
+          </button>
+        </div>
       </div>
       <ng-container *ngIf="step !== 'step_3'">
         <div class="btn-row signAndSubmit">
-          <button id ="sidebar_signBtn" type="button" class="btn btn-secondary" [routerLink]="['/signandSubmit', '3X']" [queryParams]="{edit: editMode}">
+          <button
+            id="sidebar_signBtn"
+            type="button"
+            class="btn btn-secondary"
+            [routerLink]="['/signandSubmit', '3X']"
+            [queryParams]="{ edit: editMode }"
+          >
             Sign &amp; Submit
           </button>
         </div>
