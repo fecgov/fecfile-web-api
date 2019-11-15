@@ -102,7 +102,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     private _actRoute: ActivatedRoute,
     private _schedH3Service: SchedH3Service,
     private _individualReceiptService: IndividualReceiptService,
-    private _uService: UtilService,
+    private _uService: UtilService,    
+    private _formBuilder: FormBuilder
   ) {
     super(
       _http,
@@ -129,6 +130,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _schedH3Service;
     _individualReceiptService;
     _uService;
+    _formBuilder;
   }
 
   public ngOnInit() {
@@ -310,8 +312,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public returnToSum(): void {
 
+    this.addEntries();
+
     this.isSubmit = false;
     this.schedH3.reset();
+
+    this.schedH3 = this._formBuilder.group({
+      category: ['']
+    });
+
     this.h3Entries = [];
     
     /*
@@ -335,6 +344,13 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToAdd(): void {
+    this.showIdentifer = false;
+    
+    this.schedH3.reset();
+    this.schedH3 = this._formBuilder.group({
+      category: ['']
+    });
+
     this.transactionType = 'ALLOC_H3_RATIO';
     this.receiptDateErr = false;
   }
