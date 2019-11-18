@@ -126,11 +126,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    /*   if (this.scheduleAction === ScheduleActions.edit) {
-      this._prePopulateFormForEdit(this.transactionDetail);
-    } else if (this.scheduleAction === ScheduleActions.add) {
-      this._clearFormValues();
-    } */
+    console.log('inside ngOnChanges');
+    this.ngOnInit();
   }
 
   public ngOnDestroy(): void {
@@ -404,7 +401,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan.patchValue({ entity_type: loan.entity_type }, { onlySelf: true });
     this.frmLoan.patchValue({ zip_code: loan.zip_code }, { onlySelf: true });
 
-    this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
+    /* this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
     this.frmLoan.patchValue({ election_code: loan.election_code }, { onlySelf: true });
     this.frmLoan.patchValue({ election_other_description: loan.election_other_description }, { onlySelf: true });
     this.frmLoan.patchValue({ is_loan_secured: loan.is_loan_secured }, { onlySelf: true });
@@ -424,7 +421,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan.patchValue({ lender_cand_state: loan.lender_cand_state }, { onlySelf: true });
     this.frmLoan.patchValue({ lender_cand_district: loan.lender_cand_district }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
-    this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });
+    this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true }); */
   }
 
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
@@ -443,7 +440,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan.patchValue({ entity_type: loan.entity_type }, { onlySelf: true });
     this.frmLoan.patchValue({ zip_code: loan.zip_code }, { onlySelf: true });
 
-    this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
+    /* this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
     this.frmLoan.patchValue({ election_code: loan.election_code }, { onlySelf: true });
     this.frmLoan.patchValue({ election_other_description: loan.election_other_description }, { onlySelf: true });
     this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
@@ -462,7 +459,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan.patchValue({ lender_cand_state: loan.lender_cand_state }, { onlySelf: true });
     this.frmLoan.patchValue({ lender_cand_district: loan.lender_cand_district }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
-    this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });
+    this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true }); */
 
     let transactionTypeIdentifier = '';
 
@@ -738,9 +735,10 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public saveLoan(): void {
-    if (this.entityType === 'IND') {
+    const entityType = this.frmLoan.get('entity_type').value;
+    if (entityType === 'IND') {
       this.doValidateLoan('loanSummary');
-    } else if (this.entityType === 'ORG') {
+    } else if (entityType === 'ORG') {
       this.doValidateLoan('c1');
     }
   }
@@ -783,7 +781,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       transactionDetail: {
         transactionModel: {
           transactionId: this._transactionId,
-          entityId: this._selectedEntityId
+          entityId: this._selectedEntityId,
+          entryScreenScheduleType: 'sched_c',
         }
       }
     };
@@ -806,7 +805,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       }
     };
     this.status.emit(endorserEmitObj);
-   }
+  }
 
   public isFieldName(fieldName: string, nameString: string): boolean {
     return fieldName === nameString || fieldName === this._childFieldNamePrefix + nameString;
@@ -859,7 +858,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           LoanObj[field] = this.frmLoan.get(field).value;
         }
         //also add transactionId if available (edit route)
-        if (this.transactionDetail && this.transactionDetail.transactionId) {
+        if (this.scheduleAction === ScheduleActions.edit && this.transactionDetail && this.transactionDetail.transactionId) {
           LoanObj['transaction_id'] = this.transactionDetail.transactionId;
         }
       }

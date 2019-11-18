@@ -278,6 +278,20 @@ export class LoanpaymentComponent implements OnInit {
     }
   }
 
+  cancelLoanPayment(){
+      this.status.emit({
+        form: {},
+        direction: 'previous',
+        step: 'step_3', 
+        action:ScheduleActions.edit,
+        scheduleType: this.transactionDetail.entryScreenScheduleType,
+        transactionDetail: {
+          transactionModel: this.transactionDetail
+        }
+
+      });
+  }
+
   private _goToLoanSummary() {
     const loanRepaymentEmitObj: any = {
       form: {},
@@ -285,7 +299,6 @@ export class LoanpaymentComponent implements OnInit {
       step: 'step_3',
       previousStep: 'step_2',
       scheduleType: 'sched_c_ls',
-      // action: ScheduleActions.add,
     };
     this.status.emit(loanRepaymentEmitObj);
   }

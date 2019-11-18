@@ -61,7 +61,7 @@
     }
     section {
       .section_b_label {
-        float: right;
+        float: left;
         padding-top: .4em;
       }
       .c1_verbiage_lg {
@@ -125,9 +125,13 @@
           }
           textarea {
             &.form-control {
-              overflow: scroll;
+              resize:none;
+              // overflow: scroll;
               width: 400px;
             }
+          }
+          .ng-select.forms__select ::ng-deep .ng-select-container  {            
+            height: 45px;
           }
           .forms__big_checkbox {
             -webkit-transform: scale(1.9);
