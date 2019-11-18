@@ -3712,4 +3712,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     return prePopulateFieldArray;
   }
+
+  /**
+   * Find a Form Field object by name.
+   */
+  public findFormField(name: string): any {
+    if (!name || !this.formFields) {
+      return null;
+    }
+    const fields = this.formFields;
+    for (const el of fields) {
+      if (el.hasOwnProperty('cols') && el.cols) {
+        for (let e of el.cols) {
+          if (e.name === name) {
+            return e;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
 }
