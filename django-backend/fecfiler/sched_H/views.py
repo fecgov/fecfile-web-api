@@ -440,6 +440,7 @@ def schedH1(request):
             datum = schedH1_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            datum['transaction_type_identifier'] = 'ALLOC_H1'
             # print('----')
             if (not report_id) or (report_id == '0'):
                 datum['election_year'] = None
