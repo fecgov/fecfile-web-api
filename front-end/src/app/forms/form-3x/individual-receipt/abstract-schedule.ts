@@ -957,9 +957,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public handleActivityEventTypeChange($event: any, col: any) {
 
+    // reset activity_event_identifier whenever the type changes
+    this.frmIndividualReceipt.patchValue({ activity_event_identifier: null }, { onlySelf: true });
+    this.activityEventNames = null;
+
     if (!$event) {
-      this.frmIndividualReceipt.patchValue({ activity_event_identifier: null }, { onlySelf: true });
-      this.activityEventNames = null;
+      this.totalAmountReadOnly = true;
       return;
     }
 
@@ -987,15 +990,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (!eventTypeVal) {
       this.totalAmountReadOnly = true;
     } else {
-      let activityEventIdentifier = null;
-      if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
-        activityEventIdentifier = this.frmIndividualReceipt.get('activity_event_identifier').value;
-      }
-        activityEventIdentifier = this.frmIndividualReceipt.get('activity_event_identifier').value;
-      if (activityEventIdentifier) {
-        this.totalAmountReadOnly = false;
+      if (this.activityEventNames) {
+        let activityEventIdentifier = null;
+        if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+          activityEventIdentifier = this.frmIndividualReceipt.get('activity_event_identifier').value;
+        }
+        if (activityEventIdentifier) {
+          this.totalAmountReadOnly = false;
+        } else {
+          this.totalAmountReadOnly = true;
+        }
       } else {
-        this.totalAmountReadOnly = true;
+        this.totalAmountReadOnly = false;
       }
     }
   }
