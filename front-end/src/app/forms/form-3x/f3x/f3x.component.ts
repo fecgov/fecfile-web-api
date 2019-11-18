@@ -370,17 +370,9 @@ export class F3xComponent implements OnInit {
               } else if (apiCall === '/sc/schedC1') {
                 alert('edit C1 not yet supported');
               } else if (apiCall === '/sf/schedF') {
-                alert('edit schedule F not yet supported');
+                this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
               } else {
-                // message the child component rather than sending data as input because
-                // ngOnChanges fires when the form fields are changed, thereby reseting the
-                // fields to the previous value.  Result is fields can't be changed.
-                e.transactionDetail.action = this.scheduleAction;
-                this._f3xMessageService.sendPopulateFormMessage({
-                  key: 'fullForm',
-                  abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
-                  transactionModel: e.transactionDetail
-                });
+                this._populateFormForEdit(e, AbstractScheduleParentEnum.schedMainComponent);
                 const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
                 transactionTypeText = transactionModel.type;
                 transactionType = transactionModel.transactionTypeIdentifier;
@@ -439,6 +431,22 @@ export class F3xComponent implements OnInit {
         this.transactionType = e.otherSchedHTransactionType;
       }
     }
+  }
+
+  /**
+   * Send a message the child component rather than sending data as input because
+   * ngOnChanges fires when the form fields are changed, thereby reseting the
+   * fields to the previous value.  Result is fields can't be changed.
+   * @param e
+   * @param schedule
+   */
+  private _populateFormForEdit(e: any, schedule: AbstractScheduleParentEnum) {
+    e.transactionDetail.action = this.scheduleAction;
+    this._f3xMessageService.sendPopulateFormMessage({
+      key: 'fullForm',
+      abstractScheduleComponent: schedule,
+      transactionModel: e.transactionDetail
+    });
   }
 
   /**
