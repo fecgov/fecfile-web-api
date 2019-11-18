@@ -587,7 +587,7 @@ def get_fed_nonfed_share(request):
             with connection.cursor() as cursor:
                 logger.debug('query with _sql:{}'.format(_sql))
                 logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
-                cursor.execute(_sql, (cmte_id, event_name, calendar_year))
+                cursor.execute(_sql, (cmte_id, event_name))
                 if not cursor.rowcount:
                     raise Exception('Error: no h1 data found.')
                 fed_percent = float(cursor.fetchone()[0])
