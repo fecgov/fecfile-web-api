@@ -37,12 +37,18 @@ logger = logging.getLogger(__name__)
 
 # TODO: need to back_ref_transaction_id for c1 and c2
 # both pointing to a sched_c item - need to code to enforce this after the db update is done
-MANDATORY_FIELDS_SCHED_C2 = ['cmte_id', 'report_id', 'transaction_id']
+MANDATORY_FIELDS_SCHED_C2 = [
+    'cmte_id',
+    'report_id',
+    'transaction_id',
+    'back_ref_transaction_id',
+    ]
 MANDATORY_FIELDS_SCHED_C1 = [
     'cmte_id', 
     'report_id',
     'transaction_type_identifier', 
-    'transaction_id'
+    'transaction_id',
+    'back_ref_transaction_id',
     ]
 MANDATORY_FIELDS_SCHED_C = [
     'cmte_id', 
@@ -1030,6 +1036,7 @@ def schedC1_sql_dict(data):
             'authorized_entity_id',
             'authorized_entity_title',
             'authorized_signed_date',
+            'back_ref_transaction_id',
     ]
     try:
         datum =  {k: v for k, v in data.items() if k in valid_fields}
@@ -1100,63 +1107,65 @@ def put_sql_schedC1(data):
                 other_parties_liable = %s,
                 pledged_collateral_ind = %s,
                 pledge_collateral_desc = %s,
-                pledge_collateral_amount=%s,
-                perfected_intrest_ind=%s,
-                future_income_ind=%s,
-                future_income_desc=%s,
-                future_income_estimate=%s,
-                depository_account_established_date=%s,
-                depository_account_location=%s,
-                depository_account_street_1=%s,
-                depository_account_street_2=%s,
-                depository_account_city=%s,
-                depository_account_state=%s,
-                depository_account_zip=%s,
-                depository_account_auth_date=%s,
-                basis_of_loan_desc=%s,
-                treasurer_entity_id =%s,
-                treasurer_signed_date=%s,
-                authorized_entity_id=%s,
+                pledge_collateral_amount = %s,
+                perfected_intrest_ind = %s,
+                future_income_ind = %s,
+                future_income_desc = %s,
+                future_income_estimate = %s,
+                depository_account_established_date = %s,
+                depository_account_location = %s,
+                depository_account_street_1 = %s,
+                depository_account_street_2 = %s,
+                depository_account_city = %s,
+                depository_account_state = %s,
+                depository_account_zip = %s,
+                depository_account_auth_date = %s,
+                basis_of_loan_desc = %s,
+                treasurer_entity_id = %s,
+                treasurer_signed_date = %s,
+                authorized_entity_id = %s,
                 authorized_entity_title = %s,
                 authorized_signed_date = %s,
+                back_ref_transaction_id = %s,
                 last_update_date = %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
         """
     _v = (
             data.get('line_number'),
             data.get('transaction_type'),
-            data.get('transaction_type_identifier', ''),
-            data.get('lender_entity_id', ''),
-            data.get('loan_amount', None),
-            data.get('loan_intrest_rate', ''),
-            data.get('loan_incurred_date', None),
-            data.get('loan_due_date', None),
-            data.get('is_loan_restructured', ''),
-            data.get('original_loan_date', None),
-            data.get('credit_amount_this_draw', None),
-            data.get('total_outstanding_balance', None),
-            data.get('other_parties_liable', ''),
-            data.get('pledged_collateral_ind', ''),
-            data.get('pledge_collateral_desc', ''),
-            data.get('pledge_collateral_amount', None),
-            data.get('perfected_intrest_ind', ''),
-            data.get('future_income_ind', ''),
-            data.get('future_income_desc', ''),
-            data.get('future_income_estimate', None),
-            data.get('depository_account_established_date', None),
-            data.get('depository_account_location', ''),
-            data.get('depository_account_street_1', ''),
-            data.get('depository_account_street_2', ''),
-            data.get('depository_account_city', ''),
-            data.get('depository_account_state', ''),
-            data.get('depository_account_zip', ''),
-            data.get('depository_account_auth_date', None),
-            data.get('basis_of_loan_desc', ''),
-            data.get('treasurer_entity_id', ''),
-            data.get('treasurer_signed_date', None),
-            data.get('authorized_entity_id', ''),
-            data.get('authorized_entity_title', ''),
-            data.get('authorized_signed_date', None),
+            data.get('transaction_type_identifier'),
+            data.get('lender_entity_id'),
+            data.get('loan_amount'),
+            data.get('loan_intrest_rate'),
+            data.get('loan_incurred_date'),
+            data.get('loan_due_date'),
+            data.get('is_loan_restructured'),
+            data.get('original_loan_date'),
+            data.get('credit_amount_this_draw'),
+            data.get('total_outstanding_balance'),
+            data.get('other_parties_liable'),
+            data.get('pledged_collateral_ind'),
+            data.get('pledge_collateral_desc'),
+            data.get('pledge_collateral_amount'),
+            data.get('perfected_intrest_ind'),
+            data.get('future_income_ind'),
+            data.get('future_income_desc'),
+            data.get('future_income_estimate'),
+            data.get('depository_account_established_date'),
+            data.get('depository_account_location'),
+            data.get('depository_account_street_1'),
+            data.get('depository_account_street_2'),
+            data.get('depository_account_city'),
+            data.get('depository_account_state'),
+            data.get('depository_account_zip'),
+            data.get('depository_account_auth_date'),
+            data.get('basis_of_loan_desc'),
+            data.get('treasurer_entity_id'),
+            data.get('treasurer_signed_date'),
+            data.get('authorized_entity_id'),
+            data.get('authorized_entity_title'),
+            data.get('authorized_signed_date'),
+            data.get('back_ref_transaction_id'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -1235,47 +1244,49 @@ def post_sql_schedC1(data):
             authorized_entity_id,
             authorized_entity_title,
             authorized_signed_date,
+            back_ref_transaction_id,
             create_date)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         """
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
             data.get('line_number'),
             data.get('transaction_type'),
-            data.get('transaction_type_identifier', ''),
-            data.get('transaction_id', ''),
-            data.get('lender_entity_id', ''),
-            data.get('loan_amount', None),
-            data.get('loan_intrest_rate', ''),
-            data.get('loan_incurred_date', None),
-            data.get('loan_due_date', None),
-            data.get('is_loan_restructured', ''),
-            data.get('original_loan_date', None),
-            data.get('credit_amount_this_draw', None),
-            data.get('total_outstanding_balance', None),
-            data.get('other_parties_liable', ''),
-            data.get('pledged_collateral_ind', ''),
-            data.get('pledge_collateral_desc', ''),
-            data.get('pledge_collateral_amount', None),
-            data.get('perfected_intrest_ind', ''),
-            data.get('future_income_ind', ''),
-            data.get('future_income_desc', ''),
-            data.get('future_income_estimate', None),
-            data.get('depository_account_established_date', None),
-            data.get('depository_account_location', ''),
-            data.get('depository_account_street_1', ''),
-            data.get('depository_account_street_2', ''),
-            data.get('depository_account_city', ''),
-            data.get('depository_account_state', ''),
-            data.get('depository_account_zip', ''),
-            data.get('depository_account_auth_date', None),
-            data.get('basis_of_loan_desc', ''),
-            data.get('treasurer_entity_id', ''),
-            data.get('treasurer_signed_date', None),
-            data.get('authorized_entity_id', ''),
-            data.get('authorized_entity_title', ''),
-            data.get('authorized_signed_date', None),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_id'),
+            data.get('lender_entity_id'),
+            data.get('loan_amount'),
+            data.get('loan_intrest_rate'),
+            data.get('loan_incurred_date'),
+            data.get('loan_due_date'),
+            data.get('is_loan_restructured'),
+            data.get('original_loan_date'),
+            data.get('credit_amount_this_draw'),
+            data.get('total_outstanding_balance'),
+            data.get('other_parties_liable'),
+            data.get('pledged_collateral_ind'),
+            data.get('pledge_collateral_desc'),
+            data.get('pledge_collateral_amount'),
+            data.get('perfected_intrest_ind'),
+            data.get('future_income_ind'),
+            data.get('future_income_desc'),
+            data.get('future_income_estimate'),
+            data.get('depository_account_established_date'),
+            data.get('depository_account_location'),
+            data.get('depository_account_street_1'),
+            data.get('depository_account_street_2'),
+            data.get('depository_account_city'),
+            data.get('depository_account_state'),
+            data.get('depository_account_zip'),
+            data.get('depository_account_auth_date'),
+            data.get('basis_of_loan_desc'),
+            data.get('treasurer_entity_id'),
+            data.get('treasurer_signed_date'),
+            data.get('authorized_entity_id'),
+            data.get('authorized_entity_title'),
+            data.get('authorized_signed_date'),
+            data.get('back_ref_transaction_id'),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -1339,20 +1350,21 @@ def get_list_all_schedC1(report_id, cmte_id):
             authorized_entity_id,
             authorized_entity_title,
             authorized_signed_date,
+            back_ref_transaction_id,
             last_update_date
             FROM public.sched_c1
             WHERE report_id = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            schedC2_list = cursor.fetchone()[0]
-            if schedC2_list is None:
+            schedC1_list = cursor.fetchone()[0]
+            if schedC1_list is None:
                 raise NoOPError(
                     'No sched_c1 transaction found for report_id {} and cmte_id: {}'.format(report_id, cmte_id))
-            merged_list = []
-            for dictC2 in schedC2_list:
-                merged_list.append(dictC2)
-        return merged_list
+            # merged_list = []
+            # for dictC2 in schedC2_list:
+            #     merged_list.append(dictC2)
+        return schedC1_list
     except Exception:
         raise 
 
@@ -1398,6 +1410,7 @@ def get_list_schedC1(report_id, cmte_id, transaction_id):
             authorized_entity_id,
             authorized_entity_title,
             authorized_signed_date,
+            back_ref_transaction_id,
             last_update_date
             FROM public.sched_c1
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
@@ -1608,12 +1621,14 @@ def put_sql_schedC2(data):
             SET transaction_type_identifier = %s,
                 guarantor_entity_id = %s,
                 guaranteed_amount = %s,
+                back_ref_transaction_id = %s,
                 last_update_date = %s
             WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
         """
-    _v = (data.get('transaction_type_identifier', ''),
-          data.get('guarantor_entity_id', ''),
-          data.get('guaranteed_amount', ''),
+    _v = (data.get('transaction_type_identifier'),
+          data.get('guarantor_entity_id'),
+          data.get('guaranteed_amount'),
+          data.get('back_ref_transaction_id'),
           datetime.datetime.now(),
           data.get('transaction_id'),
           data.get('report_id'),
@@ -1687,16 +1702,18 @@ def post_sql_schedC2(data):
                                     transaction_id,
                                     guarantor_entity_id,
                                     guaranteed_amount,
+                                    back_ref_transaction_id,
                                     create_date)
-        VALUES (%s,%s,%s,%s,%s,%s,%s)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
         """
         _v = (
-            data.get('cmte_id', ''),
-            data.get('report_id', ''),
-            data.get('transaction_type_identifier', ''),
-            data.get('transaction_id', ''),
-            data.get('guarantor_entity_id', ''),
-            data.get('guaranteed_amount', ''),
+            data.get('cmte_id'),
+            data.get('report_id'),
+            data.get('transaction_type_identifier'),
+            data.get('transaction_id'),
+            data.get('guarantor_entity_id'),
+            data.get('guaranteed_amount'),
+            data.get('back_ref_transaction_id'),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -1751,6 +1768,7 @@ def get_list_all_schedC2(report_id, cmte_id):
             transaction_id,
             guarantor_entity_id,
             guaranteed_amount,
+            back_ref_transaction_id,
             last_update_date
             FROM public.sched_c2
             WHERE report_id = %s AND cmte_id = %s
@@ -1794,6 +1812,7 @@ def get_list_schedC2(report_id, cmte_id, transaction_id):
             transaction_id,
             guarantor_entity_id,
             guaranteed_amount,
+            back_ref_transaction_id,
             last_update_date
             FROM public.sched_c2
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
