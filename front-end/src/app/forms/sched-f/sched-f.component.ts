@@ -5,7 +5,7 @@ import { FormsService } from 'src/app/shared/services/FormsService/forms.service
 import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { UtilService } from 'src/app/shared/utils/util.service';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { ReportTypeService } from '../form-3x/report-type/report-type.service';
@@ -232,5 +232,61 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
         return false;
       }
     }
+  }
+
+  private _patchSubordinateFormFields(fieldNames: any[], entity: any) {
+    if (fieldNames) {
+      for (const field of fieldNames) {
+        const patch = {};
+        patch[field.formName] = entity[field.entityFieldName];
+        this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+      }
+    }
+  }
+
+
+  public handleSelectedSubordinateOrg($event: NgbTypeaheadSelectItemEvent, name: string) {
+    const entity = $event.item;
+
+    // this._selectedEntity = this._utilService.deepClone(entity);
+    // this._setSetEntityIdTo(this._selectedEntity, col);
+    // this._selectedChangeWarn = {};
+
+    const fieldNames = [];
+    if (name === 'designated_com_id' || name === 'designated_com_name') {
+      fieldNames.push({ formName: 'designated_com_id', entityFieldName: 'cmte_id' });
+      fieldNames.push({ formName: 'designated_com_name', entityFieldName: 'cmte_name' });
+    } else if (name === 'subordinate_com_id' || name === 'subordinate_com_name') {
+      fieldNames.push({ formName: 'subordinate_com_id', entityFieldName: 'cmte_id' });
+      fieldNames.push({ formName: 'subordinate_com_name', entityFieldName: 'cmte_name' });
+      fieldNames.push({ formName: 'street_1_co_exp', entityFieldName: 'street_1' });
+      fieldNames.push({ formName: 'street_2_co_exp', entityFieldName: 'street_2' });
+      fieldNames.push({ formName: 'state_co_exp', entityFieldName: 'state' });
+      fieldNames.push({ formName: 'city_co_exp', entityFieldName: 'city' });
+      fieldNames.push({ formName: 'zip_co_exp', entityFieldName: 'zip_code' });
+    }
+    this._patchSubordinateFormFields(fieldNames, entity);
+
+    // // setting Beneficiary Candidate Entity Id to hidden variable
+    // const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
+    // if (beneficiaryCandEntityIdHiddenField) {
+    //   beneficiaryCandEntityIdHiddenField.value = entity.beneficiary_cand_entity_id;
+    // }
+
+    // // These fields names do not map to the same name in the form
+    // const fieldName = col.name;
+    // if (fieldName === 'entity_name' || fieldName === 'donor_cmte_id' || fieldName === 'beneficiary_cmte_id') {
+    //   // populate org/committee fields
+    //   if (fieldName === 'entity_name') {
+    //     if (this.frmIndividualReceipt.controls['donor_cmte_id']) {
+    //       this.frmIndividualReceipt.patchValue({ donor_cmte_id: entity.cmte_id }, { onlySelf: true });
+    //     } else if (this.frmIndividualReceipt.controls['beneficiary_cmte_id']) {
+    //       this.frmIndividualReceipt.patchValue({ beneficiary_cmte_id: entity.cmte_id }, { onlySelf: true });
+    //     }
+    //   }
+    //   if (fieldName === 'donor_cmte_id' || fieldName === 'beneficiary_cmte_id') {
+    //     this.frmIndividualReceipt.patchValue({ entity_name: entity.cmte_name }, { onlySelf: true });
+    //   }
+    // }
   }
 }
