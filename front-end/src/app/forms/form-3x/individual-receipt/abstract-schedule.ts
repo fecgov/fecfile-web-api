@@ -49,6 +49,7 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { reportModel } from 'src/app/reports/model/report.model';
 import { entityTypes, committeeEventTypes } from './entity-types-json';
 import { ScheduleActions } from './schedule-actions.enum';
+import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
 
 
 export enum SaveActions {
@@ -107,6 +108,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public memoDropdownSize = null;
   public totalAmountReadOnly: boolean;
 
+  protected abstractScheduleComponent: AbstractScheduleParentEnum;
   protected isInit = false;
   protected formFieldsPrePopulated = false;
   protected staticFormFields = null;
@@ -148,7 +150,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   constructor(
     private _http: HttpClient,
-    private _fb: FormBuilder,
+    protected _fb: FormBuilder,
     private _formService: FormsService,
     private _receiptService: IndividualReceiptService,
     private _contactsService: ContactsService,
@@ -176,7 +178,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         // See message sender for mesage properties
         switch (message.key) {
           case 'fullForm':
-            this._prePopulateFormForEditOrView(message.transactionModel);
+            // only load form for the AbstractSchudule parent in the view
+            if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+              this._prePopulateFormForEditOrView(message.transactionModel);
+            }
             break;
           case 'field':
             // set the field array to class variable to be referenced once the formGroup
@@ -192,7 +197,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             // has been loaded by the get dynamic fields API call.
             if (message) {
               if (message.prePopulateFromSchedD) {
-                this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
+                // only load form for the AbstractSchudule parent in the view
+                if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+                  this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
+                }
               }
             }
             break;
@@ -433,6 +441,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     if (this.frmIndividualReceipt.get('election_code')) {
       this.frmIndividualReceipt.patchValue({ election_code: null }, { onlySelf: true });
+    }
+    // selects are defaulting to value = "Select" - set to null.
+    if (this.frmIndividualReceipt.contains('activity_event_type')) {
+      this.frmIndividualReceipt.patchValue({ activity_event_type: null }, { onlySelf: true });
+    }
+    if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+      this.frmIndividualReceipt.patchValue({ activity_event_identifier: null }, { onlySelf: true });
     }
     const childElectCodeName = this._childFieldNamePrefix + 'election_code';
     if (this.frmIndividualReceipt.contains(childElectCodeName)) {
@@ -827,9 +842,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (typeof totalAmount === 'string') {
       totalAmount = totalAmount.replace(/,/g, ``);
     }
-    const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
+    // const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
-    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent).subscribe(res => {
+    let activityEvent = null;
+    if (this.frmIndividualReceipt.contains('activity_event_type')) {
+      activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
+    }
+
+    let activityEventName = null;
+    if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+      activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
+    }
+
+    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName)
+      .subscribe(res => {
 
       // TODO remove this if H1/H2 not found goes back to retuning a non-200 http code.
       if (typeof res === 'string') {
@@ -931,14 +957,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public handleActivityEventTypeChange($event: any, col: any) {
 
+    // reset activity_event_identifier whenever the type changes
+    this.frmIndividualReceipt.patchValue({ activity_event_identifier: null }, { onlySelf: true });
+    this.activityEventNames = null;
+
     if (!$event) {
-      this.frmIndividualReceipt.patchValue({ activity_event_identifier: null }, { onlySelf: true });
-      this.activityEventNames = null;
+      this.totalAmountReadOnly = true;
       return;
     }
-
-    // TODO remove ! - just for dev test until API is ready
-    // this._handleNoH1H2('sched_h1');
 
     if ($event.hasOwnProperty('hasValue')) {
       if ($event.hasValue === false) {
@@ -958,29 +984,35 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.frmIndividualReceipt.contains('activity_event_type')) {
       eventTypeVal = this.frmIndividualReceipt.get('activity_event_type').value;
     }
+
+    // Don't allow a total amount to be entered if the required activity event and activity name
+    // are not set.  For event types requiring the 2nd dropdown, activityEventNames will have data.
     if (!eventTypeVal) {
+      this.totalAmountReadOnly = true;
+    } else {
+      if (this.activityEventNames) {
+        let activityEventIdentifier = null;
+        if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+          activityEventIdentifier = this.frmIndividualReceipt.get('activity_event_identifier').value;
+        }
+        if (activityEventIdentifier) {
+          this.totalAmountReadOnly = false;
+        } else {
+          this.totalAmountReadOnly = true;
+        }
+      } else {
+        this.totalAmountReadOnly = false;
+      }
+    }
+  }
+
+  public handleActivityEventNameChange($event: any, col: any) {
+
+    if (!$event) {
       this.totalAmountReadOnly = true;
     } else {
       this.totalAmountReadOnly = false;
     }
-
-    // } else {
-    //   this.totalAmountReadOnly = true;
-    //   if (this.activityEventNames) {
-    //     let eventName = null;
-    //     if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
-    //       eventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
-    //     }
-    //     if (eventName) {
-    //       // TODO why is the value 'Select' when no value has been chosen?
-    //       if (eventName !== 'Select') {
-    //         this.totalAmountReadOnly = false;
-    //       }
-    //     }
-    //   }
-    // }
-
-    // this._getFedNonFedPercentage();
   }
 
   /**
@@ -2723,22 +2755,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.electionTypes = res.data.electionTypes;
               }
             }
-            // TODO no longer needed now that we have committeeTypeEvents
-            // if (res.data.hasOwnProperty('activityEventTypes')) {
-            //   if (Array.isArray(res.data.activityEventTypes)) {
-            //     this.activityEventTypes = res.data.activityEventTypes;
-            //     if (this._cmteTypeCategory) {
-
-            //       if (committeeEventTypes.committeeTypeEvents) {
-            //         for (const committeeTypeEvent of committeeEventTypes.committeeTypeEvents) {
-            //           if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
-            //             this.activityEventTypes = committeeTypeEvent.eventTypes;
-            //           }
-            //         }
-            //       }
-            //     }
-            //   }
-            // }
 
             if (res.data.hasOwnProperty('committeeTypeEvents')) {
               if (Array.isArray(res.data.committeeTypeEvents)) {

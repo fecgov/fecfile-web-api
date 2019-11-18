@@ -90,6 +90,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     private _schedH5Service: SchedH5Service,
     private _individualReceiptService: IndividualReceiptService,
     private _uService: UtilService,
+    private _formBuilder: FormBuilder
   ) {
     super(
       _http,
@@ -116,6 +117,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _schedH5Service;
     _individualReceiptService;
     _uService;
+    _formBuilder;
   }
 
   public ngOnInit() {
@@ -429,9 +431,16 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToSum(): void {
+
+    this.addEntries();
+
     this.isSubmit = false;
     this.schedH5.reset();
     this.h5Entries = [];
+
+    this.schedH5 = this._formBuilder.group({
+      category: ['']
+    });
 
     this.receiptDateErr = false;
 
@@ -578,8 +587,11 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.cvgStartDate = formInfo.cvgStartDate;
     this.cvgEndDate = formInfo.cvgEndDate;
 
+    let startDate =  new Date(this.cvgStartDate);
+    startDate.setDate(startDate.getDate() - 1);
+
     if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
+      this._uService.compareDatesAfter((new Date(receiptDate)), startDate))) {     
       this.receiptDateErr = true;
       this.schedH5.controls['receipt_date'].setErrors({'incorrect': true});
     } else {
