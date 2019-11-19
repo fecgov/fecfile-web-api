@@ -35,6 +35,8 @@ from fecfiler.sched_A.views import (
 from fecfiler.core.transaction_util import transaction_exists
 from fecfiler.sched_D.views import do_transaction
 
+# TODO: add date validation: disbur and dissem should have at least one of them
+# TODO: need to check and exclude memo transaction from aggregation
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -188,7 +190,7 @@ def put_schedE(data):
 def put_sql_schedE(data):
     """
     update a schedule_e item                    
-            
+
     """
     _sql = """
     UPDATE public.sched_e
@@ -283,7 +285,8 @@ def update_aggregate_on_transaction(
         WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
         AND delete_ind is distinct from 'Y'
         """
-        do_transaction(_sql, (aggregate_amount, transaction_id, report_id, cmte_id))
+        do_transaction(
+            _sql, (aggregate_amount, transaction_id, report_id, cmte_id))
     except Exception as e:
         raise Exception(
             """error on update aggregate amount
@@ -318,7 +321,8 @@ def get_transactions_election_and_office(start_date, end_date, data):
             AND delete_ind is distinct FROM 'Y' 
             ORDER BY transaction_dt ASC, create_date ASC;
         """
-        _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"))
+        _params = (data.get("cmte_id"), start_date,
+                   end_date, data.get("election_code"))
     elif data.get("so_cand_office") == "S":
         _sql = """
         SELECT  
@@ -383,7 +387,7 @@ def get_transactions_election_and_office(start_date, end_date, data):
 def update_aggregate_amt_se(data):
     """
     update related se aggrgate amount
-    
+
     """
     try:
         # itemization_value = 200
@@ -420,9 +424,11 @@ def update_aggregate_amt_se(data):
         for transaction in transaction_list:
             aggregate_amount += transaction[1]
             logger.debug(
-                "update aggregate amount for transaction:{}".format(transaction[0])
+                "update aggregate amount for transaction:{}".format(
+                    transaction[0])
             )
-            logger.debug("current aggregate amount:{}".format(aggregate_amount))
+            logger.debug(
+                "current aggregate amount:{}".format(aggregate_amount))
             update_aggregate_on_transaction(
                 cmte_id, report_id, transaction[0], aggregate_amount
             )
@@ -446,7 +452,8 @@ def update_aggregate_amt_se(data):
 
     except Exception as e:
         raise Exception(
-            "The update aggregate amount for sched_e is throwing an error: " + str(e)
+            "The update aggregate amount for sched_e is throwing an error: " +
+            str(e)
         )
 
 
@@ -507,7 +514,8 @@ def post_schedE(data):
             if rollback_flag:
                 entity_data = put_entities(old_entity)
             else:
-                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": data.get(
+                    "cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedE function is throwing an error: " + str(e)
@@ -767,7 +775,8 @@ def delete_schedE(data):
     try:
 
         delete_sql_schedE(
-            data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
+            data.get("cmte_id"), data.get(
+                "report_id"), data.get("transaction_id")
         )
     except Exception as e:
         raise
@@ -818,7 +827,8 @@ def schedE(request):
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
+                data["report_id"] = check_report_id(
+                    request.data.get("report_id"))
             else:
                 raise Exception("Missing Input: report_id is mandatory")
             if "transaction_id" in request.data and check_null_value(
@@ -848,7 +858,8 @@ def schedE(request):
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
+                data["report_id"] = check_report_id(
+                    request.data.get("report_id"))
             else:
                 raise Exception("Missing Input: report_id is mandatory")
             if "transaction_id" in request.data and check_null_value(
@@ -903,4 +914,3 @@ def schedE(request):
 
     else:
         raise NotImplementedError
-
