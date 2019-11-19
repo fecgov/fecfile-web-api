@@ -707,9 +707,6 @@
                     <button class="dropdown-item" (click)="printTransaction(trx)">
                       <i class="fas fa-print"></i> Print
                     </button>
-                    <button class="dropdown-item" (click)="cloneTransaction(trx)">
-                      <i class="far fa-copy"></i> Clone
-                    </button>
                     <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
                       <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" class="dropdown-item"
                         (click)="trashTransaction(trx)">

@@ -1525,6 +1525,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           field === 'first_name' ||
           this.isFieldName(field, 'cmte_id') ||
           this.isFieldName(field, 'cmte_name') ||
+          this.isFieldName(field, 'designating_cmte_name') ||
+          this.isFieldName(field, 'subordinate_cmte_name') ||
           this.isFieldName(field, 'entity_name')
         ) {
           // if (this._selectedEntity) {
@@ -1549,7 +1551,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             receiptObj[field] = typeAheadField;
           }
           // }
-        } else if (field === 'donor_cmte_id' || field === 'beneficiary_cmte_id') {
+        } else if (field === 'donor_cmte_id' ||
+                   field === 'beneficiary_cmte_id' ||
+                   field === 'designating_cmte_id' ||
+                   field === 'subordinate_cmte_id') {
           // added this condition as some times we are getting entire json object
           // when we perform auto lookup.
           // TODO we might need to revisit to see if we need this condition
