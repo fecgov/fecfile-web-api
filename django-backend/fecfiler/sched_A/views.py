@@ -19,11 +19,12 @@ from rest_framework.response import Response
 from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
-                                 undo_delete_entities)
+                                 undo_delete_entities, superceded_report_id_list)
 
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     update_parent_purpose,
+    cmte_type,
 )
 
 from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
@@ -50,6 +51,20 @@ MANDATORY_FIELDS_AGGREGATE = ['transaction_type_identifier', 'contribution_date'
 # list of transaction_type for child sched_b items
 CHILD_SCHED_B_TYPES = []
 
+PTY_AGGREGATE_TYPES_HQ = ['IND_NP_HQ_ACC','PARTY_NP_HQ_ACC','PAC_NP_HQ_ACC','TRIB_NP_HQ_ACC','EAR_REC_HQ_ACC','JF_TRAN_NP_HQ_IND_MEMO',
+                'JF_TRAN_NP_HQ_PAC_MEMO','JF_TRAN_NP_HQ_TRIB_MEMO','OPEXP_HQ_ACC_REG_REF','OPEXP_HQ_ACC_IND_REF','OPEXP_HQ_ACC_TRIB_REF']
+
+PTY_AGGREGATE_TYPES_CO = ['IND_NP_CONVEN_ACC','PARTY_NP_CONVEN_ACC','PAC_NP_CONVEN_ACC','TRIB_NP_CONVEN_ACC','EAR_REC_CONVEN_ACC',
+                'JF_TRAN_NP_CONVEN_IND_MEMO','JF_TRAN_NP_CONVEN_PAC_MEMO','JF_TRAN_NP_CONVEN_TRIB_MEMO','OPEXP_CONV_ACC_REG_REF',
+                'OPEXP_CONV_ACC_TRIB_REF','OPEXP_CONV_ACC_IND_REF']
+
+PTY_AGGREGATE_TYPES_NPRE = ['IND_NP_RECNT_ACC','TRIB_NP_RECNT_ACC','PARTY_NP_RECNT_ACC','PAC_NP_RECNT_ACC','EAR_REC_RECNT_ACC',
+                'JF_TRAN_NP_RECNT_IND_MEMO','JF_TRAN_NP_RECNT_PAC_MEMO','JF_TRAN_NP_RECNT_TRIB_MEMO','OTH_DISB_NP_RECNT_REG_REF',
+                'OTH_DISB_NP_RECNT_TRIB_REF','OTH_DISB_NP_RECNT_IND_REF']
+
+PTY_AGGREGATE_TYPES_RE = ['IND_RECNT_REC','PARTY_RECNT_REC','PAC_RECNT_REC','TRIB_RECNT_REC']
+
+PAC_AGGREGATE_TYPES_1 = ['IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC', 'BUS_LAB_NON_CONT_ACC']
 
 # list of all transaction type identifiers that should
 # have single column storage in DB
@@ -289,28 +304,29 @@ def post_sql_schedA(cmte_id,
 def get_list_schedA(report_id, cmte_id, transaction_id = None, include_deleted_trans_flag = False):
 
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
             # GET single row from schedA table
             if transaction_id:
                 if not include_deleted_trans_flag:
                     query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+                                    FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list))
                 else:
                     query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s"""
+                                    FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format("', '".join(report_list))
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
-                            """) t""", [report_id, cmte_id, transaction_id])
+                            """) t""", [cmte_id, transaction_id])
             else:
                 if not include_deleted_trans_flag:
                     query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+                                FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC""".format("', '".join(report_list))
                 else:
                     query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s ORDER BY transaction_id DESC"""
+                                FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s ORDER BY transaction_id DESC""".format("', '".join(report_list))
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
-                           query_string + """) t""", [report_id, cmte_id])
+                           query_string + """) t""", [cmte_id])
             schedA_list = cursor.fetchone()[0]
             if not schedA_list:
                 raise NoOPError(
@@ -336,14 +352,15 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
     load all child scjed_a items for this transaction
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
 
             # GET child rows from schedA table
             query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                            FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
+                            FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list))
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
-                           """) t""", [report_id, cmte_id, transaction_id])
+                           """) t""", [cmte_id, transaction_id])
 
             for row in cursor.fetchall():
                 # forms_obj.append(data_row)
@@ -472,25 +489,28 @@ def func_aggregate_amount(contribution_date, transaction_type_identifier, entity
     try:
         with connection.cursor() as cursor:
 
-            if transaction_type_identifier in ['IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC', 'BUS_LAB_NON_CONT_ACC']:
-
-                cursor.execute("""SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s AND transaction_type_identifier = %s AND cmte_id = %s 
-    AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
-    AND contribution_date <= %s::date
-    AND ((back_ref_transaction_id IS NULL AND memo_code IS NULL) OR (back_ref_transaction_id IS NOT NULL))
-    AND delete_ind is distinct FROM 'Y' 
-    ORDER BY contribution_date DESC, create_date DESC;""", [entity_id, transaction_type_identifier, cmte_id, contribution_date, contribution_date])
-
+            if transaction_type_identifier in PTY_AGGREGATE_TYPES_HQ:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PTY_AGGREGATE_TYPES_HQ))
+            elif transaction_type_identifier in PTY_AGGREGATE_TYPES_CO:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PTY_AGGREGATE_TYPES_CO))
+            elif transaction_type_identifier in PTY_AGGREGATE_TYPES_NPRE:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PTY_AGGREGATE_TYPES_NPRE))
+            elif transaction_type_identifier in PTY_AGGREGATE_TYPES_RE:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PTY_AGGREGATE_TYPES_RE))
+            elif transaction_type_identifier in PAC_AGGREGATE_TYPES_1:
+              params = """ AND transaction_type_identifier IN ('{}')""".format("', '".join(PAC_AGGREGATE_TYPES_1))
             else:
+              params = """ AND transaction_type_identifier NOT IN ('{}')""".format("', '".join(PAC_AGGREGATE_TYPES_1 + PTY_AGGREGATE_TYPES_HQ 
+                      + PTY_AGGREGATE_TYPES_CO + PTY_AGGREGATE_TYPES_NPRE + PTY_AGGREGATE_TYPES_RE))
 
-                cursor.execute("""SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s AND cmte_id = %s 
+            query_string = """SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s {} AND cmte_id = %s 
     AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
     AND contribution_date <= %s::date
     AND ((back_ref_transaction_id IS NULL AND memo_code IS NULL) OR (back_ref_transaction_id IS NOT NULL))
     AND delete_ind is distinct FROM 'Y' 
-    AND transaction_type_identifier NOT IN ('IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC', 'BUS_LAB_NON_CONT_ACC')
-    ORDER BY contribution_date DESC, create_date DESC;""", [entity_id, cmte_id, contribution_date, contribution_date])  
+    ORDER BY contribution_date DESC, create_date DESC;""".format(params)
 
+            cursor.execute(query_string, [entity_id, cmte_id, contribution_date, contribution_date])
             result = cursor.fetchone()
         if result is None:
           aggregate_amt = 0
@@ -620,31 +640,38 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
         transactions_list = list_all_transactions_entity(
             aggregate_start_date, aggregate_end_date, entity_id, cmte_id)
         aggregate_amount = 0
-        IND_aggregate_amount = 0
-        OTH_aggregate_amount = 0
-        BUS_aggregate_amount = 0
+        PAC_aggregate_amount = 0
+        HQ_aggregate_amount = 0
+        CO_aggregate_amount = 0
+        NPRE_aggregate_amount = 0
+        RE_aggregate_amount = 0
         REMAIN_aggregate_amount = 0
+        committee_type = cmte_type(cmte_id)
         for transaction in transactions_list:
             # checking in reports table if the delete_ind flag is false for the corresponding report
             if transaction[5] != 'Y':
-                if transaction[8] in ['IND_REC_NON_CONT_ACC']:
-                    if transaction[6] != 'X':
-                        IND_aggregate_amount += transaction[0]
-                    aggregate_amount = IND_aggregate_amount
-                elif transaction[8] in ['OTH_CMTE_NON_CONT_ACC']:
-                    if transaction[6] != 'X':
-                        OTH_aggregate_amount += transaction[0]
-                    aggregate_amount = OTH_aggregate_amount
-                elif transaction[8] in ['BUS_LAB_NON_CONT_ACC']:
-                    if transaction[6] != 'X':
-                        BUS_aggregate_amount += transaction[0]
-                    aggregate_amount = BUS_aggregate_amount
-                else:
-                    # checking if the back_ref_transaction_id is null or not. 
-                    # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
-                    if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
+                # checking if the back_ref_transaction_id is null or not. 
+                # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
+                if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
+                    if (committee_type == 'PAC') and transaction[8] in PAC_AGGREGATE_TYPES_1:
+                        PAC_aggregate_amount += transaction[0]
+                        print(PAC_aggregate_amount)
+                        aggregate_amount = PAC_aggregate_amount
+                    elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_HQ:
+                        HQ_aggregate_amount += transaction[0]
+                        aggregate_amount = HQ_aggregate_amount
+                    elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_CO:
+                        CO_aggregate_amount += transaction[0]
+                        aggregate_amount = CO_aggregate_amount
+                    elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_NPRE:
+                        NPRE_aggregate_amount += transaction[0]
+                        aggregate_amount = NPRE_aggregate_amount
+                    elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_RE:
+                        RE_aggregate_amount += transaction[0]
+                        aggregate_amount = RE_aggregate_amount
+                    else:
                         REMAIN_aggregate_amount += transaction[0]
-                    aggregate_amount = REMAIN_aggregate_amount
+                        aggregate_amount = REMAIN_aggregate_amount
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
                 # if str(report_id) == str(transaction[2]):
                 if contribution_date <= transaction[4]:

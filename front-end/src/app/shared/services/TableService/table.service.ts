@@ -95,4 +95,18 @@ export class TableService {
     }
   }
 
+  /**
+   * Returns true if direction of the selected column is descending, and false if ascending
+   * @param columnName the column to find
+   * @param sortableColumns  all possible columns
+   * @returns true if direction of the selected column is descending, and false if ascending
+   */
+  public getBinarySortDirection(columnName: string, sortableColumns: SortableColumnModel[]): boolean {
+    for (const col of sortableColumns) {
+      if (col.colName === columnName) {
+        return col.descending;
+      }
+    }
+  }
+
 }

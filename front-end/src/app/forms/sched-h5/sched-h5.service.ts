@@ -19,7 +19,7 @@ export class SchedH5Service {
   public getSummary(reportId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = '/sh5/schedH5';
+    const url = '/sh5/get_h5_summary';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -45,7 +45,7 @@ export class SchedH5Service {
       );
   }
 
-  public getBreakdown(reportId: string): Observable<any> {
+  public getBreakDown(reportId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/sh5/get_sched_h5_breakdown';
@@ -104,6 +104,31 @@ export class SchedH5Service {
       .pipe(map(res => {
         if (res) {
           console.log('Save H5 res: ', res);
+          return res;
+        }
+        return false;
+      })
+      );
+  }
+
+  public getLevinAccounts(): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/core/levin_accounts';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {         
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+        if (res) {
+          console.log('Levin Accounts res: ', res);
           return res;
         }
         return false;

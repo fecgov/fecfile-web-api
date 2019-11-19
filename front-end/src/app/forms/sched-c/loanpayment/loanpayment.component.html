@@ -18,62 +18,72 @@
 
     <section>
       <!-- Entity row -->
-      <div class="row pl-3">
-        <ng-select [(ngModel)]="selectedEntity" [ngStyle]="{ 'width': '150px'}" [items]="entityTypes"
-          bindValue="code" bindLabel="description" name="entity_type" (change)="handleTypeChange($event,f)" required type="text"></ng-select>
+      <div class="row">
+        <div class="form-group col col-md-3">
+          <ng-select class="custom" [(ngModel)]="selectedEntity" [ngStyle]="{ 'width': '150px'}" [items]="entityTypes"
+            bindValue="code" bindLabel="description" name="entity_type" (change)="handleTypeChange($event,f)" required
+            type="text" [disabled]="true">
+          </ng-select>
+        </div>
       </div>
 
       <!-- Individual Name Row -->
-      <div class="row" *ngIf="f.value.entity_type === 'IND'">
-        <div class="form-group col pr-5">
+      <div class="row" [hidden]="selectedEntity !== 'IND'">
+        <div class="form-group col col-md-3">
           <label for="last_Name">Last Name
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <input ngModel type="text" class="form-control" id="last_Name" name="last_Name" maxlength="30" required>
+          <input ngModel type="text" class="form-control" id="last_Name" name="last_Name" maxlength="30"
+            style="width: 197px;" required disabled>
         </div>
 
-        <div class="form-group col pr-5">
+        <div class="form-group col col-md-3">
           <label for="first_Name">First Name
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <input ngModel type="text" class="form-control" id="first_Name" name="first_Name" maxlength="20" required>
+          <input ngModel type="text" class="form-control" id="first_Name" name="first_Name" style="width: 197px;"
+            maxlength="20" required disabled>
         </div>
 
-        <div class="form-group col">
-          <label for="middle_name">Middle Initial (Optional)</label>
-          <input ngModel type="text" class="form-control" id="middle_name" name="middle_name" maxlength="20">
+        <div class="form-group col col-md-3">
+          <label for="middle_Name">Middle Initial (Optional)</label>
+          <input ngModel type="text" class="form-control" id="middle_Name" name="middle_Name" style="width: 197px;"
+            maxlength="20" disabled>
         </div>
 
       </div>
 
       <!-- Organization Name Row -->
-      <div class="row" *ngIf="f.value.entity_type === 'ORG'">
-        <div class="form-group col col-md-4">
-          <label for="entity_name">Banking Institution
+      <div class="row" [hidden]="selectedEntity !== 'ORG'">
+        <div class="form-group col col-md-3">
+          <label for="entity_Name">Banking Institution
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <input ngModel type="text" class="form-control" id="entity_name" name="entity_name" maxlength="200" required>
+          <input ngModel type="text" class="form-control" id="entity_Name" name="entity_Name" maxlength="200" required
+            disabled>
         </div>
       </div>
 
       <!-- Prefix/Suffix Row -->
-      <div class="row" *ngIf="f.value.entity_type === 'IND'">
-        <div class="form-group col col-md-1 pr-5">
+      <div class="row" [hidden]="selectedEntity !== 'IND'">
+        <div class="form-group col col-md-3 ">
           <label for="prefix">Prefix (Optional)</label>
-          <input ngModel type="text" class="form-control" id="prefix" name="prefix" maxlength="10">
+          <input ngModel type="text" class="form-control" id="prefix" name="prefix" style="width: 98px;" maxlength="10"
+            disabled>
         </div>
-        <div class="form-group col col-md-1 pr-5">
+        <div class="form-group col col-md-3">
           <label for="suffix">Suffix (Optional)</label>
-          <input ngModel type="text" class="form-control" id="suffix" name="suffix" maxlength="10">
+          <input ngModel type="text" class="form-control" id="suffix" name="suffix" maxlength="10" style="width: 98px;"
+            disabled>
         </div>
       </div>
 
@@ -81,62 +91,65 @@
 
       <!-- Street address row -->
       <div class="row">
-        <div class="form-group col col-md-3 pr-5">
+        <div class="form-group col col-md-3 ">
           <label for="street_1">Street 1
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <input ngModel type="text" class="form-control" id="street_1" name="street_1" required maxlength="34">
+          <input ngModel type="text" class="form-control" id="street_1" style="width: 275px;" name="street_1" required
+            maxlength="34" disabled>
         </div>
-        <div class="form-group col col-md-3 pr-5">
+        <div class="form-group col col-md-3 ">
           <label for="street_2">Street 2 (Optional)
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <input ngModel type="text" class="form-control" id="street_2" name="street_2" maxlength="34">
+          <input ngModel type="text" class="form-control" id="street_2" style="width: 275px;" name="street_2"
+            maxlength="34" disabled>
         </div>
       </div>
 
       <!-- City/State/Zip row -->
       <div class="row">
-        <div class="form-group col col-md-3 pr-5">
+        <div class="form-group col col-md-3 ">
           <label for="city">City
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <input ngModel type="text" class="form-control" id="city" name="city" required maxlength="30">
+          <input ngModel type="text" class="form-control" id="city" name="city" required style="width: 197px;"
+            maxlength="30" disabled>
         </div>
-        <div class="form-group col col-md-1 pr-5">
+        <div class="form-group col col-md-3 ">
           <label for="state">State
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <ng-select class="state-select" ngModel name="state" [items]="states" bindValue="state_code" 
-          [ngClass]="
+          <ng-select class="state-select" ngModel name="state" [items]="states" bindValue="state_code"
+            style="width: 235px;" [ngClass]="
                       f.control.get('state')?.invalid &&
                       (f.touched || f.dirty)
                         ? 'state-select-error'
                         : ''
-                    "
-          bindLabel="state_code"  required >
+                    " bindLabel="state_code" required [disabled]="true">
           </ng-select>
         </div>
-        <div class="form-group col col-md-3 pr-5">
+        <div class="form-group col col-md-3">
           <label for="city">Zip
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <input ngModel type="text" class="form-control" id="zip" name="zip" required maxlength="9">
+          <input ngModel type="text" class="form-control" id="zip" name="zip" style="width: 98px;" required
+            maxlength="9" disabled>
         </div>
       </div>
 
@@ -144,7 +157,7 @@
 
       <!-- Expenditure Date Row -->
       <div class="row">
-        <div class="form-group col col-md-4">
+        <div class="form-group col col-md-3">
           <label for="expenditure_date">Expenditure Date
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
@@ -161,7 +174,8 @@
               id="expenditure_date" aria-label="Filter From Deleted Date" aria-describedby="filter-from-deleted-date"
               (change)="expenditureDateChanged($event.target.value)" required>
           </div>
-          <div class="text-error text-left" *ngIf="f.controls?.expenditure_date?.errors && f.controls?.expenditure_date?.errors['contributionDateInvalid']">
+          <div class="text-error text-left"
+            *ngIf="f.controls?.expenditure_date?.errors && f.controls?.expenditure_date?.errors['contributionDateInvalid']">
             The date entered falls outside of the report coverage period. Transactions for this report
             should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
             need to add a transaction with a date that falls outside of the coverage period for this report,
@@ -174,11 +188,11 @@
 
       <!-- Expenditure Amount / Memo Code Row -->
       <div class="row">
-        <div class="form-group col col-md-4 pr-5">
+        <div class="form-group col col-md-3 pr-5">
           <label for="expenditure_amount">Expenditure Amount
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
-              <span class="sr-only">Click here for more information</span> 
+              <span class="sr-only">Click here for more information</span>
             </button>
           </label>
           <div class="input-group transactions__filter-multi-input">
@@ -188,15 +202,20 @@
               </span>
             </div>
             <input [ngModel]="f.expenditure_amount | number : '1.2-2'" (ngModelChange)="f.expenditure_amount=$event"
-            [ngModelOptions]="{updateOn: 'blur'}"
-             type="text" min="0" value="0" name="expenditure_amount" 
+              [ngModelOptions]="{updateOn: 'blur'}" type="text" min="0" value="0" name="expenditure_amount"
               class="form-control" id="expenditure_amount" aria-label="Expenditure Amount"
               aria-describedby="expenditure_amount" required>
-
- 
           </div>
+          <div class="text-error text-left"
+            *ngIf="f.controls?.expenditure_amount?.errors && f.controls?.expenditure_amount?.errors['nonValidAmount']">
+            Please enter a valid amount.
+          </div>
+          <div class="text-error text-left"
+          *ngIf="f.controls?.expenditure_amount?.errors && f.controls?.expenditure_amount?.errors['amountExceeded']">
+          Expenditure amount exceeds outstanding loan amount
         </div>
-        <div class="form-group col col-md-4">
+        </div>
+        <div class="form-group col col-md-3">
           <div class="checkbox">
             <label for="memoCode">Memo Code
               <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}"
@@ -212,27 +231,26 @@
 
       <hr><br>
 
-      <!-- Descriptions Row --> 
+      <!-- Descriptions Row -->
       <div class="row">
         <div class="form-group col">
-          <label for="expenditure_purpose">Expenditure Purpose Description
+          <label for="expenditure_purpose">Expenditure Purpose Description (Optional)
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <textarea ngModel type="text" class="form-control" id="expenditure_purpose"
-            name="expenditure_purpose" maxlength="100"></textarea>
+          <textarea ngModel type="text" class="form-control" id="expenditure_purpose" name="expenditure_purpose"
+            maxlength="100"></textarea>
         </div>
         <div class="form-group col">
-          <label for="memo_text">Memo Text/Description
+          <label for="memo_text">Memo Text/Description (Optional)
             <button type="button" class="btn btn-info" ngbTooltip="{{tooltipPlaceholder}}" tooltipClass="form-tooltip">
               <i class="info-icon" aria-hidden="true"></i>
               <span class="sr-only">Click here for more information</span>
             </button>
           </label>
-          <textarea ngModel type="text" class="form-control" id="memo_text" name="memo_text" 
-          maxlength="100"></textarea>
+          <textarea ngModel type="text" class="form-control" id="memo_text" name="memo_text" maxlength="100"></textarea>
         </div>
       </div>
 

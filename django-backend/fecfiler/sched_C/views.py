@@ -28,6 +28,8 @@ from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_c1_child_transactions,
     get_sched_c2_child_transactions,
+    get_sched_c2_child,
+    get_sched_c1_child,
 )
 
 # Create your views here.
@@ -245,31 +247,31 @@ def put_sql_schedC(data):
               AND delete_ind is distinct from 'Y';
         """
     _v = (
-            data.get('transaction_type', ''),
-            data.get('transaction_type_identifier', ''),
-            data.get('entity_id', ''),
-            data.get('election_code', ''),
-            data.get('election_other_description', ''),
-            data.get('loan_amount_original', None),
-            data.get('loan_payment_to_date', None),
-            data.get('loan_amount_original', None), #adding loan_balance as loan_amount_original
-            data.get('loan_incurred_date', None),
-            data.get('loan_due_date', None), 
-            data.get('loan_intrest_rate', ''),
-            data.get('is_loan_secured', ''),
-            data.get('is_personal_funds', ''),
-            data.get('lender_cmte_id', ''),
-            data.get('lender_cand_id', ''),
-            data.get('lender_cand_last_name', ''),
-            data.get('lender_cand_first_name', ''),
-            data.get('lender_cand_middle_name', ''),
-            data.get('lender_cand_prefix', ''),
-            data.get('lender_cand_suffix', ''),
-            data.get('lender_cand_office', ''),
-            data.get('lender_cand_state', ''),
-            data.get('lender_cand_district', None),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('transaction_type'),
+            data.get('transaction_type_identifier'),
+            data.get('entity_id'),
+            data.get('election_code'),
+            data.get('election_other_description'),
+            data.get('loan_amount_original'),
+            data.get('loan_payment_to_date'),
+            data.get('loan_balance'), #adding loan_balance as loan_amount_original
+            data.get('loan_incurred_date'),
+            data.get('loan_due_date'), 
+            data.get('loan_intrest_rate'),
+            data.get('is_loan_secured'),
+            data.get('is_personal_funds'),
+            data.get('lender_cmte_id'),
+            data.get('lender_cand_id'),
+            data.get('lender_cand_last_name'),
+            data.get('lender_cand_first_name'),
+            data.get('lender_cand_middle_name'),
+            data.get('lender_cand_prefix'),
+            data.get('lender_cand_suffix'),
+            data.get('lender_cand_office'),
+            data.get('lender_cand_state'),
+            data.get('lender_cand_district'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -426,7 +428,7 @@ def post_schedC(data):
         new_transaction_id = get_next_transaction_id('SC')
         data['transaction_id'] = new_transaction_id
         # TODO: this is a temp change for new loan only. need further discussion
-        data['loan_balance'] = data['loan_amount_original']
+        # data['loan_balance'] = data['loan_amount_original']
         logger.info('validating sched_c request data...')
         validate_sc_data(data)
         try:
@@ -567,13 +569,13 @@ def get_schedC(data):
             logger.debug('getting all sched_c1 childs...')
             childC1_forms_obj = get_sched_c1_child_transactions(
                 report_id, cmte_id, transaction_id)
-            print(childC1_forms_obj)
+            # print(childC1_forms_obj)
             for obj in childC1_forms_obj:
                 obj.update(API_CALL_SC1)
             logger.debug('getting all sched_c2 childs...')
             childC2_forms_obj = get_sched_c2_child_transactions(
                 report_id, cmte_id, transaction_id)
-            print(childC2_forms_obj)
+            # print(childC2_forms_obj)
             for obj in childC2_forms_obj:
                 obj.update(API_CALL_SC2)
 
@@ -635,19 +637,39 @@ def get_list_all_schedC(report_id, cmte_id):
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
-            schedC2_list = cursor.fetchone()[0]
-            if schedC2_list is None:
+            schedC_list = cursor.fetchone()[0]
+            if schedC_list is None:
                 raise NoOPError('No sched_c1 transaction found for report_id {} and cmte_id: {}'.format(
                     report_id, cmte_id))
             merged_list = []
-            for dictC2 in schedC2_list:
-                merged_list.append(dictC2)
+            for item in schedC_list:
+                entity_id = item.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                # cand_entity = {}
+                # if item.get("beneficiary_cand_entity_id"):
+                #     cand_data = {
+                #         "entity_id": item.get("beneficiary_cand_entity_id"),
+                #         "cmte_id": cmte_id,
+                #     }
+                #     cand_entity = get_entities(cand_data)[0]
+                #     cand_entity = candify_it(cand_entity)
+
+                merged_dict = {**item, **dictEntity}
+                merged_list.append(merged_dict)
+                # merged_list.append(dictC2)
         return merged_list
     except Exception:
         raise
 
 
 def get_list_schedC(report_id, cmte_id, transaction_id):
+    """
+    note: we are not loading loans based on report_id as loan
+    is not tied to report id for reporting purpose
+    """
+
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -683,17 +705,31 @@ def get_list_schedC(report_id, cmte_id, transaction_id):
             memo_text,
             last_update_date
             FROM public.sched_c
-            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
+            WHERE cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
             """
-            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            cursor.execute(_sql, (cmte_id, transaction_id))
             schedC_list = cursor.fetchone()[0]
             if schedC_list is None:
                 raise NoOPError('No sched_c transaction found for transaction_id {}'.format(
                     transaction_id))
             merged_list = []
-            for dictC in schedC_list:
-                merged_list.append(dictC)
+            for item in schedC_list:
+                entity_id = item.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                # cand_entity = {}
+                # if item.get("beneficiary_cand_entity_id"):
+                #     cand_data = {
+                #         "entity_id": item.get("beneficiary_cand_entity_id"),
+                #         "cmte_id": cmte_id,
+                #     }
+                #     cand_entity = get_entities(cand_data)[0]
+                #     cand_entity = candify_it(cand_entity)
+                merged_dict = {**item, **dictEntity}
+                merged_list.append(merged_dict)
+                # merged_list.append(dictC)
         return merged_list
     except Exception:
         raise
@@ -880,6 +916,7 @@ def get_outstanding_loans(request):
                             e.middle_name,
                             e.preffix,
                             e.suffix, 
+                            c.transaction_id,
                             c.loan_amount_original, 
                             c.loan_payment_to_date, 
                             c.loan_balance, 
@@ -908,6 +945,7 @@ def get_outstanding_loans(request):
                                 e.middle_name,
                                 e.preffix,
                                 e.suffix, 
+                                c.transaction_id,
                                 c.loan_amount_original, 
                                 c.loan_payment_to_date, 
                                 c.loan_balance, 
@@ -927,6 +965,22 @@ def get_outstanding_loans(request):
         if not json_result:
             return Response([], status=status.HTTP_200_OK)
         else:
+            for tran in json_result:
+                transaction_id = tran.get('transaction_id')
+                childC1_forms_obj = get_sched_c1_child(
+                    cmte_id, transaction_id)
+                # print(childC1_forms_obj)
+                for obj in childC1_forms_obj:
+                    obj.update(API_CALL_SC1)
+                logger.debug('getting all sched_c2 childs...')
+                childC2_forms_obj = get_sched_c2_child(
+                    cmte_id, transaction_id)
+                # print(childC2_forms_obj)
+                for obj in childC2_forms_obj:
+                    obj.update(API_CALL_SC2)
+                child_tran = childC1_forms_obj + childC2_forms_obj
+                if child_tran:
+                    tran['child'] = child_tran
             return Response(json_result, status=status.HTTP_200_OK)
 
     except:
@@ -1768,7 +1822,6 @@ def schedC2_sql_dict(data):
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
         return datum
-
     except:
         raise Exception('invalid request data.')
 

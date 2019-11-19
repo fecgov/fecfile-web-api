@@ -50,6 +50,7 @@ import { heLocale } from 'ngx-bootstrap';
 import { TransactionsService } from '../../transactions/service/transactions.service';
 import { AbstractSchedule } from './abstract-schedule';
 import { ReportsService } from 'src/app/reports/service/report.service';
+import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -127,6 +128,7 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
 
   public ngOnInit() {
     this.formType = '3X';
+    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedMainComponent;
     super.ngOnInit();
   }
 

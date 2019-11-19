@@ -67,8 +67,8 @@
                 [style.width]="'90%'" 
                 [style.height]="'30px'"
                 [ngClass]="
-                  frmIndividualReceipt.get('activity_event_name')?.invalid &&
-                  (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                  schedH3.get('account_name')?.invalid &&
+                  (schedH3.touched || schedH3.dirty) && isSubmit
                     ? 'input-field-error'
                     : ''
                 " 
@@ -93,17 +93,23 @@
                   </div>
                   <input class="form-control" 
                   type="date" 
-                  [formControlName]="'date'"
-                  [attr.name]="'date'"
+                  [formControlName]="'receipt_date'"
+                  [attr.name]="'receipt_date'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
+                  (change)="receiptDateChanged($event.target.value)" 
                   [ngClass]="
-                      frmIndividualReceipt.get('date')?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      schedH3.get('receipt_date')?.invalid &&
+                      (schedH3.touched || schedH3.dirty)
                       ? 'input-field-error'
                       : ''
                   "
                   />
+              </div>
+              <div class="text-error text-left"
+                *ngIf="receiptDateErr"
+              >
+              The date entered falls outside of the report coverage period. Transactions for this report should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you need to add a transaction with a date that falls outside of the coverage period for this report, you will need to check the memo code box.
               </div>
             </div>
           </div>
@@ -125,10 +131,11 @@
                   </div>
                   <input class="form-control" 
                   type="text" 
-                  [formControlName]="'total_tmount'"
-                  [attr.name]="'total_tmount'"
+                  [formControlName]="'total_amount_transferred'"
+                  [attr.name]="'total_amount_transferred'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
+                  [attr.readonly]=true
                   [ngClass]="
                       frmIndividualReceipt.get('date')?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -173,7 +180,7 @@
                 </button>
               </label>
               <div *ngIf="showIdentiferSelect">
-                <select id="" formControlName="activity_event_name" class="form-control" (change)="selectActivityFunctionChange($event)">                    
+                <select id="" formControlName="activity_event_name" class="form-control" (change)="selectActivityOrEventChange($event)">                    
                   <option value="" selected>Activity or Event Identifier</option>
                   <option
                       *ngFor="let identifier of identifiers"                    
@@ -207,6 +214,7 @@
                   [attr.name]="'transferred_amount'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
+                  (keyup)="handleAmountKeyup($event)"
                   [ngClass]="
                       frmIndividualReceipt.get('date')?.invalid &&
                       (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -217,7 +225,7 @@
               </div>
             </div>
           </div>
-          <div class="col col-md-4">
+          <div *ngIf="showAggregateAmount" class="col col-md-4">
             <div class="form-group">                    
               <label for="">
                 Total Amount of {{ totalName }}
@@ -235,8 +243,8 @@
                   </div>
                   <input class="form-control" 
                   type="text" 
-                  [formControlName]="'total_amount_transferred'"
-                  [attr.name]="'total_amount_transferred'"
+                  [formControlName]="'aggregate_amount'"
+                  [attr.name]="'aggregate_amount'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
                   [attr.readonly]=true
@@ -253,6 +261,94 @@
           </div>
         </div>
       </div>
+      
+      <div class="paragraph">
+        <ng-container>
+          <table class="table table-striped table-hover table__sortable">
+            <thead>
+                <tr>
+                    <th [@fadeInOut]>                              
+                    </th>
+                    <th [@fadeInOut]
+                        (click)="changeSortDirection('account_name')">Account Name
+                        <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>
+                    <th [@fadeInOut]
+                        (click)="changeSortDirection('activity')">Transfer Type
+                        <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>
+                    <th [@fadeInOut]
+                        (click)="changeSortDirection('activity_event_name')">Activity or Event Identifier
+                        <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>                  
+                    <th [@fadeInOut]
+                        (click)="changeSortDirection('receipt_date')">Date
+                        <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>
+                    <th [@fadeInOut]
+                        (click)="changeSortDirection('ratio_code')">Amount
+                        <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>
+                    <th [@fadeInOut]
+                        (click)="changeSortDirection('federal_percent')">Aggregate Amount
+                        <i class="fa fa-sort" aria-hidden="false"></i>
+                    </th>                  
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container>
+                  <tr *ngFor="let item of h3Entries | paginate: h3EntryTableConfig">
+                    <td>
+                      <input type="checkbox" (click)="checkForMultiChecked($event)">
+                    </td>
+                    <td>{{ item.account_name }}</td>
+                    <td>
+                        <div *ngIf="item.activity_event_type == 'AD'">Administrative</div>
+                        <div *ngIf="item.activity_event_type == 'GV'">Generic Voter Drive</div>
+                        <div *ngIf="item.activity_event_type == 'EA'">Exempt Activities</div>
+                        <div *ngIf="item.activity_event_type == 'DF'">Direct Fundraising</div>
+                        <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Suppot</div>
+                        <div *ngIf="item.activity_event_type == 'PC'">Public Communications Referring Only to Party(Made by PAC)</div>
+                    </td>                  
+                    <td>{{ item.activity_event_name }}</td>                    
+                    <td>{{ item.receipt_date | date: 'MM/dd/yyyy' }}</td>                          
+                    <td class="summary_text_amt">{{ item.transferred_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>                          
+                    <td class="summary_text_amt">{{ item.aggregate_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+  
+                    <td class="bulk_action" >
+                        <div [@fadeInOut]                      
+                            class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+  
+                            <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+  
+                            <div id="forms__trx-dropdown-action1" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
+                                <button class="dropdown-item" (click)="viewditH3(item)">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="dropdown-item" (click)="printH3(item)">
+                                    <i class="fas fa-print"></i> Print
+                                </button>
+                                <button class="dropdown-item" (click)="editH3(item)">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="dropdown-item" (click)="trashH3(item)">
+                                    <i class="fas fa-trash"></i> Trash
+                                </button>
+                            </div>
+                        </div>
+                    </td>
+                  </tr>
+                </ng-container>
+            </tbody>
+          </table>
+          <hr/>
+          <div class="d-flex justify-content-center pagination-controls">
+            <pagination-controls (pageChange)="entryPageChanged($event)"></pagination-controls>
+          </div>
+        </ng-container>
+      </div>
 
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
@@ -264,28 +360,32 @@
           </div>
         </div>
       </div>
-    </section>
 
-    <footer *ngIf="transactionType === 'ALLOC_H3_RATIO'">
-        <footer>
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              <div class="forms__btn-container">
-                <button class="btn btn-previous btn-left" type="button"
-                  (click)="clearFormValues(); previousStep()">                  
-                  Previous
-                </button>
-                <a class="btn btn-primary btn-right" (click)="returnToSum()">
-                  Summary
-                </a>
+      <footer>
+          <footer>
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12">
+                <div class="forms__btn-container">
+                  <button class="btn btn-previous btn-left" type="button"
+                    (click)="clearFormValues(); previousStep()">                  
+                    Previous
+                  </button>
+                  <a class="btn btn-primary btn-right" (click)="returnToSum()">
+                      Summary
+                    </a>
+                  <button class="btn btn-previous btn-right" type="button"
+                    (click)="addEntries()">                  
+                    Add
+                  </button>                  
+                </div>
               </div>
             </div>
-          </div>
-        </footer>
-    </footer>
+          </footer>
+      </footer>
+    </section>
 
     <section *ngIf="transactionType === 'ALLOC_H3_SUM'">
-      <ng-container>
+      
         <table class="table table-striped table-hover table__sortable">
           <thead>
               <tr>
@@ -300,7 +400,7 @@
                       <i class="fa fa-sort" aria-hidden="false"></i>
                   </th>                  
                   <th [@fadeInOut]
-                      (click)="changeSortDirection('date')">Date
+                      (click)="changeSortDirection('receipt_date')">Date
                       <i class="fa fa-sort" aria-hidden="false"></i>
                   </th>
                   <th [@fadeInOut]
@@ -361,31 +461,30 @@
           </tbody>
         </table>
         <hr/>
-        <div class="d-flex justify-content-center pagination-container">
+        <div class="d-flex justify-content-center pagination">
           <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
         </div>
-      </ng-container>
-    </section>
-
-    <footer *ngIf="transactionType === 'ALLOC_H3_SUM'">
-        <footer>
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              <div class="forms__btn-container">
-                <button class="btn btn-previous btn-left" type="button"
-                  (click)="clearFormValues(); previousStep()">
-                  Previous
-                </button>
-                
-                <button class="btn btn-previous btn-right" type="button" 
-                  (click)="returnToAdd()">
-                  Add
-                </button>               
+     
+      <footer *ngIf="transactionType === 'ALLOC_H3_SUM'">
+          <footer>
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12">
+                <div class="forms__btn-container">
+                  <button class="btn btn-previous btn-left" type="button"
+                    (click)="clearFormValues(); previousStep()">
+                    Previous
+                  </button>
+                  
+                  <button class="btn btn-previous btn-right" type="button" 
+                    (click)="returnToAdd()">
+                    Add
+                  </button>               
+                </div>
               </div>
             </div>
-          </div>
-        </footer>
-    </footer>
+          </footer>
+      </footer>
+    </section>
 
     <section *ngIf="transactionType === 'ALLOC_H3_SUM_P'">
       <div id="sumary" >
@@ -469,21 +568,20 @@
         </table>
       </div>
 
-    </section>
-    
-    <footer *ngIf="transactionType === 'ALLOC_H3_SUM_P'">
-      <footer>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" 
-                (click)="clearFormValues(); previousStep()">
-                Previous
-              </button>
+      <footer *ngIf="transactionType === 'ALLOC_H3_SUM_P'">
+          <footer>
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12">
+                <div class="forms__btn-container">
+                  <button class="btn btn-previous btn-left" type="button" 
+                    (click)="clearFormValues(); previousStep()">
+                    Previous
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </footer>
       </footer>
-    </footer>
+    </section>
   </form>
 </div>

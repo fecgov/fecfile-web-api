@@ -21,6 +21,7 @@ import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.
 import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedule';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
+import { Observable, Subscription } from 'rxjs';
 import { SchedH5Service } from './sched-h5.service';
 
 @Component({
@@ -48,133 +49,22 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public h5Sum: any;
   public h5SumP: any;
   public saveHRes: any;
+  public h5Subscription: Subscription;
 
-  protected staticFormFields = [
-    {
-      childForm: false,
-      childFormTitle: null,
-      colClassName: 'col col-md-4',
-      seperator: false,
-      cols: [
-        {
-          name: 'coord_expenditure_yn',
-          value: null,
-          validation: {
-            required: true
-          }
-        },
-        {
-          preText: null,
-          setEntityIdTo: 'entity_id',
-          isReadonly: false,
-          entityGroup: 'org-group',
-          toggle: true,
-          inputGroup: false,
-          inputIcon: '',
-          text: 'Organization Name',
-          infoIcon: false,
-          infoText: 'Request language from RAD',
-          name: 'designated_com_id',
-          type: 'text',
-          value: null,
-          scroll: false,
-          height: '30px',
-          width: '200px',
-          validation: {
-            required: true,
-            max: 9,
-            alphaNumeric: true
-          }
-        },
-        {
-          preText: null,
-          setEntityIdTo: 'entity_id',
-          isReadonly: false,
-          entityGroup: 'org-group',
-          toggle: true,
-          inputGroup: false,
-          inputIcon: '',
-          text: 'Organization Name',
-          infoIcon: false,
-          infoText: 'Request language from RAD',
-          name: 'designated_com_name',
-          type: 'text',
-          value: null,
-          scroll: false,
-          height: '30px',
-          width: '200px',
-          validation: {
-            required: true,
-            max: 200,
-            alphaNumeric: true
-          }
-        },
-        {
-          name: 'subordinate_com_id',
-          value: null,
-          validation: {
-            required: true,
-            max: 9,
-            alphaNumeric: true
-          }
-        },
-        {
-          name: 'subordinate_com_name',
-          value: null,
-          validation: {
-            required: true,
-            max: 200,
-            alphaNumeric: true
-          }
-        },
-        {
-          name: 'street_1_co_exp',
-          value: null,
-          validation: {
-            required: true,
-            max: 34,
-            alphaNumeric: true
-          }
-        },
-        {
-          name: 'street_2_co_exp',
-          value: null,
-          validation: {
-            required: false,
-            max: 34,
-            alphaNumeric: true
-          }
-        },
-        {
-          name: 'city_co_exp',
-          value: null,
-          validation: {
-            required: true,
-            max: 30,
-            alphaNumeric: true
-          }
-        },
-        {
-          name: 'state_co_exp',
-          value: null,
-          validation: {
-            required: true,
-            max: 2,
-            alphaNumeric: true
-          }
-        },
-        {
-          name: 'zip_co_exp',
-          value: null,
-          validation: {
-            required: true,
-            max: 10,
-            alphaNumeric: true
-          }
-        }
-      ]
-    }
-  ];
+
+  public h5Entries = [];
+  public h5Ratios: any;
+  public h5TableConfig: any;
+  public h5EntryTableConfig: any;
+
+  public levinAccountsies: any;
+
+  public receiptDateErr = false;
+
+  public cvgStartDate: any;
+  public cvgEndDate: any;
+
+  public isSubmit = false;
 
   constructor(
     _http: HttpClient,
@@ -197,7 +87,9 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
-    private _schedH5Service: SchedH5Service
+    private _schedH5Service: SchedH5Service,
+    private _individualReceiptService: IndividualReceiptService,
+    private _uService: UtilService,
   ) {
     super(
       _http,
@@ -222,6 +114,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       _reportsService
     );
     _schedH5Service;
+    _individualReceiptService;
+    _uService;
   }
 
   public ngOnInit() {
@@ -252,6 +146,22 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.setH5Sum();
     this.setH5SumP();
+
+    this.h5TableConfig = {
+      itemsPerPage: 8,
+      currentPage: 1,
+      totalItems: 8
+    };
+    this.h5EntryTableConfig = {
+      itemsPerPage: 3,
+      currentPage: 1,
+      totalItems: 3
+    };
+
+    this.setLevinAccounts();
+
+    this.h5Ratios = {};
+    this.h5Ratios['child'] = [];
   }
 
   public ngOnChanges(changes: SimpleChanges) {
@@ -259,6 +169,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.formType = '3X';
     this.showPart2 = false;
     this._setTransactionDetail();
+  }
+
+  ngDoCheck() {
+    this.status.emit({
+      otherSchedHTransactionType: this.transactionType
+    });
   }
 
   public ngOnDestroy(): void {
@@ -279,6 +195,13 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public saveAndReturnToParentDebt() {
     this._setTransactionDetail();
     this.saveAndReturnToParent();
+  }
+
+  pageChanged(event){
+    this.h5TableConfig.currentPage = event;
+  }
+  entryPageChanged(event){
+    this.h5EntryTableConfig.currentPage = event;
   }
 
   public getReportId(): string {
@@ -373,6 +296,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this._schedH5Service.saveH5(h5_obj).subscribe(res => {
       if (res) {
         this.saveHRes = res;
+        this.h5Entries = [];
       }
     });
   }
@@ -386,35 +310,58 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     // this.schedH2.patchValue({ fundraising: this.schedH2.get('select_activity_function').value === 'f' ? true : false }, { onlySelf: true });
     // this.schedH2.patchValue({ direct_cand_support: this.schedH2.get('select_activity_function').value === 'd' ? true : false }, { onlySelf: true });
 
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
+    this.h5Ratios['report_id'] = reportId;
+    this.h5Ratios.transaction_type_identifier = 'TRAN_FROM_LEVIN_ACC';
+    this.h5Ratios['account_name'] = this.schedH5.get('account_name').value;    
+
     const formObj = this.schedH5.getRawValue();
+    
+    const total_amount_transferred = Number(this.schedH5.get('total_amount_transferred').value) 
+          + Number(this.schedH5.get('transferred_amount').value);
+    this.h5Ratios.total_amount_transferred = total_amount_transferred;
+    
+    //this.schedH5.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
+    
 
-    formObj['report_id'] = this.getReportId();
-    formObj['transaction_type_identifier'] = "TRAN_FROM_NON_FED_ACC";
+    formObj['report_id'] = reportId;
+    formObj['transaction_type_identifier'] = "TRAN_FROM_LEVIN_ACC";
+    
+    delete formObj.total_amount_transferred;
 
-    //set corresponding amount value
+    //set corresponding amount value    
     if (this.schedH5.get('category').value === 'voter_id') {
-      formObj['voter_id_amount'] = this.schedH5.get('total_amount_of_transfer').value;
+      formObj['voter_id_amount'] = this.schedH5.get('transferred_amount').value;
     } else if (this.schedH5.get('category').value === 'voter_registration') {
-      formObj['voter_registration_amount'] = this.schedH5.get('total_amount_of_transfer').value;
+      formObj['voter_registration_amount'] = this.schedH5.get('transferred_amount').value;
     } else if (this.schedH5.get('category').value === 'gotv') {
-      formObj['gotv_amount'] = this.schedH5.get('total_amount_of_transfer').value;
+      formObj['gotv_amount'] = this.schedH5.get('transferred_amount').value;
     } else if (this.schedH5.get('category').value === 'generic_campaign') {
-      formObj['generic_campaign_amount'] = this.schedH5.get('total_amount_of_transfer').value;
+      formObj['generic_campaign_amount'] = this.schedH5.get('transferred_amount').value;
     }
 
-    formObj['receipt_date'] = this.schedH5.get('date').value;
-
-    // formObj['federal_percent'] = ((this.schedH2.get('federal_percent').value) / 100).toFixed(2);
-    // formObj['non_federal_percent'] = ((this.schedH2.get('non_federal_percent').value) / 100).toFixed(2);
-
+    formObj['receipt_date'] = this.schedH5.get('receipt_date').value;    
+   
     const serializedForm = JSON.stringify(formObj);
 
-    if (this.schedH5.status === 'VALID') {
-      //  && 
-      // (this.schedH2.get('federal_percent').value + this.schedH2.get('non_federal_percent').value) === 100) {
+    this.isSubmit = true;
 
-      this.saveH5(serializedForm);
-      this.schedH5.reset();
+    if (this.schedH5.status === 'VALID') {
+
+      this.schedH5.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
+     
+      this.h5Entries.push(formObj);
+      this.h5EntryTableConfig.totalItems = this.h5Entries.length;
+      this.h5Ratios.child.push(formObj);
+
+      this.schedH5.patchValue({category: ''}, { onlySelf: true });
+      this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true });
+
+      this.isSubmit = false;
+
+      //this.saveH5(serializedForm);
+      //this.schedH5.reset();
     }
   }
 
@@ -423,9 +370,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.schedH5 = new FormGroup({
       account_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
-      date: new FormControl(''),
-      total_tmount_of_transfer: new FormControl(''),
-      category: new FormControl('')
+      receipt_date: new FormControl('', Validators.required),
+      total_amount_transferred: new FormControl(''),
+      category: new FormControl(''),
+      transferred_amount: new FormControl('')
       // activity_event_name: new FormControl(''),
       // amount: new FormControl(''),
       // total_amount: new FormControl('')
@@ -481,7 +429,14 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToSum(): void {
+    this.isSubmit = false;
+    this.schedH5.reset();
+    this.h5Entries = [];
+
+    this.receiptDateErr = false;
+
     this.transactionType = 'ALLOC_H5_SUM';
+    this.setH5Sum();
   }
 
   public returnToAdd(): void {
@@ -523,6 +478,17 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public setH5Sum() {
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
+    this.h5Subscription = this._schedH5Service.getSummary(reportId).subscribe(res =>
+      {        
+        if(res) {          
+          this.h5Sum =  res;         
+          this.h5TableConfig.totalItems = res.length;
+        }
+      });
+
+    /*  
     this.h5Sum = [
       {
         "transfer_type": "GOTV",
@@ -551,9 +517,20 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       }
 
     ]
+    */
   }
 
   public setH5SumP() {
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
+    this.h5Subscription = this._schedH5Service.getBreakDown(reportId).subscribe(res =>
+      {        
+        if(res) {          
+          this.h5SumP =  res;          
+        }
+      });
+
+    /*  
     this.h5SumP = [
       {
         "category": "Voter ID",
@@ -576,6 +553,39 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         "amount": 52304200.00
       }
     ]
+    */
+  }
+
+  public setLevinAccounts() {
+
+    this.h5Subscription = this._schedH5Service.getLevinAccounts().subscribe(res =>
+      {        
+        if(res) {          
+          this.levinAccountsies  =  res;          
+        }
+      });
+    
+  }
+
+  public addEntries() {
+    const serializedForm = JSON.stringify(this.h5Ratios);
+    this.saveH5(serializedForm);
+  }
+
+  public receiptDateChanged(receiptDate: string) {
+
+    const formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
+    this.cvgStartDate = formInfo.cvgStartDate;
+    this.cvgEndDate = formInfo.cvgEndDate;
+
+    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
+      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
+      this.receiptDateErr = true;
+      this.schedH5.controls['receipt_date'].setErrors({'incorrect': true});
+    } else {
+      this.receiptDateErr = false;
+    }
+
   }
 
 }

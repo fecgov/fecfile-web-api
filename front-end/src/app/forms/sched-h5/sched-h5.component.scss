@@ -236,4 +236,19 @@
     margin-top: 1px  !important;
    // margin-bottom: 1px  !important;
   }
+
+  .dropdown-menu {
+    min-width: 6em;
+  }
+
+  .dropdown-toggle:after {
+    border: none;
+  }
+}
+
+pagination-controls /deep/ .ngx-pagination .current{
+  padding: 0.1875rem 0.625rem;
+  background: #9B9B9B !important;;
+  color: #fefefe;
+  cursor: default;
 }

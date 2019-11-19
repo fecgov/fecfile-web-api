@@ -35,6 +35,75 @@ import numpy
 
 # Create your views here.
 
+"""
+CREATE OR replace VIEW PUBLIC.dynamic_forms_view AS 
+                       WITH dy_forms_by_section  AS 
+                       ( 
+                                SELECT   dynamic_form_fields.form_type, 
+                                         dynamic_form_fields.transaction_type, 
+                                         dynamic_form_fields.field_section, 
+                                         dynamic_form_fields.field_section_order, 
+                                         dynamic_form_fields.class_name, 
+                                         dynamic_form_fields.seperator, 
+                                         dynamic_form_fields.child_form, 
+                                         dynamic_form_fields.form_sub_title, 
+                                         CASE 
+                                                  WHEN dynamic_form_fields.child_form = false THEN json_agg(json_build_object('preText',
+                                                           CASE 
+                                                                    WHEN dynamic_form_fields.field_db_name::text ~~ '%purpose%'::text THEN dynamic_form_fields.field_value
+                                                                    ELSE NULL::character VARYING
+                                                           END, 'setEntityIdTo', dynamic_form_fields.entity_id_mapping, 'isReadonly', dynamic_form_fields.field_is_readonly, 'entityGroup', dynamic_form_fields.entity_group, 'toggle', dynamic_form_fields.toggle, 'inputGroup', dynamic_form_fields.field_input_group, 'inputIcon', dynamic_form_fields.field_input_icon, 'text', dynamic_form_fields.field_label, 'infoIcon', dynamic_form_fields.field_infoicon, 'infoText', dynamic_form_fields.field_info, 'name', dynamic_form_fields.field_db_name, 'type', dynamic_form_fields.field_type, 'value',
+                                                           CASE 
+                                                                    WHEN dynamic_form_fields.field_db_name::text ~~ '%purpose%'::text
+                                                                    AND      dynamic_form_fields.field_input_group = true THEN NULL::character VARYING
+                                                                    ELSE dynamic_form_fields.field_value
+                                                           END, 'scroll', dynamic_form_fields.scroll, 'height', dynamic_form_fields.height, 'width', dynamic_form_fields.width, 'validation', json_build_object('required', dynamic_form_fields.field_is_required, 'max', dynamic_form_fields.field_size, dynamic_form_fields.field_validation, true)) ORDER BY dynamic_form_fields.field_order)
+                                                  ELSE NULL::json 
+                                         END AS json_by_section 
+                                FROM     dynamic_form_fields 
+                                WHERE    dynamic_form_fields.field_type::text <> 'hidden'::text 
+                                GROUP BY dynamic_form_fields.form_type, 
+                                         dynamic_form_fields.transaction_type, 
+                                         dynamic_form_fields.field_section, 
+                                         dynamic_form_fields.field_section_order, 
+                                         dynamic_form_fields.class_name, 
+                                         dynamic_form_fields.seperator, 
+                                         dynamic_form_fields.child_form, 
+                                         dynamic_form_fields.form_sub_title 
+                                ORDER BY dynamic_form_fields.field_section_order 
+                       )SELECT   dfbs.form_type, 
+                       dfbs.transaction_type, 
+                       json_build_object('data', json_build_object('formFields', json_agg(Json_build_object('childForm', dfbs.child_form, 'childFormTitle', dfbs.form_sub_title, 'colClassName', dfbs.class_name, 'seperator', dfbs.seperator, 'cols', dfbs.json_by_section) order BY dfbs.field_section_order), 'hiddenFields',
+                       ( 
+                              SELECT json_agg(json_build_object('type', h.field_type, 'name', replace(h.field_db_name::text, ' '::text, ''::text), 'value', h.field_value)) AS json_agg
+                              FROM   dynamic_form_fields h 
+                              WHERE  h.field_type::text = 'hidden'::text 
+                              AND    h.form_type::text = dfbs.form_type::text 
+                              AND    h.transaction_type::text = dfbs.transaction_type::text), 'states',
+                       ( 
+                                SELECT   json_agg(json_build_object('name', ref_states.state_description, 'code', ref_states.state_code) ORDER BY ref_states.st_number) AS json_agg
+                                FROM     ref_states), 'titles', 
+                       ( 
+                              SELECT json_agg(json_build_object('fieldset', dft.fieldset, 'colClassName', dft.class_name, 'label', dft.tran_type_forms_title)) AS json_agg
+                              FROM   df_tran_type_identifier dft 
+                              WHERE  dft.form_type::text = dfbs.form_type::text 
+                              AND    dft.tran_type_identifier::text = dfbs.transaction_type::text), 'entityTypes',
+                       ( 
+                              SELECT json_agg(json_build_object('entityType', dfe.entity_type, 'entityTypeDescription', dfe.entity_type_description, 'group', dfe.entity_group, 'selected', dfe.selected)) AS json_agg
+                              FROM   df_entity_types_view dfe 
+                              WHERE  dfe.form_type::text = dfbs.form_type::text 
+                              AND    dfe.transaction_type::text = dfbs.transaction_type::text), 'electionTypes',
+                       ( 
+                              SELECT json_agg(json_build_object('electionType', ref_election_type.election_type, 'electionTypeDescription', ref_election_type.election_type_desc)) AS json_agg
+                              FROM   ref_election_type), 'activityEventTypes', 
+                       ( 
+                              SELECT json_agg(json_build_object('activityEventType', ref_event_types.event_type, 'activityEventTypeDescription', ref_event_types.event_type_desc)) AS                                                                                     json_agg
+                              FROM   ref_event_types), 'subTransactions', get_sub_transaction_json(dfbs.form_type, dfbs.transaction_type::text::character VARYING), 'jfMemoTypes', get_jf_memo_types(dfbs.form_type, dfbs.transaction_type::text::character VARYING))) AS form_fields
+              FROM     dy_forms_by_section dfbs 
+              GROUP BY dfbs.form_type, 
+                       dfbs.transaction_type;
+"""
+
 logger = logging.getLogger(__name__)
 # aws s3 bucket connection
 conn = boto.connect_s3()
@@ -169,20 +238,77 @@ GET DYNAMIC FORM FIELDS API- CORE APP - SPRINT 7 - FNE 526 - BY PRAVEEN JINKA
 def get_dynamic_forms_fields(request):
 
     try:
+        cmte_id = request.user.username
+        form_type = request.query_params.get('form_type')
+        transaction_type = request.query_params.get('transaction_type')
+        if 'reportId' in request.query_params and request.query_params.get('reportId') not in ('',"", None, " ", "None", "null"):
+            report_id = request.query_params.get('reportId')
+        else:
+            report_id = 0
+        forms_obj = {}
         with connection.cursor() as cursor:
-
-            cmte_id = request.user.username
-            form_type = request.query_params.get('form_type')
-            transaction_type = request.query_params.get('transaction_type')
-            forms_obj = {}            
             cursor.execute("select form_fields from dynamic_forms_view where form_type = %s and transaction_type = %s", [form_type, transaction_type])
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
-                
-        if not bool(forms_obj):
-            return Response("No entries were found for the form_type: {} and transaction type: {} for this committee".format(form_type, transaction_type), status=status.HTTP_400_BAD_REQUEST)                              
-        
+        # print(forms_obj)
+        if bool(forms_obj):
+            if transaction_type in ['ALLOC_EXP','ALLOC_EXP_VOID','ALLOC_EXP_CC_PAY','ALLOC_EXP_STAF_REIM','ALLOC_EXP_PMT_TO_PROL', 'ALLOC_EXP_DEBT']:
+                with connection.cursor() as cursor:
+                    cursor.execute("SELECT cmte_type_category FROM public.committee_master WHERE cmte_id = %s", [cmte_id])
+                    cmte_type_categories = cursor.fetchone()
+                if cmte_type_categories:
+                    cmte_type_category = cmte_type_categories[0]
+                    if cmte_type_category:
+                        for events in forms_obj['data']['committeeTypeEvents']:
+                            for eventTypes in events['eventTypes']:
+                                if eventTypes['eventType'] in ['PC', 'AD', 'GV']:
+                                    query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                    if eventTypes['eventType'] == 'PC':
+                                        query_string += " AND public_communications = true"
+                                    elif eventTypes['eventType'] == 'AD':
+                                        query_string += " AND administrative = true"
+                                    elif eventTypes['eventType'] == 'GV':
+                                        query_string += " AND generic_voter_drive = true"
+                                    with connection.cursor() as cursor:
+                                        cursor.execute(query_string, [cmte_id,report_id])
+                                        count = cursor.fetchone()
+                                        print(cursor.query)
+                                    print(eventTypes['eventType'] + "count: "+str(count[0]))
+                                    if count[0] == 0:
+                                        eventTypes['hasValue'] = False
+                                    else:
+                                        eventTypes['hasValue'] = True
+                                elif eventTypes['eventType'] in ['DF', 'DC']:
+                                    query_string = """SELECT json_agg(t) FROM (SELECT '{}' AS "activityEventType", transaction_id AS "transactionId", activity_event_name AS "activityEventDescription" 
+                                            FROM public.sched_h2 WHERE cmte_id = %s AND {} AND delete_ind IS DISTINCT FROM 'Y') AS t"""
+                                    if eventTypes['eventType'] == 'DF':
+                                        query_string = query_string.format("DF","fundraising = true")
+                                    elif eventTypes['eventType'] == 'DC':
+                                        query_string = query_string.format("DC","direct_cand_support = true")
+                                    with connection.cursor() as cursor:
+                                        cursor.execute(query_string, [cmte_id])
+                                        print(cursor.query)
+                                        activityEventTypes = cursor.fetchone()
+                                    # print(eventTypes['eventType'] + 'activityEventTypes: '+ str(activityEventTypes[0]))
+                                    if activityEventTypes and activityEventTypes[0]:
+                                        eventTypes['activityEventTypes'] = activityEventTypes[0]
+                                        eventTypes['hasValue'] = True
+                                    else:
+                                        eventTypes['hasValue'] = False
+                                elif eventTypes['eventType'] in ['VR', 'VI', 'GO', 'GC', 'EA']:
+                                    query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                    with connection.cursor() as cursor:
+                                        cursor.execute(query_string, [cmte_id,report_id])
+                                        count = cursor.fetchone()
+                                        print(cursor.query)
+                                    print(eventTypes['eventType'] + "count: "+str(count[0]))
+                                    if count[0] == 0:
+                                        eventTypes['hasValue'] = False
+                                    else:
+                                        eventTypes['hasValue'] = True
+        else:
+            return Response("No entries were found for the form_type: {} and transaction type: {} for this committee".format(form_type, transaction_type), status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("The get_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -2219,18 +2345,16 @@ def load_child_transactions(cmte_id, report_id, ctgry_type):
                         AND delete_ind is distinct from 'Y') t;
                     """
     else:
-        child_query_string = query_string + """ WHERE report_id = %s AND cmte_id = %s AND NOT(back_ref_transaction_id iIS NULL OR back_ref_transaction_id = '')
+        report_list = superceded_report_id_list(report_id)
+        child_query_string = query_string + """ WHERE report_id in ('{}') AND cmte_id = %s AND NOT(back_ref_transaction_id iIS NULL OR back_ref_transaction_id = '')
             AND delete_ind is distinct from 'Y') t;
-            """
+            """.format("', '".join(report_list))
     child_dic = {}
 
     #child_query_view = get_query_view(ctgry_type)
     try:
         with connection.cursor() as cursor:
-            if report_id is None:
-                cursor.execute(child_query_string, [cmte_id])
-            else:
-                cursor.execute(child_query_string, (report_id, cmte_id))
+            cursor.execute(child_query_string, [cmte_id])
             child_list = cursor.fetchone()
             if child_list and ctgry_type!= 'loans_tran':
                 if child_list[0]:
@@ -4184,7 +4308,7 @@ def contact_sql_dict(data):
           'first_name'  : is_null(data.get('first_name')), 
           'last_name'  : is_null(data.get('last_name')), 
           'middle_name' : is_null(data.get('middle_name')), 
-          'preffix'  : is_null(data.get('preffix')), 
+          'preffix'  : is_null(data.get('prefix')), 
           'suffix' : is_null(data.get('suffix')), 
           'street_1'  : is_null(data.get('street_1')), 
           'street_2'  : is_null(data.get('street_2')), 
@@ -4422,20 +4546,20 @@ def get_list_contact(cmte_id, entity_id = None, name_select_flag = False, entity
             #This Flag seperates whether I need only entity name or first_name, last_name
             if not name_select_flag:
                 if isinstance(entity_id, list):
-                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND entity_id in ('{}') AND delete_ind is distinct from 'Y'""".format("', '".join(entity_id))
 
                     cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
                                 """) t""", [cmte_id])
                 # GET single row from entity table
                 elif entity_id:
-                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'"""
 
                     cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
                                 """) t""", [cmte_id, entity_id])
                 else:
-                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_type, entity_name, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
 
                     cursor.execute("""SELECT json_agg(t) FROM (""" +
@@ -4445,7 +4569,7 @@ def get_list_contact(cmte_id, entity_id = None, name_select_flag = False, entity
                     query_string = """SELECT cmte_id, entity_id, entity_type, entity_name, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 else:
-                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name, preffix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
+                    query_string = """SELECT cmte_id, entity_id, entity_type, first_name, last_name, middle_name,  preffix as prefix, suffix, street_1, street_2, city, state, zip_code, occupation, employer, cand_office, cand_office_state, cand_office_district, ref_cand_cmte_id
                                     FROM public.entity WHERE cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY entity_id DESC"""
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
                                query_string + """) t""", [cmte_id])

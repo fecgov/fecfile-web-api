@@ -288,13 +288,31 @@ def get_child_identifer(identifier, form_type):
 @api_view(["POST"])
 def create_json_builders(request):
     try:
+        print("request",request)
         MANDATORY_INPUTS = ['report_id', 'call_from']
         error_string = ""
         output = {}
         transaction_flag = False
 
         transaction_id_list = []
+
+        committeeId = request.data.get('committeeId')
+        password = request.data.get('password')
+        formType = request.data.get('formType')
+        newAmendIndicator =  request.data.get('newAmendIndicator')
+        report_id =  request.data.get('report_id')
+        reportSequence =  request.data.get('reportSequence')
+        emailAddress1 =  request.data.get('emailAddress1')
+        reportType =  request.data.get('reportType')
+        coverageStartDate =  request.data.get('coverageStartDate')
+        coverageEndDate =  request.data.get('coverageEndDate')
+        originalFECId =  request.data.get('originalFECId')
+        backDoorCode =  request.data.get('backDoorCode')
+        emailAddress2 =  request.data.get('emailAddress2')
+        wait =  request.data.get('wait')
+
         # Handling Mandatory Inputs required
+        
         for field in MANDATORY_INPUTS:
             if field not in request.data or request.data.get(field) in [None, 'null', '', ""]:
                 error_string += ','.join(field)
@@ -302,7 +320,7 @@ def create_json_builders(request):
             raise Exception(
                 'The following inputs are mandatory for this API: ' + error_string)
         # Assiging data passed through request
-        report_id = request.data.get('report_id')
+        #report_id = request.data.get('report_id')
         call_from = request.data.get('call_from')
         cmte_id = request.user.username
         # Checking for transaction ids in the request
@@ -398,25 +416,35 @@ def create_json_builders(request):
 
         elif call_from == "Submit":
             # data_obj = request
-            data_obj = {'committeeId': request.data.get('committeeId'),
-                        'password': request.data.get('password'),
-                        'formType': request.data.get('formType'),
-                        'newAmendIndicator': request.data.get('newAmendIndicator'),
-                        'report_id': request.data.get('report_id'),
-                        'reportSequence': request.data.get('reportSequence'),
-                        'emailAddress1': request.data.get('emailAddress1'),
-                        'reportType': request.data.get('reportType'),
-                        'coverageStartDate': request.data.get('coverageStartDate'),
-                        'coverageEndDate': request.data.get('coverageEndDate'),
-                        'originalFECId': request.data.get('originalFECId'),
-                        'backDoorCode': request.data.get('backDoorCode'),
-                        'emailAddress2': request.data.get('emailAddress2'),
-                        'wait': request.data.get('wait')
+            data_obj = {'committeeId': committeeId,
+                        'password': password,
+                        'formType': formType,
+                        'newAmendIndicator': newAmendIndicator,
+                        'report_id': report_id,
+                        'reportSequence': reportSequence,
+                        'emailAddress1': emailAddress1,
+                        'reportType': reportType,
+                        'coverageStartDate': coverageStartDate,
+                        'coverageEndDate': coverageEndDate,
+                        'originalFECId': originalFECId,
+                        'backDoorCode': backDoorCode,
+                        'emailAddress2': emailAddress2,
+                        'wait': wait
                         }
             file_obj = {'fecDataFile': ('data.json', open(
                 tmp_path, 'rb'), 'application/json')}
             print("data_obj = ", data_obj)
             print("file_obj = ", file_obj)
+
+            add_log(report_id,
+                cmte_id, 
+                4,
+                " create_json_builders calling data Validatior with data_obj", 
+                json.dumps(data_obj.json()), 
+                '',
+                '', 
+                '' 
+                ) 
 
             resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL +
                                  "/v1/upload_filing", data=data_obj, files=file_obj)
@@ -428,3 +456,34 @@ def create_json_builders(request):
             return JsonResponse(dictprint, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response("The create_json_builders is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+'''
+message_type,
+ 1-FATAL, 2-ERROR, 3-WARN, 4-INFO, 5-DEBUG, 6-TRACE
+'''
+def add_log(reportid, 
+            cmte_id, 
+            message_type, 
+            message_text, 
+            response_json, 
+            error_code, 
+            error_json, 
+            app_error,
+            host_name=os.uname()[1],
+            process_name="create_json_builders"):
+
+     with connection.cursor() as cursor:
+        cursor.execute("""INSERT INTO public.upload_logs(
+                                        report_id, 
+                                        cmte_id, 
+                                        process_name, 
+                                        message_type, 
+                                        message_text, 
+                                        response_json, 
+                                        error_code, 
+                                        error_json, 
+                                        app_error, 
+                                        host_name)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                                        [reportid, cmte_id, process_name, message_type, message_text, response_json, error_code, error_json, app_error, host_name])
+

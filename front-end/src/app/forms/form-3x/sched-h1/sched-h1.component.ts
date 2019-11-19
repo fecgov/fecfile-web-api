@@ -1,5 +1,5 @@
 import { NgForm } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { environment } from '../../../../environments/environment';
@@ -15,6 +15,8 @@ import { ActivatedRoute } from '@angular/router';
 
 
 export class SchedH1Component implements OnInit {
+  @Output() status: EventEmitter<any> = new EventEmitter<any>();
+
   public formType = '';
 
   constructor(
@@ -25,15 +27,25 @@ export class SchedH1Component implements OnInit {
 
   ngOnInit() {
     // localStorage.setItem('cmte_type_category', 'PAC')
-    console.log(localStorage.getItem('cmte_type_category'));
+    //console.log(localStorage.getItem('cmte_type_category'));
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
 
   }
 
   isPac() {
-    console.log(localStorage.getItem('cmte_type_category'));
+    //console.log(localStorage.getItem('cmte_type_category'));
     // return true;
-    return localStorage.getItem('cmte_type_category') === 'PAC';
+
+    let ispac = false;
+    if (localStorage.getItem('committee_details') !== null) {
+      let cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+      if(cmteDetails.cmte_type_category === 'PAC') {
+        ispac = true;
+      }
+    }  
+    //return localStorage.getItem('cmte_type_category') === 'PAC';
+  
+    return ispac;
   }
 
   saveH1(f: NgForm) {
@@ -69,10 +81,10 @@ export class SchedH1Component implements OnInit {
     // formData.append('federal_percent', '0.45');
     // formData.append('non_federal_percent', '0.55');
     // h1_obj['report_id'] = '121';
-    console.log(f.value)
+    
     if (this.isPac()) {
-      h1_obj['federal_percent'] = f.value.federal_share;
-      h1_obj['non_federal_percent'] = f.value.nonfederal_share;
+      h1_obj['federal_percent'] = f.value.federal_share / 100;
+      h1_obj['non_federal_percent'] = f.value.nonfederal_share / 100;
       if (f.value.applied_activity1) {
         h1_obj['administrative'] = true;
       }
@@ -101,17 +113,40 @@ export class SchedH1Component implements OnInit {
         h1_obj['non_pres_and_non_senate'] = true;
       }
     }
-    console.log(h1_obj)
+   
     this._http.post(url, JSON.stringify(h1_obj), {
       headers: httpOptions
     }).subscribe(
       res => {
         console.log(res);
         f.value.message = 'h1 saved.'
+        f.reset();
+        this.previousStep();
       });
   }
 
+  public handleFedShareFieldKeyup(e, f: NgForm) {
+    if(e.target.value <= 100) {
+      f.controls.nonfederal_share.setValue(100 - e.target.value);
+    }else {
+      f.controls.nonfederal_share.setValue(0);
+    }
+  }
 
+  public handleNonFedShareFieldKeyup(e, f: NgForm) {
+    if(e.target.value <= 100) {
+      f.controls.federal_share.setValue(100 - e.target.value);
+    }else {
+      f.controls.federal_share.setValue(0);
+    }
+  }
 
+  public previousStep(): void {
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_2'
+    });
+  }
 
 }

@@ -26,6 +26,7 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
     save_cand_entity,
+    superceded_report_id_list,
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -33,6 +34,7 @@ from fecfiler.core.transaction_util import (
     transaction_exists,
     update_parent_purpose,
     update_sched_d_parent,
+    update_sched_c_parent,
 )
 
 logger = logging.getLogger(__name__)
@@ -102,6 +104,7 @@ SCHED_L_B_TRAN_TYPES = [
 ]
 
 SCHED_D_CHILD_LIST = ['OTH_DISB_DEBT', 'OPEXP_DEBT']
+SCHED_C_CHILD_LIST = ['LOAN_REPAY_MADE']
 
 # adding election_year field needed by front end
 REQT_ELECTION_YR = ""
@@ -720,6 +723,12 @@ def post_schedB(datum):
                     datum.get('back_ref_transaction_id'),
                     datum.get('expenditure_amount')
                     )
+            if datum.get('transaction_type_identifier') in SCHED_C_CHILD_LIST:
+                update_sched_c_parent(
+                    datum.get('cmte_id'),
+                    datum.get('back_ref_transaction_id'),
+                    datum.get('expenditure_amount')
+                )
         except Exception as e:
             if "entity_id" in datum:
                 entity_data = put_entities(prev_entity_list[0])
@@ -840,7 +849,7 @@ def put_schedB(datum):
         if 'beneficiary_cmte_id' in datum and datum.get('beneficiary_cmte_id') not in ['', ' ', None, 'none', 'null', 'None']:
           datum['beneficiary_cmte_name'] = datum.get('entity_name')
         try:
-            if datum.get('transaction_type_identifier') in SCHED_D_CHILD_LIST:
+            if datum.get('transaction_type_identifier') in (SCHED_D_CHILD_LIST + SCHED_C_CHILD_LIST):
                 existing_exp = get_existing_expenditure(
                     datum.get('cmte_id'),
                     datum.get('transaction_id')
@@ -896,7 +905,18 @@ def put_schedB(datum):
                         datum.get('back_ref_transaction_id'),
                         datum.get('expenditure_amount'),
                         existing_exp
+                    )            
+                
+            if datum.get('transaction_type_identifier') in SCHED_C_CHILD_LIST:
+                logger.debug('existing exp:{}'.format(existing_exp))
+                if float(existing_exp) != float(datum.get('expenditure_amount')):
+                    update_sched_c_parent(
+                        datum.get('cmte_id'),
+                        datum.get('back_ref_transaction_id'),
+                        datum.get('expenditure_amount'),
+                        existing_exp
                     )
+            
             if datum.get('transaction_type_identifier') in CHILD_SCHEDB_AUTO_UPDATE_PARENT_SCHEDA_DICT.keys():
                 transaction_data = get_list_schedA_from_schedB(datum.get("report_id"), datum.get("cmte_id"), datum.get("back_ref_transaction_id"))[0]
                 transaction_data['entity_id'] = entity_id 

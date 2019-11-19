@@ -45,7 +45,7 @@ export class SchedH3Service {
       );
   }
 
-  public getTotalAmount(activity_event_type: string): Observable<any> {
+  public getTotalAmount(activity_event_type: string, reportId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     const url = '/sh3/get_h3_total_amount';
@@ -55,6 +55,7 @@ export class SchedH3Service {
 
     let params = new HttpParams();
     params = params.append('activity_event_type', activity_event_type);
+    params = params.append('report_id', reportId);
     
     return this._http
       .get(
@@ -78,7 +79,7 @@ export class SchedH3Service {
   public getSummary(reportId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    const url = '/sh3/schedH3';
+    const url = '/sh3/get_h3_summary';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);

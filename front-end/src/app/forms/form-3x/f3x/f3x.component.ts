@@ -20,6 +20,7 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
 import { TransactionModel } from '../../transactions/model/transaction.model';
+import { AbstractScheduleParentEnum } from '../individual-receipt/abstract-schedule-parent.enum';
 
 @Component({
   selector: 'app-f3x',
@@ -52,11 +53,16 @@ export class F3xComponent implements OnInit {
   public transactionType = '';
   public transactionTypeTextSchedF = '';
   public transactionTypeSchedF = '';
+  public transactionDetailSchedC: any;
   public scheduleType = '';
   public isShowFilters = false;
   public formType: string = '';
   public scheduleAction: ScheduleActions;
+  public scheduleCAction: ScheduleActions;
+  public scheduleFAction: ScheduleActions;
   public forceChangeDetectionC1: Date;
+  public forceChangeDetectionFDebtPayment: Date;
+
   public allTransactions: boolean = false;
 
   private _step: string = '';
@@ -262,7 +268,7 @@ export class F3xComponent implements OnInit {
    * @param      {Object}  e       The event object.
    */
 
-  public onNotify(e): void {
+  public onNotify(e: any): void {
     if (typeof e === 'object') {
       /**
        * This block indicates a user can move to the next
@@ -295,22 +301,23 @@ export class F3xComponent implements OnInit {
             if (this.transactionType && this.transactionType === e.transactionType) {
               this._f3xMessageService.sendLoadFormFieldsMessage('');
             }
-            if (e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.cloned) {
+            if (
+              e.transactionDetail &&
+              e.transactionDetail.transactionModel &&
+              e.transactionDetail.transactionModel.cloned
+            ) {
               this._cloned = true;
             }
-            // this.transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
-            // this.transactionType = e.transactionType ? e.transactionType : '';
+
             this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
 
-            // to force change detetion on a child component, set a date field used as input().
-            if (e.forceChange) {
-              switch (this.scheduleType) {
-                case 'sched_c1':
-                  this.forceChangeDetectionC1 = new Date();
-                  break;
-                default:
-              }
-            }            
+            // Do this before setting scheduleAction to prevent change detection
+            // in individual-receipt.component when sched F.
+            // TODO add if else around schedules with component specific action
+            // such as sched F and sched C.
+            if (this._handleScheduleFDebtPayment(e)) {
+              return;
+            }
 
             if (e.action) {
               if (e.action in ScheduleActions) {
@@ -321,6 +328,11 @@ export class F3xComponent implements OnInit {
             if (!this.scheduleAction) {
               this.scheduleAction = ScheduleActions.add;
             }
+
+            if (this._handleScheduleC(e.transactionDetail)) {
+              return;
+            }
+
             // Coming from transactions, the event may contain the transaction data
             // with an action to allow for view or edit.
 
@@ -328,17 +340,54 @@ export class F3xComponent implements OnInit {
             let transactionType = '';
 
             if (this.scheduleAction === ScheduleActions.edit) {
-              // message the child component rather than sending data as input because
-              // ngOnChanges fires when the form fields are changed, thereby reseting the
-              // fields to the previous value.  Result is fields can't be changed.
-              e.transactionDetail.action = this.scheduleAction;
-              this._f3xMessageService.sendPopulateFormMessage({
-                key: 'fullForm',
-                transactionModel: e.transactionDetail
-              });
-              const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
-              transactionTypeText = transactionModel.type;
-              transactionType = transactionModel.transactionTypeIdentifier;
+              // Sched C uses change detection for populating form for edit.
+              // Have API add scheduleType to transactions table - using apiCall until then
+
+              let apiCall = null;
+              if (e.transactionDetail) {
+                if (e.transactionDetail.transactionModel) {
+                  if (e.transactionDetail.transactionModel.hasOwnProperty('apiCall')) {
+                    apiCall = e.transactionDetail.transactionModel.apiCall;
+                  }
+                }
+              }
+              if (apiCall === '/sc/schedC') {
+                // use a schedC specific field to reduce unwanted change detection in Sched C.
+                // this.step = 'loan';
+                this.scheduleType = 'sched_c';
+                this.scheduleCAction = ScheduleActions.edit;
+                this.transactionDetailSchedC = e.transactionDetail.transactionModel;
+
+                // this._router.navigate([`/forms/form/${this.formType}`], {
+                //   queryParams: {
+                //     step: 'loan',
+                //     reportId: this._reportId,
+                //     edit: this.editMode,
+                //     transactionCategory: '',
+                //     transactionTypeIdentifier: ''
+                //   }
+                // });
+              } else if (apiCall === '/sc/schedC1') {
+                alert('edit C1 not yet supported');
+              } else if (apiCall === '/sf/schedF') {
+                alert('edit schedule F not yet supported');
+              } else {
+                // message the child component rather than sending data as input because
+                // ngOnChanges fires when the form fields are changed, thereby reseting the
+                // fields to the previous value.  Result is fields can't be changed.
+                e.transactionDetail.action = this.scheduleAction;
+                this._f3xMessageService.sendPopulateFormMessage({
+                  key: 'fullForm',
+                  abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+                  transactionModel: e.transactionDetail
+                });
+                const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+                transactionTypeText = transactionModel.type;
+                transactionType = transactionModel.transactionTypeIdentifier;
+              }
+              // } else if (this.scheduleAction === ScheduleActions.loanSummary) {
+              //   this.scheduleType = 'sched_c_ls';
+              //   this.scheduleCAction = ScheduleActions.loanSummary;
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
@@ -385,8 +434,67 @@ export class F3xComponent implements OnInit {
             this._step = e.step;
           }
         }
+      } else if(e.hasOwnProperty('otherSchedHTransactionType')){        
+        this.transactionType = e.otherSchedHTransactionType;
       }
     }
+  }
+
+  /**
+   * Handle Schedule C forms.
+   * @returns true if schedule C and should stop processing
+   */
+  private _handleScheduleC(transactionDetail: any): boolean {
+    let finish = false;
+    if (
+      this.scheduleType === 'sched_c' ||
+      this.scheduleType === 'sched_c_ls' ||
+      this.scheduleType === 'sched_c_loan_payment' ||
+      this.scheduleType === 'sched_c1'
+    ) {
+      if (this.scheduleType === 'sched_c') {
+        if (this.scheduleAction === ScheduleActions.add) {
+          // this.forceChangeDetectionC = new Date();
+          this.scheduleCAction = ScheduleActions.add;
+        } else if ((this.scheduleAction = ScheduleActions.edit)) {
+          // TODO once API provides scheduleType in transaction table object
+          // move logic where dectecting schedC using apiCall here.
+          // Could hard code a conversion from apiCall value to sched_c in the
+          // transaction table component until then.
+          this.scheduleCAction = ScheduleActions.edit;
+        }
+      } else if (this.scheduleType === 'sched_c_ls') {
+        this.scheduleType = 'sched_c_ls';
+        this.scheduleCAction = ScheduleActions.loanSummary;
+      } else if (this.scheduleType === 'sched_c_loan_payment') {
+      } else if (this.scheduleType === 'sched_c1') {
+        this.forceChangeDetectionC1 = new Date();
+      }
+      this.canContinue();
+      finish = true;
+      //setting the transaction detail for @input in 'add' scenario for loan payment
+      if (transactionDetail) {
+        this.transactionDetailSchedC = transactionDetail.transactionModel;
+      }
+    }
+    return finish;
+  }
+
+  /**
+   * Handle Schedule F Debt Payment form.
+   * @returns true if schedule F and should stop processing
+   */
+  private _handleScheduleFDebtPayment(e: any): boolean {
+    let finish = false;
+    if (this.scheduleType === 'sched_f') {
+      this.scheduleFAction = e.action;
+      this.transactionTypeSchedF = e.transactionType ? e.transactionType : '';
+      this.transactionTypeTextSchedF = e.transactionTypeText ? e.transactionTypeText : '';
+      this.forceChangeDetectionFDebtPayment = new Date();
+      this.canContinue();
+      finish = true;
+    }
+    return finish;
   }
 
   /**
@@ -409,8 +517,9 @@ export class F3xComponent implements OnInit {
       return;
     }
     if (scheduleType.startsWith('sched_f')) {
-      this.transactionTypeSchedF = transactionType;
-      this.transactionTypeTextSchedF = transactionTypeText;
+      // this.transactionTypeSchedF = transactionType;
+      // this.transactionTypeTextSchedF = transactionTypeText;
+      // this.scheduleFAction = this.scheduleAction;
     } else if (scheduleType.startsWith('sched_c')) {
     } else {
       this.transactionType = transactionType;
@@ -430,7 +539,12 @@ export class F3xComponent implements OnInit {
 
           if (this._cloned) {
             this._router.navigate([`/forms/form/${this.formType}`], {
-              queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory, cloned: this._cloned }
+              queryParams: {
+                step: this.step,
+                edit: this.editMode,
+                transactionCategory: this.transactionCategory,
+                cloned: this._cloned
+              }
             });
           } else {
             this._router.navigate([`/forms/form/${this.formType}`], {
