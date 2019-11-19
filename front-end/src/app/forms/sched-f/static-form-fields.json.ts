@@ -25,7 +25,7 @@ export const schedFstaticFormFields = [
         text: 'Organization Name',
         infoIcon: false,
         infoText: 'Request language from RAD',
-        name: 'designated_com_id',
+        name: 'designating_cmte_id',
         type: 'text',
         value: null,
         scroll: false,
@@ -49,7 +49,7 @@ export const schedFstaticFormFields = [
         text: 'Organization Name',
         infoIcon: false,
         infoText: 'Request language from RAD',
-        name: 'designated_com_name',
+        name: 'designating_cmte_name',
         type: 'text',
         value: null,
         scroll: false,
@@ -63,7 +63,7 @@ export const schedFstaticFormFields = [
       },
       {
         staticField: true,
-        name: 'subordinate_com_id',
+        name: 'subordinate_cmte_id',
         value: null,
         validation: {
           required: true,
@@ -73,7 +73,7 @@ export const schedFstaticFormFields = [
       },
       {
         staticField: true,
-        name: 'subordinate_com_name',
+        name: 'subordinate_cmte_name',
         value: null,
         validation: {
           required: true,

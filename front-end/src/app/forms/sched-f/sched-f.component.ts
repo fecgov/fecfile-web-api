@@ -142,16 +142,16 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     if (!this._checkFormFieldIsValid('coord_expenditure_yn')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('designated_com_id')) {
+    if (!this._checkFormFieldIsValid('designating_cmte_id')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('designated_com_name')) {
+    if (!this._checkFormFieldIsValid('designating_cmte_name')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('subordinate_com_id')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_id')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('subordinate_com_name')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_name')) {
       return;
     }
     if (!this._checkFormFieldIsValid('street_1_co_exp')) {
@@ -169,8 +169,8 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     if (!this._checkFormFieldIsValid('zip_co_exp')) {
       return;
     }
-    this.frmIndividualReceipt.markAsUntouched();
-    this.frmIndividualReceipt.markAsPristine();
+    // this.frmIndividualReceipt.markAsUntouched();
+    // this.frmIndividualReceipt.markAsPristine();
     this.showPart2 = true;
   }
 
@@ -244,7 +244,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     }
   }
 
-
   public handleSelectedSubordinateOrg($event: NgbTypeaheadSelectItemEvent, name: string) {
     const entity = $event.item;
 
@@ -253,12 +252,17 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     // this._selectedChangeWarn = {};
 
     const fieldNames = [];
-    if (name === 'designated_com_id' || name === 'designated_com_name') {
-      fieldNames.push({ formName: 'designated_com_id', entityFieldName: 'cmte_id' });
-      fieldNames.push({ formName: 'designated_com_name', entityFieldName: 'cmte_name' });
-    } else if (name === 'subordinate_com_id' || name === 'subordinate_com_name') {
-      fieldNames.push({ formName: 'subordinate_com_id', entityFieldName: 'cmte_id' });
-      fieldNames.push({ formName: 'subordinate_com_name', entityFieldName: 'cmte_name' });
+    if (name === 'designating_cmte_id' || name === 'designating_cmte_name') {
+      if (name === 'designating_cmte_id') {
+        fieldNames.push({ formName: 'designating_cmte_name', entityFieldName: 'cmte_name' });
+      } else {
+        fieldNames.push({ formName: 'designating_cmte_id', entityFieldName: 'cmte_id' });
+      }
+      // fieldNames.push({ formName: 'designating_cmte_id', entityFieldName: 'cmte_id' });
+      // fieldNames.push({ formName: 'designating_cmte_name', entityFieldName: 'cmte_name' });
+    } else if (name === 'subordinate_cmte_id' || name === 'subordinate_cmte_name') {
+      fieldNames.push({ formName: 'subordinate_cmte_id', entityFieldName: 'cmte_id' });
+      fieldNames.push({ formName: 'subordinate_cmte_name', entityFieldName: 'cmte_name' });
       fieldNames.push({ formName: 'street_1_co_exp', entityFieldName: 'street_1' });
       fieldNames.push({ formName: 'street_2_co_exp', entityFieldName: 'street_2' });
       fieldNames.push({ formName: 'state_co_exp', entityFieldName: 'state' });
@@ -289,4 +293,20 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     //   }
     // }
   }
+
+  formatterSubordinateCommitteeName = (x: { cmte_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.cmte_name;
+    } else {
+      return x;
+    }
+  };
+
+  formatterDesignatingCommitteeName = (x: { cmte_name: string }) => {
+    if (typeof x !== 'string') {
+      return x.cmte_name;
+    } else {
+      return x;
+    }
+  };
 }

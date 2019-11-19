@@ -95,25 +95,25 @@
           <div class="row">
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="designated_com_id">
+                <label for="designating_cmte_id">
                   Designating Committee ID Number
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'designated_com_id'"
-                  [attr.name]="'designated_com_id'"
-                  id="designated_com_id"
-                  (keyup)="handleFormFieldKeyup($event, findFormField('designated_com_id'))"
+                  [formControlName]="'designating_cmte_id'"
+                  [attr.name]="'designating_cmte_id'"
+                  id="designating_cmte_id"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('designating_cmte_id'))"
                   [ngbTypeahead]="searchCommitteeId"
                   [focusFirst]=false
                   [resultTemplate]="rtCommitteeId" 
                   [inputFormatter]="formatterCommitteeId"
-                  (selectItem)="handleSelectedSubordinateOrg($event, 'designated_com_id')"
+                  (selectItem)="handleSelectedSubordinateOrg($event, 'designating_cmte_id')"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
                   [maxlength]="'9'"
                   [ngClass]="
-                    frmIndividualReceipt.get('designated_com_id')?.invalid &&
+                    frmIndividualReceipt.get('designating_cmte_id')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -123,25 +123,25 @@
             </div>
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="designated_com_name">
+                <label for="designating_cmte_name">
                   Designating Committee Name
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'designated_com_name'"
-                  [attr.name]="'designated_com_name'"
-                  id="designated_com_name"
-                  (keyup)="handleFormFieldKeyup($event, findFormField('designated_com_name'))"
+                  [formControlName]="'designating_cmte_name'"
+                  [attr.name]="'designating_cmte_name'"
+                  id="designating_cmte_name"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('designating_cmte_name'))"
                   [ngbTypeahead]="searchCommitteeName"
                   [focusFirst]=false 
                   [resultTemplate]="rtCommitteeName" 
-                  [inputFormatter]="formatterCommitteeName"
-                  (selectItem)="handleSelectedSubordinateOrg($event, 'designated_com_name')"
+                  [inputFormatter]="formatterDesignatingCommitteeName"
+                  (selectItem)="handleSelectedSubordinateOrg($event, 'designating_cmte_name')"
                   [style.width]="'100%'" 
                   [style.height]="'30px'"
                   [maxlength]="'200'"
                   [ngClass]="
-                    frmIndividualReceipt.get('designated_com_name')?.invalid &&
+                    frmIndividualReceipt.get('designating_cmte_name')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -153,25 +153,25 @@
           <div class="row">
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="subordinate_com_id">
+                <label for="subordinate_cmte_id">
                   Subordinate Committee ID Number
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'subordinate_com_id'"
-                  [attr.name]="'subordinate_com_id'"
-                  id="subordinate_com_id"
-                  (keyup)="handleFormFieldKeyup($event, findFormField('subordinate_com_id'))"
+                  [formControlName]="'subordinate_cmte_id'"
+                  [attr.name]="'subordinate_cmte_id'"
+                  id="subordinate_cmte_id"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('subordinate_cmte_id'))"
                   [ngbTypeahead]="searchCommitteeId"
                   [focusFirst]=false
                   [resultTemplate]="rtCommitteeId" 
                   [inputFormatter]="formatterCommitteeId"
-                  (selectItem)="handleSelectedSubordinateOrg($event, 'subordinate_com_id')"
+                  (selectItem)="handleSelectedSubordinateOrg($event, 'subordinate_cmte_id')"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
                   [maxlength]="'9'"
                   [ngClass]="
-                    frmIndividualReceipt.get('subordinate_com_id')?.invalid &&
+                    frmIndividualReceipt.get('subordinate_cmte_id')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -186,20 +186,20 @@
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'subordinate_com_name'"
-                  [attr.name]="'subordinate_com_name'"
+                  [formControlName]="'subordinate_cmte_name'"
+                  [attr.name]="'subordinate_cmte_name'"
                   [style.width]="'100%'" 
                   [style.height]="'30px'"
                   [maxlength]="'200'"
-                  id="subordinate_com_name"
-                  (keyup)="handleFormFieldKeyup($event, findFormField('subordinate_com_name'))"
+                  id="subordinate_cmte_name"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('subordinate_cmte_name'))"
                   [ngbTypeahead]="searchCommitteeName"
                   [focusFirst]=false 
-                  [resultTemplate]="rtCommitteeName" 
-                  [inputFormatter]="formatterCommitteeName"
-                  (selectItem)="handleSelectedSubordinateOrg($event, 'subordinate_com_name')"
+                  [resultTemplate]="rtSubordinateCommitteeName" 
+                  [inputFormatter]="formatterSubordinateCommitteeName"
+                  (selectItem)="handleSelectedSubordinateOrg($event, 'subordinate_cmte_name')"
                   [ngClass]="
-                    frmIndividualReceipt.get('subordinate_com_name')?.invalid &&
+                    frmIndividualReceipt.get('subordinate_cmte_name')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
