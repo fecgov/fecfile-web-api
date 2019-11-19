@@ -951,7 +951,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     };
     this.status.emit(loanRepaymentEmitObj);
   }
-
+  
   public goToLoanRepayment(loan:any) {
     const loanRepaymentEmitObj: any = {
       form: {},
@@ -963,7 +963,8 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       transactionDetail: {
         transactionModel: {
           transactionId: loan.transaction_id, 
-          entityId: loan.entity_id
+          entityId: loan.entity_id,
+          entryScreenScheduleType: 'sched_c_ls',
         }
       }
     };

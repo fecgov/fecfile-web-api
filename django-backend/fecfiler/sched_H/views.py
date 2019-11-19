@@ -440,6 +440,7 @@ def schedH1(request):
             datum = schedH1_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            datum['transaction_type_identifier'] = 'ALLOC_H1'
             # print('----')
             if (not report_id) or (report_id == '0'):
                 datum['election_year'] = None
@@ -587,7 +588,7 @@ def get_fed_nonfed_share(request):
             with connection.cursor() as cursor:
                 logger.debug('query with _sql:{}'.format(_sql))
                 logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
-                cursor.execute(_sql, (cmte_id, event_name, calendar_year))
+                cursor.execute(_sql, (cmte_id, event_name))
                 if not cursor.rowcount:
                     raise Exception('Error: no h1 data found.')
                 fed_percent = float(cursor.fetchone()[0])

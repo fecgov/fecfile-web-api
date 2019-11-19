@@ -103,6 +103,12 @@
                   [formControlName]="'designated_com_id'"
                   [attr.name]="'designated_com_id'"
                   id="designated_com_id"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('designated_com_id'))"
+                  [ngbTypeahead]="searchCommitteeId"
+                  [focusFirst]=false
+                  [resultTemplate]="rtCommitteeId" 
+                  [inputFormatter]="formatterCommitteeId"
+                  (selectItem)="handleSelectedSubordinateOrg($event, 'designated_com_id')"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
                   [maxlength]="'9'"
@@ -125,6 +131,12 @@
                   [formControlName]="'designated_com_name'"
                   [attr.name]="'designated_com_name'"
                   id="designated_com_name"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('designated_com_name'))"
+                  [ngbTypeahead]="searchCommitteeName"
+                  [focusFirst]=false 
+                  [resultTemplate]="rtCommitteeName" 
+                  [inputFormatter]="formatterCommitteeName"
+                  (selectItem)="handleSelectedSubordinateOrg($event, 'designated_com_name')"
                   [style.width]="'100%'" 
                   [style.height]="'30px'"
                   [maxlength]="'200'"
@@ -149,6 +161,12 @@
                   [formControlName]="'subordinate_com_id'"
                   [attr.name]="'subordinate_com_id'"
                   id="subordinate_com_id"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('subordinate_com_id'))"
+                  [ngbTypeahead]="searchCommitteeId"
+                  [focusFirst]=false
+                  [resultTemplate]="rtCommitteeId" 
+                  [inputFormatter]="formatterCommitteeId"
+                  (selectItem)="handleSelectedSubordinateOrg($event, 'subordinate_com_id')"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
                   [maxlength]="'9'"
@@ -174,6 +192,12 @@
                   [style.height]="'30px'"
                   [maxlength]="'200'"
                   id="subordinate_com_name"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('subordinate_com_name'))"
+                  [ngbTypeahead]="searchCommitteeName"
+                  [focusFirst]=false 
+                  [resultTemplate]="rtCommitteeName" 
+                  [inputFormatter]="formatterCommitteeName"
+                  (selectItem)="handleSelectedSubordinateOrg($event, 'subordinate_com_name')"
                   [ngClass]="
                     frmIndividualReceipt.get('subordinate_com_name')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)

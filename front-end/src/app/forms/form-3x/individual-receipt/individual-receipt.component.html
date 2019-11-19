@@ -77,7 +77,7 @@
                         <span class="sr-only">Click here for more information</span>
                       </div>
                       <ng-container *ngIf="!col?.validation?.required 
-                        && !col?.isReadonly">
+                        && !col?.isReadonly && col?.name !== 'activity_event_identifier'">
                         (Optional)
                       </ng-container>
                     </label>
