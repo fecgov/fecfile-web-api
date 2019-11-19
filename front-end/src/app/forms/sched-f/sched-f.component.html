@@ -108,7 +108,7 @@
                   [focusFirst]=false
                   [resultTemplate]="rtCommitteeId" 
                   [inputFormatter]="formatterCommitteeId"
-                  (selectItem)="handleSelectedSubordinateOrg($event, 'designating_cmte_id')"
+                  (selectItem)="handleSelectedSFCommittee($event, 'designating_cmte_id')"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
                   [maxlength]="'9'"
@@ -135,8 +135,8 @@
                   [ngbTypeahead]="searchCommitteeName"
                   [focusFirst]=false 
                   [resultTemplate]="rtCommitteeName" 
-                  [inputFormatter]="formatterDesignatingCommitteeName"
-                  (selectItem)="handleSelectedSubordinateOrg($event, 'designating_cmte_name')"
+                  [inputFormatter]="formatterCommitteeName"
+                  (selectItem)="handleSelectedSFCommittee($event, 'designating_cmte_name')"
                   [style.width]="'100%'" 
                   [style.height]="'30px'"
                   [maxlength]="'200'"
@@ -166,7 +166,7 @@
                   [focusFirst]=false
                   [resultTemplate]="rtCommitteeId" 
                   [inputFormatter]="formatterCommitteeId"
-                  (selectItem)="handleSelectedSubordinateOrg($event, 'subordinate_cmte_id')"
+                  (selectItem)="handleSelectedSFCommittee($event, 'subordinate_cmte_id')"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
                   [maxlength]="'9'"
@@ -195,9 +195,9 @@
                   (keyup)="handleFormFieldKeyup($event, findFormField('subordinate_cmte_name'))"
                   [ngbTypeahead]="searchCommitteeName"
                   [focusFirst]=false 
-                  [resultTemplate]="rtSubordinateCommitteeName" 
-                  [inputFormatter]="formatterSubordinateCommitteeName"
-                  (selectItem)="handleSelectedSubordinateOrg($event, 'subordinate_cmte_name')"
+                  [resultTemplate]="rtCommitteeName" 
+                  [inputFormatter]="formatterCommitteeName"
+                  (selectItem)="handleSelectedSFCommittee($event, 'subordinate_cmte_name')"
                   [ngClass]="
                     frmIndividualReceipt.get('subordinate_cmte_name')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -379,15 +379,13 @@
                             </span>
                           </div>
                         </ng-container>
-                        <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
-                        <!-- && col?.name !== 'child*entity_name'
-                          && col?.name !== 'child*donor_cmte_id'" -->
                         <input *ngIf="col?.name !== 'first_name' 
                                 && col?.name !== 'last_name'
                                 && !isFieldName(col?.name, 'cand_first_name')
                                 && !isFieldName(col?.name, 'cand_last_name')
                                 && !isFieldName(col?.name, 'entity_name')
                                 && !isFieldName(col?.name, 'donor_cmte_id')
+                                && !isFieldName(col?.name, 'payee_cmte_id')
                                 && !isFieldName(col?.name, 'donor_cmte_name')
                                 && !isFieldName(col?.name, 'beneficiary_cmte_id')
                                 && !isFieldName(col?.name, 'beneficiary_cmte_name') 
@@ -470,6 +468,7 @@
                           [resultTemplate]="rtOrg" [inputFormatter]="formatterOrgName"
                           (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
+                                  isFieldName(col?.name, 'payee_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cand_id')" class="form-control"
                           [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
@@ -536,14 +535,11 @@
                             should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
                             need to add a transaction with a date that falls outside of the coverage period for this report,
                             you will need to check the memo code box.
-                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
-                              coverage period only. -->
                           </div>
                         </ng-container>
                       </div>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'checkbox'">
-                      <!-- [attr.disabled]="isMemoCodeReadOnly(col?.name)" -->
                       <input class="form-control forms__big_checkbox" [style.width]="col?.width"
                         [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                         [attr.value]="col?.value"
@@ -562,9 +558,9 @@
                         [attr.maxlength]="col?.validation?.max" [formControlName]="col?.name"></textarea>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && 
-                        (isFieldName(col?.name, 'payee_cand_office') ||
-                         isFieldName(col?.name, 'cand_office'))">
-                      <ng-select #candOfficeTypeSelect 
+                        isFieldName(col?.name, 'cand_office')">
+                      <ng-select #candOfficeTypeSelect
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [items]="candidateOfficeTypes"
                         (change)="handleCandOfficeChange($event, col)" 
                         class="forms__select" 
@@ -683,6 +679,18 @@
           </div>
           <!-- ./row -->
           <ng-container *ngIf="row.seperator">
+            <div class="row">
+              <div class="col-md-12">
+                <hr />
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="row.childForm">
+            <div class="row">
+              <div [class]="row.colClassName">
+                {{ row.childFormTitle }}
+              </div>
+            </div>
             <div class="row">
               <div class="col-md-12">
                 <hr />

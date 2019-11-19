@@ -209,6 +209,17 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   /**
+   * Override the base class method for specific handling for schedule F.
+   */
+  public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
+    // Don't auto-populate committee fields for sched F payment
+    if (col.name === 'payee_cmte_id') {
+    } else {
+      super.handleSelectedOrg($event, col);
+    }
+  }
+
+  /**
    * @override the Base class method.
    *
    * Determine if the field should be shown.
@@ -244,7 +255,12 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     }
   }
 
-  public handleSelectedSubordinateOrg($event: NgbTypeaheadSelectItemEvent, name: string) {
+  /**
+   * Handle user selection of Schedule F Designating or Subordinate Committee.
+   * @param $event
+   * @param name
+   */
+  public handleSelectedSFCommittee($event: NgbTypeaheadSelectItemEvent, name: string) {
     const entity = $event.item;
 
     // this._selectedEntity = this._utilService.deepClone(entity);
@@ -294,19 +310,9 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     // }
   }
 
-  formatterSubordinateCommitteeName = (x: { cmte_name: string }) => {
-    if (typeof x !== 'string') {
-      return x.cmte_name;
-    } else {
-      return x;
-    }
-  };
-
-  formatterDesignatingCommitteeName = (x: { cmte_name: string }) => {
-    if (typeof x !== 'string') {
-      return x.cmte_name;
-    } else {
-      return x;
-    }
-  };
+  public cancelSFPayment() {
+    this.showPart2 = false;
+    this.clearFormValues();
+    this.returnToParent(this.editScheduleAction);
+  }
 }
