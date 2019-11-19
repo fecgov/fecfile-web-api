@@ -1571,8 +1571,15 @@ def schedC1(request):
     else:
         raise NotImplementedError
 
+
+
+
+
+
+
 """
-start of sched_C2
+start of sched_C2 ************
+C2 is about loan endorsor - adding endorsor is considered child transaction of sched_c
 """
 
 def check_mandatory_fields_SC2(data):
