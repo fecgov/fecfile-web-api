@@ -1,3 +1,4 @@
+import { LoanService } from './../service/loan.service';
 import {
   Component,
   EventEmitter,
@@ -25,11 +26,11 @@ import { floatingPoint } from '../../../shared/utils/forms/validation/floating-p
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
-import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { ContactsMessageService } from '../../../contacts/service/contacts-message.service';
 import { EndorserModel } from '../endorser/model/endorser.model';
+import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
+import { TypeaheadService } from '../../../shared/partials/typeahead/typeahead.service';
+import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 
 export enum ActiveView {
   Endorsers = 'Endorsers',
@@ -55,8 +56,9 @@ export class EndorserComponent implements OnInit, OnDestroy {
   @Input() formOptionsVisible: boolean = false;
   @Input() transactionTypeText = '';
   @Input() transactionType = '';
+  @Input() transactionDetail: any;
   //@Input() scheduleAction: EndorsersActions = null;
-  @Input() scheduleAction: EndorsersActions = EndorsersActions.add;
+  @Input() scheduleAction: ScheduleActions = ScheduleActions.add;
 
   /**
    * Subscription for pre-populating the form for view or edit.
@@ -65,7 +67,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
   private _loadFormFieldsSubscription: Subscription;
 
   public checkBoxVal: boolean = false;
-  public frmContact: FormGroup;
+  public endorserForm: FormGroup;
   public formFields: any = [];
   public formVisible: boolean = false;
   public hiddenFields: any = [];
@@ -82,7 +84,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
   public entityTypes: any = [];
   public officeSought: any = [];
   public officeState: any = [];
-  
+
   private _formType: string = '';
   private _transactionTypePrevious: string = null;
   private _contributionAggregateValue = 0.0;
@@ -93,6 +95,8 @@ export class EndorserComponent implements OnInit, OnDestroy {
   private _contactToEdit: EndorserModel;
   private _loading: boolean = false;
   private _selectedChangeWarn: any;
+  private typeChangeEventOccured = false;
+  private _employerOccupationRequired: boolean = false;
 
   constructor(
     private _http: HttpClient,
@@ -106,7 +110,8 @@ export class EndorserComponent implements OnInit, OnDestroy {
     private _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
     private _contactsMessageService: ContactsMessageService,
-    private _formsService: FormsService
+    private _formsService: FormsService,
+    private _loanservice: LoanService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -122,31 +127,15 @@ export class EndorserComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this._selectedEntity = null;
     this._contactToEdit = null;
-    /*this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
-    localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
-    localStorage.setItem('Receipts_Entry_Screen', 'Yes');*/
-    
+
     localStorage.removeItem('contactsaved');
-    
+
     this._messageService.clearMessage();
-
-    /*this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-    if (this._reportType === null || typeof this._reportType === 'undefined') {
-      this._reportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
-    }*/
 
     this.getFormFields();
 
-    this._entityType = 'IND';
-    //this.loadDynamiceFormFields();
-    //this.formFields = this.individualFormFields;
-    //console.log(" this.formFields",  this.formFields);
-
-    //this._setForm(this.formFields);
-    this.frmContact = this._fb.group({});
+    this.endorserForm = this._fb.group({});
     if (this.selectedOptions) {
       if (this.selectedOptions.length >= 1) {
         this.formVisible = true;
@@ -154,7 +143,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
     }
   }
 
-  public ngDoCheck(): void {}
+  public ngDoCheck(): void { }
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
@@ -166,30 +155,10 @@ export class EndorserComponent implements OnInit, OnDestroy {
     console.log('obj: ', obj);
   }
 
-  /**
-   * Generates the dynamic form after all the form fields are retrived.
-   *
-   * @param      {Array}  fields  The fields
-   */
-  /*private _setForm(fields: any): void {
-    const formGroup: any = [];
-    fields.forEach(el => {
-      if (el.hasOwnProperty('cols')) {
-        el.cols.forEach(e => {
-          formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name));
-        });
-      }
-    });
-
-    this.frmContact = new FormGroup(formGroup);
-
-    // get form data API is passing X for memo code value.
-    // Set it to null here until it is checked by user where it will be set to X.
-    //this.frmContact.controls['memo_code'].setValue(null);
-  }*/
 
   private _setForm(fields: any): void {
     const formGroup: any = [];
+    this._employerOccupationRequired = false;
     console.log('_setForm fields ', fields);
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
@@ -199,20 +168,16 @@ export class EndorserComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.frmContact = new FormGroup(formGroup);
 
-    // SET THE DEFAULT HERE
-    if (this.frmContact.get('entity_type')) {
-      const entityTypeVal = this.frmContact.get('entity_type').value;
-      if (!entityTypeVal) {
-        this.frmContact.patchValue({ entity_type: this._entityType }, { onlySelf: true });
-      }
+    
+    this.endorserForm = new FormGroup(formGroup);
+
+    if (this._employerOccupationRequired) {
+      // this._listenForAggregateChanges();
     }
 
-    // get form data API is passing X for memo code value.
-    // Set it to null here until it is checked by user where it will be set to X.
-    //this.frmContact.controls['memo_code'].setValue(null);
   }
+
 
   /**
    * Sets the form field valition requirements.
@@ -234,10 +199,12 @@ export class EndorserComponent implements OnInit, OnDestroy {
 
     if (validators) {
       for (const validation of Object.keys(validators)) {
-        if (validation === 'required') {
-          if (validators[validation]) {
-            formValidators.push(Validators.required);
-          }
+        if (validation === 'required' && validators[validation]) {
+
+          //push validators for employer and occupation on amount change. 
+          if (fieldName !== 'employer' && fieldName !== 'occupation') {
+              formValidators.push(Validators.required);
+          } 
         } else if (validation === 'min') {
           if (validators[validation] !== null) {
             formValidators.push(Validators.minLength(validators[validation]));
@@ -253,17 +220,69 @@ export class EndorserComponent implements OnInit, OnDestroy {
     return formValidators;
   }
 
-  
-   /**
-   * Prevent user from keying in more than the max allowed by the API.
-   * HTML max must allow for commas, decimals and negative sign and therefore
-   * this is needed to enforce digit limitation.  This method will remove
-   * non-numerics permitted by the floatingPoint() validator,
-   * commas, decimals and negative sign, before checking the number of digits.
-   *
-   * Note: If this method is not desired, it may be replaced with a validation
-   * on submit.  It is here to catch user error before submitting the form.
-   */
+
+  public contributionAmountChange(e: any, fieldName: string, negativeAmount: boolean): void {
+    // const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+    let contributionAmount: string = e.target.value;
+
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+
+
+    // Amount is converted to negative for Return / Void / Bounced
+    let contributionAmountNum = parseFloat(contributionAmount);
+    if (negativeAmount) {
+      contributionAmountNum = -Math.abs(contributionAmountNum);
+    }
+
+    if(contributionAmountNum > 200){
+      this.endorserForm.controls['occupation'].setValidators([Validators.required]);
+      this.endorserForm.controls['employer'].setValidators([Validators.required]);
+      this.endorserForm.controls['occupation'].updateValueAndValidity();
+      this.endorserForm.controls['employer'].updateValueAndValidity();
+    }
+    else{
+      this.endorserForm.controls['occupation'].clearValidators();
+      this.endorserForm.controls['employer'].clearValidators();
+      this.endorserForm.controls['occupation'].updateValueAndValidity();
+      this.endorserForm.controls['employer'].updateValueAndValidity();
+    }
+
+
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
+
+    if (this.endorserForm.get('contribution_amount')) {
+      this.endorserForm.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
+
+
+      if ("add" === this.scheduleAction) {
+        this.endorserForm.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
+      }
+      // else {
+      //   //calculate balance and updated fields
+      //   // let currentOutstandingBalance = this.currentLoanData.loan_balance;
+      //   currentOutstandingBalance = parseFloat(currentOutstandingBalance.toString().replace(/,/g, ``));
+      //   let currentLoanAmountFromDB = this.currentLoanData.loan_amount_original;
+      //   let newOutstandingBalance = contributionAmountNum - currentLoanAmountFromDB + currentOutstandingBalance;
+      //   this.frmLoan.patchValue({ loan_balance: this._decimalPipe.transform(newOutstandingBalance, '.2-2') }, { onlySelf: true });
+      // }
+
+    }
+  }
+
+  /**
+  * Prevent user from keying in more than the max allowed by the API.
+  * HTML max must allow for commas, decimals and negative sign and therefore
+  * this is needed to enforce digit limitation.  This method will remove
+  * non-numerics permitted by the floatingPoint() validator,
+  * commas, decimals and negative sign, before checking the number of digits.
+  *
+  * Note: If this method is not desired, it may be replaced with a validation
+  * on submit.  It is here to catch user error before submitting the form.
+  */
   public contributionAmountKeyup(e: any) {
     let val = this._utilService.deepClone(e.target.value);
     val = val.replace(/,/g, ``);
@@ -278,13 +297,13 @@ export class EndorserComponent implements OnInit, OnDestroy {
   }
 
   private formatAmountForAPI(contributionAmount): string {
-   /*  // default to 0 when no value
-    contributionAmount = contributionAmount ? contributionAmount : '0';
-    // remove commas
-    contributionAmount = contributionAmount.replace(/,/g, ``);
-    // determine if negative, truncate if > max
-    contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
-    return contributionAmount; */
+    /*  // default to 0 when no value
+     contributionAmount = contributionAmount ? contributionAmount : '0';
+     // remove commas
+     contributionAmount = contributionAmount.replace(/,/g, ``);
+     // determine if negative, truncate if > max
+     contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
+     return contributionAmount; */
     return "";
   }
 
@@ -316,23 +335,23 @@ export class EndorserComponent implements OnInit, OnDestroy {
    * Gets the transaction type.
    */
   private _getTransactionType(): void {
-   /*  const transactionType: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
-
-    if (typeof transactionType === 'object') {
-      if (transactionType !== null) {
-        if (transactionType.hasOwnProperty('mainTransactionTypeValue')) {
-          this._transactionType = transactionType.mainTransactionTypeValue;
-        }
-      }
-    }
-
-    if (this.transactionType) {
-      if (this.transactionType !== this._transactionTypePrevious) {
-        this._transactionTypePrevious = this.transactionType;
-        // reload dynamic form fields
-        this.getFormFields();
-      }
-    } */
+    /*  const transactionType: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
+ 
+     if (typeof transactionType === 'object') {
+       if (transactionType !== null) {
+         if (transactionType.hasOwnProperty('mainTransactionTypeValue')) {
+           this._transactionType = transactionType.mainTransactionTypeValue;
+         }
+       }
+     }
+ 
+     if (this.transactionType) {
+       if (this.transactionType !== this._transactionTypePrevious) {
+         this._transactionTypePrevious = this.transactionType;
+         // reload dynamic form fields
+         this.getFormFields();
+       }
+     } */
   }
 
   public handleFormFieldKeyup($event: any, col: any) {
@@ -355,7 +374,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
       col.name === 'occupation'
     ) {
       if (this._selectedEntity) {
-        this.frmContact.patchValue({ [col.name]: this._selectedEntity[col.name] }, { onlySelf: true });
+        this.endorserForm.patchValue({ [col.name]: this._selectedEntity[col.name] }, { onlySelf: true });
         //this.showWarn(col.text);
         this.showWarn(col.text, col.name);
       }
@@ -387,20 +406,20 @@ export class EndorserComponent implements OnInit, OnDestroy {
 
     if (checked) {
       this.memoCode = checked;
-      this.frmContact.controls['memo_code'].setValue(this._memoCodeValue);
-      this.frmContact.controls['contribution_date'].setValidators([Validators.required]);
+      this.endorserForm.controls['memo_code'].setValue(this._memoCodeValue);
+      this.endorserForm.controls['contribution_date'].setValidators([Validators.required]);
 
-      this.frmContact.controls['contribution_date'].updateValueAndValidity();
+      this.endorserForm.controls['contribution_date'].updateValueAndValidity();
     } else {
       this._validateContributionDate();
       this.memoCode = checked;
-      this.frmContact.controls['memo_code'].setValue(null);
-      this.frmContact.controls['contribution_date'].setValidators([
+      this.endorserForm.controls['memo_code'].setValue(null);
+      this.endorserForm.controls['contribution_date'].setValidators([
         contributionDate(this.cvgStartDate, this.cvgEndDate),
         Validators.required
       ]);
 
-      this.frmContact.controls['contribution_date'].updateValueAndValidity();
+      this.endorserForm.controls['contribution_date'].updateValueAndValidity();
     }
   }*/
 
@@ -417,53 +436,53 @@ export class EndorserComponent implements OnInit, OnDestroy {
    *
    * @param stateOption the state selected in the dropdown.
    */
-  
-   /*public handleStateChange(stateOption: any, col: any) {
-    console.log("handleStateChange stateOption", stateOption);
-    if (this._selectedEntity) {
-      //this.showWarn(col.text);
-      this.frmContact.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
-    } else {
-      let stateCode = null;
-      if (stateOption.$ngOptionLabel) {
-        stateCode = stateOption.$ngOptionLabel;
-        if (stateCode) {
-          stateCode = stateCode.trim();
-          if (stateCode.length > 1) {
-            stateCode = stateCode.substring(0, 2);
-            console.log(" handleStateChange stateCode", stateCode);
-          }
-        }
-      }
-      
-      this.frmContact.patchValue({ state: stateCode }, { onlySelf: true });
-    }
-  }*/
+
+  /*public handleStateChange(stateOption: any, col: any) {
+   console.log("handleStateChange stateOption", stateOption);
+   if (this._selectedEntity) {
+     //this.showWarn(col.text);
+     this.endorserForm.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
+   } else {
+     let stateCode = null;
+     if (stateOption.$ngOptionLabel) {
+       stateCode = stateOption.$ngOptionLabel;
+       if (stateCode) {
+         stateCode = stateCode.trim();
+         if (stateCode.length > 1) {
+           stateCode = stateCode.substring(0, 2);
+           console.log(" handleStateChange stateCode", stateCode);
+         }
+       }
+     }
+     
+     this.endorserForm.patchValue({ state: stateCode }, { onlySelf: true });
+   }
+ }*/
 
 
   /*public handleStateChange(stateOption: any, col: any) {
    
     if (this._selectedEntity) {
       // this.showWarn(col.text);
-      this.frmContact.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
+      this.endorserForm.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
     } else {
-      this.frmContact.patchValue({ state: stateOption.code }, { onlySelf: true });
+      this.endorserForm.patchValue({ state: stateOption.code }, { onlySelf: true });
     }
   } commented on 10052019*/
 
 
   public handleStateChange(stateOption: any, col: any) {
-      if (this._selectedEntity) {
-        this.showWarn(col.text, 'state');
-        this.frmContact.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
-      } else {
-        this.frmContact.patchValue({ state: stateOption.code }, { onlySelf: true });
-     }
+    if (this._selectedEntity) {
+      this.showWarn(col.text, 'state');
+      this.endorserForm.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
+    } else {
+      this.endorserForm.patchValue({ state: stateOption.code }, { onlySelf: true });
+    }
   }
 
   private showWarn(fieldLabel: string, name: string) {
     if (this._selectedChangeWarn[name] === name) {
-        return;
+      return;
     }
 
     //const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
@@ -476,7 +495,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
 
     if (this._selectedEntity) {
       //this.showWarn(col.text);
-      this.frmContact.patchValue({ candOffice: this._selectedEntity.candOffice}, { onlySelf: true });
+      this.endorserForm.patchValue({ candOffice: this._selectedEntity.candOffice }, { onlySelf: true });
     } else {
       let officeCode = null;
       if (candOfficeOption.$ngOptionLabel) {
@@ -488,16 +507,16 @@ export class EndorserComponent implements OnInit, OnDestroy {
           }
         }
       }
-      
-      this.frmContact.patchValue({ candOffice: officeCode }, { onlySelf: true });
+
+      this.endorserForm.patchValue({ candOffice: officeCode }, { onlySelf: true });
     }
   }
-  
+
   public handleOfficeStateChange(officeStateOption: any, col: any) {
 
     if (this._selectedEntity) {
       //this.showWarn(col.text);
-      this.frmContact.patchValue({ candOfficeState: this._selectedEntity.candOfficeState}, { onlySelf: true });
+      this.endorserForm.patchValue({ candOfficeState: this._selectedEntity.candOfficeState }, { onlySelf: true });
     } else {
       let officeStateCode = null;
       if (officeStateOption.$ngOptionLabel) {
@@ -509,59 +528,24 @@ export class EndorserComponent implements OnInit, OnDestroy {
           }
         }
       }
-      
-      this.frmContact.patchValue({ candOfficeState: officeStateCode }, { onlySelf: true });
+
+      this.endorserForm.patchValue({ candOfficeState: officeStateCode }, { onlySelf: true });
     }
   }
-
-  /*public handleTypeChange(entityOption: any, col: any) {
-    console.log("handleTypeChange entityOption", entityOption);
-    if (this._selectedEntity) {
-      //this.showWarn(col.text);
-      this.frmContact.patchValue({ entityType: this._selectedEntity.entityType }, { onlySelf: true });
-    } else {
-      let entityCode = null;
-      if (entityOption.$ngOptionLabel) {
-        entityCode = entityOption.$ngOptionLabel;
-        if (entityCode) {
-          entityCode = entityCode.trim();
-          if (entityCode.length > 1) {
-            entityCode = entityCode.substring(0, 3 );
-            console.log(" handleTypeChange entityCode", entityCode);
-            this.frmContact.patchValue({ entityType: entityCode }, { onlySelf: true });
-            this._entityType = entityCode;
-            this.loadDynamiceFormFields();
-          }
-        }
-      }
-     
-    }
-  }*/
 
   public handleTypeChange(entityOption: any, col: any) {
-    console.log(" handleTypeChange entityOption", entityOption);
-    this._entityType = entityOption.code;
-    if (this._selectedEntity) {
-      // this.showWarn(col.text);
-      this.frmContact.patchValue({ entity_type: this._selectedEntity.entity_type }, { onlySelf: true });
-    } else {
+    /*    this is just a flag to distinguish what caused the loadDynamicFormFields() method to be invoked,
+as it can be invoked during initial form population during edit or during change event
+on ngselect  */
+    this.typeChangeEventOccured = true;
+    if (this.scheduleAction === ScheduleActions.edit) {
+      // this._prePopulateFormForEdit(this.transactionDetail);
+    }
+    else {
       this.loadDynamiceFormFields();
-      this.frmContact.patchValue({ entity_type: entityOption.code }, { onlySelf: true });
     }
   }
 
-  public handleEntityTypeChange(item: any, col: any, entityType: any) {
-    // Set the selectedEntityType for the toggle method to check.
-    for (const entityTypeObj of this.entityTypes) {
-      if (entityTypeObj.entityType === item.entityType) {
-        entityTypeObj.selected = true;
-        //this.selectedEntityType = entityTypeObj;
-        this._entityType = entityTypeObj;
-      } else {
-        entityTypeObj.selected = false;
-      }
-    }
-  }
 
 
   /**
@@ -581,39 +565,39 @@ export class EndorserComponent implements OnInit, OnDestroy {
   public receiveTypeaheadData(contact: any, fieldName: string): void {
 
     if (fieldName === 'first_name') {
-      this.frmContact.patchValue({ last_name: contact.last_name }, { onlySelf: true });
-      this.frmContact.controls['last_name'].setValue({ last_name: contact.last_name }, { onlySelf: true });
+      this.endorserForm.patchValue({ last_name: contact.last_name }, { onlySelf: true });
+      this.endorserForm.controls['last_name'].setValue({ last_name: contact.last_name }, { onlySelf: true });
     }
 
     if (fieldName === 'last_name') {
-      this.frmContact.patchValue({ first_name: contact.first_name }, { onlySelf: true });
-      this.frmContact.controls['first_name'].setValue({ first_name: contact.first_name }, { onlySelf: true });
+      this.endorserForm.patchValue({ first_name: contact.first_name }, { onlySelf: true });
+      this.endorserForm.controls['first_name'].setValue({ first_name: contact.first_name }, { onlySelf: true });
     }
 
-    this.frmContact.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
-    this.frmContact.patchValue({ prefix: contact.prefix }, { onlySelf: true });
-    this.frmContact.patchValue({ suffix: contact.suffix }, { onlySelf: true });
-    this.frmContact.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
-    this.frmContact.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
-    this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
-    this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
-    this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
-    this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
-    this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
+    this.endorserForm.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
+    this.endorserForm.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    this.endorserForm.patchValue({ suffix: contact.suffix }, { onlySelf: true });
+    this.endorserForm.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
+    this.endorserForm.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
+    this.endorserForm.patchValue({ city: contact.city }, { onlySelf: true });
+    this.endorserForm.patchValue({ state: contact.state }, { onlySelf: true });
+    this.endorserForm.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
+    this.endorserForm.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    this.endorserForm.patchValue({ occupation: contact.occupation }, { onlySelf: true });
+    this.endorserForm.patchValue({ employer: contact.employer }, { onlySelf: true });
 
-    this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
-    this.frmContact.patchValue({ candOffice: contact.candOffice }, { onlySelf: true });
-    this.frmContact.patchValue({ candOfficeState: contact.candOfficeState }, { onlySelf: true });
-    this.frmContact.patchValue({ candOfficeDistrict: contact.candOfficeDistrict }, { onlySelf: true });
+    this.endorserForm.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
+    this.endorserForm.patchValue({ candOffice: contact.candOffice }, { onlySelf: true });
+    this.endorserForm.patchValue({ candOfficeState: contact.candOfficeState }, { onlySelf: true });
+    this.endorserForm.patchValue({ candOfficeDistrict: contact.candOfficeDistrict }, { onlySelf: true });
 
   }
 
-/**
-   * Format an entity to display in the type ahead.
-   *
-   * @param result formatted item in the typeahead list
-   */
+  /**
+     * Format an entity to display in the type ahead.
+     *
+     * @param result formatted item in the typeahead list
+     */
   public formatTypeaheadItem(result: any) {
     const lastName = result.last_name ? result.last_name.trim() : '';
     const firstName = result.first_name ? result.first_name.trim() : '';
@@ -719,39 +703,39 @@ export class EndorserComponent implements OnInit, OnDestroy {
   public handleSelectedOrgItem($event: NgbTypeaheadSelectItemEvent) {
     const contact = $event.item;
     this._selectedEntity = this._utilService.deepClone(contact);
-    //this.frmContact.patchValue({ type: contact.type }, { onlySelf: true });
-    this.frmContact.patchValue({ last_name: contact.entity_name }, { onlySelf: true });
-    this.frmContact.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
-    this.frmContact.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
-    this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
-    this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
-    this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
-    this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
+    //this.endorserForm.patchValue({ type: contact.type }, { onlySelf: true });
+    this.endorserForm.patchValue({ last_name: contact.entity_name }, { onlySelf: true });
+    this.endorserForm.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
+    this.endorserForm.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
+    this.endorserForm.patchValue({ city: contact.city }, { onlySelf: true });
+    this.endorserForm.patchValue({ state: contact.state }, { onlySelf: true });
+    this.endorserForm.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    this.endorserForm.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
+    this.endorserForm.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
   }
 
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
     const contact = $event.item;
     this._selectedEntity = this._utilService.deepClone(contact);
-    //this.frmContact.patchValue({ type: contact.type }, { onlySelf: true });
-    this.frmContact.patchValue({ last_name: contact.last_name }, { onlySelf: true });
-    this.frmContact.patchValue({ first_name: contact.first_name }, { onlySelf: true });
-    this.frmContact.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
-    this.frmContact.patchValue({ prefix: contact.prefix }, { onlySelf: true });
-    this.frmContact.patchValue({ suffix: contact.suffix }, { onlySelf: true });
-    this.frmContact.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
-    this.frmContact.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
-    this.frmContact.patchValue({ city: contact.city }, { onlySelf: true });
-    this.frmContact.patchValue({ state: contact.state }, { onlySelf: true });
-    this.frmContact.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    this.frmContact.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
-    this.frmContact.patchValue({ occupation: contact.occupation }, { onlySelf: true });
-    this.frmContact.patchValue({ employer: contact.employer }, { onlySelf: true });
+    //this.endorserForm.patchValue({ type: contact.type }, { onlySelf: true });
+    this.endorserForm.patchValue({ last_name: contact.last_name }, { onlySelf: true });
+    this.endorserForm.patchValue({ first_name: contact.first_name }, { onlySelf: true });
+    this.endorserForm.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
+    this.endorserForm.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    this.endorserForm.patchValue({ suffix: contact.suffix }, { onlySelf: true });
+    this.endorserForm.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
+    this.endorserForm.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
+    this.endorserForm.patchValue({ city: contact.city }, { onlySelf: true });
+    this.endorserForm.patchValue({ state: contact.state }, { onlySelf: true });
+    this.endorserForm.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
+    this.endorserForm.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
+    this.endorserForm.patchValue({ occupation: contact.occupation }, { onlySelf: true });
+    this.endorserForm.patchValue({ employer: contact.employer }, { onlySelf: true });
 
-    //this.frmContact.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
-    //this.frmContact.patchValue({ candOffice: contact.candOffice }, { onlySelf: true });
-    //this.frmContact.patchValue({ candOfficeState: contact.candOfficeState }, { onlySelf: true });
-    //this.frmContact.patchValue({ candOfficeDistrict: contact.candOfficeDistrict }, { onlySelf: true });
+    //this.endorserForm.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
+    //this.endorserForm.patchValue({ candOffice: contact.candOffice }, { onlySelf: true });
+    //this.endorserForm.patchValue({ candOfficeState: contact.candOfficeState }, { onlySelf: true });
+    //this.endorserForm.patchValue({ candOfficeDistrict: contact.candOfficeDistrict }, { onlySelf: true });
 
 
     let transactionTypeIdentifier = '';
@@ -1037,14 +1021,14 @@ export class EndorserComponent implements OnInit, OnDestroy {
         console.log('getFormFields res =', res);
         if (res.hasOwnProperty('data')) {
           if (typeof res.data === 'object') {
-            /*if (res.data.hasOwnProperty('formFields')) {
-                  if (Array.isArray(res.data.formFields)) {
-                    this.formFields = res.data.formFields;
+            if (res.data.hasOwnProperty('formFields')) {
+              if (Array.isArray(res.data.formFields)) {
+                this.formFields = res.data.formFields;
 
-                    this._setForm(this.formFields);
-                  }
-                }*/
-            if (res.data.hasOwnProperty('individualFormFields')) {
+                this._setForm(this.formFields);
+              }
+            }
+            /* if (res.data.hasOwnProperty('individualFormFields')) {
               if (Array.isArray(res.data.individualFormFields)) {
                 this.individualFormFields = res.data.individualFormFields;
                 this.formFields = res.data.individualFormFields;
@@ -1069,7 +1053,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
                 this.candidateFormFields = res.data.candidateFormFields;
               }
             }
-
+ */
             if (res.data.hasOwnProperty('hiddenFields')) {
               if (Array.isArray(res.data.hiddenFields)) {
                 this.hiddenFields = res.data.hiddenFields;
@@ -1082,7 +1066,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
               }
             }
 
-            if (res.data.hasOwnProperty('prefixes')) {
+/*             if (res.data.hasOwnProperty('prefixes')) {
               if (Array.isArray(res.data.prefixes)) {
                 this.prefixes = res.data.prefixes;
               }
@@ -1117,7 +1101,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
                 this.titles = res.data.titles;
               }
             }
-
+ */
             this._loading = false;
           } // typeof res.data
         } // res.hasOwnProperty('data')
@@ -1145,26 +1129,26 @@ export class EndorserComponent implements OnInit, OnDestroy {
         const prefix = nameArray[3] ? nameArray[3] : null;
         const suffix = nameArray[4] ? nameArray[4] : null;
 
-        this.frmContact.patchValue({ first_name: firstName.trim() }, { onlySelf: true });
-        this.frmContact.patchValue({ last_name: lastName.trim() }, { onlySelf: true });
-        this.frmContact.patchValue({ middle_name: middleName.trim() }, { onlySelf: true });
-        this.frmContact.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
-        this.frmContact.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
+        this.endorserForm.patchValue({ first_name: firstName.trim() }, { onlySelf: true });
+        this.endorserForm.patchValue({ last_name: lastName.trim() }, { onlySelf: true });
+        this.endorserForm.patchValue({ middle_name: middleName.trim() }, { onlySelf: true });
+        this.endorserForm.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
+        this.endorserForm.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
 
-        this.frmContact.patchValue({ entity_type: formData.entity_type }, { onlySelf: true });
-        this.frmContact.patchValue({ street_1: formData.street1 }, { onlySelf: true });
-        this.frmContact.patchValue({ street_2: formData.street2 }, { onlySelf: true });
-        this.frmContact.patchValue({ city: formData.city }, { onlySelf: true });
-        this.frmContact.patchValue({ state: formData.state }, { onlySelf: true });
-        this.frmContact.patchValue({ zip_code: formData.zip }, { onlySelf: true });
+        this.endorserForm.patchValue({ entity_type: formData.entity_type }, { onlySelf: true });
+        this.endorserForm.patchValue({ street_1: formData.street1 }, { onlySelf: true });
+        this.endorserForm.patchValue({ street_2: formData.street2 }, { onlySelf: true });
+        this.endorserForm.patchValue({ city: formData.city }, { onlySelf: true });
+        this.endorserForm.patchValue({ state: formData.state }, { onlySelf: true });
+        this.endorserForm.patchValue({ zip_code: formData.zip }, { onlySelf: true });
 
-        this.frmContact.patchValue({ employer: formData.employer }, { onlySelf: true });
-        this.frmContact.patchValue({ occupation: formData.occupation }, { onlySelf: true });
+        this.endorserForm.patchValue({ employer: formData.employer }, { onlySelf: true });
+        this.endorserForm.patchValue({ occupation: formData.occupation }, { onlySelf: true });
 
-        this.frmContact.patchValue({ phoneNumber: formData.phoneNumber }, { onlySelf: true });
-        this.frmContact.patchValue({ candOffice: formData.candOffice }, { onlySelf: true });
-        this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
-        this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
+        this.endorserForm.patchValue({ phoneNumber: formData.phoneNumber }, { onlySelf: true });
+        this.endorserForm.patchValue({ candOffice: formData.candOffice }, { onlySelf: true });
+        this.endorserForm.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
+        this.endorserForm.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
 
       }
     }
@@ -1190,35 +1174,52 @@ export class EndorserComponent implements OnInit, OnDestroy {
   }
 
   public cancelStep(): void {
-    this.frmContact.reset();
-    this._router.navigate([`/contacts`]);
-  }
-  
-  public viewContacts(): void {
-    
-    if (this.frmContact.dirty || this.frmContact.touched){
-      localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
-    }
-    this._router.navigate([`/contacts`]);
+    this.endorserForm.reset();
+    this._goToLoan(null)
   }
 
-  public saveAndAddMore(): void {
-    this.doValidateContact('saveAndAddMore');
-    //this._router.navigate([`/contacts`]);
+  private _goToLoan(loan:any) {
+    const loanRepaymentEmitObj: any = {
+      form: {},
+      direction: 'next', 
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c',
+      action: ScheduleActions.add, //TODO fix it later 
+      transactionDetail: {
+        transactionModel : {
+          transactionId: loan ? loan.transaction_id : null, 
+          entityId: loan ? loan.entity_id : null
+        }
+      }
+    };
+    this.status.emit(loanRepaymentEmitObj);
   }
+
 
   public isFieldName(fieldName: string, nameString: string): boolean {
     return fieldName === nameString || fieldName === this._childFieldNamePrefix + nameString;
+  }
+
+  public saveEndorser(){
+    const hiddenFieldsObj = {
+      back_ref_transaction_id: this.transactionDetail.transactionId;
+    }
+
+    this._loanservice.saveSched_C2(this.scheduleAction, this.endorserForm.value,hiddenFieldsObj).subscribe(res => {
+      console.log('success');
+      console.log(res);
+    });
   }
 
   /**
    * Vaidates the form on submit.
    */
   public doValidateContact(callFrom: string) {
-    if (this.frmContact.valid) {
+    if (this.endorserForm.valid) {
       const contactObj: any = {};
 
-      for (const field in this.frmContact.controls) {
+      for (const field in this.endorserForm.controls) {
         if (
           field === 'last_name' ||
           field === 'first_name' ||
@@ -1241,7 +1242,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
           // If an object is received, find the value on the object by fields type
           // otherwise use the string value.  This is not desired and this patch
           // should be removed if the issue is resolved.
-          const typeAheadField = this.frmContact.get(field).value;
+          const typeAheadField = this.endorserForm.get(field).value;
           if (typeAheadField && typeof typeAheadField !== 'string') {
             contactObj[field] = typeAheadField[field];
           } else {
@@ -1249,7 +1250,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
           }
           // }
         } else {
-          contactObj[field] = this.frmContact.get(field).value;
+          contactObj[field] = this.endorserForm.get(field).value;
         }
       }
 
@@ -1280,7 +1281,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
         if (res) {
           console.log('_endorserService.saveContact res', res);
           this._contactToEdit = null;
-          this.frmContact.reset();
+          this.endorserForm.reset();
           this._selectedEntity = null;
           localStorage.removeItem(contactObj);
           if (callFrom === 'viewContacts') {
@@ -1291,38 +1292,11 @@ export class EndorserComponent implements OnInit, OnDestroy {
         }
       });
     } else {
-      this.frmContact.markAsDirty();
-      this.frmContact.markAsTouched();
+      this.endorserForm.markAsDirty();
+      this.endorserForm.markAsTouched();
       localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
       window.scrollTo(0, 0);
     }
   }
 
-  /**
-   * Determines ability for a person to leave a page with a form on it.
-   *
-   * @return     {boolean}  True if able to deactivate, False otherwise.
-   */
-  /*public async canDeactivate(): Promise<boolean> {
-    if (this._formsService.HasUnsavedData('contact')) {
-      let result: boolean = null;
-      result = await this._dialogService
-        .confirm('', ConfirmModalComponent)
-        .then(res => {
-          let val: boolean = null;
-
-          if(res === 'okay') {
-            val = true;
-          } else if(res === 'cancel') {
-            val = false;
-          }
-
-          return val;
-        });
-
-      return result;
-    } else {
-      return true;
-  }
- }*/
 }
