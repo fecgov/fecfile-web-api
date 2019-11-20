@@ -100,7 +100,7 @@
                   (change)="receiptDateChanged($event.target.value)" 
                   [ngClass]="
                       schedH3.get('receipt_date')?.invalid &&
-                      (schedH3.touched || schedH3.dirty)
+                      (schedH3.touched || schedH3.dirty) && isSubmit
                       ? 'input-field-error'
                       : ''
                   "
@@ -215,9 +215,10 @@
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
                   (keyup)="handleAmountKeyup($event)"
+                  (blur)="handleOnBlurEvent($event, col)"
                   [ngClass]="
-                      frmIndividualReceipt.get('date')?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      schedH3.get('transferred_amount')?.invalid &&
+                      (schedH3.touched || schedH3.dirty) && isSubmit
                       ? 'input-field-error'
                       : ''
                   "
