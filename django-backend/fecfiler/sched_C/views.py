@@ -220,6 +220,7 @@ def put_sql_schedC(data):
     """
     uopdate a schedule_c item
     """
+    logger.debug('put_sql_schedc with data:{}'.format(data))
     _sql = """UPDATE public.sched_c
               SET transaction_type = %s,
                   transaction_type_identifier = %s,
@@ -247,7 +248,7 @@ def put_sql_schedC(data):
                   memo_code = %s,
                   memo_text = %s,
                   last_update_date = %s
-              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+              WHERE transaction_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
         """
     _v = (
@@ -278,7 +279,6 @@ def put_sql_schedC(data):
             data.get('memo_text'),
             datetime.datetime.now(),
             data.get('transaction_id'),
-            data.get('report_id'),
             data.get('cmte_id'),
           )
     do_transaction(_sql, _v)
