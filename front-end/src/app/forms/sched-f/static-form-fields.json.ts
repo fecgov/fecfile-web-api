@@ -7,7 +7,7 @@ export const schedFstaticFormFields = [
     cols: [
       {
         staticField: true,
-        name: 'coord_expenditure_yn',
+        name: 'coordinated_exp_ind',
         value: null,
         validation: {
           required: true
@@ -83,7 +83,7 @@ export const schedFstaticFormFields = [
       },
       {
         staticField: true,
-        name: 'street_1_co_exp',
+        name: 'subordinate_cmte_street_1',
         value: null,
         validation: {
           required: true,
@@ -93,7 +93,7 @@ export const schedFstaticFormFields = [
       },
       {
         staticField: true,
-        name: 'street_2_co_exp',
+        name: 'subordinate_cmte_street_2',
         value: null,
         validation: {
           required: false,
@@ -103,7 +103,7 @@ export const schedFstaticFormFields = [
       },
       {
         staticField: true,
-        name: 'city_co_exp',
+        name: 'subordinate_cmte_city',
         value: null,
         validation: {
           required: true,
@@ -113,7 +113,7 @@ export const schedFstaticFormFields = [
       },
       {
         staticField: true,
-        name: 'state_co_exp',
+        name: 'subordinate_cmte_state',
         type: 'select',
         value: null,
         validation: {
@@ -124,7 +124,7 @@ export const schedFstaticFormFields = [
       },
       {
         staticField: true,
-        name: 'zip_co_exp',
+        name: 'subordinate_cmte_zip',
         value: null,
         validation: {
           required: true,

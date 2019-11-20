@@ -370,6 +370,8 @@ export class F3xComponent implements OnInit {
               } else if (apiCall === '/sc/schedC1') {
                 alert('edit C1 not yet supported');
               } else if (apiCall === '/sf/schedF') {
+                // force change to set show first page.
+                this.forceChangeDetectionFDebtPayment = new Date();
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
               } else {
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedMainComponent);
