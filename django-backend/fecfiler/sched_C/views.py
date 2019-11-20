@@ -1422,6 +1422,7 @@ def post_sql_schedC1(data):
 
 def get_schedC1(data):
     try:
+        logger.debug('loading c1 with:{}'.format(data))
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
         if 'transaction_id' in data:
@@ -1442,6 +1443,9 @@ def get_schedC1(data):
                         'cmte_id': cmte_id
                     }
                     entity_data = get_entities(data)[0]
+                    if _id == 'treasurer_entity_id' or _id == 'authorized_entity_id':
+                        prefix = _id.split('_')[0]
+                        entity_data = { (prefix + '_' + k) : v for k,v in entity_data.items()}
                     obj.update(entity_data)
                 merged_list.append(obj)
                     # dictEntity = entity_list[0]
@@ -1464,6 +1468,9 @@ def get_schedC1(data):
                         'cmte_id': cmte_id
                     }
                     entity_data = get_entities(data)[0]
+                    if _id == 'treasurer_entity_id' or _id == 'authorized_entity_id':
+                        prefix = _id.split('_')[0]
+                        entity_data = { (prefix + '_' + k) : v for k,v in entity_data.items()}
                     obj.update(entity_data)
                 merged_list.append(obj)
         return merged_list
@@ -1636,7 +1643,7 @@ def schedC1(request):
             # end of handling
             # print(cmte_id)
             # print(report_id)
-            datum = request.data
+            datum = request.data.copy()
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
             # print(datum)
