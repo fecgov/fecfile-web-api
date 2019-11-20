@@ -1419,6 +1419,7 @@ def post_sql_schedC1(data):
     except Exception:
         raise
 
+
 def get_schedC1(data):
     try:
         cmte_id = data.get('cmte_id')
@@ -1426,9 +1427,46 @@ def get_schedC1(data):
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedC1(report_id, cmte_id, transaction_id)
+            # adding entity data: lender, treasurer and authorized
+            merged_list = []
+            for obj in forms_obj:
+                entity_ids = [
+                    'lender_entity_id',
+                    'treasurer_entity_id',
+                    'authorized_entity_id',
+                ]
+                for _id in entity_ids:
+                    entity_id = obj.get(_id)
+                    data = {
+                        'entity_id': entity_id,
+                        'cmte_id': cmte_id
+                    }
+                    entity_data = get_entities(data)[0]
+                    obj.update(entity_data)
+                merged_list.append(obj)
+                    # dictEntity = entity_list[0]
+                    # merged_dict = {**dictA, **dictEntity}
+                    # merged_list.append(merged_dict)
+
         else:
             forms_obj = get_list_all_schedC1(report_id, cmte_id)
-        return forms_obj
+            merged_list = []
+            for obj in forms_obj:
+                entity_ids = [
+                    'lender_entity_id',
+                    'treasurer_entity_id',
+                    'authorized_entity_id',
+                ]
+                for _id in entity_ids:
+                    entity_id = obj.get(_id)
+                    data = {
+                        'entity_id': entity_id,
+                        'cmte_id': cmte_id
+                    }
+                    entity_data = get_entities(data)[0]
+                    obj.update(entity_data)
+                merged_list.append(obj)
+        return merged_list
     except:
         raise
 
