@@ -103,15 +103,15 @@ export class SchedC1Component implements OnInit, OnChanges {
   _prepopulateEditFields(c1: any) {
     this.c1Form.patchValue({original_loan_date:c1.original_loan_date});
     this.c1Form.patchValue({is_loan_restructured: c1.is_loan_restructured});
-    this.c1Form.patchValue({credit_amount_this_draw: c1.credit_amount_this_draw});
-    this.c1Form.patchValue({total_outstanding_balance: c1.total_outstanding_balance});
+    this.c1Form.patchValue({credit_amount_this_draw: this._decimalPipe.transform(c1.credit_amount_this_draw, '.2-2') });
+    this.c1Form.patchValue({total_outstanding_balance: this._decimalPipe.transform(c1.total_outstanding_balance, '.2-2') });
     this.c1Form.patchValue({other_parties_liable: c1.other_parties_liable});
     this.c1Form.patchValue({pledged_collateral_ind: c1.pledged_collateral_ind});
     this.c1Form.patchValue({pledge_collateral_desc: c1.pledge_collateral_desc});
-    this.c1Form.patchValue({pledge_collateral_amount: c1.pledge_collateral_amount});
+    this.c1Form.patchValue({pledge_collateral_amount: this._decimalPipe.transform(c1.pledge_collateral_amount, '.2-2') });
     this.c1Form.patchValue({perfected_intrest_ind: c1.perfected_intrest_ind});
     this.c1Form.patchValue({future_income_desc: c1.future_income_desc});
-    this.c1Form.patchValue({future_income_estimate: c1.future_income_estimate});
+    this.c1Form.patchValue({future_income_estimate: this._decimalPipe.transform(c1.future_income_estimate, '.2-2') });
     this.c1Form.patchValue({depository_account_location: c1.depository_account_location});
     this.c1Form.patchValue({depository_account_street_1: c1.depository_account_street_1});
     this.c1Form.patchValue({depository_account_street_2: c1.depository_account_street_2});
