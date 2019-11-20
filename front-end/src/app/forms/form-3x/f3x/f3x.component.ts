@@ -315,7 +315,7 @@ export class F3xComponent implements OnInit {
             // in individual-receipt.component when sched F.
             // TODO add if else around schedules with component specific action
             // such as sched F and sched C.
-            if (this._handleScheduleFDebtPayment(e)) {
+            if (this._handleAddScheduleFDebtPayment(e)) {
               return;
             }
 
@@ -493,24 +493,26 @@ export class F3xComponent implements OnInit {
    * Handle Schedule F Debt Payment form.
    * @returns true if schedule F and should stop processing
    */
-  private _handleScheduleFDebtPayment(e: any): boolean {
+  private _handleAddScheduleFDebtPayment(e: any): boolean {
     let finish = false;
     if (this.scheduleType === 'sched_f') {
-      this.scheduleFAction = e.action;
-      this.transactionTypeSchedF = e.transactionType ? e.transactionType : '';
-      this.transactionTypeTextSchedF = e.transactionTypeText ? e.transactionTypeText : '';
-      this.forceChangeDetectionFDebtPayment = new Date();
-      if (this.scheduleFAction === ScheduleActions.addSubTransaction) {
-        if (e.hasOwnProperty('prePopulateFromSchedD')) {
-          this._f3xMessageService.sendPopulateFormMessage({
-            key: 'prePopulateFromSchedD',
-            abstractScheduleComponent: AbstractScheduleParentEnum.schedFComponent,
-            prePopulateFromSchedD: e.prePopulateFromSchedD
-          });
+      if (e.action === ScheduleActions.addSubTransaction) {
+        this.scheduleFAction = e.action;
+        this.transactionTypeSchedF = e.transactionType ? e.transactionType : '';
+        this.transactionTypeTextSchedF = e.transactionTypeText ? e.transactionTypeText : '';
+        this.forceChangeDetectionFDebtPayment = new Date();
+        if (this.scheduleFAction === ScheduleActions.addSubTransaction) {
+          if (e.hasOwnProperty('prePopulateFromSchedD')) {
+            this._f3xMessageService.sendPopulateFormMessage({
+              key: 'prePopulateFromSchedD',
+              abstractScheduleComponent: AbstractScheduleParentEnum.schedFComponent,
+              prePopulateFromSchedD: e.prePopulateFromSchedD
+            });
+          }
         }
+        this.canContinue();
+        finish = true;
       }
-      this.canContinue();
-      finish = true;
     }
     return finish;
   }

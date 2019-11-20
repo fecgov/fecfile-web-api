@@ -46,6 +46,8 @@ export class SchedC1Component implements OnInit, OnChanges {
   public _contributionAmountMax = 14;
   public existingData: any;
   public fieldLoanAmount = { name: 'loan_amount' };
+  public c1EditMode = false;
+  public currentC1Data: any;
 
   private _reportId;
 
@@ -71,6 +73,7 @@ export class SchedC1Component implements OnInit, OnChanges {
     const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
     this._loanService.getDataSchedule(reportId, this.transactionDetail.transactionId).subscribe(res => {
       res = res[0];
+
       this._reportId = res.report_id;
       this.c1Form.patchValue({ lending_institution: res.entity_name });
       this.c1Form.patchValue({ mailing_address: res.street_2 ? `${res.street_1} ${res.street_2}` : res.street_1 });
@@ -82,8 +85,59 @@ export class SchedC1Component implements OnInit, OnChanges {
       this.c1Form.patchValue({ loan_incurred_date: res.loan_incurred_date });
       this.c1Form.patchValue({ loan_due_date: res.loan_due_date });
 
+      //if edit mode, check if a child c1 exists
+      if(this.scheduleAction === ScheduleActions.edit){
+        if(res.child && Array.isArray(res.child)){
+          let c1 = res.child.filter(e => e.transaction_type_identifier === 'SC1');
+          if(c1.length > 0){
+            c1 = c1[0];
+            this.c1EditMode = true;
+            this.currentC1Data = c1;
+            this._prepopulateEditFields(c1);
+          }
+        }
+      }
 
     });
+  }
+  _prepopulateEditFields(c1: any) {
+    this.c1Form.patchValue({original_loan_date:c1.original_loan_date});
+    this.c1Form.patchValue({is_loan_restructured: c1.is_loan_restructured});
+    this.c1Form.patchValue({credit_amount_this_draw: this._decimalPipe.transform(c1.credit_amount_this_draw, '.2-2') });
+    this.c1Form.patchValue({total_outstanding_balance: this._decimalPipe.transform(c1.total_outstanding_balance, '.2-2') });
+    this.c1Form.patchValue({other_parties_liable: c1.other_parties_liable});
+    this.c1Form.patchValue({pledged_collateral_ind: c1.pledged_collateral_ind});
+    this.c1Form.patchValue({pledge_collateral_desc: c1.pledge_collateral_desc});
+    this.c1Form.patchValue({pledge_collateral_amount: this._decimalPipe.transform(c1.pledge_collateral_amount, '.2-2') });
+    this.c1Form.patchValue({perfected_intrest_ind: c1.perfected_intrest_ind});
+    this.c1Form.patchValue({future_income_desc: c1.future_income_desc});
+    this.c1Form.patchValue({future_income_estimate: this._decimalPipe.transform(c1.future_income_estimate, '.2-2') });
+    this.c1Form.patchValue({depository_account_location: c1.depository_account_location});
+    this.c1Form.patchValue({depository_account_street_1: c1.depository_account_street_1});
+    this.c1Form.patchValue({depository_account_street_2: c1.depository_account_street_2});
+    this.c1Form.patchValue({depository_account_city: c1.depository_account_city});
+    this.c1Form.patchValue({depository_account_state: c1.depository_account_state});
+    this.c1Form.patchValue({depository_account_zip:c1.depository_account_zip});
+    this.c1Form.patchValue({depository_account_auth_date : c1.depository_account_auth_date});
+    this.c1Form.patchValue({future_income_ind : c1.future_income_ind});
+    this.c1Form.patchValue({basis_of_loan_desc : c1.basis_of_loan_desc});
+    this.c1Form.patchValue({treasurer_last_name : c1.treasurer_last_name});
+    this.c1Form.patchValue({treasurer_first_name : c1.treasurer_first_name});
+    this.c1Form.patchValue({treasurer_middle_name : c1.treasurer_middle_name});
+    this.c1Form.patchValue({treasurer_prefix : c1.treasurer_prefix});
+    this.c1Form.patchValue({treasurer_suffix : c1.treasurer_suffix});
+    this.c1Form.patchValue({treasurer_signed_date : c1.treasurer_signed_date});
+    this.c1Form.patchValue({treasurer_entity_id : c1.treasurer_entity_id});
+    this.c1Form.patchValue({final_authorization : c1.final_authorization});
+    this.c1Form.patchValue({authorized_last_name : c1.authorized_last_name});
+    this.c1Form.patchValue({authorized_first_name : c1.authorized_first_name});
+    this.c1Form.patchValue({authorized_middle_name : c1.authorized_middle_name});
+    this.c1Form.patchValue({authorized_prefix : c1.authorized_prefix});
+    this.c1Form.patchValue({authorized_suffix : c1.authorized_suffix});
+    this.c1Form.patchValue({authorized_entity_id : c1.authorized_entity_id});
+    this.c1Form.patchValue({authorized_entity_title : c1.authorized_entity_title});
+    this.c1Form.patchValue({authorized_signed_date : c1.authorized_signed_date});
+
   }
 
   public ngOnChanges(changes: SimpleChanges) {
@@ -507,7 +561,7 @@ export class SchedC1Component implements OnInit, OnChanges {
       if (this.c1Form.valid) {
       const formData = {};
       this._prepareFormDataForApi(formData);
-      this._schedC1Service.saveScheduleC1(this.formType, this.scheduleAction, formData).subscribe(res => {
+      this._schedC1Service.saveScheduleC1(this.formType, this.c1EditMode ? ScheduleActions.edit:ScheduleActions.add, formData).subscribe(res => {
         this._goToLoanSummary();
       });
       } else {
@@ -540,7 +594,7 @@ export class SchedC1Component implements OnInit, OnChanges {
       ) {
         let amount = this.c1Form.get(field).value;
         if(amount){
-          amount = amount.replace(/,/g, ``);
+          amount = amount.toString().replace(/,/g, ``);
         }
         formData[field] = amount;
       }  else if (field === 'loan_incurred_date' || field === 'loan_due_date') {
@@ -570,6 +624,9 @@ export class SchedC1Component implements OnInit, OnChanges {
           formData[field] = this.c1Form.get(field).value;
         }
       }
+    }
+    if(this.c1EditMode){
+      formData['transaction_id'] = this.currentC1Data.transaction_id;
     }
     formData['back_ref_transaction_id'] = this.transactionDetail.transactionId;
   }

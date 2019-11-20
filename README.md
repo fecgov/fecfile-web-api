@@ -68,6 +68,7 @@ Alternatively if you have made changes to the application and need to push the c
 # running commands in a running container
 `docker compose exec <container name> <command>`
 
+
 Container structure
 ```
         _____________________

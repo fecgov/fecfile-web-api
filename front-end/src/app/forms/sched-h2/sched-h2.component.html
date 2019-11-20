@@ -51,7 +51,7 @@
       <div class="header-content">
         <div class="float-left">
           <h2>
-            Allocation Ratios Summary
+            H2 Summary (List of H2 Ratios) 
             <!-- <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container> -->
             <!-- <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container> -->
           </h2>
@@ -166,8 +166,8 @@
         <div class="row subtitle">
           <div class="row col-md-12">
             <div class="col-md-4">
-              <input type="radio" formControlName="ratio_code" value="n" />
-              <label
+              <input type="radio" formControlName="ratio_code" value="n" id="ratio1"/>
+              <label for="ratio1"
                 [ngClass]="
                   schedH2.get('ratio_code')?.invalid && (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error'
@@ -177,8 +177,8 @@
               >
             </div>
             <div class="col-md-4">
-              <input type="radio" formControlName="ratio_code" value="r" />
-              <label
+              <input type="radio" formControlName="ratio_code" value="r" id="ratio2"/>
+              <label for="ratio2"
                 [ngClass]="
                   schedH2.get('ratio_code')?.invalid && (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error'
@@ -188,8 +188,8 @@
               >
             </div>
             <div class="col-md-4">
-              <input type="radio" formControlName="ratio_code" value="s" />
-              <label
+              <input type="radio" formControlName="ratio_code" value="s" id="ratio3"/>
+              <label for="ratio3"
                 [ngClass]="
                   schedH2.get('ratio_code')?.invalid && (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error'
@@ -264,16 +264,6 @@
               Only 0 - 100 allowed.
             </div>
           </div>
-          <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-            <i class="info-icon" aria-hidden="true"></i>
-            <span class="sr-only">Click here for more information</span>
-          </button>
-        </div>
-        <div
-          class="text-error text-left"
-          *ngIf="schedH2.get('non_federal_percent').errors?.min || schedH2.get('non_federal_percent').errors?.max"
-        >
-          Only 0 - 100 allowed.
         </div>
       </div>
 

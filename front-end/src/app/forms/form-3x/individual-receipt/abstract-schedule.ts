@@ -831,6 +831,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.transactionType !== 'ALLOC_EXP_DEBT') {
       return;
     }
+
+    // reset all pre-populated values
+    this.frmIndividualReceipt.patchValue({ fed_share_amount: null }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ non_fed_share_amount: null }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ activity_event_amount_ytd: null }, { onlySelf: true });
+
     if (!this.frmIndividualReceipt.contains('total_amount')) {
       return;
     }
@@ -842,7 +848,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (typeof totalAmount === 'string') {
       totalAmount = totalAmount.replace(/,/g, ``);
     }
-    // const activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
     let activityEvent = null;
     if (this.frmIndividualReceipt.contains('activity_event_type')) {
@@ -854,20 +859,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
     }
 
+    if (!activityEvent) {
+      return;
+    }
+
     this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName)
       .subscribe(res => {
-
-      // TODO remove this if H1/H2 not found goes back to retuning a non-200 http code.
-      if (typeof res === 'string') {
-        if (res.toLowerCase().includes('no h1 data found') ||
-          res.toLowerCase().includes('no h2 data found') ||
-          res.toLowerCase().includes('no valid h1 data found') ||
-          res.toLowerCase().includes('no valid h2 data found')
-        ) {
-          // this._handleNoH1H2(res);
-          // return;
-        }
-      }
 
       if (res) {
         if (res.fed_share) {
@@ -962,6 +959,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.activityEventNames = null;
 
     if (!$event) {
+      this._resetFedNonFed();
       this.totalAmountReadOnly = true;
       return;
     }
@@ -978,6 +976,22 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     if ($event.activityEventTypes) {
       this.activityEventNames = $event.activityEventTypes;
+      // make required
+      // NOTE: Any new validations from the dynamic forms API will need to 
+      // be added back as this rebuilds the validators for the FormControl.
+      // Currently the only relevent one is "required" true/fase.
+      if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+        const activityControl = this.frmIndividualReceipt.get('activity_event_identifier');
+        activityControl.setValidators([Validators.required]);
+        activityControl.updateValueAndValidity();
+      }
+    } else {
+      // remove required
+      if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
+        const activityControl = this.frmIndividualReceipt.get('activity_event_identifier');
+        activityControl.setValidators([Validators.nullValidator]);
+        activityControl.updateValueAndValidity();
+      }
     }
 
     let eventTypeVal = null;
@@ -988,6 +1002,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     // Don't allow a total amount to be entered if the required activity event and activity name
     // are not set.  For event types requiring the 2nd dropdown, activityEventNames will have data.
     if (!eventTypeVal) {
+      this._resetFedNonFed();
       this.totalAmountReadOnly = true;
     } else {
       if (this.activityEventNames) {
@@ -996,11 +1011,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           activityEventIdentifier = this.frmIndividualReceipt.get('activity_event_identifier').value;
         }
         if (activityEventIdentifier) {
+          this._getFedNonFedPercentage();
           this.totalAmountReadOnly = false;
         } else {
+          this._resetFedNonFed();
           this.totalAmountReadOnly = true;
         }
       } else {
+        this._getFedNonFedPercentage();
         this.totalAmountReadOnly = false;
       }
     }
@@ -1009,10 +1027,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public handleActivityEventNameChange($event: any, col: any) {
 
     if (!$event) {
+      this._resetFedNonFed();
       this.totalAmountReadOnly = true;
     } else {
+      this._getFedNonFedPercentage();
       this.totalAmountReadOnly = false;
     }
+  }
+
+  private _resetFedNonFed() {
+    this.frmIndividualReceipt.patchValue({ fed_share_amount: null }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ non_fed_share_amount: null }, { onlySelf: true });
+    this.frmIndividualReceipt.patchValue({ activity_event_amount_ytd: null }, { onlySelf: true });
   }
 
   /**
@@ -1499,6 +1525,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           field === 'first_name' ||
           this.isFieldName(field, 'cmte_id') ||
           this.isFieldName(field, 'cmte_name') ||
+          this.isFieldName(field, 'designating_cmte_name') ||
+          this.isFieldName(field, 'subordinate_cmte_name') ||
           this.isFieldName(field, 'entity_name')
         ) {
           // if (this._selectedEntity) {
@@ -1523,7 +1551,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             receiptObj[field] = typeAheadField;
           }
           // }
-        } else if (field === 'donor_cmte_id' || field === 'beneficiary_cmte_id') {
+        } else if (field === 'donor_cmte_id' ||
+                   field === 'beneficiary_cmte_id' ||
+                   field === 'designating_cmte_id' ||
+                   field === 'subordinate_cmte_id') {
           // added this condition as some times we are getting entire json object
           // when we perform auto lookup.
           // TODO we might need to revisit to see if we need this condition
@@ -3712,4 +3743,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     return prePopulateFieldArray;
   }
+
+  /**
+   * Find a Form Field object by name.
+   */
+  public findFormField(name: string): any {
+    if (!name || !this.formFields) {
+      return null;
+    }
+    const fields = this.formFields;
+    for (const el of fields) {
+      if (el.hasOwnProperty('cols') && el.cols) {
+        for (let e of el.cols) {
+          if (e.name === name) {
+            return e;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
 }
