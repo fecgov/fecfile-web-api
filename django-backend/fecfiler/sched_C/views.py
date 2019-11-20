@@ -1262,7 +1262,7 @@ def post_schedC1(data):
         else:
             new_treasurer_entity = post_treasurer_entities(data)
             treasurer_rollback_flag = False
-        data['treasurer_entity_id'] = new_entity.get('entity_id')
+        data['treasurer_entity_id'] = new_treasurer_entity.get('entity_id')
         logger.debug('treasurer saved.')
 
         # save authorized entity data
@@ -1278,7 +1278,7 @@ def post_schedC1(data):
         else:
             new_authorized_entity = post_authorized_entities(data)
             authorized_rollback_flag = False
-        data['authorized_entity_id'] = new_entity.get('entity_id')
+        data['authorized_entity_id'] = new_authorized_entity.get('entity_id')
         logger.debug('authrized entity saved.')
 
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
@@ -1614,7 +1614,7 @@ def schedC1(request):
             output = get_schedC1(data)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response("The schedA API - POST is throwing an exception: "
+            return Response("The schedC1 API - POST is throwing an exception: "
                             + str(e), status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'GET':
