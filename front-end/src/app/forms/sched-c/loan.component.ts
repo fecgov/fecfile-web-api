@@ -907,13 +907,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       if (this._selectedEntity) {
         LoanObj.entity_id = this._selectedEntity.entity_id;
       }
-      LoanObj.entity_type = this.entityType;
+      // LoanObj.entity_type = this.entityType;
       LoanObj['is_loan_secured'] = this.frmLoan.get('secured').value;
       console.log('LoanObj =', JSON.stringify(LoanObj));
 
       localStorage.setItem('LoanObj', JSON.stringify(LoanObj));
       this._loansService
-        .saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, this.entityType)
+        .saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, LoanObj.entity_type)
         .subscribe(res => {
           if (res) {
             console.log('_LoansService.saveContact res', res);
