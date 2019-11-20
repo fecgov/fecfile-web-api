@@ -1,26 +1,26 @@
-import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
-import { ReportTypeService } from './../../form-3x/report-type/report-type.service';
-import { MessageService } from './../../../shared/services/MessageService/message.service';
-import { LoanService } from './../service/loan.service';
-import { UtilService } from './../../../shared/utils/util.service';
-import { Component, OnInit, ViewChild, AfterViewChecked, Input, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
-import { NgForm, Validators, FormControl } from '@angular/forms';
-import { CookieService } from 'ngx-cookie-service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
-import { environment } from '../../../../environments/environment';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy } from '@angular/core';
+import { NgForm, Validators } from '@angular/forms';
+import { CookieService } from 'ngx-cookie-service';
+import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
+import { environment } from '../../../../environments/environment';
 import { validateContributionAmount } from '../../../shared/utils/forms/validation/amount.validator';
 import { ContributionDateValidator } from '../../../shared/utils/forms/validation/contribution-date.validator';
+import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
+import { F3xMessageService } from '../../form-3x/service/f3x-message.service';
+import { MessageService } from './../../../shared/services/MessageService/message.service';
+import { UtilService } from './../../../shared/utils/util.service';
+import { ReportTypeService } from './../../form-3x/report-type/report-type.service';
+import { LoanService } from './../service/loan.service';
 
 @Component({
   selector: 'app-loanpayment',
   templateUrl: './loanpayment.component.html',
   styleUrls: ['./loanpayment.component.scss']
 })
-export class LoanpaymentComponent implements OnInit {
+export class LoanpaymentComponent implements OnInit , OnDestroy{
 
   @Input() transactionDetail: any;
   @Input() scheduleAction: ScheduleActions = ScheduleActions.add;
@@ -33,6 +33,9 @@ export class LoanpaymentComponent implements OnInit {
   states: any = [];
   entityTypes: any = [{ code: 'IND', description: 'Individual' }, { code: 'ORG', description: 'Organization' }];
   outstandingLoanBalance: number;
+  
+  private _clearFormSubscription: Subscription;
+
 
   constructor(private _cookieService: CookieService,
     private _http: HttpClient,
@@ -42,8 +45,16 @@ export class LoanpaymentComponent implements OnInit {
     private _receiptService: LoanService,
     private _messageService: MessageService,
     private _reportTypeService: ReportTypeService,
-    private _router: Router, 
-    private changeDetectorRef: ChangeDetectorRef) { }
+    private _f3xMessageService: F3xMessageService) {
+
+      this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
+        if(this.form){
+          this.form.reset();
+          this.initializeForm();
+        }
+      });
+      
+     }
 
 
 
@@ -54,6 +65,11 @@ export class LoanpaymentComponent implements OnInit {
   ngOnInit() {
     this.initializeForm();
     this.getStates();
+  }
+
+  public ngOnDestroy(): void {
+    this._messageService.clearMessage();
+    this._clearFormSubscription.unsubscribe();
   }
   
 
