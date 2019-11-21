@@ -199,6 +199,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               if (message.prePopulateFromSchedD) {
                 // only load form for the AbstractSchudule parent in the view
                 if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+                  // Patch fix for sched F payment - It does not have the subTransactionInfo
+                  // when determining action so force it here.
+                  this.scheduleAction = ScheduleActions.addSubTransaction;
                   this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
                 }
               }
