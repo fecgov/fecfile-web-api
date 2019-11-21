@@ -798,31 +798,135 @@ export class LoanService {
   }
   
   
-  /*public deleteRecycleBinContact(contacts: Array<LoanModel>): Observable<any> {
-    /*const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions = new HttpHeaders();
-    const url = '/core/delete_trashed_contacts';
+  /**
+   * Saves a schedule.
+   *
+   * @param      {string}           formType  The form type
+   * @param      {ScheduleActions}  scheduleAction  The type of action to save (add, edit)
+   */
+  public saveSched_C2(scheduleAction: ScheduleActions, endorserForm:any, hiddenFields: any): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = '/sc/schedC2';
+    const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
+    // const loan: any = JSON.parse(localStorage.getItem('LoanObj'));
+    
+    const hiddenFieldsObj: any = {
+      api_call:'/sc/schedC2',
+      line_number: 13, 
+      transaction_id:endorserForm.transaction_id,
+      back_ref_transaction_id: hiddenFields.back_ref_transaction_id,
+      back_ref_sched_name: '',
+      transaction_type: 'LOAN_FROM_IND',
+      transaction_type_identifier:'LOANS_OWED_BY_CMTE', 
+      entity_id: hiddenFields.entity_id
+    };
 
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
+/*     const loanByCommFromIndObj: any = {
+      api_call:'/sc/schedC',
+      line_number: 13,
+      //transaction_id:'16G',
+      transaction_id:loan.transaction_id,
+      back_ref_transaction_id: '',
+      back_ref_sched_name: '',
+      transaction_type: 'LOAN_FROM_IND',
+      transaction_type_identifier:'LOANS_OWED_BY_CMTE'
+    };
+    const loanByCommFromBankObj: any = {
+      api_call:'/sc/schedC',
+      line_number: 13,
+      //transaction_id:'16F',
+      transaction_id:loan.transaction_id,
+      back_ref_transaction_id: '',
+      back_ref_sched_name: '',
+      transaction_type: 'LOAN_FROM_BANK',
+      transaction_type_identifier:'LOANS_OWED_BY_CMTE'
+    };
+    const loanToCommObj: any = {
+      api_call:'/sc/schedC',
+      line_number: 13,
+      transaction_id:'',
+      back_ref_transaction_id: '',
+      back_ref_sched_name: '',
+      transaction_type: 'LOAN_TO_COMM',
+      transaction_type_identifier:'LOANS_OWED_TO_CMTE'
+    }; */
+
+    /*const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+
+    if (reportType === null || typeof reportType === 'undefined') {
+      reportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+    }*/
+
+    //const transactionType: any = JSON.parse(localStorage.getItem(`form_${formType}_transaction_type`));
+    const formData: FormData = new FormData();
+    let httpOptions = new HttpHeaders();
+    let loanhiddenFields: any;
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const request: any = {};
-    const actions = [];
-    for (const con of contacts) {
-      actions.push({
-        id: con.id
-      });
+
+    for (const [key, value] of Object.entries(endorserForm)) {
+      if (value !== null) {
+        if (typeof value === 'string') {
+          formData.append(key, value);
+        }
+      }
     }
-    request.actions = actions;
+    
+    /* if (transactionTypeIdentifier==='LOANS_OWED_BY_CMTE'){
+      if (subType === 'IND'){
+        loanhiddenFields= loanByCommFromIndObj;
+      }else if (subType === 'ORG'){
+        loanhiddenFields= loanByCommFromBankObj;  
+      } 
+    } else if (transactionTypeIdentifier==='LOANS_OWED_TO_CMTE'){
+      loanhiddenFields= loanToCommObj;   
+    } */
+    loanhiddenFields = hiddenFieldsObj;
 
-    return this._http
-      .post(`${environment.apiUrl}${url}`, request, {
-        headers: httpOptions
-      })
-     .map(res => {
-          return false;
-        });
-  }*/
+    console.log ("loanhiddenFields", loanhiddenFields);
 
+    //Add loan hidden fields
+    for (const [key, value] of Object.entries(loanhiddenFields)) {
+      if (value !== null) {
+        if (typeof value === 'string') {
+          formData.append(key, value);
+        }
+      }
+    }
+    console.log("saveSched_C reportId =", reportId);
+
+    formData.append('report_id', reportId );
+
+    if (scheduleAction === ScheduleActions.add) {
+      return this._http
+        .post(`${environment.apiUrl}${url}`, formData, {
+          headers: httpOptions
+        })
+        .pipe(
+          map(res => {
+            if (res) {
+              console.log(" saveLoan called res...!", res);
+              return res;
+            }
+            return false;
+          })
+        );
+    } else if (scheduleAction === ScheduleActions.edit) {
+      return this._http
+        .put(`${environment.apiUrl}${url}`, formData, {
+          headers: httpOptions
+        })
+        .pipe(
+          map(res => {
+            if (res) {
+              return res;
+            }
+            return false;
+          })
+        );
+    } else {
+    }
+  }
 }
 

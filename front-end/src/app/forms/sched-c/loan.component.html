@@ -285,14 +285,14 @@
                 <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                   Previous
                 </button>
-                <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan(false)">
+                <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan()">
                   Save
                 </button>
                 <button *ngIf="entityType === 'ORG'" class="btn btn-secondary btn-right" type="button"
-                  (click)="AddLoanEndorser()">
+                  (click)="onSaveLoan('endorser')">
                   Endorser
                 </button>
-                <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan(true)">
+                <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan('loanRepayment')">
                   Loan Repayment
                 </button>
               </ng-template>
@@ -304,10 +304,10 @@
                   Save
                 </button>
                 <button *ngIf="entityType === 'ORG'" class="btn btn-secondary btn-right" type="button"
-                  (click)="AddLoanEndorser()">
+                  (click)="onSaveLoan('endorser')">
                   Endorser
                 </button>
-                <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan(true)">
+                <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan('loanRepayment')">
                   Loan Repayment
                 </button>
               </ng-template>
