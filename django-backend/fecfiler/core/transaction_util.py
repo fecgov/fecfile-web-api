@@ -574,18 +574,6 @@ def get_sched_c1_child(cmte_id, transaction_id):
     except:
         raise
 
-        # childC1_forms_obj = get_sched_c1_child_transactions(
-        #     report_id, cmte_id, transaction_id)
-        # # print(childC1_forms_obj)
-        # for obj in childC1_forms_obj:
-        #     obj.update(API_CALL_SC1)
-        # logger.debug('getting all sched_c2 childs...')
-        # childC2_forms_obj = get_sched_c2_child_transactions(
-        #     report_id, cmte_id, transaction_id)
-        # # print(childC2_forms_obj)
-        # for obj in childC2_forms_obj:
-        #     obj.update(API_CALL_SC2)
-
 
 def get_sched_c1_child_transactions(cmte_id, transaction_id):
     """
@@ -594,52 +582,61 @@ def get_sched_c1_child_transactions(cmte_id, transaction_id):
     # print(report_id)
     # print(transaction_id)
     _sql = """
-    SELECT             
+        SELECT             
             cmte_id,
-            report_id,
-            line_number,
-            transaction_type_identifier,
-            transaction_type,
-            transaction_id,
-            back_ref_transaction_id,
-            back_ref_sched_name,
-            lender_entity_id,
-            loan_amount,
-            loan_intrest_rate,
-            loan_incurred_date,
-            loan_due_date,
-            is_loan_restructured,
-            original_loan_date,
-            credit_amount_this_draw,
-            total_outstanding_balance,
-            other_parties_liable,
-            pledged_collateral_ind,
-            pledge_collateral_desc,
-            pledge_collateral_amount,
-            perfected_intrest_ind,
-            future_income_ind,
-            future_income_desc,
-            future_income_estimate,
-            depository_account_established_date,
-            depository_account_location,
-            depository_account_street_1,
-            depository_account_street_2,
-            depository_account_city,
-            depository_account_state,
-            depository_account_zip,
-            depository_account_auth_date,
-            basis_of_loan_desc,
-            treasurer_entity_id,
-            treasurer_signed_date,
-            authorized_entity_id,
-            authorized_entity_title,
-            authorized_signed_date,
-            create_date
-    FROM public.sched_c1
-    WHERE cmte_id = %s 
-    AND back_ref_transaction_id = %s 
-    AND delete_ind is distinct from 'Y'
+            transaction_id
+        FROM public.sched_c1
+        WHERE cmte_id = %s 
+        AND back_ref_transaction_id = %s 
+        AND delete_ind is distinct from 'Y'
     """
+    # _sql = """
+    # SELECT
+    #         cmte_id,
+    #         report_id,
+    #         line_number,
+    #         transaction_type_identifier,
+    #         transaction_type,
+    #         transaction_id,
+    #         back_ref_transaction_id,
+    #         back_ref_sched_name,
+    #         lender_entity_id,
+    #         loan_amount,
+    #         loan_intrest_rate,
+    #         loan_incurred_date,
+    #         loan_due_date,
+    #         is_loan_restructured,
+    #         original_loan_date,
+    #         credit_amount_this_draw,
+    #         total_outstanding_balance,
+    #         other_parties_liable,
+    #         pledged_collateral_ind,
+    #         pledge_collateral_desc,
+    #         pledge_collateral_amount,
+    #         perfected_intrest_ind,
+    #         future_income_ind,
+    #         future_income_desc,
+    #         future_income_estimate,
+    #         depository_account_established_date,
+    #         depository_account_location,
+    #         depository_account_street_1,
+    #         depository_account_street_2,
+    #         depository_account_city,
+    #         depository_account_state,
+    #         depository_account_zip,
+    #         depository_account_auth_date,
+    #         basis_of_loan_desc,
+    #         treasurer_entity_id,
+    #         treasurer_signed_date,
+    #         authorized_entity_id,
+    #         authorized_entity_title,
+    #         authorized_signed_date,
+    #         create_date
+    # FROM public.sched_c1
+    # WHERE cmte_id = %s
+    # AND back_ref_transaction_id = %s
+    # AND delete_ind is distinct from 'Y'
+    # """
     try:
         # if report_id:
         # _sql = _sql + 'AND report_id = {}'.format(report_id)
@@ -648,7 +645,8 @@ def get_sched_c1_child_transactions(cmte_id, transaction_id):
                 """SELECT json_agg(t) FROM (""" + _sql + """) t""",
                 [cmte_id, transaction_id],
             )
-            return post_process_it(cursor, cmte_id)
+            return cursor.fetchone()[0]
+            # return post_process_it(cursor, cmte_id)
     except:
         rais
 
@@ -657,18 +655,27 @@ def get_sched_c2_child_transactions(cmte_id, transaction_id):
     """
     load child transactions for sched_f
     """
+    # _sql = """
+    # SELECT
+    #         cmte_id,
+    #         report_id,
+    #         line_number,
+    #         transaction_type_identifier,
+    #         guarantor_entity_id,
+    #         guaranteed_amount,
+    #         transaction_id,
+    #         back_ref_transaction_id,
+    #         back_ref_sched_name,
+    #         create_date
+    # FROM public.sched_c2
+    # WHERE cmte_id = %s
+    # AND back_ref_transaction_id = %s
+    # AND delete_ind is distinct from 'Y'
+    # """
     _sql = """
     SELECT             
             cmte_id,
-            report_id,
-            line_number,
-            transaction_type_identifier,
-            guarantor_entity_id,
-            guaranteed_amount,
-            transaction_id,
-            back_ref_transaction_id,
-            back_ref_sched_name,
-            create_date
+            transaction_id
     FROM public.sched_c2
     WHERE cmte_id = %s 
     AND back_ref_transaction_id = %s 
