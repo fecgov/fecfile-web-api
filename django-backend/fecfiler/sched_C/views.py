@@ -1960,7 +1960,7 @@ def get_list_all_schedC2(report_id, cmte_id):
             transaction_type_identifier,
             transaction_id,
             guarantor_entity_id,
-            guaranteed_amount,
+            guaranteed_amount as contribution_amount,
             back_ref_transaction_id,
             last_update_date
             FROM public.sched_c2
@@ -2004,7 +2004,7 @@ def get_list_schedC2(cmte_id, transaction_id):
             transaction_type_identifier,
             transaction_id,
             guarantor_entity_id,
-            guaranteed_amount,
+            guaranteed_amount as contribution_amount,
             back_ref_transaction_id,
             last_update_date
             FROM public.sched_c2
@@ -2036,6 +2036,8 @@ def schedC2_sql_dict(data):
     ]
     try:
         datum = {k: v for k, v in data.items() if k in valid_fields}
+        if 'contribution_amount' in data:
+            datum['guaranteed_amount'] = data['contribution_amount']
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
         return datum
@@ -2178,9 +2180,8 @@ def get_endorser_summary(request):
     logger.debug('GET request received for endorser summary.')
     try:
         cmte_id = request.user.username
-        if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
-                report_id = check_report_id(
-                    request.query_params.get('report_id'))
+        if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
+                transaction_id = request.query_params.get('transaction_id')
         else:
             raise Exception('Missing Input: report_id is mandatory')
         # print(cmte_id)
@@ -2197,18 +2198,23 @@ def get_endorser_summary(request):
                         e.suffix, 
                         e.employer,
                         e.occupation,
-                        c.transaction_id,
-                        c.guaranteed_amount 
+                        e.street_1,
+                        e.street_2,
+                        e.city,
+                        e.state,
+                        e.zip_code,
+                        c.guaranteed_amount as contribution_amount,
+                        c.* 
                     FROM   public.sched_c2 c, 
                         public.entity e 
                     WHERE c.cmte_id = %s
-                    AND c.report_id = %s
+                    AND c.back_ref_transaction_id = %s
                     AND c.guarantor_entity_id = e.entity_id 
                     AND c.delete_ind is distinct from 'Y' 
                     ) t
         """
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [cmte_id, report_id])
+            cursor.execute(_sql, [cmte_id, transaction_id])
             json_result = cursor.fetchone()[0] 
             if not json_result:
                 return Response([], status=status.HTTP_200_OK)
