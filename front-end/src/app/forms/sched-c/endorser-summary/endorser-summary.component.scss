@@ -1,23 +1,23 @@
 @import '../../../shared/scss/global';
 
-.loanSumamry__table-container {
+.endorserSummary__table-container {
   padding-right: 15px;
-  .loanSumamry__page-item-range {
+  .endorserSummary__page-item-range {
     padding: .5em .1em 0 0 ;
   }
 
-  .loanSumamry__table {
+  .endorserSummary__table {
     width: 100%;
-    .loanSumamry__amount {
+    .endorserSummary__amount {
       text-align: right;
     }
   }
 
-  .loanSumamry__table-checkbox {
+  .endorserSummary__table-checkbox {
     width: 3%;
   }
 
-  .loanSumamry__table-pagination-container {
+  .endorserSummary__table-pagination-container {
     padding: 1em;
   }  
 
@@ -26,7 +26,7 @@
     border: none;
   }  
 
-  #loanSumamry__dropdown-action > button > i {
+  #endorserSummary__dropdown-action > button > i {
     padding-right: 3px;
   }
 
@@ -34,7 +34,7 @@
     text-align: left;
   }
 
-  .loanSumamry__bulk_action_btn[disabled] {
+  .endorserSummary__bulk_action_btn[disabled] {
     background:#6c757d;
     border-color: #6c757d;
   }
@@ -43,27 +43,27 @@
     min-width: 6em;
   }  
 
-  .loanSumamry__item-range {
+  .endorserSummary__item-range {
     font-size: 13px;
     color: grey;
     margin: 0 5px;
   }
 
-  .loanSumamry__total-amount {
+  .endorserSummary__total-amount {
     float: left;
   }
 
-  .loanSumamry__total-amount-val {
+  .endorserSummary__total-amount-val {
     float: right;
   }
 
-  .loanSumamry__total-amount-tip {
+  .endorserSummary__total-amount-tip {
     color: #112E51;
     padding-left: 3px;
     float: right;
   }
 
-  .loanSumamry__tooltip {
+  .endorserSummary__tooltip {
     top: 0;
     width: 300px;
     .tooltip-inner {
@@ -82,7 +82,7 @@
     }
   }
 
-  // .loanSumamry__total-amount-container {
+  // .endorserSummary__total-amount-container {
   //   margin: 1.5em 0;
   // }
 
@@ -109,7 +109,7 @@
 
   .column-options-modal {
 
-    #loanSumamry__pin-modal-header {
+    #endorserSummary__pin-modal-header {
       background-color: $crusta;
     }
 

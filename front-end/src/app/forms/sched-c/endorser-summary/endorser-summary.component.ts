@@ -7,16 +7,14 @@ import { SortableColumnModel } from '../../../shared/services/TableService/sorta
 import { LoanService, GetLoanResponse } from '../../sched-c/service/loan.service';
 import { TableService } from '../../../shared/services/TableService/table.service';
 import { UtilService } from '../../../shared/utils/util.service';
-//import { ActiveView } from '../loan-summary/
 import { LoanMessageService } from '../../sched-c/service/loan-message.service';
 import { Subscription } from 'rxjs/Subscription';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
 import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
 
 export enum ActiveView {
-  loanSummary = 'loanSummary',
+  endorserSummary = 'endorserSummary',
   recycleBin = 'recycleBin',
   edit = 'edit'
 }
@@ -57,13 +55,17 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
   @Input()
   public tableType: string;
 
+  @Input()
+  public transactionDetail: any;
+
+
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
-  //TODO-ZS -- change "any" to LoanModel when using actual data
-  public LoanModel: Array<any>;
+  //TODO-ZS -- change "any" to endorserModel when using actual data
+  public endorserModel: Array<any>;
 
   public totalAmount: number;
-  public LoanView = ActiveView.loanSummary
+  public endorserView = ActiveView.endorserSummary
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
@@ -82,20 +84,20 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
 
   // Local Storage Keys
-  private readonly loanSortableColumnsLSK =
-    'Loan.ctn.sortableColumn';
+  private readonly endorserSortableColumnsLSK =
+    'endorser.ctn.sortableColumn';
   private readonly recycleSortableColumnsLSK =
-    'Loan.recycle.sortableColumn';
-  private readonly loanCurrentSortedColLSK =
-    'Loan.ctn.currentSortedColumn';
+    'endorser.recycle.sortableColumn';
+  private readonly endorserCurrentSortedColLSK =
+    'endorser.ctn.currentSortedColumn';
   private readonly recycleCurrentSortedColLSK =
-    'Loan.recycle.currentSortedColumn';
-  private readonly loanPageLSK =
-    'Loan.ctn.page';
+    'endorser.recycle.currentSortedColumn';
+  private readonly endorserPageLSK =
+    'endorser.ctn.page';
   private readonly recyclePageLSK =
-    'Loan.recycle.page';
+    'endorser.recycle.page';
   private readonly filtersLSK =
-    'Loan.filters';
+    'endorser.filters';
 
   /**.
 	 * Array of columns to be made sortable.
@@ -113,22 +115,10 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 	 */
   private currentSortedColumnName: string;
 
-  /**
-   * Subscription for messags sent from the parent component to show the PIN Column
-   * options.
-   */
-  private showPinColumnsSubscription: Subscription;
-
-
-  /**
-   * Subscription for running the keyword and filter search
-   * to the Loan obtained from the server.
-   */
-  private keywordFilterSearchSubscription: Subscription;
 
   private columnOptionCount = 0;
   private maxColumnOption = 5;
-  private allLoanSelected: boolean;
+  private allEndorserSelected: boolean;
   private currentPageNumber: number = 1;
 
   constructor(
@@ -138,19 +128,6 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     private _utilService: UtilService,
     private _dialogService: DialogService,
   ) {
-    this.showPinColumnsSubscription = this._LoanMessageService.getShowPinColumnMessage()
-      .subscribe(
-        message => {
-          this.showPinColumns();
-        }
-      );
-
-    this.keywordFilterSearchSubscription = this._LoanMessageService.getDoKeywordFilterSearchMessage()
-      .subscribe(
-        message => {
-          this.getPage(this.config.currentPage)
-        }
-      );
 
   }
   /**
@@ -163,10 +140,8 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
       currentPage: this.currentPageNumber
     };
     this.config = paginateConfig;
-    // this.config.currentPage = 1;
-    this.tableType = ActiveView.loanSummary;
+    this.tableType = ActiveView.endorserSummary;
 
-    this.getCachedValues();
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
 
     for (const col of this.sortableColumns) {
@@ -189,15 +164,13 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
    */
   public ngOnDestroy(): void {
     this.setCachedValues();
-    this.showPinColumnsSubscription.unsubscribe();
-    this.keywordFilterSearchSubscription.unsubscribe();
   }
 
 
   /**
-	 * The Loan for a given page.
+	 * The endorser for a given page.
 	 *
-	 * @param page the page containing the Loan to get
+	 * @param page the page containing the endorser to get
 	 */
   public getPage(page: number): void {
 
@@ -205,12 +178,8 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     this.bulkActionDisabled = true;
     console.log(" getPage this.tableType", this.tableType)
     switch (this.tableType) {
-      case this.LoanView:
-        this.getLoanPage(page);
-        break;
-      case this.recycleBinView:
-        this.getRecyclingPage(page);
-        this.maxColumnOption = 6;
+      case this.endorserView:
+        this.getendorserPage(page);
         break;
       default:
         break;
@@ -219,11 +188,11 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
 
   /**
-	 * The Loan for a given page.
+	 * The endorser for a given page.
 	 *
-	 * @param page the page containing the Loan to get
+	 * @param page the page containing the endorser to get
 	 */
-  public getLoanPage(page: number): void {
+  public getendorserPage(page: number): void {
 
     this.config.currentPage = page;
 
@@ -246,13 +215,13 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     const serverSortColumnName = this._LoanService.
       mapToSingleServerName(this.currentSortedColumnName);
 
-    this._LoanService.getLoan()
-    //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
+    this._LoanService.getEndorsers(this.transactionDetail.transactionId)
+    //TODO : ZS -- change resType back to  GetEndorserResponse once service is fixed
       .subscribe((res: any) => {
 
         // res=this.tempApiResponse;
-        console.log(" getLoanPage res =", res)
-        this.LoanModel = [];
+        console.log(" getEndorserPage res =", res)
+        this.endorserModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter
         // result has only 1 page.
@@ -272,84 +241,17 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
         });
         this._LoanService.addUIFileds(res);
         this._LoanService.mockApplyFilters(res);
-        const LoanModelL = this._LoanService.mapFromServerFields(res);
-        this.LoanModel = LoanModelL;
+        const EndorserModelL = this._LoanService.mapFromServerFields(res);
+        this.endorserModel = EndorserModelL;
 
       
 
-        this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
+        this.config.totalItems = res.totalendorsersCount ? res.totalendorsersCount : 0;
         this.numberOfPages = res.totalPages;
-        this.allLoanSelected = false;
+        this.allEndorserSelected = false;
       });
   }
 
-
-  /**
-	 * The Loan for the recycling bin.
-	 *
-	 * @param page the page containing the Loan to get
-	 */
-  public getRecyclingPage(page: number): void {
-
-    this.config.currentPage = page;
-
-    let sortedCol: SortableColumnModel =
-      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
-
-    // smahal: quick fix for sortCol issue not retrived from cache
-    if (!sortedCol) {
-      this.setSortDefault();
-      sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
-    }
-
-    if (sortedCol) {
-      if (sortedCol.descending === undefined || sortedCol.descending === null) {
-        sortedCol.descending = false;
-      }
-    } else {
-      sortedCol = new SortableColumnModel('', false, false, false, false);
-    }
-
-    // const serverSortColumnName = this._LoanService.
-    //   mapToSingleServerName(this.currentSortedColumnName);
-
-    this._LoanService.getUserDeletedLoan(page, this.config.itemsPerPage,
-      this.currentSortedColumnName,
-      sortedCol.descending)
-      .subscribe((res: GetLoanResponse) => {
-        console.log(" getRecyclingPage res =", res)
-        this.LoanModel = [];
-
-        // fixes an issue where no items shown when current page != 1 and new filter
-        // result has only 1 page.
-        if (res.totalPages === 1) {
-          this.config.currentPage = 1;
-        }
-
-        this._LoanService.addUIFileds(res);
-
-        this.LoanModel = res.loans;
-
-        this._LoanService.addUIFileds(res);
-        this._LoanService.mockApplyFilters(res);
-        const LoanModelL = this._LoanService.mapFromServerFields(res.loans);
-        this.LoanModel = LoanModelL;
-
-        // handle non-numeric amounts
-        // TODO handle this server side in API
-        // for (const model of this.LoanModel) {
-        //   model.amount = model.amount ? model.amount : 0;
-        //   model.aggregate = model.aggregate ? model.aggregate : 0;
-        // }
-
-        this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
-        this.numberOfPages = res.totalPages;
-        this.allLoanSelected = false;
-
-
-
-      });
-  }
 
 
   /**
@@ -375,7 +277,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     // TODO this could be done client side or server side.
     // call server for page data in new direction
     // this.getPage(this.config.currentPage);
-    this.LoanModel = this._LoanService.sortLoan(this.LoanModel, this.currentSortedColumnName, direction);
+    this.endorserModel = this._LoanService.sortEndorser(this.endorserModel, this.currentSortedColumnName, direction);
   }
 
 
@@ -555,46 +457,46 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
 
   /**
-   * View all Loan selected by the user.
+   * View all Endorser selected by the user.
    */
   public viewAllSelected(): void {
-    alert('View all Loan is not yet supported');
+    alert('View all Endorser is not yet supported');
   }
 
 
   /**
-   * Print all Loan selected by the user.
+   * Print all Endorser selected by the user.
    */
   public printAllSelected(): void {
-    alert('Print all Loan is not yet supported');
+    alert('Print all Endorser is not yet supported');
   }
 
 
   /**
-   * Export all Loan selected by the user.
+   * Export all Endorser selected by the user.
    */
   public exportAllSelected(): void {
-    alert('Export all Loan is not yet supported');
+    alert('Export all Endorser is not yet supported');
   }
 
 
   /**
-   * Link all Loan selected by the user.
+   * Link all Endorser selected by the user.
    */
   public linkAllSelected(): void {
-    alert('Link multiple loan requirements have not been finalized');
+    alert('Link multiple endorser requirements have not been finalized');
   }
 
 
   /**
-   * Trash all Loan selected by the user.
+   * Trash all Endorser selected by the user.
    */
   public trashAllSelected(): void {
     /* let conIds = '';
-     const selectedLoan: Array<LoanModel> = [];
-     for (const con of this.LoanModel) {
+     const selectedEndorser: Array<endorserModel> = [];
+     for (const con of this.endorserModel) {
        if (con.selected && con.activeTransactionsCnt === 0) {
-         selectedLoan.push(con);
+         selectedEndorser.push(con);
          conIds += con.id + ', ';
        }
      }
@@ -602,17 +504,17 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
      conIds = conIds.substr(0, conIds.length - 2);
  
      this._dialogService
-       .confirm('You are about to delete these Loan.   ' + conIds, ConfirmModalComponent, 'Warning!')
+       .confirm('You are about to delete these Endorser.   ' + conIds, ConfirmModalComponent, 'Warning!')
        .then(res => {
          if (res === 'okay') {
-           this._LoanService
-             .trashOrRestoreLoan('trash', selectedLoan)
-             .subscribe((res: GetLoanResponse) => {
-               this.getLoanPage(this.config.currentPage);
+           this._EndorserService
+             .trashOrRestoreEndorser('trash', selectedEndorser)
+             .subscribe((res: GetEndorserResponse) => {
+               this.getEndorserPage(this.config.currentPage);
  
                let afterMessage = '';
-               if (selectedLoan.length === 1) {
-                 afterMessage = `Transaction ${selectedLoan[0].id}
+               if (selectedEndorser.length === 1) {
+                 afterMessage = `Transaction ${selectedEndorser[0].id}
                    has been successfully deleted and sent to the recycle bin.`;
                } else {
                  afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + conIds;
@@ -645,16 +547,16 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
       this.config.currentPage : 1;
 
-    if (!this.LoanModel) {
+    if (!this.endorserModel) {
       return '0';
     }
 
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
-      && this.LoanModel.length > 0) {
+      && this.endorserModel.length > 0) {
       // this.calculateNumberOfPages();
 
       if (this.config.currentPage === this.numberOfPages) {
-        // end = this.LoanModel.length;
+        // end = this.endorserModel.length;
         end = this.config.totalItems;
         start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
       } else {
@@ -662,8 +564,8 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
         start = (end - this.config.itemsPerPage) + 1;
       }
       // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
-      // if (end > this.LoanModel.length) {
-      //   end = this.LoanModel.length;
+      // if (end > this.endorserModel.length) {
+      //   end = this.endorserModel.length;
       // }
     }
     this.firstItemOnPage = start;
@@ -682,13 +584,13 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
 
   /**
-   * Check/Uncheck all Loan in the table.
+   * Check/Uncheck all Endorser in the table.
    */
-  public changeAllLoanSummrysSelected() {
+  public changeAllendorserSummarysSelected() {
 
     // TODO Iterating over the trsnactionsModel and setting the selected prop
     // works when we have server-side pagination as the model will only contain
-    // Loan for the current page.
+    // Endorser for the current page.
 
     // Until the server is ready for pagination,
     // we are getting the entire set of tranactions (> 500)
@@ -696,29 +598,29 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     // on the current page.
 
     this.bulkActionCounter = 0;
-    // for (const t of this.LoanModel) {
-    //   t.selected = this.allLoanSelected;
-    //   if (this.allLoanSelected) {
+    // for (const t of this.endorserModel) {
+    //   t.selected = this.allEndorserSelected;
+    //   if (this.allEndorserSelected) {
     //     this.bulkActionCounter++;
     //   }
     // }
 
     // TODO replace this with the commented code above when server pagination is ready.
     for (let i = (this.firstItemOnPage - 1); i <= (this.lastItemOnPage - 1); i++) {
-      this.LoanModel[i].selected = this.allLoanSelected;
-      if (this.allLoanSelected) {
+      this.endorserModel[i].selected = this.allEndorserSelected;
+      if (this.allEndorserSelected) {
         this.bulkActionCounter++;
       }
     }
-    this.bulkActionDisabled = !this.allLoanSelected;
+    this.bulkActionDisabled = !this.allEndorserSelected;
   }
 
 
   /**
-   * Check if the view to show is Loan.
+   * Check if the view to show is Endorser.
    */
-  public isLoanSummryViewActive() {
-    return this.tableType === this.LoanView ? true : false;
+  public isendorserSummaryViewActive() {
+    return this.tableType === this.endorserView ? true : false;
   }
 
 
@@ -742,7 +644,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     if (e.target.checked) {
       this.bulkActionCounter++;
     } else {
-      this.allLoanSelected = false;
+      this.allEndorserSelected = false;
       if (this.bulkActionCounter > 0) {
         this.bulkActionCounter--;
       }
@@ -750,40 +652,18 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
     // Contact View shows bulk action when more than 1 checked
     // Recycle Bin shows delete action when 1 or more checked.
-    const count = this.isLoanSummryViewActive() ? 1 : 0;
+    const count = this.isendorserSummaryViewActive() ? 1 : 0;
     this.bulkActionDisabled = (this.bulkActionCounter > count) ? false : true;
   }
 
 
-  /**
-   * Get cached values from session.
-   */
-  private getCachedValues() {
-    this.applyFiltersCache();
-    switch (this.tableType) {
-      case this.LoanView:
-        this.applyColCache(this.loanSortableColumnsLSK);
-        this.applyCurrentSortedColCache(this.loanCurrentSortedColLSK);
-        this.applyCurrentPageCache(this.loanPageLSK);
-        break;
-      case this.recycleBinView:
-        this.applyColCache(this.recycleSortableColumnsLSK);
-        this.applyColumnsSelected();
-        this.applyCurrentSortedColCache(this.recycleCurrentSortedColLSK);
-        this.applyCurrentPageCache(this.recyclePageLSK);
-        break;
-      default:
-        break;
-    }
-  }
-
 
   /**
-   * Columns selected in the PIN dialog from the Loan view
+   * Columns selected in the PIN dialog from the Endorser view
    * need to be applied to the Recycling Bin table.
    */
   private applyColumnsSelected() {
-    const key = this.loanSortableColumnsLSK;
+    const key = this.endorserSortableColumnsLSK;
     const sortableColumnsJson: string | null = localStorage.getItem(key);
     if (localStorage.getItem(key) != null) {
       const ctnCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
@@ -865,10 +745,10 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
   private setCachedValues() {
 
     switch (this.tableType) {
-      case this.LoanView:
-        this.setCacheValuesforView(this.loanSortableColumnsLSK,
-          this.loanCurrentSortedColLSK, this.loanPageLSK);
-        this.loanPageLSK
+      case this.endorserView:
+        this.setCacheValuesforView(this.endorserSortableColumnsLSK,
+          this.endorserCurrentSortedColLSK, this.endorserPageLSK);
+        this.endorserPageLSK
         break;
       case this.recycleBinView:
         this.setCacheValuesforView(this.recycleSortableColumnsLSK,
@@ -925,13 +805,13 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
-  public editLoanPayment(loan:any){
-    this._goToLoan(loan);
+  public editEndorserPayment(endorser:any){
+    this._goToEndorser(endorser);
   }
 
 
-  private _goToLoan(loan:any) {
-    const loanRepaymentEmitObj: any = {
+  private _goToEndorser(endorser:any) {
+    const endorserRepaymentEmitObj: any = {
       form: {},
       direction: 'next', //TODO-zs -- does this need to be changed?
       step: 'step_3',
@@ -940,31 +820,31 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
       action: ScheduleActions.edit,
       transactionDetail: {
         transactionModel : {
-          transactionId: loan.transaction_id, 
-          entityId: loan.entity_id
+          transactionId: endorser.transaction_id, 
+          entityId: endorser.entity_id
         }
       }
     };
-    this.status.emit(loanRepaymentEmitObj);
+    this.status.emit(endorserRepaymentEmitObj);
   }
   
-  public goToLoanRepayment(loan:any) {
-    const loanRepaymentEmitObj: any = {
+  public goToEndorserRepayment(endorser:any) {
+    const endorserRepaymentEmitObj: any = {
       form: {},
       direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
-      scheduleType: 'sched_c_loan_payment',
+      scheduleType: 'sched_c_endorser_payment',
       action: ScheduleActions.add,
       transactionDetail: {
         transactionModel: {
-          transactionId: loan.transaction_id, 
-          entityId: loan.entity_id,
+          transactionId: endorser.transaction_id, 
+          entityId: endorser.entity_id,
           entryScreenScheduleType: 'sched_c_ls',
         }
       }
     };
-    this.status.emit(loanRepaymentEmitObj);
+    this.status.emit(endorserRepaymentEmitObj);
   }
 
   /**
@@ -977,15 +857,15 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     // this.currentSortedColumnName = this._tableService.setSortDirection('default',
     //   this.sortableColumns, false);
 
-    // When default, the backend will sort by name and loan date
+    // When default, the backend will sort by name and endorser date
     this.currentSortedColumnName = 'default';
   }
 
 
   private calculateNumberOfPages(): void {
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
-      if (this.LoanModel && this.LoanModel.length > 0) {
-        this.numberOfPages = this.LoanModel.length / this.config.itemsPerPage;
+      if (this.endorserModel && this.endorserModel.length > 0) {
+        this.numberOfPages = this.endorserModel.length / this.config.itemsPerPage;
         this.numberOfPages = Math.ceil(this.numberOfPages);
       }
     }

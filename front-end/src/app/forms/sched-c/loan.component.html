@@ -289,9 +289,11 @@
                   Save
                 </button>
                 <button *ngIf="entityType === 'ORG'" class="btn btn-secondary btn-right" type="button"
-                  (click)="onSaveLoan('endorser')">
-                  Endorser
-                </button>
+                (click)="onSaveLoan('endorser')"
+                >
+                Endorser
+              </button>
+              <!-- (click)="_goToEndorser()" -->
                 <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan('loanRepayment')">
                   Loan Repayment
                 </button>
@@ -304,9 +306,10 @@
                   Save
                 </button>
                 <button *ngIf="entityType === 'ORG'" class="btn btn-secondary btn-right" type="button"
-                  (click)="onSaveLoan('endorser')">
+                (click)="onSaveLoan('endorser')">
                   Endorser
                 </button>
+                <!--  (click)="_goToEndorser()" -->
                 <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan('loanRepayment')">
                   Loan Repayment
                 </button>
