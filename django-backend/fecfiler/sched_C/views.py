@@ -571,17 +571,27 @@ def get_schedC(data):
             for obj in childB_forms_obj:
                 obj.update(API_CALL_SB)
             logger.debug('getting all sched_c1 childs...')
-            childC1_forms_obj = get_sched_c1_child_transactions(
+
+            # list of [{cmte_id:'dummny', transaction_id:'dummy'}]
+            childC1_ids = get_sched_c1_child_transactions(
                 cmte_id, transaction_id)
+            
             # print(childC1_forms_obj)
-            for obj in childC1_forms_obj:
-                obj.update(API_CALL_SC1)
+            childC1_forms_obj = []
+            for id in childC1_ids:
+                child_obj = get_schedC1(id)[0]
+                child_obj.update(API_CALL_SC1)
+                childC1_forms_obj.append(child_obj)
+
             logger.debug('getting all sched_c2 childs...')
-            childC2_forms_obj = get_sched_c2_child_transactions(
+            childC2_ids = get_sched_c2_child_transactions(
                 cmte_id, transaction_id)
             # print(childC2_forms_obj)
-            for obj in childC2_forms_obj:
-                obj.update(API_CALL_SC2)
+            childC2_forms_obj = []
+            for id in childC2_ids:
+                child_obj = get_schedC2(id)[0]
+                child_obj.update(API_CALL_SC2)
+                childC2_forms_obj.append(child_obj)
 
             child_forms_obj = (
                 childA_forms_obj + 
@@ -1427,7 +1437,8 @@ def get_schedC1(data):
         report_id = data.get('report_id')
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
-            forms_obj = get_list_schedC1(report_id, cmte_id, transaction_id)
+            # forms_obj = get_list_schedC1(report_id, cmte_id, transaction_id)
+            forms_obj = get_list_schedC1(cmte_id, transaction_id)
             # adding entity data: lender, treasurer and authorized
             merged_list = []
             for obj in forms_obj:
@@ -1537,7 +1548,10 @@ def get_list_all_schedC1(report_id, cmte_id):
     except Exception:
         raise 
 
-def get_list_schedC1(report_id, cmte_id, transaction_id):
+def get_list_schedC1(cmte_id, transaction_id):
+    """
+    skip report id for now when loading sched_c1
+    """
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -1582,10 +1596,10 @@ def get_list_schedC1(report_id, cmte_id, transaction_id):
             back_ref_transaction_id,
             last_update_date
             FROM public.sched_c1
-            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
+            WHERE cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
             """
-            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            cursor.execute(_sql, (cmte_id, transaction_id))
             schedC1_list = cursor.fetchone()[0]
             if not schedC1_list:
                 raise NoOPError(
@@ -1900,12 +1914,15 @@ def post_sql_schedC2(data):
 
 
 def get_schedC2(data):
+    """
+    note: remvoing report_id for single trnasaction for cross_report loading
+    """
     try:
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
-            forms_obj = get_list_schedC2(report_id, cmte_id, transaction_id)
+            forms_obj = get_list_schedC2(cmte_id, transaction_id)
         else:
             forms_obj = get_list_all_schedC2(report_id, cmte_id)
         return forms_obj
@@ -1963,7 +1980,7 @@ def get_list_all_schedC2(report_id, cmte_id):
         raise
 
 
-def get_list_schedC2(report_id, cmte_id, transaction_id):
+def get_list_schedC2(cmte_id, transaction_id):
     """
         cmte_id = models.CharField(max_length=9)
     report_id = models.BigIntegerField()
@@ -1991,11 +2008,11 @@ def get_list_schedC2(report_id, cmte_id, transaction_id):
             back_ref_transaction_id,
             last_update_date
             FROM public.sched_c2
-            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
+            WHERE cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
             """
 
-            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            cursor.execute(_sql, (cmte_id, transaction_id))
 
             schedC2_list = cursor.fetchone()[0]
 
