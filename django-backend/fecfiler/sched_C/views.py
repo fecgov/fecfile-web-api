@@ -572,13 +572,13 @@ def get_schedC(data):
                 obj.update(API_CALL_SB)
             logger.debug('getting all sched_c1 childs...')
             childC1_forms_obj = get_sched_c1_child_transactions(
-                report_id, cmte_id, transaction_id)
+                cmte_id, transaction_id)
             # print(childC1_forms_obj)
             for obj in childC1_forms_obj:
                 obj.update(API_CALL_SC1)
             logger.debug('getting all sched_c2 childs...')
             childC2_forms_obj = get_sched_c2_child_transactions(
-                report_id, cmte_id, transaction_id)
+                cmte_id, transaction_id)
             # print(childC2_forms_obj)
             for obj in childC2_forms_obj:
                 obj.update(API_CALL_SC2)
@@ -2015,6 +2015,7 @@ def schedC2_sql_dict(data):
         'transaction_type_identifier',
         'guarantor_entity_id',
         'guaranteed_amount',
+        'back_ref_transaction_id',
     ]
     try:
         datum = {k: v for k, v in data.items() if k in valid_fields}
@@ -2071,14 +2072,14 @@ def schedC2(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            if 'report_id' in request.query_params and check_null_value(request.query_params.get('report_id')):
                 data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
+                    request.query_params.get('report_id'))
             else:
                 raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             datum = get_schedC2(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
