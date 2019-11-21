@@ -296,16 +296,6 @@ export class EndorserComponent implements OnInit, OnDestroy {
     }
   }
 
-  private formatAmountForAPI(contributionAmount): string {
-    /*  // default to 0 when no value
-     contributionAmount = contributionAmount ? contributionAmount : '0';
-     // remove commas
-     contributionAmount = contributionAmount.replace(/,/g, ``);
-     // determine if negative, truncate if > max
-     contributionAmount = this.transformAmount(contributionAmount, this._contributionAmountMax);
-     return contributionAmount; */
-    return "";
-  }
 
   /**
    * Allow for negative sign and don't allow more than the max
@@ -331,146 +321,6 @@ export class EndorserComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Gets the transaction type.
-   */
-  private _getTransactionType(): void {
-    /*  const transactionType: any = JSON.parse(localStorage.getItem(`form_${this._formType}_transaction_type`));
- 
-     if (typeof transactionType === 'object') {
-       if (transactionType !== null) {
-         if (transactionType.hasOwnProperty('mainTransactionTypeValue')) {
-           this._transactionType = transactionType.mainTransactionTypeValue;
-         }
-       }
-     }
- 
-     if (this.transactionType) {
-       if (this.transactionType !== this._transactionTypePrevious) {
-         this._transactionTypePrevious = this.transactionType;
-         // reload dynamic form fields
-         this.getFormFields();
-       }
-     } */
-  }
-
-  public handleFormFieldKeyup($event: any, col: any) {
-    /*if (!col) {
-      return;
-    }
-    if (!col.name) {
-      return;
-    }
-    if (
-      col.name === 'middle_name' ||
-      col.name === 'prefix' ||
-      col.name === 'suffix' ||
-      col.name === 'street_1' ||
-      col.name === 'street_2' ||
-      col.name === 'city' ||
-      col.name === 'state' ||
-      col.name === 'zip_code' ||
-      col.name === 'employer' ||
-      col.name === 'occupation'
-    ) {
-      if (this._selectedEntity) {
-        this.endorserForm.patchValue({ [col.name]: this._selectedEntity[col.name] }, { onlySelf: true });
-        //this.showWarn(col.text);
-        this.showWarn(col.text, col.name);
-      }
-    } else {
-      return null;
-    }*/
-  }
-
-  /**
-   * Show a warning indicating fields may not be changed for entities loaded from the database.
-   *
-   * @param fieldLabel Field Label to show in the message
-   */
-  /*private showWarn(fieldLabel: string) {
-    const message =
-      `Changes to ${fieldLabel} can't be edited when a Contributor is` +
-      ` selected from the dropdwon.  Go to the Contacts page to edit a Contributor.`;
-
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Caution!', false).then(res => {});
-  }*/
-
-  /**
-   * Updates vaprivate _memoCode variable.
-   *
-   * @param      {Object}  e      The event object.
-   */
-  /*public memoCodeChange(e): void {
-    const { checked } = e.target;
-
-    if (checked) {
-      this.memoCode = checked;
-      this.endorserForm.controls['memo_code'].setValue(this._memoCodeValue);
-      this.endorserForm.controls['contribution_date'].setValidators([Validators.required]);
-
-      this.endorserForm.controls['contribution_date'].updateValueAndValidity();
-    } else {
-      this._validateContributionDate();
-      this.memoCode = checked;
-      this.endorserForm.controls['memo_code'].setValue(null);
-      this.endorserForm.controls['contribution_date'].setValidators([
-        contributionDate(this.cvgStartDate, this.cvgEndDate),
-        Validators.required
-      ]);
-
-      this.endorserForm.controls['contribution_date'].updateValueAndValidity();
-    }
-  }*/
-
-  /**
-   * State select options are formatted " AK - Alaska ".  Once selected
-   * the input field should display on the state code and the API must receive
-   * only the state code.  When an optin is selected, the $ngOptionLabel
-   * is received here having the state code - name format.  Parse it
-   * for the state code.  This should be modified if possible.  Look into
-   * options for ng-select and ng-option.
-   *
-   * NOTE: If the format of the option changes in the html template, the parsing
-   * logic will most likely need to change here.
-   *
-   * @param stateOption the state selected in the dropdown.
-   */
-
-  /*public handleStateChange(stateOption: any, col: any) {
-   console.log("handleStateChange stateOption", stateOption);
-   if (this._selectedEntity) {
-     //this.showWarn(col.text);
-     this.endorserForm.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
-   } else {
-     let stateCode = null;
-     if (stateOption.$ngOptionLabel) {
-       stateCode = stateOption.$ngOptionLabel;
-       if (stateCode) {
-         stateCode = stateCode.trim();
-         if (stateCode.length > 1) {
-           stateCode = stateCode.substring(0, 2);
-           console.log(" handleStateChange stateCode", stateCode);
-         }
-       }
-     }
-     
-     this.endorserForm.patchValue({ state: stateCode }, { onlySelf: true });
-   }
- }*/
-
-
-  /*public handleStateChange(stateOption: any, col: any) {
-   
-    if (this._selectedEntity) {
-      // this.showWarn(col.text);
-      this.endorserForm.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
-    } else {
-      this.endorserForm.patchValue({ state: stateOption.code }, { onlySelf: true });
-    }
-  } commented on 10052019*/
-
-
   public handleStateChange(stateOption: any, col: any) {
     if (this._selectedEntity) {
       this.showWarn(col.text, 'state');
@@ -485,78 +335,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
       return;
     }
 
-    //const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
-    //this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
-
     this._selectedChangeWarn[name] = name;
-  }
-
-  public handleCandOfficeChange(candOfficeOption: any, col: any) {
-
-    if (this._selectedEntity) {
-      //this.showWarn(col.text);
-      this.endorserForm.patchValue({ candOffice: this._selectedEntity.candOffice }, { onlySelf: true });
-    } else {
-      let officeCode = null;
-      if (candOfficeOption.$ngOptionLabel) {
-        officeCode = candOfficeOption.$ngOptionLabel;
-        if (officeCode) {
-          officeCode = officeCode.trim();
-          if (officeCode.length > 1) {
-            officeCode = officeCode.substring(0, 1);
-          }
-        }
-      }
-
-      this.endorserForm.patchValue({ candOffice: officeCode }, { onlySelf: true });
-    }
-  }
-
-  public handleOfficeStateChange(officeStateOption: any, col: any) {
-
-    if (this._selectedEntity) {
-      //this.showWarn(col.text);
-      this.endorserForm.patchValue({ candOfficeState: this._selectedEntity.candOfficeState }, { onlySelf: true });
-    } else {
-      let officeStateCode = null;
-      if (officeStateOption.$ngOptionLabel) {
-        officeStateCode = officeStateOption.$ngOptionLabel;
-        if (officeStateCode) {
-          officeStateCode = officeStateCode.trim();
-          if (officeStateCode.length > 1) {
-            officeStateCode = officeStateCode.substring(0, 2);
-          }
-        }
-      }
-
-      this.endorserForm.patchValue({ candOfficeState: officeStateCode }, { onlySelf: true });
-    }
-  }
-
-  public handleTypeChange(entityOption: any, col: any) {
-    /*    this is just a flag to distinguish what caused the loadDynamicFormFields() method to be invoked,
-as it can be invoked during initial form population during edit or during change event
-on ngselect  */
-    this.typeChangeEventOccured = true;
-    if (this.scheduleAction === ScheduleActions.edit) {
-      // this._prePopulateFormForEdit(this.transactionDetail);
-    }
-    else {
-      this.loadDynamiceFormFields();
-    }
-  }
-
-
-
-  /**
-   * Goes to the previous step.
-   */
-  public previousStep(): void {
-    this.status.emit({
-      form: {},
-      direction: 'previous',
-      step: 'step_2'
-    });
   }
 
   /**
@@ -607,117 +386,11 @@ on ngselect  */
     return `${lastName}, ${firstName}, ${street1}, ${street2}`;
   }
 
-  /**
-   * Format an entity to display in the Org type ahead.
-   *
-   * @param result formatted item in the typeahead list
-   */
-  public formatTypeaheadOrgItem(result: any) {
-    const street1 = result.street_1 ? result.street_1.trim() : '';
-    const street2 = result.street_2 ? result.street_2.trim() : '';
-    const name = result.entity_name ? result.entity_name.trim() : '';
 
-    return `${name}, ${street1}, ${street2}`;
-  }
-
-  /**
-   * Format an entity to display in the Committee ID type ahead.
-   *
-   * @param result formatted item in the typeahead list
-   */
-  public formatTypeaheadCommitteeId(result: any) {
-    const street1 = result.street_1 ? result.street_1.trim() : '';
-    const street2 = result.street_2 ? result.street_2.trim() : '';
-    const name = result.cmte_id ? result.cmte_id.trim() : '';
-
-    return `${name}, ${street1}, ${street2}`;
-  }
-
-  /**
-   * Format an entity to display in the Candidate ID type ahead.
-   *
-   * @param result formatted item in the typeahead list
-   */
-  public formatTypeaheadCandidateId(result: any) {
-    const candidateId = result.beneficiary_cand_id ? result.beneficiary_cand_id.trim() : '';
-    const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
-    const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
-    let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
-    if (office) {
-      if (office === 'P') {
-        office = 'Presidential';
-      } else if (office === 'S') {
-        office = 'Senate';
-      } else if (office === 'H') {
-        office = 'House';
-      }
-    }
-    const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
-    const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
-
-    return `${candidateId}, ${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
-  }
-
-  /**
-   * Format an entity to display in the Committee Name type ahead.
-   *
-   * @param result formatted item in the typeahead list
-   */
-  public formatTypeaheadCommitteeName(result: any) {
-    const street1 = result.street_1 ? result.street_1.trim() : '';
-    const street2 = result.street_2 ? result.street_2.trim() : '';
-    const name = result.cmte_id ? result.cmte_name.trim() : '';
-
-    return `${name}, ${street1}, ${street2}`;
-  }
-
-  /**
-   * Format an entity to display in the Candidate type ahead field.
-   *
-   * @param result formatted item in the typeahead list
-   */
-  public formatTypeaheadCandidate(result: any) {
-    const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
-    const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
-    let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
-    if (office) {
-      if (office === 'P') {
-        office = 'Presidential';
-      } else if (office === 'S') {
-        office = 'Senate';
-      } else if (office === 'H') {
-        office = 'House';
-      }
-    }
-    const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
-    const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
-
-    return `${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
-  }
-
-  /**
-   * Populate the fields in the form with the values from the selected contact.
-   *
-   * @param $event The mouse event having selected the contact from the typeahead options.
-   */
-  public handleSelectedOrgItem($event: NgbTypeaheadSelectItemEvent) {
-    const contact = $event.item;
-    this._selectedEntity = this._utilService.deepClone(contact);
-    //this.endorserForm.patchValue({ type: contact.type }, { onlySelf: true });
-    this.endorserForm.patchValue({ last_name: contact.entity_name }, { onlySelf: true });
-    this.endorserForm.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
-    this.endorserForm.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
-    this.endorserForm.patchValue({ city: contact.city }, { onlySelf: true });
-    this.endorserForm.patchValue({ state: contact.state }, { onlySelf: true });
-    this.endorserForm.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    this.endorserForm.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
-    this.endorserForm.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
-  }
 
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
     const contact = $event.item;
     this._selectedEntity = this._utilService.deepClone(contact);
-    //this.endorserForm.patchValue({ type: contact.type }, { onlySelf: true });
     this.endorserForm.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.endorserForm.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.endorserForm.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
@@ -731,26 +404,6 @@ on ngselect  */
     this.endorserForm.patchValue({ entity_type: contact.entity_type }, { onlySelf: true });
     this.endorserForm.patchValue({ occupation: contact.occupation }, { onlySelf: true });
     this.endorserForm.patchValue({ employer: contact.employer }, { onlySelf: true });
-
-    //this.endorserForm.patchValue({ phoneNumber: contact.phoneNumber }, { onlySelf: true });
-    //this.endorserForm.patchValue({ candOffice: contact.candOffice }, { onlySelf: true });
-    //this.endorserForm.patchValue({ candOfficeState: contact.candOfficeState }, { onlySelf: true });
-    //this.endorserForm.patchValue({ candOfficeDistrict: contact.candOfficeDistrict }, { onlySelf: true });
-
-
-    let transactionTypeIdentifier = '';
-    // Use this if transaction_tye_identifier is to come from dynamic form data
-    // currently it's called to early to detect type changes as it happens in step 1 / report type
-    // for (const field of this.hiddenFields) {
-    //   if (field.name === 'transaction_type_identifier') {
-    //     transactionTypeIdentifier = field.value;
-    //   }
-    // }
-
-    // default to indiv-receipt for sprint 17 - use input field in sprint 18.
-    transactionTypeIdentifier = 'INDV_REC';
-
-    //const reportId = this.getReportIdFromStorage();
   }
 
 
@@ -786,114 +439,6 @@ on ngselect  */
       })
     );
 
-  /**
-   * Search for Candidates when last name input value changes.
-   */
-  searchCandLastName = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(searchText => {
-        if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'cand_last_name');
-        } else {
-          return Observable.of([]);
-        }
-      })
-    );
-
-  /**
-   * Search for Candidate when first name input value changes.
-   */
-  searchCandFirstName = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(searchText => {
-        if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'cand_first_name');
-        } else {
-          return Observable.of([]);
-        }
-      })
-    );
-
-  /**
-   * Search for entities when organization/entity_name input value changes.
-   */
-  searchOrg = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(searchText => {
-        if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'entity_name');
-        } else {
-          return Observable.of([]);
-        }
-      })
-    );
-
-  /**
-   * Search for entities when organization/entity_name input value changes.
-   */
-  searchCommitteeName = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(searchText => {
-        if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'cmte_name');
-        } else {
-          return Observable.of([]);
-        }
-      })
-    );
-
-  /**
-   * Search for entities when organization/entity_name input value changes.
-   */
-  searchCommitteeId = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(searchText => {
-        const searchTextUpper = searchText.toUpperCase();
-
-        if (
-          searchTextUpper === 'C' ||
-          searchTextUpper === 'C0' ||
-          searchTextUpper === 'C00' ||
-          searchTextUpper === 'C000'
-        ) {
-          return Observable.of([]);
-        }
-
-        if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'cmte_id');
-        } else {
-          return Observable.of([]);
-        }
-      })
-    );
-
-  /**
-   * Search for entities when Candidate ID input value changes.
-   */
-  searchCandidateId = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(500),
-      distinctUntilChanged(),
-      switchMap(searchText => {
-        if (searchText.length < 3) {
-          return Observable.of([]);
-        } else {
-          const searchTextUpper = searchText.toUpperCase();
-          return this._typeaheadService.getContacts(searchTextUpper, 'cand_id');
-        }
-      })
-    )
-
 
   /**
    * format the value to display in the input field once selected from the typeahead.
@@ -925,95 +470,6 @@ on ngselect  */
     }
   };
 
-  /**
-   * format the value to display in the input field once selected from the typeahead.
-   *
-   * For some reason this gets called for all typeahead fields despite the binding in the
-   * template to the last name field.  In these cases return x to retain the value in the
-   * input for the other typeahead fields.
-   */
-  formatterCandLastName = (x: { cand_last_name: string }) => {
-    if (typeof x !== 'string') {
-      return x.cand_last_name;
-    } else {
-      return x;
-    }
-  };
-
-  /**
-   * format the value to display in the input field once selected from the typeahead.
-   *
-   * For some reason this gets called for all typeahead fields despite the binding in the
-   * template to the first name field.  In these cases return x to retain the value in the
-   * input for the other typeahead fields.
-   */
-  formatterCandFirstName = (x: { cand_first_name: string }) => {
-    if (typeof x !== 'string') {
-      return x.cand_first_name;
-    } else {
-      return x;
-    }
-  };
-
-  /**
-   * format the value to display in the input field once selected from the typeahead.
-   *
-   * For some reason this gets called for all typeahead fields despite the binding in the
-   * template to the entity name field.  In these cases return x to retain the value in the
-   * input for the other typeahead fields.
-   */
-  formatterOrgName = (x: { entity_name: string }) => {
-    if (typeof x !== 'string') {
-      return x.entity_name;
-    } else {
-      return x;
-    }
-  };
-
-  /**
-   * format the value to display in the input field once selected from the typeahead.
-   *
-   * For some reason this gets called for all typeahead fields despite the binding in the
-   * template to the committee ID field.  In these cases return x to retain the value in the
-   * input for the other typeahead fields.
-   */
-  formatterCommitteeId = (x: { cmte_id: string }) => {
-    if (typeof x !== 'string') {
-      return x.cmte_id;
-    } else {
-      return x;
-    }
-  };
-
-  /**
-   * format the value to display in the input field once selected from the typeahead.
-   *
-   * For some reason this gets called for all typeahead fields despite the binding in the
-   * template to the Candidate ID field.  In these cases return x to retain the value in the
-   * input for the other typeahead fields.
-   */
-  formatterCandidateId = (x: { beneficiary_cand_id: string }) => {
-    if (typeof x !== 'string') {
-      return x.beneficiary_cand_id;
-    } else {
-      return x;
-    }
-  }
-
-  /**
-   * format the value to display in the input field once selected from the typeahead.
-   *
-   * For some reason this gets called for all typeahead fields despite the binding in the
-   * template to the committee name field.  In these cases return x to retain the value in the
-   * input for the other typeahead fields.
-   */
-  formatterCommitteeName = (x: { cmte_name: string }) => {
-    if (typeof x !== 'string') {
-      return x.cmte_name;
-    } else {
-      return x;
-    }
-  };
 
   private getFormFields(): void {
     this._endorserService.get_sched_c_endorser_dynamic_forms_fields().subscribe(res => {
@@ -1028,32 +484,6 @@ on ngselect  */
                 this._setForm(this.formFields);
               }
             }
-            /* if (res.data.hasOwnProperty('individualFormFields')) {
-              if (Array.isArray(res.data.individualFormFields)) {
-                this.individualFormFields = res.data.individualFormFields;
-                this.formFields = res.data.individualFormFields;
-                this._setForm(res.data.individualFormFields);
-              }
-            }
-
-            if (res.data.hasOwnProperty('committeeFormFields')) {
-              if (Array.isArray(res.data.committeeFormFields)) {
-                this.committeeFormFields = res.data.committeeFormFields;
-              }
-            }
-
-            if (res.data.hasOwnProperty('organizationFormFields')) {
-              if (Array.isArray(res.data.organizationFormFields)) {
-                this.organizationFormFields = res.data.organizationFormFields;
-              }
-            }
-
-            if (res.data.hasOwnProperty('candidateFormFields')) {
-              if (Array.isArray(res.data.candidateFormFields)) {
-                this.candidateFormFields = res.data.candidateFormFields;
-              }
-            }
- */
             if (res.data.hasOwnProperty('hiddenFields')) {
               if (Array.isArray(res.data.hiddenFields)) {
                 this.hiddenFields = res.data.hiddenFields;
@@ -1066,42 +496,6 @@ on ngselect  */
               }
             }
 
-/*             if (res.data.hasOwnProperty('prefixes')) {
-              if (Array.isArray(res.data.prefixes)) {
-                this.prefixes = res.data.prefixes;
-              }
-            }
-
-            if (res.data.hasOwnProperty('suffixes')) {
-              if (Array.isArray(res.data.suffixes)) {
-                this.suffixes = res.data.suffixes;
-              }
-            }
-
-            if (res.data.hasOwnProperty('addEntityTypes')) {
-              if (Array.isArray(res.data.addEntityTypes)) {
-                this.entityTypes = res.data.addEntityTypes;
-              }
-            }
-
-            if (res.data.hasOwnProperty('officeSought')) {
-              if (Array.isArray(res.data.officeSought)) {
-                this.officeSought = res.data.officeSought;
-              }
-            }
-
-            if (res.data.hasOwnProperty('officeState')) {
-              if (Array.isArray(res.data.officeState)) {
-                this.officeState = res.data.officeState;
-              }
-            }
-
-            if (res.data.hasOwnProperty('titles')) {
-              if (Array.isArray(res.data.titles)) {
-                this.titles = res.data.titles;
-              }
-            }
- */
             this._loading = false;
           } // typeof res.data
         } // res.hasOwnProperty('data')
@@ -1154,25 +548,6 @@ on ngselect  */
     }
   }
 
-  /*public selectTypeChange(e): void {
-    this._entityType = e.target.value;
-    this.loadDynamiceFormFields();
-    console.log('selectTypeChange this._entityType = ', this._entityType);
-  }*/
-
-  public loadDynamiceFormFields(): void {
-    if (this._entityType === 'IND') {
-      this.formFields = this.individualFormFields;
-    } else if (this._entityType === 'ORG') {
-      this.formFields = this.organizationFormFields;
-    } else if (this._entityType === 'COM') {
-      this.formFields = this.committeeFormFields;
-    } else if (this._entityType === 'CAN') {
-      this.formFields = this.candidateFormFields;
-    }
-    this._setForm(this.formFields);
-  }
-
   public cancelStep(): void {
     this.endorserForm.reset();
     this._goToLoan(null)
@@ -1203,100 +578,34 @@ on ngselect  */
 
   public saveEndorser(){
     const hiddenFieldsObj = {
-      back_ref_transaction_id: this.transactionDetail.transactionId
+      back_ref_transaction_id: this.transactionDetail.transactionId, 
+      entity_id:this._selectedEntity ? this._selectedEntity.entity_id: null
     }
 
     this._loanservice.saveSched_C2(this.scheduleAction, this.endorserForm.value,hiddenFieldsObj).subscribe(res => {
       console.log('success');
       console.log(res);
+    }, error => {
+      console.log(error);
+    
     });
   }
 
-  /**
-   * Vaidates the form on submit.
-   */
-  public doValidateContact(callFrom: string) {
-    if (this.endorserForm.valid) {
-      const contactObj: any = {};
-
-      for (const field in this.endorserForm.controls) {
-        if (
-          field === 'last_name' ||
-          field === 'first_name' ||
-          this.isFieldName(field, 'cmte_id') ||
-          this.isFieldName(field, 'cmte_name') ||
-          this.isFieldName(field, 'entity_name')
-        ) {
-          // if (this._selectedEntity) {
-          // If the typeahead was used to load the entity into the form,
-          // we don't allow users to make changes to the entity. Non-Typeahead
-          // field (address, middle name, etc) are reset onKeyup.  Typeahead
-          // fields must be reset here.  This is a known UI design issue with the
-          // typeahead and not being able to disable fields because of add functionality.
-          // We are tolerating this limitation where the user may change the last or
-          // first name, it will reflect the change in the UI but won't be save to API.
-          // contactObj[field] = this._selectedEntity[field];
-          // } else {
-          // TODO Possible defect with typeahead setting field as the entity object
-          // rather than the string defined by the inputFormatter();
-          // If an object is received, find the value on the object by fields type
-          // otherwise use the string value.  This is not desired and this patch
-          // should be removed if the issue is resolved.
-          const typeAheadField = this.endorserForm.get(field).value;
-          if (typeAheadField && typeof typeAheadField !== 'string') {
-            contactObj[field] = typeAheadField[field];
-          } else {
-            contactObj[field] = typeAheadField;
-          }
-          // }
-        } else {
-          contactObj[field] = this.endorserForm.get(field).value;
+  public goToEndorserSummary(){
+    const loanRepaymentEmitObj: any = {
+      form: {},
+      direction: 'next', 
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c_es',
+      action: ScheduleActions.add, //TODO fix it later 
+      transactionDetail: {
+        transactionModel : {
+          transactionId: this.transactionDetail.transactionId
         }
       }
-
-      // There is a race condition with populating hiddenFields
-      // and receiving transaction data to edit from the message service.
-      // If editing, set transaction ID at this point to avoid race condition issue.
-      if (this._contactToEdit) {
-        this.hiddenFields.forEach((el: any) => {
-          if (el.name === 'id') {
-            el.value = this._contactToEdit.id;
-          }
-        });
-      }
-
-      this.hiddenFields.forEach(el => {
-        contactObj[el.name] = el.value;
-      });
-
-      // If entity ID exist, the transaction will be added to the existing entity by the API
-      // Otherwise it will create a new Entity.
-      if (this._selectedEntity) {
-        contactObj.entity_id = this._selectedEntity.entity_id;
-      }
-      contactObj.entity_type = this._entityType;
-
-      localStorage.setItem('contactObj', JSON.stringify(contactObj));
-      this._endorserService.saveContact(this.scheduleAction).subscribe(res => {
-        if (res) {
-          console.log('_endorserService.saveContact res', res);
-          this._contactToEdit = null;
-          this.endorserForm.reset();
-          this._selectedEntity = null;
-          localStorage.removeItem(contactObj);
-          if (callFrom === 'viewContacts') {
-            this._router.navigate([`/contacts`]);
-          }
-          localStorage.setItem('contactsaved', JSON.stringify({ saved: true }));
-          //window.scrollTo(0, 0);
-        }
-      });
-    } else {
-      this.endorserForm.markAsDirty();
-      this.endorserForm.markAsTouched();
-      localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
-      window.scrollTo(0, 0);
-    }
+    };
+    this.status.emit(loanRepaymentEmitObj);
   }
 
 }

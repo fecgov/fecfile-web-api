@@ -817,7 +817,8 @@ export class LoanService {
       back_ref_transaction_id: hiddenFields.back_ref_transaction_id,
       back_ref_sched_name: '',
       transaction_type: 'LOAN_FROM_IND',
-      transaction_type_identifier:'LOANS_OWED_BY_CMTE'
+      transaction_type_identifier:'LOANS_OWED_BY_CMTE', 
+      entity_id: hiddenFields.entity_id
     };
 
 /*     const loanByCommFromIndObj: any = {
