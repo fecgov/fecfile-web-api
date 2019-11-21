@@ -578,20 +578,22 @@ def get_schedC(data):
             
             # print(childC1_forms_obj)
             childC1_forms_obj = []
-            for id in childC1_ids:
-                child_obj = get_schedC1(id)[0]
-                child_obj.update(API_CALL_SC1)
-                childC1_forms_obj.append(child_obj)
+            if childC1_ids: 
+                for id in childC1_ids:
+                    child_obj = get_schedC1(id)[0]
+                    child_obj.update(API_CALL_SC1)
+                    childC1_forms_obj.append(child_obj)
 
             logger.debug('getting all sched_c2 childs...')
             childC2_ids = get_sched_c2_child_transactions(
                 cmte_id, transaction_id)
             # print(childC2_forms_obj)
             childC2_forms_obj = []
-            for id in childC2_ids:
-                child_obj = get_schedC2(id)[0]
-                child_obj.update(API_CALL_SC2)
-                childC2_forms_obj.append(child_obj)
+            if childC2_ids:
+                for id in childC2_ids:
+                    child_obj = get_schedC2(id)[0]
+                    child_obj.update(API_CALL_SC2)
+                    childC2_forms_obj.append(child_obj)
 
             child_forms_obj = (
                 childA_forms_obj + 
@@ -1790,15 +1792,44 @@ def put_schedC2(data):
     """update sched_c2 item
     here we are assuming guarantor_entoty_id are always referencing something already in our DB
     """
-    try:
+    try:        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        # save entity data . 
+        logger.debug('saving endroser entity data...')
+        if 'guarantor_entity_id' in data:
+            get_data = {
+                'cmte_id': data.get('cmte_id'),
+                'entity_id': data.get('guarantor_entity_id')
+            }
+
+            # need this update for FEC entity
+            # if get_data['entity_id'].startswith('FEC'):
+            #     get_data['cmte_id'] = 'C00000000'
+            old_entity = get_entities(get_data)[0]
+            new_entity = put_entities(data)
+            entity_rollback_flag = True
+        else:
+            new_entity = post_entities(data)
+            entity_rollback_flag = False
+        data['guarantor_entity_id'] = new_entity.get('entity_id')
+        logger.debug('guarantor entity saved.')
+
+        data = schedC2_sql_dict(data)
         check_mandatory_fields_SC2(data)
         transaction_id = check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedC2(data)
         except Exception as e:
+            if entity_rollback_flag:
+                entity_data = put_entities(old_entity)
+            else:
+                get_data = {
+                    'cmte_id': data.get('cmte_id'),
+                    'entity_id': data.get('guarantor_entity_id')
+                }
+                remove_entities(get_data)
             raise Exception(
                 'The put_sql_schedD function is throwing an error: ' + str(e))
-        return data
+        return get_schedC2(data)[0]
     except:
         raise
 
@@ -1841,44 +1872,47 @@ def post_schedC2(data):
     """
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        # save entity data . 
+        logger.debug('saving endroser entity data...')
+        if 'guarantor_entity_id' in data:
+            get_data = {
+                'cmte_id': data.get('cmte_id'),
+                'entity_id': data.get('lender_entity_id')
+            }
+
+            # need this update for FEC entity
+            # if get_data['entity_id'].startswith('FEC'):
+            #     get_data['cmte_id'] = 'C00000000'
+            old_entity = get_entities(get_data)[0]
+            new_entity = put_entities(data)
+            entity_rollback_flag = True
+        else:
+            new_entity = post_entities(data)
+            entity_rollback_flag = False
+        data['guarantor_entity_id'] = new_entity.get('entity_id')
+        logger.debug('guarantor entity saved.')
+
+        data = schedC2_sql_dict(data)
         data['transaction_id'] = get_next_transaction_id('SC')
         validate_sc2_data(data)
 
-        # save entities rirst
-        # if 'creditor_entity_id' in datum:
-        #     get_data = {
-        #         'cmte_id': datum.get('cmte_id'),
-        #         'entity_id': datum.get('creditor_entity_id')
-        #     }
-        #     prev_entity_list = get_entities(get_data)
-        #     entity_data = put_entities(datum)
-        # else:
-        #     entity_data = post_entities(datum)
-
-        # continue to save transaction
-        # creditor_entity_id = entity_data.get('creditor_entity_id')
-        # datum['creditor_entity_id'] = creditor_entity_id
-        # datum['line_number'] = disclosure_rules(datum.get('line_number'), datum.get('report_id'), datum.get('transaction_type'), datum.get('contribution_amount'), datum.get('contribution_date'), entity_id, datum.get('cmte_id'))
-        # trans_char = "SD"
-        # transaction_id = get_next_transaction_id(trans_char)
-        # datum['transaction_id'] = transaction_id
         try:
             post_sql_schedC2(data)
         except Exception as e:
-            # if 'creditor_entity_id' in datum:
-            #     entity_data = put_entities(prev_entity_list[0])
-            # else:
-            #     get_data = {
-            #         'cmte_id': datum.get('cmte_id'),
-            #         'entity_id': creditor_entity_id
-            #     }
-            #     remove_entities(get_data)
+            if entity_rollback_flag:
+                entity_data = put_entities(old_entity)
+            else:
+                get_data = {
+                    'cmte_id': data.get('cmte_id'),
+                    'entity_id': data.get('guarantor_entity_id')
+                }
+                remove_entities(get_data)
             raise Exception(
                 'The post_sql_schedC2 function is throwing an error: ' + str(e))
         # update line number based on aggregate amount info
         # update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
         #     'transaction_type'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
-        return data
+        return get_schedC2(data)[0]
     except:
         raise
 
@@ -1974,6 +2008,12 @@ def get_list_all_schedC2(report_id, cmte_id):
                     'No sched_c2 transaction found for report_id {} and cmte_id: {}'.format(report_id, cmte_id))
             merged_list = []
             for dictC2 in schedC2_list:
+                _q = {
+                        'entity_id' : dictC2.get('guarantor_entity_id'), 
+                        'cmte_id' : cmte_id
+                    }
+                guarantor = get_entities(_q)[0]
+                dictC2.update(guarantor)
                 merged_list.append(dictC2)
         return merged_list
     except Exception:
@@ -2019,9 +2059,19 @@ def get_list_schedC2(cmte_id, transaction_id):
             if schedC2_list is None:
                 raise NoOPError(
                     'The transaction id: {} does not exist or is deleted'.format(transaction_id))
+
             merged_list = []
             for dictC2 in schedC2_list:
+                _q = {
+                        'entity_id' : dictC2.get('guarantor_entity_id'), 
+                        'cmte_id' : cmte_id
+                    }
+                guarantor = get_entities(_q)[0]
+                dictC2.update(guarantor)
                 merged_list.append(dictC2)
+            # merged_list = []
+            # for dictC2 in schedC2_list:
+            #     merged_list.append(dictC2)
         return merged_list
     except Exception:
         raise
@@ -2029,6 +2079,9 @@ def get_list_schedC2(cmte_id, transaction_id):
 
 def schedC2_sql_dict(data):
     valid_fields = [
+        'cmte_id',
+        'report_id',
+        'transaction_id',
         'transaction_type_identifier',
         'guarantor_entity_id',
         'guaranteed_amount',
@@ -2067,7 +2120,8 @@ def schedC2(request):
             # end of handling
             # print(cmte_id)
             # print(report_id)
-            datum = schedC2_sql_dict(request.data)
+            # datum = schedC2_sql_dict(request.data)
+            datum = request.data.copy()
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
             if 'transaction_id' in request.data and check_null_value(
@@ -2131,7 +2185,8 @@ def schedC2(request):
 
     elif request.method == 'PUT':
         try:
-            datum = schedC2_sql_dict(request.data)
+            # datum = schedC2_sql_dict(request.data)
+            datum = request.data.copy()
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 datum['transaction_id'] = request.data.get('transaction_id')
             else:
