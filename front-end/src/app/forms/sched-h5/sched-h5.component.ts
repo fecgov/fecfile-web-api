@@ -23,6 +23,7 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
 import { Observable, Subscription } from 'rxjs';
 import { SchedH5Service } from './sched-h5.service';
+import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 @Component({
   selector: 'app-sched-h5',
@@ -123,6 +124,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnInit() {
+    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedH5Component;
     this.formType = '3X';
     this.formFieldsPrePopulated = true;
     // this.formFields = this._staticFormFields;

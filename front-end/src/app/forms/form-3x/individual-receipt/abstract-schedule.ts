@@ -117,12 +117,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
 
   private _reportType: any = null;
-  private _cloned: boolean = false;
+  private _cloned = false;
   private _types: any = [];
   private _transaction: any = {};
   private _transactionType: string = null;
   private _transactionTypePrevious: string = null;
-  private _transactionCategory: string = '';
+  private _transactionCategory = '';
   private _formSubmitted = false;
   private _contributionAggregateValue = 0.0;
   private _contributionAggregateValueChild = 0.0;
@@ -223,8 +223,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     });
 
     this._loadFormFieldsSubscription = this._f3xMessageService.getLoadFormFieldsMessage().subscribe(message => {
-      this._getFormFields();
-      this._validateTransactionDate();
+      if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+        this._getFormFields();
+        this._validateTransactionDate();
+      }
     });
 
     _activatedRoute.queryParams.subscribe(p => {
@@ -1604,7 +1606,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           field === 'total_amount' ||
           field === 'fed_share_amount' ||
           field === 'non_fed_share_amount' ||
-          field === 'activity_event_amount_ytd'
+          field === 'activity_event_amount_ytd' ||
+          field === 'aggregate_general_elec_exp'
         ) {
           // fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
           // Amounts in numeric format shoud be supported by the API.
@@ -3805,7 +3808,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const fields = this.formFields;
     for (const el of fields) {
       if (el.hasOwnProperty('cols') && el.cols) {
-        for (let e of el.cols) {
+        for (const e of el.cols) {
           if (e.name === name) {
             return e;
           }
