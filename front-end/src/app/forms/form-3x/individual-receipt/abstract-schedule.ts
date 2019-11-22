@@ -1154,7 +1154,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (isChildForm) {
       this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': aggregateValue }, { onlySelf: true });
     } else {
-      this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+      if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+        this.frmIndividualReceipt.patchValue({ aggregate_general_elec_exp: aggregateValue }, { onlySelf: true });
+      } else {
+        this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+      }
     }
   }
 
