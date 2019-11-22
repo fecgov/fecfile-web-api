@@ -299,7 +299,7 @@ export class F3xComponent implements OnInit {
             // The solutionhere is to call the message service.  This may be the preferred
             // mechanism to use going forward.
             if (this.transactionType && this.transactionType === e.transactionType) {
-              this._f3xMessageService.sendLoadFormFieldsMessage('');
+              this._f3xMessageService.sendLoadFormFieldsMessage(AbstractScheduleParentEnum.schedMainComponent);
             }
             if (
               e.transactionDetail &&

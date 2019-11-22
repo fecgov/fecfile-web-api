@@ -27,6 +27,7 @@ import { PaginationInstance } from 'ngx-pagination';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { SchedH4Service } from './sched-h4.service';
+import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 
 @Component({
@@ -116,7 +117,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
 
 
   public ngOnInit() {
-    
+    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedH4Component;
     // temp code - waiting until dynamic forms completes and loads the formGroup
     // before rendering the static fields, otherwise validation error styling
     // is not working (input-error-field class).  If dynamic forms deliver,

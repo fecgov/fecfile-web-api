@@ -24,6 +24,7 @@ import { TransactionModel } from '../transactions/model/transaction.model';
 import { Observable, Subscription } from 'rxjs';
 import { SchedH3Service } from './sched-h3.service';
 import { style, animate, transition, trigger } from '@angular/animations';
+import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 @Component({
   selector: 'app-sched-h3',
@@ -137,6 +138,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnInit() {
+    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedH3Component;
     this.formType = '3X';
     this.formFieldsPrePopulated = true;
     // this.formFields = this._staticFormFields;
