@@ -750,6 +750,8 @@ def schedH2_sql_dict(data):
     try:
         # return {k: v for k, v in data.items() if k in valid_h2_fields}
         datum = {k: v for k, v in data.items() if k in valid_h2_fields}
+        if 'receipt_date' in data:
+            datum['revise_date'] = data.get('receipt_date')
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
         return datum
@@ -921,6 +923,7 @@ def get_schedH2(data):
 def get_list_all_schedH2(report_id, cmte_id):
     """
     load all transactions for a report
+    revise_date is renamed to 'receipt_date' in front end
     """
     try:
         with connection.cursor() as cursor:
@@ -936,7 +939,7 @@ def get_list_all_schedH2(report_id, cmte_id):
             fundraising,
             direct_cand_support,
             ratio_code,
-            revise_date,
+            revise_date as receipt_date,
             federal_percent,
             non_federal_percent,
             create_date ,
@@ -976,7 +979,7 @@ def get_list_schedH2(report_id, cmte_id, transaction_id):
             fundraising,
             direct_cand_support,
             ratio_code,
-            revise_date,
+            revise_date as receipt_date,
             federal_percent,
             non_federal_percent,
             create_date ,

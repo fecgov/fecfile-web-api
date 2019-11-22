@@ -845,6 +845,24 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.status.emit(endorserEmitObj);
   }
 
+  public _goToEndorserSummary(): void {
+    const endorserEmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c_es',
+      action: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
+          transactionId: this._transactionId,
+          entityId: this._selectedEntityId
+        }
+      }
+    };
+    this.status.emit(endorserEmitObj);
+  }
+
   public isFieldName(fieldName: string, nameString: string): boolean {
     return fieldName === nameString || fieldName === this._childFieldNamePrefix + nameString;
   }
