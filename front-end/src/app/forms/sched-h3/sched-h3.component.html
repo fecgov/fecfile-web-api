@@ -548,7 +548,7 @@
                         <span class="sr-only">Click here for more information</span>
                       </button>
                     </section>
-                    <section *ngIf="item.activity_event_type === 'total'">
+                    <section *ngIf="item.activity_event_type === 'total'" class="totalRow">
                       Total Amount Transferred
                       <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                         tooltipClass="form-tooltip">
@@ -558,7 +558,10 @@
                     </section>
                     
                   </td>
-                  <td class="summary_text_amt">{{ item.sum | currency:'USD':'symbol-narrow':'1.2-2' }}</td>                    
+                  <td class="summary_text_amt"
+                    [ngClass]="item.activity_event_type === 'Total Amount Transferred' ?
+                    'totalRow' : 'summary_text_amt'"
+                  >{{ item.sum | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
                 </tr>
               </ng-container>                  
             </tbody>

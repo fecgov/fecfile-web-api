@@ -150,8 +150,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.setCategory();
     this.setActivityOrEventIdentifier();
 
-    this.setH5Sum();
-    this.setH5SumP();
+    //this.setH5Sum();
+    //this.setH5SumP();
 
     this.h5TableConfig = {
       itemsPerPage: 8,
@@ -175,6 +175,14 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.formType = '3X';
     this.showPart2 = false;
     this._setTransactionDetail();
+
+    if(this.transactionType === 'ALLOC_H5_SUM') {      
+      this.setH5Sum();      
+    }
+
+    if(this.transactionType === 'ALLOC_H5_SUM_P') {      
+      this.setH5SumP();
+    }
   }
 
   ngDoCheck() {
@@ -538,8 +546,30 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.h5Subscription = this._schedH5Service.getBreakDown(reportId).subscribe(res =>
       {        
-        if(res) {          
-          this.h5SumP =  res;          
+        if(res) {
+
+          this.h5SumP = [];
+
+          this.h5SumP.push(
+            {
+              'category': 'Voter ID',
+              'amount': +res[0].voter_id
+            },{
+              'category': 'Voter Registration',
+              'amount': +res[0].voter_registration
+            },{
+              'category': 'Generic Campaign Activities',
+              'amount': +res[0].generic_campaign
+            },{
+              'category': 'GOTV',
+              'amount': +res[0].gotv
+            },{
+              'category': 'This Period (Total Amount of Transfer Received)',
+              'amount': +res[0].total
+            }
+          );
+
+          //this.h5SumP =  res;
         }
       });
 

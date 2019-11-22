@@ -41,7 +41,7 @@ MANDATORY_FIELDS_SCHED_C2 = [
     ]
 MANDATORY_FIELDS_SCHED_C1 = [
     'cmte_id', 
-    'report_id',
+    # 'report_id',
     'transaction_type_identifier', 
     'transaction_id',
     'back_ref_transaction_id',
@@ -1137,7 +1137,7 @@ def put_sql_schedC1(data):
                 authorized_signed_date = %s,
                 back_ref_transaction_id = %s,
                 last_update_date = %s
-              WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
+              WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
         """
     _v = (
             data.get('line_number'),
@@ -1177,7 +1177,6 @@ def put_sql_schedC1(data):
             data.get('back_ref_transaction_id'),
             datetime.datetime.now(),
             data.get('transaction_id'),
-            data.get('report_id'),
             data.get('cmte_id'),
           )
     do_transaction(_sql, _v)

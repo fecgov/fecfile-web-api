@@ -137,7 +137,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     }, 2000);
 
     //this.getH2Sum(this.getReportId());
-    this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+    //this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
     
     this.setSchedH2();
 
@@ -161,7 +161,11 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
-    this.formType = '3X';    
+    this.formType = '3X';
+
+    if(this.transactionType === 'ALLOC_H2_SUM') {
+      this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+    }
   }
 
   ngDoCheck() {
