@@ -141,7 +141,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     };
     this.config = paginateConfig;
     this.tableType = ActiveView.endorserSummary;
-
+    this.getCachedValues();
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
 
     for (const col of this.sortableColumns) {
@@ -166,6 +166,22 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     this.setCachedValues();
   }
 
+  /**
+   * Get cached values from session.
+   */
+  private getCachedValues() {
+    this.applyFiltersCache();
+    switch (this.tableType) {
+      case this.endorserView:
+        this.applyColCache(this.endorserSortableColumnsLSK);
+        this.applyCurrentSortedColCache(this.endorserCurrentSortedColLSK);
+        this.applyCurrentPageCache(this.endorserPageLSK);
+        break;
+      default:
+        break;
+    }
+  }
+
 
   /**
 	 * The endorser for a given page.
@@ -187,6 +203,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
   }
 
 
+  
   /**
 	 * The endorser for a given page.
 	 *
@@ -232,17 +249,12 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
         //TODO - ZS -- this is temporary fix to map fields to the right attributes until service response is fixed
         res.forEach(element => {
-          if(element.entity_type==='IND'){
             element.name = `${element.last_name}, ${element.first_name}`;
-          }
-          else if(element.entity_type==='ORG'){
-            element.name = element.entity_name;
-          }
         });
         this._LoanService.addUIFileds(res);
         this._LoanService.mockApplyFilters(res);
-        const EndorserModelL = this._LoanService.mapFromServerFields(res);
-        this.endorserModel = EndorserModelL;
+        // const EndorserModelL = this._LoanService.mapFromServerFields(res);
+        this.endorserModel = res;
 
       
 
@@ -790,7 +802,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
    */
   private setSortableColumns(): void {
 
-    const defaultSortColumns = ['name', 'loan_amount_original', 'loan_payment_to_date', 'loan_balance', 'loan_due_date'];
+    const defaultSortColumns = ['name', 'contribution_amount', 'employer', 'occupation'];
     const otherSortColumns = [];
 
     this.sortableColumns = [];
