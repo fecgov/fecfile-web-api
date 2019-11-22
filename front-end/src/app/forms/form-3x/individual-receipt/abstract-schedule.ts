@@ -31,7 +31,10 @@ import { Observable, Subscription, interval, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { F3xMessageService } from '../service/f3x-message.service';
 
@@ -51,7 +54,6 @@ import { entityTypes, committeeEventTypes } from './entity-types-json';
 import { ScheduleActions } from './schedule-actions.enum';
 import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
 
-
 export enum SaveActions {
   saveOnly = 'saveOnly',
   saveForReturnToParent = 'saveForReturnToParent',
@@ -62,7 +64,6 @@ export enum SaveActions {
 }
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
-
   transactionTypeText = '';
   transactionType = '';
   scheduleAction: ScheduleActions = null;
@@ -230,7 +231,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnInit(): void {
-
     this._selectedEntity = null;
     this._selectedChangeWarn = null;
     this._selectedEntityChild = null;
@@ -306,15 +306,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     } else {
       this._dialogService
-      .confirm(
-        'This report has been filed with the FEC. If you want to change, you must Amend the report',
-        ConfirmModalComponent,
-        'Warning',
-        true,
-        ModalHeaderClassEnum.warningHeader,
-        null,
-        'Return to Reports'
-      )
+        .confirm(
+          'This report has been filed with the FEC. If you want to change, you must Amend the report',
+          ConfirmModalComponent,
+          'Warning',
+          true,
+          ModalHeaderClassEnum.warningHeader,
+          null,
+          'Return to Reports'
+        )
         .then(res => {
           if (res === 'okay') {
             this.ngOnInit();
@@ -335,7 +335,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   private _prepareForm() {
-
     this._getTransactionType();
 
     this._validateTransactionDate();
@@ -398,10 +397,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (el.hasOwnProperty('cols') && el.cols) {
         el.cols.forEach(e => {
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name, e.value));
-          if (this.isFieldName(e.name, 'contribution_amount') ||
-              this.isFieldName(e.name, 'expenditure_amount') ||
-              this.isFieldName(e.name, 'total_amount') ||
-              this.isFieldName(e.name, 'incurred_amount')) {
+          if (
+            this.isFieldName(e.name, 'contribution_amount') ||
+            this.isFieldName(e.name, 'expenditure_amount') ||
+            this.isFieldName(e.name, 'total_amount') ||
+            this.isFieldName(e.name, 'incurred_amount')
+          ) {
             if (e.validation) {
               this._contributionAmountMax = e.validation.max ? e.validation.max : 0;
             }
@@ -459,13 +460,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._listenForAggregateChanges();
     }
 
-    if (this.scheduleAction === ScheduleActions.add) {      
-      this.frmIndividualReceipt.patchValue({ beginning_balance: this._decimalPipe.transform(0, '.2-2') },
-        { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ payment_amount: this._decimalPipe.transform(0, '.2-2') },
-        { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ balance_at_close: this._decimalPipe.transform(0, '.2-2') },
-        { onlySelf: true });
+    if (this.scheduleAction === ScheduleActions.add) {
+      this.frmIndividualReceipt.patchValue(
+        { beginning_balance: this._decimalPipe.transform(0, '.2-2') },
+        { onlySelf: true }
+      );
+      this.frmIndividualReceipt.patchValue(
+        { payment_amount: this._decimalPipe.transform(0, '.2-2') },
+        { onlySelf: true }
+      );
+      this.frmIndividualReceipt.patchValue(
+        { balance_at_close: this._decimalPipe.transform(0, '.2-2') },
+        { onlySelf: true }
+      );
     }
 
     // // Rather than set a flag as a check for setting up a change listener
@@ -507,8 +514,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
      * This block adds zip code, and contribution date validation.
      * Required for occupation and employer will be dependent on aggregate.
      */
-    if (this.isFieldName(fieldName, 'zip_code') ||
-        this.isFieldName(fieldName, 'zip_co_exp')) {
+    if (this.isFieldName(fieldName, 'zip_code') || this.isFieldName(fieldName, 'zip_co_exp')) {
       formValidators.push(alphaNumeric());
     } else if (this.isFieldName(fieldName, 'contribution_date') || this.isFieldName(fieldName, 'expenditure_date')) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
@@ -757,8 +763,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public handleOnBlurEvent($event: any, col: any) {
     if (this.isFieldName(col.name, 'contribution_amount') || this.isFieldName(col.name, 'expenditure_amount')) {
       this.contributionAmountChange($event, col.name, col.validation.dollarAmountNegative);
-    } else if (this.isFieldName(col.name, 'total_amount') ||
-               this.isFieldName(col.name, 'incurred_amount')) {
+    } else if (this.isFieldName(col.name, 'total_amount') || this.isFieldName(col.name, 'incurred_amount')) {
       if (this.isFieldName(col.name, 'total_amount') && this.totalAmountReadOnly) {
         return;
       }
@@ -778,10 +783,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.transactionType !== 'DEBT_TO_VENDOR') {
       return;
     }
-    if (!this.frmIndividualReceipt.contains('beginning_balance') ||
-        !this.frmIndividualReceipt.contains('incurred_amount') ||
-        !this.frmIndividualReceipt.contains('payment_amount') ||
-        !this.frmIndividualReceipt.contains('balance_at_close')) {
+    if (
+      !this.frmIndividualReceipt.contains('beginning_balance') ||
+      !this.frmIndividualReceipt.contains('incurred_amount') ||
+      !this.frmIndividualReceipt.contains('payment_amount') ||
+      !this.frmIndividualReceipt.contains('balance_at_close')
+    ) {
       return;
     }
 
@@ -817,8 +824,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     paymentAmount = parseFloat(paymentAmount);
     const balanceAtClose = beginningBalance + incurredAmount - paymentAmount;
 
-    this._formatAmount({ target: { value: balanceAtClose.toString() } },
-      'balance_at_close', false);
+    this._formatAmount({ target: { value: balanceAtClose.toString() } }, 'balance_at_close', false);
   }
 
   /**
@@ -826,9 +832,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Call the API to calculate the fed, non-fed and activity YTD values.
    */
   private _getFedNonFedPercentage() {
-
-    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
-        this.transactionType !== 'ALLOC_EXP_DEBT') {
+    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' && this.transactionType !== 'ALLOC_EXP_DEBT') {
       return;
     }
 
@@ -863,33 +867,32 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName)
-      .subscribe(res => {
-
-      if (res) {
-        if (res.fed_share) {
-          this._formatAmount({ target: { value: res.fed_share.toString() } },
-            'fed_share_amount', false);
+    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName).subscribe(
+      res => {
+        if (res) {
+          if (res.fed_share) {
+            this._formatAmount({ target: { value: res.fed_share.toString() } }, 'fed_share_amount', false);
+          }
+          if (res.nonfed_share) {
+            this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'non_fed_share_amount', false);
+          }
+          if (res.aggregate_amount) {
+            this._formatAmount(
+              { target: { value: res.aggregate_amount.toString() } },
+              'activity_event_amount_ytd',
+              false
+            );
+          }
         }
-        if (res.nonfed_share) {
-          this._formatAmount({ target: { value: res.nonfed_share.toString() } },
-            'non_fed_share_amount', false);
-        }
-        if (res.aggregate_amount) {
-          this._formatAmount({ target: { value: res.aggregate_amount.toString() } },
-            'activity_event_amount_ytd', false);
-        }
-      }
-    },
-    errorRes => {
-    });
+      },
+      errorRes => {}
+    );
   }
 
   /**
    * Present user with H1/H2 required before making Debt payment.
    */
   private _handleNoH1H2(activityEventScheduleType: string) {
-
     // Default to H1 if not provided
     if (!activityEventScheduleType) {
       activityEventScheduleType = 'sched_h1';
@@ -903,7 +906,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
     const scheduleType = activityEventScheduleType;
 
-    const message = `Please add Schedule ${scheduleName} before proceeding with adding the ` +
+    const message =
+      `Please add Schedule ${scheduleName} before proceeding with adding the ` +
       `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
     this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
       const emitObj: any = {
@@ -953,7 +957,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Handle a change to the Activity Event select.
    */
   public handleActivityEventTypeChange($event: any, col: any) {
-
     // reset activity_event_identifier whenever the type changes
     this.frmIndividualReceipt.patchValue({ activity_event_identifier: null }, { onlySelf: true });
     this.activityEventNames = null;
@@ -977,7 +980,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if ($event.activityEventTypes) {
       this.activityEventNames = $event.activityEventTypes;
       // make required
-      // NOTE: Any new validations from the dynamic forms API will need to 
+      // NOTE: Any new validations from the dynamic forms API will need to
       // be added back as this rebuilds the validators for the FormControl.
       // Currently the only relevent one is "required" true/fase.
       if (this.frmIndividualReceipt.contains('activity_event_identifier')) {
@@ -1025,7 +1028,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public handleActivityEventNameChange($event: any, col: any) {
-
     if (!$event) {
       this._resetFedNonFed();
       this.totalAmountReadOnly = true;
@@ -1067,7 +1069,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     return null;
   }
 
-
   /**
    * Return true if readonly else null to remove readonly attribute from DOM.
    */
@@ -1076,9 +1077,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return null;
     }
     // Must be H4 or H6
-    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
-      this.transactionType !== 'ALLOC_EXP_DEBT') {
-        return null;
+    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' && this.transactionType !== 'ALLOC_EXP_DEBT') {
+      return null;
     }
     return this.totalAmountReadOnly ? true : null;
   }
@@ -1221,9 +1221,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       // Not sure if this is needed for preventing excessive calls.
       // Removed for now to get working for sched_h.
       // if (this.transactionType !== this._transactionTypePrevious) {
-        this._transactionTypePrevious = this.transactionType;
-        // reload dynamic form fields
-        this._getFormFields();
+      this._transactionTypePrevious = this.transactionType;
+      // reload dynamic form fields
+      this._getFormFields();
       // }
     }
   }
@@ -1568,14 +1568,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           receiptObj[field] = this._contributionAmount;
         } else if (field === this._childFieldNamePrefix + 'contribution_amount') {
           receiptObj[field] = this._contributionAmountChlid;
-        } else if (field === 'beginning_balance' ||
-                   field === 'incurred_amount' ||
-                   field === 'balance_at_close' ||
-                   field === 'payment_amount' ||
-                   field === 'total_amount' ||
-                   field === 'fed_share_amount' ||
-                   field === 'non_fed_share_amount' ||
-                   field === 'activity_event_amount_ytd') {
+        } else if (
+          field === 'beginning_balance' ||
+          field === 'incurred_amount' ||
+          field === 'balance_at_close' ||
+          field === 'payment_amount' ||
+          field === 'total_amount' ||
+          field === 'fed_share_amount' ||
+          field === 'non_fed_share_amount' ||
+          field === 'activity_event_amount_ytd'
+        ) {
           // fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
           // Amounts in numeric format shoud be supported by the API.
           // The individual-receipt.service is currently only passing string values
@@ -1591,7 +1593,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           }
           receiptObj[field] = amountVal;
         } else if (field === 'levin_account_id') {
-          receiptObj[field] = (this.frmIndividualReceipt.get(field).value).toString();
+          receiptObj[field] = this.frmIndividualReceipt.get(field).value.toString();
         } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
@@ -1636,8 +1638,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       // we might need to revisit to fix the two transactions one screen
 
       // set the back ref id for save on a sub tran.
-      if (this._parentTransactionModel && this._parentTransactionModel.transactionId
-        && this.scheduleAction === ScheduleActions.addSubTransaction) {
+      if (
+        this._parentTransactionModel &&
+        this._parentTransactionModel.transactionId &&
+        this.scheduleAction === ScheduleActions.addSubTransaction
+      ) {
         receiptObj.back_ref_transaction_id = this._parentTransactionModel.transactionId;
       }
 
@@ -1648,7 +1653,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._transactionToEdit = null;
 
           const reportId = this._receiptService.getReportIdFromStorage(this.formType);
-          this._reportsService.updateReportDate(new reportModel({report_id: reportId}))
+          this._reportsService
+            .updateReportDate(new reportModel({ report_id: reportId }))
             .subscribe((resUpdateReportDate: any) => {
               console.log(resUpdateReportDate);
             });
@@ -1729,7 +1735,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               }
             }
 
-
             const addSubTransEmitObj: any = {
               form: this.frmIndividualReceipt,
               direction: 'next',
@@ -1746,8 +1751,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             if (prePopulateFieldArray) {
               addSubTransEmitObj.prePopulateFieldArray = prePopulateFieldArray;
             } else if (this.subTransactionInfo) {
-              if (this.subTransactionInfo.scheduleType === 'sched_d' &&
-                  this.subTransactionInfo.isParent === true) {
+              if (this.subTransactionInfo.scheduleType === 'sched_d' && this.subTransactionInfo.isParent === true) {
                 addSubTransEmitObj.prePopulateFromSchedD = res;
               }
             }
@@ -1762,14 +1766,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             this._completedCloning = true;
             this.viewTransactions();
           } else {
-
             if (saveAction === SaveActions.saveOnly) {
-
               // sched D subtran must have payee fields pre-poulated after saving one
               // and presenting new one to save.
               if (this.subTransactionInfo) {
-                if (this.subTransactionInfo.scheduleType === 'sched_d' &&
-                    this.subTransactionInfo.isParent === false) {
+                if (this.subTransactionInfo.scheduleType === 'sched_d' && this.subTransactionInfo.isParent === false) {
                   this._prePopulateFromSchedDData = res;
                   this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
                 }
@@ -1996,7 +1997,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
 
       this._router.navigate([`/forms/form/${this.formType}`], {
-        queryParams: { step: 'transactions', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory }
+        queryParams: {
+          step: 'transactions',
+          reportId: reportId,
+          edit: this.editMode,
+          transactionCategory: this._transactionCategory
+        }
       });
     } else {
       let reportId = this._receiptService.getReportIdFromStorage(this.formType);
@@ -2004,48 +2010,57 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         reportId = '0';
       }
       this._dialogService
-      .confirm('You are about to delete this transaction ' + this._transactionToEdit.transactionId + '.', ConfirmModalComponent, 'Caution!')
-      .then(res => {
-        if (res === 'okay') {
-          this._transactionsService
-            .trashOrRestoreTransactions(this.formType, 'trash', reportId, [this._transactionToEdit])
-            .subscribe((res: GetTransactionsResponse) => {
-              this._dialogService.confirm(
-                'Transaction has been successfully deleted and sent to the recycle bin. ' + this._transactionToEdit.transactionId,
-                ConfirmModalComponent,
-                'Success!',
-                false,
-                ModalHeaderClassEnum.successHeader
-              ).then(response => {
-                if (response === 'okay' ||
-                response === 'cancel' ||
-                response === ModalDismissReasons.BACKDROP_CLICK ||
-                response === ModalDismissReasons.ESC) {
-                  this._router.navigate([`/forms/form/${this.formType}`], {
-                    queryParams: {
-                      step: 'transactions',
-                      reportId: reportId,
-                      edit: this.editMode,
-                      transactionCategory: this._transactionCategory,
-                      refresh: 1
+        .confirm(
+          'You are about to delete this transaction ' + this._transactionToEdit.transactionId + '.',
+          ConfirmModalComponent,
+          'Caution!'
+        )
+        .then(res => {
+          if (res === 'okay') {
+            this._transactionsService
+              .trashOrRestoreTransactions(this.formType, 'trash', reportId, [this._transactionToEdit])
+              .subscribe((res: GetTransactionsResponse) => {
+                this._dialogService
+                  .confirm(
+                    'Transaction has been successfully deleted and sent to the recycle bin. ' +
+                      this._transactionToEdit.transactionId,
+                    ConfirmModalComponent,
+                    'Success!',
+                    false,
+                    ModalHeaderClassEnum.successHeader
+                  )
+                  .then(response => {
+                    if (
+                      response === 'okay' ||
+                      response === 'cancel' ||
+                      response === ModalDismissReasons.BACKDROP_CLICK ||
+                      response === ModalDismissReasons.ESC
+                    ) {
+                      this._router.navigate([`/forms/form/${this.formType}`], {
+                        queryParams: {
+                          step: 'transactions',
+                          reportId: reportId,
+                          edit: this.editMode,
+                          transactionCategory: this._transactionCategory,
+                          refresh: 1
+                        }
+                      });
+                      this._router.navigateByUrl('/dashboard', { skipLocationChange: true }).then(() => {
+                        this._router.navigate([`/forms/form/${this.formType}`], {
+                          queryParams: {
+                            step: 'transactions',
+                            reportId: reportId,
+                            edit: this.editMode,
+                            transactionCategory: this._transactionCategory
+                          }
+                        });
+                      });
                     }
                   });
-                  this._router.navigateByUrl('/dashboard', { skipLocationChange: true }).then(() => {
-                    this._router.navigate([`/forms/form/${this.formType}`], {
-                      queryParams: {
-                        step: 'transactions',
-                        reportId: reportId,
-                        edit: this.editMode,
-                        transactionCategory: this._transactionCategory
-                      }
-                    });
-                });
-                }
               });
-            });
-        } else if (res === 'cancel') {
-        }
-      });
+          } else if (res === 'cancel') {
+          }
+        });
     }
   }
 
@@ -2737,7 +2752,26 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.memoDropdownSize = null;
     this.totalAmountReadOnly = true;
     const levinText = 'LEVIN';
-    if ((this.transactionType).startsWith(levinText)) {
+    const staticTranTypes = [
+      'ALLOC_H2_SUM',
+      'ALLOC_H1',
+      'ALLOC_H2_RATIO',
+      'ALLOC_H3_RATIO',
+      'ALLOC_H3_SUM',
+      'ALLOC_H3_SUM_P',
+      'ALLOC_H5_RATIO',
+      'ALLOC_H5_SUM',
+      'ALLOC_H5_SUM_P',
+      'ALLOC_H4_TYPES',
+      'ALLOC_H6_TYPES'
+    ];
+    // var a = [1,2,3];
+    // Do not call dynaic form for statis transaction types
+    if (staticTranTypes.indexOf(this.transactionType) !== -1) {
+      return;
+    }
+
+    if (this.transactionType.startsWith(levinText)) {
       this._receiptService.getLevinAccounts().subscribe(res => {
         if (res) {
           this.levinAccounts = res;
@@ -2750,7 +2784,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           if (typeof res.data === 'object') {
             if (res.data.hasOwnProperty('formFields')) {
               if (Array.isArray(res.data.formFields)) {
-
                 // If fields are pre-populated for "static" forms, append any additional fields
                 // from the API as with SF.
                 if (this.formFieldsPrePopulated) {
@@ -2840,7 +2873,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     // Fix an issue where previous transaction type is passed.
                     for (const hiddenField of this.hiddenFields) {
                       if ('transaction_type_identifier' === hiddenField.name) {
-                        if (hiddenField.value = this.transactionType) {
+                        if ((hiddenField.value = this.transactionType)) {
                           this.multipleSubTransactionInfo = res.data.subTransactions;
                         }
                       }
@@ -2860,19 +2893,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
       let schedDSubTran = false;
       if (this.subTransactionInfo) {
-        if (this.subTransactionInfo.scheduleType === 'sched_d' &&
-            this.subTransactionInfo.isParent === false) {
-              schedDSubTran = true;
+        if (this.subTransactionInfo.scheduleType === 'sched_d' && this.subTransactionInfo.isParent === false) {
+          schedDSubTran = true;
         }
       }
 
       // If Data for sched D sub-tran has been received by the message service,
       // pre-populate the formGroup now that the dynamic form API call is complete.
-      if (this._prePopulateFromSchedDData
-        && schedDSubTran
-        && this.scheduleAction === ScheduleActions.addSubTransaction) {
-          this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
-          this._prePopulateFromSchedDData = null;
+      if (
+        this._prePopulateFromSchedDData &&
+        schedDSubTran &&
+        this.scheduleAction === ScheduleActions.addSubTransaction
+      ) {
+        this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
+        this._prePopulateFromSchedDData = null;
       }
     });
   }
@@ -2897,9 +2931,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
-   * Sched D Debt Payments (Sub-transactions) will be auto-populated with 
+   * Sched D Debt Payments (Sub-transactions) will be auto-populated with
    * fields from the main Sched D.
-   * 
+   *
    * @param schedDData
    */
   protected _prePopulateFromSchedD(schedDData: any) {
@@ -2950,7 +2984,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   /**
    * Helper method for pre-populating an array to apply field values to the form.
-   * 
+   *
    * @param data
    * @param fieldName
    * @param fieldArray
@@ -2967,7 +3001,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     return fieldArray;
   }
-
 
   /**
    * Pre-populate form fields with values from the pre-populate array.
@@ -3156,14 +3189,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (this.isFieldName(prop, 'contribution_amount') || this.isFieldName(prop, 'expenditure_amount')) {
                     const amount = trx[prop] ? trx[prop] : 0;
                     this.contributionAmountChange({ target: { value: amount.toString() } }, prop, false);
-                  } else if (this.isFieldName(prop, 'total_amount') ||
-                             this.isFieldName(prop, 'beginning_balance') ||
-                             this.isFieldName(prop, 'incurred_amount') ||
-                             this.isFieldName(prop, 'payment_amount') ||
-                             this.isFieldName(prop, 'balance_at_close') ||
-                             this.isFieldName(prop, 'fed_share_amount') ||
-                             this.isFieldName(prop, 'non_fed_share_amount') ||
-                             this.isFieldName(prop, 'activity_event_amount_ytd')) {
+                  } else if (
+                    this.isFieldName(prop, 'total_amount') ||
+                    this.isFieldName(prop, 'beginning_balance') ||
+                    this.isFieldName(prop, 'incurred_amount') ||
+                    this.isFieldName(prop, 'payment_amount') ||
+                    this.isFieldName(prop, 'balance_at_close') ||
+                    this.isFieldName(prop, 'fed_share_amount') ||
+                    this.isFieldName(prop, 'non_fed_share_amount') ||
+                    this.isFieldName(prop, 'activity_event_amount_ytd')
+                  ) {
                     const amount = trx[prop] ? trx[prop] : 0;
                     this._formatAmount({ target: { value: amount.toString() } }, prop, false);
                   }
@@ -3184,7 +3219,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
 
     // TODO this should come from the API
-    let paymentAmount = 0.00;
+    let paymentAmount = 0.0;
     for (const subTrx of this.subTransactions) {
       if (subTrx.hasOwnProperty('expenditure_amount')) {
         if (subTrx.expenditure_amount) {
@@ -3213,9 +3248,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         incurredAmount = trx.incurred_amount;
       }
     }
-    const balanceAtClose = (trx.beginning_balance + incurredAmount) - paymentAmount;
+    const balanceAtClose = trx.beginning_balance + incurredAmount - paymentAmount;
     this._formatAmount({ target: { value: balanceAtClose.toString() } }, 'balance_at_close', false);
-
   }
 
   /**
@@ -3227,7 +3261,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * @param apiCall
    */
   private _getParentFromChild(reportId: string, backRefTransactionId: string, apiCall: string) {
-
     // There is a bug the apiCall value is incorrect when where a parent-child have different schedules
     // as with Sched_D.  Temporary path is to hard code the apiCall based on the trnasactionID 1st to chars.
     // TODO add back_ref_api_call to child transaction in the getSched API and pass it here.
@@ -3758,5 +3791,4 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     return null;
   }
-
 }
