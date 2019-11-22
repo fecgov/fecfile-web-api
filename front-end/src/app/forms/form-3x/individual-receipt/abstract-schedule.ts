@@ -222,8 +222,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     });
 
     this._loadFormFieldsSubscription = this._f3xMessageService.getLoadFormFieldsMessage().subscribe(message => {
-      this._getFormFields();
-      this._validateTransactionDate();
+      if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+        this._getFormFields();
+        this._validateTransactionDate();
+      }
     });
 
     _activatedRoute.queryParams.subscribe(p => {
@@ -1588,7 +1590,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                    field === 'total_amount' ||
                    field === 'fed_share_amount' ||
                    field === 'non_fed_share_amount' ||
-                   field === 'activity_event_amount_ytd') {
+                   field === 'activity_event_amount_ytd' ||
+                   field === 'aggregate_general_elec_exp') {
           // fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
           // Amounts in numeric format shoud be supported by the API.
           // The individual-receipt.service is currently only passing string values
