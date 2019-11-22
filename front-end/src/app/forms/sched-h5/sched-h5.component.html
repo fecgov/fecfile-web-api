@@ -378,7 +378,10 @@
           <tbody>
             <ng-container *ngFor="let report of h5SumP">
               <tr>
-                <td class="summary_text_level_3">
+                <td class="summary_text_level_3"
+                  [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
+                  'totalRow' : 'summary_text_level_3'"
+                >
                   {{ report.category }}
                   <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                     tooltipClass="form-tooltip">
@@ -386,7 +389,10 @@
                     <span class="sr-only">Click here for more information</span>
                   </button>
                 </td>
-                <td class="summary_text_amt">{{ report.amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+                <td class="summary_text_amt"
+                  [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
+                  'totalRow' : 'summary_text_level_3'"
+                >{{ report.amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
               </tr>
             </ng-container>
           </tbody>
