@@ -169,8 +169,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     };
     
 
-    this.setH3Sum();
-    this.setH3SumP();
+    //this.setH3Sum();
+    //this.setH3SumP();
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
 
@@ -184,7 +184,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
-    this.showPart2 = false;    
+    this.showPart2 = false;
+
+    if(this.transactionType === 'ALLOC_H3_SUM') {
+      this.setH3Sum();
+    }
+
+    if(this.transactionType === 'ALLOC_H3_SUM_P') {
+      this.setH3SumP();
+    }
   }
 
   ngDoCheck() {
