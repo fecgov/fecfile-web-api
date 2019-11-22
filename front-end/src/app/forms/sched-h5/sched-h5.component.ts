@@ -173,7 +173,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this._setTransactionDetail();
 
     if(this.transactionType === 'ALLOC_H5_SUM') {      
-      this.setH5Sum();
+      this.setH5Sum();      
+    }
+
+    if(this.transactionType === 'ALLOC_H5_SUM_P') {      
       this.setH5SumP();
     }
   }
