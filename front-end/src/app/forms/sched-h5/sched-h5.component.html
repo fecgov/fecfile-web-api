@@ -128,12 +128,7 @@
                   [formControlName]="'total_amount_transferred'"                  
                   [attr.name]="'total_amount_transferred'" [style.width]="'50%'" [style.height]="'30px'" 
                   [attr.readonly]=true
-                  [ngClass]="
-                      frmIndividualReceipt.get('date')?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'input-field-error'
-                      : ''
-                  " />
+                  />
               </div>
             </div>
           </div>
@@ -176,9 +171,10 @@
                   [attr.name]="'transferred_amount'"
                   [style.width]="'50%'" 
                   [style.height]="'30px'"
+                  (blur)="handleOnBlurEvent($event, col)"
                   [ngClass]="
-                      frmIndividualReceipt.get('date')?.invalid &&
-                      (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                      schedH5.get('transferred_amount')?.invalid &&
+                      (schedH5.touched || schedH5.dirty)
                       ? 'input-field-error'
                       : ''
                   "
@@ -244,7 +240,7 @@
         <div class="grid-row__col grid-row__col--12">
           <div class="forms__btn-container">
             <button class="btn btn-primary btn-right" type="button" (click)="saveAddMore()">
-              Save & Edit
+              Save & Add
             </button>
           </div>
         </div>
