@@ -200,6 +200,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               if (message.prePopulateFromSchedD) {
                 // only load form for the AbstractSchudule parent in the view
                 if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+                  // Patch fix for sched F payment - It does not have the subTransactionInfo
+                  // when determining action so force it here.
+                  this.scheduleAction = ScheduleActions.addSubTransaction;
                   this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
                 }
               }
@@ -514,7 +517,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
      * This block adds zip code, and contribution date validation.
      * Required for occupation and employer will be dependent on aggregate.
      */
-    if (this.isFieldName(fieldName, 'zip_code') || this.isFieldName(fieldName, 'zip_co_exp')) {
+
+    if (this.isFieldName(fieldName, 'zip_code') ||
+        this.isFieldName(fieldName, 'subordinate_cmte_zip')) {
       formValidators.push(alphaNumeric());
     } else if (this.isFieldName(fieldName, 'contribution_date') || this.isFieldName(fieldName, 'expenditure_date')) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
@@ -1061,7 +1066,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public isSelectFieldReadOnly(col: any) {
     if (col.type === 'select' && col.isReadonly) {
-      if (this.frmIndividualReceipt.contains(col.name)) {
+      if (this.frmIndividualReceipt.get(col.name)) {
         this.frmIndividualReceipt.get(col.name).disable();
       }
       return true;
@@ -1152,7 +1157,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (isChildForm) {
       this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': aggregateValue }, { onlySelf: true });
     } else {
-      this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+      if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+        this.frmIndividualReceipt.patchValue({ aggregate_general_elec_exp: aggregateValue }, { onlySelf: true });
+      } else {
+        this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+      }
     }
   }
 
@@ -1523,8 +1532,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         } else if (
           field === 'last_name' ||
           field === 'first_name' ||
+          field === 'cand_last_name' ||
+          field === 'cand_first_name' ||
           this.isFieldName(field, 'cmte_id') ||
           this.isFieldName(field, 'cmte_name') ||
+          this.isFieldName(field, 'designating_cmte_name') ||
+          this.isFieldName(field, 'subordinate_cmte_name') ||
           this.isFieldName(field, 'entity_name')
         ) {
           // if (this._selectedEntity) {
@@ -1549,10 +1562,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             receiptObj[field] = typeAheadField;
           }
           // }
-        } else if (field === 'donor_cmte_id' || field === 'beneficiary_cmte_id') {
-          // added this condition as some times we are getting entire json object
+        } else if (field === 'donor_cmte_id' ||
+                   field === 'payee_cmte_id' ||
+                   field === 'beneficiary_cmte_id' ||
+                   field === 'designating_cmte_id' ||
+                   field === 'subordinate_cmte_id') {
+          // added this condition as formControl value is entire entity object
           // when we perform auto lookup.
-          // TODO we might need to revisit to see if we need this condition
           const typeAheadField = this.frmIndividualReceipt.get(field).value;
           if (typeAheadField && typeof typeAheadField !== 'string') {
             receiptObj[field] = typeAheadField['cmte_id'];
@@ -2069,34 +2085,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
   public ImportTransactions(): void {
     alert('Import transaction is not yet supported');
-  }
-
-  /**
-   * @deprecated
-   */
-  public receiveTypeaheadData(contact: any, fieldName: string): void {
-    console.log('entity selected by typeahead is ' + contact);
-
-    if (fieldName === 'first_name') {
-      this.frmIndividualReceipt.patchValue({ last_name: contact.last_name }, { onlySelf: true });
-      this.frmIndividualReceipt.controls['last_name'].setValue({ last_name: contact.last_name }, { onlySelf: true });
-    }
-
-    if (fieldName === 'last_name') {
-      this.frmIndividualReceipt.patchValue({ first_name: contact.first_name }, { onlySelf: true });
-      this.frmIndividualReceipt.controls['first_name'].setValue({ first_name: contact.first_name }, { onlySelf: true });
-    }
-
-    this.frmIndividualReceipt.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ prefix: contact.prefix }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ suffix: contact.suffix }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ city: contact.city }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ state: contact.state }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ zip_code: contact.zip_code }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ occupation: contact.occupation }, { onlySelf: true });
-    this.frmIndividualReceipt.patchValue({ employer: contact.employer }, { onlySelf: true });
   }
 
   /**
@@ -3115,7 +3103,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     }
                   }
                   if (this.frmIndividualReceipt) {
-                    if (this.frmIndividualReceipt.contains(prop)) {
+                    if (this.frmIndividualReceipt.get(prop)) {
                       if (this.frmIndividualReceipt.get(prop)) {
                         if (this.isFieldName(prop, 'contribution_aggregate')) {
                           this._contributionAggregateValue = trx[prop];
@@ -3156,6 +3144,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                         const patch = {};
                         patch[prop] = trx[prop];
                         this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+
+                        // if (this.frmIndividualReceipt.get(prop)) {
+                        //   const ctl = this.frmIndividualReceipt.get(prop);
+                        //   if (ctl.disabled) {
+                        //     ctl.enable();
+                        //     this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+                        //     ctl.disable();
+                        //   } else {
+                        //     this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+                        //   }
+                        // }
+
                       }
                     }
                   }
@@ -3166,9 +3166,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (prop === 'entity_type') {
                     if (this.entityTypes) {
                       for (const field of this.entityTypes) {
+                        field.selected = false;
                         if (trx[prop] === field.entityType) {
                           field.selected = true;
                           this.selectedEntityType = field;
+                          this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
                           this.toggleValidationIndOrg(trx[prop]);
                           break;
                         }

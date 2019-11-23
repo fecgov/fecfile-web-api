@@ -116,10 +116,12 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     this.showPart2 = false;
     this._setTransactionDetail();
 
-    if (this._prePopulateFromSchedDData && this.scheduleAction === ScheduleActions.addSubTransaction) {
-      this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
-      this._prePopulateFromSchedDData = null;
-    }
+    super.ngOnChanges(null);
+
+    // if (this._prePopulateFromSchedDData && this.scheduleAction === ScheduleActions.addSubTransaction) {
+    //   this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
+    //   this._prePopulateFromSchedDData = null;
+    // }
   }
 
   public ngOnDestroy(): void {
@@ -139,38 +141,38 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
 
     this.frmIndividualReceipt.markAsTouched();
 
-    if (!this._checkFormFieldIsValid('coord_expenditure_yn')) {
+    if (!this._checkFormFieldIsValid('coordinated_exp_ind')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('designated_com_id')) {
+    if (!this._checkFormFieldIsValid('designating_cmte_id')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('designated_com_name')) {
+    if (!this._checkFormFieldIsValid('designating_cmte_name')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('subordinate_com_id')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_id')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('subordinate_com_name')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_name')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('street_1_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_street_1')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('street_2_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_street_2')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('city_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_city')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('state_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_state')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('zip_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_zip')) {
       return;
     }
-    this.frmIndividualReceipt.markAsUntouched();
-    this.frmIndividualReceipt.markAsPristine();
+    // this.frmIndividualReceipt.markAsUntouched();
+    // this.frmIndividualReceipt.markAsPristine();
     this.showPart2 = true;
   }
 
@@ -205,6 +207,17 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     if (this.scheduleAction === ScheduleActions.addSubTransaction) {
       this.clearFormValues();
     } else if (this.scheduleAction === ScheduleActions.edit) {
+    }
+  }
+
+  /**
+   * Override the base class method for specific handling for schedule F.
+   */
+  public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
+    // Don't auto-populate committee fields for sched F payment
+    if (col.name === 'payee_cmte_id') {
+    } else {
+      super.handleSelectedOrg($event, col);
     }
   }
 
@@ -244,8 +257,12 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     }
   }
 
-
-  public handleSelectedSubordinateOrg($event: NgbTypeaheadSelectItemEvent, name: string) {
+  /**
+   * Handle user selection of Schedule F Designating or Subordinate Committee.
+   * @param $event
+   * @param name
+   */
+  public handleSelectedSFCommittee($event: NgbTypeaheadSelectItemEvent, name: string) {
     const entity = $event.item;
 
     // this._selectedEntity = this._utilService.deepClone(entity);
@@ -253,17 +270,22 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     // this._selectedChangeWarn = {};
 
     const fieldNames = [];
-    if (name === 'designated_com_id' || name === 'designated_com_name') {
-      fieldNames.push({ formName: 'designated_com_id', entityFieldName: 'cmte_id' });
-      fieldNames.push({ formName: 'designated_com_name', entityFieldName: 'cmte_name' });
-    } else if (name === 'subordinate_com_id' || name === 'subordinate_com_name') {
-      fieldNames.push({ formName: 'subordinate_com_id', entityFieldName: 'cmte_id' });
-      fieldNames.push({ formName: 'subordinate_com_name', entityFieldName: 'cmte_name' });
-      fieldNames.push({ formName: 'street_1_co_exp', entityFieldName: 'street_1' });
-      fieldNames.push({ formName: 'street_2_co_exp', entityFieldName: 'street_2' });
-      fieldNames.push({ formName: 'state_co_exp', entityFieldName: 'state' });
-      fieldNames.push({ formName: 'city_co_exp', entityFieldName: 'city' });
-      fieldNames.push({ formName: 'zip_co_exp', entityFieldName: 'zip_code' });
+    if (name === 'designating_cmte_id' || name === 'designating_cmte_name') {
+      if (name === 'designating_cmte_id') {
+        fieldNames.push({ formName: 'designating_cmte_name', entityFieldName: 'cmte_name' });
+      } else {
+        fieldNames.push({ formName: 'designating_cmte_id', entityFieldName: 'cmte_id' });
+      }
+      // fieldNames.push({ formName: 'designating_cmte_id', entityFieldName: 'cmte_id' });
+      // fieldNames.push({ formName: 'designating_cmte_name', entityFieldName: 'cmte_name' });
+    } else if (name === 'subordinate_cmte_id' || name === 'subordinate_cmte_name') {
+      fieldNames.push({ formName: 'subordinate_cmte_id', entityFieldName: 'cmte_id' });
+      fieldNames.push({ formName: 'subordinate_cmte_name', entityFieldName: 'cmte_name' });
+      fieldNames.push({ formName: 'subordinate_cmte_street_1', entityFieldName: 'street_1' });
+      fieldNames.push({ formName: 'subordinate_cmte_street_2', entityFieldName: 'street_2' });
+      fieldNames.push({ formName: 'subordinate_cmte_state', entityFieldName: 'state' });
+      fieldNames.push({ formName: 'subordinate_cmte_city', entityFieldName: 'city' });
+      fieldNames.push({ formName: 'subordinate_cmte_zip', entityFieldName: 'zip_code' });
     }
     this._patchSubordinateFormFields(fieldNames, entity);
 
@@ -288,5 +310,11 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     //     this.frmIndividualReceipt.patchValue({ entity_name: entity.cmte_name }, { onlySelf: true });
     //   }
     // }
+  }
+
+  public cancelSFPayment() {
+    this.showPart2 = false;
+    this.clearFormValues();
+    this.returnToParent(this.editScheduleAction);
   }
 }

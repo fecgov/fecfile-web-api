@@ -90,7 +90,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     private _schedH5Service: SchedH5Service,
     private _individualReceiptService: IndividualReceiptService,
     private _uService: UtilService,
-    private _formBuilder: FormBuilder
+    private _formBuilder: FormBuilder,
+    private _decPipe: DecimalPipe,
   ) {
     super(
       _http,
@@ -118,6 +119,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _individualReceiptService;
     _uService;
     _formBuilder;
+    _decPipe;
   }
 
   public ngOnInit() {
@@ -320,8 +322,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     const formObj = this.schedH5.getRawValue();
     
-    const total_amount_transferred = Number(this.schedH5.get('total_amount_transferred').value) 
-          + Number(this.schedH5.get('transferred_amount').value);
+    const total_amount_transferred = +(this.schedH5.get('total_amount_transferred').value) 
+          + (+this.schedH5.get('transferred_amount').value);
     this.h5Ratios.total_amount_transferred = total_amount_transferred;
     
     //this.schedH5.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
@@ -351,7 +353,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     if (this.schedH5.status === 'VALID') {
 
-      this.schedH5.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
+      this.schedH5.patchValue({total_amount_transferred: this._decPipe.transform(total_amount_transferred, '.2-2')}, { onlySelf: true });
      
       this.h5Entries.push(formObj);
       this.h5EntryTableConfig.totalItems = this.h5Entries.length;
@@ -374,8 +376,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       account_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
       receipt_date: new FormControl('', Validators.required),
       total_amount_transferred: new FormControl(''),
-      category: new FormControl(''),
-      transferred_amount: new FormControl('')
+      category: new FormControl('', Validators.required),
+      transferred_amount: new FormControl('', Validators.required)
       // activity_event_name: new FormControl(''),
       // amount: new FormControl(''),
       // total_amount: new FormControl('')
@@ -598,6 +600,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.receiptDateErr = false;
     }
 
+  }
+
+  public handleOnBlurEvent($event: any, col: any) {
+    this.schedH5.patchValue({transferred_amount: this._decPipe.transform(this.schedH5.get('transferred_amount').value, '.2-2')}, { onlySelf: true }); 
   }
 
 }

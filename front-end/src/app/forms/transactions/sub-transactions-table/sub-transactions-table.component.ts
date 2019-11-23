@@ -104,6 +104,14 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
           case 'ALLOC_FEA_DISB_DEBT':
             model.amount = trx.total_fed_levin_amount;
             break;
+          case 'COEXP_PARTY_DEBT':
+            model.amount = trx.expenditure_amount;
+            // TODO API should provie schdule_type. Infer from transaction_type until then.
+            if (!trx.schdule_type) {
+              trx.schdule_type = 'sched_f';
+            }
+            model.scheduleType = trx.schdule_type;
+            break;
           default:
         }
 

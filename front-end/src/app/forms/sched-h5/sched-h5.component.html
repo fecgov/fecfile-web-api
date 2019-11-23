@@ -133,6 +133,7 @@
                     <i class="dollar-sign-icon" aria-hidden="true"></i>
                   </span>
                 </div>
+<<<<<<< HEAD
                 <input
                   class="form-control"
                   type="text"
@@ -148,6 +149,13 @@
                       : ''
                   "
                 />
+=======
+                <input class="form-control" type="text" 
+                  [formControlName]="'total_amount_transferred'"                  
+                  [attr.name]="'total_amount_transferred'" [style.width]="'50%'" [style.height]="'30px'" 
+                  [attr.readonly]=true
+                  />
+>>>>>>> b4a29c1bc310ac5442013a48424bd76d37d3005d
               </div>
             </div>
           </div>
@@ -189,9 +197,15 @@
                   [attr.name]="'transferred_amount'"
                   [style.width]="'50%'"
                   [style.height]="'30px'"
+                  (blur)="handleOnBlurEvent($event, col)"
                   [ngClass]="
+<<<<<<< HEAD
                     frmIndividualReceipt.get('date')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+=======
+                      schedH5.get('transferred_amount')?.invalid &&
+                      (schedH5.touched || schedH5.dirty)
+>>>>>>> b4a29c1bc310ac5442013a48424bd76d37d3005d
                       ? 'input-field-error'
                       : ''
                   "

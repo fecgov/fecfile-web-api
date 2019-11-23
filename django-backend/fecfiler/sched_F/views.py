@@ -123,15 +123,27 @@ def schedF_sql_dict(data):
             'subordinate_cmte_state',
             'subordinate_cmte_zip',
             'payee_entity_id',
+            'entity_id',
             'expenditure_date',
-            'expenditure_amount ',
-            'aggregate_general_elec_exp ',
+            'expenditure_amount',
+            'aggregate_general_elec_exp',
             'purpose',
             'category_code',
             'payee_cmte_id',
             'memo_code',
             'memo_text',
-            
+            'entity_type',
+            'entity_name',
+            'last_name',
+            'first_name',
+            'middle_name',
+            'suffix',
+            'street_1',
+            'street_2',
+            'city',
+            'state',
+            'zip_code',
+            'prefix'
     ]
     try:
         output = {k: v for k, v in data.items() if k in valid_fields}
@@ -157,9 +169,35 @@ def put_schedF(data):
     try:
         check_mandatory_fields_SF(data)
         #check_transaction_id(data.get('transaction_id'))
+        if 'entity_id' in data:
+            get_data = {
+                'cmte_id': data.get('cmte_id'),
+                'entity_id': data.get('entity_id')
+            }
+
+            # need this update for FEC entity
+            if get_data['entity_id'].startswith('FEC'):
+                get_data['cmte_id'] = 'C00000000'
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(data)
+            entity_flag = True
+        else:
+            entity_data = post_entities(data)
+            entity_flag = False
         try:
+            entity_id = entity_data.get('entity_id')
+            data['payee_entity_id'] = entity_id
             put_sql_schedF(data)
         except Exception as e:
+            # if exceptions saving shced_a, remove entities or rollback entities too
+            if entity_flag:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {
+                    'cmte_id': data.get('cmte_id'),
+                    'entity_id': entity_id
+                }
+                remove_entities(get_data)
             raise Exception(
                 'The put_sql_schedF function is throwing an error: ' + str(e))
         return data
@@ -204,8 +242,7 @@ def put_sql_schedF(data):
                   payee_cand_district= %s,
                   memo_code= %s,
                   memo_text= %s,
-                  create_date= %s,
-                  last_update_date= %s,
+                  last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
         """
@@ -226,7 +263,7 @@ def put_sql_schedF(data):
             data.get('subordinate_cmte_zip', ''),
             data.get('payee_entity_id', ''),
             data.get('expenditure_date', None),
-            data.get('expenditure_amount ', None),
+            data.get('expenditure_amount', None),
             data.get('aggregate_general_elec_exp', None),
             data.get('purpose', ''),
             data.get('category_code', ''),
@@ -267,11 +304,37 @@ def post_schedF(data):
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
         data['transaction_id'] = get_next_transaction_id('SF')
-        print(data)
         validate_sF_data(data)
+        if 'entity_id' in data:
+            get_data = {
+                'cmte_id': data.get('cmte_id'),
+                'entity_id': data.get('entity_id')
+            }
+
+            # need this update for FEC entity
+            if get_data['entity_id'].startswith('FEC'):
+                get_data['cmte_id'] = 'C00000000'
+            prev_entity_list = get_entities(get_data)
+            entity_data = put_entities(data)
+            entity_flag = True
+        else:
+            entity_data = post_entities(data)
+            entity_flag = False
         try:
+            entity_id = entity_data.get('entity_id')
+            data['payee_entity_id'] = entity_id
+            logger.debug(data)
             post_sql_schedF(data)
         except Exception as e:
+            # if exceptions saving shced_a, remove entities or rollback entities too
+            if entity_flag:
+                entity_data = put_entities(prev_entity_list[0])
+            else:
+                get_data = {
+                    'cmte_id': data.get('cmte_id'),
+                    'entity_id': entity_id
+                }
+                remove_entities(get_data)
             raise Exception(
                 'The post_sql_schedF function is throwing an error: ' + str(e))
         return data
@@ -301,8 +364,8 @@ def post_sql_schedF(data):
             subordinate_cmte_zip,
             payee_entity_id,
             expenditure_date,
-            expenditure_amount ,
-            aggregate_general_elec_exp ,
+            expenditure_amount,
+            aggregate_general_elec_exp,
             purpose,
             category_code,
             payee_cmte_id,
@@ -341,7 +404,7 @@ def post_sql_schedF(data):
             data.get('subordinate_cmte_zip', ''),
             data.get('payee_entity_id', ''),
             data.get('expenditure_date', None),
-            data.get('expenditure_amount ', None),
+            data.get('expenditure_amount', None),
             data.get('aggregate_general_elec_exp', None),
             data.get('purpose', ''),
             data.get('category_code', ''),
@@ -406,10 +469,10 @@ def get_list_all_schedF(report_id, cmte_id):
             subordinate_cmte_city,
             subordinate_cmte_state,
             subordinate_cmte_zip,
-            payee_entity_id,
+            payee_entity_id as entity_id,
             expenditure_date,
-            expenditure_amount ,
-            aggregate_general_elec_exp ,
+            expenditure_amount,
+            aggregate_general_elec_exp,
             purpose,
             category_code,
             payee_cmte_id,
@@ -438,7 +501,15 @@ def get_list_all_schedF(report_id, cmte_id):
                     report_id, cmte_id))
             merged_list = []
             for dictF in schedF_list:
-                merged_list.append(dictF)
+                entity_id = dictF.get('entity_id')
+                data = {
+                    'entity_id': entity_id,
+                    'cmte_id': cmte_id
+                }
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                merged_dict = {**dictF, **dictEntity}
+                merged_list.append(merged_dict)
         return merged_list
     except Exception:
         raise
@@ -465,10 +536,10 @@ def get_list_schedF(report_id, cmte_id, transaction_id):
             subordinate_cmte_city,
             subordinate_cmte_state,
             subordinate_cmte_zip,
-            payee_entity_id,
+            payee_entity_id as entity_id,
             expenditure_date,
-            expenditure_amount ,
-            aggregate_general_elec_exp ,
+            expenditure_amount,
+            aggregate_general_elec_exp,
             purpose,
             category_code,
             payee_cmte_id,
@@ -497,7 +568,18 @@ def get_list_schedF(report_id, cmte_id, transaction_id):
                     transaction_id))
             merged_list = []
             for dictF in schedF_list:
-                merged_list.append(dictF)
+                entity_id = dictF.get('entity_id')
+                data = {
+                    'entity_id': entity_id,
+                    'cmte_id': cmte_id
+                }
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                del dictEntity['cand_office']
+                del dictEntity['cand_office_state']
+                del dictEntity['cand_office_district']
+                merged_dict = {**dictF, **dictEntity}
+                merged_list.append(merged_dict)
         return merged_list
     except Exception:
         raise

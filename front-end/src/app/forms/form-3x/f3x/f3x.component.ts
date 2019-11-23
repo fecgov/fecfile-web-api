@@ -315,7 +315,7 @@ export class F3xComponent implements OnInit {
             // in individual-receipt.component when sched F.
             // TODO add if else around schedules with component specific action
             // such as sched F and sched C.
-            if (this._handleScheduleFDebtPayment(e)) {
+            if (this._handleAddScheduleFDebtPayment(e)) {
               return;
             }
 
@@ -370,6 +370,8 @@ export class F3xComponent implements OnInit {
               } else if (apiCall === '/sc/schedC1') {
                 alert('edit C1 not yet supported');
               } else if (apiCall === '/sf/schedF') {
+                // force change to set show first page.
+                this.forceChangeDetectionFDebtPayment = new Date();
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
               } else {
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedMainComponent);
@@ -459,7 +461,9 @@ export class F3xComponent implements OnInit {
       this.scheduleType === 'sched_c' ||
       this.scheduleType === 'sched_c_ls' ||
       this.scheduleType === 'sched_c_loan_payment' ||
-      this.scheduleType === 'sched_c1'
+      this.scheduleType === 'sched_c1' ||
+      this.scheduleType === 'sched_c_en' ||
+      this.scheduleType === 'sched_c_es'
     ) {
       if (this.scheduleType === 'sched_c') {
         if (this.scheduleAction === ScheduleActions.add) {
@@ -493,24 +497,26 @@ export class F3xComponent implements OnInit {
    * Handle Schedule F Debt Payment form.
    * @returns true if schedule F and should stop processing
    */
-  private _handleScheduleFDebtPayment(e: any): boolean {
+  private _handleAddScheduleFDebtPayment(e: any): boolean {
     let finish = false;
     if (this.scheduleType === 'sched_f') {
-      this.scheduleFAction = e.action;
-      this.transactionTypeSchedF = e.transactionType ? e.transactionType : '';
-      this.transactionTypeTextSchedF = e.transactionTypeText ? e.transactionTypeText : '';
-      this.forceChangeDetectionFDebtPayment = new Date();
-      if (this.scheduleFAction === ScheduleActions.addSubTransaction) {
-        if (e.hasOwnProperty('prePopulateFromSchedD')) {
-          this._f3xMessageService.sendPopulateFormMessage({
-            key: 'prePopulateFromSchedD',
-            abstractScheduleComponent: AbstractScheduleParentEnum.schedFComponent,
-            prePopulateFromSchedD: e.prePopulateFromSchedD
-          });
+      if (e.action === ScheduleActions.addSubTransaction) {
+        this.scheduleFAction = e.action;
+        this.transactionTypeSchedF = e.transactionType ? e.transactionType : '';
+        this.transactionTypeTextSchedF = e.transactionTypeText ? e.transactionTypeText : '';
+        this.forceChangeDetectionFDebtPayment = new Date();
+        if (this.scheduleFAction === ScheduleActions.addSubTransaction) {
+          if (e.hasOwnProperty('prePopulateFromSchedD')) {
+            this._f3xMessageService.sendPopulateFormMessage({
+              key: 'prePopulateFromSchedD',
+              abstractScheduleComponent: AbstractScheduleParentEnum.schedFComponent,
+              prePopulateFromSchedD: e.prePopulateFromSchedD
+            });
+          }
         }
+        this.canContinue();
+        finish = true;
       }
-      this.canContinue();
-      finish = true;
     }
     return finish;
   }
