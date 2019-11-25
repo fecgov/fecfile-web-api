@@ -232,7 +232,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     const serverSortColumnName = this._LoanService.
       mapToSingleServerName(this.currentSortedColumnName);
 
-    this._LoanService.getEndorsers(this.transactionDetail.transactionId)
+    this._LoanService.getEndorsers(this.transactionDetail.endorser.back_ref_transaction_id)
     //TODO : ZS -- change resType back to  GetEndorserResponse once service is fixed
       .subscribe((res: any) => {
 
@@ -817,47 +817,30 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
-  public editEndorserPayment(endorser:any){
+  public editEndorser(endorser:any){
     this._goToEndorser(endorser);
   }
-
 
   private _goToEndorser(endorser:any) {
     const endorserRepaymentEmitObj: any = {
       form: {},
-      direction: 'next', //TODO-zs -- does this need to be changed?
+      direction: 'next', 
       step: 'step_3',
       previousStep: 'step_2',
-      scheduleType: 'sched_c',
+      scheduleType: 'sched_c_en',
       action: ScheduleActions.edit,
       transactionDetail: {
         transactionModel : {
           transactionId: endorser.transaction_id, 
-          entityId: endorser.entity_id
+          entityId: endorser.entity_id, 
+          endorser, 
+          entryScreenScheduleType:'sched_c_es'
         }
       }
     };
     this.status.emit(endorserRepaymentEmitObj);
   }
   
-  public goToEndorserRepayment(endorser:any) {
-    const endorserRepaymentEmitObj: any = {
-      form: {},
-      direction: 'next',
-      step: 'step_3',
-      previousStep: 'step_2',
-      scheduleType: 'sched_c_endorser_payment',
-      action: ScheduleActions.add,
-      transactionDetail: {
-        transactionModel: {
-          transactionId: endorser.transaction_id, 
-          entityId: endorser.entity_id,
-          entryScreenScheduleType: 'sched_c_ls',
-        }
-      }
-    };
-    this.status.emit(endorserRepaymentEmitObj);
-  }
 
   /**
    * Set the UI to show the default column sorted in the default direction.

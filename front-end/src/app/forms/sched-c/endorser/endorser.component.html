@@ -284,14 +284,15 @@
               <button class="btn btn-previous btn-left" type="button" (click)="cancelStep()">
                 Cancel
               </button>
-              <button class="btn btn-secondary btn-right" type="button" (click)="saveAndAddMore()">
-                Add Endorsers
-              </button>
+              
               <button class="btn btn-previous btn-right" type="button"  (click)="goToEndorserSummary()">
-                  Endorser Summary
+                Endorser Summary
               </button>
-              <button class="btn btn-previous btn-right" type="button"  (click)="saveEndorser()">
+              <button class="btn btn-primary btn-right" type="button"  (click)="saveEndorser(false)">
                 Save
+              </button>
+              <button class="btn btn-secondary btn-right" type="button" (click)=saveEndorser(true)>
+                Add Endorsers
               </button>
             </div>
           </div>          

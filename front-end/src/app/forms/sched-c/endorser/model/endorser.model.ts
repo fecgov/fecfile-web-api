@@ -13,17 +13,10 @@ export class EndorserModel {
     city: string;
     state: string;
     zip: string;
-    phoneNumber: string;
     employer: string;
     occupation: string;
-    officeSought: string;
-    candOffice: string;
-    candOfficeState: string;
-    candOfficeDistrict: string;
-    candCmteId: string;
-    deletedDate: string;
-    selected: boolean;
-    activeTransactionsCnt: number;
+    contribution_amount:string;
+
     constructor(contact: any) {
         this.entity_type = contact.entity_type ? contact.entity_type : '';
         this.id = contact.id ? contact.id : '';
@@ -39,19 +32,9 @@ export class EndorserModel {
         this.city = contact.city ? contact.city : '';
         this.state = contact.state ? contact.state : '';
         this.zip = contact.zip ? contact.zip : '';
-        this.phoneNumber = contact.phoneNumber ? contact.phoneNumber : '';
+        this.contribution_amount = contact.contribution_amount ? contact.contribution_amount : '';
         this.employer = contact.employer ? contact.employer : '';
         this.occupation = contact.occupation ? contact.occupation : '';
-        this.officeSought = contact.officeSought ? contact.officeSought : '';
-        this.candOffice = contact.candOffice ? contact.candOffice : '';
-        this.candOfficeState = contact.candOfficeState ? contact.candOfficeState : '';
-        this.candOfficeDistrict = contact.candOfficeDistrict ? contact.candOfficeDistrict : '';
-        this.phoneNumber = contact.phoneNumber ? contact.phoneNumber : '';
-        this.candCmteId = contact.candCmteId ? contact.candCmteId : '';
-        this.deletedDate = contact.deletedDate ? contact.deletedDate : '';
-        this.selected = contact.selected;
-        this.activeTransactionsCnt = contact.active_transactions_cnt ? contact.active_transactions_cnt : 0;
-       
 
     }
 }

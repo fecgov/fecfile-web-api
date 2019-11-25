@@ -837,8 +837,12 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       action: ScheduleActions.add,
       transactionDetail: {
         transactionModel: {
-          transactionId: this._transactionId,
-          entityId: this._selectedEntityId
+          endorser:{
+            back_ref_transaction_id: this._transactionId,
+          },
+          entityId: this._selectedEntityId, 
+          entryScreenScheduleType:'sched_c', 
+          transaction_id: this._transactionId
         }
       }
     };
@@ -914,8 +918,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           LoanObj[field] = this.frmLoan.get(field).value;
         }
         //also add transactionId if available (edit route)
-        if (this.scheduleAction === ScheduleActions.edit && this.transactionDetail && this.transactionDetail.transactionId) {
-          LoanObj['transaction_id'] = this.transactionDetail.transactionId;
+        if (this.scheduleAction === ScheduleActions.edit && this.transactionDetail && this.transactionDetail.transaction_id) {
+          LoanObj['transaction_id'] = this.transactionDetail.transaction_id;
         }
       }
 
@@ -1023,7 +1027,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private _prePopulateFormForEdit(transactionDetail: any) {
 
     const reportId = this._receiptService.getReportIdFromStorage(this.formType);
-    this._loansService.getDataSchedule(reportId, transactionDetail.transactionId).subscribe((res: any) => {
+    this._loansService.getDataSchedule(reportId, transactionDetail.transaction_id).subscribe((res: any) => {
       console.log();
       if (!res) {
         return;
