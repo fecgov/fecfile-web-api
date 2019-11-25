@@ -1110,7 +1110,7 @@ def is_new_report(report_id, cmte_id):
 def do_h2_carryover(report_id, cmte_id):
     """
     this is the function to handle h2 carryover form one report to next report:
-    1. load all h2 items with distinct event names
+    1. load all h2 items with distinct event names from last report
     2. update all records with new transaction_id, new report_id
     3. set ration code to 's' - same as previously
     4. copy all other fields
@@ -1147,21 +1147,29 @@ def do_h2_carryover(report_id, cmte_id):
                     federal_percent,
                     non_federal_percent,
                     now()
-            FROM public.sched_d 
+            FROM public.sched_h2
             WHERE 
             cmte_id = %s
-            AND balance_at_close > 0 
-            AND delete_ind is distinct from 'Y' ;
-
+            AND report_id in (
+                SELECT report_id
+                FROM sched_h2
+                WHERE revise_date = (
+	            SELECT
+                    MAX(revise_date)
+                    FROM sched_h2
+                    WHERE cmte_id = %s
+                    AND delete_ind is distinct from 'Y')
+            ) 
+            AND delete_ind is distinct from 'Y'
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (report_id, cmte_id))
+            cursor.execute(_sql, (report_id, cmte_id, cmte_id))
             if cursor.rowcount == 0:
-                logger.debug('No valid debts found.')
+                logger.debug('No valid h2 items found.')
             logger.debug(
-                'debt carryover done with report_id {}'.format(report_id))
-            logger.debug('total carryover debts:{}'.format(cursor.rowcount))
+                'h2 carryover done with report_id {}'.format(report_id))
+            logger.debug('total carryover h2 items:{}'.format(cursor.rowcount))
     except:
         raise
 
@@ -1175,6 +1183,7 @@ def get_h2_summary_table(request):
 
     update: all h2 items with current report_id need to show up
     """
+
     logger.debug('get_h2_summary_table with request:{}'.format(request.query_params))
     _sql = """
     SELECT json_agg(t) from(
@@ -1210,8 +1219,10 @@ def get_h2_summary_table(request):
     try:
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
-        if is_new_report(cmte_id, report_id):
-            do_h2_carryover()
+        logger.debug('checking if it is a new report')
+        if is_new_report(report_id, cmte_id):
+            logger.debug('new report: do h2 carryover.')
+            do_h2_carryover(report_id, cmte_id)
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
             logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
