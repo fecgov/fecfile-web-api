@@ -63,7 +63,7 @@
               <i class="ellipsis-icon"></i>
             </button>
             <div id="endorserSummary__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-              <button class="dropdown-item" (click)="editLoanPayment(ln)">
+              <button class="dropdown-item" (click)="editEndorser(ln)">
                 <i class="edit-icon"></i> Edit
               </button>
               <button class="dropdown-item" (click)="printLoan(ln)">
@@ -84,3 +84,29 @@
     <pagination-controls (pageChange)="currentPageNumber = $event">
     </pagination-controls>
   </div>
+  <footer>
+
+    <div class="grid-row">
+      <div class="grid-row__col grid-row__col--12">
+        <div class="forms__btn-container">
+          <br />
+        </div>
+      </div>
+    </div>
+    <div class="grid-row">
+      <div class="grid-row__col grid-row__col--12">
+        <div class="forms__btn-container">
+          <button class="btn btn-previous btn-right" type="button"  (click)="saveEndorser()">
+            Next
+          </button>
+        </div>
+      </div>          
+    </div>
+    <div class="grid-row">
+      <div class="grid-row__col grid-row__col--12">
+        <div class="forms__btn-container">
+          <br />
+        </div>
+      </div>
+    </div>
+  </footer>

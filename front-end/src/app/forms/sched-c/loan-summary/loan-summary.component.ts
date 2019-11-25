@@ -944,7 +944,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       action: ScheduleActions.edit,
       transactionDetail: {
         transactionModel : {
-          transactionId: loan.transaction_id, 
+          transaction_id: loan.transaction_id, 
           entityId: loan.entity_id
         }
       }

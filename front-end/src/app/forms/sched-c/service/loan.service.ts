@@ -122,31 +122,31 @@ export class LoanService {
    * @return     {Observable}
    */
   public getEndorsers(loanTransactionId: string): Observable<any> {
-    /* const token: string = JSON.parse(this._cookieService.get('user'));
+    const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    const url = '/sc/get_outstanding_loans';
+    const url = '/sc/get_endorser_summary';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
+    let params = new HttpParams();
+    params = params.append('transaction_id', loanTransactionId);
     
     return this._http
       .get(
         `${environment.apiUrl}${url}`,
         {
+          params,
           headers: httpOptions
         }
       )
       .pipe(map(res => {
           if (res) {
-            console.log('get_outstanding_loans API res: ', res);
-
             return res;
           }
           return false;
-      })); */
+      }));
 
-      return Observable.of(this.mockEndorserSummaryData);
   }
 
   /**
@@ -865,12 +865,13 @@ export class LoanService {
     const hiddenFieldsObj: any = {
       api_call:'/sc/schedC2',
       line_number: 13, 
-      transaction_id:endorserForm.transaction_id,
+      transaction_id:hiddenFields.transaction_id,
       back_ref_transaction_id: hiddenFields.back_ref_transaction_id,
       back_ref_sched_name: '',
       transaction_type: 'LOAN_FROM_IND',
       transaction_type_identifier:'LOANS_OWED_BY_CMTE', 
-      entity_id: hiddenFields.entity_id
+      entity_id: hiddenFields.entity_id, 
+      entity_type:'IND'
     };
 
 /*     const loanByCommFromIndObj: any = {

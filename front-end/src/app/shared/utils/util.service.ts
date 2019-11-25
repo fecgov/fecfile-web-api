@@ -5,7 +5,7 @@ import * as _ from 'lodash';
   providedIn: 'root'
 })
 export class UtilService {
-  constructor() {}
+  constructor() { }
 
   /**
    * Deep clone an object with lodash.  Useful when shallow cloning
@@ -140,5 +140,12 @@ export class UtilService {
       }
     }
     return true;
+  }
+
+  public extractNameFromEntityObj(field: string, typeAheadField: any): string {
+    if (typeAheadField && typeof typeAheadField !== 'string') {
+      return typeAheadField[field];
+    }
+    return typeAheadField;
   }
 }
