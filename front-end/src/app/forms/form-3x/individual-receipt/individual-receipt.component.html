@@ -303,7 +303,7 @@
                         bindValue="code" 
                         bindLabel="code" 
                         [selectOnTab]="true"
-                        [readonly]="isSelectFieldReadOnly(col)"
+                        [attr.readonly]="isSelectFieldReadOnly(col)"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -378,7 +378,7 @@
                         (change)="handleActivityEventNameChange($event, col)" 
                         class="forms__select activity-event-name-select" 
                         [formControlName]="col?.name" 
-                        bindValue="activityEventType"
+                        bindValue="activityEventDescription"
                         bindLabel="activityEventDescription" 
                         [selectOnTab]="true"
                         [ngClass]="

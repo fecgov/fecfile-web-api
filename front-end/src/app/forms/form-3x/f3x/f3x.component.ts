@@ -299,7 +299,7 @@ export class F3xComponent implements OnInit {
             // The solutionhere is to call the message service.  This may be the preferred
             // mechanism to use going forward.
             if (this.transactionType && this.transactionType === e.transactionType) {
-              this._f3xMessageService.sendLoadFormFieldsMessage('');
+              this._f3xMessageService.sendLoadFormFieldsMessage(AbstractScheduleParentEnum.schedMainComponent);
             }
             if (
               e.transactionDetail &&
@@ -370,6 +370,8 @@ export class F3xComponent implements OnInit {
               } else if (apiCall === '/sc/schedC1') {
                 alert('edit C1 not yet supported');
               } else if (apiCall === '/sf/schedF') {
+                // force change to set show first page.
+                this.forceChangeDetectionFDebtPayment = new Date();
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
               } else {
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedMainComponent);
@@ -459,7 +461,9 @@ export class F3xComponent implements OnInit {
       this.scheduleType === 'sched_c' ||
       this.scheduleType === 'sched_c_ls' ||
       this.scheduleType === 'sched_c_loan_payment' ||
-      this.scheduleType === 'sched_c1'
+      this.scheduleType === 'sched_c1' ||
+      this.scheduleType === 'sched_c_en' ||
+      this.scheduleType === 'sched_c_es'
     ) {
       if (this.scheduleType === 'sched_c') {
         if (this.scheduleAction === ScheduleActions.add) {

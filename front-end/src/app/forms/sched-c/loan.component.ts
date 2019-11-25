@@ -783,7 +783,6 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
 
   private _goToC1() {
-
     const c1EmitObj: any = {
       form: {},
       direction: 'next',
@@ -801,9 +800,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.status.emit(c1EmitObj);
   }
 
-  public onSaveLoan(loanRepaymentRoute = false): void {
-    if (loanRepaymentRoute) {
-      this.doValidateLoan('loanRepayment');
+  public onSaveLoan(nextScreen: string = null): void {
+    if (nextScreen) {
+      this.doValidateLoan(nextScreen);
     } else {
       this.saveLoan();
     }
@@ -828,13 +827,31 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.status.emit(loanRepaymentEmitObj);
   }
 
-  public AddLoanEndorser(): void {
+  private _goToEndorser(): void {
     const endorserEmitObj: any = {
       form: {},
       direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
       scheduleType: 'sched_c_en',
+      action: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
+          transactionId: this._transactionId,
+          entityId: this._selectedEntityId
+        }
+      }
+    };
+    this.status.emit(endorserEmitObj);
+  }
+
+  public _goToEndorserSummary(): void {
+    const endorserEmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c_es',
       action: ScheduleActions.add,
       transactionDetail: {
         transactionModel: {
@@ -917,11 +934,6 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         .subscribe(res => {
           if (res) {
             console.log('_LoansService.saveContact res', res);
-
-            //reset the form to not dirty in the service so navigation can proceed
-            // this.frmLoan.reset();
-            // this._formsService.setFormDirtyFlag(this.frmLoan);
-
             this._loanToEdit = null;
             this.frmLoan.reset();
             this._selectedEntity = null;
@@ -936,6 +948,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
               this._goToLoanRepayment();
             } else if (nextScreen === 'c1') {
               this._goToC1();
+            } else if(nextScreen === 'endorser'){
+              this._goToEndorser();
             }
           }
         });
@@ -1202,5 +1216,5 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       }
     });
   }
-
+  
 }

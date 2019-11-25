@@ -116,10 +116,12 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     this.showPart2 = false;
     this._setTransactionDetail();
 
-    if (this._prePopulateFromSchedDData && this.scheduleAction === ScheduleActions.addSubTransaction) {
-      this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
-      this._prePopulateFromSchedDData = null;
-    }
+    super.ngOnChanges(null);
+
+    // if (this._prePopulateFromSchedDData && this.scheduleAction === ScheduleActions.addSubTransaction) {
+    //   this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
+    //   this._prePopulateFromSchedDData = null;
+    // }
   }
 
   public ngOnDestroy(): void {
@@ -139,7 +141,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
 
     this.frmIndividualReceipt.markAsTouched();
 
-    if (!this._checkFormFieldIsValid('coord_expenditure_yn')) {
+    if (!this._checkFormFieldIsValid('coordinated_exp_ind')) {
       return;
     }
     if (!this._checkFormFieldIsValid('designating_cmte_id')) {
@@ -154,19 +156,19 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     if (!this._checkFormFieldIsValid('subordinate_cmte_name')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('street_1_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_street_1')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('street_2_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_street_2')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('city_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_city')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('state_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_state')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('zip_co_exp')) {
+    if (!this._checkFormFieldIsValid('subordinate_cmte_zip')) {
       return;
     }
     // this.frmIndividualReceipt.markAsUntouched();
@@ -279,11 +281,11 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     } else if (name === 'subordinate_cmte_id' || name === 'subordinate_cmte_name') {
       fieldNames.push({ formName: 'subordinate_cmte_id', entityFieldName: 'cmte_id' });
       fieldNames.push({ formName: 'subordinate_cmte_name', entityFieldName: 'cmte_name' });
-      fieldNames.push({ formName: 'street_1_co_exp', entityFieldName: 'street_1' });
-      fieldNames.push({ formName: 'street_2_co_exp', entityFieldName: 'street_2' });
-      fieldNames.push({ formName: 'state_co_exp', entityFieldName: 'state' });
-      fieldNames.push({ formName: 'city_co_exp', entityFieldName: 'city' });
-      fieldNames.push({ formName: 'zip_co_exp', entityFieldName: 'zip_code' });
+      fieldNames.push({ formName: 'subordinate_cmte_street_1', entityFieldName: 'street_1' });
+      fieldNames.push({ formName: 'subordinate_cmte_street_2', entityFieldName: 'street_2' });
+      fieldNames.push({ formName: 'subordinate_cmte_state', entityFieldName: 'state' });
+      fieldNames.push({ formName: 'subordinate_cmte_city', entityFieldName: 'city' });
+      fieldNames.push({ formName: 'subordinate_cmte_zip', entityFieldName: 'zip_code' });
     }
     this._patchSubordinateFormFields(fieldNames, entity);
 

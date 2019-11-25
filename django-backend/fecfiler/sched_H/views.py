@@ -743,12 +743,15 @@ def schedH2_sql_dict(data):
         "fundraising",
         "direct_cand_support",
         "ratio_code",
+        "revise_date",
         "federal_percent",
         "non_federal_percent",
     ]
     try:
         # return {k: v for k, v in data.items() if k in valid_h2_fields}
         datum = {k: v for k, v in data.items() if k in valid_h2_fields}
+        if 'receipt_date' in data:
+            datum['revise_date'] = data.get('receipt_date')
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
         return datum
@@ -783,6 +786,7 @@ def put_sql_schedH2(data):
                 fundraising = %s,
                 direct_cand_support = %s,
                 ratio_code = %s,
+                revise_date = %s,
                 federal_percent = %s,
                 non_federal_percent = %s,
                 last_update_date = %s
@@ -797,6 +801,7 @@ def put_sql_schedH2(data):
             data.get('fundraising'),
             data.get('direct_cand_support'),
             data.get('ratio_code'),
+            data.get('revise_date'),
             data.get('federal_percent'),
             data.get('non_federal_percent'),
             datetime.datetime.now(),
@@ -851,12 +856,13 @@ def post_sql_schedH2(data):
             fundraising,
             direct_cand_support,
             ratio_code,
+            revise_date,
             federal_percent,
             non_federal_percent,
             create_date
             )
         VALUES ({}); 
-        """.format(','.join(['%s']*13))
+        """.format(','.join(['%s']*14))
         _v = (
             data.get('cmte_id'),
             data.get('report_id'),
@@ -868,6 +874,7 @@ def post_sql_schedH2(data):
             data.get('fundraising'),
             data.get('direct_cand_support'),
             data.get('ratio_code'),
+            data.get('revise_date'),
             data.get('federal_percent'),
             data.get('non_federal_percent'),
             datetime.datetime.now() 
@@ -916,6 +923,7 @@ def get_schedH2(data):
 def get_list_all_schedH2(report_id, cmte_id):
     """
     load all transactions for a report
+    revise_date is renamed to 'receipt_date' in front end
     """
     try:
         with connection.cursor() as cursor:
@@ -931,6 +939,7 @@ def get_list_all_schedH2(report_id, cmte_id):
             fundraising,
             direct_cand_support,
             ratio_code,
+            revise_date as receipt_date,
             federal_percent,
             non_federal_percent,
             create_date ,
@@ -970,6 +979,7 @@ def get_list_schedH2(report_id, cmte_id, transaction_id):
             fundraising,
             direct_cand_support,
             ratio_code,
+            revise_date as receipt_date,
             federal_percent,
             non_federal_percent,
             create_date ,
@@ -1075,7 +1085,7 @@ def get_h2_summary_table(request):
             WHEN true THEN 'fundraising' 
             ELSE 'direct_cand_suppot' 
             END )  AS event_type, 
-        DATE(create_date) AS receipt_date, 
+        revise_date AS receipt_date, 
         ratio_code, 
         federal_percent, 
         non_federal_percent 
@@ -1091,7 +1101,7 @@ def get_h2_summary_table(request):
             WHEN true THEN 'fundraising' 
             ELSE 'direct_cand_suppot' 
             END )  AS event_type, 
-        DATE(create_date) AS receipt_date, 
+        revise_date AS receipt_date, 
         ratio_code, 
         federal_percent, 
         non_federal_percent 
