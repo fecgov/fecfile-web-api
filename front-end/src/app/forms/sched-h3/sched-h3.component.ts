@@ -24,6 +24,7 @@ import { TransactionModel } from '../transactions/model/transaction.model';
 import { Observable, Subscription } from 'rxjs';
 import { SchedH3Service } from './sched-h3.service';
 import { style, animate, transition, trigger } from '@angular/animations';
+import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 @Component({
   selector: 'app-sched-h3',
@@ -137,6 +138,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnInit() {
+    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedH3Component;
     this.formType = '3X';
     this.formFieldsPrePopulated = true;
     // this.formFields = this._staticFormFields;
@@ -172,8 +174,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     };
     
 
-    this.setH3Sum();
-    this.setH3SumP();
+    //this.setH3Sum();
+    //this.setH3SumP();
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
 
@@ -187,7 +189,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
-    this.showPart2 = false;    
+    this.showPart2 = false;
+
+    if(this.transactionType === 'ALLOC_H3_SUM') {
+      this.setH3Sum();
+    }
+
+    if(this.transactionType === 'ALLOC_H3_SUM_P') {
+      this.setH3SumP();
+    }
   }
 
   ngDoCheck() {

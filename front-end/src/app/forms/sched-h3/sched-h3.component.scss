@@ -262,6 +262,11 @@
   .dropdown-toggle:after {
     border: none;
   }
+
+  .totalRow {
+    font-size: 24px !important;
+    font-weight: bold !important;
+  }
 }
 
 pagination-controls /deep/ .ngx-pagination .current{

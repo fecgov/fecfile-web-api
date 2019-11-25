@@ -117,12 +117,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
 
   private _reportType: any = null;
-  private _cloned: boolean = false;
+  private _cloned = false;
   private _types: any = [];
   private _transaction: any = {};
   private _transactionType: string = null;
   private _transactionTypePrevious: string = null;
-  private _transactionCategory: string = '';
+  private _transactionCategory = '';
   private _formSubmitted = false;
   private _contributionAggregateValue = 0.0;
   private _contributionAggregateValueChild = 0.0;
@@ -223,8 +223,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     });
 
     this._loadFormFieldsSubscription = this._f3xMessageService.getLoadFormFieldsMessage().subscribe(message => {
-      this._getFormFields();
-      this._validateTransactionDate();
+      if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+        this._getFormFields();
+        this._validateTransactionDate();
+      }
     });
 
     _activatedRoute.queryParams.subscribe(p => {
@@ -837,7 +839,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Call the API to calculate the fed, non-fed and activity YTD values.
    */
   private _getFedNonFedPercentage() {
-    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' && this.transactionType !== 'ALLOC_EXP_DEBT') {
+
+    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
+        this.transactionType !== 'ALLOC_EXP_DEBT'
+        &&
+        this.transactionType !== 'ALLOC_EXP' &&
+        this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
+        this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
+        this.transactionType !== 'ALLOC_EXP_STAF_REIM' &&
+        this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
+        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
+        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
+        this.transactionType !== 'ALLOC_EXP_VOID'
+        ) {
       return;
     }
 
@@ -975,7 +989,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if ($event.hasOwnProperty('hasValue')) {
       if ($event.hasValue === false) {
         if ($event.hasOwnProperty('scheduleType')) {
-          this._handleNoH1H2($event.scheduleType);
+          //this._handleNoH1H2($event.scheduleType);
         } else {
           this._handleNoH1H2(null);
         }
@@ -1592,7 +1606,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           field === 'total_amount' ||
           field === 'fed_share_amount' ||
           field === 'non_fed_share_amount' ||
-          field === 'activity_event_amount_ytd'
+          field === 'activity_event_amount_ytd' ||
+          field === 'aggregate_general_elec_exp'
         ) {
           // fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
           // Amounts in numeric format shoud be supported by the API.
@@ -3454,6 +3469,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.transactionType !== 'EAR_REC' &&
       this.transactionType !== 'CON_EAR_UNDEP' &&
       this.transactionType !== 'CON_EAR_DEP_1'
+      &&
+        this.transactionType !== 'ALLOC_EXP' &&
+        this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
+        this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
+        this.transactionType !== 'ALLOC_EXP_STAF_REIM' &&
+        this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
+        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
+        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
+        this.transactionType !== 'ALLOC_EXP_VOID'
     ) {
       return;
     }
@@ -3784,7 +3808,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const fields = this.formFields;
     for (const el of fields) {
       if (el.hasOwnProperty('cols') && el.cols) {
-        for (let e of el.cols) {
+        for (const e of el.cols) {
           if (e.name === name) {
             return e;
           }
