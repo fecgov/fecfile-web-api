@@ -851,6 +851,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
         this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
         this.transactionType !== 'ALLOC_EXP_VOID'
+        &&
+        this.transactionType !== 'ALLOC_FEA_DISB' &&
+        this.transactionType !== 'ALLOC_FEA_CC_PAY' &&
+        this.transactionType !== 'ALLOC_FEA_CC_PAY_MEMO' &&
+        this.transactionType !== 'ALLOC_FEA_STAF_REIM' &&
+        this.transactionType !== 'ALLOC_FEA_STAF_REIM_MEMO' &&       
+        this.transactionType !== 'ALLOC_FEA_VOID'
         ) {
       return;
     }
@@ -3470,14 +3477,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.transactionType !== 'CON_EAR_UNDEP' &&
       this.transactionType !== 'CON_EAR_DEP_1'
       &&
-        this.transactionType !== 'ALLOC_EXP' &&
-        this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
-        this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
-        this.transactionType !== 'ALLOC_EXP_STAF_REIM' &&
-        this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
-        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
-        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
-        this.transactionType !== 'ALLOC_EXP_VOID'
+      this.transactionType !== 'ALLOC_EXP' &&
+      this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
+      this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
+      this.transactionType !== 'ALLOC_EXP_STAF_REIM' &&
+      this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
+      this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
+      this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
+      this.transactionType !== 'ALLOC_EXP_VOID'
+      &&
+      this.transactionType !== 'ALLOC_FEA_DISB' &&
+      this.transactionType !== 'ALLOC_FEA_CC_PAY' &&
+      this.transactionType !== 'ALLOC_FEA_CC_PAY_MEMO' &&
+      this.transactionType !== 'ALLOC_FEA_STAF_REIM' &&
+      this.transactionType !== 'ALLOC_FEA_STAF_REIM_MEMO' &&       
+      this.transactionType !== 'ALLOC_FEA_VOID'
     ) {
       return;
     }
