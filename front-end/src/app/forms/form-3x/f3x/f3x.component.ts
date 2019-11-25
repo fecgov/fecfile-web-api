@@ -465,7 +465,7 @@ export class F3xComponent implements OnInit {
       this.scheduleType === 'sched_c_en' ||
       this.scheduleType === 'sched_c_es'
     ) {
-      if (this.scheduleType === 'sched_c') {
+      if (this.scheduleType === 'sched_c' || this.scheduleType === 'sched_c_en') {
         if (this.scheduleAction === ScheduleActions.add) {
           // this.forceChangeDetectionC = new Date();
           this.scheduleCAction = ScheduleActions.add;

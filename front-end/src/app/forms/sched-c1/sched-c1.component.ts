@@ -137,6 +137,9 @@ export class SchedC1Component implements OnInit, OnChanges {
     this.c1Form.patchValue({authorized_entity_id : c1.authorized_entity_id});
     this.c1Form.patchValue({authorized_entity_title : c1.authorized_entity_title});
     this.c1Form.patchValue({authorized_signed_date : c1.authorized_signed_date});
+    if(c1.authorized_signed_date){
+      this.c1Form.patchValue({final_authorization : true});
+    }
 
   }
 
