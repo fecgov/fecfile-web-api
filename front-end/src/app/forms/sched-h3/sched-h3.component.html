@@ -475,103 +475,56 @@
     </section>
 
     <section *ngIf="transactionType === 'ALLOC_H3_SUM_P'">
-      <div id="sumary">
+      <div id="sumary" >
         <table class="table table-striped summary_table_text">
-          <thead>
-            <tr class="summary_text_amt_level_1">
-              <th>
-                <h3>Categories</h3>
-              </th>
-              <th>
-                <h3>Total Breakdown of Transfer Received (This Period)</h3>
-              </th>
-            </tr>
+            <thead>
+              <tr class="summary_text_amt_level_1">
+                <th>
+                    <h3>Categories</h3>
+                </th>
+                <th>
+                    <h3>Total Breakdown of Transfer Received (This Period)</h3>
+                </th>
+              </tr>
             </thead>
             <tbody>
               <ng-container *ngFor="let item of h3SumP">
                 <tr>
-                  <td class="summary_text_level_3">
-                    <section *ngIf="item.activity_event_type === 'AD'">
-                      Administrative
-                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                          tooltipClass="form-tooltip">
-                          <i class="info-icon" aria-hidden="true"></i>
-                          <span class="sr-only">Click here for more information</span>
-                      </button>
-                    </section>
-                    <section *ngIf="item.activity_event_type === 'GV'">
-                      Generic Voter Drive
-                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                        tooltipClass="form-tooltip">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">Click here for more information</span>
-                      </button>
-                    </section>
-                    <section *ngIf="item.activity_event_type === 'EA'">
-                      Exempt Activities
-                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                        tooltipClass="form-tooltip">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">Click here for more information</span>
-                      </button>
-                    </section>
-                    <section *ngIf="item.activity_event_type === 'DF'">
-                      Direct Fundraising
-                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                        tooltipClass="form-tooltip">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">Click here for more information</span>
-                      </button>
-                    </section>
-                    <section *ngIf="item.activity_event_type === 'DC'">
-                      Direct Candidate Support
-                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                        tooltipClass="form-tooltip">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">Click here for more information</span>
-                      </button>
-                    </section>
-                    <section *ngIf="item.activity_event_type === 'PC'">
-                      Public Communications Referring Only to Party(Made by PAC)
-                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                        tooltipClass="form-tooltip">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">Click here for more information</span>
-                      </button>
-                    </section>
-                    <section *ngIf="item.activity_event_type === 'total'" class="totalRow">
-                      Total Amount Transferred
-                      <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                        tooltipClass="form-tooltip">
-                        <i class="info-icon" aria-hidden="true"></i>
-                        <span class="sr-only">Click here for more information</span>
-                      </button>
-                    </section>
-                    
+                  <td class="summary_text_level_3"
+                    [ngClass]="item.category === 'Total Amount Transferred' ?
+                    'totalRow' : 'summary_text_level_3'"
+                  >
+                    {{ item.category }}
+                    <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                      tooltipClass="form-tooltip">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                    </button>
                   </td>
                   <td class="summary_text_amt"
-                    [ngClass]="item.activity_event_type === 'Total Amount Transferred' ?
-                    'totalRow' : 'summary_text_amt'"
-                  >{{ item.sum | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+                    [ngClass]="item.category === 'Total Amount Transferred' ?
+                    'totalRow' : 'summary_text_level_3'"
+                  >{{ item.amount | currency:'USD':'symbol-narrow':'1.2-2' }}
+                  </td>
                 </tr>
               </ng-container>                  
             </tbody>
-
         </table>
       </div>
 
       <footer *ngIf="transactionType === 'ALLOC_H3_SUM_P'">
-        <footer>
-          <div class="grid-row">
-            <div class="grid-row__col grid-row__col--12">
-              <div class="forms__btn-container">
-                <button class="btn btn-previous btn-left" type="button" (click)="clearFormValues(); previousStep()">
-                  Previous
-                </button>
+          <footer>
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12">
+                <div class="forms__btn-container">
+                  <button class="btn btn-previous btn-left" type="button"
+                    (click)="clearFormValues(); previousStep()">
+                    Previous
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </footer>
+          </footer>
       </footer>
     </section>
   </form>
