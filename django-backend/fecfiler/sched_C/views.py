@@ -73,7 +73,7 @@ def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SC"):
         raise Exception(
             'The Transaction ID: {} is not in the specified format.' +
-            'Transaction IDs start with SD characters'.format(transaction_id))
+            'Transaction IDs start with SC characters'.format(transaction_id))
     return transaction_id
 
 
@@ -88,7 +88,7 @@ def check_mandatory_fields_SC(data):
                 errors.append(field)
         if errors:
             raise Exception(
-                'The following mandatory fields are required in order to save data to schedA table: {}'.format(','.join(errors)))
+                'The following mandatory fields are required in order to save data: {}'.format(','.join(errors)))
     except:
         raise
 
@@ -757,21 +757,20 @@ def delete_schedC(data):
     """
     try:
         # check_mandatory_fields_SC2(data)
-        delete_sql_schedC(data.get('cmte_id'), data.get(
-            'report_id'), data.get('transaction_id'))
+        delete_sql_schedC(data.get('cmte_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
 
-def delete_sql_schedC(cmte_id, report_id, transaction_id):
+def delete_sql_schedC(cmte_id, transaction_id):
     """
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_c
             SET delete_ind = 'Y' 
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
+            WHERE transaction_id = %s AND cmte_id = %s
         """
-    _v = (transaction_id, report_id, cmte_id)
+    _v = (transaction_id, cmte_id)
     do_transaction(_sql, _v)
 
 
@@ -844,14 +843,14 @@ def schedC(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
-                data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
-            else:
-                raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            #     data['report_id'] = check_report_id(
+            #         request.data.get('report_id'))
+            # else:
+            #     raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedC(data)
@@ -1073,7 +1072,7 @@ def check_mandatory_fields_SC1(data):
             #     string = string + x + ", "
             # string = string[0:-2]
             raise Exception(
-                'The following mandatory fields are required in order to save data to schedA table: {}'.format(','.join(errors)))
+                'The following mandatory fields are required in order to save data: {}'.format(','.join(errors)))
     except:
         raise
 
@@ -1620,21 +1619,20 @@ def delete_schedC1(data):
     """
     try:
         # check_mandatory_fields_SC2(data)
-        delete_sql_schedC1(data.get('cmte_id'), data.get(
-            'report_id'), data.get('transaction_id'))
+        delete_sql_schedC1(data.get('cmte_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
 
-def delete_sql_schedC1(cmte_id, report_id, transaction_id):
+def delete_sql_schedC1(cmte_id, transaction_id):
     """
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_c1
             SET delete_ind = 'Y' 
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
+            WHERE transaction_id = %s AND cmte_id = %s
         """
-    _v = (transaction_id, report_id, cmte_id)
+    _v = (transaction_id, cmte_id)
     do_transaction(_sql, _v)
 
 
@@ -1705,14 +1703,14 @@ def schedC1(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
-                data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
-            else:
-                raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            #     data['report_id'] = check_report_id(
+            #         request.data.get('report_id'))
+            # else:
+            #     raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedC1(data)
@@ -1782,7 +1780,7 @@ def check_mandatory_fields_SC2(data):
             #     string = string + x + ", "
             # string = string[0:-2]
             raise Exception(
-                'The following mandatory fields are required in order to save data to schedA table: {}'.format(','.join(errors)))
+                'The following mandatory fields are required in order to save data: {}'.format(','.join(errors)))
     except:
         raise
 
@@ -1968,19 +1966,18 @@ def delete_schedC2(data):
     function for handling delete request for sc2
     """
     try:
-        check_mandatory_fields_SC2(data)
-        delete_sql_schedC2(data.get('cmte_id'), data.get(
-            'report_id'), data.get('transaction_id'))
+        # check_mandatory_fields_SC2(data)
+        delete_sql_schedC2(data.get('cmte_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
 
-def delete_sql_schedC2(cmte_id, report_id, transaction_id):
+def delete_sql_schedC2(cmte_id, transaction_id):
     _sql = """UPDATE public.sched_c2
             SET delete_ind = 'Y' 
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
+            WHERE transaction_id = %s AND cmte_id = %s
         """
-    _v = (transaction_id, report_id, cmte_id)
+    _v = (transaction_id, cmte_id)
     do_transaction(_sql, _v)
 
 
@@ -2167,14 +2164,14 @@ def schedC2(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
-                data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
-            else:
-                raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            #     data['report_id'] = check_report_id(
+            #         request.data.get('report_id'))
+            # else:
+            #     raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedC2(data)
