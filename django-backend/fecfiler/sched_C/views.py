@@ -1827,7 +1827,7 @@ def put_schedC2(data):
                 }
                 remove_entities(get_data)
             raise Exception(
-                'The put_sql_schedD function is throwing an error: ' + str(e))
+                'The put_sql_schedC2 function is throwing an error: ' + str(e))
         return get_schedC2(data)[0]
     except:
         raise
@@ -1843,7 +1843,7 @@ def put_sql_schedC2(data):
                 guaranteed_amount = %s,
                 back_ref_transaction_id = %s,
                 last_update_date = %s
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
+            WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
         """
     _v = (data.get('transaction_type_identifier'),
           data.get('guarantor_entity_id'),
@@ -1851,7 +1851,6 @@ def put_sql_schedC2(data):
           data.get('back_ref_transaction_id'),
           datetime.datetime.now(),
           data.get('transaction_id'),
-          data.get('report_id'),
           data.get('cmte_id'),
           )
     do_transaction(_sql, _v)
