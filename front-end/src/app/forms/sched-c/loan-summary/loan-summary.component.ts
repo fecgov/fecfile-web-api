@@ -212,10 +212,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       case this.LoanView:
         this.getLoanPage(page);
         break;
-      case this.recycleBinView:
-        this.getRecyclingPage(page);
-        this.maxColumnOption = 6;
-        break;
       default:
         break;
     }
@@ -322,73 +318,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       }
     };
     this.status.emit(c1EmitObj);
-  }
-
-  /**
-	 * The Loan for the recycling bin.
-	 *
-	 * @param page the page containing the Loan to get
-	 */
-  public getRecyclingPage(page: number): void {
-
-    this.config.currentPage = page;
-
-    let sortedCol: SortableColumnModel =
-      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
-
-    // smahal: quick fix for sortCol issue not retrived from cache
-    if (!sortedCol) {
-      this.setSortDefault();
-      sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
-    }
-
-    if (sortedCol) {
-      if (sortedCol.descending === undefined || sortedCol.descending === null) {
-        sortedCol.descending = false;
-      }
-    } else {
-      sortedCol = new SortableColumnModel('', false, false, false, false);
-    }
-
-    // const serverSortColumnName = this._LoanService.
-    //   mapToSingleServerName(this.currentSortedColumnName);
-
-    this._LoanService.getUserDeletedLoan(page, this.config.itemsPerPage,
-      this.currentSortedColumnName,
-      sortedCol.descending)
-      .subscribe((res: GetLoanResponse) => {
-        console.log(" getRecyclingPage res =", res)
-        this.LoanModel = [];
-
-        // fixes an issue where no items shown when current page != 1 and new filter
-        // result has only 1 page.
-        if (res.totalPages === 1) {
-          this.config.currentPage = 1;
-        }
-
-        this._LoanService.addUIFileds(res);
-
-        this.LoanModel = res.loans;
-
-        this._LoanService.addUIFileds(res);
-        this._LoanService.mockApplyFilters(res);
-        const LoanModelL = this._LoanService.mapFromServerFields(res.loans);
-        this.LoanModel = LoanModelL;
-
-        // handle non-numeric amounts
-        // TODO handle this server side in API
-        // for (const model of this.LoanModel) {
-        //   model.amount = model.amount ? model.amount : 0;
-        //   model.aggregate = model.aggregate ? model.aggregate : 0;
-        // }
-
-        this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
-        this.numberOfPages = res.totalPages;
-        this.allLoanSelected = false;
-
-
-
-      });
   }
 
 
@@ -635,18 +564,15 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       .confirm('You are about to delete this transaction ' + loan.transaction_id + '.', ConfirmModalComponent, 'Caution!')
       .then(res => {
         if (res === 'okay') {
-          // this._transactionsService
-          //   .trashOrRestoreTransactions(this.formType, 'trash', reportId, [trx])
-          //   .subscribe((res: GetTransactionsResponse) => {
-          //     this._getSubTransactions(reportId, trx.backRefTransactionId, trx.apiCall);
-              this._dialogService.confirm(
-                'Transaction has been successfully deleted and sent to the recycle bin. ' + loan.transactionId,
-                ConfirmModalComponent,
-                'Success!',
-                false,
-                ModalHeaderClassEnum.successHeader
-              );
-            // });
+          this._LoanService.deleteLoan(loan).subscribe(res => {
+            this._dialogService.confirm(
+              'Transaction has been successfully deleted and sent to the recycle bin. ' + loan.transactionId,
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          })
         } else if (res === 'cancel') {
         }
       });
