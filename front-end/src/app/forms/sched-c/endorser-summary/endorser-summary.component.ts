@@ -821,6 +821,24 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     this._goToEndorser(endorser);
   }
 
+  public goToC1() {
+    const c1EmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c1',
+      action: this.transactionDetail.c1Exists ? ScheduleActions.edit: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
+          transactionId: this.transactionDetail.endorser.back_ref_transaction_id,
+        }
+      }
+    };
+    this.status.emit(c1EmitObj);
+  }
+
+
   private _goToEndorser(endorser:any) {
     const endorserRepaymentEmitObj: any = {
       form: {},

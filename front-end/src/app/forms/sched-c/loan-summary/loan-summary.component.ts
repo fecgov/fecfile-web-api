@@ -183,7 +183,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.getPage(this.config.currentPage);
   }
 
-  public goToPage(pageEvent: any){
+  public goToPage(pageEvent: any) {
     console.log(pageEvent);
     this.currentPageNumber = pageEvent;
   }
@@ -251,7 +251,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       mapToSingleServerName(this.currentSortedColumnName);
 
     this._LoanService.getLoan()
-    //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
+      //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
       .subscribe((res: any) => {
 
         // res=this.tempApiResponse;
@@ -267,10 +267,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 
         //TODO - ZS -- this is temporary fix to map fields to the right attributes until service response is fixed
         res.forEach(element => {
-          if(element.entity_type==='IND'){
+          if (element.entity_type === 'IND') {
             element.name = `${element.last_name}, ${element.first_name}`;
           }
-          else if(element.entity_type==='ORG'){
+          else if (element.entity_type === 'ORG') {
             element.name = element.entity_name;
           }
         });
@@ -279,7 +279,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         const LoanModelL = this._LoanService.mapFromServerFields(res);
         this.LoanModel = LoanModelL;
 
-      
+
 
         this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
         this.numberOfPages = res.totalPages;
@@ -287,6 +287,42 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       });
   }
 
+  public goToC1(loan:any) {
+    const c1Exists = this._LoanService.c1Exists(loan);
+    const c1EmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c1',
+      action: c1Exists ? ScheduleActions.edit: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
+          transactionId: loan.transaction_id,
+        }
+      }
+    };
+    this.status.emit(c1EmitObj);
+  }
+
+  public goToEndorserSummary(loan:any) {
+    const c1EmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c_es',
+      action: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
+          endorser:{
+            back_ref_transaction_id:loan.transaction_id,
+          }, 
+        }
+      }
+    };
+    this.status.emit(c1EmitObj);
+  }
 
   /**
 	 * The Loan for the recycling bin.
@@ -929,12 +965,12 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
-  public editLoanPayment(loan:any){
+  public editLoanPayment(loan: any) {
     this._goToLoan(loan);
   }
 
 
-  private _goToLoan(loan:any) {
+  private _goToLoan(loan: any) {
     const loanRepaymentEmitObj: any = {
       form: {},
       direction: 'next', //TODO-zs -- does this need to be changed?
@@ -943,16 +979,16 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       scheduleType: 'sched_c',
       action: ScheduleActions.edit,
       transactionDetail: {
-        transactionModel : {
-          transaction_id: loan.transaction_id, 
+        transactionModel: {
+          transaction_id: loan.transaction_id,
           entityId: loan.entity_id
         }
       }
     };
     this.status.emit(loanRepaymentEmitObj);
   }
-  
-  public goToLoanRepayment(loan:any) {
+
+  public goToLoanRepayment(loan: any) {
     const loanRepaymentEmitObj: any = {
       form: {},
       direction: 'next',
@@ -962,7 +998,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       action: ScheduleActions.add,
       transactionDetail: {
         transactionModel: {
-          transactionId: loan.transaction_id, 
+          transactionId: loan.transaction_id,
           entityId: loan.entity_id,
           entryScreenScheduleType: 'sched_c_ls',
         }

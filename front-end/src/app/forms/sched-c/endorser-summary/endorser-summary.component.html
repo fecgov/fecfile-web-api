@@ -23,7 +23,7 @@
         </th>
         <th [@fadeInOut]  [class]="getSortClass('employer')" (click)="changeSortDirection('employer')">Employer
         </th>
-        <th [@fadeInOut]  [class]="getSortClass('occupation')" (click)="changeSortDirection('occupation')">occupation
+        <th [@fadeInOut]  [class]="getSortClass('occupation')" (click)="changeSortDirection('occupation')">Occupation
         </th>
 
         <th class="bulk_action">
@@ -87,26 +87,12 @@
   <footer>
 
     <div class="grid-row">
-      <div class="grid-row__col grid-row__col--12">
-        <div class="forms__btn-container">
-          <br />
-        </div>
-      </div>
-    </div>
-    <div class="grid-row">
-      <div class="grid-row__col grid-row__col--12">
-        <div class="forms__btn-container">
-          <button class="btn btn-previous btn-right" type="button"  (click)="saveEndorser()">
+      <div class="grid-row__col grid-row__col--12 ">
+        <div class="forms__btn-container pr-4">
+          <button class="btn btn-primary btn-right" type="button"  (click)="goToC1()">
             Next
           </button>
         </div>
       </div>          
-    </div>
-    <div class="grid-row">
-      <div class="grid-row__col grid-row__col--12">
-        <div class="forms__btn-container">
-          <br />
-        </div>
-      </div>
     </div>
   </footer>

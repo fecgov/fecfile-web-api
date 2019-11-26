@@ -93,6 +93,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private _selectedEntityId: any;
   private typeChangeEventOccured = false;
   _routeListener: Subscription;
+  private c1ExistsFlag: any;
 
   constructor(
     private _http: HttpClient,
@@ -842,7 +843,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           },
           entityId: this._selectedEntityId, 
           entryScreenScheduleType:'sched_c', 
-          transaction_id: this._transactionId
+          transaction_id: this._transactionId, 
+          c1Exists : this.c1ExistsFlag
         }
       }
     };
@@ -953,6 +955,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
             } else if (nextScreen === 'c1') {
               this._goToC1();
             } else if(nextScreen === 'endorser'){
+              this.c1ExistsFlag = this._loansService.c1Exists(this.currentLoanData);
               this._goToEndorser();
             }
           }
@@ -973,6 +976,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
   }
+  
+  
 
   private _gotoSummary() {
     const summaryEmitObj: any = {
