@@ -2833,6 +2833,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
                       this.activityEventTypes = committeeTypeEvent.eventTypes;
                     }
+
+                    if((this.transactionType === 'ALLOC_FEA_DISB' ||
+                      this.transactionType === 'ALLOC_FEA_CC_PAY' ||
+                      this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+                      this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
+                      this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+                      this.transactionType == 'ALLOC_FEA_VOID') &&
+                      'H6' === committeeTypeEvent.committeeTypeCategory) {
+                        this.activityEventTypes = committeeTypeEvent.eventTypes;
+                      }
                   }
                 }
               }
