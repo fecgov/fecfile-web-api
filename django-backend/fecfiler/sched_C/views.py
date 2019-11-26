@@ -4,6 +4,7 @@ import logging
 import os
 from decimal import Decimal
 
+
 import requests
 from django.conf import settings
 from django.db import connection
@@ -934,7 +935,7 @@ def get_outstanding_loans(request):
                             e.last_name,
                             e.first_name,
                             e.middle_name,
-                            e.preffix,
+                            e.preffix as prefix,
                             e.suffix, 
                             c.transaction_id,
                             c.loan_amount_original, 
@@ -948,6 +949,7 @@ def get_outstanding_loans(request):
                         AND c.transaction_type_identifier = %s
                         AND c.entity_id = e.entity_id 
                         AND c.loan_balance > 0
+                        AND delete_ind is distinct from 'Y'
                         ) t
             """
             with connection.cursor() as cursor:
@@ -963,7 +965,7 @@ def get_outstanding_loans(request):
                                 e.last_name,
                                 e.first_name,
                                 e.middle_name,
-                                e.preffix,
+                                e.preffix as prefix,
                                 e.suffix, 
                                 c.transaction_id,
                                 c.loan_amount_original, 
@@ -976,6 +978,7 @@ def get_outstanding_loans(request):
                             WHERE c.cmte_id = %s
                             AND c.entity_id = e.entity_id 
                             AND c.loan_balance > 0
+                            AND c.delete_ind is distinct from 'Y'
                             ) t
                 """
             with connection.cursor() as cursor:
