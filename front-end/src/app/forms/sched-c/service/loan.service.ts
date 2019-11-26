@@ -983,7 +983,7 @@ export class LoanService {
   }
 
   c1Exists(currentLoanData: any): any {
-    if(currentLoanData.child && Array.isArray(currentLoanData.child)){
+    if(currentLoanData && currentLoanData.child && Array.isArray(currentLoanData.child)){
       let c1 = currentLoanData.child.filter(e => e.transaction_type_identifier === 'SC1');
       if(c1.length > 0){
         return true;
