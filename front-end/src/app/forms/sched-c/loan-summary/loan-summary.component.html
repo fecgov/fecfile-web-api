@@ -98,7 +98,7 @@
                 <button class="dropdown-item" (click)="printLoan(ln)">
                   <i class="print-icon"></i> Print
                 </button>
-                <button *ngIf="ln.activeTransactionsCnt == 0" class="dropdown-item" (click)="trashLoanSummry(ln)">
+                <button class="dropdown-item" (click)="trashLoan(ln)">
                   <i class="trash-icon"></i> Trash
                 </button>
               </div>

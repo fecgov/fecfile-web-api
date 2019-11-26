@@ -201,8 +201,8 @@
                 <i class="dollar-sign-icon" aria-hidden="true"></i>
               </span>
             </div>
-            <input [ngModel]="f.expenditure_amount | number : '1.2-2'" (ngModelChange)="f.expenditure_amount=$event"
-              [ngModelOptions]="{updateOn: 'blur'}" type="text" min="0" value="0" name="expenditure_amount"
+            <input ngModel (change)="expenditureAmountChanged($event)"
+               type="text" min="0" value="0" name="expenditure_amount"
               class="form-control" id="expenditure_amount" aria-label="Expenditure Amount"
               aria-describedby="expenditure_amount" required>
           </div>

@@ -3439,7 +3439,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.frmIndividualReceipt) {
       this.frmIndividualReceipt.reset();
     }
-    if (this.frmIndividualReceipt.contains('entity_type')) {
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.contains('entity_type')) {
       this.selectedEntityType = this._entityTypeDefault;
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
     }

@@ -33,6 +33,7 @@ export interface GetLoanResponse {
   providedIn: 'root'
 })
 export class LoanService {
+  
 
   // only for mock data
   private mockRestoreTrxArray = [];
@@ -108,6 +109,34 @@ export class LoanService {
       }));
   }
 
+  deleteLoan(loan: any) : Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/sc/schedC';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let params = new HttpParams();
+    params = params.append('transaction_id', loan.transaction_id);
+
+    return this._http.delete(
+      `${environment.apiUrl}${url}`,
+        {
+          params,
+          headers: httpOptions
+        }
+    )
+    .pipe(map(res => {
+      if (res) {
+        console.log('get_outstanding_loans API res: ', res);
+
+        return res;
+      }
+      return false;
+  }));
+  }
+
 
    /**
    * Gets the endorsers by loan transactionId.
@@ -147,70 +176,6 @@ export class LoanService {
           return false;
       }));
 
-  }
-
-  /**
-   * Get the contacts for the user's Recycling Bin by Report ID.
-   * These are contacts "trashed" by the user.
-   *
-   * @param formType
-   * @param reportId
-   * @param page
-   * @param itemsPerPage
-   * @param sortColumnName
-   * @param descending
-   * @param filters
-   * @return     {Observable}
-   */
-  public getUserDeletedLoan(
-    page: number,
-    itemsPerPage: number,
-    sortColumnName: string,
-    descending: boolean,
-    ): Observable<any> {
-
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
-    const url = '/core/get_all_trashed_contacts';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    const request: any = {};
-    request.page = page;
-    request.itemsPerPage = itemsPerPage;
-    request.sortColumnName = sortColumnName;
-    request.descending = descending;
-
-    
-    // For mock response - remove after API is verified
-    // const mockResponse: GetLoanResponse = {
-    //   contacts: this.mockRestoreTrxArray,
-    //   totalAmount: 0,
-    //   totalContactCount: this.mockRestoreTrxArray.length,
-
-    //   // remove after API is renamed.
-    //   itemsPerPage: 5,
-    //   'total pages': 0
-    // };
-    // return Observable.of(mockResponse);
-
-    return this._http
-      .post(
-        `${environment.apiUrl}${url}`,
-        request,
-        {
-          headers: httpOptions
-        }
-      )
-      .pipe(map(res => {
-          if (res) {
-            console.log('Contact Recycle Bin Table res: ', res);
-
-            return res;
-          }
-          return false;
-      }));
   }
 
 
