@@ -581,6 +581,13 @@ export class EndorserComponent implements OnInit, OnDestroy {
   }
 
   public saveEndorser(addmore: boolean = false) {
+    if(!this.endorserForm.valid){
+      this.endorserForm.markAsDirty();
+      this.endorserForm.markAsTouched();
+      window.scrollTo(0, 0);
+      return ;
+    }
+
     const hiddenFieldsObj = {
       back_ref_transaction_id: this.transactionDetail.endorser.back_ref_transaction_id,
       entity_id: this._selectedEntity ? this._selectedEntity.entity_id : null, 
@@ -625,7 +632,8 @@ export class EndorserComponent implements OnInit, OnDestroy {
           endorser:{
             transaction_id:this.transactionDetail.endorser.transaction_id,
             back_ref_transaction_id: this.transactionDetail.endorser.back_ref_transaction_id
-          }
+          }, 
+          c1Exists: this.transactionDetail.c1Exists
         }
       }
     };

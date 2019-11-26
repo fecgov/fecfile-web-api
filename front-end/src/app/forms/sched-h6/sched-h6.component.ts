@@ -26,14 +26,15 @@ import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
-import { SchedH4Service } from './sched-h4.service';
-import { SchedH4Model } from './sched-h4.model';
+import { SchedH6Service } from './sched-h6.service';
+import { SchedH6Model } from './sched-h6.model';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
+
 @Component({
-  selector: 'app-sched-h4',
-  templateUrl: './sched-h4.component.html',
-  styleUrls: ['./sched-h4.component.scss'],
+  selector: 'app-sched-h6',
+  templateUrl: './sched-h6.component.html',
+  styleUrls: ['./sched-h6.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None,
   animations: [
@@ -48,7 +49,7 @@ import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstra
     ])
   ]
 })
-export class SchedH4Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+export class SchedH6Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
@@ -58,18 +59,18 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
   public formType: string;  
   public showPart2: boolean;
   public loaded = false;
-  public schedH4: FormGroup;
+  public schedH6: FormGroup;
    
-  public h4Subscription: Subscription;
-  public h4Sum: any;
+  public h6Subscription: Subscription;
+  public h6Sum: any;
   public saveHRes: any;
 
   public tableConfig: any;
 
   public showSelectType = true;
 
-  public schedH4sModel: Array<SchedH4Model>;
-  public schedH4sModelL: Array<SchedH4Model>;
+  public schedH6sModel: Array<SchedH6Model>;
+  public schedH6sModelL: Array<SchedH6Model>;
    
   constructor(
     _http: HttpClient,
@@ -93,7 +94,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
     private _actRoute: ActivatedRoute,
-    private _schedH4Service: SchedH4Service,
+    private _schedH6Service: SchedH6Service,
     private _individualReceiptService: IndividualReceiptService,
   ) {    
      super(
@@ -118,13 +119,13 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
       _transactionsService,
       _reportsService
     );
-    _schedH4Service;
+    _schedH6Service;
     _individualReceiptService;
   }
 
 
   public ngOnInit() {
-    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedH4Component;
+    
     // temp code - waiting until dynamic forms completes and loads the formGroup
     // before rendering the static fields, otherwise validation error styling
     // is not working (input-error-field class).  If dynamic forms deliver,
@@ -133,27 +134,15 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
       this.loaded = true;
     }, 2000);
 
-    this.formType = this._actRoute.snapshot.paramMap.get('form_id');
-    //this.getH4Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
-    
-    //this.setSchedH4();
+    this.formType = this._actRoute.snapshot.paramMap.get('form_id');    
 
     this.tableConfig = {
       itemsPerPage: 8,
       currentPage: 1,
       totalItems: 10
     };
-
-    //this.setDefaultValues();
-
-    /*
-    console.log("this.transactionType: ", this.transactionType);
-    if(this.transactionType === 'ALLOC_H4_RATIO') {
-      this.transactionType = 'ALLOC_EXP_DEBT'
-    }
-    */
-
-    this.setSchedH4();
+ 
+    this.setSchedH6();
 
   }
 
@@ -165,8 +154,8 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
 
-    if(this.transactionType === 'ALLOC_H4_SUM') {
-      this.getH4Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+    if(this.transactionType === 'ALLOC_H6_SUM') {
+      this.getH6Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
     }
   }
 
@@ -181,7 +170,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   setDefaultValues() {
-    this.schedH4.patchValue({ratio_code:'n'}, { onlySelf: true });
+    this.schedH6.patchValue({ratio_code:'n'}, { onlySelf: true });
   }
 
   public getReportId(): string {
@@ -204,45 +193,46 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
 
   }
 
-  public setSchedH4() {
-    this.schedH4 = new FormGroup({     
+  public setSchedH6() {
+    this.schedH6 = new FormGroup({     
       type: new FormControl('', Validators.required)      
     });
   }
 
   public selectTypeChange(e) {    
-    this.transactionType = e.currentTarget.value;   
+    this.transactionType = e.currentTarget.value;
+    console.log('99: ', this.transactionType);
   }
  
-  public getH4Sum(reportId: string) {
-    this.schedH4sModel = [];
+  public getH6Sum(reportId: string) {
+    this.schedH6sModel = [];
     
-    this.h4Subscription = this._schedH4Service.getSummary(reportId).subscribe(res =>
+    this.h6Subscription = this._schedH6Service.getSummary(reportId).subscribe(res =>
       {        
         if(res) {          
-          //this.h4Sum =  res;
-          this.schedH4sModelL = this.mapFromServerFields(res);
-          this.schedH4sModel = this.mapFromServerFields(res);
-          this.setArrow(this.schedH4sModel);
+          //this.h6Sum =  res;
+          this.schedH6sModelL = this.mapFromServerFields(res);
+          this.schedH6sModel = this.mapFromServerFields(res);
+          this.setArrow(this.schedH6sModel);
 
-          this.schedH4sModel = this.schedH4sModel .filter(obj => obj.memo_code !== 'X');
-          this.tableConfig.totalItems = this.schedH4sModel.length;
+          this.schedH6sModel = this.schedH6sModel .filter(obj => obj.memo_code !== 'X');
+          this.tableConfig.totalItems = this.schedH6sModel.length;
         }
       });        
   }
  
   public returnToSum(): void {
-    this.transactionType = 'ALLOC_H4_SUM';
-    this.getH4Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+    this.transactionType = 'ALLOC_H6_SUM';
+    this.getH6Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
   }
 
   public returnToAdd(): void {
-    this.transactionType = 'ALLOC_EXP_DEBT'; //'ALLOC_H4_RATIO';    
+    this.transactionType = 'ALLOC_EXP_DEBT'; //'ALLOC_H6_RATIO';    
   }
 
   public previousStep(): void {
     
-    this.schedH4.reset();
+    this.schedH6.reset();
 
     this.status.emit({
       form: {},
@@ -251,31 +241,31 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     });
   }
 
-  public clickArrow(item: SchedH4Model) {
+  public clickArrow(item: SchedH6Model) {
     if(item.arrow_dir === 'down') {
-      let indexRep = this.schedH4sModel.indexOf(item);
+      let indexRep = this.schedH6sModel.indexOf(item);
       if (indexRep > -1) {
-        const tmp: SchedH4Model = this.schedH4sModelL.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id});
-        this.schedH4sModel.splice(indexRep + 1, 0, tmp);
-        this.tableConfig.totalItems = this.schedH4sModel.length;
+        const tmp: SchedH6Model = this.schedH6sModelL.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id});
+        this.schedH6sModel.splice(indexRep + 1, 0, tmp);
+        this.tableConfig.totalItems = this.schedH6sModel.length;
       }
 
-      this.schedH4sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'up';
-      this.schedH4sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id}).arrow_dir = 'show';
+      this.schedH6sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'up';
+      this.schedH6sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id}).arrow_dir = 'show';
       
     }else if(item.arrow_dir === 'up') {
-      this.schedH4sModel = this.schedH4sModel.filter(obj => obj.memo_code !== 'X');      
-      this.tableConfig.totalItems = this.schedH4sModel.length;
+      this.schedH6sModel = this.schedH6sModel.filter(obj => obj.memo_code !== 'X');      
+      this.tableConfig.totalItems = this.schedH6sModel.length;
 
-      this.schedH4sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'down';      
+      this.schedH6sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'down';
     }
    
   }
 
-  public setArrow(items: SchedH4Model[]) {
+  public setArrow(items: SchedH6Model[]) {
     if(items) {
       for(const item of items) {        
-        if(item.memo_code !== 'X' && this.schedH4sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id})) {
+        if(item.memo_code !== 'X' && this.schedH6sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id})) {
             item.arrow_dir = 'down';           
         }        
       }
@@ -291,7 +281,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     const modelArray: any = [];
 
     for (const row of serverData) {
-      const model = new SchedH4Model({});      
+      const model = new SchedH6Model({});      
 
       model.cmte_id = row.cmte_id;
       model.report_id = row.report_id;     
@@ -303,6 +293,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
       model.expenditure_date = row.expenditure_date;
       model.fed_share_amount = row.fed_share_amount;
       model.non_fed_share_amount = row.non_fed_share_amount;
+      model.levin_share = row.levin_share;
       model.memo_code = row.memo_code;
       model.first_name = row.first_name;
       model.last_name = row.last_name;
