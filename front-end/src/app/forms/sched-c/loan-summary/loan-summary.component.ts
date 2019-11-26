@@ -625,6 +625,33 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     alert('Link multiple loan requirements have not been finalized');
   }
 
+/**
+   * Trash the transaction selected by the user.
+   *
+   * @param trx the Transaction to trash
+   */
+  public trashLoan(loan: any): void {
+    this._dialogService
+      .confirm('You are about to delete this transaction ' + loan.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          // this._transactionsService
+          //   .trashOrRestoreTransactions(this.formType, 'trash', reportId, [trx])
+          //   .subscribe((res: GetTransactionsResponse) => {
+          //     this._getSubTransactions(reportId, trx.backRefTransactionId, trx.apiCall);
+              this._dialogService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + loan.transactionId,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            // });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
 
   /**
    * Trash all Loan selected by the user.

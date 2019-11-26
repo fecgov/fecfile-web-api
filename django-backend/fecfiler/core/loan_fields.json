@@ -375,7 +375,7 @@
             "width": "100px",
             "validation": {
               "required": true,
-              "max": null,
+              "max": 15,
               "dollarAmount": false
             }
           },
@@ -691,7 +691,7 @@
             "width": "154px",
             "validation": {
               "required": true,
-              "max": null,
+              "max": 15,
               "dollarAmount": false
             }
           },
