@@ -178,13 +178,11 @@
                           </div>
                         </td>
                         <td>{{ item.expenditure_date | date: 'MM/dd/yyyy' }}</td>
-                        <td>
-                          <div *ngIf="item.activity_event_type == 'AD'">Administrative</div>
-                          <div *ngIf="item.activity_event_type == 'GV'">Generic Voter Drive</div>
-                          <div *ngIf="item.activity_event_type == 'EA'">Exempt Activities</div>
-                          <div *ngIf="item.activity_event_type == 'DF'">Direct Fundraising</div>
-                          <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Suppot</div>
-                          <div *ngIf="item.activity_event_type == 'PC'">Public Communications Referring Only to Party(Made by PAC)</div>                            
+                        <td>                          
+                          <div *ngIf="item.activity_event_type == 'GC'">Generic Campaign</div>
+                          <div *ngIf="item.activity_event_type == 'GO'">GOTV</div>
+                          <div *ngIf="item.activity_event_type == 'VI'">Voter ID</div>
+                          <div *ngIf="item.activity_event_type == 'VR'">Voter Registration</div>
                         </td>
                         <td>                           
                           {{ item.entity_type == 'IND' ?
