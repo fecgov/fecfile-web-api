@@ -9,6 +9,7 @@ export class SchedH6Model {
     expenditure_date:string;
     fed_share_amount: number;
     non_fed_share_amount: number;
+    levin_share: number;
     memo_code: string;
     first_name: string;
     last_name: string;
@@ -25,6 +26,7 @@ export class SchedH6Model {
         this.activity_event_type = schedH6.activity_event_type ? schedH6.activity_event_type : '';
         this.expenditure_date = schedH6.expenditure_date ? schedH6.expenditure_date : '';
         this.fed_share_amount = schedH6.fed_share_amount ? schedH6.fed_share_amount : '';
+        this.levin_share = schedH6.levin_share ? schedH6.levin_share : '';
         this.non_fed_share_amount = schedH6.non_fed_share_amount ? schedH6.non_fed_share_amount : '';
         this.memo_code = schedH6.memo_code ? schedH6.memo_code : '';
         this.first_name = schedH6.first_name ? schedH6.first_name : '';
