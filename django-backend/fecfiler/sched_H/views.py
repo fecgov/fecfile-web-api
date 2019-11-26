@@ -1067,6 +1067,112 @@ def get_h2_type_events(request):
     except:
         raise
 
+def is_new_report(report_id, cmte_id):
+    """
+    check if a report_id is new or not
+    a report_id is new if:
+    1.  not exist in sched_h2 table 
+    2. and the cvg_date is newer than the most recent one
+
+    TODO: may need to reconsider this
+    """
+    # _sql = """
+    # select * from public.sched_d
+    # where report_id = %s and cmte_id = %s
+    # """
+    _sql = """
+        SELECT 1 AS seq, 
+            cvg_start_date 
+        FROM   PUBLIC.reports 
+        WHERE  report_id = %s
+        UNION 
+        SELECT 2 AS seq, 
+            Max(cvg_end_date) 
+        FROM   PUBLIC.reports r 
+            JOIN PUBLIC.sched_h2 sh 
+                ON r.report_id = sh.report_id 
+                    AND r.cmte_id = sh.cmte_id 
+                    AND r.cmte_id = %s
+        ORDER  BY seq 
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id))
+            results = cursor.fetchall()
+            new_date = results[0][1]
+            old_date = results[1][1]
+            if new_date and old_date and new_date > old_date:
+                return True
+            return False
+    except:
+        raise
+
+def do_h2_carryover(report_id, cmte_id):
+    """
+    this is the function to handle h2 carryover form one report to next report:
+    1. load all h2 items with distinct event names from last report
+    2. update all records with new transaction_id, new report_id
+    3. set ration code to 's' - same as previously
+    4. copy all other fields
+    """
+    _sql = """
+    insert into public.sched_h2(
+                    cmte_id,
+                    report_id,
+                    line_number,
+                    transaction_type_identifier,
+                    transaction_type,
+                    transaction_id,
+                    activity_event_name,
+                    fundraising,
+                    direct_cand_support,
+                    ratio_code,
+                    revise_date,
+                    federal_percent,
+                    non_federal_percent,
+                    create_date
+					)
+					SELECT 
+					cmte_id, 
+                    %s, 
+                    line_number,
+                    transaction_type_identifier, 
+                    transaction_type,
+                    get_next_transaction_id('SH'), 
+                    activity_event_name,
+                    fundraising,
+                    direct_cand_support, 
+                    's',
+                    revise_date,
+                    federal_percent,
+                    non_federal_percent,
+                    now()
+            FROM public.sched_h2
+            WHERE 
+            cmte_id = %s
+            AND report_id in (
+                SELECT report_id
+                FROM sched_h2
+                WHERE revise_date = (
+	            SELECT
+                    MAX(revise_date)
+                    FROM sched_h2
+                    WHERE cmte_id = %s
+                    AND delete_ind is distinct from 'Y')
+            ) 
+            AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id, cmte_id))
+            if cursor.rowcount == 0:
+                logger.debug('No valid h2 items found.')
+            logger.debug(
+                'h2 carryover done with report_id {}'.format(report_id))
+            logger.debug('total carryover h2 items:{}'.format(cursor.rowcount))
+    except:
+        raise
+
 @api_view(['GET'])
 def get_h2_summary_table(request):
     """
@@ -1077,6 +1183,7 @@ def get_h2_summary_table(request):
 
     update: all h2 items with current report_id need to show up
     """
+
     logger.debug('get_h2_summary_table with request:{}'.format(request.query_params))
     _sql = """
     SELECT json_agg(t) from(
@@ -1106,12 +1213,16 @@ def get_h2_summary_table(request):
         federal_percent, 
         non_federal_percent 
     FROM   public.sched_h2 
-    WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
+    WHERE  cmte_id = %s AND report_id = %s AND ratio_code = 'n' AND delete_ind is distinct from 'Y'
             ) t;
     """
     try:
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
+        logger.debug('checking if it is a new report')
+        if is_new_report(report_id, cmte_id):
+            logger.debug('new report: do h2 carryover.')
+            do_h2_carryover(report_id, cmte_id)
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
             logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))

@@ -26,14 +26,15 @@ import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
-import { SchedH2Service } from './sched-h2.service';
+import { SchedH6Service } from './sched-h6.service';
+import { SchedH6Model } from './sched-h6.model';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 
 @Component({
-  selector: 'app-sched-h2',
-  templateUrl: './sched-h2.component.html',
-  styleUrls: ['./sched-h2.component.scss'],
+  selector: 'app-sched-h6',
+  templateUrl: './sched-h6.component.html',
+  styleUrls: ['./sched-h6.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None,
   animations: [
@@ -48,7 +49,7 @@ import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstra
     ])
   ]
 })
-export class SchedH2Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+export class SchedH6Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
@@ -58,20 +59,19 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public formType: string;  
   public showPart2: boolean;
   public loaded = false;
-  public schedH2: FormGroup;
+  public schedH6: FormGroup;
    
-  public h2Subscription: Subscription;
-  public h2Sum: any;
+  public h6Subscription: Subscription;
+  public h6Sum: any;
   public saveHRes: any;
 
   public tableConfig: any;
-  public receiptDateErr = false;
 
-  public cvgStartDate: any;
-  public cvgEndDate: any;
+  public showSelectType = true;
 
-  public isSubmit = false;
-
+  public schedH6sModel: Array<SchedH6Model>;
+  public schedH6sModelL: Array<SchedH6Model>;
+   
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -94,9 +94,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
     private _actRoute: ActivatedRoute,
-    private _schedH2Service: SchedH2Service,
+    private _schedH6Service: SchedH6Service,
     private _individualReceiptService: IndividualReceiptService,
-    private _uService: UtilService,
   ) {    
      super(
       _http,
@@ -120,14 +119,13 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       _transactionsService,
       _reportsService
     );
-    _schedH2Service;
+    _schedH6Service;
     _individualReceiptService;
-    _uService;
   }
 
 
   public ngOnInit() {
-    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedH2Component;
+    
     // temp code - waiting until dynamic forms completes and loads the formGroup
     // before rendering the static fields, otherwise validation error styling
     // is not working (input-error-field class).  If dynamic forms deliver,
@@ -136,23 +134,16 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       this.loaded = true;
     }, 2000);
 
-    //this.getH2Sum(this.getReportId());
-    //this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
-    
-    this.setSchedH2();
+    this.formType = this._actRoute.snapshot.paramMap.get('form_id');    
 
     this.tableConfig = {
       itemsPerPage: 8,
       currentPage: 1,
       totalItems: 10
     };
+ 
+    this.setSchedH6();
 
-    this.setDefaultValues();
-
-    this.formType = this._actRoute.snapshot.paramMap.get('form_id');
-
-    this.schedH2.patchValue({ select_activity_function: ''}, { onlySelf: true });
-   
   }
 
   pageChanged(event){
@@ -163,8 +154,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
 
-    if(this.transactionType === 'ALLOC_H2_SUM') {
-      this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+    if(this.transactionType === 'ALLOC_H6_SUM') {
+      this.getH6Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
     }
   }
 
@@ -179,7 +170,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   setDefaultValues() {
-    this.schedH2.patchValue({ratio_code:'n'}, { onlySelf: true });
+    this.schedH6.patchValue({ratio_code:'n'}, { onlySelf: true });
   }
 
   public getReportId(): string {
@@ -202,130 +193,120 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   }
 
-  public setSchedH2() {
-    this.schedH2 = new FormGroup({      
-      activity_event_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
-      receipt_date: new FormControl(''),
-      select_activity_function: new FormControl('', Validators.required),
-      fundraising: new FormControl('', Validators.required),
-      direct_cand_support: new FormControl('', Validators.required),
-      ratio_code: new FormControl('', Validators.required),
-      federal_percent: new FormControl('', [Validators.min(0), Validators.max(100), Validators.required]),
-      non_federal_percent: new FormControl('', [Validators.min(0), Validators.max(100), Validators.required])
+  public setSchedH6() {
+    this.schedH6 = new FormGroup({     
+      type: new FormControl('', Validators.required)      
     });
   }
-  
-  public clearFormValues() {
-    this.schedH2.reset();
+
+  public selectTypeChange(e) {    
+    this.transactionType = e.currentTarget.value;
+    console.log('99: ', this.transactionType);
   }
-
-  public saveAndAddMore(): void {
-    this.doValidate();    
-  }
-
-  public doValidate() {
+ 
+  public getH6Sum(reportId: string) {
+    this.schedH6sModel = [];
     
-    this.schedH2.patchValue({ fundraising: this.schedH2.get('select_activity_function').value === 'f' ? true : false }, { onlySelf: true });
-    this.schedH2.patchValue({ direct_cand_support: this.schedH2.get('select_activity_function').value === 'd' ? true : false }, { onlySelf: true });
-
-    const formObj = this.schedH2.getRawValue();
-
-    //formObj['report_id'] = 0;
-    formObj['report_id'] = this._individualReceiptService.getReportIdFromStorage(this.formType);
-    formObj['transaction_type_identifier'] = "ALLOC_H2_RATIO";
-    
-    formObj['federal_percent'] = ((this.schedH2.get('federal_percent').value) / 100).toFixed(2);
-    formObj['non_federal_percent'] = ((this.schedH2.get('non_federal_percent').value) / 100).toFixed(2);
-    
-    const serializedForm = JSON.stringify(formObj);
-
-    this.isSubmit = true;
-
-    if(this.schedH2.status === 'VALID' && 
-        (this.schedH2.get('federal_percent').value + this.schedH2.get('non_federal_percent').value) === 100) {
-
-      this.saveH2Ratio(serializedForm);      
-      this.schedH2.reset();
-      this.isSubmit = false;
-    }
-  }
-
-  public getH2Sum(reportId: string) {
-    
-    this.h2Subscription = this._schedH2Service.getSummary(reportId).subscribe(res =>
+    this.h6Subscription = this._schedH6Service.getSummary(reportId).subscribe(res =>
       {        
         if(res) {          
-          this.h2Sum =  res;         
-          this.tableConfig.totalItems = res.length;           
+          //this.h6Sum =  res;
+          this.schedH6sModelL = this.mapFromServerFields(res);
+          this.schedH6sModel = this.mapFromServerFields(res);
+          this.setArrow(this.schedH6sModel);
+
+          this.schedH6sModel = this.schedH6sModel .filter(obj => obj.memo_code !== 'X');
+          this.tableConfig.totalItems = this.schedH6sModel.length;
         }
       });        
   }
-
-  public saveH2Ratio(ratio: any) {
-    
-    this._schedH2Service.saveH2Ratio(ratio).subscribe(res => {
-      if (res) {        
-        this.saveHRes = res;
-      }
-    });
-  }
  
   public returnToSum(): void {
-
-    this.saveAndAddMore();
-
-    this.isSubmit = false;
-
-    this.schedH2.reset();
-
-    this.transactionType = 'ALLOC_H2_SUM';
-
-    this.receiptDateErr = false;
-   
-    this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
-
+    this.transactionType = 'ALLOC_H6_SUM';
+    this.getH6Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
   }
 
   public returnToAdd(): void {
-    this.transactionType = 'ALLOC_H2_RATIO';
-
-    this.receiptDateErr = false;  
+    this.transactionType = 'ALLOC_EXP_DEBT'; //'ALLOC_H6_RATIO';    
   }
 
-  public receiptDateChanged(receiptDate: string) {
+  public previousStep(): void {
+    
+    this.schedH6.reset();
 
-    const formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
-    this.cvgStartDate = formInfo.cvgStartDate;
-    this.cvgEndDate = formInfo.cvgEndDate;
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_2'
+    });
+  }
 
-    let startDate =  new Date(this.cvgStartDate);
-    startDate.setDate(startDate.getDate() - 1);
+  public clickArrow(item: SchedH6Model) {
+    if(item.arrow_dir === 'down') {
+      let indexRep = this.schedH6sModel.indexOf(item);
+      if (indexRep > -1) {
+        const tmp: SchedH6Model = this.schedH6sModelL.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id});
+        this.schedH6sModel.splice(indexRep + 1, 0, tmp);
+        this.tableConfig.totalItems = this.schedH6sModel.length;
+      }
 
-    if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), startDate))) {
-      this.receiptDateErr = true;
-      this.schedH2.controls['receipt_date'].setErrors({'incorrect': true});  
-    } else {
-      this.receiptDateErr = false;
+      this.schedH6sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'up';
+      this.schedH6sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id}).arrow_dir = 'show';
+      
+    }else if(item.arrow_dir === 'up') {
+      this.schedH6sModel = this.schedH6sModel.filter(obj => obj.memo_code !== 'X');      
+      this.tableConfig.totalItems = this.schedH6sModel.length;
+
+      this.schedH6sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'down';
+    }
+   
+  }
+
+  public setArrow(items: SchedH6Model[]) {
+    if(items) {
+      for(const item of items) {        
+        if(item.memo_code !== 'X' && this.schedH6sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id})) {
+            item.arrow_dir = 'down';           
+        }        
+      }
+    }
+    console.log('9: ', items);
+  }
+
+  public mapFromServerFields(serverData: any) {
+    if (!serverData || !Array.isArray(serverData)) {
+      return;
     }
 
-  }
- 
-  public handleFedPercentFieldKeyup(e) {
-    if(e.target.value <= 100) {
-      this.schedH2.patchValue({ non_federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
-    }else {
-      this.schedH2.patchValue({ non_federal_percent: 0}, { onlySelf: true });
+    const modelArray: any = [];
+
+    for (const row of serverData) {
+      const model = new SchedH6Model({});      
+
+      model.cmte_id = row.cmte_id;
+      model.report_id = row.report_id;     
+      model.transaction_type_identifier = row.transaction_type_identifier;
+      model.transaction_id = row.transaction_id;
+      model.back_ref_transaction_id = row.back_ref_transaction_id;
+      model.activity_event_identifier = row.activity_event_identifier;
+      model.activity_event_type = row.activity_event_type;
+      model.expenditure_date = row.expenditure_date;
+      model.fed_share_amount = row.fed_share_amount;
+      model.non_fed_share_amount = row.non_fed_share_amount;
+      model.memo_code = row.memo_code;
+      model.first_name = row.first_name;
+      model.last_name = row.last_name;
+      model.entity_name = row.entity_name;
+      model.entity_type = row.entity_type;
+
+      modelArray.push(model);
+    
     }
-  }
 
-  public handleNonFedPercentFieldKeyup(e) {
-    if(e.target.value <= 100) {
-      this.schedH2.patchValue({ federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
-    }else {
-      this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true }); 
-    }  
-  }
+    console.log('91: ', modelArray);
 
+    return modelArray;
+  }
+  
 }
 

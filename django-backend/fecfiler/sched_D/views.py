@@ -287,7 +287,7 @@ def schedD_sql_dict(data):
         "first_name",
         "last_name",
         "middle_name",
-        "preffix",
+        "prefix",
         "suffix",
         "street_1",
         "street_2",

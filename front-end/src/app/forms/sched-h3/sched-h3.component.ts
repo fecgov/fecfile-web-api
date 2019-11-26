@@ -24,6 +24,7 @@ import { TransactionModel } from '../transactions/model/transaction.model';
 import { Observable, Subscription } from 'rxjs';
 import { SchedH3Service } from './sched-h3.service';
 import { style, animate, transition, trigger } from '@angular/animations';
+import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 @Component({
   selector: 'app-sched-h3',
@@ -137,6 +138,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnInit() {
+    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedH3Component;
     this.formType = '3X';
     this.formFieldsPrePopulated = true;
     // this.formFields = this._staticFormFields;
@@ -172,8 +174,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     };
     
 
-    this.setH3Sum();
-    this.setH3SumP();
+    //this.setH3Sum();
+    //this.setH3SumP();
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
 
@@ -187,7 +189,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
-    this.showPart2 = false;    
+    this.showPart2 = false;
+
+    if(this.transactionType === 'ALLOC_H3_SUM') {
+      this.setH3Sum();
+    }
+
+    if(this.transactionType === 'ALLOC_H3_SUM_P') {
+      this.setH3SumP();
+    }
   }
 
   ngDoCheck() {
@@ -451,8 +461,56 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.h3Subscription = this._schedH3Service.getBreakDown(this.getReportId()).subscribe(res =>
       {        
-        if(res) {          
-          this.h3SumP =  res;          
+        if(res) {
+          this.h3SumP = [];
+
+          const amountAD = res.find(obj => obj.activity_event_type === 'AD') ?
+            res.find(obj => obj.activity_event_type === 'AD').sum : 0;
+
+          const amountGV = res.find(obj => obj.activity_event_type === 'GV') ?
+            res.find(obj => obj.activity_event_type === 'GV').sum : 0;
+
+          const amountEA = res.find(obj => obj.activity_event_type === 'EA') ?
+            res.find(obj => obj.activity_event_type === 'EA').sum : 0;
+
+          const amountDF = res.find(obj => obj.activity_event_type === 'DF') ?
+            res.find(obj => obj.activity_event_type === 'DF').sum : 0;
+
+          const amountDC = res.find(obj => obj.activity_event_type === 'DC') ?
+            res.find(obj => obj.activity_event_type === 'DC').sum : 0;
+
+          const amountPC = res.find(obj => obj.activity_event_type === 'PC') ?
+            res.find(obj => obj.activity_event_type === 'PC').sum : 0;
+
+          const amountTotal = res.find(obj => obj.activity_event_type === 'total') ?
+            res.find(obj => obj.activity_event_type === 'total').sum : 0;
+
+          this.h3SumP.push(
+            {
+              'category': 'Administrative',
+              'amount': amountAD
+            },{
+              'category': 'Generic Voter Drive',
+              'amount': amountGV
+            },{
+              'category': 'Exempt Activities',
+              'amount': amountEA
+            },{
+              'category': 'Direct Fundraising',
+              'amount': amountDF
+            },{
+              'category': 'Direct Candidate Support',
+              'amount': amountDC
+            },{
+              'category': 'Public Communications Referring Only to Party (PAC)',
+              'amount': amountPC
+            },{
+              'category': 'Total Amount Transferred',
+              'amount': amountTotal
+            }
+          );
+
+          //this.h3SumP =  res;
         }
       });     
 
