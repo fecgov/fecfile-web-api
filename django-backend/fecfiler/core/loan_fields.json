@@ -245,7 +245,7 @@
             "width": "98px",
             "validation": {
               "required": true,
-              "max": 10,
+              "max": 9,
               "alphaNumeric": true
             }
           }
@@ -561,7 +561,7 @@
             "width": "98px",
             "validation": {
               "required": true,
-              "max": 10,
+              "max": 9,
               "alphaNumeric": true
             }
           }
