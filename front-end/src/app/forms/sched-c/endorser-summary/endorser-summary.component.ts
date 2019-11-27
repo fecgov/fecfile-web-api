@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
 import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../../shared/partials/confirm-modal/confirm-modal.component';
 
 export enum ActiveView {
   endorserSummary = 'endorserSummary',
@@ -884,6 +885,30 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     }
   }
 
+  /**
+   * Trash the transaction selected by the user.
+   *
+   * @param trx the Transaction to trash
+   */
+  public trashEndorser(endorser: any): void {
+    this._dialogService
+      .confirm('You are about to delete this transaction ' + endorser.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._LoanService.deleteEndorser(endorser).subscribe(res => {
+            this.getPage(this.config.currentPage);
+            this._dialogService.confirm(
+              'Transaction has been successfully deleted. ' + endorser.transactionId,
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          })
+        } else if (res === 'cancel') {
+        }
+      });
+  }
 
 
 }
