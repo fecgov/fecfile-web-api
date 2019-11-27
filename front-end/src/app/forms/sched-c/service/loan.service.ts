@@ -860,8 +860,10 @@ export class LoanService {
       back_ref_sched_name: '',
       transaction_type: 'LOAN_FROM_IND',
       transaction_type_identifier: 'LOANS_OWED_BY_CMTE',
+      entity_type: 'IND',
       entity_id: hiddenFields.entity_id,
-      entity_type: 'IND'
+      //also pass an additional attribute callled guarantor_entity_id since thats what is it is mapped to in db
+      guarantor_entity_id: hiddenFields.entity_id
     };
 
     /*     const loanByCommFromIndObj: any = {
