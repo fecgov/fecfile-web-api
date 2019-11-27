@@ -237,8 +237,11 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToAdd(): void {
-    this.transactionType = 'ALLOC_EXP_DEBT'; //'ALLOC_H4_RATIO';    
-  }
+    this.showSelectType = true;
+    this.transactionType = "ALLOC_H4_TYPES"
+
+    //this.transactionType = 'ALLOC_EXP_DEBT'; //'ALLOC_H4_RATIO';
+  }1
 
   public previousStep(): void {
     
