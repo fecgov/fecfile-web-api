@@ -180,9 +180,11 @@ def put_schedC(data):
             if get_data['entity_id'].startswith('FEC'):
                 get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
+            logger.debug('updating entity with data:{}'.format(data))
             new_entity = put_entities(data)
             rollback_flag = True
         else:
+            logger.debug('saving new entity:{}'.format(data))
             new_entity = post_entities(data)
             rollback_flag = False
 
@@ -196,6 +198,7 @@ def put_schedC(data):
         #check_transaction_id(data.get('transaction_id'))
         try:
             # rollback_data = get_schedC(data)
+            logger.debug('updating loan with data:{}'.format(data))
             put_sql_schedC(data)
 
         except Exception as e:
@@ -420,6 +423,7 @@ def post_schedC(data):
             if get_data['entity_id'].startswith('FEC'):
                 get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
+            logger.debug('updating entity with data:{}'.format(data))
             new_entity = put_entities(data)
             rollback_flag = True
         else:
@@ -888,6 +892,7 @@ def schedC(request):
             #     data = put_schedB(datum)
             #     output = get_schedB(data)
             # else:
+            logger.debug('updating sched_c with data:{}'.format(datum))
             data = put_schedC(datum)
             # output = get_schedA(data)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
