@@ -1724,15 +1724,19 @@ def get_sched_h3_breakdown(request):
     AND cmte_id = %s
     AND back_ref_transaction_id is not null
     AND delete_ind is distinct from 'Y'
-    GROUP BY activity_event_type
-    union 
-	SELECT 'total', sum(total_amount_transferred) 
-    FROM public.sched_h3 
-    WHERE report_id = %s 
-    AND cmte_id = %s
-    AND back_ref_transaction_id is null
-    AND delete_ind is distinct from 'Y') t
+    GROUP BY activity_event_type) t
     """
+    #     print(0)
+    # except print(0):
+    #     pass
+    # union 
+	# SELECT 'total', sum(total_amount_transferred) 
+    # FROM public.sched_h3 
+    # WHERE report_id = %s 
+    # AND cmte_id = %s
+    # AND back_ref_transaction_id is null
+    # AND delete_ind is distinct from 'Y') t
+    # """
     try:
         cmte_id = request.user.username
         if not('report_id' in request.query_params):
@@ -1743,8 +1747,17 @@ def get_sched_h3_breakdown(request):
         else:
             report_id = check_report_id(request.query_params.get('report_id'))
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [report_id, cmte_id, report_id, cmte_id])
+            cursor.execute(_sql, [report_id, cmte_id])
             result = cursor.fetchone()[0]
+            print('...')
+            print(result)
+            if result:
+                _total = 0
+                for _rec in result:
+                    if _rec.get('sum'):
+                        _total += float(_rec.get('sum'))
+            total = {'activity_event_type': 'total', 'sum': _total}
+            result.append(total)
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         raise Exception('Error on fetching h3 break down')
