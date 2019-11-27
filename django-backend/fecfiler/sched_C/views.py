@@ -311,7 +311,8 @@ def auto_generate_sched_a(data):
     }
     # set up parent
     data['back_ref_transaction_id'] = data['transaction_id']
-    # get a new sched_a id
+    data['back_ref_sched_name'] = data['transaction_id'][0:2] 
+    # get a new sched_a id0:2
     
     data['transaction_id'] = get_next_transaction_id('SA')
     # fill in purpose - hardcoded - TODO: confirm on this
