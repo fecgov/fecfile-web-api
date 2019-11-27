@@ -1749,15 +1749,16 @@ def get_sched_h3_breakdown(request):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [report_id, cmte_id])
             result = cursor.fetchone()[0]
-            print('...')
-            print(result)
+            # print('...')
+            # print(result)
             if result:
                 _total = 0
                 for _rec in result:
                     if _rec.get('sum'):
                         _total += float(_rec.get('sum'))
-            total = {'activity_event_type': 'total', 'sum': _total}
-            result.append(total)
+                total = {'activity_event_type': 'total', 'sum': _total}
+                result.append(total)
+            logger.debug('h3 breakdown:{}'.format(result))
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         raise Exception('Error on fetching h3 break down')
