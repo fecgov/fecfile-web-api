@@ -47,7 +47,7 @@
             </label>
             <input id="lending_institution" class="form-control" type="text" [formControlName]="'lending_institution'"
               [attr.name]="'lending_institution'" [attr.readonly]="true" [style.width]="'100%'" [style.height]="'30px'"
-              [ngClass]="
+              [attr.maxlength]="'100'" [ngClass]="
                 c1Form.get('lending_institution')?.invalid &&
                 (c1Form.touched || c1Form.dirty)
                   ? 'input-field-error'
@@ -69,7 +69,7 @@
             </label>
             <input id="mailing_address" class="form-control" type="text" [formControlName]="'mailing_address'"
               [attr.name]="'mailing_address'" [attr.readonly]="true" [style.width]="'100%'" [style.height]="'30px'"
-              [ngClass]="
+              [attr.maxlength]="'100'" [ngClass]="
                 c1Form.get('mailing_address')?.invalid &&
                 (c1Form.touched || c1Form.dirty)
                   ? 'input-field-error'
@@ -90,7 +90,7 @@
               </div>
             </label>
             <input class="form-control" id="city" type="text" [formControlName]="'city'" [attr.readonly]="true"
-              [attr.name]="'city'" [style.width]="'66%'" [style.height]="'30px'" [ngClass]="
+              [attr.maxlength]="'30'" [attr.name]="'city'" [style.width]="'66%'" [style.height]="'30px'" [ngClass]="
                 c1Form.get('city')?.invalid &&
                 (c1Form.touched || c1Form.dirty)
                   ? 'input-field-error'
@@ -132,7 +132,7 @@
               </div>
             </label>
             <input class="form-control" type="text" [formControlName]="'zip'" [attr.name]="'zip'" [attr.readonly]="true"
-              [style.width]="'33%'" [style.height]="'30px'" [ngClass]="
+              [style.width]="'33%'" [style.height]="'30px'" [attr.maxlength]="'9'" [ngClass]="
                 c1Form.get('zip')?.invalid && (c1Form.touched || c1Form.dirty)
                   ? 'input-field-error'
                   : ''
@@ -321,9 +321,8 @@
                   <i class="calendar-icon" aria-hidden="true"></i>
                 </span>
               </div>
-              <input class="form-control" id="original_loan_date" type="date"
-                [formControlName]="'original_loan_date'" [attr.name]="'original_loan_date'"
-                [style.width]="'66%'" [style.height]="'30px'" [ngClass]="
+              <input class="form-control" id="original_loan_date" type="date" [formControlName]="'original_loan_date'"
+                [attr.name]="'original_loan_date'" [style.width]="'66%'" [style.height]="'30px'" [ngClass]="
                     c1Form.get('original_loan_date')?.invalid &&
                     (c1Form.touched || c1Form.dirty)
                       ? 'input-field-error'
@@ -548,8 +547,7 @@
                           ? 'input-field-label-error'
                           : ''
                         ">
-                <input id="perfected_intrest_ind" type="radio"
-                  formControlName="perfected_intrest_ind" value="Y" />
+                <input id="perfected_intrest_ind" type="radio" formControlName="perfected_intrest_ind" value="Y" />
                 Yes
               </label>
             </div>
@@ -560,8 +558,7 @@
                           ? 'input-field-label-error'
                           : ''
                       ">
-                <input id="other_parties_liable_n" type="radio" formControlName="perfected_intrest_ind"
-                  value="N" />
+                <input id="other_parties_liable_n" type="radio" formControlName="perfected_intrest_ind" value="N" />
                 No
               </label>
             </div>
@@ -672,9 +669,8 @@
                     </span>
                   </div>
                   <input class="form-control" id="depository_account_auth_date" type="date"
-                    [formControlName]="'depository_account_auth_date'"
-                    [attr.name]="'depository_account_auth_date'" [style.width]="'66%'"
-                    [style.height]="'30px'" [ngClass]="
+                    [formControlName]="'depository_account_auth_date'" [attr.name]="'depository_account_auth_date'"
+                    [style.width]="'66%'" [style.height]="'30px'" [ngClass]="
                               c1Form.get('depository_account_auth_date')?.invalid &&
                               (c1Form.touched || c1Form.dirty)
                                 ? 'input-field-error'
@@ -690,9 +686,8 @@
                 Location of Account:
               </div>
               <input id="depository_account_location" class="form-control" type="text"
-                [formControlName]="'depository_account_location'"
-                [attr.name]="'depository_account_location'" [style.width]="'100%'" [style.height]="'30px'"
-                [ngClass]="
+                [formControlName]="'depository_account_location'" [attr.maxlength]="'200'"
+                [attr.name]="'depository_account_location'" [style.width]="'100%'" [style.height]="'30px'" [ngClass]="
                           c1Form.get('depository_account_location')?.invalid &&
                           (c1Form.touched || c1Form.dirty)
                             ? 'input-field-error'
@@ -705,7 +700,7 @@
               </div>
               <input id="depository_account_street_1" class="form-control" type="text"
                 [formControlName]="'depository_account_street_1'" [attr.name]="'depository_account_street_1'"
-                [style.width]="'100%'" [style.height]="'30px'" [ngClass]="
+                [attr.maxlength]="'34'" [style.width]="'100%'" [style.height]="'30px'" [ngClass]="
                         c1Form.get('depository_account_street_1')?.invalid &&
                         (c1Form.touched || c1Form.dirty)
                           ? 'input-field-error'
@@ -716,7 +711,7 @@
               <div for="depository_account_street_2" class="c1_verbiage_lg">
                 Street Address 2
               </div>
-              <input id="depository_account_street_2" class="form-control" type="text"
+              <input id="depository_account_street_2" class="form-control" type="text" [attr.maxlength]="'34'"
                 [formControlName]="'depository_account_street_2'" [attr.name]="'depository_account_street_2'"
                 [style.width]="'100%'" [style.height]="'30px'" [ngClass]="
                           c1Form.get('depository_account_street_2')?.invalid &&
@@ -730,7 +725,7 @@
                 <div for="depository_account_city" class="c1_verbiage_lg">
                   City
                 </div>
-                <input class="form-control" id="depository_account_city" type="text"
+                <input class="form-control" id="depository_account_city" type="text" [attr.maxlength]="'100'"
                   [formControlName]="'depository_account_city'" [attr.name]="'depository_account_city'"
                   [style.width]="'90%'" [style.height]="'30px'" [ngClass]="
                             c1Form.get('depository_account_city')?.invalid &&
@@ -761,7 +756,8 @@
                   Zip
                 </div>
                 <input class="form-control" type="text" [formControlName]="'depository_account_zip'"
-                  [attr.name]="'depository_account_zip'" [style.width]="'100%'" [style.height]="'30px'" [ngClass]="
+                  [attr.maxlength]="'9'" [attr.name]="'depository_account_zip'" [style.width]="'100%'"
+                  [style.height]="'30px'" [ngClass]="
                               c1Form.get('depository_account_zip')?.invalid && (c1Form.touched || c1Form.dirty)
                                 ? 'input-field-error'
                                 : ''
@@ -814,7 +810,8 @@
               Last Name
             </label>
             <input id="treasurer_last_name" class="form-control" type="text" [formControlName]="'treasurer_last_name'"
-              [attr.name]="'treasurer_last_name'" [style.width]="'75%'" [style.height]="'30px'" [ngClass]="
+              [attr.maxlength]="'30'" [attr.name]="'treasurer_last_name'" [style.width]="'75%'" [style.height]="'30px'"
+              [ngClass]="
                 c1Form.get('treasurer_last_name')?.invalid &&
                 (c1Form.touched)
                   ? 'input-field-error'
@@ -829,8 +826,9 @@
             <label for="treasurer_first_name">
               First Name
             </label>
-            <input id="treasurer_first_name" class="form-control" type="text" [formControlName]="'treasurer_first_name'"
-              [attr.name]="'treasurer_first_name'" [style.width]="'75%'" [style.height]="'30px'" [ngClass]="
+            <input id="treasurer_first_name" class="form-control" [attr.maxlength]="'20'" type="text"
+              [formControlName]="'treasurer_first_name'" [attr.name]="'treasurer_first_name'" [style.width]="'75%'"
+              [style.height]="'30px'" [ngClass]="
                 c1Form.get('treasurer_first_name')?.invalid &&
                 (c1Form.touched)
                   ? 'input-field-error'
@@ -845,7 +843,7 @@
             <label for="treasurer_middle_name">
               Middle Name (Optional)
             </label>
-            <input id="treasurer_middle_name" class="form-control" type="text"
+            <input id="treasurer_middle_name" class="form-control" type="text" [attr.maxlength]="'20'"
               [formControlName]="'treasurer_middle_name'" [attr.name]="'treasurer_middle_name'" [style.width]="'75%'"
               [style.height]="'30px'" [ngClass]="
                 c1Form.get('treasurer_middle_name')?.invalid &&
@@ -868,7 +866,7 @@
                 (c1Form.touched)
                   ? 'input-field-error'
                   : ''
-              " />
+              " [attr.maxlength]="'10'" />
           </div>
         </div>
         <div class="col col-md-4">
@@ -877,7 +875,8 @@
               Suffix (Optional)
             </label>
             <input id="treasurer_suffix" class="form-control" type="text" [formControlName]="'treasurer_suffix'"
-              [attr.name]="'treasurer_suffix'" [style.width]="'35%'" [style.height]="'30px'" [ngClass]="
+              [attr.maxlength]="'10'" [attr.name]="'treasurer_suffix'" [style.width]="'35%'" [style.height]="'30px'"
+              [ngClass]="
                 c1Form.get('treasurer_suffix')?.invalid &&
                 (c1Form.touched)
                   ? 'input-field-error'
@@ -1000,8 +999,8 @@
                   Last Name
                 </label>
                 <input id="authorized_last_name" class="form-control" type="text"
-                  [formControlName]="'authorized_last_name'" [attr.name]="'authorized_last_name'"
-                  [style.width]="'75%'" [style.height]="'30px'" [ngClass]="
+                  [formControlName]="'authorized_last_name'" [attr.name]="'authorized_last_name'" [style.width]="'75%'"
+                  [style.height]="'30px'" [attr.maxlength]="'30'" [ngClass]="
                         c1Form.get('authorized_last_name')?.invalid &&
                         (c1Form.touched)
                           ? 'input-field-error'
@@ -1017,8 +1016,8 @@
                   First Name
                 </label>
                 <input id="authorized_first_name" class="form-control" type="text"
-                  [formControlName]="'authorized_first_name'" [attr.name]="'authorized_first_name'"
-                  [style.width]="'75%'" [style.height]="'30px'" [ngClass]="
+                  [formControlName]="'authorized_first_name'" [attr.maxlength]="'20'"
+                  [attr.name]="'authorized_first_name'" [style.width]="'75%'" [style.height]="'30px'" [ngClass]="
                         c1Form.get('authorized_first_name')?.invalid &&
                         (c1Form.touched)
                           ? 'input-field-error'
@@ -1034,8 +1033,8 @@
                   Middle Name (Optional)
                 </label>
                 <input id="authorized_middle_name" class="form-control" type="text"
-                  [formControlName]="'treasurer_middle_name'" [attr.name]="'authorized_middle_name'"
-                  [style.width]="'75%'" [style.height]="'30px'" [ngClass]="
+                  [formControlName]="'authorized_middle_name'" [attr.maxlength]="'20'"
+                  [attr.name]="'authorized_middle_name'" [style.width]="'75%'" [style.height]="'30px'" [ngClass]="
                         c1Form.get('authorized_middle_name')?.invalid &&
                         (c1Form.touched)
                           ? 'input-field-error'
@@ -1050,9 +1049,9 @@
                 <label for="authorized_prefix">
                   Prefix (Optional)
                 </label>
-                <input id="authorized_prefix" class="form-control" type="text"
-                  [formControlName]="'authorized_prefix'" [attr.name]="'authorized_prefix'"
-                  [style.width]="'35%'" [style.height]="'30px'" [ngClass]="
+                <input id="authorized_prefix" class="form-control" type="text" [attr.maxlength]="'10'"
+                  [formControlName]="'authorized_prefix'" [attr.name]="'authorized_prefix'" [style.width]="'35%'"
+                  [style.height]="'30px'" [ngClass]="
                       c1Form.get('authorized_prefix')?.invalid &&
                       (c1Form.touched)
                         ? 'input-field-error'
@@ -1065,9 +1064,9 @@
                 <label for="authorized_suffix">
                   Suffix (Optional)
                 </label>
-                <input id="authorized_suffix" class="form-control" type="text"
-                  [formControlName]="'authorized_suffix'" [attr.name]="'authorized_suffix'"
-                  [style.width]="'35%'" [style.height]="'30px'" [ngClass]="
+                <input id="authorized_suffix" class="form-control" type="text" [attr.maxlength]="'10'"
+                  [formControlName]="'authorized_suffix'" [attr.name]="'authorized_suffix'" [style.width]="'35%'"
+                  [style.height]="'30px'" [ngClass]="
                       c1Form.get('authorized_suffix')?.invalid &&
                       (c1Form.touched)
                         ? 'input-field-error'
@@ -1082,7 +1081,7 @@
                 <label for="authorized_entity_title">
                   Title
                 </label>
-                <input id="authorized_entity_title" class="form-control" type="text"
+                <input id="authorized_entity_title" class="form-control" type="text" [attr.maxlength]="'20'"
                   [formControlName]="'authorized_entity_title'" [attr.name]="'authorized_entity_title'"
                   [style.width]="'85%'" [style.height]="'30px'" [ngClass]="
                         c1Form.get('authorized_entity_title')?.invalid &&

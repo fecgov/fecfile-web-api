@@ -565,8 +565,9 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       .then(res => {
         if (res === 'okay') {
           this._LoanService.deleteLoan(loan).subscribe(res => {
+            this.getPage(this.config.currentPage);
             this._dialogService.confirm(
-              'Transaction has been successfully deleted and sent to the recycle bin. ' + loan.transactionId,
+              'Transaction has been successfully deleted. ' + loan.transactionId,
               ConfirmModalComponent,
               'Success!',
               false,
