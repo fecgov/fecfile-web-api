@@ -361,9 +361,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.showIdentifer = false;
     
     this.schedH3.reset();
-    this.schedH3 = this._formBuilder.group({
-      category: ['']
-    });
+    this.setH3();
 
     this.transactionType = 'ALLOC_H3_RATIO';
     this.receiptDateErr = false;
@@ -522,6 +520,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public doValidate() {
 
+    this.schedH3.patchValue({transferred_amount: this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)}, { onlySelf: true });
     //this.h3Ratios = {};
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
@@ -538,8 +537,10 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     
     //const total_amount_transferred = Number(this.schedH3.get('total_amount_transferred').value) 
     //  + Number(this.schedH3.get('transferred_amount').value);
-    const total_amount_transferred = +this.schedH3.get('total_amount_transferred').value 
-      + (+this.schedH3.get('transferred_amount').value);
+    //const total_amount_transferred = +this.schedH3.get('total_amount_transferred').value 
+    //  + (+this.schedH3.get('transferred_amount').value);
+    const total_amount_transferred = this.convertFormattedAmountToDecimal(this.schedH3.get('total_amount_transferred').value) + 
+      this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)
     this.h3Ratios.total_amount_transferred = total_amount_transferred;
  
     formObj['report_id'] = this.getReportId();
@@ -550,7 +551,20 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.isSubmit = true;
 
-    if(this.schedH3.status === 'VALID') {     
+    if(this.schedH3.status === 'VALID') {
+
+      this.schedH3.patchValue({transferred_amount: this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)}, { onlySelf: true });
+
+      if(this.showAggregateAmount) {
+        //const aggregate_amount = Number(this.schedH3.get('aggregate_amount').value) + Number(this.schedH3.get('transferred_amount').value);
+        const aggregate_amount = +this.schedH3.get('aggregate_amount').value + (+this.schedH3.get('transferred_amount').value);
+
+        //const aggregate_amount = this.convertFormattedAmountToDecimal(this.schedH3.get('aggregate_amount').value) + this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
+        this.schedH3.patchValue({aggregate_amount: aggregate_amount}, { onlySelf: true });
+      }else {
+        this.schedH3.patchValue({aggregate_amount: 0.00}, { onlySelf: true });
+      }
+
       this.h3Entries.push(formObj);
       this.h3EntryTableConfig.totalItems = this.h3Entries.length;
       this.h3Ratios.child.push(formObj);
@@ -563,15 +577,17 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
       //this.schedH3.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
       this.schedH3.patchValue({total_amount_transferred:  this._decPipe.transform(total_amount_transferred, '.2-2')}, { onlySelf: true });
-
+/*
       if(this.showAggregateAmount) {
         //const aggregate_amount = Number(this.schedH3.get('aggregate_amount').value) + Number(this.schedH3.get('transferred_amount').value);
         const aggregate_amount = +this.schedH3.get('aggregate_amount').value + (+this.schedH3.get('transferred_amount').value);
+
+        //const aggregate_amount = this.convertFormattedAmountToDecimal(this.schedH3.get('aggregate_amount').value) + this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
         this.schedH3.patchValue({aggregate_amount: aggregate_amount}, { onlySelf: true });
       }else {
         this.schedH3.patchValue({aggregate_amount: 0.00}, { onlySelf: true });
       }
-      
+*/      
       this.schedH3.patchValue({category: ''}, { onlySelf: true });
       this.showIdentifer = false;
     }
@@ -636,6 +652,19 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public handleOnBlurEvent($event: any, col: any) {
     this.schedH3.patchValue({transferred_amount: this._decPipe.transform(this.schedH3.get('transferred_amount').value, '.2-2')}, { onlySelf: true }); 
+  }
+
+  private convertFormattedAmountToDecimal(formatedAmount: string): number {
+    if(!formatedAmount) {
+      formatedAmount = '0'
+    }
+    if (typeof formatedAmount === 'string') {
+      // remove commas
+      formatedAmount = formatedAmount.replace(/,/g, ``);
+      return parseFloat(formatedAmount);
+    } else {
+      return formatedAmount;
+    }
   }
 
 }
