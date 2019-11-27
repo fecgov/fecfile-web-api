@@ -33,7 +33,6 @@ export interface GetLoanResponse {
   providedIn: 'root'
 })
 export class LoanService {
-  
 
   // only for mock data
   private mockRestoreTrxArray = [];
@@ -85,13 +84,13 @@ export class LoanService {
    */
   public getLoan(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     const url = '/sc/get_outstanding_loans';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    
+
     return this._http
       .get(
         `${environment.apiUrl}${url}`,
@@ -100,18 +99,18 @@ export class LoanService {
         }
       )
       .pipe(map(res => {
-          if (res) {
-            console.log('get_outstanding_loans API res: ', res);
+        if (res) {
+          console.log('get_outstanding_loans API res: ', res);
 
-            return res;
-          }
-          return false;
+          return res;
+        }
+        return false;
       }));
   }
 
-  deleteLoan(loan: any) : Observable<any> {
+  deleteLoan(loan: any): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     const url = '/sc/schedC';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -122,37 +121,63 @@ export class LoanService {
 
     return this._http.delete(
       `${environment.apiUrl}${url}`,
-        {
-          params,
-          headers: httpOptions
-        }
-    )
-    .pipe(map(res => {
-      if (res) {
-        console.log('get_outstanding_loans API res: ', res);
-
-        return res;
+      {
+        params,
+        headers: httpOptions
       }
-      return false;
-  }));
+    )
+      .pipe(map(res => {
+        if (res) {
+          console.log('get_outstanding_loans API res: ', res);
+
+          return res;
+        }
+        return false;
+      }));
+  }
+
+  deleteEndorser(endorser: any): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/sc/schedC2';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let params = new HttpParams();
+    params = params.append('transaction_id', endorser.transaction_id);
+
+    return this._http.delete(
+      `${environment.apiUrl}${url}`,
+      {
+        params,
+        headers: httpOptions
+      }
+    )
+      .pipe(map(res => {
+        if (res) {
+          return res;
+        }
+        return false;
+      }));
   }
 
 
-   /**
-   * Gets the endorsers by loan transactionId.
-   * 
-   * @param formType
-   * @param reportId
-   * @param page
-   * @param itemsPerPage
-   * @param sortColumnName
-   * @param descending
-   * @param filters
-   * @return     {Observable}
-   */
+  /**
+  * Gets the endorsers by loan transactionId.
+  * 
+  * @param formType
+  * @param reportId
+  * @param page
+  * @param itemsPerPage
+  * @param sortColumnName
+  * @param descending
+  * @param filters
+  * @return     {Observable}
+  */
   public getEndorsers(loanTransactionId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     const url = '/sc/get_endorser_summary';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -160,7 +185,7 @@ export class LoanService {
 
     let params = new HttpParams();
     params = params.append('transaction_id', loanTransactionId);
-    
+
     return this._http
       .get(
         `${environment.apiUrl}${url}`,
@@ -170,10 +195,10 @@ export class LoanService {
         }
       )
       .pipe(map(res => {
-          if (res) {
-            return res;
-          }
-          return false;
+        if (res) {
+          return res;
+        }
+        return false;
       }));
 
   }
@@ -260,7 +285,7 @@ export class LoanService {
         break;
       case 'entity_name':
         name = 'entity_name';
-        break;  
+        break;
       case 'entityType':
         name = 'entityType';
         break;
@@ -269,19 +294,19 @@ export class LoanService {
         break;
       case 'street1':
         name = 'street1';
-        break; 
+        break;
       case 'street2':
         name = 'street2';
-        break;         
+        break;
       case 'city':
         name = 'city';
-        break;         
+        break;
       case 'state':
         name = 'state';
-        break;                                
+        break;
       case 'zip':
         name = 'zip';
-        break;                        
+        break;
       case 'employer':
         name = 'employer';
         break;
@@ -290,13 +315,13 @@ export class LoanService {
         break;
       case 'phoneNumber':
         name = 'phoneNumber';
-        break;  
+        break;
       case 'cmte_id':
         name = 'cmte_id';
         break;
       case 'report_id':
         name = 'report_id';
-        break;  
+        break;
       case 'line_number':
         name = 'line_number';
         break;
@@ -305,19 +330,19 @@ export class LoanService {
         break;
       case 'transaction_type_identifier':
         name = 'transaction_type_identifier';
-        break; 
+        break;
       case 'transaction_id':
         name = 'transaction_id';
-        break;         
+        break;
       case 'entity_id':
         name = 'entity_id';
-        break;         
+        break;
       case 'election_code':
         name = 'election_code';
-        break;                                
+        break;
       case 'election_other_description':
         name = 'election_other_description';
-        break;                        
+        break;
       case 'loan_amount_original':
         name = 'loan_amount_original';
         break;
@@ -326,59 +351,59 @@ export class LoanService {
         break;
       case 'loan_payment_to_date':
         name = 'loan_payment_to_date';
-        break;  
+        break;
       case 'loan_balance':
-        name= 'loan_balance';
+        name = 'loan_balance';
         break;
       case 'loan_incurred_date':
-        name= 'loan_incurred_date';
-        break;  
+        name = 'loan_incurred_date';
+        break;
       case 'loan_due_date':
-        name= 'loan_due_date';
+        name = 'loan_due_date';
         break;
       case 'loan_intrest_rate':
-        name= 'loan_intrest_rate';
+        name = 'loan_intrest_rate';
         break;
       case 'is_loan_secured':
-        name= 'is_loan_secured';
-        break;       
+        name = 'is_loan_secured';
+        break;
       case 'is_personal_funds':
-        name= 'is_personal_funds';
-        break;     
+        name = 'is_personal_funds';
+        break;
       case 'lender_cmte_id':
-        name= 'lender_cmte_id';
-        break;   
+        name = 'lender_cmte_id';
+        break;
       case 'lender_cand_id':
-        name= 'lender_cand_id';
-        break;           
+        name = 'lender_cand_id';
+        break;
       case 'lender_cand_last_name':
-        name= 'lender_cand_last_name';
-        break;           
+        name = 'lender_cand_last_name';
+        break;
       case 'lender_cand_first_name':
-        name= 'lender_cand_first_name';
-        break;           
+        name = 'lender_cand_first_name';
+        break;
       case 'lender_cand_middle_name':
-        name= 'lender_cand_middle_name';
-        break;           
+        name = 'lender_cand_middle_name';
+        break;
       case 'lender_cand_prefix':
-        name= 'lender_cand_prefix';
-        break;           
+        name = 'lender_cand_prefix';
+        break;
       case 'lender_cand_suffix':
-        name= 'lender_cand_suffix';
-        break;           
+        name = 'lender_cand_suffix';
+        break;
       case 'lender_cand_office':
-        name= 'lender_cand_office';
-        break;           
+        name = 'lender_cand_office';
+        break;
       case 'delete_ind':
-        name= 'delete_ind';
-        break;         
+        name = 'delete_ind';
+        break;
       case 'memo_text':
-        name= 'memo_text';
-        break;         
+        name = 'memo_text';
+        break;
       case 'memo_code':
-        name= 'memo_code';
-        break;                 
-              default:
+        name = 'memo_code';
+        break;
+      default:
     }
     return name ? name : '';
   }
@@ -402,7 +427,7 @@ export class LoanService {
     serverObject.transaction_type_identifier = model.transaction_type_identifier;
     serverObject.transaction_id = model.transaction_id;
     serverObject.entity_id = model.entity_id;
-    serverObject.name =  model.name;
+    serverObject.name = model.name;
     serverObject.entity_type = model.entity_type;
     serverObject.street1 = model.street1;
     serverObject.street2 = model.street2;
@@ -432,7 +457,7 @@ export class LoanService {
     serverObject.lender_cand_district = model.lender_cand_district;
     serverObject.memo_code = model.memo_code;
     serverObject.memo_text = model.memo_text;
-    serverObject.delete_ind = model.delete_ind;    
+    serverObject.delete_ind = model.delete_ind;
     return serverObject;
   }
 
@@ -475,11 +500,11 @@ export class LoanService {
     if (!response.contacts) {
       return;
     }
- }
+  }
 
   private getDateMMDDYYYYformat(dateValue: Date): Date {
     var utc = new Date(dateValue.getUTCFullYear(), dateValue.getUTCMonth() + 1, dateValue.getUTCDate());
-    utc.setUTCHours(0,0,0,0);
+    utc.setUTCHours(0, 0, 0, 0);
     return utc
   }
 
@@ -491,19 +516,19 @@ export class LoanService {
    */
   public sortLoan(array: any, sortColumnName: string, descending: boolean) {
     const direction = descending ? -1 : 1;
-    this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
+    this._orderByPipe.transform(array, { property: sortColumnName, direction: direction });
     return array;
   }
 
-    /**
-   *
-   * @param array
-   * @param sortColumnName
-   * @param descending
-   */
+  /**
+ *
+ * @param array
+ * @param sortColumnName
+ * @param descending
+ */
   public sortEndorser(array: any, sortColumnName: string, descending: boolean) {
     const direction = descending ? -1 : 1;
-    this._orderByPipe.transform(array, {property: sortColumnName, direction: direction});
+    this._orderByPipe.transform(array, { property: sortColumnName, direction: direction });
     return array;
   }
 
@@ -514,7 +539,7 @@ export class LoanService {
    */
   public getContactCategories(formType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
+    let httpOptions = new HttpHeaders();
     let url = '';
     let params = new HttpParams();
 
@@ -526,13 +551,13 @@ export class LoanService {
     params = params.append('form_type', `F${formType}`);
 
     return this._http
-       .get(
-          `${environment.apiUrl}${url}`,
-          {
-            params,
-            headers: httpOptions
-          }
-       );
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          params,
+          headers: httpOptions
+        }
+      );
   }
 
   public getStates(): Observable<any> {
@@ -548,7 +573,7 @@ export class LoanService {
       headers: httpOptions
     });
   }
-  
+
   public getTypes(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/core/get_entityTypes';
@@ -587,49 +612,49 @@ export class LoanService {
     return t1;
   }
 
-     /**
-    * Trash or restore tranactions to/from the Recycling Bin.
-    * 
-    * @param action the action to be applied to the contacts (e.g. trash, restore)
-    * @param reportId the unique identifier for the Report
-    * @param contacts the contacts to trash or restore
-    */
-   public trashOrRestoreLoan(action: string, contacts: Array<LoanModel>) {
-   /*
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
-    const url = '/core/trash_restore_contact';
+  /**
+ * Trash or restore tranactions to/from the Recycling Bin.
+ * 
+ * @param action the action to be applied to the contacts (e.g. trash, restore)
+ * @param reportId the unique identifier for the Report
+ * @param contacts the contacts to trash or restore
+ */
+  public trashOrRestoreLoan(action: string, contacts: Array<LoanModel>) {
+    /*
+     const token: string = JSON.parse(this._cookieService.get('user'));
+     let httpOptions =  new HttpHeaders();
+     const url = '/core/trash_restore_contact';
+ 
+     httpOptions = httpOptions.append('Content-Type', 'application/json');
+     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+ 
+     const request: any = {};
+     const actions = [];
+     for (const cnt of contacts) {
+       actions.push({
+         action: action,
+         id: cnt.id
+       });
+     }
+     request.actions = actions;
+ 
+     return this._http
+     .put(
+       `${environment.apiUrl}${url}`,
+       request,
+       {
+         headers: httpOptions
+       }
+     )
+     .pipe(map(res => {
+         if (res) {
+           console.log('Trash Restore response: ', res);
+           return res;
+         }
+         return false;
+     }));*/
 
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    const request: any = {};
-    const actions = [];
-    for (const cnt of contacts) {
-      actions.push({
-        action: action,
-        id: cnt.id
-      });
-    }
-    request.actions = actions;
-
-    return this._http
-    .put(
-      `${environment.apiUrl}${url}`,
-      request,
-      {
-        headers: httpOptions
-      }
-    )
-    .pipe(map(res => {
-        if (res) {
-          console.log('Trash Restore response: ', res);
-          return res;
-        }
-        return false;
-    }));*/
-
-   }
+  }
 
   /**
    * Gets the saved transaction data for the schedule.
@@ -679,45 +704,45 @@ export class LoanService {
     });
   }
 
-   /**
-   * Saves a schedule.
-   *
-   * @param      {string}           formType  The form type
-   * @param      {ScheduleActions}  scheduleAction  The type of action to save (add, edit)
-   */
+  /**
+  * Saves a schedule.
+  *
+  * @param      {string}           formType  The form type
+  * @param      {ScheduleActions}  scheduleAction  The type of action to save (add, edit)
+  */
   public saveSched_C(scheduleAction: ScheduleActions, transactionTypeIdentifier: string, subType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/sc/schedC';
     const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
     const loan: any = JSON.parse(localStorage.getItem('LoanObj'));
     const loanByCommFromIndObj: any = {
-      api_call:'/sc/schedC',
+      api_call: '/sc/schedC',
       line_number: 13,
       //transaction_id:'16G',
-      transaction_id:loan.transaction_id,
+      transaction_id: loan.transaction_id,
       back_ref_transaction_id: '',
       back_ref_sched_name: '',
       transaction_type: 'LOAN_FROM_IND',
-      transaction_type_identifier:'LOANS_OWED_BY_CMTE'
+      transaction_type_identifier: 'LOANS_OWED_BY_CMTE'
     };
     const loanByCommFromBankObj: any = {
-      api_call:'/sc/schedC',
+      api_call: '/sc/schedC',
       line_number: 13,
       //transaction_id:'16F',
-      transaction_id:loan.transaction_id,
+      transaction_id: loan.transaction_id,
       back_ref_transaction_id: '',
       back_ref_sched_name: '',
       transaction_type: 'LOAN_FROM_BANK',
-      transaction_type_identifier:'LOANS_OWED_BY_CMTE'
+      transaction_type_identifier: 'LOANS_OWED_BY_CMTE'
     };
     const loanToCommObj: any = {
-      api_call:'/sc/schedC',
+      api_call: '/sc/schedC',
       line_number: 13,
-      transaction_id:'',
+      transaction_id: '',
       back_ref_transaction_id: '',
       back_ref_sched_name: '',
       transaction_type: 'LOAN_TO_COMM',
-      transaction_type_identifier:'LOANS_OWED_TO_CMTE'
+      transaction_type_identifier: 'LOANS_OWED_TO_CMTE'
     };
 
     /*const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
@@ -733,8 +758,8 @@ export class LoanService {
     let loanhiddenFields: any;
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    console.log (" saveSched_C transactionTypeIdentifier =", transactionTypeIdentifier)
-    console.log (" saveSched_C subType =", subType)
+    console.log(" saveSched_C transactionTypeIdentifier =", transactionTypeIdentifier)
+    console.log(" saveSched_C subType =", subType)
 
     for (const [key, value] of Object.entries(loan)) {
       if (value !== null) {
@@ -743,18 +768,18 @@ export class LoanService {
         }
       }
     }
-    
-    if (transactionTypeIdentifier==='LOANS_OWED_BY_CMTE'){
-      if (subType === 'IND'){
-        loanhiddenFields= loanByCommFromIndObj;
-      }else if (subType === 'ORG'){
-        loanhiddenFields= loanByCommFromBankObj;  
-      } 
-    } else if (transactionTypeIdentifier==='LOANS_OWED_TO_CMTE'){
-      loanhiddenFields= loanToCommObj;   
+
+    if (transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE') {
+      if (subType === 'IND') {
+        loanhiddenFields = loanByCommFromIndObj;
+      } else if (subType === 'ORG') {
+        loanhiddenFields = loanByCommFromBankObj;
+      }
+    } else if (transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE') {
+      loanhiddenFields = loanToCommObj;
     }
 
-    console.log ("loanhiddenFields", loanhiddenFields);
+    console.log("loanhiddenFields", loanhiddenFields);
 
     //Add loan hidden fields
     for (const [key, value] of Object.entries(loanhiddenFields)) {
@@ -766,7 +791,7 @@ export class LoanService {
     }
     console.log("saveSched_C reportId =", reportId);
 
-    formData.append('report_id', reportId );
+    formData.append('report_id', reportId);
 
     if (scheduleAction === ScheduleActions.add) {
       return this._http
@@ -813,61 +838,61 @@ export class LoanService {
       headers: httpOptions
     });
   }
-  
-  
+
+
   /**
    * Saves a schedule.
    *
    * @param      {string}           formType  The form type
    * @param      {ScheduleActions}  scheduleAction  The type of action to save (add, edit)
    */
-  public saveSched_C2(scheduleAction: ScheduleActions, endorserForm:any, hiddenFields: any): Observable<any> {
+  public saveSched_C2(scheduleAction: ScheduleActions, endorserForm: any, hiddenFields: any): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/sc/schedC2';
     const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
     // const loan: any = JSON.parse(localStorage.getItem('LoanObj'));
-    
+
     const hiddenFieldsObj: any = {
-      api_call:'/sc/schedC2',
-      line_number: 13, 
-      transaction_id:hiddenFields.transaction_id,
+      api_call: '/sc/schedC2',
+      line_number: 13,
+      transaction_id: hiddenFields.transaction_id,
       back_ref_transaction_id: hiddenFields.back_ref_transaction_id,
       back_ref_sched_name: '',
       transaction_type: 'LOAN_FROM_IND',
-      transaction_type_identifier:'LOANS_OWED_BY_CMTE', 
-      entity_id: hiddenFields.entity_id, 
-      entity_type:'IND'
+      transaction_type_identifier: 'LOANS_OWED_BY_CMTE',
+      entity_id: hiddenFields.entity_id,
+      entity_type: 'IND'
     };
 
-/*     const loanByCommFromIndObj: any = {
-      api_call:'/sc/schedC',
-      line_number: 13,
-      //transaction_id:'16G',
-      transaction_id:loan.transaction_id,
-      back_ref_transaction_id: '',
-      back_ref_sched_name: '',
-      transaction_type: 'LOAN_FROM_IND',
-      transaction_type_identifier:'LOANS_OWED_BY_CMTE'
-    };
-    const loanByCommFromBankObj: any = {
-      api_call:'/sc/schedC',
-      line_number: 13,
-      //transaction_id:'16F',
-      transaction_id:loan.transaction_id,
-      back_ref_transaction_id: '',
-      back_ref_sched_name: '',
-      transaction_type: 'LOAN_FROM_BANK',
-      transaction_type_identifier:'LOANS_OWED_BY_CMTE'
-    };
-    const loanToCommObj: any = {
-      api_call:'/sc/schedC',
-      line_number: 13,
-      transaction_id:'',
-      back_ref_transaction_id: '',
-      back_ref_sched_name: '',
-      transaction_type: 'LOAN_TO_COMM',
-      transaction_type_identifier:'LOANS_OWED_TO_CMTE'
-    }; */
+    /*     const loanByCommFromIndObj: any = {
+          api_call:'/sc/schedC',
+          line_number: 13,
+          //transaction_id:'16G',
+          transaction_id:loan.transaction_id,
+          back_ref_transaction_id: '',
+          back_ref_sched_name: '',
+          transaction_type: 'LOAN_FROM_IND',
+          transaction_type_identifier:'LOANS_OWED_BY_CMTE'
+        };
+        const loanByCommFromBankObj: any = {
+          api_call:'/sc/schedC',
+          line_number: 13,
+          //transaction_id:'16F',
+          transaction_id:loan.transaction_id,
+          back_ref_transaction_id: '',
+          back_ref_sched_name: '',
+          transaction_type: 'LOAN_FROM_BANK',
+          transaction_type_identifier:'LOANS_OWED_BY_CMTE'
+        };
+        const loanToCommObj: any = {
+          api_call:'/sc/schedC',
+          line_number: 13,
+          transaction_id:'',
+          back_ref_transaction_id: '',
+          back_ref_sched_name: '',
+          transaction_type: 'LOAN_TO_COMM',
+          transaction_type_identifier:'LOANS_OWED_TO_CMTE'
+        }; */
 
     /*const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
     let reportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
@@ -890,7 +915,7 @@ export class LoanService {
         }
       }
     }
-    
+
     /* if (transactionTypeIdentifier==='LOANS_OWED_BY_CMTE'){
       if (subType === 'IND'){
         loanhiddenFields= loanByCommFromIndObj;
@@ -902,7 +927,7 @@ export class LoanService {
     } */
     loanhiddenFields = hiddenFieldsObj;
 
-    console.log ("loanhiddenFields", loanhiddenFields);
+    console.log("loanhiddenFields", loanhiddenFields);
 
     //Add loan hidden fields
     for (const [key, value] of Object.entries(loanhiddenFields)) {
@@ -914,7 +939,7 @@ export class LoanService {
     }
     console.log("saveSched_C reportId =", reportId);
 
-    formData.append('report_id', reportId );
+    formData.append('report_id', reportId);
 
     if (scheduleAction === ScheduleActions.add) {
       return this._http
@@ -948,9 +973,9 @@ export class LoanService {
   }
 
   c1Exists(currentLoanData: any): any {
-    if(currentLoanData && currentLoanData.child && Array.isArray(currentLoanData.child)){
+    if (currentLoanData && currentLoanData.child && Array.isArray(currentLoanData.child)) {
       let c1 = currentLoanData.child.filter(e => e.transaction_type_identifier === 'SC1');
-      if(c1.length > 0){
+      if (c1.length > 0) {
         return true;
       }
     }
