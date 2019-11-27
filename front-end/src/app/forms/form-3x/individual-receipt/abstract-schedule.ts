@@ -898,6 +898,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (res) {
           if (res.fed_share) {
             this._formatAmount({ target: { value: res.fed_share.toString() } }, 'fed_share_amount', false);
+            this._formatAmount({ target: { value: res.fed_share.toString() } }, 'federal_share', false);
           }
           if (res.nonfed_share) {
             this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'non_fed_share_amount', false);
