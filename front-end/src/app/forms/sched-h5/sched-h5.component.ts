@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -23,13 +23,26 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
 import { Observable, Subscription } from 'rxjs';
 import { SchedH5Service } from './sched-h5.service';
+import { style, animate, transition, trigger } from '@angular/animations';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 @Component({
   selector: 'app-sched-h5',
   templateUrl: './sched-h5.component.html',
   styleUrls: ['./sched-h5.component.scss'],
-  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe]
+  providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
+  encapsulation: ViewEncapsulation.None,
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate(500, style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate(0, style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class SchedH5Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionTypeText: string;
@@ -66,6 +79,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public cvgEndDate: any;
 
   public isSubmit = false;
+
+  public transferredAmountErr = false;
 
   constructor(
     _http: HttpClient,
@@ -315,6 +330,21 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     });
   }
 
+  public saveAndGetSummary(ratio: any) {
+
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    
+    this._schedH5Service.saveAndGetSummary(ratio, reportId).subscribe(res => {
+      if (res) {        
+        //this.saveHRes = res;
+        //this.h3Entries = [];
+
+        this.h5Sum =  res;         
+        this.h5TableConfig.totalItems = res.length;
+      }
+    });
+  }
+
   public saveAddMore(): void {
     //   this.doValidate();    
     // }
@@ -476,6 +506,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public selectCategoryChange(e) {
 
+    this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true }); 
+
     if (!this.schedH5.get('category').value) {
       this.showIdentifer = false;
     } else {
@@ -617,7 +649,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public addEntries() {
     const serializedForm = JSON.stringify(this.h5Ratios);
-    this.saveH5(serializedForm);
+    //this.saveH5(serializedForm);
+    this.saveAndGetSummary(serializedForm);
   }
 
   public receiptDateChanged(receiptDate: string) {
@@ -640,7 +673,14 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public handleOnBlurEvent($event: any, col: any) {
-    this.schedH5.patchValue({transferred_amount: this._decPipe.transform(this.schedH5.get('transferred_amount').value, '.2-2')}, { onlySelf: true }); 
+    if(this.isNumber(this.schedH5.get('transferred_amount').value)) {
+      this.transferredAmountErr = false;
+      this.schedH5.patchValue({transferred_amount: this._decPipe.transform(this.schedH5.get('transferred_amount').value, '.2-2')}, { onlySelf: true }); 
+      this.schedH5.controls['transferred_amount'].setErrors(null);  
+    }else {
+      this.transferredAmountErr = true
+      this.schedH5.controls['transferred_amount'].setErrors({'incorrect': true});  
+    }
   }
 
   private convertFormattedAmountToDecimal(formatedAmount: string): number {
@@ -654,6 +694,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     } else {
       return formatedAmount;
     }
+  }
+
+  private isNumber(value: string | number): boolean {
+    return ((value != null) && !isNaN(Number(value.toString())));
   }
 
 }

@@ -151,7 +151,7 @@
             <div class="form-group">
               <label for=""> </label>
 
-              <select id="" formControlName="category" class="form-control">
+              <select id="" formControlName="category" class="form-control" (change)="selectCategoryChange($event)">
                 <option value="" selected>Select Category</option>
                 <option *ngFor="let category of categories" [value]="category.id">
                   {{ category.name }}
@@ -190,6 +190,9 @@
                       : ''
                   "
                 />
+              </div>
+              <div class="text-error text-left" *ngIf="transferredAmountErr">
+                Please enter a valid amount.
               </div>
             </div>
           </div>
