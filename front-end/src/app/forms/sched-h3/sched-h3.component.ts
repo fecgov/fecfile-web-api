@@ -25,6 +25,7 @@ import { Observable, Subscription } from 'rxjs';
 import { SchedH3Service } from './sched-h3.service';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
+import { isNumeric } from 'rxjs/util/isNumeric';
 
 @Component({
   selector: 'app-sched-h3',
@@ -626,8 +627,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this._schedH3Service.saveAndGetSummary(ratio, reportId).subscribe(res => {
       if (res) {
         //this.saveHRes = res;
-        //this.h3Entries = [];
-
+        this.h3Entries = [];
         this.h3Sum =  res;
         this.h3TableConfig.totalItems = res.length;
       }
@@ -639,6 +639,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     //this.saveH3Ratio(serializedForm);
 
     this.saveAndGetSummary(serializedForm);
+    this.h3Ratios = [];
   }
 
   public handleAmountKeyup(e: any) {
@@ -688,9 +689,14 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public handleOnBlurEvent($event: any, col: any) {
-    if(this.isNumber(this.schedH3.get('transferred_amount').value)) {
+    const entry = $event.target.value.replace(/,/g, ``);
+    if(this.isNumber(entry)) {
       this.transferredAmountErr = false;
-      this.schedH3.patchValue({transferred_amount: this._decPipe.transform(this.schedH3.get('transferred_amount').value, '.2-2')}, { onlySelf: true });
+      //this.schedH3.patchValue({transferred_amount: this._decPipe.transform(
+      //    this.convertFormattedAmountToDecimal(entry), '.2-2')}, { onlySelf: true });
+      this.schedH3.patchValue({transferred_amount: this._decPipe.transform(
+        this.convertFormattedAmountToDecimal(
+          this.schedH3.get('transferred_amount').value), '.2-2')}, { onlySelf: true });
       this.schedH3.controls['transferred_amount'].setErrors(null);
     }else {
       this.transferredAmountErr = true;
