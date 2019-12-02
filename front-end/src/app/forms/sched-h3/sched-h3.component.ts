@@ -333,6 +333,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.isSubmit = false;
     this.schedH3.reset();
+    this.setH3();
+    //this.schedH3.patchValue({ transferred_amount: 0}, { onlySelf: true });
 
     this.schedH3 = this._formBuilder.group({
       category: ['']
@@ -639,7 +641,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     //this.saveH3Ratio(serializedForm);
 
     this.saveAndGetSummary(serializedForm);
-    this.h3Ratios = [];
+    this.h3Ratios = {};
+    this.h3Ratios['child'] = [];
   }
 
   public handleAmountKeyup(e: any) {
@@ -719,6 +722,14 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   private isNumber(value: string | number): boolean {
    return ((value != null) && !isNaN(Number(value.toString())));
+  }
+
+  public clearFormValues() {
+    this.setH3();
+    this.h3Entries = [];
+    this.h3Ratios = {};
+    this.h3Ratios['child'] = [];
+    this.transferredAmountErr = false;
   }
 
 }
