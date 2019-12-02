@@ -337,9 +337,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this._schedH5Service.saveAndGetSummary(ratio, reportId).subscribe(res => {
       if (res) {        
         //this.saveHRes = res;
-        //this.h3Entries = [];
-
-        this.h5Sum =  res;         
+        this.h5Entries = [];
+        this.h5Sum =  res;
         this.h5TableConfig.totalItems = res.length;
       }
     });
@@ -651,6 +650,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     const serializedForm = JSON.stringify(this.h5Ratios);
     //this.saveH5(serializedForm);
     this.saveAndGetSummary(serializedForm);
+    this.h5Ratios = [];
   }
 
   public receiptDateChanged(receiptDate: string) {
@@ -673,9 +673,14 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public handleOnBlurEvent($event: any, col: any) {
-    if(this.isNumber(this.schedH5.get('transferred_amount').value)) {
+    const entry = $event.target.value.replace(/,/g, ``);
+    if(this.isNumber(entry)) {
       this.transferredAmountErr = false;
-      this.schedH5.patchValue({transferred_amount: this._decPipe.transform(this.schedH5.get('transferred_amount').value, '.2-2')}, { onlySelf: true }); 
+      //this.schedH5.patchValue({transferred_amount: this._decPipe.transform(
+      //  this.convertFormattedAmountToDecimal(entry), '.2-2')}, { onlySelf: true });
+      this.schedH5.patchValue({transferred_amount: this._decPipe.transform(
+        this.convertFormattedAmountToDecimal(
+          this.schedH5.get('transferred_amount').value), '.2-2')}, { onlySelf: true });
       this.schedH5.controls['transferred_amount'].setErrors(null);  
     }else {
       this.transferredAmountErr = true
