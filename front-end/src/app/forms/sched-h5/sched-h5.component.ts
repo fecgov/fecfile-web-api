@@ -481,7 +481,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.isSubmit = false;
     this.schedH5.reset();
+    this.setH5();
+
     this.h5Entries = [];
+    this.schedH5.patchValue({ transferred_amount: 0}, { onlySelf: true });
 
     this.schedH5 = this._formBuilder.group({
       category: ['']
@@ -505,7 +508,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public selectCategoryChange(e) {
 
-    this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true }); 
+    this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true });
 
     if (!this.schedH5.get('category').value) {
       this.showIdentifer = false;
@@ -650,7 +653,9 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     const serializedForm = JSON.stringify(this.h5Ratios);
     //this.saveH5(serializedForm);
     this.saveAndGetSummary(serializedForm);
-    this.h5Ratios = [];
+    this.schedH5.patchValue({transferred_amount: 0}, { onlySelf: true });
+    this.h5Ratios = {};
+    this.h5Ratios['child'] = [];
   }
 
   public receiptDateChanged(receiptDate: string) {
@@ -703,6 +708,14 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   private isNumber(value: string | number): boolean {
     return ((value != null) && !isNaN(Number(value.toString())));
+  }
+
+  public clearFormValues() {
+    this.setH5();
+    this.h5Entries = [];
+    this.h5Ratios = {};
+    this.h5Ratios['child'] = [];
+    this.transferredAmountErr = false;
   }
 
 }
