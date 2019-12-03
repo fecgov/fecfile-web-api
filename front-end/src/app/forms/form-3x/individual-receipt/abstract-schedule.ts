@@ -1711,7 +1711,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
           }
 
-          // Replace this with clearForm() if possible
+          // Replace this with clearFormValues() if possible or break it into
+          // 2 methods so 1 may be called here so as not to miss init vars.
           this._formSubmitted = true;
           this.memoCode = false;
           this.memoCodeChild = false;
@@ -1725,7 +1726,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._selectedCandidateChangeWarn = null;
           this._selectedCandidateChild = null;
           this._selectedCandidateChangeWarnChild = null;
-          // Replace this with clearForm() if possible - END
+          this.activityEventNames = null;
+          // Replace this with clearFormValues() if possible - END
 
           localStorage.removeItem(`form_${this.formType}_receipt`);
           localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
@@ -3114,6 +3116,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                         if (this.isFieldName(prop, 'activity_event_type')) {
                           if (trx[prop] !== null || trx[prop] !== 'Select') {
                             this.totalAmountReadOnly = false;
+                            if (this.activityEventTypes) {
+                              for (const activityEvent of this.activityEventTypes) {
+                                if (trx[prop] === activityEvent.eventType) {
+                                  if (activityEvent.scheduleType === 'sched_h2' && activityEvent.hasValue === true) {
+                                    this.activityEventNames = activityEvent.activityEventTypes;
+                                  }
+                                }
+                              }
+                            }
                           }
                         }
                         if (this.isFieldName(prop, 'memo_code')) {
@@ -3454,19 +3465,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public populatePurpose(fieldName: string) {
     if (
-      this.transactionType !== 'EAR_REC' &&
-      this.transactionType !== 'CON_EAR_UNDEP' &&
-      this.transactionType !== 'CON_EAR_DEP_1'
+      !this.subTransactionInfo.isEarmark && !this.subTransactionInfo.isParent
+      // this.transactionType !== 'EAR_REC' &&
+      // this.transactionType !== 'CON_EAR_UNDEP' &&
+      // this.transactionType !== 'CON_EAR_DEP_1'
     ) {
       return;
     }
     const isChildField = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
     if (isChildField) {
-      if (!this.frmIndividualReceipt.contains('purpose_description')) {
+      if (!this.frmIndividualReceipt.get('child*purpose_description')) {
         return;
       }
     } else {
-      if (!this.frmIndividualReceipt.contains('child*purpose_description')) {
+      if (!this.frmIndividualReceipt.get('purpose_description')) {
         return;
       }
     }
@@ -3541,7 +3553,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
       console.log('purpose is: ' + purpose);
       if (purpose !== purposePre) {
-        this.frmIndividualReceipt.patchValue({ purpose_description: purpose }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ 'child*purpose_description': purpose }, { onlySelf: true });
       }
     } else {
       let lastName = '';
@@ -3611,7 +3623,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
       console.log('purpose is: ' + purpose);
       if (purpose !== purposePre) {
-        this.frmIndividualReceipt.patchValue({ 'child*purpose_description': purpose }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ purpose_description: purpose }, { onlySelf: true });
       }
     }
   }
