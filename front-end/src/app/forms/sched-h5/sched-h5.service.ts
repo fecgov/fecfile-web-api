@@ -5,6 +5,7 @@ import 'rxjs/add/observable/of';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../environments/environment';
 import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -165,9 +166,18 @@ export class SchedH5Service {
             console.log('Save H3Ratio res: ', res);
 
             //get summary
-            this.getSummary(reportId);
+            //this.getSummary(reportId);
 
-            return res;
+            let sub: Subscription;
+            let sum: any;
+            sub = this.getSummary(reportId).subscribe(res =>
+              {
+                if(res) {
+                  sum =  res;
+                }
+              });
+
+            return sum;
           }
           return false;
       })

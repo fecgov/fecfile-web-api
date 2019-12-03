@@ -5,7 +5,7 @@
 *NOTE: Requires [virtualenv](http://virtualenv.readthedocs.org/en/latest/),
 [virtualenvwrapper](http://virtualenvwrapper.readthedocs.org/en/latest/) and
 [Node.js](http://nodejs.org/).*
-- Also requires Python version 3.5.0.  You can run multiple versions of Python with Pyenv.
+- Also requires Python version 3.6.  You can run multiple versions of Python with Pyenv.
   [https://amaral.northwestern.edu/resources/guides/pyenv-tutorial](https://amaral.northwestern.edu/resources/guides/pyenv-tutorial)
 
 * Fork this repository.

@@ -256,7 +256,8 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH6sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id}).arrow_dir = 'show';
       
     }else if(item.arrow_dir === 'up') {
-      this.schedH6sModel = this.schedH6sModel.filter(obj => obj.memo_code !== 'X');      
+      //this.schedH6sModel = this.schedH6sModel.filter(obj => obj.memo_code !== 'X');
+      this.schedH6sModel = this.schedH6sModel.filter(obj => obj.back_ref_transaction_id !== item.transaction_id);
       this.tableConfig.totalItems = this.schedH6sModel.length;
 
       this.schedH6sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'down';

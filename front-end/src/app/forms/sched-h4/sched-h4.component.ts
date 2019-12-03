@@ -267,7 +267,8 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH4sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id}).arrow_dir = 'show';
       
     }else if(item.arrow_dir === 'up') {
-      this.schedH4sModel = this.schedH4sModel.filter(obj => obj.memo_code !== 'X');      
+      //this.schedH4sModel = this.schedH4sModel.filter(obj => obj.memo_code !== 'X');
+      this.schedH4sModel = this.schedH4sModel.filter(obj => obj.back_ref_transaction_id !== item.transaction_id);
       this.tableConfig.totalItems = this.schedH4sModel.length;
 
       this.schedH4sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'down';      
@@ -283,7 +284,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
         }        
       }
     }
-    console.log('9: ', items);
+
   }
 
   public mapFromServerFields(serverData: any) {
@@ -315,8 +316,6 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
       modelArray.push(model);
     
     }
-
-    console.log('91: ', modelArray);
 
     return modelArray;
   }
