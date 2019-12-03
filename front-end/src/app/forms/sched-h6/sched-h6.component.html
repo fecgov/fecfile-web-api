@@ -95,7 +95,7 @@
               <tr>                
                 <td class="summary_text_level_3">
                   <input type="radio" formControlName="type" value="ALLOC_FEA_VOID" id="h6Opt4" (click)="selectTypeChange($event)">
-                  <label for="oh6Opt4">Void of Allocated FEA Expenditure</label>
+                  <label for="h6Opt4">Void of Allocated FEA Expenditure</label>
                   <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                       tooltipClass="form-tooltip">
                       <i class="info-icon" aria-hidden="true"></i>
@@ -131,8 +131,12 @@
             <table class="table table-striped table-hover table__sortable">
                 <thead>
                     <tr>
-                        <th [@fadeInOut]>                              
-                        </th>                         
+                        <th [@fadeInOut]>
+                        </th>
+                        <th [@fadeInOut]
+                            (click)="changeSortDirection('activity_event_name')">Name/Organization
+                            <i class="fa fa-sort" aria-hidden="false"></i>
+                        </th>
                         <th [@fadeInOut]
                             (click)="changeSortDirection('date')">Activity or Event Identifier
                             <i class="fa fa-sort" aria-hidden="false"></i>
@@ -143,10 +147,6 @@
                         </th>
                         <th [@fadeInOut]
                             (click)="changeSortDirection('activity')">Purpose
-                            <i class="fa fa-sort" aria-hidden="false"></i>
-                        </th>
-                        <th [@fadeInOut]
-                            (click)="changeSortDirection('activity_event_name')">Name/Organization
                             <i class="fa fa-sort" aria-hidden="false"></i>
                         </th>
                         <th [@fadeInOut]
@@ -166,30 +166,26 @@
                         <td>
                             <input type="checkbox" (click)="checkForMultiChecked($event)">
                         </td>
-                       
-                        
                         <td>
-                          <div class="row td-arrow">
-                            {{ item.activity_event_identifier  }}
-                            <div >
-                              <i *ngIf="item.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow" (click)="clickArrow(item)"></i>
-                              <i *ngIf="item.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(item)"></i>
+                            <div class="row td-arrow">
+                              {{ item.entity_type == 'IND' ?
+                                  item.first_name + ' ' + item.last_name :
+                                  item.entity_name
+                              }}
+                              <div >
+                                  <i *ngIf="item.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow" (click)="clickArrow(item)"></i>
+                                  <i *ngIf="item.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(item)"></i>
+                                </div>
                             </div>
-                          </div>
                         </td>
+                        <td>
+                            <div *ngIf="item.activity_event_type == 'GC'">Generic Campaign</div>
+                            <div *ngIf="item.activity_event_type == 'GO'">GOTV</div>
+                            <div *ngIf="item.activity_event_type == 'VI'">Voter ID</div>
+                            <div *ngIf="item.activity_event_type == 'VR'">Voter Registration</div>
+                          </td>
                         <td>{{ item.expenditure_date | date: 'MM/dd/yyyy' }}</td>
-                        <td>                          
-                          <div *ngIf="item.activity_event_type == 'GC'">Generic Campaign</div>
-                          <div *ngIf="item.activity_event_type == 'GO'">GOTV</div>
-                          <div *ngIf="item.activity_event_type == 'VI'">Voter ID</div>
-                          <div *ngIf="item.activity_event_type == 'VR'">Voter Registration</div>
-                        </td>
-                        <td>                           
-                          {{ item.entity_type == 'IND' ?
-                              item.first_name + ' ' + item.last_name :
-                              item.entity_name
-                          }}
-                        </td>   
+                        <td>{{ item.expenditure_purpose }}</td>
                         <td>{{ item.fed_share_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
                         <td>{{ item.levin_share | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
                         <td>

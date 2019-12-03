@@ -959,6 +959,9 @@ def get_outstanding_loans(request):
     logger.debug('POST request received.')
     try:
         cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        if not report_id:
+            raise Exception('report_id is required.')
         if 'transaction_type_identifier' in request.query_params:
             tran_type = request.query_params.get('transaction_type_identifier')
             if not tran_type in valid_transaction_types: 
@@ -985,11 +988,12 @@ def get_outstanding_loans(request):
                         AND c.transaction_type_identifier = %s
                         AND c.entity_id = e.entity_id 
                         AND c.loan_balance > 0
+                        AND c.loan_incurred_date <= (select cvg_end_date from public.reports where report_id = %s)
                         AND delete_ind is distinct from 'Y'
                         ) t
             """
             with connection.cursor() as cursor:
-                cursor.execute(_sql, [cmte_id, tran_type])
+                cursor.execute(_sql, [cmte_id, tran_type, report_id])
                 json_result = cursor.fetchone()[0] 
             
         else:
@@ -1014,11 +1018,12 @@ def get_outstanding_loans(request):
                             WHERE c.cmte_id = %s
                             AND c.entity_id = e.entity_id 
                             AND c.loan_balance > 0
+                            AND c.loan_incurred_date <= (select cvg_end_date from public.reports where report_id = %s)
                             AND c.delete_ind is distinct from 'Y'
                             ) t
                 """
             with connection.cursor() as cursor:
-                cursor.execute(_sql, [cmte_id])
+                cursor.execute(_sql, [cmte_id, report_id])
                 json_result = cursor.fetchone()[0] 
 
         if not json_result:

@@ -3884,4 +3884,63 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     return null;
   }
+
+  public isShedH4OrH6TransactionType(transactionType: string): boolean {
+
+    if(transactionType === 'ALLOC_EXP' ||
+      transactionType === 'ALLOC_EXP_CC_PAY' ||
+      //transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+      transactionType === 'ALLOC_EXP_STAF_REIM' ||
+      //transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+      transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+      //transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+      transactionType === 'ALLOC_EXP_VOID'
+      ||
+      transactionType === 'ALLOC_FEA_DISB' ||
+      transactionType === 'ALLOC_FEA_CC_PAY' ||
+      //transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+      transactionType === 'ALLOC_FEA_STAF_REIM' ||
+      //transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+      transactionType === 'ALLOC_FEA_VOID') {
+        return true;
+    }else {
+        return false
+    }
+  }
+
+  public goH4OrH6Summary(transactionType: string) {
+
+    if(transactionType === 'ALLOC_EXP' ||
+      transactionType === 'ALLOC_EXP_CC_PAY' ||
+      transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+      transactionType === 'ALLOC_EXP_STAF_REIM' ||
+      transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+      transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+      transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+      transactionType === 'ALLOC_EXP_VOID') {
+        const emitObj: any = {
+          form: this.frmIndividualReceipt,
+          direction: 'next',
+          step: 'step_3',
+          previousStep: 'step_2',
+          transactionType: 'ALLOC_H4_SUM'
+        };
+        this.status.emit(emitObj);
+    }
+
+    if(transactionType === 'ALLOC_FEA_DISB' ||
+      transactionType === 'ALLOC_FEA_CC_PAY' ||
+      transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+      transactionType === 'ALLOC_FEA_STAF_REIM' ||
+      transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+      transactionType === 'ALLOC_FEA_VOID') {const emitObj: any = {
+        form: this.frmIndividualReceipt,
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2',
+        transactionType: 'ALLOC_H6_SUM'
+      };
+      this.status.emit(emitObj);
+    }
+  }
 }

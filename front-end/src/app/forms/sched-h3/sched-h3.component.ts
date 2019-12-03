@@ -268,7 +268,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.categories = [
       {
         "id":"AD",
-        "name":"Total Administrative"
+        "name":"Administrative"
       },
       {
         "id":"GV",
@@ -329,7 +329,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public returnToSum(): void {
 
-    this.addEntries();
+    if(this.h3Ratios.child.length > 0) {
+      this.addEntries();
+    }
 
     this.isSubmit = false;
     this.schedH3.reset();
@@ -359,7 +361,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.receiptDateErr = false;
 
     this.transactionType = 'ALLOC_H3_SUM';
-    this.setH3Sum();
+    //this.setH3Sum();
   }
 
   public returnToAdd(): void {
