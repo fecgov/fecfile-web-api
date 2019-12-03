@@ -25,7 +25,7 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
 from fecfiler.sched_A.views import (get_list_child_schedA,
-                                    get_next_transaction_id, post_schedA)
+                                    get_next_transaction_id, post_schedA, post_sql_schedA)
 from fecfiler.sched_B.views import get_list_child_schedB, post_schedB
 from fecfiler.sched_D.views import do_transaction
 
@@ -59,11 +59,11 @@ API_CALL_SA = {'api_call':'/sa/schedA'}
 API_CALL_SB = {'api_call':'/sb/schedB'}
 API_CALL_SC1 = {'api_call':'/sc/schedC1'}
 API_CALL_SC2 = {'api_call':'/sc/schedC2'}
+
 # need to generate auto sched_a items when a loan is made by a committee
 AUTO_SCHED_A_MAP = { 
-    'LOAN_FROM_IND' : 'LOAN_FROM_IND_REC',
-    'LOAN_FROM_BANK' : 'LOAN_FROM_BANK_REC',
-    }
+    'LOANS_OWED_BY_CMTE' : ['LOAN_FROM_IND','LOAN_FORM_BANK']
+}
 
 # need to generate auto sched_b item when 
 AUTO_SCHED_B_MAP = {
@@ -180,9 +180,11 @@ def put_schedC(data):
             if get_data['entity_id'].startswith('FEC'):
                 get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
+            logger.debug('updating entity with data:{}'.format(data))
             new_entity = put_entities(data)
             rollback_flag = True
         else:
+            logger.debug('saving new entity:{}'.format(data))
             new_entity = post_entities(data)
             rollback_flag = False
 
@@ -196,6 +198,7 @@ def put_schedC(data):
         #check_transaction_id(data.get('transaction_id'))
         try:
             # rollback_data = get_schedC(data)
+            logger.debug('updating loan with data:{}'.format(data))
             put_sql_schedC(data)
 
         except Exception as e:
@@ -308,26 +311,57 @@ def auto_generate_sched_a(data):
     }
     # set up parent
     data['back_ref_transaction_id'] = data['transaction_id']
-    # get a new sched_a id
+    data['back_ref_sched_name'] = data['transaction_id'][0:2] 
+    # get a new sched_a id0:2
     
     data['transaction_id'] = get_next_transaction_id('SA')
     # fill in purpose - hardcoded - TODO: confirm on this
     data['purpose_description'] = 'Loan received: {}'.format(
         data.get('transaction_type_identifier')
         )
-    # update transaction type and line num
-    data['transaction_type_identifier'] = AUTO_SCHED_A_MAP.get(
-        data['transaction_type_identifier']
-        )
-    # TODO: will enable this when db update done
-    # data['line_number'], data['transaction_type'] = get_line_number_trans_type(
-    #     data.get('transaction_type_identifier')
+    # set transaction type and line num
+    # AUTO_SCHED_A_MAP = { 
+    # 'LOAN_FROM_IND' : 'LOAN_FROM_IND_REC',
+    # 'LOAN_FROM_BANK' : 'LOAN_FROM_BANK_REC',
+    # }
+    if data['entity_type'] == 'IND':
+        data['transaction_type_identifier'] = 'LOAN_FROM_IND'
+    elif data['entity_type'] == 'ORG':
+        data['transaction_type_identifier'] = 'LOAN_FROM_BANK'
+    else:
+        raise Exception('Error: invalid entity type for loan')
+    # AUTO_SCHED_A_MAP.get(
+    #     data['transaction_type_identifier']
     #     )
+    # TODO: will enable this when db update done
+    data['line_number'], data['transaction_type'] = get_line_number_trans_type(
+        data.get('transaction_type_identifier')
+        )
     for _f in field_mapper:
         data[_f] = data.get(field_mapper.get(_f))
     # TODO: not sure we need to return child data or not
     logger.debug('save a auto sched_a item with loan data:{}'.format(data))
-    post_schedA(data)
+    post_sql_schedA(
+        data.get('cmte_id'), 
+        data.get('report_id'),
+        data.get('line_number'),
+        data.get('transaction_type'),
+        data.get('transaction_id'),
+        data.get('back_ref_transaction_id'),
+        data.get('back_ref_sched_name'),
+        data.get('entity_id'),
+        data.get('contribution_date'),
+        data.get('contribution_amount'),
+        data.get('purpose_description'),
+        data.get('memo_code'),
+        data.get('memo_text'),
+        data.get('election_code'),
+        data.get('election_other_description'),
+        data.get('donor_cmte_id'),
+        data.get('donor_cmte_name'),
+        data.get('transaction_type_identifier')
+        )
+    logger.debug('auto-generation done.')
 
 def auto_generate_sched_b(data):
     """
@@ -420,6 +454,7 @@ def post_schedC(data):
             if get_data['entity_id'].startswith('FEC'):
                 get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
+            logger.debug('updating entity with data:{}'.format(data))
             new_entity = put_entities(data)
             rollback_flag = True
         else:
@@ -441,6 +476,7 @@ def post_schedC(data):
             post_sql_schedC(data)
             try:
                 if data['transaction_type_identifier'] in AUTO_SCHED_A_MAP:
+                # if data['transaction_type_identifier'] == 'LOANS_OWED_BY_CMTE':
                     logger.info('auto-generating a sched_a transaction...')
                     auto_generate_sched_a(data)
                 if data['transaction_type_identifier'] in AUTO_SCHED_B_MAP:
@@ -888,6 +924,7 @@ def schedC(request):
             #     data = put_schedB(datum)
             #     output = get_schedB(data)
             # else:
+            logger.debug('updating sched_c with data:{}'.format(datum))
             data = put_schedC(datum)
             # output = get_schedA(data)
             return JsonResponse(data, status=status.HTTP_201_CREATED)

@@ -14,6 +14,7 @@ import { MessageService } from './../../../shared/services/MessageService/messag
 import { UtilService } from './../../../shared/utils/util.service';
 import { ReportTypeService } from './../../form-3x/report-type/report-type.service';
 import { LoanService } from './../service/loan.service';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-loanpayment',
@@ -33,6 +34,7 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
   states: any = [];
   entityTypes: any = [{ code: 'IND', description: 'Individual' }, { code: 'ORG', description: 'Organization' }];
   outstandingLoanBalance: number;
+  public _contributionAmountMax = 12;
   
   private _clearFormSubscription: Subscription;
 
@@ -42,6 +44,7 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
     private utilService: UtilService,
     private _contributionDateValidator: ContributionDateValidator,
     private _loanService: LoanService,
+    private _decimalPipe: DecimalPipe,
     private _receiptService: LoanService,
     private _messageService: MessageService,
     private _reportTypeService: ReportTypeService,
@@ -190,6 +193,59 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
       console.log('date is valid');
     }
 
+  }
+
+  expenditureAmountChanged(amount:any){
+    this._formatAmount(amount,'expenditure_amount',false);
+  }
+
+  private _formatAmount(e: any, fieldName: string, negativeAmount: boolean) {
+    let contributionAmount: string = e.target.value;
+
+    // default to 0 when no value
+    contributionAmount = contributionAmount ? contributionAmount : '0';
+
+    // remove commas
+    contributionAmount = contributionAmount.replace(/,/g, ``);
+
+    // determine if negative, truncate if > max
+    contributionAmount = this._transformAmount(contributionAmount, this._contributionAmountMax);
+
+    let contributionAmountNum = parseFloat(contributionAmount);
+    // Amount is converted to negative for Return / Void / Bounced
+    if (negativeAmount) {
+      contributionAmountNum = -Math.abs(contributionAmountNum);
+      // this._contributionAmount = String(contributionAmountNum);
+    }
+
+    const amountValue: string = this._decimalPipe.transform(contributionAmountNum, '.2-2');
+    const patch = {};
+    patch[fieldName] = amountValue;
+    this.form.control.patchValue(patch, { onlySelf: true });
+  }
+
+   /**
+   * Allow for negative sign and don't allow more than the max
+   * number of digits.
+   */
+  private _transformAmount(amount: string, max: number): string {
+    if (!amount) {
+      return amount;
+    } else if (amount.length > 0 && amount.length <= max) {
+      return amount;
+    } else {
+      // Need to handle negative sign, decimal and max digits
+      if (amount.substring(0, 1) === '-') {
+        if (amount.length === max || amount.length === max + 1) {
+          return amount;
+        } else {
+          return amount.substring(0, max + 2);
+        }
+      } else {
+        const result = amount.substring(0, max + 1);
+        return result;
+      }
+    }
   }
 
   private removeCommas(amount: string): string {

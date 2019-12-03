@@ -144,12 +144,6 @@
                   [style.width]="'50%'"
                   [style.height]="'30px'"
                   [attr.readonly]="true"
-                  [ngClass]="
-                    frmIndividualReceipt.get('date')?.invalid &&
-                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'input-field-error'
-                      : ''
-                  "
                 />
               </div>
             </div>
@@ -227,6 +221,9 @@
                       : ''
                   "
                 />
+              </div>
+              <div class="text-error text-left" *ngIf="transferredAmountErr">
+                Please enter a valid amount.
               </div>
             </div>
           </div>
@@ -322,7 +319,7 @@
                     {{ item.transferred_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
                   </td>
                   <td class="summary_text_amt">
-                    {{ item.aggregate_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
+                    {{ item.aggregate_amount }}
                   </td>
 
                   <td class="bulk_action">

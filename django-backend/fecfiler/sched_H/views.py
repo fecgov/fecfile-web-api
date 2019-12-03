@@ -1434,17 +1434,17 @@ def put_sql_schedH3(data):
         """
     _v = (  
            
-            data.get('transaction_type_identifier', ''),
-            data.get('back_ref_transaction_id', ''),
-            data.get('back_ref_sched_name', ''),
-            data.get('account_name', ''),
-            data.get('activity_event_type', ''),
-            data.get('activity_event_name', ''),
-            data.get('receipt_date', None),
-            data.get('total_amount_transferred', None),
-            data.get('transferred_amount', None),
-            data.get('memo_code', ''),
-            data.get('memo_text', ''),
+            data.get('transaction_type_identifier'),
+            data.get('back_ref_transaction_id'),
+            data.get('back_ref_sched_name'),
+            data.get('account_name'),
+            data.get('activity_event_type'),
+            data.get('activity_event_name'),
+            data.get('receipt_date'),
+            data.get('total_amount_transferred'),
+            data.get('transferred_amount'),
+            data.get('memo_code'),
+            data.get('memo_text'),
             datetime.datetime.now(),
             data.get('transaction_id'),
             data.get('report_id'),
@@ -1718,19 +1718,25 @@ def get_sched_h3_breakdown(request):
     """
     _sql = """
     SELECT json_agg(t) FROM(
-    SELECT activity_event_type, sum(total_amount_transferred) 
+    SELECT activity_event_type, sum(transferred_amount) 
     FROM public.sched_h3 
     WHERE report_id = %s 
     AND cmte_id = %s
+    AND back_ref_transaction_id is not null
     AND delete_ind is distinct from 'Y'
-    GROUP BY activity_event_type
-    union 
-	SELECT 'total', sum(total_amount_transferred) 
-    FROM public.sched_h3 
-    WHERE report_id = %s 
-    AND cmte_id = %s
-    AND delete_ind is distinct from 'Y') t
+    GROUP BY activity_event_type) t
     """
+    #     print(0)
+    # except print(0):
+    #     pass
+    # union 
+	# SELECT 'total', sum(total_amount_transferred) 
+    # FROM public.sched_h3 
+    # WHERE report_id = %s 
+    # AND cmte_id = %s
+    # AND back_ref_transaction_id is null
+    # AND delete_ind is distinct from 'Y') t
+    # """
     try:
         cmte_id = request.user.username
         if not('report_id' in request.query_params):
@@ -1741,8 +1747,18 @@ def get_sched_h3_breakdown(request):
         else:
             report_id = check_report_id(request.query_params.get('report_id'))
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [report_id, cmte_id, report_id, cmte_id])
+            cursor.execute(_sql, [report_id, cmte_id])
             result = cursor.fetchone()[0]
+            # print('...')
+            # print(result)
+            if result:
+                _total = 0
+                for _rec in result:
+                    if _rec.get('sum'):
+                        _total += float(_rec.get('sum'))
+                total = {'activity_event_type': 'total', 'sum': _total}
+                result.append(total)
+            logger.debug('h3 breakdown:{}'.format(result))
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         raise Exception('Error on fetching h3 break down')
@@ -1799,13 +1815,16 @@ def get_h3_summary(request):
     # TODO: what is gonna happen when people click edit button? 
     """
     try:
+        logger.debug('get_h3_summary...')
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
         aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
-
+        logger.debug('cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
         with connection.cursor() as cursor:
             # GET single row from schedA table
-            _sql = """SELECT json_agg(t) FROM ( SELECT
+            _sql = """
+            SELECT json_agg(t) FROM ( 
+                SELECT
             cmte_id,
             report_id,
             transaction_type_identifier,
@@ -1826,20 +1845,22 @@ def get_h3_summary(request):
             FROM public.sched_h3
             WHERE (report_id = %s or report_id = 0) AND cmte_id = %s
             AND back_ref_transaction_id is not null
-            AND delete_ind is distinct from 'Y') t
+            AND delete_ind is distinct from 'Y'
+            ) t
             """
             cursor.execute(_sql, (report_id, cmte_id))
             # print(_sql)
             # cursor.execute(_sql)
-            _sum = cursor.fetchone()[0] 
-            for _rec in _sum:
-                if _rec['activity_event_name']:
-                    _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'], 0)
-                elif _rec['activity_event_type']:
-                    _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
-                else:
-                    pass
-            return Response( _sum, status = status.HTTP_200_OK)
+            _sum = cursor.fetchone()[0]
+            if _sum: 
+                for _rec in _sum:
+                    if _rec['activity_event_name']:
+                        _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'], 0)
+                    elif _rec['activity_event_type']:
+                        _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
+                    else:
+                        pass
+            return Response( _sum, status = status.HTTP_200_OK )
     except:
         raise 
 
@@ -1910,6 +1931,7 @@ def schedH3(request):
     
     if request.method == 'POST':
         try:
+            logger.debug('POST a h3 with data:{}'.format(request.data))
             cmte_id = request.user.username
             if not('report_id' in request.data):
                 raise Exception('Missing Input: Report_id is mandatory')
@@ -3200,7 +3222,7 @@ def get_sched_h5_breakdown(request):
     """
     _sql = """
     SELECT json_agg(t) FROM(
-        select sum(total_amount_transferred) as total,
+        select
         sum(voter_id_amount) as voter_id,
         sum(voter_registration_amount) as voter_registration,
         sum(gotv_amount) as gotv,
@@ -3223,9 +3245,20 @@ def get_sched_h5_breakdown(request):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [report_id, cmte_id])
             result = cursor.fetchone()[0]
+            # print(result)
+            # if none returned, set it to 0
+            # TODO: make this code a little more elegent by re-define handshaking with frontend
+            _t = {k:0 for k,v in result[0].items() if not v}
+            result[0].update(_t)
+            result[0]['total'] = (
+                float(result[0].get('voter_id', 0)) + 
+                float(result[0].get('voter_registration', 0)) + 
+                float(result[0].get('gotv', 0)) + 
+                float(result[0].get('generic_campaign', 0))
+                )
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
-        raise Exception('Error on fetching h3 break down')
+        raise Exception('Error on fetching h5 break down')
 
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])

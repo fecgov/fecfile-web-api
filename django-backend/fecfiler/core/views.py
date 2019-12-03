@@ -1386,7 +1386,8 @@ def post_entities(data):
 
     try:
         check_mandatory_fields_entity(data)
-        data['preffix'] = data.get('prefix')
+        if data.get('prefix'):
+            data['preffix'] = data.get('prefix')
         entity_type = data.get('entity_type')
         check_entity_type(entity_type)
         entity_id = get_next_entity_id(entity_type)
@@ -1486,7 +1487,8 @@ def put_entities(data):
 
     try:
         check_mandatory_fields_entity(data)
-        data['preffix'] = data.get('prefix')
+        if data.get('prefix'):
+            data['preffix'] = data.get('prefix')
         cmte_id = data.get('cmte_id')
         entity_type = data.get('entity_type')
         check_entity_type(entity_type)

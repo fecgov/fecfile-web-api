@@ -142,7 +142,7 @@ export class SchedH3Service {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    const formData: FormData = new FormData();   
+    const formData: FormData = new FormData();
     for (const [key, value] of Object.entries(ratio)) {
       if (value !== null) {
         if (typeof value === 'string') {
@@ -166,6 +166,46 @@ export class SchedH3Service {
           return false;
       })
       );
+  }
+
+  public saveAndGetSummary(ratio: any, reportId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/sh3/schedH3';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const formData: FormData = new FormData();
+    for (const [key, value] of Object.entries(ratio)) {
+      if (value !== null) {
+        if (typeof value === 'string') {
+          formData.append(key, value);
+        }
+      }
+    }
+
+    return this._http
+      .post(
+        `${environment.apiUrl}${url}`, ratio,
+        {
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
+            console.log('Save H3Ratio res: ', res);
+
+            //get summary
+            this.getSummary(reportId);
+
+            return res;
+          }
+          return false;
+      })
+      );
+
+
   }
     
 }

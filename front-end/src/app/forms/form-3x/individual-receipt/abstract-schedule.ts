@@ -898,9 +898,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (res) {
           if (res.fed_share) {
             this._formatAmount({ target: { value: res.fed_share.toString() } }, 'fed_share_amount', false);
+            this._formatAmount({ target: { value: res.fed_share.toString() } }, 'federal_share', false);
           }
           if (res.nonfed_share) {
             this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'non_fed_share_amount', false);
+            this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'levin_share', false);
           }
           if (res.aggregate_amount) {
             this._formatAmount(
@@ -3439,7 +3441,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.frmIndividualReceipt) {
       this.frmIndividualReceipt.reset();
     }
-    if (this.frmIndividualReceipt.contains('entity_type')) {
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.contains('entity_type')) {
       this.selectedEntityType = this._entityTypeDefault;
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
     }
