@@ -199,10 +199,22 @@ def get_report_types(request):
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj= json.loads(data_row[0])
-                
+
         if not bool(forms_obj):
-            return Response("No entries were found for the form type: {} for this committee".format(form_type), status=status.HTTP_400_BAD_REQUEST)                              
-        
+            return Response("No entries were found for the form type: {} for this committee".format(form_type), status=status.HTTP_400_BAD_REQUEST)
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT cmte_filing_freq FROM public.committee_master WHERE cmte_id=%s", [cmte_id])
+            cmte_filing_freq = cursor.fetchone()
+            if cmte_filing_freq:
+                cmte_filing_freq = cmte_filing_freq[0]
+
+        if cmte_filing_freq == 'Q':
+            reports = forms_obj.get('report_type')
+            for report in reports:
+                if report.get('report_type') == 'YE':
+                    report['election_state'][0]['dates'][0]['cvg_start_date'] = "2019-10-01"
+
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("The get_report_types API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -1374,7 +1386,8 @@ def post_entities(data):
 
     try:
         check_mandatory_fields_entity(data)
-        data['preffix'] = data.get('prefix')
+        if data.get('prefix'):
+            data['preffix'] = data.get('prefix')
         entity_type = data.get('entity_type')
         check_entity_type(entity_type)
         entity_id = get_next_entity_id(entity_type)
@@ -1474,7 +1487,8 @@ def put_entities(data):
 
     try:
         check_mandatory_fields_entity(data)
-        data['preffix'] = data.get('prefix')
+        if data.get('prefix'):
+            data['preffix'] = data.get('prefix')
         cmte_id = data.get('cmte_id')
         entity_type = data.get('entity_type')
         check_entity_type(entity_type)
@@ -1719,13 +1733,14 @@ def autolookup_search_contacts(request):
     """
     logger.debug('autolookup with request params:{}'.format(dict(request.query_params.items())))
 
-    allowed_params = ['entity_name', 'first_name', 'last_name', 'ref_cand_cmte_id'] 
+    allowed_params = ['entity_name', 'first_name', 'last_name', 'ref_cand_cmte_id', 'principal_campaign_committee'] 
     field_remapper = {
         'cmte_id': 'ref_cand_cmte_id',
         'cmte_name': 'entity_name',
         'cand_id': 'ref_cand_cmte_id',
         'cand_last_name': 'last_name',
-        'cand_first_name': 'first_name' 
+        'cand_first_name': 'first_name',
+        'payee_cmte_id': 'principal_campaign_committee'
     }
 
     try:
@@ -1811,6 +1826,7 @@ def autolookup_search_contacts(request):
                     'cand_id' in request.query_params
                     or 'cand_first_name' in request.query_params
                     or 'cand_last_name' in request.query_params
+                    or 'payee_cmte_id' in request.query_params
                     ):
                     parameters = [committee_id]
                     query_string = """
@@ -1888,7 +1904,7 @@ def autolookup_search_contacts(request):
             #     raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
 
         if query_string == "":
-            raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
+            raise Exception("One parameter has to be passed for this api to display results. The parameters should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name', 'payee_cmte_id']")
         with connection.cursor() as cursor:
             logger.debug("autolookup query:{}".format(query_string))
             logger.debug("autolookup parameters:{}".format(parameters))
@@ -5824,5 +5840,3 @@ def get_sched_c_loanPayment_dynamic_forms_fields(request):
         return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("The get_sched_c_loanPayment_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
-# """

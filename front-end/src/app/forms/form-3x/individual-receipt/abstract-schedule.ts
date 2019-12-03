@@ -839,7 +839,26 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Call the API to calculate the fed, non-fed and activity YTD values.
    */
   private _getFedNonFedPercentage() {
-    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' && this.transactionType !== 'ALLOC_EXP_DEBT') {
+
+    if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
+        this.transactionType !== 'ALLOC_EXP_DEBT'
+        &&
+        this.transactionType !== 'ALLOC_EXP' &&
+        this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
+        this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
+        this.transactionType !== 'ALLOC_EXP_STAF_REIM' &&
+        this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
+        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
+        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
+        this.transactionType !== 'ALLOC_EXP_VOID'
+        &&
+        this.transactionType !== 'ALLOC_FEA_DISB' &&
+        this.transactionType !== 'ALLOC_FEA_CC_PAY' &&
+        this.transactionType !== 'ALLOC_FEA_CC_PAY_MEMO' &&
+        this.transactionType !== 'ALLOC_FEA_STAF_REIM' &&
+        this.transactionType !== 'ALLOC_FEA_STAF_REIM_MEMO' &&       
+        this.transactionType !== 'ALLOC_FEA_VOID'
+        ) {
       return;
     }
 
@@ -879,9 +898,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (res) {
           if (res.fed_share) {
             this._formatAmount({ target: { value: res.fed_share.toString() } }, 'fed_share_amount', false);
+            this._formatAmount({ target: { value: res.fed_share.toString() } }, 'federal_share', false);
           }
           if (res.nonfed_share) {
             this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'non_fed_share_amount', false);
+            this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'levin_share', false);
           }
           if (res.aggregate_amount) {
             this._formatAmount(
@@ -977,7 +998,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if ($event.hasOwnProperty('hasValue')) {
       if ($event.hasValue === false) {
         if ($event.hasOwnProperty('scheduleType')) {
-          this._handleNoH1H2($event.scheduleType);
+          //this._handleNoH1H2($event.scheduleType);
         } else {
           this._handleNoH1H2(null);
         }
@@ -2816,6 +2837,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
                       this.activityEventTypes = committeeTypeEvent.eventTypes;
                     }
+
+                    if((this.transactionType === 'ALLOC_FEA_DISB' ||
+                      this.transactionType === 'ALLOC_FEA_CC_PAY' ||
+                      this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+                      this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
+                      this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+                      this.transactionType == 'ALLOC_FEA_VOID') &&
+                      'H6' === committeeTypeEvent.committeeTypeCategory) {
+                        this.activityEventTypes = committeeTypeEvent.eventTypes;
+                      }
                   }
                 }
               }
@@ -3421,7 +3452,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.frmIndividualReceipt) {
       this.frmIndividualReceipt.reset();
     }
-    if (this.frmIndividualReceipt.contains('entity_type')) {
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.contains('entity_type')) {
       this.selectedEntityType = this._entityTypeDefault;
       this.frmIndividualReceipt.patchValue({ entity_type: this.selectedEntityType.entityType }, { onlySelf: true });
     }
@@ -3469,6 +3500,22 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       // this.transactionType !== 'EAR_REC' &&
       // this.transactionType !== 'CON_EAR_UNDEP' &&
       // this.transactionType !== 'CON_EAR_DEP_1'
+      &&
+      this.transactionType !== 'ALLOC_EXP' &&
+      this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
+      this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
+      this.transactionType !== 'ALLOC_EXP_STAF_REIM' &&
+      this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
+      this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
+      this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
+      this.transactionType !== 'ALLOC_EXP_VOID'
+      &&
+      this.transactionType !== 'ALLOC_FEA_DISB' &&
+      this.transactionType !== 'ALLOC_FEA_CC_PAY' &&
+      this.transactionType !== 'ALLOC_FEA_CC_PAY_MEMO' &&
+      this.transactionType !== 'ALLOC_FEA_STAF_REIM' &&
+      this.transactionType !== 'ALLOC_FEA_STAF_REIM_MEMO' &&       
+      this.transactionType !== 'ALLOC_FEA_VOID'
     ) {
       return;
     }

@@ -655,7 +655,6 @@ def update_linenumber_aggamt_transactions_SA(contribution_date, transaction_type
                 if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
                     if (committee_type == 'PAC') and transaction[8] in PAC_AGGREGATE_TYPES_1:
                         PAC_aggregate_amount += transaction[0]
-                        print(PAC_aggregate_amount)
                         aggregate_amount = PAC_aggregate_amount
                     elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_HQ:
                         HQ_aggregate_amount += transaction[0]

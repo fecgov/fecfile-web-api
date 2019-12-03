@@ -4,6 +4,7 @@ import logging
 import os
 from decimal import Decimal
 
+
 import requests
 from django.conf import settings
 from django.db import connection
@@ -24,7 +25,7 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities)
 from fecfiler.sched_A.views import (get_list_child_schedA,
-                                    get_next_transaction_id, post_schedA)
+                                    get_next_transaction_id, post_schedA, post_sql_schedA)
 from fecfiler.sched_B.views import get_list_child_schedB, post_schedB
 from fecfiler.sched_D.views import do_transaction
 
@@ -58,11 +59,11 @@ API_CALL_SA = {'api_call':'/sa/schedA'}
 API_CALL_SB = {'api_call':'/sb/schedB'}
 API_CALL_SC1 = {'api_call':'/sc/schedC1'}
 API_CALL_SC2 = {'api_call':'/sc/schedC2'}
+
 # need to generate auto sched_a items when a loan is made by a committee
 AUTO_SCHED_A_MAP = { 
-    'LOAN_FROM_IND' : 'LOAN_FROM_IND_REC',
-    'LOAN_FROM_BANK' : 'LOAN_FROM_BANK_REC',
-    }
+    'LOANS_OWED_BY_CMTE' : ['LOAN_FROM_IND','LOAN_FORM_BANK']
+}
 
 # need to generate auto sched_b item when 
 AUTO_SCHED_B_MAP = {
@@ -73,7 +74,7 @@ def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SC"):
         raise Exception(
             'The Transaction ID: {} is not in the specified format.' +
-            'Transaction IDs start with SD characters'.format(transaction_id))
+            'Transaction IDs start with SC characters'.format(transaction_id))
     return transaction_id
 
 
@@ -88,7 +89,7 @@ def check_mandatory_fields_SC(data):
                 errors.append(field)
         if errors:
             raise Exception(
-                'The following mandatory fields are required in order to save data to schedA table: {}'.format(','.join(errors)))
+                'The following mandatory fields are required in order to save data: {}'.format(','.join(errors)))
     except:
         raise
 
@@ -179,9 +180,11 @@ def put_schedC(data):
             if get_data['entity_id'].startswith('FEC'):
                 get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
+            logger.debug('updating entity with data:{}'.format(data))
             new_entity = put_entities(data)
             rollback_flag = True
         else:
+            logger.debug('saving new entity:{}'.format(data))
             new_entity = post_entities(data)
             rollback_flag = False
 
@@ -195,6 +198,7 @@ def put_schedC(data):
         #check_transaction_id(data.get('transaction_id'))
         try:
             # rollback_data = get_schedC(data)
+            logger.debug('updating loan with data:{}'.format(data))
             put_sql_schedC(data)
 
         except Exception as e:
@@ -307,26 +311,57 @@ def auto_generate_sched_a(data):
     }
     # set up parent
     data['back_ref_transaction_id'] = data['transaction_id']
-    # get a new sched_a id
+    data['back_ref_sched_name'] = data['transaction_id'][0:2] 
+    # get a new sched_a id0:2
     
     data['transaction_id'] = get_next_transaction_id('SA')
     # fill in purpose - hardcoded - TODO: confirm on this
     data['purpose_description'] = 'Loan received: {}'.format(
         data.get('transaction_type_identifier')
         )
-    # update transaction type and line num
-    data['transaction_type_identifier'] = AUTO_SCHED_A_MAP.get(
-        data['transaction_type_identifier']
-        )
-    # TODO: will enable this when db update done
-    # data['line_number'], data['transaction_type'] = get_line_number_trans_type(
-    #     data.get('transaction_type_identifier')
+    # set transaction type and line num
+    # AUTO_SCHED_A_MAP = { 
+    # 'LOAN_FROM_IND' : 'LOAN_FROM_IND_REC',
+    # 'LOAN_FROM_BANK' : 'LOAN_FROM_BANK_REC',
+    # }
+    if data['entity_type'] == 'IND':
+        data['transaction_type_identifier'] = 'LOAN_FROM_IND'
+    elif data['entity_type'] == 'ORG':
+        data['transaction_type_identifier'] = 'LOAN_FROM_BANK'
+    else:
+        raise Exception('Error: invalid entity type for loan')
+    # AUTO_SCHED_A_MAP.get(
+    #     data['transaction_type_identifier']
     #     )
+    # TODO: will enable this when db update done
+    data['line_number'], data['transaction_type'] = get_line_number_trans_type(
+        data.get('transaction_type_identifier')
+        )
     for _f in field_mapper:
         data[_f] = data.get(field_mapper.get(_f))
     # TODO: not sure we need to return child data or not
     logger.debug('save a auto sched_a item with loan data:{}'.format(data))
-    post_schedA(data)
+    post_sql_schedA(
+        data.get('cmte_id'), 
+        data.get('report_id'),
+        data.get('line_number'),
+        data.get('transaction_type'),
+        data.get('transaction_id'),
+        data.get('back_ref_transaction_id'),
+        data.get('back_ref_sched_name'),
+        data.get('entity_id'),
+        data.get('contribution_date'),
+        data.get('contribution_amount'),
+        data.get('purpose_description'),
+        data.get('memo_code'),
+        data.get('memo_text'),
+        data.get('election_code'),
+        data.get('election_other_description'),
+        data.get('donor_cmte_id'),
+        data.get('donor_cmte_name'),
+        data.get('transaction_type_identifier')
+        )
+    logger.debug('auto-generation done.')
 
 def auto_generate_sched_b(data):
     """
@@ -419,6 +454,7 @@ def post_schedC(data):
             if get_data['entity_id'].startswith('FEC'):
                 get_data['cmte_id'] = 'C00000000'
             old_entity = get_entities(get_data)[0]
+            logger.debug('updating entity with data:{}'.format(data))
             new_entity = put_entities(data)
             rollback_flag = True
         else:
@@ -440,6 +476,7 @@ def post_schedC(data):
             post_sql_schedC(data)
             try:
                 if data['transaction_type_identifier'] in AUTO_SCHED_A_MAP:
+                # if data['transaction_type_identifier'] == 'LOANS_OWED_BY_CMTE':
                     logger.info('auto-generating a sched_a transaction...')
                     auto_generate_sched_a(data)
                 if data['transaction_type_identifier'] in AUTO_SCHED_B_MAP:
@@ -757,21 +794,20 @@ def delete_schedC(data):
     """
     try:
         # check_mandatory_fields_SC2(data)
-        delete_sql_schedC(data.get('cmte_id'), data.get(
-            'report_id'), data.get('transaction_id'))
+        delete_sql_schedC(data.get('cmte_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
 
-def delete_sql_schedC(cmte_id, report_id, transaction_id):
+def delete_sql_schedC(cmte_id, transaction_id):
     """
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_c
             SET delete_ind = 'Y' 
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
+            WHERE transaction_id = %s AND cmte_id = %s
         """
-    _v = (transaction_id, report_id, cmte_id)
+    _v = (transaction_id, cmte_id)
     do_transaction(_sql, _v)
 
 
@@ -799,6 +835,8 @@ def schedC(request):
             datum = schedC_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            if 'prefix' in request.data:
+                datum['preffix'] = request.data.get('prefix')
             logger.debug('data before saving to db:{}'.format(datum))
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
@@ -844,14 +882,14 @@ def schedC(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
-                data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
-            else:
-                raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            #     data['report_id'] = check_report_id(
+            #         request.data.get('report_id'))
+            # else:
+            #     raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedC(data)
@@ -877,6 +915,8 @@ def schedC(request):
             # end of handling
             datum['report_id'] = report_id
             datum['cmte_id'] = request.user.username
+            if 'prefix' in request.data:
+                datum['preffix'] = request.data.get('prefix')
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
@@ -884,6 +924,7 @@ def schedC(request):
             #     data = put_schedB(datum)
             #     output = get_schedB(data)
             # else:
+            logger.debug('updating sched_c with data:{}'.format(datum))
             data = put_schedC(datum)
             # output = get_schedA(data)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -930,7 +971,7 @@ def get_outstanding_loans(request):
                             e.last_name,
                             e.first_name,
                             e.middle_name,
-                            e.preffix,
+                            e.preffix as prefix,
                             e.suffix, 
                             c.transaction_id,
                             c.loan_amount_original, 
@@ -944,6 +985,7 @@ def get_outstanding_loans(request):
                         AND c.transaction_type_identifier = %s
                         AND c.entity_id = e.entity_id 
                         AND c.loan_balance > 0
+                        AND delete_ind is distinct from 'Y'
                         ) t
             """
             with connection.cursor() as cursor:
@@ -959,7 +1001,7 @@ def get_outstanding_loans(request):
                                 e.last_name,
                                 e.first_name,
                                 e.middle_name,
-                                e.preffix,
+                                e.preffix as prefix,
                                 e.suffix, 
                                 c.transaction_id,
                                 c.loan_amount_original, 
@@ -972,6 +1014,7 @@ def get_outstanding_loans(request):
                             WHERE c.cmte_id = %s
                             AND c.entity_id = e.entity_id 
                             AND c.loan_balance > 0
+                            AND c.delete_ind is distinct from 'Y'
                             ) t
                 """
             with connection.cursor() as cursor:
@@ -1073,7 +1116,7 @@ def check_mandatory_fields_SC1(data):
             #     string = string + x + ", "
             # string = string[0:-2]
             raise Exception(
-                'The following mandatory fields are required in order to save data to schedA table: {}'.format(','.join(errors)))
+                'The following mandatory fields are required in order to save data: {}'.format(','.join(errors)))
     except:
         raise
 
@@ -1195,6 +1238,8 @@ def post_authorized_entities(data):
     """
     auth_data = {k.replace('authorized_',''):v for k,v in data.items() if k.startswith('authorized_')}
     auth_data['cmte_id'] = data.get('cmte_id')
+    if 'prefix' in auth_data:
+        auth_data['preffix'] = auth_data.get('prefix')
     auth_data['entity_type'] = 'IND'
     logger.debug('post_auth_entity with data:{}'.format(auth_data))
     return post_entities(auth_data)
@@ -1205,6 +1250,8 @@ def post_treasurer_entities(data):
     """
     trea_data = { k.replace('treasurer_',''):v for k,v in data.items() if k.startswith('treasurer_')}
     trea_data['cmte_id'] = data.get('cmte_id')
+    if 'prefix' in trea_data:
+        trea_data['preffix'] = trea_data.get('prefix')
     trea_data['entity_type'] = 'IND'
     logger.debug('post_trea_entity with data:{}'.format(trea_data))
     return post_entities(trea_data)
@@ -1216,6 +1263,8 @@ def put_authorized_entities(data):
     """
     auth_data = {k.replace('authorized_',''):v for k,v in data.items() if k.startswith('authorized_')}
     auth_data['cmte_id'] = data.get('cmte_id')
+    if 'prefix' in auth_data:
+        auth_data['preffix'] = auth_data.get('prefix')
     auth_data['entity_type'] = 'IND'
     logger.debug('put_auth_entity with data:{}'.format(auth_data))
     return put_entities(auth_data)
@@ -1227,6 +1276,8 @@ def put_treasurer_entities(data):
     """
     trea_data = {k.replace('treasurer_',''):v for k,v in data.items() if k.startswith('treasurer_')}
     trea_data['cmte_id'] = data.get('cmte_id')
+    if 'prefix' in trea_data:
+        trea_data['preffix'] = trea_data.get('prefix')
     trea_data['entity_type'] = 'IND'
     logger.debug('put_trea_entity with data:{}'.format(trea_data))
     return put_entities(trea_data)
@@ -1620,21 +1671,20 @@ def delete_schedC1(data):
     """
     try:
         # check_mandatory_fields_SC2(data)
-        delete_sql_schedC1(data.get('cmte_id'), data.get(
-            'report_id'), data.get('transaction_id'))
+        delete_sql_schedC1(data.get('cmte_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
 
-def delete_sql_schedC1(cmte_id, report_id, transaction_id):
+def delete_sql_schedC1(cmte_id, transaction_id):
     """
     do delete sql transaction
     """
     _sql = """UPDATE public.sched_c1
             SET delete_ind = 'Y' 
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
+            WHERE transaction_id = %s AND cmte_id = %s
         """
-    _v = (transaction_id, report_id, cmte_id)
+    _v = (transaction_id, cmte_id)
     do_transaction(_sql, _v)
 
 
@@ -1661,6 +1711,8 @@ def schedC1(request):
             datum = request.data.copy()
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            if 'prefix' in request.data:
+                datum['preffix'] = request.data.get('prefix')
             # print(datum)
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
@@ -1705,14 +1757,14 @@ def schedC1(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
-                data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
-            else:
-                raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            #     data['report_id'] = check_report_id(
+            #         request.data.get('report_id'))
+            # else:
+            #     raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedC1(data)
@@ -1738,6 +1790,8 @@ def schedC1(request):
             # end of handling
             datum['report_id'] = report_id
             datum['cmte_id'] = request.user.username
+            if 'prefix' in request.data:
+                datum['preffix'] = request.data.get('prefix')
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
@@ -1782,7 +1836,7 @@ def check_mandatory_fields_SC2(data):
             #     string = string + x + ", "
             # string = string[0:-2]
             raise Exception(
-                'The following mandatory fields are required in order to save data to schedA table: {}'.format(','.join(errors)))
+                'The following mandatory fields are required in order to save data: {}'.format(','.join(errors)))
     except:
         raise
 
@@ -1827,7 +1881,7 @@ def put_schedC2(data):
                 }
                 remove_entities(get_data)
             raise Exception(
-                'The put_sql_schedD function is throwing an error: ' + str(e))
+                'The put_sql_schedC2 function is throwing an error: ' + str(e))
         return get_schedC2(data)[0]
     except:
         raise
@@ -1843,7 +1897,7 @@ def put_sql_schedC2(data):
                 guaranteed_amount = %s,
                 back_ref_transaction_id = %s,
                 last_update_date = %s
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
+            WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'
         """
     _v = (data.get('transaction_type_identifier'),
           data.get('guarantor_entity_id'),
@@ -1851,7 +1905,6 @@ def put_sql_schedC2(data):
           data.get('back_ref_transaction_id'),
           datetime.datetime.now(),
           data.get('transaction_id'),
-          data.get('report_id'),
           data.get('cmte_id'),
           )
     do_transaction(_sql, _v)
@@ -1968,19 +2021,18 @@ def delete_schedC2(data):
     function for handling delete request for sc2
     """
     try:
-        check_mandatory_fields_SC2(data)
-        delete_sql_schedC2(data.get('cmte_id'), data.get(
-            'report_id'), data.get('transaction_id'))
+        # check_mandatory_fields_SC2(data)
+        delete_sql_schedC2(data.get('cmte_id'), data.get('transaction_id'))
     except Exception as e:
         raise
 
 
-def delete_sql_schedC2(cmte_id, report_id, transaction_id):
+def delete_sql_schedC2(cmte_id, transaction_id):
     _sql = """UPDATE public.sched_c2
             SET delete_ind = 'Y' 
-            WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
+            WHERE transaction_id = %s AND cmte_id = %s
         """
-    _v = (transaction_id, report_id, cmte_id)
+    _v = (transaction_id, cmte_id)
     do_transaction(_sql, _v)
 
 
@@ -2123,6 +2175,9 @@ def schedC2(request):
             datum = request.data.copy()
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            if 'prefix' in request.data:
+                datum['preffix'] = request.data.get('prefix')
+
             if 'transaction_id' in request.data and check_null_value(
                     request.data.get('transaction_id')):
                 datum['transaction_id'] = check_transaction_id(
@@ -2167,14 +2222,14 @@ def schedC2(request):
             data = {
                 'cmte_id': request.user.username
             }
-            if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
-                data['report_id'] = check_report_id(
-                    request.data.get('report_id'))
-            else:
-                raise Exception('Missing Input: report_id is mandatory')
-            if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
+            # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
+            #     data['report_id'] = check_report_id(
+            #         request.data.get('report_id'))
+            # else:
+            #     raise Exception('Missing Input: report_id is mandatory')
+            if 'transaction_id' in request.query_params and check_null_value(request.query_params.get('transaction_id')):
                 data['transaction_id'] = check_transaction_id(
-                    request.data.get('transaction_id'))
+                    request.query_params.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
             delete_schedC2(data)
@@ -2201,6 +2256,8 @@ def schedC2(request):
             # end of handling
             datum['report_id'] = report_id
             datum['cmte_id'] = request.user.username
+            if 'prefix' in request.data:
+                datum['preffix'] = request.data.get('prefix')
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')

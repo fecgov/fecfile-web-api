@@ -195,14 +195,8 @@ export class EndorserService {
       model.zip = row.zip;
       model.employer = row.employer;
       model.occupation = row.occupation;
-      model.phoneNumber = row.phoneNumber;
       model.entity_name = row.entity_name;
-      model.candOffice = row.candOffice;
-      model.candOfficeState = row.candOfficeState
-      model.candOfficeDistrict = row.candOfficeDistrict;
-      model.activeTransactionsCnt = row.active_transactions_cnt;
-      model.candCmteId = row.candCmteId;
-      model.deletedDate = row.deleteddate;
+      model.contribution_amount = row.contribution_amount;
       modelArray.push(model);
     }
     return modelArray;
@@ -314,14 +308,8 @@ export class EndorserService {
     serverObject.zip = model.zip;
     serverObject.employer = model.employer;
     serverObject.occupation = model.occupation;
-    serverObject.phoneNumber = model.phoneNumber;
+    serverObject.contribution_amount = model.contribution_amount;
     serverObject.entityName = model.entity_name;
-    serverObject.candOffice = model.candOffice;
-    serverObject.candOfficeState = model.candOfficeState;
-    serverObject.candOfficeDistrict = model.candOfficeDistrict;
-    serverObject.candCmteId = model.candCmteId;
-    serverObject.activeTransactionsCnt = model.activeTransactionsCnt;
-    serverObject.deletedDate = model.deletedDate;
     
     return serverObject;
   }

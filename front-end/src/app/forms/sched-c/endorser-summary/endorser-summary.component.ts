@@ -12,6 +12,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
 import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../../shared/partials/confirm-modal/confirm-modal.component';
 
 export enum ActiveView {
   endorserSummary = 'endorserSummary',
@@ -232,7 +233,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     const serverSortColumnName = this._LoanService.
       mapToSingleServerName(this.currentSortedColumnName);
 
-    this._LoanService.getEndorsers(this.transactionDetail.transactionId)
+    this._LoanService.getEndorsers(this.transactionDetail.endorser.back_ref_transaction_id)
     //TODO : ZS -- change resType back to  GetEndorserResponse once service is fixed
       .subscribe((res: any) => {
 
@@ -817,47 +818,48 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
-  public editEndorserPayment(endorser:any){
+  public editEndorser(endorser:any){
     this._goToEndorser(endorser);
+  }
+
+  public goToC1() {
+    const c1EmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c1',
+      action: this.transactionDetail.c1Exists ? ScheduleActions.edit: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
+          transactionId: this.transactionDetail.endorser.back_ref_transaction_id,
+        }
+      }
+    };
+    this.status.emit(c1EmitObj);
   }
 
 
   private _goToEndorser(endorser:any) {
     const endorserRepaymentEmitObj: any = {
       form: {},
-      direction: 'next', //TODO-zs -- does this need to be changed?
+      direction: 'next', 
       step: 'step_3',
       previousStep: 'step_2',
-      scheduleType: 'sched_c',
+      scheduleType: 'sched_c_en',
       action: ScheduleActions.edit,
       transactionDetail: {
         transactionModel : {
           transactionId: endorser.transaction_id, 
-          entityId: endorser.entity_id
+          entityId: endorser.entity_id, 
+          endorser, 
+          entryScreenScheduleType:'sched_c_es'
         }
       }
     };
     this.status.emit(endorserRepaymentEmitObj);
   }
   
-  public goToEndorserRepayment(endorser:any) {
-    const endorserRepaymentEmitObj: any = {
-      form: {},
-      direction: 'next',
-      step: 'step_3',
-      previousStep: 'step_2',
-      scheduleType: 'sched_c_endorser_payment',
-      action: ScheduleActions.add,
-      transactionDetail: {
-        transactionModel: {
-          transactionId: endorser.transaction_id, 
-          entityId: endorser.entity_id,
-          entryScreenScheduleType: 'sched_c_ls',
-        }
-      }
-    };
-    this.status.emit(endorserRepaymentEmitObj);
-  }
 
   /**
    * Set the UI to show the default column sorted in the default direction.
@@ -883,6 +885,30 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
     }
   }
 
+  /**
+   * Trash the transaction selected by the user.
+   *
+   * @param trx the Transaction to trash
+   */
+  public trashEndorser(endorser: any): void {
+    this._dialogService
+      .confirm('You are about to delete this transaction ' + endorser.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._LoanService.deleteEndorser(endorser).subscribe(res => {
+            this.getPage(this.config.currentPage);
+            this._dialogService.confirm(
+              'Transaction has been successfully deleted. ' + endorser.transactionId,
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          })
+        } else if (res === 'cancel') {
+        }
+      });
+  }
 
 
 }

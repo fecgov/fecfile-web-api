@@ -636,6 +636,7 @@ def schedF(request):
                 data = post_schedF(datum)
             # Associating child transactions to parent and storing them to DB
 
+            update_aggregate_general_elec_exp(datum['cmte_id'], datum['payee_cand_id'], datum['expenditure_date'])
             output = get_schedF(data)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -680,7 +681,9 @@ def schedF(request):
                     request.data.get('transaction_id'))
             else:
                 raise Exception('Missing Input: transaction_id is mandatory')
+            datum = get_schedF(data)[0]
             delete_schedF(data)
+            update_aggregate_general_elec_exp(datum['cmte_id'], datum['beneficiary_cand_id'], datetime.datetime.strptime(datum.get('expenditure_date'), '%Y-%m-%d').date().strftime("%m/%d/%Y"))
             return Response("The Transaction ID: {} has been successfully deleted".format(data.get('transaction_id')), status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response("The schedF API - DELETE is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -712,7 +715,9 @@ def schedF(request):
             # else:
             data = put_schedF(datum)
             # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            update_aggregate_general_elec_exp(datum['cmte_id'], datum['payee_cand_id'], datum['expenditure_date'])
+            output = get_schedF(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.debug(e)
             return Response("The schedF API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -721,7 +726,167 @@ def schedF(request):
         raise NotImplementedError
 
 
+"""
+TO GET THE AGGREGATE FOR EXPENDITURE AMOUNT FOR CANDIDATE PER GENERAL ELECTION
+"""
+@api_view(['GET'])
+def get_aggregate_general_elec_exp(request):
+    try:
+        aggregate_amount = 0.0
+        cmte_id = request.user.username
+        mandatory_fields = ['beneficiary_cand_id', 'expenditure_date']
+        for field in mandatory_fields:
+            if request.query_params.get(field) in [None,'',""," ", 'Null', 'None']:
+                raise Exception('Mandatory fields are missing in the request parameters. The mandatory fields are: ' + ','.join(mandatory_fields))
+        beneficiary_cand_id = request.query_params.get('beneficiary_cand_id')
+        # election_year = request.query_params.get('election_year')
+        expenditure_date = request.query_params.get('expenditure_date')
+        expenditure_amount = request.query_params.get('expenditure_amount',0.0)
+        cvg_start_date, cvg_end_date = agg_dates(cmte_id, beneficiary_cand_id, expenditure_date)
+        logger.debug('cvg_start_date:' + str(cvg_start_date))
+        logger.debug('cvg_end_date:' + str(cvg_end_date))
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT aggregate_general_elec_exp FROM public.sched_f WHERE payee_cand_id = %s AND expenditure_date >= %s AND
+                expenditure_date <= %s AND expenditure_date <= %s ORDER BY expenditure_date DESC, create_date DESC """, [beneficiary_cand_id, cvg_start_date, cvg_end_date, expenditure_date])
+            if cursor.rowcount != 0:
+                aggregate_amount = cursor.fetchone()[0]
+                if not aggregate_amount:
+                    aggregate_amount = 0.0
+        return JsonResponse({"aggregate_general_elec_exp": float(expenditure_amount)+float(aggregate_amount)}, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        logger.debug(e)
+        return Response("The get_aggregate_general_elec_exp API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
+    try:
+        start_date = None
+        end_date = None
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (SELECT e.cand_office, e.cand_office_state, e.cand_office_district FROM public.entity e 
+                WHERE e.cmte_id in ('C00000000') 
+                AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s) 
+                AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = %s AND e.delete_ind is distinct from 'Y') as t""",
+                [cmte_id, beneficiary_cand_id])
+            cand = cursor.fetchone()[0]
+            logger.debug('Candidate Office Data: ' + str(cand))
+        if cand:
+            cand = cand[0]
+            if cand['cand_office'] == 'H':
+                add_year = 1
+                if not(cand['cand_office_state'] and cand['cand_office_district']):
+                    raise Exception("The candidate details for candidate Id: {} are missing: office state and district".format(beneficiary_cand_id))
+            elif cand['cand_office'] == 'S':
+                add_year = 5
+                if not cand['cand_office_state']:
+                    raise Exception("The candidate details for candidate Id: {} are missing: office state".format(beneficiary_cand_id))
+                cand['cand_office_district'] = None
+            elif cand['cand_office'] == 'P':
+                add_year = 3
+                cand['cand_office_state'] = None
+                cand['cand_office_district'] = None
+            else:
+                raise Exception("The candidate id: {} does not belong to either Senate, House or Presidential office. Kindly check cand_office in entity table for details".format(beneficiary_cand_id))
+        else:
+            raise Exception("The candidate Id: {} is not present in the entity table.".format(beneficiary_cand_id))
+        election_year_list = get_election_year(cand['cand_office'], cand['cand_office_state'], cand['cand_office_district'])
+        logger.debug('Election years based on FEC API:' + str(election_year_list))
+        expenditure_year =  datetime.datetime.strptime(expenditure_date, '%m/%d/%Y').date().year
+        for i, val in enumerate(election_year_list):
+            if i == len(election_year_list)-2:
+                break
+            if election_year_list[i+1]<expenditure_year and expenditure_year<=election_year_list[i]:
+                end_date = datetime.date(election_year_list[i], 12, 31)
+                start_year = election_year_list[i]-add_year
+                start_date = datetime.date(start_year, 1, 1)
+        if not end_date:
+            if datetime.datetime.now().year%2 == 1:
+                end_year = datetime.datetime.now().year+add_year
+                end_date = datetime.date(end_year, 12, 31)
+                start_date = datetime.date(datetime.datetime.now().year, 1, 1)
+            else:
+                end_date = datetime.date(datetime.datetime.now().year, 12, 31)
+                start_year = datetime.datetime.now().year-add_year
+                start_date = datetime.date(start_year, 1, 1)
+        return start_date, end_date
+    except Exception as e:
+        logger.debug(e)
+        raise Exception("The agg_dates function is throwing an error: " + str(e))
 
+def update_aggregate_general_elec_exp(cmte_id, beneficiary_cand_id, expenditure_date):
+    try:
+        aggregate_amount = 0.0
+        # expenditure_date = datetime.datetime.strptime(expenditure_date, '%Y-%m-%d').date()
+        cvg_start_date, cvg_end_date = agg_dates(cmte_id, beneficiary_cand_id, expenditure_date)
+        transaction_list = get_SF_transactions_candidate(cvg_start_date, cvg_end_date, beneficiary_cand_id)
+        for transaction in transaction_list:
+            if transaction['memo_code'] != 'X':
+                aggregate_amount += float(transaction['expenditure_amount'])
+            if transaction['expenditure_date'] >= expenditure_date:
+                put_aggregate_SF(aggregate_amount, transaction['transaction_id'])
+    except Exception as e:
+        logger.debug(e)
+        raise Exception("The update_aggregate_general_elec_exp API is throwing an error: " + str(e))
 
+def get_SF_transactions_candidate(start_date, end_date, beneficiary_cand_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (SELECT t1.transaction_id, t1.expenditure_date, t1.expenditure_amount, 
+                t1.aggregate_general_elec_exp, t1.memo_code FROM public.sched_f t1 WHERE t1.payee_cand_id = %s AND t1.expenditure_date >= %s AND 
+                t1.expenditure_date <= %s AND t1.delete_ind is distinct FROM 'Y' 
+                AND (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id) is distinct FROM 'Y'
+                ORDER BY t1.expenditure_date ASC, t1.create_date ASC) t""", [beneficiary_cand_id, start_date, end_date])
+            if cursor.rowcount == 0:
+                transaction_list = []
+            else:
+                transaction_list = cursor.fetchall()[0][0]
+        logger.debug(transaction_list)
+        return transaction_list
+    except Exception as e:
+        logger.debug(e)
+        raise Exception("The get_SF_transactions_candidate function is throwing an error: " + str(e))
 
+def put_aggregate_SF(aggregate_general_elec_exp, transaction_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor .execute("UPDATE public.sched_f SET aggregate_general_elec_exp = %s WHERE transaction_id = %s", [aggregate_general_elec_exp, transaction_id])
+            if (cursor.rowcount == 0):
+                raise Exception('The Transaction ID: {} does not exist in schedF table'.format(transaction_id))
+    except Exception as e:
+        logger.debug(e)
+        raise Exception("The put_aggregate_SF function is throwing an error: " + str(e))
+
+def get_election_year(office_sought, election_state, election_district):
+    try:
+        if office_sought == 'P':
+            param_string = "&office_sought={}".format(office_sought)
+            add_year = 4
+        elif office_sought == 'S':
+            param_string = "&office_sought={}&election_state={}".format(office_sought, election_state)
+            add_year = 6
+        elif office_sought == 'H':
+            param_string = "&office_sought={}&election_state={}&election_district={}".format(office_sought, election_state, election_district)
+            add_year = 2
+        else:
+            raise Exception('office_sought can only take P,S,H values')
+        i=1
+        results = []
+        election_year_list = []
+        while True:
+            ab = requests.get('https://api.open.fec.gov/v1/election-dates/?sort=-election_date&api_key=50nTHLLMcu3XSSzLnB0hax2Jg5LFniladU5Yf25j&page={}&per_page=100&sort_hide_null=false&sort_nulls_last=false{}'.format(i,param_string))
+            results = results + ab.json()['results']
+            if i == ab.json()['pagination']['pages'] or ab.json()['pagination']['pages'] == 0:
+                break
+            else:
+                i+=1
+        logger.debug('count of FEC election dates API:' + str(len(results)))
+        for result in results:
+            if result['election_year'] not in election_year_list:
+                election_year_list.append(result['election_year'])
+        if election_year_list:
+            election_year_list.sort(reverse = True)
+            if election_year_list[0]+add_year >= datetime.datetime.now().year:
+                election_year_list.insert(0,election_year_list[0]+add_year)
+        return election_year_list
+    except Exception as e:
+        logger.debug(e)
+        raise Exception("The get_election_year function is throwing an error: " + str(e))

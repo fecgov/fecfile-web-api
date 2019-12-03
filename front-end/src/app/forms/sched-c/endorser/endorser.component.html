@@ -17,7 +17,7 @@
   <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
 </ng-template>
 
-<div class="add_new_contact-container">
+<div class="add_new_endorser-container">
   <form [formGroup]="endorserForm">
     <header>
       <div class="header-content">
@@ -284,14 +284,14 @@
               <button class="btn btn-previous btn-left" type="button" (click)="cancelStep()">
                 Cancel
               </button>
-              <button class="btn btn-secondary btn-right" type="button" (click)="saveAndAddMore()">
-                Add Endorsers
-              </button>
-              <button class="btn btn-previous btn-right" type="button"  (click)="goToEndorserSummary()">
-                  Endorser Summary
-              </button>
-              <button class="btn btn-previous btn-right" type="button"  (click)="saveEndorser()">
+<!--               <button class="btn btn-secondary btn-right" type="button"  (click)="goToEndorserSummary()">
+                Endorser Summary
+              </button> -->
+              <button class="btn btn-secondary btn-right" type="button"  (click)="saveEndorser(false)">
                 Save
+              </button>
+              <button class="btn btn-secondary btn-right" type="button" (click)=saveEndorser(true)>
+                Add Endorsers
               </button>
             </div>
           </div>          

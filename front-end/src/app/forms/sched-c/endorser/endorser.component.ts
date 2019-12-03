@@ -1,3 +1,4 @@
+import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
 import { LoanService } from './../service/loan.service';
 import {
   Component,
@@ -58,7 +59,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
   @Input() transactionType = '';
   @Input() transactionDetail: any;
   //@Input() scheduleAction: EndorsersActions = null;
-  @Input() scheduleAction: ScheduleActions = ScheduleActions.add;
+  @Input() scheduleAction: ScheduleActions;
 
   /**
    * Subscription for pre-populating the form for view or edit.
@@ -111,29 +112,31 @@ export class EndorserComponent implements OnInit, OnDestroy {
     private _dialogService: DialogService,
     private _contactsMessageService: ContactsMessageService,
     private _formsService: FormsService,
-    private _loanservice: LoanService
+    private _loanservice: LoanService,
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    this._populateFormSubscription = this._contactsMessageService.getPopulateFormMessage().subscribe(message => {
-      this.populateFormForEditOrView(message);
+/*     this._populateFormSubscription = this._contactsMessageService.getPopulateFormMessage().subscribe(message => {
+      this.populateFormForEdit(message);
       //this.getFormFields();
     });
 
     this._loadFormFieldsSubscription = this._contactsMessageService.getLoadFormFieldsMessage().subscribe(message => {
       //this.getFormFields();
-    });
+    }); */
   }
 
   ngOnInit(): void {
     this._contactToEdit = null;
 
-    localStorage.removeItem('contactsaved');
-
     this._messageService.clearMessage();
 
     this.getFormFields();
+
+    if(!this.scheduleAction){
+      this.scheduleAction = ScheduleActions.add;
+    }
 
     this.endorserForm = this._fb.group({});
     if (this.selectedOptions) {
@@ -141,13 +144,14 @@ export class EndorserComponent implements OnInit, OnDestroy {
         this.formVisible = true;
       }
     }
+
   }
 
   public ngDoCheck(): void { }
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
-    this._populateFormSubscription.unsubscribe();
+    // this._populateFormSubscription.unsubscribe();
     //localStorage.removeItem('contactsaved');
   }
 
@@ -169,13 +173,12 @@ export class EndorserComponent implements OnInit, OnDestroy {
     });
 
 
-    
+
     this.endorserForm = new FormGroup(formGroup);
 
-    if (this._employerOccupationRequired) {
-      // this._listenForAggregateChanges();
+    if (this.scheduleAction === ScheduleActions.edit) {
+      this.populateFormForEdit(this.transactionDetail.endorser);
     }
-
   }
 
 
@@ -203,8 +206,8 @@ export class EndorserComponent implements OnInit, OnDestroy {
 
           //push validators for employer and occupation on amount change. 
           if (fieldName !== 'employer' && fieldName !== 'occupation') {
-              formValidators.push(Validators.required);
-          } 
+            formValidators.push(Validators.required);
+          }
         } else if (validation === 'min') {
           if (validators[validation] !== null) {
             formValidators.push(Validators.minLength(validators[validation]));
@@ -238,13 +241,13 @@ export class EndorserComponent implements OnInit, OnDestroy {
       contributionAmountNum = -Math.abs(contributionAmountNum);
     }
 
-    if(contributionAmountNum > 200){
+    if (contributionAmountNum > 200) {
       this.endorserForm.controls['occupation'].setValidators([Validators.required]);
       this.endorserForm.controls['employer'].setValidators([Validators.required]);
       this.endorserForm.controls['occupation'].updateValueAndValidity();
       this.endorserForm.controls['employer'].updateValueAndValidity();
     }
-    else{
+    else {
       this.endorserForm.controls['occupation'].clearValidators();
       this.endorserForm.controls['employer'].clearValidators();
       this.endorserForm.controls['occupation'].updateValueAndValidity();
@@ -503,67 +506,68 @@ export class EndorserComponent implements OnInit, OnDestroy {
     });
   }
 
-  private populateFormForEditOrView(editOrView: any) {
-    // The action here is the same as the this.scheduleAction
-    // using the field from the message in case there is a race condition with Input().
-    if (editOrView !== null) {
-      if (editOrView.transactionModel) {
-        const formData: EndorserModel = editOrView.transactionModel;
+  private populateFormForEdit(endorser: any) {
+    if (endorser) {
 
-        this.hiddenFields.forEach(el => {
-          if (el.name === 'id') {
-            el.value = formData.id;
-          }
-        });
+      this.endorserForm.patchValue({ first_name: endorser.first_name }, { onlySelf: true });
+      this.endorserForm.patchValue({ last_name: endorser.last_name }, { onlySelf: true });
+      this.endorserForm.patchValue({ middle_name: endorser.middle_name }, { onlySelf: true });
+      this.endorserForm.patchValue({ prefix: endorser.prefix }, { onlySelf: true });
+      this.endorserForm.patchValue({ suffix: endorser.suffix }, { onlySelf: true });
 
-        const nameArray = formData.name.split(',');
-        const firstName = nameArray[1] ? nameArray[1] : null;
-        const lastName = nameArray[0] ? nameArray[0] : null;
-        const middleName = nameArray[2] ? nameArray[2] : null;
-        const prefix = nameArray[3] ? nameArray[3] : null;
-        const suffix = nameArray[4] ? nameArray[4] : null;
+      this.endorserForm.patchValue({ street_1: endorser.street_1 }, { onlySelf: true });
+      this.endorserForm.patchValue({ street_2: endorser.street_2 }, { onlySelf: true });
+      this.endorserForm.patchValue({ city: endorser.city }, { onlySelf: true });
+      this.endorserForm.patchValue({ state: endorser.state }, { onlySelf: true });
+      this.endorserForm.patchValue({ zip_code: endorser.zip_code }, { onlySelf: true });
 
-        this.endorserForm.patchValue({ first_name: firstName.trim() }, { onlySelf: true });
-        this.endorserForm.patchValue({ last_name: lastName.trim() }, { onlySelf: true });
-        this.endorserForm.patchValue({ middle_name: middleName.trim() }, { onlySelf: true });
-        this.endorserForm.patchValue({ prefix: prefix.trim() }, { onlySelf: true });
-        this.endorserForm.patchValue({ suffix: suffix.trim() }, { onlySelf: true });
+      this.endorserForm.patchValue({ employer: endorser.employer }, { onlySelf: true });
+      this.endorserForm.patchValue({ occupation: endorser.occupation }, { onlySelf: true });
 
-        this.endorserForm.patchValue({ entity_type: formData.entity_type }, { onlySelf: true });
-        this.endorserForm.patchValue({ street_1: formData.street1 }, { onlySelf: true });
-        this.endorserForm.patchValue({ street_2: formData.street2 }, { onlySelf: true });
-        this.endorserForm.patchValue({ city: formData.city }, { onlySelf: true });
-        this.endorserForm.patchValue({ state: formData.state }, { onlySelf: true });
-        this.endorserForm.patchValue({ zip_code: formData.zip }, { onlySelf: true });
+      this.endorserForm.patchValue({ contribution_amount: this._decimalPipe.transform(endorser.contribution_amount, '.2-2') }
+        , { onlySelf: true });
+      ;
 
-        this.endorserForm.patchValue({ employer: formData.employer }, { onlySelf: true });
-        this.endorserForm.patchValue({ occupation: formData.occupation }, { onlySelf: true });
-
-        this.endorserForm.patchValue({ phoneNumber: formData.phoneNumber }, { onlySelf: true });
-        this.endorserForm.patchValue({ candOffice: formData.candOffice }, { onlySelf: true });
-        this.endorserForm.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
-        this.endorserForm.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
-
+      if (this._selectedEntity) {
+        this._selectedEntity.entity_id;
       }
+      else {
+        this._selectedEntity = {
+          entity_id: this.transactionDetail.endorser.guarantor_entity_id
+        }
+      }
+
     }
   }
 
   public cancelStep(): void {
     this.endorserForm.reset();
-    this._goToLoan(null)
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_3', 
+      action:ScheduleActions.edit,
+      scheduleType: this.transactionDetail.entryScreenScheduleType,
+      transactionDetail: {
+        transactionModel: this.transactionDetail
+      }
+
+    });
   }
 
-  private _goToLoan(loan:any) {
+
+
+  private _goToLoan(loan: any) {
     const loanRepaymentEmitObj: any = {
       form: {},
-      direction: 'next', 
+      direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
       scheduleType: 'sched_c',
       action: ScheduleActions.add, //TODO fix it later 
       transactionDetail: {
-        transactionModel : {
-          transactionId: loan ? loan.transaction_id : null, 
+        transactionModel: {
+          transactionId: loan ? loan.transaction_id : null,
           entityId: loan ? loan.entity_id : null
         }
       }
@@ -576,36 +580,65 @@ export class EndorserComponent implements OnInit, OnDestroy {
     return fieldName === nameString || fieldName === this._childFieldNamePrefix + nameString;
   }
 
-  public saveEndorser(){
-    const hiddenFieldsObj = {
-      back_ref_transaction_id: this.transactionDetail.transactionId, 
-      entity_id:this._selectedEntity ? this._selectedEntity.entity_id: null
+  public saveEndorser(addmore: boolean = false) {
+    if(!this.endorserForm.valid){
+      this.endorserForm.markAsDirty();
+      this.endorserForm.markAsTouched();
+      window.scrollTo(0, 0);
+      return ;
     }
 
-    this._loanservice.saveSched_C2(this.scheduleAction, this.endorserForm.value,hiddenFieldsObj).subscribe(res => {
+    const hiddenFieldsObj = {
+      back_ref_transaction_id: this.transactionDetail.endorser.back_ref_transaction_id,
+      entity_id: this._selectedEntity ? this._selectedEntity.entity_id : null, 
+      transaction_id: this.transactionDetail.endorser.transaction_id
+    }
+    let endorserObj = this._prepareDataForApiCall();
+
+
+    this._loanservice.saveSched_C2(this.scheduleAction, endorserObj, hiddenFieldsObj).subscribe(res => {
       console.log('success');
       console.log(res);
+      if (!addmore) {
+        this.goToEndorserSummary();
+      }
+      else {
+        this.endorserForm.reset();
+      }
     }, error => {
       console.log(error);
-    
+
     });
   }
 
-  public goToEndorserSummary(){
+  _prepareDataForApiCall() {
+    const endorserObj = this.endorserForm.value;
+    endorserObj.contribution_amount = endorserObj.contribution_amount.replace(/,/g, ``);
+    endorserObj.last_name = this._utilService.extractNameFromEntityObj('last_name', endorserObj.last_name);
+    endorserObj.first_name = this._utilService.extractNameFromEntityObj('first_name', endorserObj.first_name);
+    return endorserObj;
+  }
+
+  public goToEndorserSummary() {
     const loanRepaymentEmitObj: any = {
       form: {},
-      direction: 'next', 
+      direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
       scheduleType: 'sched_c_es',
       action: ScheduleActions.add, //TODO fix it later 
       transactionDetail: {
-        transactionModel : {
-          transactionId: this.transactionDetail.transactionId
+        transactionModel: {
+          endorser:{
+            transaction_id:this.transactionDetail.endorser.transaction_id,
+            back_ref_transaction_id: this.transactionDetail.endorser.back_ref_transaction_id
+          }, 
+          c1Exists: this.transactionDetail.c1Exists
         }
       }
     };
     this.status.emit(loanRepaymentEmitObj);
   }
+
 
 }
