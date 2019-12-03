@@ -1732,7 +1732,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
           }
 
-          // Replace this with clearForm() if possible
+          // Replace this with clearFormValues() if possible or break it into
+          // 2 methods so 1 may be called here so as not to miss init vars.
           this._formSubmitted = true;
           this.memoCode = false;
           this.memoCodeChild = false;
@@ -1746,7 +1747,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._selectedCandidateChangeWarn = null;
           this._selectedCandidateChild = null;
           this._selectedCandidateChangeWarnChild = null;
-          // Replace this with clearForm() if possible - END
+          this.activityEventNames = null;
+          // Replace this with clearFormValues() if possible - END
 
           localStorage.removeItem(`form_${this.formType}_receipt`);
           localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
@@ -1759,8 +1761,31 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             console.log('schedA save has no transaction_id property');
           }
 
+          // UI allows for returning to parent from unsaved child.  If this is the case switch
+          // saveAction from saveForEditSub to saveForAddSub.
+          if (saveAction === SaveActions.saveForEditSub) {
+            let editChild = false;
+            if (res) {
+              if (res.hasOwnProperty('child')) {
+                if (Array.isArray(res.child)) {
+                  if (res.child.length > 0) {
+                    if (res.child[0].hasOwnProperty('transaction_id')) {
+                      if (res.child[0].transaction_id) {
+                        editChild = true;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            if (!editChild) {
+              saveAction = SaveActions.saveForAddSub;
+            }
+          }
+
           // If save is for user click addChild, we are saving parent on behalf of the user
           // before presenting a new sub tran to add.  Save parent id and emit to show new child form.
+
           if (saveAction === SaveActions.saveForAddSub) {
             if (this.scheduleAction === ScheduleActions.add || this.scheduleAction === ScheduleActions.edit) {
               this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([res])[0];
@@ -1922,10 +1947,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   private _progressToChild(scheduleAction: ScheduleActions, res: any): void {
     let childTransactionId = null;
+    let childTransaction = null;
     let apiCall = null;
     if (res.hasOwnProperty('child')) {
       if (Array.isArray(res.child)) {
         if (res.child.length > 0) {
+          childTransaction = res.child[0];
           if (res.child[0].hasOwnProperty('transaction_id')) {
             childTransactionId = res.child[0].transaction_id;
           }
@@ -1942,6 +1969,22 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       transactionModel.type = this.subTransactionInfo.subTransactionTypeDescription;
       transactionModel.transactionTypeIdentifier = this.subTransactionInfo.subTransactionType;
       transactionModel.apiCall = apiCall;
+      // Need a better way to pass a fully populated child TransactionModel.
+      // Until then mapping for additional fields will be done here field by field.
+      if (childTransaction) {
+        let prefix = '';
+        if (childTransaction.hasOwnProperty('contribution_amount')) {
+          prefix = 'contribution_';
+        } else if (childTransaction.hasOwnProperty('expenditure_amount')) {
+          prefix = 'expenditure_';
+        }
+        transactionModel.amount = childTransaction[prefix + 'amount'];
+        transactionModel.date = childTransaction[prefix + 'date'];
+        transactionModel.aggregate = childTransaction[prefix + 'aggregate'];
+        transactionModel.memoCode = childTransaction.memo_code;
+        transactionModel.entityId = childTransaction.entity_id;
+      }
+
       this.memoCode = false;
       this.memoCodeChild = false;
       const emitObj: any = {
@@ -3145,6 +3188,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                         if (this.isFieldName(prop, 'activity_event_type')) {
                           if (trx[prop] !== null || trx[prop] !== 'Select') {
                             this.totalAmountReadOnly = false;
+                            if (this.activityEventTypes) {
+                              for (const activityEvent of this.activityEventTypes) {
+                                if (trx[prop] === activityEvent.eventType) {
+                                  if (activityEvent.scheduleType === 'sched_h2' && activityEvent.hasValue === true) {
+                                    this.activityEventNames = activityEvent.activityEventTypes;
+                                  }
+                                }
+                              }
+                            }
                           }
                         }
                         if (this.isFieldName(prop, 'memo_code')) {
@@ -3178,18 +3230,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                         const patch = {};
                         patch[prop] = trx[prop];
                         this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
-
-                        // if (this.frmIndividualReceipt.get(prop)) {
-                        //   const ctl = this.frmIndividualReceipt.get(prop);
-                        //   if (ctl.disabled) {
-                        //     ctl.enable();
-                        //     this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
-                        //     ctl.disable();
-                        //   } else {
-                        //     this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
-                        //   }
-                        // }
-
                       }
                     }
                   }
@@ -3215,11 +3255,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this._selectedEntityChild = {};
                     this._selectedEntityChild.entity_id = trx[prop];
                   }
-                  // TODO add for _selectedCandidate abd _selectedCandidateChild
+                  // TODO add for _selectedCandidate
                 }
               }
               // loop through props again now that aggregate should be set
-              // and apply contributionAMountChange() formatting, setting, etc.
+              // and apply contributionAmountChange() formatting, setting, etc.
               for (const prop in trx) {
                 if (trx.hasOwnProperty(prop)) {
                   if (this.isFieldName(prop, 'contribution_amount') || this.isFieldName(prop, 'expenditure_amount')) {
@@ -3485,9 +3525,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public populatePurpose(fieldName: string) {
     if (
-      this.transactionType !== 'EAR_REC' &&
-      this.transactionType !== 'CON_EAR_UNDEP' &&
-      this.transactionType !== 'CON_EAR_DEP_1'
+      !this.subTransactionInfo.isEarmark && !this.subTransactionInfo.isParent
+      // this.transactionType !== 'EAR_REC' &&
+      // this.transactionType !== 'CON_EAR_UNDEP' &&
+      // this.transactionType !== 'CON_EAR_DEP_1'
       &&
       this.transactionType !== 'ALLOC_EXP' &&
       this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
@@ -3509,11 +3550,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     const isChildField = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
     if (isChildField) {
-      if (!this.frmIndividualReceipt.contains('purpose_description')) {
+      if (!this.frmIndividualReceipt.get('child*purpose_description')) {
         return;
       }
     } else {
-      if (!this.frmIndividualReceipt.contains('child*purpose_description')) {
+      if (!this.frmIndividualReceipt.get('purpose_description')) {
         return;
       }
     }
@@ -3588,7 +3629,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
       console.log('purpose is: ' + purpose);
       if (purpose !== purposePre) {
-        this.frmIndividualReceipt.patchValue({ purpose_description: purpose }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ 'child*purpose_description': purpose }, { onlySelf: true });
       }
     } else {
       let lastName = '';
@@ -3658,7 +3699,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
       console.log('purpose is: ' + purpose);
       if (purpose !== purposePre) {
-        this.frmIndividualReceipt.patchValue({ 'child*purpose_description': purpose }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ purpose_description: purpose }, { onlySelf: true });
       }
     }
   }
