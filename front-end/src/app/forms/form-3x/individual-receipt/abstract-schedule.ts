@@ -1616,7 +1616,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           field === 'fed_share_amount' ||
           field === 'non_fed_share_amount' ||
           field === 'activity_event_amount_ytd' ||
-          field === 'aggregate_general_elec_exp'
+          field === 'aggregate_general_elec_exp' ||
+          // for H6 fields name
+          field === 'federal_share' ||
+          field === 'levin_share'
         ) {
           // fed_share_amount, non_fed_share_amount, activity_event_amount_ytd
           // Amounts in numeric format shoud be supported by the API.
