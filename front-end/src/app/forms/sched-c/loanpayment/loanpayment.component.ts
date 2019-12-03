@@ -1,3 +1,4 @@
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm, Validators } from '@angular/forms';
@@ -21,7 +22,7 @@ import { DecimalPipe } from '@angular/common';
   templateUrl: './loanpayment.component.html',
   styleUrls: ['./loanpayment.component.scss']
 })
-export class LoanpaymentComponent implements OnInit , OnDestroy{
+export class LoanpaymentComponent implements OnInit, OnDestroy {
 
   @Input() transactionDetail: any;
   @Input() scheduleAction: ScheduleActions = ScheduleActions.add;
@@ -35,8 +36,11 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
   entityTypes: any = [{ code: 'IND', description: 'Individual' }, { code: 'ORG', description: 'Organization' }];
   outstandingLoanBalance: number;
   public _contributionAmountMax = 12;
-  
+
+  private _loanTransactionId;
+
   private _clearFormSubscription: Subscription;
+  editMode: any;
 
 
   constructor(private _cookieService: CookieService,
@@ -48,16 +52,18 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
     private _receiptService: LoanService,
     private _messageService: MessageService,
     private _reportTypeService: ReportTypeService,
-    private _f3xMessageService: F3xMessageService) {
+    private _f3xMessageService: F3xMessageService,
+    private _activatedRoute: ActivatedRoute,
+    private _router: Router) {
 
-      this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
-        if(this.form){
-          this.form.reset();
-          this.initializeForm();
-        }
-      });
-      
-     }
+    this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
+      if (this.form) {
+        this.form.reset();
+        this.initializeForm();
+      }
+    });
+
+  }
 
 
 
@@ -74,19 +80,29 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
     this._messageService.clearMessage();
     this._clearFormSubscription.unsubscribe();
   }
-  
 
-  isIndividual(){
-    if(this.form.control.get('entity_type').value === 'IND'){
+
+  isIndividual() {
+    if (this.form.control.get('entity_type').value === 'IND') {
       return true;
     }
     return false;
   }
-  
+
   private getLoanRepaymentData() {
-    
+
     const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
-    this._loanService.getDataSchedule(reportId, this.transactionDetail.transactionId).subscribe(res => {
+
+
+    if (this.transactionDetail && this.transactionDetail.transactionTypeIdentifier === "LOAN_REPAY_MADE") {
+      this._loanTransactionId = this.transactionDetail.backRefTransactionId;
+    }
+    else {
+      this._loanTransactionId = this.transactionDetail.transactionId;
+    }
+
+
+    this._loanService.getDataSchedule(reportId, this._loanTransactionId).subscribe(res => {
       res = res[0];
       this.selectedEntity = res.entity_type;
 
@@ -106,7 +122,7 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
 
       //remove unnecessary form controls
       this.removeUnnecessaryFormControls();
-      
+
       //validators have to be set after getting current loan metadata to enfore max contribution amount
       this.setupValidators();
 
@@ -195,8 +211,8 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
 
   }
 
-  expenditureAmountChanged(amount:any){
-    this._formatAmount(amount,'expenditure_amount',false);
+  expenditureAmountChanged(amount: any) {
+    this._formatAmount(amount, 'expenditure_amount', false);
   }
 
   private _formatAmount(e: any, fieldName: string, negativeAmount: boolean) {
@@ -224,10 +240,10 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
     this.form.control.patchValue(patch, { onlySelf: true });
   }
 
-   /**
-   * Allow for negative sign and don't allow more than the max
-   * number of digits.
-   */
+  /**
+  * Allow for negative sign and don't allow more than the max
+  * number of digits.
+  */
   private _transformAmount(amount: string, max: number): string {
     if (!amount) {
       return amount;
@@ -282,18 +298,18 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
 
       formData.append('cmte_id', committeeDetails.committeeid);
       formData.append('transaction_type_identifier', 'LOAN_REPAY_MADE');
-      formData.append('back_ref_transaction_id', this.transactionDetail.transactionId);
-      
-      if(this.transactionDetail.entityId){
+      formData.append('back_ref_transaction_id', this._loanTransactionId);
+
+      if (this.transactionDetail.entityId) {
         formData.append('entity_id', this.transactionDetail.entityId);
       }
 
       console.log();
 
-      for (const [key, value] of Object.entries(this.form.controls)){
-        if(value.value !== null){
-          if(typeof value.value === 'string'){
-            formData.append(key,value.value);
+      for (const [key, value] of Object.entries(this.form.controls)) {
+        if (value.value !== null) {
+          if (typeof value.value === 'string') {
+            formData.append(key, value.value);
           }
         }
       }
@@ -350,18 +366,39 @@ export class LoanpaymentComponent implements OnInit , OnDestroy{
     }
   }
 
-  cancelLoanPayment(){
+  cancelLoanPayment() {
+    
+    
+    if (this.transactionDetail.entryScreenScheduleType === 'transactions') {
+      this.goToTransactionsTable();
+    }
+    else {
       this.status.emit({
         form: {},
         direction: 'previous',
-        step: 'step_3', 
-        action:ScheduleActions.edit,
+        step: 'step_3',
+        action: ScheduleActions.edit,
         scheduleType: this.transactionDetail.entryScreenScheduleType,
         transactionDetail: {
           transactionModel: this.transactionDetail
         }
 
       });
+    }
+  }
+
+  private goToTransactionsTable() {
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit
+      ? this._activatedRoute.snapshot.queryParams.edit
+      : true;
+    this._router.navigate([`/forms/form/3X`], {
+      queryParams: {
+        step: 'transactions',
+        reportId: this._reportTypeService.getReportIdFromStorage('3X').toString(),
+        edit: this.editMode,
+        transactionCategory: 'disbursements'
+      }
+    });
   }
 
   private _goToLoanSummary() {

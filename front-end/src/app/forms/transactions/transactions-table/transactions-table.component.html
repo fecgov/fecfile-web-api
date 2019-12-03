@@ -342,6 +342,9 @@
           <th [@fadeInOut] *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
             (click)="changeSortDirection('memoText')">Memo Text
           </th>
+          <th [@fadeInOut] *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')"
+          (click)="changeSortDirection('deletedDate')">Deleted Date
+          </th>
           <th [@fadeInOut] *ngIf="isColumnVisible('committeeId')" [class]="getSortClass('committeeId')"
             (click)="changeSortDirection('committeeId')">Donor Committee ID
           </th>
@@ -413,6 +416,7 @@
             <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+            <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trx.electionCode}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trx.electionYear}}</td>
@@ -473,10 +477,10 @@
             <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
+            <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trxChild.electionCode}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trxChild.electionYear}}</td>
-            <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
             <td>
               <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
                 <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trxChild)">
@@ -1729,7 +1733,7 @@
             </div>
           </div>
           <!--transactionCategory = 'other'-->
-          <div class="container" *ngIf="transactionCategory === 'disbursements'">
+          <div class="container" *ngIf="transactionCategory === 'other'">
             <div class="row">
               <div class="col-md">
                 <div class="checkbox">

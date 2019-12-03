@@ -309,7 +309,7 @@ export class F3xComponent implements OnInit {
               this._cloned = true;
             }
 
-            this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
+            this.extractScheduleType(e);
 
             // Do this before setting scheduleAction to prevent change detection
             // in individual-receipt.component when sched F.
@@ -329,7 +329,7 @@ export class F3xComponent implements OnInit {
               this.scheduleAction = ScheduleActions.add;
             }
 
-            if (this._handleScheduleC(e.transactionDetail)) {
+            if (this._handleScheduleC(e)) {
               return;
             }
 
@@ -435,6 +435,24 @@ export class F3xComponent implements OnInit {
     }
   }
 
+
+  /**
+   * This method should extract the schedule type based on transactionTypeIdentifier in certain
+   * cases. It was being defaulted to sched_a but in case of e.g. sched c, it should be extracted.
+   * Additional use cases can be added to it 
+   * @param e 
+   */
+  private extractScheduleType(e: any) {
+
+    if (e.transactionDetail && e.transactionDetail.transactionModel && 
+      e.transactionDetail.transactionModel.transactionTypeIdentifier === "LOAN_REPAY_MADE") {
+      e.scheduleType = "sched_c_loan_payment";
+    }
+
+    //default to sched_a ?
+    this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
+  }
+
   /**
    * Send a message the child component rather than sending data as input because
    * ngOnChanges fires when the form fields are changed, thereby reseting the
@@ -455,7 +473,8 @@ export class F3xComponent implements OnInit {
    * Handle Schedule C forms.
    * @returns true if schedule C and should stop processing
    */
-  private _handleScheduleC(transactionDetail: any): boolean {
+  private _handleScheduleC(transaction: any): boolean {
+    let transactionDetail = transaction.transactionDetail;
     let finish = false;
     if (
       this.scheduleType === 'sched_c' ||
@@ -480,6 +499,12 @@ export class F3xComponent implements OnInit {
         this.scheduleType = 'sched_c_ls';
         this.scheduleCAction = ScheduleActions.loanSummary;
       } else if (this.scheduleType === 'sched_c_loan_payment') {
+        //this is being done in case loan payment is being accessed from transaction table, 
+        //a flag is needed to return back to the transaction table's 'disbursement tab'
+        //upon clicking cancel, based on the current implementation of loan payments.
+        if (transaction.previousStep === 'transactions'){
+          transactionDetail.transactionModel.entryScreenScheduleType = transaction.previousStep;
+        }
       } else if (this.scheduleType === 'sched_c1') {
         this.forceChangeDetectionC1 = new Date();
       }
