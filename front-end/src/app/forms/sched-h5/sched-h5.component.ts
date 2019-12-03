@@ -477,7 +477,9 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public returnToSum(): void {
 
-    this.addEntries();
+    if(this.h5Ratios.child.length > 0) {
+      this.addEntries();
+    }
 
     this.isSubmit = false;
     this.schedH5.reset();
@@ -493,7 +495,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.receiptDateErr = false;
 
     this.transactionType = 'ALLOC_H5_SUM';
-    this.setH5Sum();
+    //this.setH5Sum();
   }
 
   public returnToAdd(): void {
