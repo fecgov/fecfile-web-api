@@ -177,11 +177,17 @@
                         <td>
                             <input type="checkbox" (click)="checkForMultiChecked($event)">
                         </td>
-                        <td>                           
-                          {{ item.entity_type == 'IND' ?
-                              item.first_name + ' ' + item.last_name :
-                              item.entity_name
-                          }}
+                        <td>
+                            <div class="row td-arrow">
+                              {{ item.entity_type == 'IND' ?
+                                  item.first_name + ' ' + item.last_name :
+                                  item.entity_name
+                              }}
+                            <div >
+                              <i *ngIf="item.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow" (click)="clickArrow(item)"></i>
+                              <i *ngIf="item.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(item)"></i>
+                            </div>
+                          </div>
                         </td>
                         <td>
                             <div *ngIf="item.activity_event_type == 'AD'">Administrative</div>
@@ -192,13 +198,7 @@
                             <div *ngIf="item.activity_event_type == 'PC'">Public Communications Referring Only to Party(Made by PAC)</div>                            
                         </td>
                         <td>
-                          <div class="row td-arrow">
-                            {{ item.activity_event_identifier  }}
-                            <div >
-                              <i *ngIf="item.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow" (click)="clickArrow(item)"></i>
-                              <i *ngIf="item.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(item)"></i>
-                            </div>
-                          </div>
+                            {{ item.activity_event_identifier }}
                         </td>
                         <td>{{ item.expenditure_date | date: 'MM/dd/yyyy' }}</td>   
                         <td>{{ item.fed_share_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
