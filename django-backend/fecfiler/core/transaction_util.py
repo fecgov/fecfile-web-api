@@ -422,7 +422,7 @@ def get_sched_f_child_transactions(report_id, cmte_id, transaction_id):
 
 def get_sched_h4_child_transactions(report_id, cmte_id, transaction_id):
     """
-    load child transactions for sched_f
+    load child transactions for sched_h4
     TODO: those chiuld trnasaction functions can be refatored later on
     """
     _sql = """
@@ -467,7 +467,7 @@ def get_sched_h4_child_transactions(report_id, cmte_id, transaction_id):
 
 def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
     """
-    load child transactions for sched_f
+    load child transactions for sched_h6
     """
     _sql = """
     SELECT             

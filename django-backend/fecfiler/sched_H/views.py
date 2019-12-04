@@ -26,7 +26,10 @@ from fecfiler.core.transaction_util import (
     transaction_exists,
     update_sched_d_parent,
     cmte_type,
+    get_sched_h4_child_transactions,
+    get_sched_h6_child_transactions,
 )
+
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
 
@@ -2580,8 +2583,11 @@ def get_schedH4(data):
         # TODO: temp change, need to reove this code when h4, h6 schedma updated  
         for obj in forms_obj:
             obj['expenditure_purpose'] = obj.get('purpose', '')
+            child_data = get_sched_h4_child_transactions(obj.get('report_id'), obj.get('cmte_id'), obj.get('transaction_id'))
+            if child_data:
+                obj['child'] = child_data
 
-        return forms_obj
+        return forms_ob
     except:
         raise
 
@@ -3841,7 +3847,9 @@ def get_schedH6(data):
             obj['non_fed_share_amount'] = obj.get('levin_share')
             obj['total_amount'] = obj.get('total_fed_levin_amount')
             obj['activity_event_amount_ytd'] = obj.get('activity_event_total_ytd')
-
+            child_data = get_sched_h6_child_transactions(obj.get('report_id'), obj.get('cmte_id'), obj.get('transaction_id'))
+            if child_data:
+                obj['child'] = child_data
         return forms_obj
     except:
         raise

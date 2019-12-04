@@ -28,6 +28,7 @@ from fecfiler.core.views import (
     undo_delete_entities,
     check_calendar_year,
     get_cvg_dates,
+    get_levin_account,
 )
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
@@ -115,7 +116,11 @@ def schedL_sql_dict(data):
         "coh_cop_ytd",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        # if 'levin_account_id' in data:
+        #     valid_data['record_id'] = data.get('levin_account_id')
+        #     levin_account = get_levin_account(data.get)
+        return valid_data
     except:
         raise Exception("invalid request data.")
 
@@ -285,7 +290,6 @@ def post_sql_schedL(data):
             cvg_end_date,
             item_receipts,
             unitem_receipts,
-            ttl_receipts,
             other_receipts,
             total_receipts,
             voter_reg_disb_amount,
@@ -302,7 +306,6 @@ def post_sql_schedL(data):
             coh_cop,
             item_receipts_ytd,
             unitem_receipts_ytd,
-            total_reciepts_ytd,
             other_receipts_ytd,
             total_receipts_ytd,
             voter_reg_disb_amount_ytd,
@@ -317,12 +320,12 @@ def post_sql_schedL(data):
             sub_total_ytd,
             disbursements_ytd,
             coh_cop_ytd,
-            create_date ,
+            create_date,
             last_update_date 
             )
         VALUES ({})
         """.format(
-            ",".join(["%s"] * 45)
+            ",".join(["%s"] * 43)
         )
         _v = (
             data.get("cmte_id"),
@@ -336,7 +339,6 @@ def post_sql_schedL(data):
             data.get("cvg_end_date"),
             data.get("item_receipts"),
             data.get("unitem_receipts"),
-            data.get("ttl_receipts"),
             data.get("other_receipts"),
             data.get("total_receipts"),
             data.get("voter_reg_disb_amount"),
@@ -353,7 +355,6 @@ def post_sql_schedL(data):
             data.get("coh_cop"),
             data.get("item_receipts_ytd"),
             data.get("unitem_receipts_ytd"),
-            data.get("total_reciepts_ytd"),
             data.get("other_receipts_ytd"),
             data.get("total_receipts_ytd"),
             data.get("voter_reg_disb_amount_ytd"),
@@ -412,7 +413,6 @@ def get_list_all_schedL(report_id, cmte_id):
             cvg_end_date,
             item_receipts,
             unitem_receipts,
-            ttl_receipts,
             other_receipts,
             total_receipts,
             voter_reg_disb_amount,
@@ -429,7 +429,6 @@ def get_list_all_schedL(report_id, cmte_id):
             coh_cop,
             item_receipts_ytd,
             unitem_receipts_ytd,
-            total_reciepts_ytd,
             other_receipts_ytd,
             total_receipts_ytd,
             voter_reg_disb_amount_ytd,
@@ -483,7 +482,6 @@ def get_list_schedL(report_id, cmte_id, transaction_id):
             cvg_end_date,
             item_receipts,
             unitem_receipts,
-            ttl_receipts,
             other_receipts,
             total_receipts,
             voter_reg_disb_amount,
@@ -500,7 +498,6 @@ def get_list_schedL(report_id, cmte_id, transaction_id):
             coh_cop,
             item_receipts_ytd,
             unitem_receipts_ytd,
-            total_reciepts_ytd,
             other_receipts_ytd,
             total_receipts_ytd,
             voter_reg_disb_amount_ytd,
@@ -569,6 +566,7 @@ def schedL(request):
     if request.method == "POST":
         try:
             cmte_id = request.user.username
+
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -577,9 +575,18 @@ def schedL(request):
             else:
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
+            logger.debug('sched_l POST with data:{}'.format(request.data))
             datum = schedL_sql_dict(request.data)
+            logger.debug(datum)
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
+            # populate levin account info: record_id is levin_account_id
+            if 'levin_account_id' in request.data:
+                levin_acct_id = request.data.get('levin_account_id')
+                datum['record_id'] = levin_acct_id
+                levin_account = get_levin_account(cmte_id, levin_acct_id)
+                if levin_account:
+                    datum['account_name'] = levin_account[0].get('levin_account_name')
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
@@ -680,7 +687,12 @@ def schedL(request):
             # end of handling
             datum["report_id"] = report_id
             datum["cmte_id"] = request.user.username
-
+            if 'levin_account_id' in request.data:
+                levin_acct_id = request.data.get('levin_account_id')
+                datum['record_id'] = levin_acct_id
+                levin_account = get_levin_account(cmte_id, levin_acct_id)
+                if levin_account:
+                    datum['account_name'] = levin_account[0].get('levin_account_name')
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
             # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
