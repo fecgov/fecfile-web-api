@@ -345,6 +345,37 @@ export class IndividualReceiptService {
     });
   }
 
+  public getSchedFPaymentAggregate(
+    reportId: string,
+    entityId: number,
+    cmteId: string,
+    transactionTypeIdentifier: string,
+    contributionDate: string
+  ): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/sa/contribution_aggregate';
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('report_id', reportId);
+    if (entityId) {
+      params = params.append('entity_id', entityId.toString());
+    }
+    if (cmteId) {
+      params = params.append('cmte_id', cmteId.toString());
+    }
+    params = params.append('transaction_type_identifier', transactionTypeIdentifier);
+    params = params.append('contribution_date', contributionDate);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+  }
+
   public getFedNonFedPercentage__(amount: string, activityEvent: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sh1/get_h1_percentage';

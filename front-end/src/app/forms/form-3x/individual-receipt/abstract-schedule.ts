@@ -129,13 +129,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _contributionAmount = '';
   private _contributionAmountChlid = '';
   private readonly _memoCodeValue: string = 'X';
-  private _selectedEntity: any;
+  protected _selectedEntity: any;
   private _selectedEntityChild: any;
-  private _selectedCandidate: any;
+  protected _selectedCandidate: any;
   private _selectedCandidateChild: any;
-  private _selectedChangeWarn: any;
+  protected _selectedChangeWarn: any;
   private _selectedChangeWarnChild: any;
-  private _selectedCandidateChangeWarn: any;
+  protected _selectedCandidateChangeWarn: any;
   private _selectedCandidateChangeWarnChild: any;
   private _contributionAmountMax: number;
   private _transactionToEdit: TransactionModel;
@@ -158,7 +158,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
-    private _utilService: UtilService,
+    protected _utilService: UtilService,
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
     private _decimalPipe: DecimalPipe,
@@ -2045,7 +2045,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private _setSetEntityIdTo(userSelectedEntity: any, col: any) {
+  protected _setSetEntityIdTo(userSelectedEntity: any, col: any) {
     if (col.setEntityIdTo) {
       userSelectedEntity.setEntityIdTo = col.setEntityIdTo;
     }
@@ -2770,11 +2770,30 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.frmIndividualReceipt.controls[fieldName].setValidators([Validators.required]);
           this.frmIndividualReceipt.controls[fieldName].updateValueAndValidity();
         }
-        if (this._selectedEntity) {
-          if (this._selectedEntity.entity_id) {
-            const contribDate = this._utilService.formatDate(dateValue);
-            if (fieldName === 'contribution_date') {
-              this._getContributionAggregate(contribDate, this._selectedEntity.entity_id, null);
+        if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+          // if (this._selectedCandidate) {
+          //   if (this._selectedCandidate.entity_id) {
+          //     const contribDate = this._utilService.formatDate(dateValue);
+          //     if (fieldName === 'expenditure_date') {
+          //       this._getSchedFDebtPaymentAggregate(contribDate, this._selectedCandidate.entity_id, null);
+          //     }
+          //   }
+          // }
+          if (this._selectedEntity) {
+            if (this._selectedEntity.entity_id) {
+              const contribDate = this._utilService.formatDate(dateValue);
+              if (fieldName === 'expenditure_date') {
+                this._getSchedFDebtPaymentAggregate(contribDate, this._selectedEntity.entity_id, null);
+              }
+            }
+          }
+        } else {
+          if (this._selectedEntity) {
+            if (this._selectedEntity.entity_id) {
+              const contribDate = this._utilService.formatDate(dateValue);
+              if (fieldName === 'contribution_date') {
+                this._getContributionAggregate(contribDate, this._selectedEntity.entity_id, null);
+              }
             }
           }
         }
@@ -3749,6 +3768,40 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         );
 
         this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
+      });
+  }
+
+  /**
+   * Get the aggregate for Schedule F Debt Payment.  It is similar to _getContributionAggregate().
+   */
+  private _getSchedFDebtPaymentAggregate(contribDate: string, entityId: number, cmteId: string) {
+    const reportId = this._receiptService.getReportIdFromStorage(this.formType);
+    this._receiptService
+      .getSchedFPaymentAggregate(reportId, entityId, cmteId, this.transactionType, contribDate)
+      .subscribe(res => {
+        const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
+
+        let contributionAggregate: string = String(res.contribution_aggregate);
+        contributionAggregate = contributionAggregate ? contributionAggregate : '0';
+        this._contributionAggregateValue = parseFloat(contributionAggregate);
+
+        let transactionDate = null;
+        if (this.frmIndividualReceipt.get('expenditure_date')) {
+          transactionDate = this.frmIndividualReceipt.get('expenditure_date').value;
+        }
+        const aggregateValue: string = this._receiptService.determineAggregate(
+          this._contributionAggregateValue,
+          contributionAmountNum,
+          this.scheduleAction,
+          this.memoCode,
+          this._selectedCandidate,
+          this._transactionToEdit,
+          this.transactionType,
+          this._isSubOfParent(),
+          transactionDate
+        );
+
+        this.frmIndividualReceipt.patchValue({ aggregate_general_elec_exp: aggregateValue }, { onlySelf: true });
       });
   }
 
