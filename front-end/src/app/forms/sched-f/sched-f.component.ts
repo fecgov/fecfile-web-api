@@ -115,13 +115,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   public ngOnChanges(changes: SimpleChanges) {
     this.showPart2 = false;
     this._setTransactionDetail();
-
     super.ngOnChanges(null);
-
-    // if (this._prePopulateFromSchedDData && this.scheduleAction === ScheduleActions.addSubTransaction) {
-    //   this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
-    //   this._prePopulateFromSchedDData = null;
-    // }
   }
 
   public ngOnDestroy(): void {
@@ -135,10 +129,10 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     this.saveAndReturnToParent();
   }
 
+  /**
+   * Proceed to 2nd part of the payment.
+   */
   public next() {
-    // TODO add this in once the form fields are displaying red when in error.
-    // check all page 1 for valid
-
     this.frmIndividualReceipt.markAsTouched();
 
     if (!this._checkFormFieldIsValid('coordinated_exp_ind')) {
@@ -176,9 +170,26 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     this.showPart2 = true;
   }
 
+  /**
+   * Return to the first part of the payment.
+   */
   public back() {
     this.showPart2 = false;
   }
+
+  // /**
+  //  * Special handling for Sched F Payment Aggregate.
+  //  * @param $event
+  //  * @param col
+  //  */
+  // public handleOnBlurEvent($event: any, col: any) {
+  //   if (this.isFieldName(col.name, 'aggregate_general_elec_exp')) {
+  //     // this.contributionAmountChange($event, col.name, col.validation.dollarAmountNegative);
+  //     this.frmIndividualReceipt.patchValue({ aggregate_general_elec_exp: 111.11 }, { onlySelf: true });
+  //   } else {
+  //     super.handleOnBlurEvent($event, col);
+  //   }
+  // }
 
   /**
    * Returns true if the field is valid.
@@ -216,6 +227,10 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
     // Don't auto-populate committee fields for sched F payment
     if (col.name === 'payee_cmte_id') {
+      // const entity = $event.item;
+      // this._selectedCandidate = this._utilService.deepClone(entity);
+      // this._setSetEntityIdTo(this._selectedCandidate, col);
+      // this._selectedCandidateChangeWarn = {};
     } else {
       super.handleSelectedOrg($event, col);
     }
@@ -265,10 +280,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   public handleSelectedSFCommittee($event: NgbTypeaheadSelectItemEvent, name: string) {
     const entity = $event.item;
 
-    // this._selectedEntity = this._utilService.deepClone(entity);
-    // this._setSetEntityIdTo(this._selectedEntity, col);
-    // this._selectedChangeWarn = {};
-
     const fieldNames = [];
     if (name === 'designating_cmte_id' || name === 'designating_cmte_name') {
       if (name === 'designating_cmte_id') {
@@ -276,8 +287,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
       } else {
         fieldNames.push({ formName: 'designating_cmte_id', entityFieldName: 'cmte_id' });
       }
-      // fieldNames.push({ formName: 'designating_cmte_id', entityFieldName: 'cmte_id' });
-      // fieldNames.push({ formName: 'designating_cmte_name', entityFieldName: 'cmte_name' });
     } else if (name === 'subordinate_cmte_id' || name === 'subordinate_cmte_name') {
       fieldNames.push({ formName: 'subordinate_cmte_id', entityFieldName: 'cmte_id' });
       fieldNames.push({ formName: 'subordinate_cmte_name', entityFieldName: 'cmte_name' });
@@ -288,30 +297,11 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
       fieldNames.push({ formName: 'subordinate_cmte_zip', entityFieldName: 'zip_code' });
     }
     this._patchSubordinateFormFields(fieldNames, entity);
-
-    // // setting Beneficiary Candidate Entity Id to hidden variable
-    // const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
-    // if (beneficiaryCandEntityIdHiddenField) {
-    //   beneficiaryCandEntityIdHiddenField.value = entity.beneficiary_cand_entity_id;
-    // }
-
-    // // These fields names do not map to the same name in the form
-    // const fieldName = col.name;
-    // if (fieldName === 'entity_name' || fieldName === 'donor_cmte_id' || fieldName === 'beneficiary_cmte_id') {
-    //   // populate org/committee fields
-    //   if (fieldName === 'entity_name') {
-    //     if (this.frmIndividualReceipt.controls['donor_cmte_id']) {
-    //       this.frmIndividualReceipt.patchValue({ donor_cmte_id: entity.cmte_id }, { onlySelf: true });
-    //     } else if (this.frmIndividualReceipt.controls['beneficiary_cmte_id']) {
-    //       this.frmIndividualReceipt.patchValue({ beneficiary_cmte_id: entity.cmte_id }, { onlySelf: true });
-    //     }
-    //   }
-    //   if (fieldName === 'donor_cmte_id' || fieldName === 'beneficiary_cmte_id') {
-    //     this.frmIndividualReceipt.patchValue({ entity_name: entity.cmte_name }, { onlySelf: true });
-    //   }
-    // }
   }
 
+  /**
+   * Cancel the payment and return to the start or first part.
+   */
   public cancelSFPayment() {
     this.showPart2 = false;
     this.clearFormValues();
