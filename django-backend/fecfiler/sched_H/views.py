@@ -2209,7 +2209,9 @@ def put_schedH4(data):
         )
         try:
             put_sql_schedH4(data)
-            update_activity_event_amount_ytd(data)
+            # update ytd aggregation if not memo transaction
+            if not data.get('transaction_type_identifier').endswith('_MEMO'):
+                update_activity_event_amount_ytd(data)
                         
             # if debt payment, update parent sched_d
             if data.get('transaction_type_identifier') == 'ALLOC_EXP_DEBT':
@@ -2303,7 +2305,7 @@ def validate_parent_transaction_exist(data):
 def validate_fed_nonfed_share(data):
     # remove ',' in the number if number is passed in as string
     for _rec in ['fed_share_amount', 'non_fed_share_amount', 'total_amount']:
-        if ',' in data.get(_rec):
+        if ',' in str(data.get(_rec)):
             data[_rec] = data[_rec].replace(',','')
     if (float(data.get('fed_share_amount')) + 
         float(data.get('non_fed_share_amount')) != float(data.get('total_amount'))):
@@ -2487,7 +2489,10 @@ def post_schedH4(data):
         validate_sh4_data(data)
         try:
             post_sql_schedH4(data)
-            update_activity_event_amount_ytd(data)
+            # update ytd aggregation if not memo transaction
+            if not data.get('transaction_type_identifier').endswith('_MEMO'):
+                logger.info('update ytd amount...')
+                update_activity_event_amount_ytd(data)
 
             # sched_d debt payment, need to update parent
             if data.get('transaction_type_identifier') == 'ALLOC_EXP_DEBT':
@@ -3545,6 +3550,9 @@ def put_schedH6(data):
         )
         try:
             put_sql_schedH6(data)
+            # update ytd aggregation if not memo transaction
+            if not data.get('transaction_type_identifier').endswith('_MEMO'):
+                update_activity_event_amount_ytd_h6(data)
             update_activity_event_amount_ytd_h6(data)
 
             # if debt payment, update parent sched_d
@@ -3629,7 +3637,7 @@ def validate_sh6_data(data):
     """
     check_mandatory_fields_SH6(data)
     for _rec in ['levin_share', 'federal_share', 'total_fed_levin_amount']:
-        if ',' in data.get(_rec, ''):
+        if ',' in str(data.get(_rec, '')):
             # logger.debug(data.get(_rec))
             data[_rec] = data[_rec].replace(',', '')
 
@@ -3807,7 +3815,9 @@ def post_schedH6(data):
         validate_sh6_data(data)
         try:
             post_sql_schedH6(data)
-            update_activity_event_amount_ytd_h6(data)
+            # update ytd aggregation if not memo transaction
+            if not data.get('transaction_type_identifier').endswith('_MEMO'):
+                update_activity_event_amount_ytd_h6(data)
             if data.get('transaction_type_identifier') == 'ALLOC_FEA_DISB_DEBT':
                 update_sched_d_parent(
                     data.get('cmte_id'),
