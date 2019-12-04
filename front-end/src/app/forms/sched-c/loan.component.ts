@@ -920,8 +920,15 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           LoanObj[field] = this.frmLoan.get(field).value;
         }
         //also add transactionId if available (edit route)
-        if (this.scheduleAction === ScheduleActions.edit && this.transactionDetail && this.transactionDetail.transaction_id) {
-          LoanObj['transaction_id'] = this.transactionDetail.transaction_id;
+        if (this.scheduleAction === ScheduleActions.edit && this.transactionDetail) {
+          if(this.transactionDetail.transaction_id){
+            LoanObj['transaction_id'] = this.transactionDetail.transaction_id;
+          }
+          //in some instances, transaction_id is being passed as 'transactionId'
+          //TODO - need to combine/standardize the attribute names.
+          else if(this.transactionDetail.transactionId){
+            LoanObj['transaction_id'] = this.transactionDetail.transactionId;
+          }
         }
       }
 

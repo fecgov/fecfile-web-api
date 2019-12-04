@@ -1,3 +1,4 @@
+import { LoanService } from './../../sched-c/service/loan.service';
 import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router, NavigationStart, RoutesRecognized } from '@angular/router';
@@ -23,6 +24,7 @@ import { IndividualReceiptService } from '../../form-3x/individual-receipt/indiv
 import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
 import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { filter } from 'rxjs/operators';
+import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
 
 const transactionCategoryOptions = [];
 
@@ -143,7 +145,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _receiptService: IndividualReceiptService,
-    private _transactionTypeService: TransactionTypeService
+    private _transactionTypeService: TransactionTypeService, 
+    private _loanService: LoanService
   ) {
     this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
@@ -1354,7 +1357,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'electionYear'
       ];
     } else if (this.transactionCategory === 'loans-and-debts') {
-      defaultSortColumns = ['type', 'name', 'loanClosingBalance', 'loanBalance'];
+      defaultSortColumns = ['type', 'name', 'loanClosingBalance', 'loanBalance','loanIncurredDate'];
       otherSortColumns = [
         'transactionId',
         'street',
@@ -1366,10 +1369,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'purposeDescription',
         'loanBeginningBalance',
         'loanAmount',
-        'loanClosingBalance',
+        // 'loanClosingBalance',
         'loanDueDate',
         'loanIncurredAmt',
-        'loanIncurredDate',
         'loanPaymentAmt',
         'loanPaymentToDate'
       ];
@@ -1403,5 +1405,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.numberOfPages = Math.ceil(this.numberOfPages);
       }
     }
+  }
+
+  public goToC1(trx:any) {
+    trx.scheduleType='sched_c1';
+    this.editTransaction(trx);
+  }
+
+  public goToEndorsersSummary(trx:any){
+    trx.scheduleType="sched_c_es";
+    trx.endorser = {back_ref_transaction_id: trx.transactionId};
+    this.editTransaction(trx);
   }
 }

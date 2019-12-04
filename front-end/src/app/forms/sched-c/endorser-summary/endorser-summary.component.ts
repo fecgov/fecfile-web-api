@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -153,6 +153,11 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
 
     this.getPage(this.config.currentPage);
+  }
+
+  public ngOnChanges(changes:SimpleChanges){
+    console.log('this.ngOnChanges is called');
+    this.ngOnInit();
   }
 
   public goToPage(pageEvent: any){
