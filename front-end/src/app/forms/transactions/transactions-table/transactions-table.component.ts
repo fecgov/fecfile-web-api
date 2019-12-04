@@ -548,7 +548,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this._transactionsService.addUIFileds(res);
 
-        this.transactionsModel = res.transactions;
+        // this.transactionsModel = res.transactions;
+
+        const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
+        this.transactionsModel = transactionsModelL;
 
         // handle non-numeric amounts
         // TODO handle this server side in API

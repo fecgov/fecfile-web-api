@@ -258,13 +258,15 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     if(item.arrow_dir === 'down') {
       let indexRep = this.schedH4sModel.indexOf(item);
       if (indexRep > -1) {
-        const tmp: SchedH4Model = this.schedH4sModelL.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id});
-        this.schedH4sModel.splice(indexRep + 1, 0, tmp);
+        let tmp: Array<SchedH4Model> = this.schedH4sModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id);
+        for(let entry of tmp) {
+          entry.arrow_dir = 'show';
+          this.schedH4sModel.splice(indexRep + 1, 0, entry);
+          indexRep++;
+        }
         this.tableConfig.totalItems = this.schedH4sModel.length;
       }
-
       this.schedH4sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'up';
-      this.schedH4sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id}).arrow_dir = 'show';
       
     }else if(item.arrow_dir === 'up') {
       //this.schedH4sModel = this.schedH4sModel.filter(obj => obj.memo_code !== 'X');

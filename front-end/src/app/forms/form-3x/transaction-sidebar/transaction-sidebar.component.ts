@@ -88,11 +88,12 @@ export class TransactionSidebarComponent implements OnInit {
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
+    this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
     this._transactionTypeService.getTransactionCategories(this._formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
         this.cashOnHand = res.data.cashOnHand;
-        this.reportId = res.data.id ? res.data.id : 0;
+        // this.reportId = res.data.id ? res.data.id : 0;
       }
       for (
         let transactionCategorieIndex = 0;

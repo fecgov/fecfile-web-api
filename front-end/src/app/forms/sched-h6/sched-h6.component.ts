@@ -247,13 +247,16 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     if(item.arrow_dir === 'down') {
       let indexRep = this.schedH6sModel.indexOf(item);
       if (indexRep > -1) {
-        const tmp: SchedH6Model = this.schedH6sModelL.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id});
-        this.schedH6sModel.splice(indexRep + 1, 0, tmp);
+        let tmp: Array<SchedH6Model> = this.schedH6sModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id);
+        for(let entry of tmp) {
+          entry.arrow_dir = 'show';
+          this.schedH6sModel.splice(indexRep + 1, 0, entry);
+          indexRep++;
+        }
         this.tableConfig.totalItems = this.schedH6sModel.length;
       }
 
       this.schedH6sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'up';
-      this.schedH6sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id}).arrow_dir = 'show';
       
     }else if(item.arrow_dir === 'up') {
       //this.schedH6sModel = this.schedH6sModel.filter(obj => obj.memo_code !== 'X');

@@ -2298,6 +2298,10 @@ def validate_parent_transaction_exist(data):
         pass
 
 def validate_fed_nonfed_share(data):
+    # remove ',' in the number if number is passed in as string
+    for _rec in ['fed_share_amount', 'non_fed_share_amount', 'total_amount']:
+        if ',' in data.get(_rec):
+            data[_rec] = data[_rec].replace(',','')
     if (float(data.get('fed_share_amount')) + 
         float(data.get('non_fed_share_amount')) != float(data.get('total_amount'))):
         raise Exception('Error: fed_amount and non_fed_amount should sum to total amount.')
@@ -3618,6 +3622,11 @@ def validate_sh6_data(data):
     validate sH6 json data
     """
     check_mandatory_fields_SH6(data)
+    for _rec in ['levin_share', 'federal_share', 'total_fed_levin_amount']:
+        if ',' in data.get(_rec, ''):
+            # logger.debug(data.get(_rec))
+            data[_rec] = data[_rec].replace(',', '')
+
 
 
 def post_sql_schedH6(data):
@@ -3766,6 +3775,7 @@ def post_schedH6(data):
     """
     try:
         # check_mandatory_fields_SH6(datum, MANDATORY_FIELDS_SCHED_H6o)
+        logger.debug('saving h6 with data:{}'.format(data))
         if "entity_id" in data:
             get_data = {
                 "cmte_id": data.get("cmte_id"),
@@ -3782,7 +3792,7 @@ def post_schedH6(data):
         else:
             entity_data = post_entities(data)
             roll_back = False
-
+        logger.debug('entity saved.')
         # continue to save transaction
         entity_id = entity_data.get("entity_id")
         data['entity_id'] = entity_id
@@ -3981,6 +3991,7 @@ def schedH6(request):
                 data = put_schedH6(datum)
             else:
                 # print(datum)
+                print('post new h6 with data:{}'.format(datum))
                 data = post_schedH6(datum)
             # Associating child transactions to parent and storing them to DB
             output = get_schedH6(data)
