@@ -129,13 +129,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _contributionAmount = '';
   private _contributionAmountChlid = '';
   private readonly _memoCodeValue: string = 'X';
-  protected _selectedEntity: any;
+  private _selectedEntity: any;
   private _selectedEntityChild: any;
-  protected _selectedCandidate: any;
+  private _selectedCandidate: any;
   private _selectedCandidateChild: any;
-  protected _selectedChangeWarn: any;
+  private _selectedChangeWarn: any;
   private _selectedChangeWarnChild: any;
-  protected _selectedCandidateChangeWarn: any;
+  private _selectedCandidateChangeWarn: any;
   private _selectedCandidateChangeWarnChild: any;
   private _contributionAmountMax: number;
   private _transactionToEdit: TransactionModel;
@@ -158,7 +158,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
-    protected _utilService: UtilService,
+    private _utilService: UtilService,
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
     private _decimalPipe: DecimalPipe,
@@ -2301,11 +2301,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (beneficiaryCandEntityIdHiddenField) {
       beneficiaryCandEntityIdHiddenField.value = entity.beneficiary_cand_entity_id;
     }
-    // for (const field of fieldNames) {
-    //   const patch = {};
-    //   patch[namePrefix + field] = entity[field];
-    //   this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
-    // }
+
+    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+      if (this.frmIndividualReceipt.contains('expenditure_date')) {
+        if (this._selectedCandidate) {
+          if (this._selectedCandidate.beneficiary_cand_id) {
+            const dateValue = this.frmIndividualReceipt.get('expenditure_date').value;
+            const expenditureDate = this._utilService.formatDate(dateValue);
+            this._getSchedFDebtPaymentAggregate(this._selectedCandidate.beneficiary_cand_id,
+              expenditureDate, this._selectedCandidate.beneficiary_cand_entity_id);
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -2731,7 +2739,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   /**
    * Apply business rules when date changes.
    *
-   * @param fieldName the date field ane in the form.
+   * @param fieldName the date field name in the form.
    */
   public dateChange(fieldName: string) {
     console.log('date has changed!');
@@ -2774,19 +2782,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.frmIndividualReceipt.controls[fieldName].updateValueAndValidity();
         }
         if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
-          // if (this._selectedCandidate) {
-          //   if (this._selectedCandidate.entity_id) {
-          //     const contribDate = this._utilService.formatDate(dateValue);
-          //     if (fieldName === 'expenditure_date') {
-          //       this._getSchedFDebtPaymentAggregate(contribDate, this._selectedCandidate.entity_id, null);
-          //     }
-          //   }
-          // }
-          if (this._selectedEntity) {
-            if (this._selectedEntity.entity_id) {
-              const contribDate = this._utilService.formatDate(dateValue);
-              if (fieldName === 'expenditure_date') {
-                this._getSchedFDebtPaymentAggregate(contribDate, this._selectedEntity.entity_id, null);
+          if (fieldName === 'expenditure_date') {
+            if (this._selectedCandidate) {
+              if (this._selectedCandidate.beneficiary_cand_id) {
+                const expenditureDate = this._utilService.formatDate(dateValue);
+                this._getSchedFDebtPaymentAggregate(this._selectedCandidate.beneficiary_cand_id,
+                  expenditureDate, this._selectedCandidate.beneficiary_cand_entity_id);
               }
             }
           }
@@ -3258,6 +3259,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (prop === 'entity_id') {
                     this._selectedEntity = {};
                     this._selectedEntity.entity_id = trx[prop];
+                  }
+                  if (prop === 'beneficiary_cand_entity_id') {
+                    this._selectedCandidate = {};
+                    this._selectedCandidate.entity_id = trx[prop];
                   }
                   if (prop === 'entity_type') {
                     if (this.entityTypes) {
@@ -3776,15 +3781,27 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   /**
    * Get the aggregate for Schedule F Debt Payment.  It is similar to _getContributionAggregate().
+   * @param candidateId the Candidate ID 
+   * @param expenditureDate the date of the expenditure from the form
+   * @param candidateEntityId the Entity ID for the Candidate
+   * @param expenditureAmount the expenditure amount from the form
    */
-  private _getSchedFDebtPaymentAggregate(contribDate: string, entityId: number, cmteId: string) {
-    const reportId = this._receiptService.getReportIdFromStorage(this.formType);
+  private _getSchedFDebtPaymentAggregate(
+    candidateId: number,
+    expenditureDate: string,
+    candidateEntityId: string,
+    expenditureAmount?: string) {
+
+    if (!candidateId || !expenditureDate) {
+      return;
+    }
+
     this._receiptService
-      .getSchedFPaymentAggregate(reportId, entityId, cmteId, this.transactionType, contribDate)
+      .getSchedFPaymentAggregate(candidateId, expenditureDate)
       .subscribe(res => {
         const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
 
-        let contributionAggregate: string = String(res.contribution_aggregate);
+        let contributionAggregate: string = String(res.aggregate_general_elec_exp);
         contributionAggregate = contributionAggregate ? contributionAggregate : '0';
         this._contributionAggregateValue = parseFloat(contributionAggregate);
 
@@ -3792,13 +3809,23 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (this.frmIndividualReceipt.get('expenditure_date')) {
           transactionDate = this.frmIndividualReceipt.get('expenditure_date').value;
         }
+
+        // Sched F Payment uses Candidate Entity ID for aggregate calc.
+        // Pass it in the Entity ID of the Transaction Model.
+        // Clone used to not adversely impact processing on this._transactionToEdit
+        let transactionToEditClone = null;
+        if (this._transactionToEdit && this.scheduleAction === ScheduleActions.edit) {
+          transactionToEditClone = this._utilService.deepClone(this._transactionToEdit);
+          transactionToEditClone.entityId = candidateEntityId;
+        }
+
         const aggregateValue: string = this._receiptService.determineAggregate(
           this._contributionAggregateValue,
           contributionAmountNum,
           this.scheduleAction,
           this.memoCode,
           this._selectedCandidate,
-          this._transactionToEdit,
+          transactionToEditClone,
           this.transactionType,
           this._isSubOfParent(),
           transactionDate

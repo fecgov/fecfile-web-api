@@ -345,35 +345,40 @@ export class IndividualReceiptService {
     });
   }
 
+  /**
+   * Get the aggregate amout for the Schedule F Payment on a Debt.
+   *
+   * @param candidateId Candidate ID selected in the form
+   * @param expenditureDate Date of the expenditure from the form
+   * @param expenditureAmount optional - amount of the expenditure from the form
+   */
   public getSchedFPaymentAggregate(
-    reportId: string,
-    entityId: number,
-    cmteId: string,
-    transactionTypeIdentifier: string,
-    contributionDate: string
+    candidateId: number,
+    expenditureDate: string,
+    expenditureAmount?: string
   ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url = '/sa/contribution_aggregate';
+    const url = '/sf/get_aggregate';
+
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    params = params.append('report_id', reportId);
-    if (entityId) {
-      params = params.append('entity_id', entityId.toString());
+    params = params.append('beneficiary_cand_id', candidateId.toString());
+    params = params.append('expenditure_date', expenditureDate);
+    if (expenditureAmount) {
+      params = params.append('expenditure_amount', expenditureAmount);
     }
-    if (cmteId) {
-      params = params.append('cmte_id', cmteId.toString());
-    }
-    params = params.append('transaction_type_identifier', transactionTypeIdentifier);
-    params = params.append('contribution_date', contributionDate);
 
-    return this._http.get(`${environment.apiUrl}${url}`, {
-      headers: httpOptions,
-      params
-    });
+    // return this._http.get(`${environment.apiUrl}${url}`, {
+    //   headers: httpOptions,
+    //   params
+    // });
+    let rando = Math.floor(Math.random() * 10000);
+    rando += 0.99;
+    return Observable.of({ aggregate_general_elec_exp: rando });
   }
 
   public getFedNonFedPercentage__(amount: string, activityEvent: string): Observable<any> {
