@@ -520,46 +520,50 @@ def get_list_schedF(report_id, cmte_id, transaction_id):
         with connection.cursor() as cursor:
             # GET single row from schedA table
             _sql = """SELECT json_agg(t) FROM ( SELECT
-            cmte_id,
-            report_id,
-            transaction_type_identifier,
-            transaction_id, 
-            back_ref_transaction_id,
-            back_ref_sched_name,
-            coordinated_exp_ind,
-            designating_cmte_id,
-            designating_cmte_name,
-            subordinate_cmte_id,
-            subordinate_cmte_name,
-            subordinate_cmte_street_1,
-            subordinate_cmte_street_2,
-            subordinate_cmte_city,
-            subordinate_cmte_state,
-            subordinate_cmte_zip,
-            payee_entity_id as entity_id,
-            expenditure_date,
-            expenditure_amount,
-            aggregate_general_elec_exp,
-            purpose,
-            category_code,
-            payee_cmte_id,
-            payee_cand_id as beneficiary_cand_id,
-            payee_cand_last_name as cand_last_name,
-            payee_cand_fist_name as cand_first_name,
-            payee_cand_middle_name as cand_middle_name,
-            payee_cand_prefix as cand_prefix,
-            payee_cand_suffix as cand_suffix,
-            payee_cand_office as cand_office,
-            payee_cand_state as cand_office_state,
-            payee_cand_district as cand_office_district,
-            memo_code,
-            memo_text,
-            delete_ind,
-            create_date,
-            last_update_date
-            FROM public.sched_f
-            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
-            AND delete_ind is distinct from 'Y') t
+            sf.cmte_id,
+            sf.report_id,
+            sf.transaction_type_identifier,
+            sf.transaction_id, 
+            sf.back_ref_transaction_id,
+            sf.back_ref_sched_name,
+            sf.coordinated_exp_ind,
+            sf.designating_cmte_id,
+            sf.designating_cmte_name,
+            sf.subordinate_cmte_id,
+            sf.subordinate_cmte_name,
+            sf.subordinate_cmte_street_1,
+            sf.subordinate_cmte_street_2,
+            sf.subordinate_cmte_city,
+            sf.subordinate_cmte_state,
+            sf.subordinate_cmte_zip,
+            sf.payee_entity_id as entity_id,
+            sf.expenditure_date,
+            sf.expenditure_amount,
+            sf.aggregate_general_elec_exp,
+            sf.purpose,
+            sf.category_code,
+            sf.payee_cmte_id,
+            sf.payee_cand_id as beneficiary_cand_id,
+            sf.payee_cand_last_name as cand_last_name,
+            sf.payee_cand_fist_name as cand_first_name,
+            sf.payee_cand_middle_name as cand_middle_name,
+            sf.payee_cand_prefix as cand_prefix,
+            sf.payee_cand_suffix as cand_suffix,
+            sf.payee_cand_office as cand_office,
+            sf.payee_cand_state as cand_office_state,
+            sf.payee_cand_district as cand_office_district,
+            sf.memo_code,
+            sf.memo_text,
+            sf.delete_ind,
+            sf.create_date,
+            sf.last_update_date,
+            (SELECT DISTINCT ON (e.ref_cand_cmte_id) e.entity_id 
+            FROM public.entity e WHERE e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = sf.cmte_id) 
+                        AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = sf.payee_cand_id AND e.delete_ind is distinct from 'Y'
+                        ORDER BY e.ref_cand_cmte_id DESC, e.entity_id DESC) AS beneficiary_cand_entity_id
+            FROM public.sched_f sf
+            WHERE sf.report_id = %s AND sf.cmte_id = %s AND sf.transaction_id = %s
+            AND sf.delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
             schedF_list = cursor.fetchone()[0]
@@ -764,9 +768,9 @@ def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (SELECT e.cand_office, e.cand_office_state, e.cand_office_district FROM public.entity e 
                 WHERE e.cmte_id in ('C00000000') 
-                AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s) 
                 AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = %s AND e.delete_ind is distinct from 'Y') as t""",
-                [cmte_id, beneficiary_cand_id])
+                [beneficiary_cand_id])
+            # print(cursor.query)
             cand = cursor.fetchone()[0]
             logger.debug('Candidate Office Data: ' + str(cand))
         if cand:

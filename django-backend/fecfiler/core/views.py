@@ -1909,6 +1909,7 @@ def autolookup_search_contacts(request):
             logger.debug("autolookup query:{}".format(query_string))
             logger.debug("autolookup parameters:{}".format(parameters))
             cursor.execute(query_string, parameters)
+            # print(cursor.query)
             # print('fail..')
             for row in cursor.fetchall():
                 data_row = list(row)
@@ -2141,7 +2142,8 @@ def get_child_query_string(category_type):
     if category_type == 'disbursements_tran':
         query_view = """
                         SELECT json_agg(t) FROM
-                        (SELECT report_type,
+                        (SELECT report_id, 
+                                report_type,
                                 transaction_type, 
                                 transaction_type_desc, 
                                 transaction_id, 
@@ -2174,7 +2176,8 @@ def get_child_query_string(category_type):
     elif category_type == 'other_tran':
         query_view = """
                         SELECT json_agg(t) FROM
-                        (SELECT report_type,
+                        (SELECT report_id, 
+                                report_type,
                                 activity_event_identifier,
                                 schedule,
                                 transaction_type, 
@@ -2207,7 +2210,8 @@ def get_child_query_string(category_type):
     elif category_type == 'receipts_tran':
         query_view = """
                         SELECT json_agg(t) FROM
-                        (SELECT report_type,
+                        (SELECT report_id, 
+                                report_type,
                                 transaction_type, 
                                 transaction_type_desc, 
                                 transaction_id, 
@@ -2238,7 +2242,8 @@ def get_child_query_string(category_type):
     else:
         query_view = """
                         SELECT json_agg(t) FROM
-                        (SELECT report_type,
+                        (SELECT report_id, 
+                                report_type,
                                 transaction_type, 
                                 transaction_type_desc, 
                                 transaction_id, 
@@ -2273,35 +2278,37 @@ def get_trans_query(category_type, cmte_id, param_string):
     query_string = ''
     
     if category_type == 'disbursements_tran':
-        query_string = """SELECT report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
-
-                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
-                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, election_year, election_other_description,transaction_type_identifier, entity_id from all_disbursements_transactions_view
+        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type from all_disbursements_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ 
                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                             """
     elif category_type == 'receipts_tran':
-        query_string = """SELECT report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
-                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
-                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_receipts_transactions_view
+        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
+                                transaction_type_identifier, entity_id, entity_type from all_receipts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ 
                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                             """
     elif category_type == 'loans_tran':
-        query_string = """SELECT report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, purpose_description, loan_amount, loan_payment_to_date, loan_balance, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id from all_loans_debts_transactions_view
+        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, purpose_description, loan_amount, loan_payment_to_date, loan_balance, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id from all_loans_debts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     elif category_type == 'other_tran':
-        query_string = """SELECT schedule, report_type, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+        query_string = """SELECT report_id, schedule, report_type, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, 
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_other_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ AND delete_ind is distinct from 'Y'
                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                             """
     else:
-        query_string = """SELECT report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
-                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
-                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_receipts_transactions_view
+        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+                                COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
+                                transaction_type_identifier, entity_id, entity_type from all_receipts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """
                             AND (back_ref_transaction_id is null OR back_ref_transaction_id = '')
                             """
@@ -2573,6 +2580,7 @@ def get_all_transactions(request):
 
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
+            # print(cursor.query)
             for row in cursor.fetchall():
                 data_row = list(row)
                 # forms_obj=data_row[0]
