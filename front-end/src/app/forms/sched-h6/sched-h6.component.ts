@@ -297,6 +297,7 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
       model.activity_event_identifier = row.activity_event_identifier;
       model.activity_event_type = row.activity_event_type;
       model.expenditure_date = row.expenditure_date;
+      model.expenditure_purpose = row.expenditure_purpose;
       model.fed_share_amount = row.fed_share_amount;
       model.non_fed_share_amount = row.non_fed_share_amount;
       model.levin_share = row.levin_share;
