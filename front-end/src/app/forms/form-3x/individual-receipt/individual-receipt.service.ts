@@ -372,13 +372,13 @@ export class IndividualReceiptService {
       params = params.append('expenditure_amount', expenditureAmount);
     }
 
-    // return this._http.get(`${environment.apiUrl}${url}`, {
-    //   headers: httpOptions,
-    //   params
-    // });
-    let rando = Math.floor(Math.random() * 10000);
-    rando += 0.99;
-    return Observable.of({ aggregate_general_elec_exp: rando });
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+    // let rando = Math.floor(Math.random() * 10000);
+    // rando += 0.99;
+    // return Observable.of({ aggregate_general_elec_exp: rando });
   }
 
   public getFedNonFedPercentage__(amount: string, activityEvent: string): Observable<any> {
