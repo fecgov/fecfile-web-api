@@ -86,16 +86,20 @@ export class LoanService {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/sc/get_outstanding_loans';
+    const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
+    let params = new HttpParams();
+    params = params.append('report_id', reportId);
 
     return this._http
       .get(
         `${environment.apiUrl}${url}`,
         {
-          headers: httpOptions
+          headers: httpOptions,
+          params
         }
       )
       .pipe(map(res => {
