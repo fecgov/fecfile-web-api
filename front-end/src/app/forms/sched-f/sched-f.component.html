@@ -7,8 +7,8 @@
   <ng-template #rtCommitteeId let-r="result" let-t="term">
     <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
   </ng-template>
-  <ng-template #rtCandidateId let-r="result" let-t="term">
-    <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
+  <ng-template #rtPayeeCommitteeId let-r="result" let-t="term">
+    <ngb-highlight [result]="formatTypeaheadPayeeCommitteeId(r)" [term]="t"></ngb-highlight>
   </ng-template>
   <ng-template #rtCommitteeName let-r="result" let-t="term">
     <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
@@ -478,7 +478,7 @@
                             " id="typeahead-template-committee-id" 
                           [ngbTypeahead]="searchPayeeCommitteeId" 
                           [focusFirst]=false
-                          [resultTemplate]="rtCandidateId" 
+                          [resultTemplate]="rtPayeeCommitteeId"
                           [inputFormatter]="formatterPayeeCommitteeId"
                           (selectItem)="handleSelectedCandidate($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
