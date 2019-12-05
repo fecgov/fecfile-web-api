@@ -1853,7 +1853,8 @@ def autolookup_search_contacts(request):
                         e.cand_office,
                         e.cand_office_state,
                         e.cand_office_district,
-                        e.cand_election_year
+                        e.cand_election_year,
+                        e.principal_campaign_committee as payee_cmte_id
                         FROM public.entity e WHERE e.cmte_id in ('C00000000') 
                         AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                         AND substr(e.ref_cand_cmte_id,1,1) != 'C'
@@ -3426,13 +3427,13 @@ GET THIRD NAVIGATION TRANSACTION TYPES VALUES API - CORE APP - SPRINT 13 - FNE 1
 
 def loansanddebts(report_id, cmte_id):
     try:
-        loans_sc_sql = "SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c WHERE memo_code IS NULL AND cmte_id = %s AND report_id = %s AND line_number = '10' AND delete_ind is distinct from 'Y'"
+        loans_sc_sql = "SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c WHERE memo_code IS NULL AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'"
         error_message_sc = "The loans_sql function is throwing an error for sched_c table : "
 
-        loans_sc1_sql = "SELECT COALESCE(SUM(total_outstanding_balance), 0.0) FROM public.sched_c1 WHERE cmte_id = %s AND report_id = %s AND line_number = '10' AND delete_ind is distinct from 'Y'"
+        loans_sc1_sql = "SELECT COALESCE(SUM(total_outstanding_balance), 0.0) FROM public.sched_c1 WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'"
         error_message_sc1 = "The loans_sql function is throwing an error for sched_c1 table : "
 
-        loans_sd_sql = "SELECT COALESCE(SUM(payment_amount), 0.0) FROM public.sched_d WHERE cmte_id = %s AND report_id = %s AND line_num = '10' AND delete_ind is distinct from 'Y'"
+        loans_sd_sql = "SELECT COALESCE(SUM(payment_amount), 0.0) FROM public.sched_d WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'"
         error_message_sd = "The loans_sql function is throwing an error for sched_d table : "
 
         value_list = [cmte_id, report_id]
