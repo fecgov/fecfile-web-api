@@ -951,6 +951,10 @@ def get_outstanding_loans(request):
     valid ransction_type values:
     LOANS_OWED_BY_CMTE
     LOANS_OWED_TO_CMTE
+
+    a loan is outstanding if:
+    1. it has a outstannding balance(>0) in current report
+    2. it has live payment(even the balance become 0) in current report
     """
     valid_transaction_types = [
         'LOANS_OWED_BY_CMTE',
@@ -1020,10 +1024,36 @@ def get_outstanding_loans(request):
                             AND c.loan_balance > 0
                             AND c.loan_incurred_date <= (select cvg_end_date from public.reports where report_id = %s)
                             AND c.delete_ind is distinct from 'Y'
+                            UNION
+                            SELECT e.entity_name, 
+                                e.entity_type, 
+                                e.last_name, 
+                                e.first_name, 
+                                e.middle_name, 
+                                e.preffix AS prefix, 
+                                e.suffix, 
+                                c.transaction_id, 
+                                c.loan_amount_original, 
+                                c.loan_payment_to_date, 
+                                c.loan_balance, 
+                                c.loan_due_date, 
+                                c.transaction_type_identifier 
+                            FROM   PUBLIC.sched_c c, 
+                                PUBLIC.entity e 
+                            WHERE  c.entity_id = e.entity_id 
+                            AND    c.transaction_id IN 
+                            ( 
+                                    SELECT back_ref_transaction_id 
+                                    FROM   sched_b 
+                                    WHERE  cmte_id = %s 
+                                    AND    report_id = %s
+                                    AND    (transaction_type_identifier = 'LOAN_REPAY_MADE' OR
+                                    transaction_type_identifier = 'LOAN_REPAY_RCVD')
+                                    AND    delete_ind IS distinct from 'Y')
                             ) t
                 """
             with connection.cursor() as cursor:
-                cursor.execute(_sql, [cmte_id, report_id])
+                cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
                 json_result = cursor.fetchone()[0] 
 
         if not json_result:
