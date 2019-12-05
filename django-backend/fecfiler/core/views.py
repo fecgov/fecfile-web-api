@@ -1853,7 +1853,8 @@ def autolookup_search_contacts(request):
                         e.cand_office,
                         e.cand_office_state,
                         e.cand_office_district,
-                        e.cand_election_year
+                        e.cand_election_year,
+                        e.principal_campaign_committee as payee_cmte_id
                         FROM public.entity e WHERE e.cmte_id in ('C00000000') 
                         AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                         AND substr(e.ref_cand_cmte_id,1,1) != 'C'
