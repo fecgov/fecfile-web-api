@@ -15,11 +15,13 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from fecfiler.core.transaction_util import (get_line_number_trans_type,
-                                            get_sched_c1_child,
-                                            get_sched_c1_child_transactions,
-                                            get_sched_c2_child,
-                                            get_sched_c2_child_transactions)
+from fecfiler.core.transaction_util import (
+    get_line_number_trans_type,
+    get_sched_c1_child,
+    get_sched_c1_child_transactions,
+    get_sched_c2_child,
+    get_sched_c2_child_transactions,
+    delete_child_transaction)
 from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
@@ -791,10 +793,17 @@ def get_list_schedC(report_id, cmte_id, transaction_id):
 def delete_schedC(data):
     """
     function for handling delete request for sc
+    note: all child transactions will be marked as delete
     """
     try:
-        # check_mandatory_fields_SC2(data)
-        delete_sql_schedC(data.get('cmte_id'), data.get('transaction_id'))
+        cmte_id = data.get('cmte_id')
+        transaction_id = data.get('transaction_id')
+        logger.debug('delete sched_c: {}'.format(transaction_id))
+        delete_sql_schedC(cmte_id, transaction_id)
+        for sched_tp in ['sched_a', 'sched_b', 'sched_c1', 'sched_c2']:
+            logger.debug('delete child of {}'.format(sched_tp))
+            delete_child_transaction(sched_tp, cmte_id, transaction_id)
+        logger.debug('delete {} done'.format(transaction_id))
     except Exception as e:
         raise
 
