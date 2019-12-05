@@ -221,20 +221,20 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     }
   }
 
-  /**
-   * Override the base class method for specific handling for schedule F.
-   */
-  public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
-    // Don't auto-populate committee fields for sched F payment
-    if (col.name === 'payee_cmte_id') {
-      // const entity = $event.item;
-      // this._selectedCandidate = this._utilService.deepClone(entity);
-      // this._setSetEntityIdTo(this._selectedCandidate, col);
-      // this._selectedCandidateChangeWarn = {};
-    } else {
-      super.handleSelectedOrg($event, col);
-    }
-  }
+  // /**
+  //  * Override the base class method for specific handling for schedule F.
+  //  */
+  // public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
+  //   // Don't auto-populate committee fields for sched F payment
+  //   if (col.name === 'payee_cmte_id') {
+  //     // const entity = $event.item;
+  //     // this._selectedCandidate = this._utilService.deepClone(entity);
+  //     // this._setSetEntityIdTo(this._selectedCandidate, col);
+  //     // this._selectedCandidateChangeWarn = {};
+  //   } else {
+  //     super.handleSelectedOrg($event, col);
+  //   }
+  // }
 
   /**
    * @override the Base class method.

@@ -2591,6 +2591,33 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     );
 
   /**
+   * Search for Committee Payees when Committee ID input value changes.
+   */
+  searchPayeeCommitteeId = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        const searchTextUpper = searchText.toUpperCase();
+
+        if (
+          searchTextUpper === 'C' ||
+          searchTextUpper === 'C0' ||
+          searchTextUpper === 'C00' ||
+          searchTextUpper === 'C000'
+        ) {
+          return Observable.of([]);
+        }
+
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'payee_cmte_id');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  /**
    * Search for entities when Candidate ID input value changes.
    */
   searchCandidateId = (text$: Observable<string>) =>
@@ -2692,6 +2719,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   formatterCommitteeId = (x: { cmte_id: string }) => {
     if (typeof x !== 'string') {
       return x.cmte_id;
+    } else {
+      return x;
+    }
+  };
+
+  formatterPayeeCommitteeId = (x: { payee_cmte_id: string }) => {
+    if (typeof x !== 'string') {
+      return x.payee_cmte_id;
     } else {
       return x;
     }
