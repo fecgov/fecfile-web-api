@@ -86,14 +86,16 @@
 
       <div class="form__step" [hidden]="step !== 'step_3'">
         <div [hidden]="transactionType === 'ALLOC_H4_TYPES' || transactionType === 'ALLOC_H4_SUM'
-         || transactionType === 'ALLOC_H6_TYPES' || transactionType === 'ALLOC_H6_SUM'">
+         || transactionType === 'ALLOC_H6_TYPES' || transactionType === 'ALLOC_H6_SUM'
+         || transactionType === 'LA_ENTRY' || transactionType === 'LB_ENTRY'">
           <f3x-individual-receipt
             [hidden]="
               scheduleType !== 'sched_a' &&
               scheduleType !== 'sched_b' &&
               scheduleType !== 'sched_d' &&
               scheduleType !== 'sched_h4' &&
-              scheduleType !== 'sched_h6'
+              scheduleType !== 'sched_h6' &&
+              scheduleType !== 'sched_L'
             "
             [transactionTypeText]="transactionTypeText"
             [transactionType]="transactionType"
@@ -226,6 +228,15 @@
           (status)="onNotify($event)"
         >
         </app-sched-h6>
+        <app-sched-l
+          [hidden]="transactionType !== 'LA_ENTRY' && transactionType !== 'LB_ENTRY'"
+          [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType"
+          [scheduleAction]="scheduleAction"
+          [scheduleType]="scheduleType"
+          (status)="onNotify($event)"
+        >
+        </app-sched-l>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_4'">

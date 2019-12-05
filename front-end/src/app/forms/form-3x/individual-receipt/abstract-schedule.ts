@@ -2841,7 +2841,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       'ALLOC_H5_SUM',
       'ALLOC_H5_SUM_P',
       'ALLOC_H4_TYPES',
-      'ALLOC_H6_TYPES'
+      'ALLOC_H6_TYPES',
+      'LA_ENTRY',
+      'LB_ENTRY'
     ];
     // var a = [1,2,3];
     // Do not call dynaic form for statis transaction types
