@@ -197,6 +197,10 @@ export class TransactionTypeComponent implements OnInit {
         this.scheduleType = 'sched_c_ls';
       }
 
+      if (this.transactionType === 'DEBT_OWN_BY_SUMMARY' && this.scheduleType === 'sched_d') {
+        this.scheduleType = 'sched_d_ds';
+      }
+
       this.status.emit({
         form: this.frmOption,
         direction: 'next',
@@ -287,7 +291,7 @@ export class TransactionTypeComponent implements OnInit {
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
 
     this.secondaryOptions = this._mainTransactionCategory[0].options;
-    
+
     /*if (this._mainTransactionCategory[0].options[0].value === 'schedule-h1') {
       this.secondaryOptions[0].options = [
         {
@@ -425,8 +429,6 @@ export class TransactionTypeComponent implements OnInit {
         }
       ];
     } */
-
-    
 
     this.transactionCategorySelected = true;
 

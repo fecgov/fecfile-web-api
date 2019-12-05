@@ -94,6 +94,7 @@ import { SchedH5Component } from './forms/sched-h5/sched-h5.component';
 import { SchedH4Component } from './forms/sched-h4/sched-h4.component';
 import { EndorserSummaryComponent } from './forms/sched-c/endorser-summary/endorser-summary.component';
 import { SchedH6Component } from './forms/sched-h6/sched-h6.component';
+import { DebtSummaryComponent } from './forms/sched-d/debt-summary/debt-summary.component';
 import { SchedLComponent } from './forms/sched-l/sched-l.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
@@ -166,13 +167,14 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     EndorserComponent,
     SchedC1Component,
     SchedH3Component,
-    SchedH5Component, 
+    SchedH5Component,
     LoanpaymentComponent,
     SchedH4Component,
     LoanpaymentComponent,
     EndorserSummaryComponent,
     SchedH6Component,
-    SchedLComponent,
+    DebtSummaryComponent,
+    SchedLComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [
@@ -215,4 +217,4 @@ const appInitializerFn = (appConfig: AppConfigService) => {
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AppModule { }
+export class AppModule {}
