@@ -95,6 +95,7 @@ import { SchedH4Component } from './forms/sched-h4/sched-h4.component';
 import { EndorserSummaryComponent } from './forms/sched-c/endorser-summary/endorser-summary.component';
 import { SchedH6Component } from './forms/sched-h6/sched-h6.component';
 import { DebtSummaryComponent } from './forms/sched-d/debt-summary/debt-summary.component';
+import { SchedLComponent } from './forms/sched-l/sched-l.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -172,7 +173,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     LoanpaymentComponent,
     EndorserSummaryComponent,
     SchedH6Component,
-    DebtSummaryComponent
+    DebtSummaryComponent,
+    SchedLComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [

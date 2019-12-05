@@ -10,5 +10,6 @@ export enum AbstractScheduleParentEnum {
   schedH2Component = 'schedH2Component',
   schedH3Component = 'schedH3Component',
   schedH4Component = 'schedH4Component',
-  schedH5Component = 'schedH5Component'
+  schedH5Component = 'schedH5Component',
+  schedLComponent = 'schedLComponent'
 }

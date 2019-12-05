@@ -3236,7 +3236,7 @@ def load_loan_debt_summary(period_args):
         WHERE  cmte_id = %s 
             AND report_id = %s 
             AND transaction_type_identifier IN ( 
-                'LOAN_OWED_TO_CMTE', 'LOAN_OWED_BY_CMTE' ) 
+                'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE' ) 
         GROUP  BY transaction_type_identifier 
         UNION 
         SELECT transaction_type_identifier, 
@@ -3245,7 +3245,7 @@ def load_loan_debt_summary(period_args):
         WHERE  cmte_id = %s 
             AND report_id = %s 
             AND transaction_type_identifier IN ( 
-                'DEBTS_OWED_TO_CMTE', 'DEBTS_OWED_BY_CMTE' ) 
+                'DEBT_TO_VENDER') 
         GROUP  BY transaction_type_identifier 
     """
     _sql_ytd = """
@@ -3255,7 +3255,7 @@ def load_loan_debt_summary(period_args):
         WHERE  cmte_id = %s 
             AND loan_incurred_date BETWEEN %s AND %s 
             AND transaction_type_identifier IN ( 
-                'LOAN_OWED_TO_CMTE', 'LOAN_OWED_BY_CMTE' ) 
+                'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE' ) 
         GROUP  BY transaction_type_identifier 
         UNION 
         SELECT transaction_type_identifier AS ytd, 
@@ -3264,7 +3264,7 @@ def load_loan_debt_summary(period_args):
         WHERE  cmte_id = %s
             AND create_date BETWEEN %s AND %s
             AND transaction_type_identifier IN ( 
-                'DEBTS_OWED_TO_CMTE', 'DEBTS_OWED_BY_CMTE' ) 
+                'DEBT_TO_VENDER') 
         GROUP  BY transaction_type_identifier 
     """
     try:
