@@ -1,0 +1,264 @@
+<ng-template #rt let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtOrg let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCommitteeId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCandidateId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCommitteeName let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCandidate let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<div class="sched-l-container">
+  <form [formGroup]="schedL">
+    <header>
+      <div class="header-content">
+        <div class="float-left">
+          <h2>
+            Form 3X
+            <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
+            <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container>
+          </h2>
+        </div>
+        <div class="float-right" ngbDropdown>
+          <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
+            <span class="ellipsis-icon" aria-hidden="true"></span>
+            <span class="sr-only">Click for more options</span>
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
+            <button class="dropdown-item">
+              <i class="file-import-icon" (click)="ImportTransactions()"></i> Import
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <hr />
+        </div>
+      </div>
+    </header>
+
+    <section *ngIf="showSelectType && transactionType === 'LA_ENTRY'">
+      <div class="subtitle">
+        <h2>
+            <b>What Type of Levin Receipts are you adding?</b>
+        </h2>
+      </div>
+      
+      <div>
+        <table class="table table-striped summary_table_text"> 
+            <thead>
+            </thead>
+            <tbody>
+              <tr>               
+                <td class="summary_text_level_3" id="LEVIN_INDV_REC" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_INDV_REC" placeholder="Individual Receipt">
+                  <label for="LEVIN_INDV_REC" class="child-options-label">Individual Receipt</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_ORG_REC" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_ORG_REC" placeholder="Business Receipt">
+                  <label for="LEVIN_ORG_REC" class="child-options-label">Business Receipt</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_PARTN_REC" (click)="selectTypeChange($event)">                
+                  <input type="radio" formControlName="type" value="LEVIN_PARTN_REC" placeholder="Partnership Receipt"> 
+                  <label for="LEVIN_PARTN_REC" class="child-options-label">Partnership Receipt</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <!--<tr>                
+                <td class="summary_text_level_3" id="LEVIN_PARTN_MEMO" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_PARTN_MEMO" placeholder="Partnership Memo">
+                  <label for="LEVIN_PARTN_MEMO" class="child-options-label">Partnership Memo</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>-->
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_PAC_REC" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_PAC_REC" placeholder="PAC Receipt">
+                  <label for="LEVIN_PAC_REC" class="child-options-label">PAC Receipt</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_NON_FED_REC" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_NON_FED_REC" placeholder="Non-Federal PAC Receipt">
+                  <label for="LEVIN_NON_FED_REC" class="child-options-label">Non-Federal PAC Receipt</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_TRIB_REC" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_TRIB_REC" placeholder="Tribal Receipt">
+                  <label for="LEVIN_TRIB_REC" class="child-options-label">Tribal Receipt</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_OTH_REC" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_OTH_REC" placeholder="Other Receipt">
+                  <label for="LEVIN_OTH_REC" class="child-options-label">Other Receipt</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+            </tbody>
+        </table>
+      </div>
+
+      <footer>
+          <footer>
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12">
+                <div class="forms__btn-container">
+                  <button class="btn btn-previous btn-left" type="button" 
+                  (click)="previousStep()">
+                    Cancel
+                  </button>
+                  
+                                                  
+                </div>
+              </div>
+            </div>
+          </footer>
+      </footer>
+    </section>
+
+    <section *ngIf="showSelectType && transactionType === 'LB_ENTRY'">
+      <div class="subtitle">
+        <h2>
+            <b>What Type of Levin Disbursements are you adding?</b>
+        </h2>
+      </div>
+      
+      <div>
+        <table class="table table-striped summary_table_text"> 
+            <thead>
+            </thead>
+            <tbody>
+              <tr>               
+                <td class="summary_text_level_3" id="LEVIN_VOTER_REG" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_VOTER_REG" placeholder="Voter Registration">
+                  <label for="LEVIN_VOTER_REG" class="child-options-label">Voter Registration</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_VOTER_ID" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_VOTER_ID" placeholder="Voter ID">
+                  <label for="LEVIN_VOTER_ID" class="child-options-label">Voter ID</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_GOTV" (click)="selectTypeChange($event)">                
+                  <input type="radio" formControlName="type" value="LEVIN_GOTV" placeholder="Get out the Vote (GOTV)"> 
+                  <label for="LEVIN_GOTV" class="child-options-label">Get out the Vote (GOTV)</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_GEN" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_GEN" placeholder="Generic Campaign Activity">
+                  <label for="LEVIN_GEN" class="child-options-label">Generic Campaign Activity</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+              <tr>                
+                <td class="summary_text_level_3" id="LEVIN_OTH_DISB" (click)="selectTypeChange($event)">
+                  <input type="radio" formControlName="type" value="LEVIN_OTH_DISB" placeholder="Other Disbursement">
+                  <label for="LEVIN_OTH_DISB" class="child-options-label">Other Disbursement</label>
+                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                  </button>
+                </td>                
+              </tr>
+            </tbody>
+        </table>
+      </div>
+
+      <footer>
+          <footer>
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12">
+                <div class="forms__btn-container">
+                  <button class="btn btn-previous btn-left" type="button" 
+                  (click)="previousStep()">
+                    Cancel
+                  </button>
+                  
+                                                  
+                </div>
+              </div>
+            </div>
+          </footer>
+      </footer>
+    </section>
+
+    
+    
+  </form>
+</div>

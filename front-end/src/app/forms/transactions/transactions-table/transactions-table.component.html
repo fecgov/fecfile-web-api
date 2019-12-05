@@ -722,6 +722,12 @@
                         <i class="trash-icon"></i> Trash
                       </button>
                     </span>
+                  <button class="dropdown-item" (click)="goToLoanRepayment(trx)" *ngIf="trx.apiCall === '/sc/schedC'">
+                    <i class="print-icon"></i> Loan repayment
+                  </button>
+                  <button class="dropdown-item" (click)="goToDebtPayment(trx)" *ngIf="trx.apiCall === '/sd/schedD'">
+                    <i class="print-icon"></i> Make a payment
+                  </button>
                   </div>
                 </div>
               </div>

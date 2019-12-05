@@ -1417,4 +1417,16 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     trx.endorser = {back_ref_transaction_id: trx.transactionId};
     this.editTransaction(trx);
   }
+
+  public goToLoanRepayment(trx:any){
+    trx.scheduleType="sched_c_loan_payment"
+    trx.backRefTransactionId = trx.transactionId;
+    this.editTransaction(trx);
+  }
+
+  public goToDebtPayment(trx:any){
+    // trx.scheduleType="sched_c_loan_payment"
+    // trx.backRefTransactionId = trx.transactionId;
+    this.editTransaction(trx);
+  }
 }
