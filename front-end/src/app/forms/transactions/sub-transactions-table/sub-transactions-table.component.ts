@@ -134,6 +134,17 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
             break;
           default:
         }
+
+        model.activityEventType = trx.activity_event_type;
+        model.activityEventIdentifier = trx.activity_event_identifier;
+        model.fedShareAmount = trx.fed_share_amount;
+        model.nonfedShareAmount = trx.non_fed_share_amount;
+
+        if(transactionType === 'ALLOC_FEA_CC_PAY_MEMO' || transactionType === 'ALLOC_FEA_STAF_REIM_MEMO') {
+          model.fedShareAmount = trx.federal_share;
+          model.levinShare = trx.levin_share;
+        }
+
         model.memoCode = trx.memo_code;
         model.memoText = trx.memo_text;
 
@@ -220,5 +231,20 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
    */
   public editTransaction(trx: TransactionModel): void {
     this._transactionsMessageService.sendEditTransactionMessage(trx);
+  }
+
+  public isH4OrH6(): string {
+    if (this.subTransactions) {
+      for (const trx of this.subTransactions) {
+        const transactionType = trx.transaction_type_identifier;
+        switch (transactionType) {
+          case  'ALLOC_EXP_CC_PAY_MEMO' || 'ALLOC_EXP_STAF_REIM_MEMO' || 'ALLOC_EXP_PMT_TO_PROL_MEMO':
+            return 'H4';
+          case 'ALLOC_FEA_CC_PAY_MEMO' || 'ALLOC_FEA_STAF_REIM_MEMO':
+            return 'H6';
+          default:
+        }
+      }
+    }
   }
 }
