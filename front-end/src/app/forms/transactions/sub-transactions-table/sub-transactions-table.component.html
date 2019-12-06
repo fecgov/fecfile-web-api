@@ -31,15 +31,16 @@
         Type
         <i class="fa fa-sort" aria-hidden="false"></i>
       </th>
-      <th *ngIf="isH4OrH6() === 'H4'">
-        Puporse
+      <th *ngIf="isH4OrH6() === 'H4' || isH4OrH6() === 'H6'">
+        Purpose
         <i class="fa fa-sort" aria-hidden="false"></i>
       </th>
       <th *ngIf="isH4OrH6() === 'H6'">
         Name/Organization
         <i class="fa fa-sort" aria-hidden="false"></i>
       </th>
-      <th>Amount
+      <th *ngIf="isH4OrH6() !== 'H6'">
+        Amount
           <i class="fa fa-sort" aria-hidden="false"></i>
       </th>
       <th *ngIf="isH4OrH6() === 'H4' || isH4OrH6() === 'H6'">
