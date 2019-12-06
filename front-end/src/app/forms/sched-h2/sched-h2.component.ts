@@ -27,6 +27,7 @@ import { PaginationInstance } from 'ngx-pagination';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { SchedH2Service } from './sched-h2.service';
+import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 
 @Component({
@@ -126,7 +127,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
 
   public ngOnInit() {
-    
+    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedH2Component;
     // temp code - waiting until dynamic forms completes and loads the formGroup
     // before rendering the static fields, otherwise validation error styling
     // is not working (input-error-field class).  If dynamic forms deliver,
@@ -136,7 +137,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     }, 2000);
 
     //this.getH2Sum(this.getReportId());
-    this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+    //this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
     
     this.setSchedH2();
 
@@ -160,7 +161,11 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
-    this.formType = '3X';    
+    this.formType = '3X';
+
+    if(this.transactionType === 'ALLOC_H2_SUM') {
+      this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+    }
   }
 
   ngDoCheck() {
@@ -293,8 +298,11 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.cvgStartDate = formInfo.cvgStartDate;
     this.cvgEndDate = formInfo.cvgEndDate;
 
+    let startDate =  new Date(this.cvgStartDate);
+    startDate.setDate(startDate.getDate() - 1);
+
     if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgStartDate)))) {     
+      this._uService.compareDatesAfter((new Date(receiptDate)), startDate))) {
       this.receiptDateErr = true;
       this.schedH2.controls['receipt_date'].setErrors({'incorrect': true});  
     } else {

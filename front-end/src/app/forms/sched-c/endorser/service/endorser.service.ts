@@ -11,6 +11,7 @@ import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.p
 import { DatePipe } from '@angular/common';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
 import { map } from 'rxjs/operators';
+import { ScheduleActions } from '../../../form-3x/individual-receipt/schedule-actions.enum';
 
 export interface GetEndorsersResponse {
   contacts: EndorserModel[];
@@ -194,14 +195,8 @@ export class EndorserService {
       model.zip = row.zip;
       model.employer = row.employer;
       model.occupation = row.occupation;
-      model.phoneNumber = row.phoneNumber;
       model.entity_name = row.entity_name;
-      model.candOffice = row.candOffice;
-      model.candOfficeState = row.candOfficeState
-      model.candOfficeDistrict = row.candOfficeDistrict;
-      model.activeTransactionsCnt = row.active_transactions_cnt;
-      model.candCmteId = row.candCmteId;
-      model.deletedDate = row.deleteddate;
+      model.contribution_amount = row.contribution_amount;
       modelArray.push(model);
     }
     return modelArray;
@@ -313,14 +308,8 @@ export class EndorserService {
     serverObject.zip = model.zip;
     serverObject.employer = model.employer;
     serverObject.occupation = model.occupation;
-    serverObject.phoneNumber = model.phoneNumber;
+    serverObject.contribution_amount = model.contribution_amount;
     serverObject.entityName = model.entity_name;
-    serverObject.candOffice = model.candOffice;
-    serverObject.candOfficeState = model.candOfficeState;
-    serverObject.candOfficeDistrict = model.candOfficeDistrict;
-    serverObject.candCmteId = model.candCmteId;
-    serverObject.activeTransactionsCnt = model.activeTransactionsCnt;
-    serverObject.deletedDate = model.deletedDate;
     
     return serverObject;
   }
@@ -539,7 +528,7 @@ export class EndorserService {
    * @param      {string}           formType  The form type
    * @param      {EndorsersActions}  scheduleAction  The type of action to save (add, edit)
    */
-  public saveContact(scheduleAction: EndorsersActions): Observable<any> {
+  public saveContact(scheduleAction: ScheduleActions): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/core/contacts';
     /*const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
@@ -564,7 +553,7 @@ export class EndorserService {
       }
     }
 
-    if (scheduleAction === EndorsersActions.add) {
+    if (scheduleAction === ScheduleActions.add) {
       return this._http
         .post(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions
@@ -578,7 +567,7 @@ export class EndorserService {
             return false;
           })
         );
-    } else if (scheduleAction === EndorsersActions.edit) {
+    } else if (scheduleAction === ScheduleActions.edit) {
       return this._http
         .put(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions
@@ -597,7 +586,7 @@ export class EndorserService {
 
   public get_sched_c_endorser_dynamic_forms_fields(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
-    const url: string = `${environment.apiUrl}/core/get_contacts_dynamic_forms_fields`;
+    const url: string = `${environment.apiUrl}/core/get_dynamic_forms_fields?form_type=F3X&transaction_type=SC2`;
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let formData: FormData = new FormData();

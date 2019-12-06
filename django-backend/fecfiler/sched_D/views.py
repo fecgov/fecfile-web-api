@@ -287,7 +287,7 @@ def schedD_sql_dict(data):
         "first_name",
         "last_name",
         "middle_name",
-        "preffix",
+        "prefix",
         "suffix",
         "street_1",
         "street_2",
@@ -797,17 +797,40 @@ def get_schedD(data):
 def is_new_report(report_id, cmte_id):
     """
     check if a report_id is new or not
-    a report_id not exist in db will be considered new for now
+    a report_id is new if:
+    1.  not exist in sched_d table 
+    2. and the cvg_date is newer than the most recent one
+
     TODO: may need to reconsider this
     """
+    # _sql = """
+    # select * from public.sched_d
+    # where report_id = %s and cmte_id = %s
+    # """
     _sql = """
-    select * from public.sched_d 
-    where report_id = %s and cmte_id = %s
+        SELECT 1 AS seq, 
+            cvg_start_date 
+        FROM   PUBLIC.reports 
+        WHERE  report_id = %s
+        UNION 
+        SELECT 2 AS seq, 
+            Max(cvg_end_date) 
+        FROM   PUBLIC.reports r 
+            JOIN PUBLIC.sched_d sd 
+                ON r.report_id = sd.report_id 
+                    AND r.cmte_id = sd.cmte_id 
+                    AND r.cmte_id = %s
+        ORDER  BY seq 
     """
     try:
         with connection.cursor() as cursor:
             cursor.execute(_sql, (report_id, cmte_id))
-            return cursor.rowcount == 0
+            results = cursor.fetchall()
+            new_date = results[0][1]
+            old_date = results[1][1]
+            if new_date and old_date and new_date > old_date:
+                return True
+            return False
     except:
         raise
 

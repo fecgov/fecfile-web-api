@@ -33,9 +33,11 @@ export class SchedC1Service {
     const formData: FormData = new FormData();
     const httpOptions = new HttpHeaders().append('Authorization', 'JWT ' + token);
     formData.append('report_id', reportId);
+    formData.append('transaction_type_identifier', 'SC1');
+    formData.append('entity_type', 'ORG'); 
 
     for (const [key, value] of Object.entries(data)) {
-      if (value !== null) {
+      if (value) {
         if (typeof value === 'string') {
           formData.append(key, value);
         } else if (value.hasOwnProperty('filename')) {

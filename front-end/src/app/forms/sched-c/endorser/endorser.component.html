@@ -17,13 +17,13 @@
   <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
 </ng-template>
 
-<div class="add_new_contact-container">
-  <form [formGroup]="frmContact">
+<div class="add_new_endorser-container">
+  <form [formGroup]="endorserForm">
     <header>
       <div class="header-content">
         <!--<div class="float-left">-->
           <h1>
-            Add New Contact
+              F3X - Schedule C - Endorser
           </h1>
           <br />
         <!--</div>-->
@@ -83,12 +83,11 @@
                       [formControlName]="col?.name"
                       (blur)="col?.name === 'contribution_amount' ? contributionAmountChange($event) : null"
                       [ngClass]="
-                        frmContact.get(col?.name)?.invalid &&
-                        (frmContact.touched || frmContact.dirty)
+                        endorserForm.get(col?.name)?.invalid &&
+                        (endorserForm.touched || endorserForm.dirty)
                           ? 'input-field-error'
                           : ''
                       "
-                      (keyup)="handleFormFieldKeyup($event, col)"
                     />
                     <input
                       *ngIf="col?.name === 'last_name'"
@@ -101,8 +100,8 @@
                       [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
                       [ngClass]="
-                        frmContact.get(col?.name)?.invalid &&
-                        (frmContact.touched || frmContact.dirty)
+                        endorserForm.get(col?.name)?.invalid &&
+                        (endorserForm.touched || endorserForm.dirty)
                           ? 'input-field-error'
                           : ''
                       "
@@ -123,8 +122,8 @@
                       [maxlength]="col?.validation?.max"
                       [formControlName]="col?.name"
                       [ngClass]="
-                        frmContact.get(col?.name)?.invalid &&
-                        (frmContact.touched || frmContact.dirty)
+                        endorserForm.get(col?.name)?.invalid &&
+                        (endorserForm.touched || endorserForm.dirty)
                           ? 'input-field-error'
                           : ''
                       "
@@ -146,8 +145,8 @@
                     [maxlength]="col?.validation?.max"
                     [formControlName]="col?.name"
                     [ngClass]="
-                      frmContact.get(col?.name)?.invalid &&
-                      (frmContact.touched || frmContact.dirty)
+                      endorserForm.get(col?.name)?.invalid &&
+                      (endorserForm.touched || endorserForm.dirty)
                         ? 'input-field-error'
                         : ''
                     "
@@ -162,34 +161,34 @@
                   <div
                     class="error-text"
                     *ngIf="
-                      (frmContact.touched || frmContact.dirty) &&
-                      frmContact.get(col?.name).invalid
+                      (endorserForm.touched || endorserForm.dirty) &&
+                      endorserForm.get(col?.name).invalid
                     "
                   >
-                    <ng-container *ngIf="frmContact.get(col?.name).errors?.maxlength">
+                    <ng-container *ngIf="endorserForm.get(col?.name).errors?.maxlength">
                       <div
                         class="text-error text-left"
                         *ngIf="
-                          frmContact.get(col?.name).errors.maxlength?.requiredLength <
-                          frmContact.get(col?.name).errors.maxlength?.actualLength
+                          endorserForm.get(col?.name).errors.maxlength?.requiredLength <
+                          endorserForm.get(col?.name).errors.maxlength?.actualLength
                         "
                       >
-                        Only {{ frmContact.get(col?.name).errors.maxlength?.requiredLength }} characters
+                        Only {{ endorserForm.get(col?.name).errors.maxlength?.requiredLength }} characters
                         allowed.
                       </div>
                     </ng-container>
-                    <ng-container *ngIf="frmContact.get(col?.name).errors">
+                    <ng-container *ngIf="endorserForm.get(col?.name).errors">
                       <div
                         class="text-error text-left"
-                        *ngIf="frmContact.get(col?.name).errors?.nonAlphaNumeric"
+                        *ngIf="endorserForm.get(col?.name).errors?.nonAlphaNumeric"
                       >
                         Alphanumeric characters only.
                       </div>
                     </ng-container>
-                    <ng-container *ngIf="frmContact.get(col?.name).errors">
+                    <ng-container *ngIf="endorserForm.get(col?.name).errors">
                       <div
                         class="text-error text-left"
-                        *ngIf="frmContact.get(col?.name).errors?.nonFloatingPoint"
+                        *ngIf="endorserForm.get(col?.name).errors?.nonFloatingPoint"
                       >
                         Only numerical values are allowed.
                       </div>
@@ -209,8 +208,8 @@
                     [formControlName]="col?.name"
                     (change)="col?.name === 'memo_code' ? memoCodeChange($event) : null"
                     [ngClass]="
-                      frmContact.get(col?.name)?.invalid &&
-                      (frmContact.touched || frmContact.dirty)
+                      endorserForm.get(col?.name)?.invalid &&
+                      (endorserForm.touched || endorserForm.dirty)
                         ? 'input-field-error'
                         : ''
                     "
@@ -227,37 +226,20 @@
                   ></textarea>
                 </ng-container>
 
-                
-                <!--<ng-container *ngIf="col?.type === 'select' && 
-                    (isFieldName(col?.name, 'state') ||
-                    isFieldName(col?.name, 'cand_office_state'))">
-                  <ng-select #stateSelect [items]="states" (change)="handleStateChange($event, col)"
-                    class="state-select" [formControlName]="col?.name" bindValue="code" bindLabel="code" [ngClass]="
-                    frmContact.get(col?.name)?.invalid &&
-                        (frmContact.touched || frmContact.dirty)
-                          ? 'state-select-error'
-                          : ''
-                      ">
-                    <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
-                      <span>{{ item.code + ' - ' + item.name }}</span>
-                    </ng-template>
-                  </ng-select>
-                </ng-container> -->
-
                 <ng-container *ngIf="col?.type === 'select' && 
                     (isFieldName(col?.name, 'state') ||
                     isFieldName(col?.name, 'cand_office_state'))">
                     <ng-select #stateSelect 
                       [items]="states" 
                       (change)="handleStateChange($event, col)"
-                      class="forms__select" 
+                      class="state-select" 
                       [formControlName]="col?.name" 
                       bindValue="code" 
                       bindLabel="code" 
                       [selectOnTab]="true"
                       [ngClass]="
-                          frmContact.get(col?.name)?.invalid &&
-                          (frmContact.touched || frmContact.dirty)
+                          endorserForm.get(col?.name)?.invalid &&
+                          (endorserForm.touched || endorserForm.dirty)
                             ? 'forms__select-error'
                             : ''
                         ">
@@ -267,68 +249,8 @@
                     </ng-select>
                </ng-container>
 
-                <ng-container *ngIf="col?.type === 'select' && col?.name === 'office_Sought'">
-                  <ng-select
-                    (change)="handleCandOfficeChange($event, col)"
-                    class="state-select"
-                    [style.width]="col?.width"
-                    [style.height]="col?.height"
-                    [formControlName]="col?.name"
-                    bindValue="code"
-                    bindLabel="name" 
-                    [ngClass]="
-                      frmContact.get(col?.name)?.invalid &&
-                      (frmContact.touched || frmContact.dirty)
-                        ? 'state-select-error'
-                        : ''
-                    "
-                  >
-                    <ng-option *ngFor="let item1 of officeSought" [ngValue]="item1">
-                      {{ item1.code }} - {{ item1.name }}
-                    </ng-option>
-                  </ng-select>
-                </ng-container>
 
-                <ng-container *ngIf="col?.type === 'select' && col?.name === 'Office_State'">
-                  <ng-select
-                    (change)="handleOfficeStateChange($event, col)"
-                    class="state-select"
-                    [style.width]="col?.width"
-                    [style.height]="col?.height"
-                    [formControlName]="col?.name"
-                    bindValue="code"
-                    bindLabel="name" 
-                    [ngClass]="
-                      frmContact.get(col?.name)?.invalid &&
-                      (frmContact.touched || frmContact.dirty)
-                        ? 'state-select-error'
-                        : ''
-                    "
-                  >
-                    <ng-option *ngFor="let item2 of states" [ngValue]="item2">
-                      {{ item2.code }} - {{ item2.name }}
-                    </ng-option>
-                  </ng-select>
-                </ng-container>
                 
-              <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type'">
-                  <ng-select #entityTypeSelect
-                    [items]="entityTypes"
-                    (change)="handleTypeChange($event, col)"
-                    [style.width]="col?.width"
-                    [style.height]="col?.height"
-                    [formControlName]="col?.name"
-                    bindValue="code"
-                    bindLabel="name" 
-                    [ngClass]="
-                      frmContact.get(col?.name)?.invalid &&
-                      (frmContact.touched || frmContact.dirty)
-                        ? 'state-select-error'
-                        : ''
-                    "
-                  >
-                  </ng-select>
-                </ng-container>
 
              </div>
             </div>
@@ -362,11 +284,14 @@
               <button class="btn btn-previous btn-left" type="button" (click)="cancelStep()">
                 Cancel
               </button>
-              <button class="btn btn-secondary btn-right" type="button" (click)="saveAndAddMore()">
-                Save &amp; Add More
+<!--               <button class="btn btn-secondary btn-right" type="button"  (click)="goToEndorserSummary()">
+                Endorser Summary
+              </button> -->
+              <button class="btn btn-secondary btn-right" type="button"  (click)="saveEndorser(false)">
+                Save
               </button>
-              <button class="btn btn-previous btn-right" type="button"  (click)="viewContacts()">
-                View Contacts
+              <button class="btn btn-secondary btn-right" type="button" (click)=saveEndorser(true)>
+                Add Endorsers
               </button>
             </div>
           </div>          

@@ -48,6 +48,8 @@
       </header>
   
       <section *ngIf="loaded">
+      <!-- <section *ngIf="formFields && frmIndividualReceipt"> -->
+          
         <div [hidden]="showPart2" class="paragraph">
           <div class="col coord_expenditure_text">
             <h3>Has filer been designated to make a Coordinated Expenditure?</h3>
@@ -57,7 +59,7 @@
               <div class="form-check form-check-inline">                  
                 <label for="coord_expenditure_y"                   
                   [ngClass]="
-                  frmIndividualReceipt.get('coord_expenditure_yn')?.invalid &&
+                  frmIndividualReceipt.get('coordinated_exp_ind')?.invalid &&
                   (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                     ? 'input-field-label-error'
                     : ''
@@ -65,7 +67,7 @@
                   <input
                     id="coord_expenditure_y"
                     type="radio"
-                    formControlName="coord_expenditure_yn"
+                    formControlName="coordinated_exp_ind"
                     value="Y"
                   />
                   Yes
@@ -74,7 +76,7 @@
               <div class="form-check form-check-inline">                 
                 <label for="coord_expenditure_n"
                   [ngClass]="
-                  frmIndividualReceipt.get('coord_expenditure_yn')?.invalid &&
+                  frmIndividualReceipt.get('coordinated_exp_ind')?.invalid &&
                   (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                     ? 'input-field-label-error'
                     : ''
@@ -82,7 +84,7 @@
                   <input
                     id="coord_expenditure_n"
                     type="radio"
-                    formControlName="coord_expenditure_yn"
+                    formControlName="coordinated_exp_ind"
                     value="N"
                   />
                   No
@@ -93,19 +95,25 @@
           <div class="row">
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="designated_com_id">
+                <label for="designating_cmte_id">
                   Designating Committee ID Number
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'designated_com_id'"
-                  [attr.name]="'designated_com_id'"
-                  id="designated_com_id"
+                  [formControlName]="'designating_cmte_id'"
+                  [attr.name]="'designating_cmte_id'"
+                  id="designating_cmte_id"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('designating_cmte_id'))"
+                  [ngbTypeahead]="searchCommitteeId"
+                  [focusFirst]=false
+                  [resultTemplate]="rtCommitteeId" 
+                  [inputFormatter]="formatterCommitteeId"
+                  (selectItem)="handleSelectedSFCommittee($event, 'designating_cmte_id')"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
                   [maxlength]="'9'"
                   [ngClass]="
-                    frmIndividualReceipt.get('designated_com_id')?.invalid &&
+                    frmIndividualReceipt.get('designating_cmte_id')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -115,19 +123,25 @@
             </div>
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="designated_com_name">
+                <label for="designating_cmte_name">
                   Designating Committee Name
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'designated_com_name'"
-                  [attr.name]="'designated_com_name'"
-                  id="designated_com_name"
+                  [formControlName]="'designating_cmte_name'"
+                  [attr.name]="'designating_cmte_name'"
+                  id="designating_cmte_name"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('designating_cmte_name'))"
+                  [ngbTypeahead]="searchCommitteeName"
+                  [focusFirst]=false 
+                  [resultTemplate]="rtCommitteeName" 
+                  [inputFormatter]="formatterCommitteeName"
+                  (selectItem)="handleSelectedSFCommittee($event, 'designating_cmte_name')"
                   [style.width]="'100%'" 
                   [style.height]="'30px'"
                   [maxlength]="'200'"
                   [ngClass]="
-                    frmIndividualReceipt.get('designated_com_name')?.invalid &&
+                    frmIndividualReceipt.get('designating_cmte_name')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -139,19 +153,25 @@
           <div class="row">
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="subordinate_com_id">
+                <label for="subordinate_cmte_id">
                   Subordinate Committee ID Number
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'subordinate_com_id'"
-                  [attr.name]="'subordinate_com_id'"
-                  id="subordinate_com_id"
+                  [formControlName]="'subordinate_cmte_id'"
+                  [attr.name]="'subordinate_cmte_id'"
+                  id="subordinate_cmte_id"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('subordinate_cmte_id'))"
+                  [ngbTypeahead]="searchCommitteeId"
+                  [focusFirst]=false
+                  [resultTemplate]="rtCommitteeId" 
+                  [inputFormatter]="formatterCommitteeId"
+                  (selectItem)="handleSelectedSFCommittee($event, 'subordinate_cmte_id')"
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
                   [maxlength]="'9'"
                   [ngClass]="
-                    frmIndividualReceipt.get('subordinate_com_id')?.invalid &&
+                    frmIndividualReceipt.get('subordinate_cmte_id')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -166,14 +186,20 @@
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'subordinate_com_name'"
-                  [attr.name]="'subordinate_com_name'"
+                  [formControlName]="'subordinate_cmte_name'"
+                  [attr.name]="'subordinate_cmte_name'"
                   [style.width]="'100%'" 
                   [style.height]="'30px'"
                   [maxlength]="'200'"
-                  id="subordinate_com_name"
+                  id="subordinate_cmte_name"
+                  (keyup)="handleFormFieldKeyup($event, findFormField('subordinate_cmte_name'))"
+                  [ngbTypeahead]="searchCommitteeName"
+                  [focusFirst]=false 
+                  [resultTemplate]="rtCommitteeName" 
+                  [inputFormatter]="formatterCommitteeName"
+                  (selectItem)="handleSelectedSFCommittee($event, 'subordinate_cmte_name')"
                   [ngClass]="
-                    frmIndividualReceipt.get('subordinate_com_name')?.invalid &&
+                    frmIndividualReceipt.get('subordinate_cmte_name')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -185,19 +211,19 @@
           <div class="row">
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="street_1_co_exp">
+                <label for="subordinate_cmte_street_1">
                   Street 1
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'street_1_co_exp'"
-                  [attr.name]="'street_1_co_exp'"
+                  [formControlName]="'subordinate_cmte_street_1'"
+                  [attr.name]="'subordinate_cmte_street_1'"
                   [style.width]="'80%'" 
-                  id="street_1_co_exp"
+                  id="subordinate_cmte_street_1"
                   [style.height]="'30px'"
                   [maxlength]="'34'"
                   [ngClass]="
-                    frmIndividualReceipt.get('street_1_co_exp')?.invalid &&
+                    frmIndividualReceipt.get('subordinate_cmte_street_1')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -207,19 +233,19 @@
             </div>
             <div class="col col-md-5">
               <div class="form-group">
-                <label for="street_2_co_exp">
+                <label for="subordinate_cmte_street_2">
                     Street 2 (Optional)
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'street_2_co_exp'"
-                  [attr.name]="'street_2_co_exp'"
+                  [formControlName]="'subordinate_cmte_street_2'"
+                  [attr.name]="'subordinate_cmte_street_2'"
                   [style.width]="'80%'" 
                   [style.height]="'30px'"
-                  id="street_2_co_exp"
+                  id="subordinate_cmte_street_2"
                   [maxlength]="'34'"
                   [ngClass]="
-                    frmIndividualReceipt.get('street_2_co_exp')?.invalid &&
+                    frmIndividualReceipt.get('subordinate_cmte_street_2')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -231,19 +257,19 @@
           <div class="row">
             <div class="col col-md-4">
               <div class="form-group">
-                <label for="city_co_exp">
+                <label for="subordinate_cmte_city">
                   City
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'city_co_exp'"
-                  [attr.name]="'city_co_exp'"
-                  id="city_co_exp"
+                  [formControlName]="'subordinate_cmte_city'"
+                  [attr.name]="'subordinate_cmte_city'"
+                  id="subordinate_cmte_city"
                   [style.width]="'66%'" 
                   [style.height]="'30px'"
                   [maxlength]="'30'"
                   [ngClass]="
-                    frmIndividualReceipt.get('city_co_exp')?.invalid &&
+                    frmIndividualReceipt.get('subordinate_cmte_city')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -253,19 +279,19 @@
             </div>
             <div class="col col-md-4">
               <div class="form-group" [style.width]="'235px'">
-                <label for="state_co_exp">
+                <label for="subordinate_cmte_state">
                     State
                 </label>
                 <ng-select #stateSelect 
                   [items]="states"                   
                   class="forms__select" 
-                  [formControlName]="'state_co_exp'" 
-                  id="state_co_exp"
+                  [formControlName]="'subordinate_cmte_state'" 
+                  id="subordinate_cmte_state"
                   bindValue="code" 
                   bindLabel="code" 
                   [selectOnTab]="true"
                     [ngClass]="
-                    frmIndividualReceipt.get('state_co_exp')?.invalid &&
+                    frmIndividualReceipt.get('subordinate_cmte_state')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'forms__select-error'
                       : ''
@@ -278,19 +304,19 @@
             </div>
             <div class="col col-md-4">
               <div class="form-group">
-                <label for="zip_co_exp">
+                <label for="subordinate_cmte_zip">
                     Zip
                 </label>
                 <input class="form-control" 
                   type="text" 
-                  [formControlName]="'zip_co_exp'"
-                  [attr.name]="'zip_co_exp'"
-                  id="zip_co_exp"
+                  [formControlName]="'subordinate_cmte_zip'"
+                  [attr.name]="'subordinate_cmte_zip'"
+                  id="subordinate_cmte_zip"
                   [style.width]="'33%'" 
                   [style.height]="'30px'"
                   [maxlength]="'10'"
                   [ngClass]="
-                    frmIndividualReceipt.get('zip_co_exp')?.invalid &&
+                    frmIndividualReceipt.get('subordinate_cmte_zip')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -298,11 +324,11 @@
                 />
                 <div class="error-text" *ngIf="
                   (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
-                  frmIndividualReceipt.get('zip_co_exp').invalid
+                  frmIndividualReceipt.get('subordinate_cmte_zip').invalid
                 ">
-                  <ng-container *ngIf="frmIndividualReceipt.get('zip_co_exp').errors">
+                  <ng-container *ngIf="frmIndividualReceipt.get('subordinate_cmte_zip').errors">
                     <div class="text-error text-left"
-                      *ngIf="frmIndividualReceipt.get('zip_co_exp').errors?.nonAlphaNumeric">
+                      *ngIf="frmIndividualReceipt.get('subordinate_cmte_zip').errors?.nonAlphaNumeric">
                       Alphanumeric characters only.
                     </div>
                   </ng-container>
@@ -338,7 +364,7 @@
                         <span class="sr-only">Click here for more information</span>
                       </div>
 
-                      <ng-container *ngIf="!col?.validation?.required && col?.name !== 'contribution_aggregate'
+                      <ng-container *ngIf="!col?.validation?.required && col?.name !== 'aggregate_general_elec_exp'
                                             && !col.staticField">
                         (Optional)
                       </ng-container>
@@ -353,15 +379,13 @@
                             </span>
                           </div>
                         </ng-container>
-                        <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
-                        <!-- && col?.name !== 'child*entity_name'
-                          && col?.name !== 'child*donor_cmte_id'" -->
                         <input *ngIf="col?.name !== 'first_name' 
                                 && col?.name !== 'last_name'
                                 && !isFieldName(col?.name, 'cand_first_name')
                                 && !isFieldName(col?.name, 'cand_last_name')
                                 && !isFieldName(col?.name, 'entity_name')
                                 && !isFieldName(col?.name, 'donor_cmte_id')
+                                && !isFieldName(col?.name, 'payee_cmte_id')
                                 && !isFieldName(col?.name, 'donor_cmte_name')
                                 && !isFieldName(col?.name, 'beneficiary_cmte_id')
                                 && !isFieldName(col?.name, 'beneficiary_cmte_name') 
@@ -370,21 +394,22 @@
                           [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.readonly]="(col.type === 'text' && col?.isReadonly) ? true : null"
                           [attr.value]="col?.value"
-                          [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount') 
-                                        || isFieldName(col?.name, 'contribution_aggregate'))? col?.validation?.max + 5: col?.validation?.max"
+                          [maxlength]="(isFieldName(col?.name, 'expenditure_amount') ||
+                                        isFieldName(col?.name, 'aggregate_general_elec_exp'))
+                                        ? col?.validation?.max + 5: col?.validation?.max"
                           [formControlName]="col?.name"
-                          (blur)="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount')) 
-                                    ? contributionAmountChange($event, col?.name, col?.validation?.dollarAmountNegative) : populatePurpose(col?.name)"
+                          (blur)="handleOnBlurEvent($event, col)"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                                 ? 'input-field-error'
                                 : ''
-                            " (keyup)="handleFormFieldKeyup($event, col)" (change)="(isFieldName(col?.name, 'contribution_date') || isFieldName(col?.name, 'expenditure_date')) 
+                            " (keyup)="handleFormFieldKeyup($event, col)" (change)="(isFieldName(col?.name, 'expenditure_date')) 
                                       ? dateChange(col?.name) : null;" />
                         <input *ngIf="col?.name === 'last_name'" class="form-control" [style.width]="col?.width"
                           [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -397,6 +422,7 @@
                         <input *ngIf="col?.name === 'first_name'" class="form-control" [style.width]="col?.width"
                           [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -442,6 +468,7 @@
                           [resultTemplate]="rtOrg" [inputFormatter]="formatterOrgName"
                           (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
+                                  isFieldName(col?.name, 'payee_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cand_id')" class="form-control"
                           [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
@@ -508,14 +535,11 @@
                             should fall within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you
                             need to add a transaction with a date that falls outside of the coverage period for this report,
                             you will need to check the memo code box.
-                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
-                              coverage period only. -->
                           </div>
                         </ng-container>
                       </div>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'checkbox'">
-                      <!-- [attr.disabled]="isMemoCodeReadOnly(col?.name)" -->
                       <input class="form-control forms__big_checkbox" [style.width]="col?.width"
                         [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                         [attr.value]="col?.value"
@@ -533,8 +557,10 @@
                         [style.overflow]="col.scroll ? col.scroll : null" [attr.name]="col?.name"
                         [attr.maxlength]="col?.validation?.max" [formControlName]="col?.name"></textarea>
                     </ng-container>
-                    <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office')">
-                      <ng-select #candOfficeTypeSelect 
+                    <ng-container *ngIf="col?.type === 'select' && 
+                        isFieldName(col?.name, 'cand_office')">
+                      <ng-select #candOfficeTypeSelect
+                        [attr.readonly]="isSelectFieldReadOnly(col)"
                         [items]="candidateOfficeTypes"
                         (change)="handleCandOfficeChange($event, col)" 
                         class="forms__select" 
@@ -552,14 +578,17 @@
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && 
                           (isFieldName(col?.name, 'state') ||
-                          isFieldName(col?.name, 'cand_office_state'))">
+                           isFieldName(col?.name, 'payee_cand_state') ||
+                           isFieldName(col?.name, 'cand_office_state'))"
+                    >
                       <ng-select #stateSelect 
                         [items]="states" 
                         (change)="handleStateChange($event, col)"
                         class="forms__select" 
                         [formControlName]="col?.name" 
                         bindValue="code" 
-                        bindLabel="code" 
+                        bindLabel="code"
+                        [attr.readonly]="isSelectFieldReadOnly(col)"
                         [selectOnTab]="true"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -597,6 +626,7 @@
                         [formControlName]="col?.name" 
                         bindValue="entityType"
                         bindLabel="entityTypeDescription" 
+                        [attr.readonly]="isSelectFieldReadOnly(col)"
                         [selectOnTab]="true"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
@@ -655,6 +685,18 @@
               </div>
             </div>
           </ng-container>
+          <ng-container *ngIf="row.childForm">
+            <div class="row">
+              <div [class]="row.colClassName">
+                {{ row.childFormTitle }}
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <hr />
+              </div>
+            </div>
+          </ng-container>
         </ng-container>
       </section>
   
@@ -678,7 +720,7 @@
                 </a> -->
                 <a *ngIf="showPart2" class="btn btn-primary btn-right" (click)="saveAndReturnToParentDebt()">
                   Save &amp; View Expenditure
-                </a>                
+                </a>   
               </div>
             </div>
           </div>

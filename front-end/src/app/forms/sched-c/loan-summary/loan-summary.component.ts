@@ -183,7 +183,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.getPage(this.config.currentPage);
   }
 
-  public goToPage(pageEvent: any){
+  public goToPage(pageEvent: any) {
     console.log(pageEvent);
     this.currentPageNumber = pageEvent;
   }
@@ -211,10 +211,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     switch (this.tableType) {
       case this.LoanView:
         this.getLoanPage(page);
-        break;
-      case this.recycleBinView:
-        this.getRecyclingPage(page);
-        this.maxColumnOption = 6;
         break;
       default:
         break;
@@ -251,7 +247,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       mapToSingleServerName(this.currentSortedColumnName);
 
     this._LoanService.getLoan()
-    //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
+      //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
       .subscribe((res: any) => {
 
         // res=this.tempApiResponse;
@@ -267,10 +263,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 
         //TODO - ZS -- this is temporary fix to map fields to the right attributes until service response is fixed
         res.forEach(element => {
-          if(element.entity_type==='IND'){
+          if (element.entity_type === 'IND') {
             element.name = `${element.last_name}, ${element.first_name}`;
           }
-          else if(element.entity_type==='ORG'){
+          else if (element.entity_type === 'ORG') {
             element.name = element.entity_name;
           }
         });
@@ -279,7 +275,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         const LoanModelL = this._LoanService.mapFromServerFields(res);
         this.LoanModel = LoanModelL;
 
-      
+
 
         this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
         this.numberOfPages = res.totalPages;
@@ -287,72 +283,41 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       });
   }
 
-
-  /**
-	 * The Loan for the recycling bin.
-	 *
-	 * @param page the page containing the Loan to get
-	 */
-  public getRecyclingPage(page: number): void {
-
-    this.config.currentPage = page;
-
-    let sortedCol: SortableColumnModel =
-      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
-
-    // smahal: quick fix for sortCol issue not retrived from cache
-    if (!sortedCol) {
-      this.setSortDefault();
-      sortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
-    }
-
-    if (sortedCol) {
-      if (sortedCol.descending === undefined || sortedCol.descending === null) {
-        sortedCol.descending = false;
-      }
-    } else {
-      sortedCol = new SortableColumnModel('', false, false, false, false);
-    }
-
-    // const serverSortColumnName = this._LoanService.
-    //   mapToSingleServerName(this.currentSortedColumnName);
-
-    this._LoanService.getUserDeletedLoan(page, this.config.itemsPerPage,
-      this.currentSortedColumnName,
-      sortedCol.descending)
-      .subscribe((res: GetLoanResponse) => {
-        console.log(" getRecyclingPage res =", res)
-        this.LoanModel = [];
-
-        // fixes an issue where no items shown when current page != 1 and new filter
-        // result has only 1 page.
-        if (res.totalPages === 1) {
-          this.config.currentPage = 1;
+  public goToC1(loan:any) {
+    const c1Exists = this._LoanService.c1Exists(loan);
+    const c1EmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c1',
+      action: c1Exists ? ScheduleActions.edit: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
+          transactionId: loan.transaction_id,
         }
+      }
+    };
+    this.status.emit(c1EmitObj);
+  }
 
-        this._LoanService.addUIFileds(res);
-
-        this.LoanModel = res.loans;
-
-        this._LoanService.addUIFileds(res);
-        this._LoanService.mockApplyFilters(res);
-        const LoanModelL = this._LoanService.mapFromServerFields(res.loans);
-        this.LoanModel = LoanModelL;
-
-        // handle non-numeric amounts
-        // TODO handle this server side in API
-        // for (const model of this.LoanModel) {
-        //   model.amount = model.amount ? model.amount : 0;
-        //   model.aggregate = model.aggregate ? model.aggregate : 0;
-        // }
-
-        this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
-        this.numberOfPages = res.totalPages;
-        this.allLoanSelected = false;
-
-
-
-      });
+  public goToEndorserSummary(loan:any) {
+    const c1EmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c_es',
+      action: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
+          endorser:{
+            back_ref_transaction_id:loan.transaction_id,
+          }, 
+        }
+      }
+    };
+    this.status.emit(c1EmitObj);
   }
 
 
@@ -587,6 +552,31 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    */
   public linkAllSelected(): void {
     alert('Link multiple loan requirements have not been finalized');
+  }
+
+/**
+   * Trash the transaction selected by the user.
+   *
+   * @param trx the Transaction to trash
+   */
+  public trashLoan(loan: any): void {
+    this._dialogService
+      .confirm('You are about to delete this transaction ' + loan.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._LoanService.deleteLoan(loan).subscribe(res => {
+            this.getPage(this.config.currentPage);
+            this._dialogService.confirm(
+              'Transaction has been successfully deleted. ' + loan.transactionId,
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          })
+        } else if (res === 'cancel') {
+        }
+      });
   }
 
 
@@ -929,12 +919,12 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     //this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
   }
 
-  public editLoanPayment(loan:any){
+  public editLoanPayment(loan: any) {
     this._goToLoan(loan);
   }
 
 
-  private _goToLoan(loan:any) {
+  private _goToLoan(loan: any) {
     const loanRepaymentEmitObj: any = {
       form: {},
       direction: 'next', //TODO-zs -- does this need to be changed?
@@ -943,8 +933,8 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       scheduleType: 'sched_c',
       action: ScheduleActions.edit,
       transactionDetail: {
-        transactionModel : {
-          transactionId: loan.transaction_id, 
+        transactionModel: {
+          transaction_id: loan.transaction_id,
           entityId: loan.entity_id
         }
       }
@@ -952,7 +942,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.status.emit(loanRepaymentEmitObj);
   }
 
-  public goToLoanRepayment(loan:any) {
+  public goToLoanRepayment(loan: any) {
     const loanRepaymentEmitObj: any = {
       form: {},
       direction: 'next',
@@ -962,8 +952,9 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       action: ScheduleActions.add,
       transactionDetail: {
         transactionModel: {
-          transactionId: loan.transaction_id, 
-          entityId: loan.entity_id
+          transactionId: loan.transaction_id,
+          entityId: loan.entity_id,
+          entryScreenScheduleType: 'sched_c_ls',
         }
       }
     };

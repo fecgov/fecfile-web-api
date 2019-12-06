@@ -47,7 +47,7 @@
       </div>
     </header>
 
-    <section *ngIf="transactionType === 'ALLOC_H4_TYPES' && transactionType !== 'ALLOC_EXP_DEBT'">
+    <section *ngIf="showSelectType && transactionType !== 'ALLOC_H4_SUM'">
       <div class="subtitle">
         <h2>
             <b>What Type of Disbursement are you adding?</b>
@@ -61,7 +61,8 @@
             <tbody>
               <tr>               
                 <td class="summary_text_level_3">
-                  <input type="radio" formControlName="type" value="ALLOC_EXP" (change)="selectTypeChange($event)">Allocated Payment
+                  <input type="radio" formControlName="type" value="ALLOC_EXP" id="opt1" (click)="selectTypeChange($event)">
+                  <label for="opt1">Allocated Payment</label>
                   <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                       tooltipClass="form-tooltip">
                       <i class="info-icon" aria-hidden="true"></i>
@@ -71,7 +72,8 @@
               </tr>
               <tr>                
                 <td class="summary_text_level_3">
-                  <input type="radio" formControlName="type" value="ALLOC_ECP_CC_PAY" (change)="selectTypeChange($event)">Allocated Credit Card Payment
+                  <input type="radio" formControlName="type" value="ALLOC_EXP_CC_PAY" id="opt2" (click)="selectTypeChange($event)">
+                  <label for="opt2">Allocated Credit Card Payment</label>
                   <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                       tooltipClass="form-tooltip">
                       <i class="info-icon" aria-hidden="true"></i>
@@ -81,7 +83,8 @@
               </tr>
               <tr>                
                 <td class="summary_text_level_3">                
-                  <input type="radio" formControlName="type" value="ALLOC_EXP_STAF_REIM" (change)="selectTypeChange($event)"> Allocated Staff Reimbusement
+                  <input type="radio" formControlName="type" value="ALLOC_EXP_STAF_REIM" id="opt3" (click)="selectTypeChange($event)"> 
+                  <label for="opt3">Allocated Staff Reimbusement</label>
                   <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                       tooltipClass="form-tooltip">
                       <i class="info-icon" aria-hidden="true"></i>
@@ -91,7 +94,8 @@
               </tr>
               <tr>                
                 <td class="summary_text_level_3">
-                  <input type="radio" formControlName="type" value="ALLOC_EXP_PMT_TO_PROL" (change)="selectTypeChange($event)">Allocated Payroll
+                  <input type="radio" formControlName="type" value="ALLOC_EXP_PMT_TO_PROL" id="opt4" (click)="selectTypeChange($event)">
+                  <label for="opt4">Allocated Payroll</label>
                   <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                       tooltipClass="form-tooltip">
                       <i class="info-icon" aria-hidden="true"></i>
@@ -101,7 +105,8 @@
               </tr>
               <tr>                
                 <td class="summary_text_level_3">
-                  <input type="radio" formControlName="type" value="ALLOC_EXP_VOID" (change)="selectTypeChange($event)">Void of Allocated Expenditure
+                  <input type="radio" formControlName="type" value="ALLOC_EXP_VOID" id="opt5" (click)="selectTypeChange($event)">
+                  <label for="opt5">Void of Allocated Expenditure</label>
                   <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                       tooltipClass="form-tooltip">
                       <i class="info-icon" aria-hidden="true"></i>
@@ -119,7 +124,7 @@
               <div class="grid-row__col grid-row__col--12">
                 <div class="forms__btn-container">
                   <button class="btn btn-previous btn-left" type="button" 
-                  (click)="clearFormValues(); previousStep()">
+                  (click)="previousStep()">
                     Cancel
                   </button>
                   
@@ -166,32 +171,41 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <ng-container >
-                        <tr *ngFor="let item of h4Sum | paginate: tableConfig">
+                    <ng-container *ngFor="let item of schedH4sModel | paginate: tableConfig">
+                        <tr *ngIf="item.memo_code !=='X' || item.arrow_dir ==='show'"
+                         [ngStyle]="{'background-color': item.memo_code !=='X' ? '' : '#D9EDF6'}">
                         <td>
                             <input type="checkbox" (click)="checkForMultiChecked($event)">
                         </td>
-                        <td>                           
-                          {{ item.entity_type == 'IND' ?
-                              item.first_name + ' ' + item.last_name :
-                              item.entity_name
-                          }}
+                        <td>
+                            <div class="row td-arrow">
+                              {{ item.entity_type == 'IND' ?
+                                  item.first_name + ' ' + item.last_name :
+                                  item.entity_name
+                              }}
+                            <div >
+                              <i *ngIf="item.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow" (click)="clickArrow(item)"></i>
+                              <i *ngIf="item.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(item)"></i>
+                            </div>
+                          </div>
                         </td>
                         <td>
-                            <div *ngIf="item.event_type == 'AD'">Administrative</div>
-                            <div *ngIf="item.event_type == 'GV'">Generic Voter Drive</div>
-                            <div *ngIf="item.event_type == 'EA'">Exempt Activities</div>
-                            <div *ngIf="item.event_type == 'DF'">Direct Fundraising</div>
-                            <div *ngIf="item.event_type == 'DC'">Direct Candidate Suppot</div>
-                            <div *ngIf="item.event_type == 'PC'">Public Communications Referring Only to Party(Made by PAC)</div>                            
+                            <div *ngIf="item.activity_event_type == 'AD'">Administrative</div>
+                            <div *ngIf="item.activity_event_type == 'GV'">Generic Voter Drive</div>
+                            <div *ngIf="item.activity_event_type == 'EA'">Exempt Activities</div>
+                            <div *ngIf="item.activity_event_type == 'DF'">Direct Fundraising</div>
+                            <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Suppot</div>
+                            <div *ngIf="item.activity_event_type == 'PC'">Public Communications Referring Only to Party(Made by PAC)</div>                            
                         </td>
-                        <td>{{ item.activity_event_identifier  }}</td>
-                        <td>{{ item.Date | date: 'MM/dd/yyyy' }}</td>                          
-                        <td>{{ item.fed_share_amount }}</td>
-                        <td>{{ item.non_fed_share_amount }}</td>
                         <td>
-                            <div *ngIf="item.memo_code == 't'"><input type="checkbox" checked onclick="return false;">Memo</div>
-                            <div *ngIf="item.memo_code != 't'"><input type="checkbox" onclick="return false;">Memo</div>                            
+                            {{ item.activity_event_identifier }}
+                        </td>
+                        <td>{{ item.expenditure_date | date: 'MM/dd/yyyy' }}</td>   
+                        <td>{{ item.fed_share_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+                        <td>{{ item.non_fed_share_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+                        <td>
+                            <div *ngIf="item.memo_code == 'X'"><input type="checkbox" checked onclick="return false;">Memo</div>
+                            <div *ngIf="item.memo_code != 'X'"><input type="checkbox" onclick="return false;">Memo</div>                            
                         </td>
 
                         <td class="bulk_action" >
@@ -238,7 +252,7 @@
             <div class="grid-row__col grid-row__col--12">
               <div class="forms__btn-container">
                 <button class="btn btn-previous btn-left" type="button" 
-                (click)="clearFormValues(); previousStep()">
+                (click)="previousStep()">
                   Previous
                 </button>
                 

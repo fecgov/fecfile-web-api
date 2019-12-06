@@ -345,6 +345,42 @@ export class IndividualReceiptService {
     });
   }
 
+  /**
+   * Get the aggregate amout for the Schedule F Payment on a Debt.
+   *
+   * @param candidateId Candidate ID selected in the form
+   * @param expenditureDate Date of the expenditure from the form
+   * @param expenditureAmount optional - amount of the expenditure from the form
+   */
+  public getSchedFPaymentAggregate(
+    candidateId: number,
+    expenditureDate: string,
+    expenditureAmount?: string
+  ): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/sf/get_aggregate';
+
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('beneficiary_cand_id', candidateId.toString());
+    params = params.append('expenditure_date', expenditureDate);
+    if (expenditureAmount) {
+      params = params.append('expenditure_amount', expenditureAmount);
+    }
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+    // let rando = Math.floor(Math.random() * 10000);
+    // rando += 0.99;
+    // return Observable.of({ aggregate_general_elec_exp: rando });
+  }
+
   public getFedNonFedPercentage__(amount: string, activityEvent: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sh1/get_h1_percentage';
@@ -369,7 +405,7 @@ export class IndividualReceiptService {
     });
   }
 
-  public getFedNonFedPercentage(amount: string, activityEvent: string): Observable<any> {
+  public getFedNonFedPercentage(amount: string, activityEvent: string, activityEventName: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sh1/get_fed_nonfed_share';
     let httpOptions = new HttpHeaders();
@@ -391,6 +427,9 @@ export class IndividualReceiptService {
     }
     if (activityEvent) {
       params = params.append('activity_event_type', activityEvent);
+    }
+    if (activityEventName) {
+      params = params.append('activity_event_identifier', activityEventName);
     }
 
     return this._http.get(`${environment.apiUrl}${url}`, {

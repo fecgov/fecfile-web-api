@@ -1583,9 +1583,14 @@ public printReport(report: reportModel): void{
 
           const formType =
             report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+          /*  
           this._router.navigate([`/forms/form/${formType}`], {
             queryParams: { step: 'reports', reportId: report.report_id }
             });
+          */
+          this._router.navigate([`/forms/form/${formType}`], {
+            queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'receipts'  }
+          });
           }, 1500);
         }          
       }

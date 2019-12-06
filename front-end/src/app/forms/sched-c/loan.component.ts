@@ -1,10 +1,11 @@
+import { F3xMessageService } from './../form-3x/service/f3x-message.service';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
 import { FormsService } from '../../shared/services/FormsService/forms.service';
@@ -46,6 +47,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   /**
    * Subscription for pre-populating the form for view or edit.
    */
+
+  private _clearFormSubscription: Subscription;
 
   public checkBoxVal = false;
   public frmLoan: FormGroup;
@@ -89,6 +92,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private currentLoanData: any; 0
   private _selectedEntityId: any;
   private typeChangeEventOccured = false;
+  _routeListener: Subscription;
+  private c1ExistsFlag: any;
 
   constructor(
     private _http: HttpClient,
@@ -106,15 +111,41 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     private _receiptService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _transactionsMessageService: TransactionsMessageService,
-    private _contributionDateValidator: ContributionDateValidator
+    private _contributionDateValidator: ContributionDateValidator,
+    private _f3xMessageService: F3xMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
+
+
+    this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
+      if (this.frmLoan) {
+        this.frmLoan.reset();
+        this.setupForm();
+      }
+    });
+
   }
 
   ngOnInit(): void {
+    /* this._routeListener = this._router.events.subscribe(val => {
 
+      //whenver navigation starts, check the current form and set dirty status in the service to be retreived during GuardCheck
+      if (val instanceof NavigationStart) {
+        this._formsService.setFormDirtyFlag(this.frmLoan);
+      }
+
+
+      //check
+      console.info('checking router can deactivate or not');
+      console.info('route value: ' + val);
+    }); */
+
+    this.setupForm();
+  }
+
+  private setupForm() {
     this._selectedEntity = null;
     this._loanToEdit = null;
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
@@ -126,16 +157,17 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    /*   if (this.scheduleAction === ScheduleActions.edit) {
-      this._prePopulateFormForEdit(this.transactionDetail);
-    } else if (this.scheduleAction === ScheduleActions.add) {
-      this._clearFormValues();
-    } */
+    console.log('inside ngOnChanges');
+    this.ngOnInit();
   }
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
+    this._clearFormSubscription.unsubscribe();
+    //this._routeListener.unsubscribe();
   }
+
+
 
 
   private _setForm(fields: any): void {
@@ -191,11 +223,15 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       formValidators.push(alphaNumeric());
     }
 
+
+    //date validator is only applicable for "add" and not for edit. Also field is being disabled for edit. 
     if (fieldName === 'loan_incurred_date') {
       const formType = JSON.parse(localStorage.getItem('form_3X_report_type'));
       this.cvgStartDate = formType.cvgStartDate;
       this.cvgEndDate = formType.cvgEndDate;
-      formValidators.push(this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate)); //TODO-ZS  -- do null checks. 
+      if (this.scheduleAction === ScheduleActions.add) {
+        formValidators.push(this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate)); //TODO-ZS  -- do null checks. 
+      }
     }
 
     if (validators) {
@@ -404,7 +440,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan.patchValue({ entity_type: loan.entity_type }, { onlySelf: true });
     this.frmLoan.patchValue({ zip_code: loan.zip_code }, { onlySelf: true });
 
-    this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
+    /* this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
     this.frmLoan.patchValue({ election_code: loan.election_code }, { onlySelf: true });
     this.frmLoan.patchValue({ election_other_description: loan.election_other_description }, { onlySelf: true });
     this.frmLoan.patchValue({ is_loan_secured: loan.is_loan_secured }, { onlySelf: true });
@@ -424,7 +460,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan.patchValue({ lender_cand_state: loan.lender_cand_state }, { onlySelf: true });
     this.frmLoan.patchValue({ lender_cand_district: loan.lender_cand_district }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
-    this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });
+    this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true }); */
   }
 
   public handleSelectedItem($event: NgbTypeaheadSelectItemEvent) {
@@ -443,7 +479,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan.patchValue({ entity_type: loan.entity_type }, { onlySelf: true });
     this.frmLoan.patchValue({ zip_code: loan.zip_code }, { onlySelf: true });
 
-    this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
+    /* this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
     this.frmLoan.patchValue({ election_code: loan.election_code }, { onlySelf: true });
     this.frmLoan.patchValue({ election_other_description: loan.election_other_description }, { onlySelf: true });
     this.frmLoan.patchValue({ loan_amount_original: loan.loan_amount_original }, { onlySelf: true });
@@ -462,7 +498,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan.patchValue({ lender_cand_state: loan.lender_cand_state }, { onlySelf: true });
     this.frmLoan.patchValue({ lender_cand_district: loan.lender_cand_district }, { onlySelf: true });
     this.frmLoan.patchValue({ memo_code: loan.memo_code }, { onlySelf: true });
-    this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true });
+    this.frmLoan.patchValue({ memo_text: loan.memo_text }, { onlySelf: true }); */
 
     let transactionTypeIdentifier = '';
 
@@ -702,6 +738,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           } // typeof res.data
         } // res.hasOwnProperty('data')
 
+
+        //in some instances, transaction_id is being passed as 'transactionId'
+        //TODO - need to combine/standardize the attribute names.
+        if (!this.transactionDetail.transaction_id && this.transactionDetail.transactionId) {
+          this.transactionDetail.transaction_id = this.transactionDetail.transactionId;
+        }
+
         if (this.scheduleAction === ScheduleActions.edit) {
           this._prePopulateFormForEdit(this.transactionDetail);
         }
@@ -738,9 +781,10 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public saveLoan(): void {
-    if (this.entityType === 'IND') {
+    const entityType = this.frmLoan.get('entity_type').value;
+    if (entityType === 'IND') {
       this.doValidateLoan('loanSummary');
-    } else if (this.entityType === 'ORG') {
+    } else if (entityType === 'ORG') {
       this.doValidateLoan('c1');
     }
   }
@@ -753,7 +797,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       step: 'step_3',
       previousStep: 'step_2',
       scheduleType: 'sched_c1',
-      action: ScheduleActions.add,
+      action: this.scheduleAction,
       transactionDetail: {
         transactionModel: {
           transactionId: this._transactionId,
@@ -764,9 +808,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.status.emit(c1EmitObj);
   }
 
-  public onSaveLoan(loanRepaymentRoute = false): void {
-    if (loanRepaymentRoute) {
-      this.doValidateLoan('loanRepayment');
+  public onSaveLoan(nextScreen: string = null): void {
+    if (nextScreen) {
+      this.doValidateLoan(nextScreen);
     } else {
       this.saveLoan();
     }
@@ -783,14 +827,15 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       transactionDetail: {
         transactionModel: {
           transactionId: this._transactionId,
-          entityId: this._selectedEntityId
+          entityId: this._selectedEntityId,
+          entryScreenScheduleType: 'sched_c',
         }
       }
     };
     this.status.emit(loanRepaymentEmitObj);
   }
 
-  public AddLoanEndorser(): void {
+  private _goToEndorser(): void {
     const endorserEmitObj: any = {
       form: {},
       direction: 'next',
@@ -800,13 +845,36 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       action: ScheduleActions.add,
       transactionDetail: {
         transactionModel: {
+          endorser: {
+            back_ref_transaction_id: this._transactionId,
+          },
+          entityId: this._selectedEntityId,
+          entryScreenScheduleType: 'sched_c',
+          transaction_id: this._transactionId,
+          c1Exists: this.c1ExistsFlag
+        }
+      }
+    };
+    this.status.emit(endorserEmitObj);
+  }
+
+  public _goToEndorserSummary(): void {
+    const endorserEmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c_es',
+      action: ScheduleActions.add,
+      transactionDetail: {
+        transactionModel: {
           transactionId: this._transactionId,
           entityId: this._selectedEntityId
         }
       }
     };
     this.status.emit(endorserEmitObj);
-   }
+  }
 
   public isFieldName(fieldName: string, nameString: string): boolean {
     return fieldName === nameString || fieldName === this._childFieldNamePrefix + nameString;
@@ -859,8 +927,15 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           LoanObj[field] = this.frmLoan.get(field).value;
         }
         //also add transactionId if available (edit route)
-        if (this.transactionDetail && this.transactionDetail.transactionId) {
-          LoanObj['transaction_id'] = this.transactionDetail.transactionId;
+        if (this.scheduleAction === ScheduleActions.edit && this.transactionDetail) {
+          if (this.transactionDetail.transaction_id) {
+            LoanObj['transaction_id'] = this.transactionDetail.transaction_id;
+          }
+          //in some instances, transaction_id is being passed as 'transactionId'
+          //TODO - need to combine/standardize the attribute names.
+          else if (this.transactionDetail.transactionId) {
+            LoanObj['transaction_id'] = this.transactionDetail.transactionId;
+          }
         }
       }
 
@@ -869,13 +944,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       if (this._selectedEntity) {
         LoanObj.entity_id = this._selectedEntity.entity_id;
       }
-      LoanObj.entity_type = this.entityType;
+      // LoanObj.entity_type = this.entityType;
       LoanObj['is_loan_secured'] = this.frmLoan.get('secured').value;
       console.log('LoanObj =', JSON.stringify(LoanObj));
 
       localStorage.setItem('LoanObj', JSON.stringify(LoanObj));
       this._loansService
-        .saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, this.entityType)
+        .saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, LoanObj.entity_type)
         .subscribe(res => {
           if (res) {
             console.log('_LoansService.saveContact res', res);
@@ -893,6 +968,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
               this._goToLoanRepayment();
             } else if (nextScreen === 'c1') {
               this._goToC1();
+            } else if (nextScreen === 'endorser') {
+              this.c1ExistsFlag = this._loansService.c1Exists(this.currentLoanData);
+              this._goToEndorser();
             }
           }
         });
@@ -912,6 +990,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
   }
+
+
 
   private _gotoSummary() {
     const summaryEmitObj: any = {
@@ -966,7 +1046,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private _prePopulateFormForEdit(transactionDetail: any) {
 
     const reportId = this._receiptService.getReportIdFromStorage(this.formType);
-    this._loansService.getDataSchedule(reportId, transactionDetail.transactionId).subscribe((res: any) => {
+    this._loansService.getDataSchedule(reportId, transactionDetail.transaction_id).subscribe((res: any) => {
       console.log();
       if (!res) {
         return;
@@ -1029,6 +1109,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       this.frmLoan.patchValue({ loan_amount_original: this._decimalPipe.transform(loanData.loan_amount_original, '.2-2') })
       this.frmLoan.patchValue({ loan_payment_to_date: this._decimalPipe.transform(loanData.loan_payment_to_date, '.2-2') })
       this.frmLoan.patchValue({ loan_balance: this._decimalPipe.transform(loanData.loan_balance, '.2-2') })
+
+      this.frmLoan.controls['loan_incurred_date'].disable();
 
       this.frmLoan.patchValue({ entity_type: entityType }, { onlySelf: true });
       this._selectedEntity.entity_type = entityType;
@@ -1157,4 +1239,5 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       }
     });
   }
+
 }

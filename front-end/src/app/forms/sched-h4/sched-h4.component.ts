@@ -27,7 +27,8 @@ import { PaginationInstance } from 'ngx-pagination';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { SchedH4Service } from './sched-h4.service';
-
+import { SchedH4Model } from './sched-h4.model';
+import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 
 @Component({
   selector: 'app-sched-h4',
@@ -64,6 +65,11 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
   public saveHRes: any;
 
   public tableConfig: any;
+
+  public showSelectType = true;
+
+  public schedH4sModel: Array<SchedH4Model>;
+  public schedH4sModelL: Array<SchedH4Model>;
    
   constructor(
     _http: HttpClient,
@@ -88,6 +94,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     _reportsService: ReportsService,
     private _actRoute: ActivatedRoute,
     private _schedH4Service: SchedH4Service,
+    private _individualReceiptService: IndividualReceiptService,
   ) {    
      super(
       _http,
@@ -112,11 +119,12 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
       _reportsService
     );
     _schedH4Service;
+    _individualReceiptService;
   }
 
 
   public ngOnInit() {
-    
+    this.abstractScheduleComponent = AbstractScheduleParentEnum.schedH4Component;
     // temp code - waiting until dynamic forms completes and loads the formGroup
     // before rendering the static fields, otherwise validation error styling
     // is not working (input-error-field class).  If dynamic forms deliver,
@@ -126,7 +134,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     }, 2000);
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
-    this.getH4Sum(this.getReportId());
+    //this.getH4Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
     
     //this.setSchedH4();
 
@@ -138,10 +146,12 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
 
     //this.setDefaultValues();
 
+    /*
     console.log("this.transactionType: ", this.transactionType);
     if(this.transactionType === 'ALLOC_H4_RATIO') {
       this.transactionType = 'ALLOC_EXP_DEBT'
     }
+    */
 
     this.setSchedH4();
 
@@ -153,7 +163,17 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
 
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
-    this.formType = '3X';    
+    this.formType = '3X';
+
+    if(this.transactionType === 'ALLOC_H4_SUM') {
+      this.getH4Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+    }
+  }
+
+  ngDoCheck() {
+    this.status.emit({
+      otherSchedHTransactionType: this.transactionType
+    });
   }
 
   public ngOnDestroy(): void {
@@ -186,34 +206,120 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
 
   public setSchedH4() {
     this.schedH4 = new FormGroup({     
-      type: new FormControl('ALLOC_EXP', Validators.required)      
+      type: new FormControl('', Validators.required)      
     });
   }
 
-  public selectTypeChange(e) { 
-    const receiptObj: any = {};
-    receiptObj['transaction_type_identifier'] = e.currentTarget.value;
-    localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));   
+  public selectTypeChange(e) {    
+    this.transactionType = e.currentTarget.value;   
   }
  
   public getH4Sum(reportId: string) {
+    this.schedH4sModel = [];
     
     this.h4Subscription = this._schedH4Service.getSummary(reportId).subscribe(res =>
       {        
         if(res) {          
-          this.h4Sum =  res;         
-          this.tableConfig.totalItems = res.length;           
+          //this.h4Sum =  res;
+          this.schedH4sModelL = this.mapFromServerFields(res);
+          this.schedH4sModel = this.mapFromServerFields(res);
+          this.setArrow(this.schedH4sModel);
+
+          this.schedH4sModel = this.schedH4sModel .filter(obj => obj.memo_code !== 'X');
+          this.tableConfig.totalItems = this.schedH4sModel.length;
         }
       });        
   }
  
   public returnToSum(): void {
     this.transactionType = 'ALLOC_H4_SUM';
-    this.getH4Sum(this.getReportId());
+    this.getH4Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
   }
 
   public returnToAdd(): void {
-    this.transactionType = 'ALLOC_EXP_DEBT'; //'ALLOC_H4_RATIO';    
+    this.showSelectType = true;
+    this.transactionType = "ALLOC_H4_TYPES"
+
+    //this.transactionType = 'ALLOC_EXP_DEBT'; //'ALLOC_H4_RATIO';
+  }1
+
+  public previousStep(): void {
+    
+    this.schedH4.reset();
+
+    this.status.emit({
+      form: {},
+      direction: 'previous',
+      step: 'step_2'
+    });
+  }
+
+  public clickArrow(item: SchedH4Model) {
+    if(item.arrow_dir === 'down') {
+      let indexRep = this.schedH4sModel.indexOf(item);
+      if (indexRep > -1) {
+        let tmp: Array<SchedH4Model> = this.schedH4sModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id);
+        for(let entry of tmp) {
+          entry.arrow_dir = 'show';
+          this.schedH4sModel.splice(indexRep + 1, 0, entry);
+          indexRep++;
+        }
+        this.tableConfig.totalItems = this.schedH4sModel.length;
+      }
+      this.schedH4sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'up';
+      
+    }else if(item.arrow_dir === 'up') {
+      //this.schedH4sModel = this.schedH4sModel.filter(obj => obj.memo_code !== 'X');
+      this.schedH4sModel = this.schedH4sModel.filter(obj => obj.back_ref_transaction_id !== item.transaction_id);
+      this.tableConfig.totalItems = this.schedH4sModel.length;
+
+      this.schedH4sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'down';      
+    }
+   
+  }
+
+  public setArrow(items: SchedH4Model[]) {
+    if(items) {
+      for(const item of items) {        
+        if(item.memo_code !== 'X' && this.schedH4sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id})) {
+            item.arrow_dir = 'down';           
+        }        
+      }
+    }
+
+  }
+
+  public mapFromServerFields(serverData: any) {
+    if (!serverData || !Array.isArray(serverData)) {
+      return;
+    }
+
+    const modelArray: any = [];
+
+    for (const row of serverData) {
+      const model = new SchedH4Model({});      
+
+      model.cmte_id = row.cmte_id;
+      model.report_id = row.report_id;     
+      model.transaction_type_identifier = row.transaction_type_identifier;
+      model.transaction_id = row.transaction_id;
+      model.back_ref_transaction_id = row.back_ref_transaction_id;
+      model.activity_event_identifier = row.activity_event_identifier;
+      model.activity_event_type = row.activity_event_type;
+      model.expenditure_date = row.expenditure_date;
+      model.fed_share_amount = row.fed_share_amount;
+      model.non_fed_share_amount = row.non_fed_share_amount;
+      model.memo_code = row.memo_code;
+      model.first_name = row.first_name;
+      model.last_name = row.last_name;
+      model.entity_name = row.entity_name;
+      model.entity_type = row.entity_type;
+
+      modelArray.push(model);
+    
+    }
+
+    return modelArray;
   }
   
 }
