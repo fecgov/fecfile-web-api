@@ -45,6 +45,7 @@ export class TransactionModel {
   fedShareAmount: any;
   nonfedShareAmount: any;
   levinShare: any;
+  purpose: any;
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
@@ -92,5 +93,6 @@ export class TransactionModel {
     this.fedShareAmount = transaction.fedShareAmount;
     this.nonfedShareAmount = transaction.nonfedShareAmount;
     this.levinShare = transaction.levinShare;
+    this.purpose = transaction.purpose;
   }
 }
