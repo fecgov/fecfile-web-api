@@ -76,11 +76,11 @@
           <div *ngIf="trx.activityEventType == 'DC'">Direct Candidate Suppot</div>
           <div *ngIf="trx.activityEventType == 'PC'">Public Communications Referring Only to Party(Made by PAC)</div>
       </td>
-      <td *ngIf="isH4OrH6() === 'H4'">
-          {{ trx.activityEventIdentifier }}
+      <td *ngIf="isH4OrH6() === 'H4' || isH4OrH6() === 'H6'">
+          {{ trx.purpose }}
       </td>
       <td *ngIf="isH4OrH6() === 'H6'">{{ trx.name }}</td>
-      <td class="transactions__amount">
+      <td *ngIf="isH4OrH6() !== 'H6'" class="transactions__amount">
         {{ trx.amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
       </td>
       <td *ngIf="isH4OrH6() === 'H4' || isH4OrH6() === 'H6'">

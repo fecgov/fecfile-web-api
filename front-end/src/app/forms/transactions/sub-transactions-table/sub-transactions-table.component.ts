@@ -137,12 +137,14 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
 
         model.activityEventType = trx.activity_event_type;
         model.activityEventIdentifier = trx.activity_event_identifier;
+        model.purpose = trx.purpose;
         model.fedShareAmount = trx.fed_share_amount;
         model.nonfedShareAmount = trx.non_fed_share_amount;
 
         if(transactionType === 'ALLOC_FEA_CC_PAY_MEMO' || transactionType === 'ALLOC_FEA_STAF_REIM_MEMO') {
           model.fedShareAmount = trx.federal_share;
           model.levinShare = trx.levin_share;
+          model.purpose = trx.expenditure_purpose;
         }
 
         model.memoCode = trx.memo_code;
