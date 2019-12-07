@@ -1170,4 +1170,62 @@ def get_sla_summary_table(request):
 
 @api_view(["GET"])
 def get_slb_summary_table(request):
-    pass
+    """
+    get all Levin sched_b summary for current report
+    """
+    # response = {}
+    logger.debug("get_sql_summary with data:{}".format(request.query_params))
+    try:
+        cmte_id = request.user.username
+
+        if not (
+            "report_id" in request.query_params
+            and check_null_value(request.query_params.get("report_id"))
+        ):
+            raise Exception("Missing Input: report_id is mandatory")
+
+        _sql_p1 = """
+        SELECT json_agg(t) FROM
+        (
+            SELECT * 
+            FROM public.sched_b 
+            WHERE cmte_id = %s
+            AND report_id = %s
+            AND transaction_type_identifier in ("""
+
+        _sql_p2 = """)
+            AND delete_ind is distinct from 'Y'
+        ) t
+        """
+
+        # if not (
+        #     "calendar_year" in request.query_params
+        #     and check_null_value(request.query_params.get("calendar_year"))
+        # ):
+        #     raise Exception("Missing Input: calendar_year is mandatory")
+
+        report_id = check_report_id(request.query_params.get("report_id"))
+        transaction_tps = ["'" + tp + "'" for tp in LB_TRANSACTIONS if "MEMO" not in tp]
+        tps_str = ",".join(transaction_tps)
+        logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
+        logger.debug("transaction_types:{}".format(tps_str))
+        with connection.cursor() as cursor:
+            cursor.execute(_sql_p1 + tps_str + _sql_p2, [cmte_id, report_id])
+            result = cursor.fetchone()[0]
+            print(result)
+            # adding memo child transactions
+            # if result:
+            #     for obj in result:
+            #         if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
+            #             memo_objs = get_la_memos(
+            #                 cmte_id, obj.get("report_id"), obj.get("transaction_id")
+            #             )
+            #             if memo_objs:
+            #                 obj["child"] = memo_objs
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+            "The get_slb_summary_table API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
