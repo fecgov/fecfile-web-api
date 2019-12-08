@@ -2985,7 +2985,7 @@ def load_loan_debt_summary(period_args):
         WHERE  cmte_id = %s 
             AND report_id = %s 
             AND transaction_type_identifier IN ( 
-                'LOAN_OWED_TO_CMTE', 'LOAN_OWED_BY_CMTE' ) 
+                'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE' ) 
         GROUP  BY transaction_type_identifier 
         UNION 
         SELECT transaction_type_identifier, 
@@ -2994,7 +2994,7 @@ def load_loan_debt_summary(period_args):
         WHERE  cmte_id = %s 
             AND report_id = %s 
             AND transaction_type_identifier IN ( 
-                'DEBTS_OWED_TO_CMTE', 'DEBTS_OWED_BY_CMTE' ) 
+                'DEBT_TO_VENDER') 
         GROUP  BY transaction_type_identifier 
     """
     _sql_ytd = """
@@ -3004,7 +3004,7 @@ def load_loan_debt_summary(period_args):
         WHERE  cmte_id = %s 
             AND loan_incurred_date BETWEEN %s AND %s 
             AND transaction_type_identifier IN ( 
-                'LOAN_OWED_TO_CMTE', 'LOAN_OWED_BY_CMTE' ) 
+                'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE' ) 
         GROUP  BY transaction_type_identifier 
         UNION 
         SELECT transaction_type_identifier AS ytd, 
@@ -3013,7 +3013,7 @@ def load_loan_debt_summary(period_args):
         WHERE  cmte_id = %s
             AND create_date BETWEEN %s AND %s
             AND transaction_type_identifier IN ( 
-                'DEBTS_OWED_TO_CMTE', 'DEBTS_OWED_BY_CMTE' ) 
+                'DEBT_TO_VENDER') 
         GROUP  BY transaction_type_identifier 
     """
     try:
@@ -3175,13 +3175,13 @@ GET THIRD NAVIGATION TRANSACTION TYPES VALUES API - CORE APP - SPRINT 13 - FNE 1
 
 def loansanddebts(report_id, cmte_id):
     try:
-        loans_sc_sql = "SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c WHERE memo_code IS NULL AND cmte_id = %s AND report_id = %s AND line_number = '10' AND delete_ind is distinct from 'Y'"
+        loans_sc_sql = "SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c WHERE memo_code IS NULL AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'"
         error_message_sc = "The loans_sql function is throwing an error for sched_c table : "
 
-        loans_sc1_sql = "SELECT COALESCE(SUM(total_outstanding_balance), 0.0) FROM public.sched_c1 WHERE cmte_id = %s AND report_id = %s AND line_number = '10' AND delete_ind is distinct from 'Y'"
+        loans_sc1_sql = "SELECT COALESCE(SUM(total_outstanding_balance), 0.0) FROM public.sched_c1 WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'"
         error_message_sc1 = "The loans_sql function is throwing an error for sched_c1 table : "
 
-        loans_sd_sql = "SELECT COALESCE(SUM(payment_amount), 0.0) FROM public.sched_d WHERE cmte_id = %s AND report_id = %s AND line_num = '10' AND delete_ind is distinct from 'Y'"
+        loans_sd_sql = "SELECT COALESCE(SUM(payment_amount), 0.0) FROM public.sched_d WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'"
         error_message_sd = "The loans_sql function is throwing an error for sched_d table : "
 
         value_list = [cmte_id, report_id]

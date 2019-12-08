@@ -164,8 +164,6 @@
         >
         </app-sched-c1>
 
-        
-
         <!-- <app-sched-c2
           [hidden]="scheduleType !== 'sched_c2'"
           [transactionTypeText]="transactionTypeTextSchedC"
@@ -175,6 +173,11 @@
           (status)="onNotify($event)"
         >
         </app-sched-c2> -->
+
+        <app-debt-summary
+          *ngIf="scheduleType === 'sched_d_ds'"
+          (status)="onNotify($event)">          
+        </app-debt-summary>
 
         <app-sched-h1
           *ngIf="scheduleType === 'sched_h1'"
