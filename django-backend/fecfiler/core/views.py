@@ -2056,24 +2056,27 @@ def get_trans_query(category_type, cmte_id, param_string):
         query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
-                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type from all_disbursements_transactions_view
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate from all_disbursements_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     elif category_type == 'loans_tran':
-        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, purpose_description, loan_amount, loan_payment_to_date, loan_balance, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id from all_loans_debts_transactions_view
+        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
+                          purpose_description, loan_amount, loan_payment_to_date, loan_balance, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
+                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate from all_loans_debts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     elif category_type == 'other_tran':
         query_string = """SELECT report_id, schedule, report_type, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, 
-                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, entity_id from all_other_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + + """ """
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, 
+                                entity_id, entity_type, deleteddate  from all_other_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     else:
         query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
-                                transaction_type_identifier, entity_id, entity_type from all_receipts_transactions_view
+                                transaction_type_identifier, entity_id, entity_type, deleteddate from all_receipts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
     return query_string
 
@@ -2192,25 +2195,75 @@ def superceded_report_id_list(report_id):
     except Exception as e:
         raise
 
+def get_core_sched_c1(cmte_id, back_ref_transaction_id):
+    try:
+        with connection.cursor() as cursor:
+            # GET rows from schedC1 table
+            _sql = """SELECT json_agg(t) FROM ( SELECT 
+            cmte_id,
+            report_id,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            last_update_date
+            FROM public.sched_c1
+            WHERE cmte_id = %s AND back_ref_transaction_id = %s
+            AND delete_ind is distinct from 'Y') t
+            """
+            cursor.execute(_sql, [cmte_id, back_ref_transaction_id])
+            schedC1_list = cursor.fetchone()
+            if schedC1_list and schedC1_list[0]:
+                return schedC1_list[0]
+            else:
+                return []
+    except Exception as e:
+        raise Exception ('The get_core_sched_c1 function is throwing an error: ' + str(e))
+
+def get_core_sched_c2(cmte_id, back_ref_transaction_id):
+    """
+    load c2 child transactions for sched_c without report_id
+    """
+    _sql = """
+    SELECT 
+            cmte_id,
+            report_id,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            last_update_date
+    FROM public.sched_c2
+    WHERE cmte_id = %s 
+    AND back_ref_transaction_id = %s 
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + _sql + """) t""",[cmte_id, back_ref_transaction_id])
+            schedC2_list = cursor.fetchone()
+            if schedC2_list and schedC2_list[0]:
+                return schedC2_list[0]
+            else:
+                return []
+    except Exception as e:
+        raise Exception ('The get_core_sched_c2 function is throwing an error: ' + str(e))
+
 @api_view(['GET', 'POST'])
 def get_all_transactions(request):
     try:
         # print("request.data: ", request.data)
         cmte_id = request.user.username
         ctgry_type = request.data.get('category_type')
-        report_id = None
         param_string = ""
         page_num = int(request.data.get('page', 1))
         descending = request.data.get('descending', 'false')
         if not ('sortColumnName' in request.data and check_null_value(request.data.get('sortColumnName'))):
-            sortcolumn = 'default'
+            sortcolumn = 'name'
         else:
             sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
         search_string = request.data.get('search')
         params = request.data.get('filters', {})
         keywords = params.get('keywords')
-        # report_id = request.data.get('reportid')
         if str(descending).lower() == 'true':
             descending = 'DESC'
         else:
@@ -2268,54 +2321,63 @@ def get_all_transactions(request):
         
         trans_query_string = get_trans_query(ctgry_type,cmte_id, param_string)
 
-        if sortcolumn and sortcolumn != 'default':
-            trans_query_string = trans_query_string + """ ORDER BY """+ sortcolumn + """ """ + descending
-        elif sortcolumn == 'default':
-            # if ctgry_type == 'disbursements_tran':
-            #     trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
-            # elif ctgry_type == 'receipts_tran':
-            #     trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC"""
-            if ctgry_type == 'loans_tran':
-                 trans_query_string = trans_query_string + """ ORDER BY name ASC, loan_incurred_date  ASC"""
-            else:
-                # elif ctgry_type == 'other_tran':
-                trans_query_string = trans_query_string + """ ORDER BY name ASC, transaction_date  ASC""" 
+        # transactions ordering
+        if ctgry_type == 'loans_tran':
+            trans_query_string = trans_query_string + """ ORDER BY {} ASC, loan_incurred_date  ASC, create_date ASC""".format(sortcolumn)
+        else:
+            trans_query_string = trans_query_string + """ ORDER BY {} ASC, transaction_date  ASC, create_date ASC""".format(sortcolumn)
+
         output_list = []
+        total_amount = 0.0
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             print(cursor.query)
             data_row = cursor.fetchone()
             if data_row and data_row[0]:
-                forms_obj = data_row[0]                
-                logger.debug('total transactions loaded:{}'.format(len(forms_obj)))   
+                transaction_list = data_row[0]
+                logger.debug('total transactions loaded:{}'.format(len(transaction_list)))
                 status_value = status.HTTP_200_OK
                 # Sorting parents and child transactions
                 if ctgry_type == 'loans_tran':
-                    logger.debug('Test1')
-                elif ctgry_type == 'other_tran':
-                    logger.debug('Test2')
+                    for transaction in transaction_list:
+                        c1_list = get_core_sched_c1(cmte_id, transaction.get('transaction_id'))
+                        print(c1_list)
+                        for c1 in c1_list:
+                            c1['sched_type'] = 'sched_c1'
+                            c1['api_call'] = '/sc/schedC1'
+                        c2_list = get_core_sched_c2(cmte_id, transaction.get('transaction_id'))
+                        for c2 in c2_list:
+                            c2['sched_type'] = 'sched_c2'
+                            c2['api_call'] = '/sc/schedC2'
+                        if c1_list or c2_list:
+                            transaction['child'] = []
+                            transaction['child'].extend(c1_list + c2_list)
+                    output_list = transaction_list
+                    logger.debug('loans_transactions:')
                 else:
-                    transaction_dict = {trans.get('transaction_id'): trans for trans in forms_obj}
+                    transaction_dict = {trans.get('transaction_id'): trans for trans in transaction_list}
                     for tran_id,transaction in transaction_dict.items():
+                        total_amount += transaction.get('transaction_amount', 0.0)
                         if transaction.get('back_ref_transaction_id') is not None and transaction.get('back_ref_transaction_id') in transaction_dict: 
-                            output_list.append[transaction]
+                            parent = transaction_dict.get(transaction.get('back_ref_transaction_id'))
+                            if 'child' not in parent:
+                                parent['child'] = []
+                            parent['child'].append(transaction)
                         else:
-                            output_list.append[transaction]                         
+                            output_list.append(transaction)
             else:
                 status_value = status.HTTP_204_NO_CONTENT
-
-
-
-        total_count = len(forms_obj)
-        paginator = Paginator(forms_obj, itemsperpage)
+        logger.debug(output_list)
+        total_count = len(output_list)
+        paginator = Paginator(output_list, itemsperpage)
         if paginator.num_pages < page_num:
-            page_num = paginator.num_pages
-        forms_obj = paginator.page(page_num)
+            forms_obj = []
+        else:
+            forms_obj = paginator.page(page_num)
         json_result = {'transactions': list(forms_obj), 'totalTransactionCount': total_count,
                     'itemsPerPage': itemsperpage, 'pageNumber': page_num,'totalPages':paginator.num_pages}
-
-        if sum_trans:
-            json_result['totalAmount'] = sum_trans
+        if total_amount:
+            json_result['totalAmount'] = total_amount
         return Response(json_result, status=status_value)
     except Exception as e:
         return Response("The get_all_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
