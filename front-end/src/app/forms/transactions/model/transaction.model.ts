@@ -40,6 +40,8 @@ export class TransactionModel {
   loanPaymentAmt: any;
   loanPaymentToDate: any;
   reportType: any;
+  reportId: any;
+  scrollDebtPaymentButtonIntoView: boolean;
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
@@ -82,5 +84,7 @@ export class TransactionModel {
     this.reportStatus = transaction.reportStatus;
     this.toggleChild = transaction.toggleChild;
     this.child = transaction.child;
+    this.scrollDebtPaymentButtonIntoView = transaction.scrollDebtPaymentButtonIntoView ? transaction.scrollDebtPaymentButtonIntoView : false;
+    this.reportId = transaction.reportId;
   }
 }

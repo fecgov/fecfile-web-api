@@ -1,3 +1,4 @@
+import { TransactionsService } from './../../transactions/service/transactions.service';
 import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
@@ -141,6 +142,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
+    private _transactionService: TransactionsService
   ) {
     this.showPinColumnsSubscription = this._LoanMessageService.getShowPinColumnMessage()
       .subscribe(
@@ -318,6 +320,53 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       }
     };
     this.status.emit(c1EmitObj);
+  }
+
+  public editLoanRepayment(payment:any){
+    const loanRepaymentEmitObj: any = {
+      form: {},
+      direction: 'next', //TODO-zs -- does this need to be changed?
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c_loan_payment',
+      action: ScheduleActions.edit,
+      transactionDetail: {
+        transactionModel: {
+          backRefTransactionId:payment.back_ref_transaction_id,
+          transactionId: payment.transaction_id,
+          entityId: payment.entity_id,
+          apiCall:payment.api_call, 
+          transactionTypeIdentifier : payment.transaction_type_identifier,
+          date:payment.expenditure_date,
+          amount:payment.expenditure_amount, 
+          purposeDescription:payment.expenditure_purpose, 
+          memoText: payment.memo_text
+        }
+      }
+    };
+    this.status.emit(loanRepaymentEmitObj);
+  }
+
+  public deleteLoanRepayment(payment: any){
+    payment.transactionId = payment.transaction_id; //TODO - clean this. 
+    this._dialogService
+      .confirm('You are about to delete this transaction ' + payment.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+
+          this._transactionService.trashOrRestoreTransactions('3X','trash',payment.report_id,[payment]).subscribe(res => {
+            this.getPage(this.config.currentPage);
+            this._dialogService.confirm(
+              'Transaction has been successfully deleted. ' + payment.transactionId,
+              ConfirmModalComponent,
+              'Success!',
+              false,
+              ModalHeaderClassEnum.successHeader
+            );
+          })
+        } else if (res === 'cancel') {
+        }
+      });
   }
 
 

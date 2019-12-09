@@ -151,6 +151,7 @@
           *ngIf="scheduleType === 'sched_c_loan_payment'"
           [transactionDetail]="transactionDetailSchedC"
           (status)="onNotify($event)"
+          [scheduleAction]="loanPaymentScheduleAction"
         >
         </app-loanpayment>
 
