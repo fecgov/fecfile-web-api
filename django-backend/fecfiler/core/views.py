@@ -248,7 +248,7 @@ GET DYNAMIC FORM FIELDS API- CORE APP - SPRINT 7 - FNE 526 - BY PRAVEEN JINKA
 """
 @api_view(['GET'])
 def get_dynamic_forms_fields(request):
-    try:
+    # try:
         cmte_id = request.user.username
         form_type = request.query_params.get('form_type')
         transaction_type = request.query_params.get('transaction_type')
@@ -321,13 +321,13 @@ def get_dynamic_forms_fields(request):
             elif transaction_type == 'DEBT_TO_VENDOR':
                 if cmte_type_category and cmte_type_category == 'PAC':
                     del forms_obj['data']['subTransactions'][1]
-                    del forms_obj['data']['subTransactions'][5]
-                    del forms_obj['data']['subTransactions'][6]
+                    del forms_obj['data']['subTransactions'][4]
+                    del forms_obj['data']['subTransactions'][4]
         else:
             return Response("No entries were found for the form_type: {} and transaction type: {} for this committee".format(form_type, transaction_type), status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
-    except Exception as e:
-        return Response("The get_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+    # except Exception as e:
+    #     return Response("The get_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 """
 ********************************************************************************************************************************
