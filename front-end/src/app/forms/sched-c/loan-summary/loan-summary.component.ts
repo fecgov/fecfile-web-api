@@ -1,5 +1,5 @@
 import { TransactionsService } from './../../transactions/service/transactions.service';
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -163,6 +163,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * Initialize the component.
    */
   public ngOnInit(): void {
+    //intentionally left blank as component intitialized in ngOnChanges()
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
     const paginateConfig: PaginationInstance = {
       id: 'forms__ctn-table-pagination',
       itemsPerPage: 10,
