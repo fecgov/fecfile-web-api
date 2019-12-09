@@ -333,6 +333,10 @@ export class F3xComponent implements OnInit {
               return;
             }
 
+            if (this._handleScheduleD()) {
+              return;
+            }
+
             // Coming from transactions, the event may contain the transaction data
             // with an action to allow for view or edit.
 
@@ -435,18 +439,19 @@ export class F3xComponent implements OnInit {
     }
   }
 
-
   /**
    * This method should extract the schedule type based on transactionTypeIdentifier in certain
    * cases. It was being defaulted to sched_a but in case of e.g. sched c, it should be extracted.
-   * Additional use cases can be added to it 
-   * @param e 
+   * Additional use cases can be added to it
+   * @param e
    */
   private extractScheduleType(e: any) {
-
-    if (e.transactionDetail && e.transactionDetail.transactionModel && 
-      e.transactionDetail.transactionModel.transactionTypeIdentifier === "LOAN_REPAY_MADE") {
-      e.scheduleType = "sched_c_loan_payment";
+    if (
+      e.transactionDetail &&
+      e.transactionDetail.transactionModel &&
+      e.transactionDetail.transactionModel.transactionTypeIdentifier === 'LOAN_REPAY_MADE'
+    ) {
+      e.scheduleType = 'sched_c_loan_payment';
     }
 
     //default to sched_a ?
@@ -499,10 +504,10 @@ export class F3xComponent implements OnInit {
         this.scheduleType = 'sched_c_ls';
         this.scheduleCAction = ScheduleActions.loanSummary;
       } else if (this.scheduleType === 'sched_c_loan_payment') {
-        //this is being done in case loan payment is being accessed from transaction table, 
+        //this is being done in case loan payment is being accessed from transaction table,
         //a flag is needed to return back to the transaction table's 'disbursement tab'
         //upon clicking cancel, based on the current implementation of loan payments.
-        if (transaction.previousStep === 'transactions'){
+        if (transaction.previousStep === 'transactions') {
           transactionDetail.transactionModel.entryScreenScheduleType = transaction.previousStep;
         }
       } else if (this.scheduleType === 'sched_c1') {
@@ -514,6 +519,19 @@ export class F3xComponent implements OnInit {
       if (transactionDetail) {
         this.transactionDetailSchedC = transactionDetail.transactionModel;
       }
+    }
+    return finish;
+  }
+
+  /**
+   * Special handling for Sched D.  For example, don't call dynamic forms for Summary.
+   * @returns true if schedule D and should stop processing
+   */
+  private _handleScheduleD(): boolean {
+    let finish = false;
+    if (this.scheduleType === 'sched_d_ds') {
+      this.canContinue();
+      finish = true;
     }
     return finish;
   }
