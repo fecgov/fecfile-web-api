@@ -144,6 +144,7 @@
         
         <app-loansummary 
           *ngIf="scheduleType === 'sched_c_ls'"
+          [formType]="'3X'"
           (status)="onNotify($event)">          
         </app-loansummary>
 
@@ -151,6 +152,7 @@
           *ngIf="scheduleType === 'sched_c_loan_payment'"
           [transactionDetail]="transactionDetailSchedC"
           (status)="onNotify($event)"
+          [scheduleAction]="loanPaymentScheduleAction"
         >
         </app-loanpayment>
 

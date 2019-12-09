@@ -534,6 +534,39 @@ def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
         raise
 
 
+def get_sched_c_loan_payments(cmte_id, transaction_id):
+    """
+    load loan payments for a particular loan based on transaction_id
+    """
+    _sql = """
+    SELECT             
+            cmte_id,
+            report_id,
+            transaction_id,
+            back_ref_transaction_id,
+            expenditure_date,
+            expenditure_amount,
+            transaction_type_identifier, 
+            expenditure_purpose, 
+            memo_text
+    FROM public.sched_b
+    WHERE cmte_id = %s 
+    AND back_ref_transaction_id = %s 
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        # if report_id:
+        # _sql = _sql + 'AND report_id = {}'.format(report_id)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + _sql + """) t""",
+                [cmte_id, transaction_id],
+            )
+            return post_process_it(cursor, cmte_id)
+    except:
+        raise
+
+
 def get_sched_c1_child(cmte_id, transaction_id):
     """
     load child transactions for sched_f without report_id
