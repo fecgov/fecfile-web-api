@@ -21,7 +21,7 @@ from fecfiler.core.transaction_util import (
     get_sched_c1_child_transactions,
     get_sched_c2_child,
     get_sched_c2_child_transactions,
-    get_sched_c_loan_payments
+    get_sched_c_loan_payments,
     delete_child_transaction)
 
 from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
