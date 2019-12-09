@@ -2258,6 +2258,8 @@ def get_all_transactions(request):
         descending = request.data.get('descending', 'false')
         if not ('sortColumnName' in request.data and check_null_value(request.data.get('sortColumnName'))):
             sortcolumn = 'name'
+        elif request.data.get('sortColumnName') == 'default':
+            sortcolumn = 'name'
         else:
             sortcolumn = request.data.get('sortColumnName')
         itemsperpage = request.data.get('itemsPerPage', 5)
@@ -2331,7 +2333,7 @@ def get_all_transactions(request):
         total_amount = 0.0
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
-            print(cursor.query)
+            # print(cursor.query)
             data_row = cursor.fetchone()
             if data_row and data_row[0]:
                 transaction_list = data_row[0]
@@ -2341,7 +2343,7 @@ def get_all_transactions(request):
                 if ctgry_type == 'loans_tran':
                     for transaction in transaction_list:
                         c1_list = get_core_sched_c1(cmte_id, transaction.get('transaction_id'))
-                        print(c1_list)
+                        # print(c1_list)
                         for c1 in c1_list:
                             c1['sched_type'] = 'sched_c1'
                             c1['api_call'] = '/sc/schedC1'
@@ -2367,7 +2369,7 @@ def get_all_transactions(request):
                             output_list.append(transaction)
             else:
                 status_value = status.HTTP_204_NO_CONTENT
-        logger.debug(output_list)
+        # logger.debug(output_list)
         total_count = len(output_list)
         paginator = Paginator(output_list, itemsperpage)
         if paginator.num_pages < page_num:
