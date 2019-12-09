@@ -248,7 +248,6 @@ GET DYNAMIC FORM FIELDS API- CORE APP - SPRINT 7 - FNE 526 - BY PRAVEEN JINKA
 """
 @api_view(['GET'])
 def get_dynamic_forms_fields(request):
-
     try:
         cmte_id = request.user.username
         form_type = request.query_params.get('form_type')
@@ -263,62 +262,67 @@ def get_dynamic_forms_fields(request):
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj=data_row[0]
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT cmte_type_category FROM public.committee_master WHERE cmte_id = %s", [cmte_id])
+            cmte_type_categories = cursor.fetchone()
+            if cmte_type_categories:
+                cmte_type_category = cmte_type_categories[0]
         # print(forms_obj)
         if bool(forms_obj):
             if transaction_type in ['ALLOC_EXP','ALLOC_EXP_VOID','ALLOC_EXP_CC_PAY','ALLOC_EXP_STAF_REIM','ALLOC_EXP_PMT_TO_PROL', 'ALLOC_EXP_DEBT']:
-                with connection.cursor() as cursor:
-                    cursor.execute("SELECT cmte_type_category FROM public.committee_master WHERE cmte_id = %s", [cmte_id])
-                    cmte_type_categories = cursor.fetchone()
-                if cmte_type_categories:
-                    cmte_type_category = cmte_type_categories[0]
-                    if cmte_type_category:
-                        for events in forms_obj['data']['committeeTypeEvents']:
-                            for eventTypes in events['eventTypes']:
-                                if eventTypes['eventType'] in ['PC', 'AD', 'GV']:
-                                    query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
-                                    if eventTypes['eventType'] == 'PC':
-                                        query_string += " AND public_communications = true"
-                                    elif eventTypes['eventType'] == 'AD':
-                                        query_string += " AND administrative = true"
-                                    elif eventTypes['eventType'] == 'GV':
-                                        query_string += " AND generic_voter_drive = true"
-                                    with connection.cursor() as cursor:
-                                        cursor.execute(query_string, [cmte_id,report_id])
-                                        count = cursor.fetchone()
-                                        print(cursor.query)
-                                    print(eventTypes['eventType'] + "count: "+str(count[0]))
-                                    if count[0] == 0:
-                                        eventTypes['hasValue'] = False
-                                    else:
-                                        eventTypes['hasValue'] = True
-                                elif eventTypes['eventType'] in ['DF', 'DC']:
-                                    query_string = """SELECT json_agg(t) FROM (SELECT activity_event_name AS "activityEventType", transaction_id AS "transactionId", activity_event_name AS "activityEventDescription" 
-                                            FROM public.sched_h2 WHERE cmte_id = %s AND {} AND delete_ind IS DISTINCT FROM 'Y') AS t"""
-                                    if eventTypes['eventType'] == 'DF':
-                                        query_string = query_string.format("fundraising = true")
-                                    elif eventTypes['eventType'] == 'DC':
-                                        query_string = query_string.format("direct_cand_support = true")
-                                    with connection.cursor() as cursor:
-                                        cursor.execute(query_string, [cmte_id])
-                                        print(cursor.query)
-                                        activityEventTypes = cursor.fetchone()
-                                    # print(eventTypes['eventType'] + 'activityEventTypes: '+ str(activityEventTypes[0]))
-                                    if activityEventTypes and activityEventTypes[0]:
-                                        eventTypes['activityEventTypes'] = activityEventTypes[0]
-                                        eventTypes['hasValue'] = True
-                                    else:
-                                        eventTypes['hasValue'] = False
-                                elif eventTypes['eventType'] in ['VR', 'VI', 'GO', 'GC', 'EA']:
-                                    query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
-                                    with connection.cursor() as cursor:
-                                        cursor.execute(query_string, [cmte_id,report_id])
-                                        count = cursor.fetchone()
-                                        print(cursor.query)
-                                    print(eventTypes['eventType'] + "count: "+str(count[0]))
-                                    if count[0] == 0:
-                                        eventTypes['hasValue'] = False
-                                    else:
-                                        eventTypes['hasValue'] = True
+                if cmte_type_category:
+                    for events in forms_obj['data']['committeeTypeEvents']:
+                        for eventTypes in events['eventTypes']:
+                            if eventTypes['eventType'] in ['PC', 'AD', 'GV']:
+                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                if eventTypes['eventType'] == 'PC':
+                                    query_string += " AND public_communications = true"
+                                elif eventTypes['eventType'] == 'AD':
+                                    query_string += " AND administrative = true"
+                                elif eventTypes['eventType'] == 'GV':
+                                    query_string += " AND generic_voter_drive = true"
+                                with connection.cursor() as cursor:
+                                    cursor.execute(query_string, [cmte_id,report_id])
+                                    count = cursor.fetchone()
+                                    print(cursor.query)
+                                print(eventTypes['eventType'] + "count: "+str(count[0]))
+                                if count[0] == 0:
+                                    eventTypes['hasValue'] = False
+                                else:
+                                    eventTypes['hasValue'] = True
+                            elif eventTypes['eventType'] in ['DF', 'DC']:
+                                query_string = """SELECT json_agg(t) FROM (SELECT activity_event_name AS "activityEventType", transaction_id AS "transactionId", activity_event_name AS "activityEventDescription" 
+                                        FROM public.sched_h2 WHERE cmte_id = %s AND {} AND delete_ind IS DISTINCT FROM 'Y') AS t"""
+                                if eventTypes['eventType'] == 'DF':
+                                    query_string = query_string.format("fundraising = true")
+                                elif eventTypes['eventType'] == 'DC':
+                                    query_string = query_string.format("direct_cand_support = true")
+                                with connection.cursor() as cursor:
+                                    cursor.execute(query_string, [cmte_id])
+                                    print(cursor.query)
+                                    activityEventTypes = cursor.fetchone()
+                                # print(eventTypes['eventType'] + 'activityEventTypes: '+ str(activityEventTypes[0]))
+                                if activityEventTypes and activityEventTypes[0]:
+                                    eventTypes['activityEventTypes'] = activityEventTypes[0]
+                                    eventTypes['hasValue'] = True
+                                else:
+                                    eventTypes['hasValue'] = False
+                            elif eventTypes['eventType'] in ['VR', 'VI', 'GO', 'GC', 'EA']:
+                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                with connection.cursor() as cursor:
+                                    cursor.execute(query_string, [cmte_id,report_id])
+                                    count = cursor.fetchone()
+                                    print(cursor.query)
+                                print(eventTypes['eventType'] + "count: "+str(count[0]))
+                                if count[0] == 0:
+                                    eventTypes['hasValue'] = False
+                                else:
+                                    eventTypes['hasValue'] = True
+            elif transaction_type == 'DEBT_TO_VENDOR':
+                if cmte_type_category and cmte_type_category == 'PAC':
+                    del forms_obj['data']['subTransactions'][1]
+                    del forms_obj['data']['subTransactions'][5]
+                    del forms_obj['data']['subTransactions'][6]
         else:
             return Response("No entries were found for the form_type: {} and transaction type: {} for this committee".format(form_type, transaction_type), status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
@@ -2323,11 +2327,11 @@ def get_all_transactions(request):
         
         trans_query_string = get_trans_query(ctgry_type,cmte_id, param_string)
 
-        # transactions ordering
+        # transactions ordering ASC or DESC
         if ctgry_type == 'loans_tran':
-            trans_query_string = trans_query_string + """ ORDER BY {} ASC, loan_incurred_date  ASC, create_date ASC""".format(sortcolumn)
+            trans_query_string = trans_query_string + """ ORDER BY {} {}, loan_incurred_date  ASC, create_date ASC""".format(sortcolumn, descending)
         else:
-            trans_query_string = trans_query_string + """ ORDER BY {} ASC, transaction_date  ASC, create_date ASC""".format(sortcolumn)
+            trans_query_string = trans_query_string + """ ORDER BY {} {}, transaction_date  ASC, create_date ASC""".format(sortcolumn, descending)
 
         output_list = []
         total_amount = 0.0

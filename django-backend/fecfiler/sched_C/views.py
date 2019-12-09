@@ -25,7 +25,7 @@ from fecfiler.core.transaction_util import (
 from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
-                                 undo_delete_entities)
+                                 undo_delete_entities, superceded_report_id_list)
 from fecfiler.sched_A.views import (get_list_child_schedA,
                                     get_next_transaction_id, post_schedA, post_sql_schedA)
 from fecfiler.sched_B.views import get_list_child_schedB, post_schedB
@@ -544,7 +544,8 @@ def post_sql_schedC(data):
             lender_cand_district,
             memo_code,
             memo_text,
-            create_date)
+            create_date,
+            last_update_date)
             VALUES({});
             """.format(','.join(['%s']*30))
         logger.debug('sql:{}'.format(_sql))
@@ -579,6 +580,7 @@ def post_sql_schedC(data):
             data.get('lender_cand_district'),
             data.get('memo_code'),
             data.get('memo_text'),
+            datetime.datetime.now(),
             datetime.datetime.now()
         )
         logger.debug('values:{}'.format(_v))
