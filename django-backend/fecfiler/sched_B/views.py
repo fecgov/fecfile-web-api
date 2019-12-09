@@ -110,15 +110,23 @@ SCHED_C_CHILD_LIST = ['LOAN_REPAY_MADE']
 REQT_ELECTION_YR = ""
 
 # To avoid circular reference adding sched_a function
-def put_sql_schedA_from_schedB(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier):
+def put_sql_schedA_from_schedB(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, 
+    contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, 
+    transaction_type_identifier):
     """
-    uopdate a schedule_a item
+    update a schedule_a item
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
             # Insert data into schedA table
-            cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, transaction_type_identifier = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                           [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier, transaction_id, report_id, cmte_id])
+            cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, 
+                entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, 
+                election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, transaction_type_identifier = %s, last_update_date = %s 
+                WHERE transaction_id = %s AND report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list)),
+                           [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, 
+                           purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, 
+                           transaction_type_identifier, datetime.datetime.now(), transaction_id, report_id, cmte_id])
             if (cursor.rowcount == 0):
                 raise Exception(
                     'The Transaction ID: {} does not exist in schedA table'.format(transaction_id))
@@ -305,7 +313,9 @@ def post_sql_schedB(
                     beneficiary_cand_prefix,
                     beneficiary_cand_suffix,
                     aggregate_amt,
-                    beneficiary_cand_entity_id
+                    beneficiary_cand_entity_id,
+                    last_update_date,
+                    create_date
                 )
                 VALUES ("""
                 + ",".join(["%s"] * 38)
@@ -349,6 +359,8 @@ def post_sql_schedB(
                     beneficiary_cand_suffix,
                     aggregate_amt,
                     beneficiary_cand_entity_id,
+                    datetime.datetime.now(),
+                    datetime.datetime.now()
                 ],
             )
     except Exception:
@@ -467,6 +479,7 @@ def put_sql_schedB(
     db transaction for saving current sched_b item
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE public.sched_b SET 
@@ -504,12 +517,13 @@ def put_sql_schedB(
                             beneficiary_cand_prefix = %s,
                             beneficiary_cand_suffix = %s,
                             aggregate_amt = %s,
-                            beneficiary_cand_entity_id = %s
+                            beneficiary_cand_entity_id = %s,
+                            last_update_date = %s
                     WHERE transaction_id = %s 
-                    AND report_id = %s 
+                    AND report_id in ('{}') 
                     AND cmte_id = %s 
                     AND delete_ind is distinct from 'Y'
-                """,
+                """.format("', '".join(report_list)),
                 [
                     line_number,
                     transaction_type,
@@ -546,8 +560,8 @@ def put_sql_schedB(
                     beneficiary_cand_suffix,
                     aggregate_amt,
                     beneficiary_cand_entity_id,
+                    datetime.datetime.now(),
                     transaction_id,
-                    report_id,
                     cmte_id,
                 ],
             )
@@ -566,19 +580,21 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
     db transaction for deleting current item
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
 
             # UPDATE delete_ind flag on a single row from Sched_B table
             cursor.execute(
                 """
                 UPDATE public.sched_b 
-                SET delete_ind = 'Y' 
+                SET delete_ind = 'Y',
+                last_update_date = %s 
                 WHERE transaction_id = %s 
-                AND report_id = %s 
+                AND report_id in ('{}')
                 AND cmte_id = %s 
                 AND delete_ind is distinct from 'Y'
-                """,
-                [transaction_id, report_id, cmte_id],
+                """.format("', '".join(report_list)),
+                [datetime.datetime.now(), transaction_id, cmte_id],
             )
             if cursor.rowcount == 0:
                 raise Exception(
@@ -590,21 +606,21 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
         raise
 
 
-def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
-    """
-    db transaction for deleting all child transactions
-    """
-    try:
-        with connection.cursor() as cursor:
+# def delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id):
+#     """
+#     db transaction for deleting all child transactions
+#     """
+#     try:
+#         with connection.cursor() as cursor:
 
-            # UPDATE back_ref_transaction_id value to null in sched_b table
-            value = None
-            cursor.execute(
-                """UPDATE public.sched_b SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                [value, transaction_id, report_id, cmte_id],
-            )
-    except Exception:
-        raise
+#             # UPDATE back_ref_transaction_id value to null in sched_b table
+#             value = None
+#             cursor.execute(
+#                 """UPDATE public.sched_b SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+#                 [value, transaction_id, report_id, cmte_id],
+#             )
+#     except Exception:
+#         raise
 
 
 # not sure this function will ever be used - will implement this later
@@ -1286,28 +1302,41 @@ def schedB(request):
 def get_list_schedA_from_schedB(report_id, cmte_id, transaction_id = None, include_deleted_trans_flag = False):
 
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
             # GET single row from schedA table
             if transaction_id:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'"""
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, 
+                    entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, 
+                    election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                    FROM public.sched_a 
+                    WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list))
                 else:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                                    FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s"""
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, 
+                    entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, 
+                    election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                    FROM public.sched_a 
+                    WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format("', '".join(report_list))
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
                             """) t""", [report_id, cmte_id, transaction_id])
             else:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC"""
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
+                    back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, 
+                    memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                    FROM public.sched_a 
+                    WHERE report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC""".format("', '".join(report_list))
                 else:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
-                                FROM public.sched_a WHERE report_id = %s AND cmte_id = %s ORDER BY transaction_id DESC"""
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
+                    back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, 
+                    memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
+                    FROM public.sched_a 
+                    WHERE report_id in ('{}') AND cmte_id = %s ORDER BY transaction_id DESC""".format("', '".join(report_list))
 
                 cursor.execute("""SELECT json_agg(t) FROM (""" +
-                           query_string + """) t""", [report_id, cmte_id])           
+                           query_string + """) t""", [cmte_id])
             print(cursor.query)
             schedA_list = cursor.fetchone()[0]
             if not schedA_list:

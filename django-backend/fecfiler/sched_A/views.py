@@ -24,11 +24,9 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     update_parent_purpose,
-    cmte_type,
-)
+    cmte_type)
 
-from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
-                                    delete_schedB, get_list_child_schedB,
+from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     get_schedB, post_schedB, put_schedB,
                                     schedB_sql_dict, put_sql_schedB, post_sql_schedB,
                                     put_sql_agg_amount_schedB, get_list_child_transactionId_schedB,
@@ -293,13 +291,13 @@ def post_sql_schedA(cmte_id,
             transaction_id, back_ref_transaction_id, back_ref_sched_name, 
             entity_id, contribution_date, contribution_amount, purpose_description, 
             memo_code, memo_text, election_code, election_other_description, 
-            create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier)
+            create_date, last_update_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier)
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, [cmte_id, report_id, line_number, transaction_type, 
             transaction_id, back_ref_transaction_id, back_ref_sched_name, 
             entity_id, contribution_date, contribution_amount, purpose_description, 
             memo_code, memo_text, election_code, election_other_description, 
-            datetime.datetime.now(), donor_cmte_id, donor_cmte_name, 
+            datetime.datetime.now(), datetime.datetime.now(), donor_cmte_id, donor_cmte_name, 
             transaction_type_identifier])
     except Exception:
         raise
@@ -366,8 +364,11 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
         with connection.cursor() as cursor:
 
             # GET child rows from schedA table
-            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
-                            FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list))
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, 
+            contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, 
+            election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, itemized_ind
+                            FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND 
+                            delete_ind is distinct from 'Y'""".format("', '".join(report_list))
 
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
                            """) t""", [cmte_id, transaction_id])
@@ -393,15 +394,38 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
         raise
 
 
-def put_sql_schedA(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier):
+def put_sql_schedA(cmte_id, 
+                    report_id, 
+                    line_number, 
+                    transaction_type, 
+                    transaction_id, 
+                    back_ref_transaction_id, 
+                    back_ref_sched_name, 
+                    entity_id, 
+                    contribution_date, 
+                    contribution_amount, 
+                    purpose_description, 
+                    memo_code, 
+                    memo_text, 
+                    election_code, 
+                    election_other_description, 
+                    donor_cmte_id, 
+                    donor_cmte_name, 
+                    transaction_type_identifier):
     """
-    uopdate a schedule_a item
+    update a schedule_a item
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
             # Insert data into schedA table
-            cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, transaction_type_identifier = %s WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                           [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, transaction_type_identifier, transaction_id, report_id, cmte_id])
+            cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, 
+              entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, 
+              election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, transaction_type_identifier = %s, last_update_date = %s 
+              WHERE transaction_id = %s AND report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list)),
+                           [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, 
+                           purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, 
+                           transaction_type_identifier, datetime.datetime.now(), transaction_id, cmte_id])
             if (cursor.rowcount == 0):
                 raise Exception(
                     'The Transaction ID: {} does not exist in schedA table'.format(transaction_id))
@@ -413,11 +437,13 @@ def delete_sql_schedA(transaction_id, report_id, cmte_id):
     """delete a sched_a item
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
 
             # UPDATE delete_ind flag on a single row from Sched_A table
-            cursor.execute("""UPDATE public.sched_a SET delete_ind = 'Y' WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [
-                           transaction_id, report_id, cmte_id])
+            cursor.execute("""UPDATE public.sched_a SET delete_ind = 'Y', last_update_date = %s WHERE transaction_id = %s AND report_id in ('{}') 
+              AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list)), 
+              [datetime.datetime.now(), transaction_id, report_id, cmte_id])
             if (cursor.rowcount == 0):
                 raise Exception(
                     'The Transaction ID: {} is either already deleted or does not exist in schedA table'.format(transaction_id))
@@ -440,16 +466,16 @@ def remove_sql_schedA(transaction_id, report_id, cmte_id):
         raise
 
 
-def delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id):
-    """delete parent child link in sched_a
-    """
-    try:
-        with connection.cursor() as cursor:
-            # UPDATE back_ref_transaction_id value to null in sched_a table
-            cursor.execute("""UPDATE public.sched_a SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [
-                           None, transaction_id, report_id, cmte_id])
-    except Exception:
-        raise
+# def delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id):
+#     """delete parent child link in sched_a
+#     """
+#     try:
+#         with connection.cursor() as cursor:
+#             # UPDATE back_ref_transaction_id value to null in sched_a table
+#             cursor.execute("""UPDATE public.sched_a SET back_ref_transaction_id = %s WHERE back_ref_transaction_id = %s AND report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""", [
+#                            None, transaction_id, report_id, cmte_id])
+#     except Exception:
+#         raise
 
 
 def find_form_type(report_id, cmte_id):
@@ -1048,8 +1074,6 @@ def delete_schedA(data):
         transaction_id = check_transaction_id(data.get('transaction_id'))
         datum = get_list_schedA(report_id, cmte_id, transaction_id)[0]
         delete_sql_schedA(transaction_id, report_id, cmte_id)
-        # delete_parent_child_link_sql_schedA(transaction_id, report_id, cmte_id)
-        # delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
         update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
         ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
     except:
@@ -1260,9 +1284,11 @@ def get_child_transaction_schedB(cmte_id, report_id, back_ref_transaction_id):
     load child sched_b transaction_id
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
-            query_string = """SELECT transaction_id FROM public.sched_b WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
-            cursor.execute(query_string, [report_id, cmte_id, back_ref_transaction_id])
+            query_string = """SELECT transaction_id FROM public.sched_b WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND 
+            delete_ind is distinct from 'Y'""".format("', '".join(report_list))
+            cursor.execute(query_string, [cmte_id, back_ref_transaction_id])
             if cursor.rowcount == 0:
                 return None
             else:
@@ -1275,9 +1301,11 @@ def get_child_transaction_schedA(cmte_id, report_id, back_ref_transaction_id):
     load child sched_a transaction_id
     """
     try:
+        report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
-            query_string = """SELECT transaction_id FROM public.sched_a WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'"""
-            cursor.execute(query_string, [report_id, cmte_id, back_ref_transaction_id])
+            query_string = """SELECT transaction_id FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND 
+            delete_ind is distinct from 'Y'""".format("', '".join(report_list))
+            cursor.execute(query_string, [cmte_id, back_ref_transaction_id])
             if cursor.rowcount == 0:
                 return None
             else:
@@ -1492,11 +1520,11 @@ def trash_restore_sql_transaction(table_list, report_id, transaction_id, _delete
                 # UPDATE delete_ind flag to Y in DB
                 _sql = """
                 UPDATE public.{} 
-                SET delete_ind = '{}'
+                SET delete_ind = '{}', last_update_date = %s
                 WHERE report_id in ('{}')
                         AND transaction_id = '{}'
                 """.format(table, _delete, "', '".join(report_list), transaction_id)
-                cursor.execute(_sql)
+                cursor.execute(_sql, [datetime.datetime.now()])
                 logger.debug(cursor.query)
                 row_count += cursor.rowcount
         if not row_count:
