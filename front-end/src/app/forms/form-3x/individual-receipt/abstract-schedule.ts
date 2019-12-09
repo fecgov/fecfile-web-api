@@ -163,7 +163,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _currencyPipe: CurrencyPipe,
     private _decimalPipe: DecimalPipe,
     private _reportTypeService: ReportTypeService,
-    private _typeaheadService: TypeaheadService,
+    protected _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
     private _f3xMessageService: F3xMessageService,
     private _transactionsMessageService: TransactionsMessageService,
@@ -2591,6 +2591,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       })
     );
+
 
   /**
    * Search for entities when Candidate ID input value changes.

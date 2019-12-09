@@ -40,6 +40,12 @@ export class TransactionModel {
   loanPaymentAmt: any;
   loanPaymentToDate: any;
   reportType: any;
+  activityEventType: any;
+  activityEventIdentifier: any;
+  fedShareAmount: any;
+  nonfedShareAmount: any;
+  levinShare: any;
+  purpose: any;
   reportId: any;
   scrollDebtPaymentButtonIntoView: boolean;
 
@@ -84,6 +90,12 @@ export class TransactionModel {
     this.reportStatus = transaction.reportStatus;
     this.toggleChild = transaction.toggleChild;
     this.child = transaction.child;
+    this.activityEventType = transaction.activityEventType;
+    this.activityEventIdentifier = transaction.activityEventIdentifier;
+    this.fedShareAmount = transaction.fedShareAmount;
+    this.nonfedShareAmount = transaction.nonfedShareAmount;
+    this.levinShare = transaction.levinShare;
+    this.purpose = transaction.purpose;
     this.scrollDebtPaymentButtonIntoView = transaction.scrollDebtPaymentButtonIntoView ? transaction.scrollDebtPaymentButtonIntoView : false;
     this.reportId = transaction.reportId;
   }

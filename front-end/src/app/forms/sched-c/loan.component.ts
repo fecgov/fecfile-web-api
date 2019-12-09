@@ -741,7 +741,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
         //in some instances, transaction_id is being passed as 'transactionId'
         //TODO - need to combine/standardize the attribute names.
-        if (!this.transactionDetail.transaction_id && this.transactionDetail.transactionId) {
+        if (this.transactionDetail && !this.transactionDetail.transaction_id && this.transactionDetail.transactionId) {
           this.transactionDetail.transaction_id = this.transactionDetail.transactionId;
         }
 
