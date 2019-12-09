@@ -1,4 +1,3 @@
-from django.shortcuts import render
 import datetime
 import json
 import logging
@@ -17,27 +16,46 @@ from rest_framework.response import Response
 
 from fecfiler.core.views import (
     NoOPError,
+    check_calendar_year,
     check_null_value,
     check_report_id,
     date_format,
     delete_entities,
+    get_cvg_dates,
     get_entities,
+    get_levin_account,
     post_entities,
     put_entities,
     remove_entities,
     undo_delete_entities,
-    check_calendar_year,
-    get_cvg_dates,
-    get_levin_account,
 )
+from fecfiler.core.transaction_util import get_sched_a_transactions
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
-
 
 # Create your views here.
 logger = logging.getLogger(__name__)
 
 MANDATORY_FIELDS_SCHED_L = ["cmte_id", "report_id", "transaction_id", "record_id"]
+
+LA_TRANSACTIONS = [
+    "LEVIN_OTHER_REC",
+    "LEVIN_PARTN_MEMO",
+    "LEVIN_PARTN_REC",
+    "LEVIN_TRIB_REC",
+    "LEVIN_ORG_REC",
+    "LEVIN_INDV_REC",
+    "LEVIN_NON_FED_REC",
+    "LEVIN_PAC_REC",
+]
+
+LB_TRANSACTIONS = [
+    "LEVIN_VOTER_ID",
+    "LEVIN_GOTV",
+    "LEVIN_GEN",
+    "LEVIN_OTH_DISB",
+    "LEVIN_VOTER_REG",
+]
 
 
 def check_transaction_id(transaction_id):
@@ -575,18 +593,18 @@ def schedL(request):
             else:
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
-            logger.debug('sched_l POST with data:{}'.format(request.data))
+            logger.debug("sched_l POST with data:{}".format(request.data))
             datum = schedL_sql_dict(request.data)
             logger.debug(datum)
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
             # populate levin account info: record_id is levin_account_id
-            if 'levin_account_id' in request.data:
-                levin_acct_id = request.data.get('levin_account_id')
-                datum['record_id'] = levin_acct_id
+            if "levin_account_id" in request.data:
+                levin_acct_id = request.data.get("levin_account_id")
+                datum["record_id"] = levin_acct_id
                 levin_account = get_levin_account(cmte_id, levin_acct_id)
                 if levin_account:
-                    datum['account_name'] = levin_account[0].get('levin_account_name')
+                    datum["account_name"] = levin_account[0].get("levin_account_name")
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
@@ -610,17 +628,19 @@ def schedL(request):
     elif request.method == "GET":
         try:
             data = {"cmte_id": request.user.username}
-            if "report_id" in request.data and check_null_value(
-                request.data.get("report_id")
+            if "report_id" in request.query_params and check_null_value(
+                request.query_params.get("report_id")
             ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
+                data["report_id"] = check_report_id(
+                    request.query_params.get("report_id")
+                )
             else:
                 raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
+            if "transaction_id" in request.query_params and check_null_value(
+                request.query_params.get("transaction_id")
             ):
                 data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+                    request.query_params.get("transaction_id")
                 )
             datum = get_schedL(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
@@ -687,12 +707,12 @@ def schedL(request):
             # end of handling
             datum["report_id"] = report_id
             datum["cmte_id"] = request.user.username
-            if 'levin_account_id' in request.data:
-                levin_acct_id = request.data.get('levin_account_id')
-                datum['record_id'] = levin_acct_id
+            if "levin_account_id" in request.data:
+                levin_acct_id = request.data.get("levin_account_id")
+                datum["record_id"] = levin_acct_id
                 levin_account = get_levin_account(cmte_id, levin_acct_id)
                 if levin_account:
-                    datum['account_name'] = levin_account[0].get('levin_account_name')
+                    datum["account_name"] = levin_account[0].get("levin_account_name")
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
             # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
@@ -1057,6 +1077,155 @@ def get_sl_summary_table(request):
     except Exception as e:
         return Response(
             "The get_sl_summary_table API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+def get_la_memos(cmte_id, report_id, transaction_id):
+    """
+    load child memo transactions for levin sched_a
+    """
+    return get_sched_a_transactions(
+        report_id, cmte_id, back_ref_transaction_id=transaction_id
+    )
+    # _sql = """
+    # SELECT json_agg(t) FROM (
+    # SELECT *
+    # FROM public.sched_a
+    # WHERE cmte_id = %s
+    # AND back_ref_transaction_id = %s
+    # AND delete_ind is distinct from 'Y') t
+    # """
+    # try:
+    #     with connection.cursor() as cursor:
+    #         cursor.execute(
+    #             _sql, (cmte_id, transaction_id)
+    #         )
+    #         return cursor.fetchone()[0]
+    # except:
+    #     raise
+
+
+@api_view(["GET"])
+def get_sla_summary_table(request):
+    """
+    get all Levin sched_a summary for current report
+    """
+    # response = {}
+    logger.debug("get_sql_summary with data:{}".format(request.query_params))
+    try:
+        cmte_id = request.user.username
+
+        if not (
+            "report_id" in request.query_params
+            and check_null_value(request.query_params.get("report_id"))
+        ):
+            raise Exception("Missing Input: report_id is mandatory")
+
+        _sql_p1 = """
+        SELECT json_agg(t) FROM
+        (
+            SELECT * 
+            FROM public.sched_a 
+            WHERE cmte_id = %s
+            AND report_id = %s
+            AND transaction_type_identifier in ("""
+
+        _sql_p2 = """)
+            AND delete_ind is distinct from 'Y'
+        ) t
+        """
+
+        # if not (
+        #     "calendar_year" in request.query_params
+        #     and check_null_value(request.query_params.get("calendar_year"))
+        # ):
+        #     raise Exception("Missing Input: calendar_year is mandatory")
+
+        report_id = check_report_id(request.query_params.get("report_id"))
+        transaction_tps = ["'" + tp + "'" for tp in LA_TRANSACTIONS if "MEMO" not in tp]
+        tps_str = ",".join(transaction_tps)
+        logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
+        logger.debug("transaction_types:{}".format(tps_str))
+        with connection.cursor() as cursor:
+            cursor.execute(_sql_p1 + tps_str + _sql_p2, [cmte_id, report_id])
+            result = cursor.fetchone()[0]
+            print(result)
+            # adding memo child transactions
+            if result:
+                for obj in result:
+                    if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
+                        memo_objs = get_la_memos(
+                            cmte_id, obj.get("report_id"), obj.get("transaction_id")
+                        )
+                        if memo_objs:
+                            obj["child"] = memo_objs
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+            "The get_sla_summary_table API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+@api_view(["GET"])
+def get_slb_summary_table(request):
+    """
+    get all Levin sched_b summary for current report
+    """
+    # response = {}
+    logger.debug("get_sql_summary with data:{}".format(request.query_params))
+    try:
+        cmte_id = request.user.username
+
+        if not (
+            "report_id" in request.query_params
+            and check_null_value(request.query_params.get("report_id"))
+        ):
+            raise Exception("Missing Input: report_id is mandatory")
+
+        _sql_p1 = """
+        SELECT json_agg(t) FROM
+        (
+            SELECT * 
+            FROM public.sched_b 
+            WHERE cmte_id = %s
+            AND report_id = %s
+            AND transaction_type_identifier in ("""
+
+        _sql_p2 = """)
+            AND delete_ind is distinct from 'Y'
+        ) t
+        """
+
+        # if not (
+        #     "calendar_year" in request.query_params
+        #     and check_null_value(request.query_params.get("calendar_year"))
+        # ):
+        #     raise Exception("Missing Input: calendar_year is mandatory")
+
+        report_id = check_report_id(request.query_params.get("report_id"))
+        transaction_tps = ["'" + tp + "'" for tp in LB_TRANSACTIONS if "MEMO" not in tp]
+        tps_str = ",".join(transaction_tps)
+        logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
+        logger.debug("transaction_types:{}".format(tps_str))
+        with connection.cursor() as cursor:
+            cursor.execute(_sql_p1 + tps_str + _sql_p2, [cmte_id, report_id])
+            result = cursor.fetchone()[0]
+            print(result)
+            # adding memo child transactions
+            # if result:
+            #     for obj in result:
+            #         if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
+            #             memo_objs = get_la_memos(
+            #                 cmte_id, obj.get("report_id"), obj.get("transaction_id")
+            #             )
+            #             if memo_objs:
+            #                 obj["child"] = memo_objs
+        return Response(result, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+            "The get_slb_summary_table API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
 

@@ -7,6 +7,31 @@ import datetime
 logger = logging.getLogger(__name__)
 
 
+def delete_child_transaction(table, cmte_id, transaction_id):
+    """
+    delete sql transaction
+    """
+    _sql1 = """UPDATE public.{}""".format(table)
+    _sql2 = """ SET delete_ind = 'Y' 
+            WHERE back_ref_transaction_id = %s AND cmte_id = %s
+        """
+    _v = (transaction_id, cmte_id)
+    logger.debug("delete sql: {}".format(_sql1 + _sql2))
+    do_transaction(_sql1 + _sql2, _v)
+
+
+def restore_child_transaction(table, cmte_id, transaction_id):
+    """
+    restore sql transaction
+    """
+    _sql1 = """UPDATE public.{}""".format(table)
+    _sql2 = """ SET delete_ind = '' 
+            WHERE back_ref_transaction_id = %s AND cmte_id = %s
+        """
+    _v = (transaction_id, cmte_id)
+    do_transaction(_sql1 + sql2, _v)
+
+
 def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
     """
     update parent sched_c transaction when a child payemnt transaction saved
@@ -146,8 +171,8 @@ def do_transaction(sql, values):
     try:
         with connection.cursor() as cursor:
             cursor.execute(sql, values)
-            if cursor.rowcount == 0:
-                raise Exception("The sql transaction: {} failed...".format(sql))
+            # if cursor.rowcount == 0:
+            #     raise Exception("The sql transaction: {} failed...".format(sql))
     except Exception:
         raise
 
