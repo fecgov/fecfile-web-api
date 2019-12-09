@@ -102,18 +102,24 @@ export class DebtSummaryService {
    *
    * TODO The API should be changed to pass the property names expected by the front end.
    */
-  public mapFromServerFields(serverData: any) {
+  public mapFromServerFields(serverData: any): DebtSummaryModel[] {
     if (!serverData || !Array.isArray(serverData)) {
       return;
     }
     const modelArray = [];
     for (const row of serverData) {
       const model = new DebtSummaryModel({});
+      model.selected = false;
+      model.toggleChild = false;
+      model.apiCall = row.api_call;
       model.transactionTypeIdentifier = row.transaction_type_identifier;
+      model.transactionTypeDescription = row.transaction_type_description;
+      model.scheduleType = row.schedule_type;
       model.transactionId = row.transaction_id;
       model.backRefTransactionId = row.back_ref_transaction_id;
-      model.child = row.child;
+      model.child = this._mapChildFromServerFields(row.child);
       model.entityType = row.entity_type;
+      this._setDebtName(row);
       model.name = row.name;
       model.beginningBalance = row.beginning_balance ? row.beginning_balance : 0;
       model.incurredAmt = row.incurred_amount ? row.incurred_amount : 0;
@@ -122,5 +128,49 @@ export class DebtSummaryService {
       modelArray.push(model);
     }
     return modelArray;
+  }
+
+  /**
+   * Map server fields from the response to the model for the child payment.
+   */
+  private _mapChildFromServerFields(serverData: any): DebtSummaryModel[] {
+    if (!serverData || !Array.isArray(serverData)) {
+      return;
+    }
+    const modelArray = [];
+    for (const row of serverData) {
+      const model = new DebtSummaryModel({});
+      model.selected = false;
+      model.toggleChild = false;
+      model.apiCall = row.api_call;
+      model.transactionTypeIdentifier = row.transaction_type_identifier;
+      model.transactionTypeDescription = row.transaction_type_description;
+      model.scheduleType = row.schedule_type;
+      model.transactionId = row.transaction_id;
+      model.backRefTransactionId = row.back_ref_transaction_id;
+      model.entityType = row.entity_type;
+      this._setDebtName(row);
+      model.name = row.name;
+      model.paymentAmt = row.expenditure_amount ? row.expenditure_amount : 0;
+      model.paymentDate = row.expenditure_date;
+      modelArray.push(model);
+    }
+    return modelArray;
+  }
+
+  private _setDebtName(debt: any): void {
+    const lastName = debt.last_name ? debt.last_name.trim() : '';
+    const firstName = debt.first_name ? debt.first_name.trim() : '';
+    const middleName = debt.middle_name ? debt.middle_name.trim() : '';
+    const suffix = debt.suffix ? debt.suffix.trim() : '';
+    const prefix = debt.prefix ? debt.prefix.trim() : '';
+
+    if (debt.entity_type === 'IND' || debt.entity_type === 'CAN') {
+      debt.name = `${lastName}, ${firstName}, ${middleName}, ${prefix}, ${suffix}`;
+    } else {
+      if (debt.hasOwnProperty('entity_name')) {
+        debt.name = debt.entity_name;
+      }
+    }
   }
 }

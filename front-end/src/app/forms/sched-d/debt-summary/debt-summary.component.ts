@@ -14,6 +14,7 @@ import {
 import { TransactionsService } from '../../transactions/service/transactions.service';
 import { ReportTypeService } from '../../form-3x/report-type/report-type.service';
 import { TransactionModel } from '../../transactions/model/transaction.model';
+import { mockChildPayments } from './mock.json';
 
 // export enum ActiveView {
 //   debtSummary = 'debtSummary',
@@ -43,7 +44,7 @@ export class DebtSummaryComponent implements OnInit {
   @Output()
   public status: EventEmitter<any> = new EventEmitter<any>();
 
-  public debtModel: Array<any>;
+  public debtModel: Array<DebtSummaryModel>;
   public totalAmount: number;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
@@ -166,19 +167,9 @@ export class DebtSummaryComponent implements OnInit {
 
         // TODO - this is temporary fix to map fields to the right attributes until service response is fixed
         res.forEach((debt: any) => {
-          const lastName = debt.last_name ? debt.last_name.trim() : '';
-          const firstName = debt.first_name ? debt.first_name.trim() : '';
-          const middleName = debt.middle_name ? debt.middle_name.trim() : '';
-          const suffix = debt.suffix ? debt.suffix.trim() : '';
-          const prefix = debt.prefix ? debt.prefix.trim() : '';
-
-          if (debt.entity_type === 'IND' || debt.entity_type === 'CAN') {
-            debt.name = `${lastName}, ${firstName}, ${middleName}, ${prefix}, ${suffix}`;
-          } else {
-            if (debt.hasOwnProperty('entity_name')) {
-              debt.name = debt.entity_name;
-            }
-          }
+          // temp code for developing the child payments
+          debt.child = mockChildPayments;
+          // temp code end
         });
 
         const debtModelL = this._debtSummaryService.mapFromServerFields(res);
@@ -346,7 +337,14 @@ export class DebtSummaryComponent implements OnInit {
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
-    const defaultSortColumns = ['name', 'beginningBalance', 'incurredAmt', 'paymentAmt', 'closingBalance'];
+    const defaultSortColumns = [
+      'name',
+      'paymentDate',
+      'beginningBalance',
+      'incurredAmt',
+      'paymentAmt',
+      'closingBalance'
+    ];
     const otherSortColumns = [];
 
     this.sortableColumns = [];
@@ -432,6 +430,27 @@ export class DebtSummaryComponent implements OnInit {
           type: debt.transactionTypeIdentifier, // should come from API
           transactionTypeIdentifier: debt.transactionTypeIdentifier,
           apiCall: '/sd/schedD' // should come from API
+        }
+      }
+    });
+  }
+
+  // TODO use this for edit debt once api has all fields needed for edit.
+  public editDebtPayment(debtPayment: DebtSummaryModel) {
+    const emptyValidForm = {};
+    this.status.emit({
+      form: emptyValidForm,
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      action: DebtSumarysActions.edit,
+      scheduleType: 'sched_f', // debtPayment.scheduleType,
+      transactionDetail: {
+        transactionModel: {
+          transactionId: debtPayment.transactionId,
+          type: debtPayment.transactionTypeIdentifier,
+          transactionTypeIdentifier: debtPayment.transactionTypeIdentifier,
+          apiCall: debtPayment.apiCall
         }
       }
     });

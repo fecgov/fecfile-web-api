@@ -138,6 +138,10 @@
   .child-bg {
     padding-left: 80px;
     background-color: #d9edf6 !important;
+    .child-bg-text {
+      padding-left: 1.75em;
+      font-style: italic;
+    }
   }
 
   // .debtSumamry__total-amount-container {
