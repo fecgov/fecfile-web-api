@@ -171,6 +171,24 @@ def schedF_sql_dict(data):
     except:
         raise Exception("invalid request data.")
 
+def get_existing_expenditure_amount(cmte_id, transaction_id):
+    """
+    fetch existing expenditure amount in the db for current transaction
+    """
+    _sql = """
+    select expenditure_amount
+    from public.sched_f
+    where cmte_id = %s
+    and transaction_id = %s
+    """
+    _v = (cmte_id, transaction_id)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _v)
+            return cursor.fetchone()[0]
+    except:
+        raise
+
 
 def put_schedF(data):
     """
@@ -195,10 +213,23 @@ def put_schedF(data):
         else:
             entity_data = post_entities(data)
             entity_flag = False
+
+        existing_expenditure = get_existing_expenditure_amount(
+            data.get("cmte_id"), data.get("transaction_id"))
         try:
             entity_id = entity_data.get("entity_id")
             data["payee_entity_id"] = entity_id
             put_sql_schedF(data)
+
+            # if debt payment, need to update debt balance
+            if data.get("transaction_type_identifier") == "COEXP_PARTY_DEBT":
+                if float(existing_expenditure) != float(data.get("enpenditure_amount")):
+                    update_sched_d_parent(
+                        data.get("cmte_id"),
+                        data.get("back_ref_transaction_id"),
+                        data.get("expenditure_amount"),
+                        existing_expenditure,
+                    )
         except Exception as e:
             # if exceptions saving shced_a, remove entities or rollback entities too
             if entity_flag:
