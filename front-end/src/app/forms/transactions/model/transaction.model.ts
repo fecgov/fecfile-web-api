@@ -46,6 +46,8 @@ export class TransactionModel {
   nonfedShareAmount: any;
   levinShare: any;
   purpose: any;
+  reportId: any;
+  scrollDebtPaymentButtonIntoView: boolean;
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
@@ -94,5 +96,7 @@ export class TransactionModel {
     this.nonfedShareAmount = transaction.nonfedShareAmount;
     this.levinShare = transaction.levinShare;
     this.purpose = transaction.purpose;
+    this.scrollDebtPaymentButtonIntoView = transaction.scrollDebtPaymentButtonIntoView ? transaction.scrollDebtPaymentButtonIntoView : false;
+    this.reportId = transaction.reportId;
   }
 }

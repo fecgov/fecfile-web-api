@@ -911,7 +911,7 @@
               <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
             <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trx.schedule}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trx.scheduleType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')">
               {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
             <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
@@ -974,7 +974,7 @@
               <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
             <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trxChild.schedule}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trxChild.scheduleType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
