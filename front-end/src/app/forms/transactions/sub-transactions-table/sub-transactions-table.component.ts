@@ -112,28 +112,32 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
             }
             model.scheduleType = trx.schdule_type;
             break;
-          //for h4 & h6  
-          case 'ALLOC_EXP_CC_PAY_MEMO' || 'ALLOC_EXP_STAF_REIM_MEMO' || 'ALLOC_EXP_PMT_TO_PROL_MEMO':
-            model.amount = trx.total_amount;
-            break;
-          case 'ALLOC_FEA_CC_PAY_MEMO' || 'ALLOC_FEA_STAF_REIM_MEMO':
-            model.amount = trx.total_fed_levin_amount;
-            break;
           default:
+        }
+
+        if(transactionType ===  'ALLOC_EXP_CC_PAY_MEMO' || transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' || transactionType ==='ALLOC_EXP_PMT_TO_PROL_MEMO') {
+            model.amount = trx.total_amount;;
+        }
+
+        if(transactionType ===  'ALLOC_FEA_CC_PAY_MEMO' || transactionType === 'ALLOC_FEA_STAF_REIM_MEMO') {
+            model.amount = trx.total_fed_levin_amount;;
         }
 
         model.date = trx.expenditure_date ? trx.expenditure_date : trx.contribution_date;
         model.aggregate = trx.contribution_aggregate;
-        //for h4 & h6
-        switch (transactionType) {
-          case 'ALLOC_EXP_CC_PAY_MEMO' || 'ALLOC_EXP_STAF_REIM_MEMO' || 'ALLOC_EXP_PMT_TO_PROL_MEMO':
-            model.aggregate = trx.activity_event_amount_ytd;
-            break;
-          case 'ALLOC_FEA_CC_PAY_MEMO' || 'ALLOC_FEA_STAF_REIM_MEMO':
-            model.aggregate = trx.activity_event_total_ytd;
-            break;
-          default:
+
+        model.activityEventType = trx.activity_event_type;
+        model.activityEventIdentifier = trx.activity_event_identifier;
+        model.purpose = trx.purpose;
+        model.fedShareAmount = trx.fed_share_amount;
+        model.nonfedShareAmount = trx.non_fed_share_amount;
+
+        if(transactionType === 'ALLOC_FEA_CC_PAY_MEMO' || transactionType === 'ALLOC_FEA_STAF_REIM_MEMO') {
+          model.fedShareAmount = trx.federal_share;
+          model.levinShare = trx.levin_share;
+          model.purpose = trx.expenditure_purpose;
         }
+
         model.memoCode = trx.memo_code;
         model.memoText = trx.memo_text;
 
@@ -220,5 +224,21 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
    */
   public editTransaction(trx: TransactionModel): void {
     this._transactionsMessageService.sendEditTransactionMessage(trx);
+  }
+
+  public isH4OrH6(): string {
+    if (this.subTransactions) {
+      for (const trx of this.subTransactions) {
+        const transactionType = trx.transaction_type_identifier;
+
+        if(transactionType ===  'ALLOC_EXP_CC_PAY_MEMO' || transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' || transactionType ==='ALLOC_EXP_PMT_TO_PROL_MEMO') {
+          return 'H4';
+        }
+
+        if(transactionType ===  'ALLOC_FEA_CC_PAY_MEMO' || transactionType === 'ALLOC_FEA_STAF_REIM_MEMO') {
+          return 'H6';
+        }
+      }
+    }
   }
 }

@@ -610,17 +610,17 @@ def schedL(request):
     elif request.method == "GET":
         try:
             data = {"cmte_id": request.user.username}
-            if "report_id" in request.data and check_null_value(
-                request.data.get("report_id")
+            if "report_id" in request.query_params and check_null_value(
+                request.query_params.get("report_id")
             ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
+                data["report_id"] = check_report_id(request.query_params.get("report_id"))
             else:
                 raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
+            if "transaction_id" in request.query_params and check_null_value(
+                request.query_params.get("transaction_id")
             ):
                 data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+                    request.query_params.get("transaction_id")
                 )
             datum = get_schedL(data)
             return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
