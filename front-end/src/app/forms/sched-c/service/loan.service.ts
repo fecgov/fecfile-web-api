@@ -259,6 +259,7 @@ export class LoanService {
       model.memo_text = row.memo_text;
       model.delete_ind = row.delete_ind;
       model.child = row.child
+      model.payments = row.payments;
       modelArray.push(model);
     }
     return modelArray;

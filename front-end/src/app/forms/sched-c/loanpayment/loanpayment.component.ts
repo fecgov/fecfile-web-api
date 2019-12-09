@@ -25,7 +25,7 @@ import { DecimalPipe } from '@angular/common';
 export class LoanpaymentComponent implements OnInit, OnDestroy {
 
   @Input() transactionDetail: any;
-  @Input() scheduleAction: ScheduleActions = ScheduleActions.add;
+  @Input() scheduleAction: ScheduleActions ;
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   tooltipPlaceholder: string = 'Language to be provided by RAD';
@@ -81,6 +81,9 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
     this._clearFormSubscription.unsubscribe();
   }
 
+  ngOnChanges(){
+    this.ngOnInit();
+  }
 
   isIndividual() {
     if (this.form.control.get('entity_type').value === 'IND') {
@@ -91,11 +94,17 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
 
   private getLoanRepaymentData() {
 
+    this.scheduleAction ? this.scheduleAction : this.scheduleAction = ScheduleActions.add;
     const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
 
 
     if (this.transactionDetail && this.transactionDetail.transactionTypeIdentifier === "LOAN_REPAY_MADE") {
-      this._loanTransactionId = this.transactionDetail.backRefTransactionId;
+      if(this.transactionDetail.backRefTransactionId){
+        this._loanTransactionId = this.transactionDetail.backRefTransactionId;
+      }
+      else if(this.transactionDetail.back_ref_transaction_id){
+        this._loanTransactionId = this.transactionDetail.back_ref_transaction_id;
+      }
     }
     else {
       this._loanTransactionId = this.transactionDetail.transactionId;
@@ -118,7 +127,15 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
       this.form.control.patchValue({ 'city': res.city });
       this.form.control.patchValue({ 'zip': res.zip_code });
       this.form.control.patchValue({ 'state': res.state });
+      this.form.control.patchValue({ 'entity_id': res.entity_id });
       this.outstandingLoanBalance = Number(res.loan_balance);
+
+      if(this.scheduleAction === ScheduleActions.edit){
+         this.form.control.patchValue({ 'expenditure_date': this.transactionDetail.date });
+         this.form.control.patchValue({ 'expenditure_amount': this._decimalPipe.transform(this.transactionDetail.amount, '.2-2')});
+         this.form.control.patchValue({ 'expenditure_purpose': this.transactionDetail.purposeDescription });
+         this.form.control.patchValue({ 'memo_text': this.transactionDetail.memoText });
+      }
 
       //remove unnecessary form controls
       this.removeUnnecessaryFormControls();
@@ -265,17 +282,17 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
   }
 
   private removeCommas(amount: string): string {
-    return amount.replace(new RegExp(',', 'g'), '');
+    return amount.toString().replace(new RegExp(',', 'g'), '');
 
   }
 
-  public saveLoanPayment(form: string, scheduleAction: ScheduleActions) {
+  public saveLoanPayment(form: string) {
 
 
     if (this.validateForm()) {
 
       let formType: string = '3X';
-      scheduleAction = ScheduleActions.add;
+      // scheduleAction = ScheduleActions.add;
 
       const token: string = JSON.parse(this._cookieService.get('user'));
       let url: string = '/sb/schedB';
@@ -320,7 +337,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
         formData.append('memo_code', 'X');
       }
 
-      if (scheduleAction === ScheduleActions.add || scheduleAction === ScheduleActions.addSubTransaction) {
+      if (this.scheduleAction === ScheduleActions.add || this.scheduleAction === ScheduleActions.addSubTransaction) {
         return this._http
           .post(`${environment.apiUrl}${url}`, formData, {
             headers: httpOptions
@@ -347,21 +364,33 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
             return false;
           }
           );
-      } else if (scheduleAction === ScheduleActions.edit) {
+      } else if (this.scheduleAction === ScheduleActions.edit) {
+        formData.set('transaction_id', this.transactionDetail.transactionId);
         return this._http
           .put(`${environment.apiUrl}${url}`, formData, {
             headers: httpOptions
           })
-          .pipe(
-            map(res => {
-              if (res) {
-                return res;
-              }
-              return false;
-            })
+          .subscribe(res => {
+            if (res) {
+              //update sidebar
+              this._receiptService.getSchedule(formType, res).subscribe(resp => {
+                const message: any = {
+                  formType,
+                  totals: resp
+                };
+                this._messageService.sendMessage(message);
+              });
+
+              //navigate to Loan Summary here
+              this._goToLoanSummary();
+              // return res;
+            }
+            console.log('success but no response.. failure?')
+            return false;
+          }
           );
       } else {
-        console.log('unexpected ScheduleActions received - ' + scheduleAction);
+        console.log('unexpected ScheduleActions received - ' + this.scheduleAction);
       }
     }
   }

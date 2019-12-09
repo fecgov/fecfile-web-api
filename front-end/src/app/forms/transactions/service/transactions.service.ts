@@ -845,10 +845,12 @@ export class TransactionsService {
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.reportType = row.report_type;
   model.type = row.transaction_type_desc;
+  model.scheduleType = row.schedule;
   model.entityId = row.entity_id;
   model.transactionTypeIdentifier = row.transaction_type_identifier;
   model.apiCall = row.api_call;
   model.transactionId = row.transaction_id;
+  model.backRefTransactionId = row.back_ref_transaction_id;
   model.name = row.name;
   model.street = row.street_1;
   model.street2 = row.street_2;

@@ -21,7 +21,9 @@ from fecfiler.core.transaction_util import (
     get_sched_c1_child_transactions,
     get_sched_c2_child,
     get_sched_c2_child_transactions,
+    get_sched_c_loan_payments,
     delete_child_transaction)
+
 from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
@@ -1072,6 +1074,11 @@ def get_outstanding_loans(request):
         else:
             for tran in json_result:
                 transaction_id = tran.get('transaction_id')
+                loan_pyaments_obj = get_sched_c_loan_payments(
+                    cmte_id,transaction_id)
+                for obj in loan_pyaments_obj:
+                    obj.update(API_CALL_SB)
+                logger.debug('getting all c1 childs...')
                 childC1_forms_obj = get_sched_c1_child(
                     cmte_id, transaction_id)
                 # print(childC1_forms_obj)
@@ -1086,6 +1093,8 @@ def get_outstanding_loans(request):
                 child_tran = childC1_forms_obj + childC2_forms_obj
                 if child_tran:
                     tran['child'] = child_tran
+                if loan_pyaments_obj:
+                    tran['payments'] = loan_pyaments_obj
             return Response(json_result, status=status.HTTP_200_OK)
 
     except:

@@ -1425,8 +1425,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   public goToDebtPayment(trx:any){
-    // trx.scheduleType="sched_c_loan_payment"
-    // trx.backRefTransactionId = trx.transactionId;
+    trx.scrollDebtPaymentButtonIntoView = true;
     this.editTransaction(trx);
   }
 }
