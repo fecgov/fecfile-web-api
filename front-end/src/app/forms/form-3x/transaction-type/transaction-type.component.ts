@@ -161,7 +161,7 @@ export class TransactionTypeComponent implements OnInit {
         window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
       }
 
-      if (this.transactionType !== 'LOAN_SUMMARY') {
+      if (this.transactionType !== 'LOAN_SUMMARY' && this.transactionType !== 'DEBT_OWN_BY_SUMMARY') {
         // Send message to form (indv-receipt) to clear form field vals if they are still populated.
         this._f3xMessageService.sendInitFormMessage('');
       }

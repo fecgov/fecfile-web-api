@@ -62,6 +62,7 @@ export class F3xComponent implements OnInit {
   public scheduleFAction: ScheduleActions;
   public forceChangeDetectionC1: Date;
   public forceChangeDetectionFDebtPayment: Date;
+  public forceChangeDetectionDebtSummary: Date;
 
   public allTransactions: boolean = false;
 
@@ -334,6 +335,10 @@ export class F3xComponent implements OnInit {
               return;
             }
 
+            if (this._handleScheduleD()) {
+              return;
+            }
+
             // Coming from transactions, the event may contain the transaction data
             // with an action to allow for view or edit.
             let transactionTypeText = '';
@@ -357,7 +362,6 @@ export class F3xComponent implements OnInit {
                 this.scheduleType = 'sched_c';
                 this.scheduleCAction = ScheduleActions.edit;
                 this.transactionDetailSchedC = e.transactionDetail.transactionModel;
-
               } else if (apiCall === '/sc/schedC1') {
                 alert('edit C1 not yet supported');
               } else if (apiCall === '/sf/schedF') {
@@ -423,18 +427,19 @@ export class F3xComponent implements OnInit {
     }
   }
 
-
   /**
    * This method should extract the schedule type based on transactionTypeIdentifier in certain
    * cases. It was being defaulted to sched_a but in case of e.g. sched c, it should be extracted.
-   * Additional use cases can be added to it 
-   * @param e 
+   * Additional use cases can be added to it
+   * @param e
    */
   private extractScheduleType(e: any) {
-
-    if (e.transactionDetail && e.transactionDetail.transactionModel &&
-      e.transactionDetail.transactionModel.transactionTypeIdentifier === "LOAN_REPAY_MADE") {
-      e.scheduleType = "sched_c_loan_payment";
+    if (
+      e.transactionDetail &&
+      e.transactionDetail.transactionModel &&
+      e.transactionDetail.transactionModel.transactionTypeIdentifier === 'LOAN_REPAY_MADE'
+    ) {
+      e.scheduleType = 'sched_c_loan_payment';
     }
 
     //default to sched_a ?
@@ -487,7 +492,7 @@ export class F3xComponent implements OnInit {
         this.scheduleType = 'sched_c_ls';
         this.scheduleCAction = ScheduleActions.loanSummary;
       } else if (this.scheduleType === 'sched_c_loan_payment') {
-        //this is being done in case loan payment is being accessed from transaction table, 
+        //this is being done in case loan payment is being accessed from transaction table,
         //a flag is needed to return back to the transaction table's 'disbursement tab'
         //upon clicking cancel, based on the current implementation of loan payments.
         if (transaction.previousStep === 'transactions') {
@@ -496,16 +501,17 @@ export class F3xComponent implements OnInit {
 
         //also loan payment needs to have a schedule action of its own, 'loanPaymentScheduleAction'
         //since a new payment can be "added" while "editing" the loan itself
-        if (transaction && transaction.transactionDetail && transaction.transactionDetail.transactionModel &&
-          transaction.transactionDetail.transactionModel.apiCall === '/sb/schedB' && 
-          transaction.transactionDetail.transactionModel.transactionId) {
+        if (
+          transaction &&
+          transaction.transactionDetail &&
+          transaction.transactionDetail.transactionModel &&
+          transaction.transactionDetail.transactionModel.apiCall === '/sb/schedB' &&
+          transaction.transactionDetail.transactionModel.transactionId
+        ) {
           this.loanPaymentScheduleAction = ScheduleActions.edit;
-        }
-        else {
+        } else {
           this.loanPaymentScheduleAction = ScheduleActions.add;
         }
-
-
       } else if (this.scheduleType === 'sched_c1') {
         this.forceChangeDetectionC1 = new Date();
       }
@@ -515,6 +521,20 @@ export class F3xComponent implements OnInit {
       if (transactionDetail) {
         this.transactionDetailSchedC = transactionDetail.transactionModel;
       }
+    }
+    return finish;
+  }
+
+  /**
+   * Special handling for Sched D.  For example, don't call dynamic forms for Summary.
+   * @returns true if schedule D and should stop processing
+   */
+  private _handleScheduleD(): boolean {
+    let finish = false;
+    if (this.scheduleType === 'sched_d_ds') {
+      this.forceChangeDetectionDebtSummary = new Date();
+      this.canContinue();
+      finish = true;
     }
     return finish;
   }
