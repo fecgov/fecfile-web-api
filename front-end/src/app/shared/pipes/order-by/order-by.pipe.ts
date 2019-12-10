@@ -4,7 +4,6 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'orderBy'
 })
 export class OrderByPipe implements PipeTransform {
-
   /**
    * Sorts a table column.
    *
@@ -13,31 +12,26 @@ export class OrderByPipe implements PipeTransform {
    */
   transform(records: Array<any>, args?: any): any {
     if (Array.isArray(records)) {
-      return records.sort(function (a, b) {
-
+      return records.sort(function(a, b) {
         //first two conditions are added to also sort "null" values
 
-        if (!a[args.property]) {
+        if (!a[args.property] && a[args.property] !== 0) {
           a[args.property] = '';
         }
 
-        if (!b[args.property]) {
+        if (!b[args.property] && b[args.property] !== 0) {
           b[args.property] = '';
         }
 
-
         if (a[args.property] === b[args.property]) {
           return 0;
-        }
-        else if (a[args.property] < b[args.property]) {
+        } else if (a[args.property] < b[args.property]) {
           return -1 * args.direction;
-        }
-        else {
+        } else {
           return 1 * args.direction;
         }
       });
     }
     return;
   }
-
 }
