@@ -104,6 +104,16 @@ CREATE OR replace VIEW PUBLIC.dynamic_forms_view AS
                        dfbs.transaction_type;
 """
 
+SCHEDULE_TO_TABLE_DICT = { 'SA': ['sched_a'],
+    'SB': ['sched_b'],
+    'SC': ['sched_c', 'sched_c1', 'sched_c2'],
+    'SD': ['sched_d'],
+    'SE': ['sched_e'],
+    'SF': ['sched_f'],
+    'SH': ['sched_h1', 'sched_h2', 'sched_h3', 'sched_h4', 'sched_h5', 'sched_h6'],
+    'SL': ['sched_l']
+}
+
 logger = logging.getLogger(__name__)
 # aws s3 bucket connection
 conn = boto.connect_s3()
@@ -2085,36 +2095,54 @@ def get_trans_query(category_type, cmte_id, param_string):
     return query_string
 
 def filter_get_all_trans(request, param_string):
-    if request.method == 'GET':
-        return param_string
+    # if request.method == 'GET':
+    #     return param_string
     filt_dict = request.data.get('filters', {})
-    for f_key, value_d in filt_dict.items():
-        if not value_d or value_d == 'null':
-            continue
-        if 'filterCategories' in f_key:
-            cat_tuple = "('"+"','".join(value_d)+"')"
-            param_string = param_string + " AND transaction_type_desc In " + cat_tuple
-        if 'filterDateFrom' in f_key and 'filterDateTo' in filt_dict.keys():
-            param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
-        # The below code was added by Praveen. This is added to reuse this function in get_all_trashed_transactions API.
-        if 'filterDeletedDateFrom' in f_key and 'filterDeletedDateTo' in filt_dict.keys():
-            param_string = param_string + " AND date(last_update_date) >= '" + value_d +"' AND date(last_update_date) <= '" + filt_dict['filterDeletedDateTo'] +"'"
-        # End of Addition
-        if 'filterAmountMin' in f_key and 'filterAmountMax' in filt_dict.keys():
-            param_string = param_string + " AND transaction_amount >= " + str(value_d) +" AND transaction_amount <= " + str(filt_dict['filterAmountMax'])
-        if 'filterAggregateAmountMin' in f_key and 'filterAggregateAmountMax' in filt_dict.keys():
-            param_string = param_string + " AND aggregate_amt >= " + str(value_d) +" AND aggregate_amt <= " + str(filt_dict['filterAggregateAmountMax'])
-        if 'filterStates' in f_key:
-            state_tuple = "('"+"','".join(value_d)+"')"
-            param_string = param_string + " AND state In " + state_tuple
-        if 'filterItemizations' in f_key:
-            itemized_tuple = "('"+"','".join(value_d)+"')"
-            param_string = param_string + " AND itemized In " + itemized_tuple
-        if 'filterElectionCodes' in f_key:
-            itemized_tuple = "('"+"','".join(value_d)+"')"
-            param_string = param_string + " AND election_code In " + itemized_tuple
-        if 'filterElectionYearFrom' in f_key and 'filterElectionYearTo' in filt_dict.keys():
-            param_string = param_string + " AND election_year >= '" + value_d +"' AND election_year <= '" + filt_dict['filterElectionYearTo'] +"'"
+    ctgry_type = request.data.get('category_type')
+    # print(filt_dict)
+    if filt_dict.get('filterCategories'):
+        cat_tuple = "('"+"','".join(filt_dict['filterCategories'])+"')"
+        param_string = param_string + " AND transaction_type_desc In " + cat_tuple
+    if filt_dict.get('filterDateFrom') not in [None, 'null']:
+        param_string = param_string + " AND transaction_date >= '" + filt_dict['filterDateFrom'] + "'"
+    if filt_dict.get('filterDateTo') not in [None, 'null']:
+        param_string = param_string + " AND transaction_date <= '" + filt_dict['filterDateTo'] + "'"
+    # The below code was added by Praveen. This is added to reuse this function in get_all_trashed_transactions API.
+    if filt_dict.get('filterDeletedDateFrom') not in [None, 'null']:
+        param_string = param_string + " AND date(last_update_date) >= '" + filt_dict['filterDeletedDateFrom'] + "'"
+    if filt_dict.get('filterDeletedDateTo') not in [None, 'null']:
+        param_string = param_string + " AND date(last_update_date) <= '" + filt_dict['filterDeletedDateTo'] + "'"
+    # End of Addition
+    if filt_dict.get('filterAmountMin') not in [None, 'null']:
+        param_string = param_string + " AND transaction_amount >= '" + str(filt_dict['filterAmountMin']) + "'"
+    if filt_dict.get('filterAmountMax') not in [None, 'null']:
+        param_string = param_string + " AND transaction_amount <= '" + str(filt_dict['filterAmountMax']) + "'"
+    if filt_dict.get('filterAggregateAmountMin') not in [None, 'null']:
+        param_string = param_string + " AND aggregate_amt >= '" + str(filt_dict['filterAggregateAmountMin']) + "'"
+    if filt_dict.get('filterAggregateAmountMax') not in [None, 'null']:
+        param_string = param_string + " AND aggregate_amt <= '" + str(filt_dict['filterAggregateAmountMax']) + "'"
+    if filt_dict.get('filterStates'):
+        state_tuple = "('"+"','".join(filt_dict['filterStates'])+"')"
+        param_string = param_string + " AND state In " + state_tuple
+    if filt_dict.get('filterItemizations'):
+        itemized_tuple = "('"+"','".join(filt_dict['filterItemizations'])+"')"
+        param_string = param_string + " AND itemized In " + itemized_tuple
+    if filt_dict.get('filterElectionCodes'):
+        election_tuple = "('"+"','".join(filt_dict['filterElectionCodes'])+"')"
+        param_string = param_string + " AND election_code In " + election_tuple
+    if filt_dict.get('filterElectionYearFrom') not in [None, 'null']:
+        param_string = param_string + " AND election_year >= '" + filt_dict['filterElectionYearFrom'] + "'"
+    if filt_dict.get('filterElectionYearTo') not in [None, 'null']:
+        param_string = param_string + " AND election_year <= '" + filt_dict['filterElectionYearTo'] + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterLoanAmountMin') not in [None, 'null']:
+        param_string = param_string + " AND loan_amount >= '" + str(filt_dict['filterLoanAmountMin']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterLoanAmountMax') not in [None, 'null']:
+        param_string = param_string + " AND loan_amount <= '" + str(filt_dict['filterLoanAmountMax']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterLoanClosingBalanceMin') not in [None, 'null']:
+        param_string = param_string + " AND loan_closing_balance >= '" + str(filt_dict['filterLoanClosingBalanceMin']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterLoanClosingBalanceMax') not in [None, 'null']:
+        param_string = param_string + " AND loan_closing_balance <= '" + str(filt_dict['filterLoanClosingBalanceMax']) + "'"
+    # print(param_string)
     return param_string
 
 # def get_aggregate_amount(transaction_id):
@@ -2372,7 +2400,7 @@ def get_all_transactions(request):
                         else:
                             output_list.append(transaction)
             else:
-                status_value = status.HTTP_204_NO_CONTENT
+                status_value = status.HTTP_200_OK
         # logger.debug(output_list)
         total_count = len(output_list)
         paginator = Paginator(output_list, itemsperpage)
@@ -2588,39 +2616,26 @@ def get_list_report_data(report_id, cmte_id):
 @api_view(['POST'])
 def delete_trashed_transactions(request):
     try:
-        #import ipdb;ipdb.set_trace()
-        #message_dict = {}
         committeeid = request.user.username
+        row_count = 0
         for _action in request.data.get('actions', []):
             #report_id = _action.get('report_id', '')
             trans_id = _action.get('transaction_id', '')
-            
-            message='Transaction deleted successfully'
-            #message_dict[trans_id] = message
-            sched_a_obj = get_SA_from_transaction_data(trans_id)[0]
-            #print(sched_a_obj) Mahendra 10052019
-            if sched_a_obj:
-               
-                report_info = get_list_report_data(sched_a_obj['report_id'], committeeid)[0]
-                #print(report_info)
-                if report_info and report_info['status'] == 'Submitted':
-                   message = 'The transaction report is submitted.'
-                   #message_dict[trans_id] = message
-                elif report_info and report_info['status'] == None:
-                    message = 'The transaction report is None.'
-                    #message_dict[trans_id] = message
-                else:
+            table_list = SCHEDULE_TO_TABLE_DICT.get(trans_id[:2])
+            if table_list:
+                for table in table_list:
                     try:
-
                         with connection.cursor() as cursor:
-                            cursor.execute("""Delete FROM public.sched_a where transaction_id = %s;""",[trans_id])
-                            #message = 'Transaction deleted successfully'
+                            cursor.execute("""Delete FROM public.{} where transaction_id = %s;""".format(table),[trans_id])
+                            row_count += cursor.rowcount
                     except Exception as e:
-                        print(e)
-                        message = 'Error in deleting the transaction'
-                        #message_dict[trans_id] = message
-
-        json_result = {'message':message}
+                        raise Exception('delete_trashed_transactions SQl is throwing an error: ' + str(e))
+                if not row_count:
+                    logger.debug('Delete trashed transaction: '+str(trans_id)+' for committee: '+str(committeeid))
+                    raise Exception("""The transaction ID: {1} is either already deleted or does not exist in {0} table""".format(','.join(table_list), trans_id))
+            else:
+                raise Exception('The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT.'.format(trans_id))
+        json_result = {'message':'Transaction deleted successfully'}
         return Response(json_result, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response('The delete_trashed_transactions API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)

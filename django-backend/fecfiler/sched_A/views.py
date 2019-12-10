@@ -1529,8 +1529,8 @@ def trash_restore_sql_transaction(table_list, report_id, transaction_id, _delete
                 row_count += cursor.rowcount
         if not row_count:
             raise Exception(
-                """The transaction ID: {} is either already deleted
-                 or does not exist in {} table""".format(','.join(table_list), transaction_id))
+                """The transaction ID: {1} is either already deleted
+                 or does not exist in {0} table""".format(','.join(table_list), transaction_id))
     except Exception:
         raise
 
