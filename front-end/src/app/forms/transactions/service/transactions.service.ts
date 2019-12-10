@@ -376,35 +376,35 @@ export class TransactionsService {
       case 'itemized':
         name = 'itemized';
         break;
-      case 'election_code':
-        name = 'electionCode';
+      case 'electionCode':
+        name = 'election_code';
         break;
-      case 'loan_amount':
-        name = 'loanAmount';
+      case 'loanAmount':
+        name = 'loan_amount';
         break;
-      case 'loan_balance':
-        name = 'loanBalance';
+      case 'loanBalance':
+        name = 'loan_balance';
         break;
-      case 'loan_beginning_balance':
-        name = 'loanBeginningBalance';
+      case 'loanBeginningBalance':
+        name = 'loan_beginning_balance';
         break;
-      case 'loan_closing_balance':
-        name = 'loanClosingBalance';
+      case 'loanClosingBalance':
+        name = 'loan_closing_balance';
         break;
-      case 'loan_due_date':
-        name = 'loanDueDate';
+      case 'loanDueDate':
+        name = 'loan_due_date';
         break;
-      case 'loan_incurred_amt':
-        name = 'loanIncurredAmt';
+      case 'loanIncurredAmt':
+        name = 'loan_incurred_amt';
         break;
-      case 'loan_incurred_date':
-        name = 'loanIncurredDate';
+      case 'loanIncurredDate':
+        name = 'loan_incurred_date';
         break;
-      case 'loan_payment_amt':
-        name = 'loanPaymentAmt';
+      case 'loanPaymentAmt':
+        name = 'loan_payment_amt';
         break;
-      case 'loan_payment_to_date':
-        name = 'loanPaymentToDate';
+      case 'loanPaymentToDate':
+        name = 'loan_payment_to_date';
         break;
       default:
     }
