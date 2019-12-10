@@ -46,10 +46,11 @@ from fecfiler.sched_A.views import get_next_transaction_id
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-API_CALL_SB = {"api_call": "/sb/schedB"}
-API_CALL_SF = {"api_call": "/sf/schedF"}
-API_CALL_SH4 = {"api_call": "/sh4/schedH4"}
-API_CALL_SH6 = {"api_call": "/sh6/schedH6"}
+API_CALL_SB = {"api_call": "/sb/schedB", "sched_type": "sched_b"}
+API_CALL_SF = {"api_call": "/sf/schedF", "sched_type": "sched_f"}
+API_CALL_SE = {"api_call": "/se/schedE", "sched_type": "sched_e"}
+API_CALL_SH4 = {"api_call": "/sh4/schedH4", "sched_type": "sched_h4"}
+API_CALL_SH6 = {"api_call": "/sh6/schedH6", "sched_type": "sched_h6"}
 
 MANDATORY_FIELDS_SCHED_D = [
     "report_id",
@@ -740,26 +741,7 @@ def get_schedD(data):
         if "transaction_id" in data:
             transaction_id = check_transaction_id(data.get("transaction_id"))
             forms_obj = get_list_schedD(report_id, cmte_id, transaction_id)
-            tran_id = forms_obj[0].get("transaction_type_identifier")
-            forms_obj[0].update(
-                {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
-            )
-            child_objs = get_child_transactions(report_id, cmte_id, transaction_id)
-            for obj in child_objs:  # this api_call code need to refactored later on
-                tran_id = obj.get("transaction_type_identifier")
-                obj.update(
-                    {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
-                )
-                if obj["transaction_id"].startswith("SB"):
-                    obj.update(API_CALL_SB)
-                if obj["transaction_id"].startswith("SF"):
-                    obj.update(API_CALL_SF)
-                if "levin_share" in obj:
-                    obj.update(API_CALL_SH6)
-                if "non_fed_share_amount" in obj:
-                    obj.update(API_CALL_SH4)
-            if len(child_objs) > 0:
-                forms_obj[0]["child"] = child_objs
+
         else:
             # when laod sched_d in bulk, need to do a carry-over when new report_id
             # passed in: duplicate all non-zero sched_d items with updated report_id
@@ -773,6 +755,42 @@ def get_schedD(data):
             )
             do_carryover(report_id, cmte_id)
             forms_obj = get_list_all_schedD(report_id, cmte_id)
+        logger.debug("total schedD items loaded:{}".format(len(forms_obj)))
+        if forms_obj:
+            for f_obj in forms_obj:
+
+                tran_id = f_obj.get("transaction_type_identifier")
+                f_obj.update(
+                    {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
+                )
+                transaction_id = f_obj.get("transaction_id")
+                child_objs = get_child_transactions(report_id, cmte_id, transaction_id)
+                logger.debug("total childs:{}".format(len(child_objs)))
+                if child_objs:
+                    logger.debug
+                    for (
+                        obj
+                    ) in child_objs:  # this api_call code need to refactored later on
+                        tran_id = obj.get("transaction_type_identifier")
+                        obj.update(
+                            {
+                                "transaction_type_description": tran_desc_dic.get(
+                                    tran_id, ""
+                                )
+                            }
+                        )
+                        obj.update({"back_ref_api_call": "/sd/schedD"})
+                        if obj["transaction_id"].startswith("SB"):
+                            obj.update(API_CALL_SB)
+                        if obj["transaction_id"].startswith("SE"):
+                            obj.update(API_CALL_SE)
+                        if obj["transaction_id"].startswith("SF"):
+                            obj.update(API_CALL_SF)
+                        if "levin_share" in obj:
+                            obj.update(API_CALL_SH6)
+                        if "non_fed_share_amount" in obj:
+                            obj.update(API_CALL_SH4)
+                        f_obj["child"] = child_objs
         return forms_obj
     except:
         raise
