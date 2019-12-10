@@ -181,4 +181,9 @@ urlpatterns = [
         views.get_sched_c_endorser_dynamic_forms_fields,
         name="get_sched_c_endorser_dynamic_forms_fields",
     ),
+    url(
+        r"^core/prepare_Schedl_summary_data$",
+        views. prepare_Schedl_summary_data,
+        name=" prepare_Schedl_summary_data",
+    ),
 ]
