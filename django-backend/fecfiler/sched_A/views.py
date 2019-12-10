@@ -292,7 +292,7 @@ def post_sql_schedA(cmte_id,
             entity_id, contribution_date, contribution_amount, purpose_description, 
             memo_code, memo_text, election_code, election_other_description, 
             create_date, last_update_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """, [cmte_id, report_id, line_number, transaction_type, 
             transaction_id, back_ref_transaction_id, back_ref_sched_name, 
             entity_id, contribution_date, contribution_amount, purpose_description, 
