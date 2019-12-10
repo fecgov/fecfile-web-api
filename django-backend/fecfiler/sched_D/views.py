@@ -21,6 +21,7 @@ from fecfiler.core.transaction_util import (
     get_sched_h4_child_transactions,
     get_sched_h6_child_transactions,
     get_transaction_type_descriptions,
+    do_carryover_sc_payments,
 )
 
 from fecfiler.core.views import (
@@ -821,8 +822,6 @@ def is_new_report(report_id, cmte_id):
 
 def do_carryover(report_id, cmte_id):
     """
-    TODO: we may need a debt-incurred-date for debt forward carryover - 
-          need date comparison
     this is the function to handle debt carryover form one report to next report:
     1. load all non-zero close_balance sched_d and make sure:
     - debt incurred date < report coverge start
@@ -831,10 +830,6 @@ def do_carryover(report_id, cmte_id):
     2. update all records with new transaction_id, new report_id
     3. copy close_balance to starting_balance, leave all other amount 0
     4. insert sched_c into db
-    5. if carryover happens, for each carryover debt:
-       - do child payments carry over
-       - need to query and check sched_c parent-child relationship
-       - replace payment parent id to current carryover one.
     """
     _sql = """
     insert into public.sched_d(
@@ -853,25 +848,26 @@ def do_carryover(report_id, cmte_id):
                     create_date
 					)
 					SELECT 
-					cmte_id, 
+					d.cmte_id, 
                     %s, 
-                    line_num,
-                    transaction_type_identifier, 
+                    d.line_num,
+                    d.transaction_type_identifier, 
                     get_next_transaction_id('SD'), 
-                    entity_id, 
-                    balance_at_close, 
+                    d.entity_id, 
+                    d.balance_at_close, 
                     0, 
                     0, 
                     0, 
-					purpose,
-                    transaction_id,
+					d.purpose,
+                    d.transaction_id,
                     now()
-            FROM public.sched_d d
+            FROM public.sched_d d, public.reports r
             WHERE 
             d.cmte_id = %s
             AND d.balance_at_close > 0 
             AND d.report_id != %s
-            AND d.create_date < (
+            AND d.report_id = r.report_id
+            AND r.cvg_start_date < (
                         SELECT r.cvg_start_date
                         FROM   public.reports r
                         WHERE  r.report_id = %s
@@ -882,7 +878,7 @@ def do_carryover(report_id, cmte_id):
                 and d1.back_ref_transaction_id is not null
                 and d1.delete_ind is distinct from 'Y'
             )
-            AND delete_ind is distinct from 'Y' ;
+            AND d.delete_ind is distinct from 'Y' ;
     """
     # query_back_sql = """
     # select d.back_ref_transaction_id
@@ -895,7 +891,7 @@ def do_carryover(report_id, cmte_id):
             else:
                 logger.debug("debt carryover done with report_id {}".format(report_id))
                 logger.debug("total carryover debts:{}".format(cursor.rowcount))
-                # do_carryover_sc_payments(cursor.rowcount)
+                # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
                 logger.debug("carryover done.")
     except:
         raise

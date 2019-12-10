@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):
     """
     do carryover on sched_b debt payments
+    -- Deprecated
     """
     _sql = """
     INSERT INTO public.sched_b(
@@ -28,7 +29,7 @@ def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):
             create_date
 					)
     SELECT cmte_id, %s, line_number, transaction_type, 
-            transaction_id, %s, back_ref_sched_name, 
+            get_next_transaction_id('SB'), %s, back_ref_sched_name, 
             entity_id, expenditure_date, expenditure_amount, 
             semi_annual_refund_bundled_amount, expenditure_purpose, 
             category_code, memo_code, memo_text, election_code, 
@@ -52,6 +53,7 @@ def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):
 
 def do_carryover_sc_payments(cmte_id, report_id, rowcount):
     """
+    -- Deprecated
     carry over all debt payment child transactions, including:
     sched_b
     sched_e
@@ -60,8 +62,10 @@ def do_carryover_sc_payments(cmte_id, report_id, rowcount):
     sched_h6
     """
 
+    # first query the parent-child relationship in sched_d for current report
+    # need this informattion for carrying over all the payments
     _sql = """
-    select back_ref_transction_id as parent_id, transaction_id as current_id 
+    select back_ref_transaction_id as parent_id, transaction_id as current_id 
     from public.sched_d d
     where d.cmte_id = %s
     and d.report_id = %s
@@ -71,7 +75,7 @@ def do_carryover_sc_payments(cmte_id, report_id, rowcount):
     try:
         # new_beginning_balance = new_balance
         with connection.cursor() as cursor:
-            cursor.execute(_sql)
+            cursor.execute(_sql, [cmte_id, report_id])
             for i in range(rowcount):
                 parent_id = cursor.fetchone()[0]
                 current_id = cursor.fetchone()[1]
@@ -248,6 +252,7 @@ def do_transaction(sql, values):
     try:
         with connection.cursor() as cursor:
             cursor.execute(sql, values)
+            logger.debug("transaction done with rowcount:{}".format(cursor.rowcount))
             # if cursor.rowcount == 0:
             #     raise Exception("The sql transaction: {} failed...".format(sql))
     except Exception:
