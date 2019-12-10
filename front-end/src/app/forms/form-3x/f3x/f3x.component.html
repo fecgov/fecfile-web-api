@@ -178,6 +178,7 @@
 
         <app-debt-summary
           *ngIf="scheduleType === 'sched_d_ds'"
+          [forceChangeDetection]="forceChangeDetectionDebtSummary"
           (status)="onNotify($event)">          
         </app-debt-summary>
 

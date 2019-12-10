@@ -62,6 +62,7 @@ export class F3xComponent implements OnInit {
   public scheduleFAction: ScheduleActions;
   public forceChangeDetectionC1: Date;
   public forceChangeDetectionFDebtPayment: Date;
+  public forceChangeDetectionDebtSummary: Date;
 
   public allTransactions: boolean = false;
 
@@ -361,7 +362,6 @@ export class F3xComponent implements OnInit {
                 this.scheduleType = 'sched_c';
                 this.scheduleCAction = ScheduleActions.edit;
                 this.transactionDetailSchedC = e.transactionDetail.transactionModel;
-
               } else if (apiCall === '/sc/schedC1') {
                 alert('edit C1 not yet supported');
               } else if (apiCall === '/sf/schedF') {
@@ -434,10 +434,12 @@ export class F3xComponent implements OnInit {
    * @param e
    */
   private extractScheduleType(e: any) {
-
-    if (e.transactionDetail && e.transactionDetail.transactionModel &&
-      e.transactionDetail.transactionModel.transactionTypeIdentifier === "LOAN_REPAY_MADE") {
-      e.scheduleType = "sched_c_loan_payment";
+    if (
+      e.transactionDetail &&
+      e.transactionDetail.transactionModel &&
+      e.transactionDetail.transactionModel.transactionTypeIdentifier === 'LOAN_REPAY_MADE'
+    ) {
+      e.scheduleType = 'sched_c_loan_payment';
     }
 
     //default to sched_a ?
@@ -499,16 +501,17 @@ export class F3xComponent implements OnInit {
 
         //also loan payment needs to have a schedule action of its own, 'loanPaymentScheduleAction'
         //since a new payment can be "added" while "editing" the loan itself
-        if (transaction && transaction.transactionDetail && transaction.transactionDetail.transactionModel &&
-          transaction.transactionDetail.transactionModel.apiCall === '/sb/schedB' && 
-          transaction.transactionDetail.transactionModel.transactionId) {
+        if (
+          transaction &&
+          transaction.transactionDetail &&
+          transaction.transactionDetail.transactionModel &&
+          transaction.transactionDetail.transactionModel.apiCall === '/sb/schedB' &&
+          transaction.transactionDetail.transactionModel.transactionId
+        ) {
           this.loanPaymentScheduleAction = ScheduleActions.edit;
-        }
-        else {
+        } else {
           this.loanPaymentScheduleAction = ScheduleActions.add;
         }
-
-
       } else if (this.scheduleType === 'sched_c1') {
         this.forceChangeDetectionC1 = new Date();
       }
@@ -529,6 +532,7 @@ export class F3xComponent implements OnInit {
   private _handleScheduleD(): boolean {
     let finish = false;
     if (this.scheduleType === 'sched_d_ds') {
+      this.forceChangeDetectionDebtSummary = new Date();
       this.canContinue();
       finish = true;
     }

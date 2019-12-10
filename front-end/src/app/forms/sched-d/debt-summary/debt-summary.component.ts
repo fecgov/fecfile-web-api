@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Output, EventEmitter, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
@@ -15,12 +15,6 @@ import { TransactionsService } from '../../transactions/service/transactions.ser
 import { ReportTypeService } from '../../form-3x/report-type/report-type.service';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { mockChildPayments } from './mock.json';
-
-// export enum ActiveView {
-//   debtSummary = 'debtSummary',
-//   recycleBin = 'recycleBin',
-//   edit = 'edit'
-// }
 
 export enum DebtSumarysActions {
   add = 'add',
@@ -40,7 +34,11 @@ export enum DebtSumarysActions {
     ])
   ]
 })
-export class DebtSummaryComponent implements OnInit {
+export class DebtSummaryComponent implements OnInit, OnChanges {
+
+  @Input()
+  public forceChangeDetection: Date;
+
   @Output()
   public status: EventEmitter<any> = new EventEmitter<any>();
 
@@ -58,7 +56,6 @@ export class DebtSummaryComponent implements OnInit {
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
-
   private allDebtSelected: boolean;
   private currentPageNumber = 1;
 
@@ -66,12 +63,6 @@ export class DebtSummaryComponent implements OnInit {
    * Array of columns to be made sortable.
    */
   private sortableColumns: SortableColumnModel[] = [];
-
-  /**
-   * A clone of the sortableColumns for reverting user
-   * column options on a Cancel.
-   */
-  private cloneSortableColumns: SortableColumnModel[] = [];
 
   /**
    * Identifies the column currently sorted by name.
@@ -90,8 +81,6 @@ export class DebtSummaryComponent implements OnInit {
     private _utilService: UtilService,
     private _dialogService: DialogService,
     private _debtSummaryService: DebtSummaryService,
-    private _transactionsService: TransactionsService,
-    private _reportTypeService: ReportTypeService
   ) {}
 
   /**
@@ -112,6 +101,15 @@ export class DebtSummaryComponent implements OnInit {
     // this.getCachedValues();
     // this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
 
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * Get the debt summary data onChange.
+   * 
+   * @param changes
+   */
+  public ngOnChanges(changes: SimpleChanges) {
     this.getPage(this.config.currentPage);
   }
 
@@ -291,49 +289,6 @@ export class DebtSummaryComponent implements OnInit {
   }
 
   /**
-   * Determine if the column is to be visible in the table.
-   *
-   * @param colName
-   * @returns true if visible
-   */
-  public isColumnVisible(colName: string): boolean {
-    const sortableCol = this.getSortableColumn(colName);
-    if (sortableCol) {
-      return sortableCol.visible;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Set the visibility of a column in the table.
-   *
-   * @param colName the name of the column to make shown
-   * @param visible is true if the columns should be shown
-   */
-  public setColumnVisible(colName: string, visible: boolean) {
-    const sortableCol = this.getSortableColumn(colName);
-    if (sortableCol) {
-      sortableCol.visible = visible;
-    }
-  }
-
-  /**
-   * Set the checked property of a column in the table.
-   * The checked is true if the column option settings
-   * is checked for the column.
-   *
-   * @param colName the name of the column to make shown
-   * @param checked is true if the columns should be shown
-   */
-  private setColumnChecked(colName: string, checked: boolean) {
-    const sortableCol = this.getSortableColumn(colName);
-    if (sortableCol) {
-      sortableCol.checked = checked;
-    }
-  }
-
-  /**
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
@@ -472,10 +427,8 @@ export class DebtSummaryComponent implements OnInit {
       )
       .then(res => {
         if (res === 'okay') {
-          // const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
-          // this._transactionsService
-          //   .trashOrRestoreTransactions('F3X', 'trash', reportId, [trx])
           this._debtSummaryService.deleteDebt(debt).subscribe((res2: any) => {
+            this.getPage(this.config.currentPage);
             this._dialogService.confirm(
               'Transaction has been successfully deleted and sent to the recycle bin. ' + debt.transactionId,
               ConfirmModalComponent,
