@@ -318,7 +318,7 @@ def post_sql_schedB(
                     create_date
                 )
                 VALUES ("""
-                + ",".join(["%s"] * 38)
+                + ",".join(["%s"] * 40)
                 + ")",
                 [
                     cmte_id,
@@ -643,9 +643,12 @@ def post_schedB(datum):
     create and save current sched_b item
     """
     try:
+        cmte_id = datum.get('cmte_id')
+        entity_flag = False
         check_mandatory_fields_SB(datum, list_mandatory_fields_schedB)
         logger.debug("...mandatory check done.")
         if "entity_id" in datum:
+            entity_flag = True
             get_data = {
                 "cmte_id": datum.get("cmte_id"),
                 "entity_id": datum.get("entity_id"),
@@ -740,7 +743,7 @@ def post_schedB(datum):
                     datum.get('expenditure_amount')
                 )
         except Exception as e:
-            if "entity_id" in datum:
+            if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
                 get_data = {"cmte_id": datum.get(cmte_id), "entity_id": entity_id}
@@ -750,8 +753,8 @@ def post_schedB(datum):
             )
         logger.debug("sched_b transaction saved successfully.")
         return datum
-    except:
-        raise
+    except Exception as e:
+        raise Exception ("post_schedB function is throwing error: " + str(e))
 
 
 def get_schedB(data):

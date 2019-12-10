@@ -549,7 +549,7 @@ def post_sql_schedC(data):
             create_date,
             last_update_date)
             VALUES({});
-            """.format(','.join(['%s']*30))
+            """.format(','.join(['%s']*31))
         logger.debug('sql:{}'.format(_sql))
 
         _v = (
