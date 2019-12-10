@@ -1186,11 +1186,19 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         });
 
         const nameArray = formData.name.split(',');
+        /*
         const firstName = nameArray[1] ? nameArray[1] : null;
         const lastName = nameArray[0] ? nameArray[0] : null;
         const middleName = nameArray[2] ? nameArray[2] : null;
         const prefix = nameArray[3] ? nameArray[3] : null;
         const suffix = nameArray[4] ? nameArray[4] : null;
+        */
+
+        const firstName = nameArray[1] ? nameArray[1].trim() : '';
+        const lastName = nameArray[0] ? nameArray[0].trim() : '';
+        const middleName = nameArray[2] ? nameArray[2].trim() : '';
+        const prefix = nameArray[3] ? nameArray[3].trim() : '';
+        const suffix = nameArray[4] ? nameArray[4].trim() : '';
 
         this.frmContact.patchValue({ first_name: firstName }, { onlySelf: true });
         this.frmContact.patchValue({ last_name: lastName }, { onlySelf: true });
@@ -1217,8 +1225,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         
         this.frmContact.patchValue({ candCmteId: formData.candCmteId }, { onlySelf: true });
         this.frmContact.patchValue({ officeSought: formData.officeSought }, { onlySelf: true });
-        this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
-        this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
+        //this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
+        //this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
       }
     }
   }
