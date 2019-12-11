@@ -466,7 +466,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     filters.filterLoanAmountMin = this.filterLoanAmountMin;
     filters.filterLoanAmountMax = this.filterLoanAmountMax;
     filters.filterLoanClosingBalanceMin = this.filterLoanClosingBalanceMin;
-    filters.filterLoanClosingBalanceMax = this.filterLoanClosingBalanceMin;
+    filters.filterLoanClosingBalanceMax = this.filterLoanClosingBalanceMax;
 
     if (this.filterAmountMin !== null) {
       modified = true;

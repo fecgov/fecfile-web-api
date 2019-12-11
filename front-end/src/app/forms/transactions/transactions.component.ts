@@ -331,6 +331,25 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Loan Amount
+    if (filters.filterLoanAmountMin && filters.filterLoanAmountMax) {
+      const amountGroup = [];
+      amountGroup.push({
+        filterLoanAmountMin: filters.filterLoanAmountMin,
+        filterLoanAmountMax: filters.filterLoanAmountMax
+      });
+      let amtTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.loanAmount) {
+          amtTag = true;
+          tag.group = amountGroup;
+        }
+      }
+      if (!amtTag) {
+        this.tagArray.push({ type: FilterTypes.loanAmount, prefix: 'Loan Amount', group: amountGroup });
+      }
+    }
+
     // Closing loan balance
     if (filters.filterLoanClosingBalanceMin && filters.filterLoanClosingBalanceMax) {
       const amountGroup = [];
@@ -346,7 +365,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
       }
       if (!amtTag) {
-        this.tagArray.push({ type: FilterTypes.amount, prefix: 'Balance at close', group: amountGroup });
+        this.tagArray.push({ type: FilterTypes.loanClosingBalance, prefix: 'Balance at close', group: amountGroup });
       }
     }
 
@@ -605,6 +624,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.removeFilter(FilterTypes.loanClosingBalance, null);
   }
 
+  /**
+   * Remove the Loan Amount filter tag and inform the filter component to clear it.
+   */
+  public removeLoanAmountFilter() {
+    this.filters.filterLoanAmountMin = null;
+    this.filters.filterLoanAmountMax = null;
+    this.removeFilter(FilterTypes.loanAmount, null);
+  }
+
   public removeMemoFilter() {
     this.filters.filterMemoCode = false;
     this.removeFilter(FilterTypes.memoCode, null);
@@ -682,6 +710,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         break;
       case FilterTypes.aggregateAmount:
         this.removeAggregateAmountFilter();
+        this.removeTagArrayItem(type);
+        break;
+      case FilterTypes.loanAmount:
+        this.removeLoanAmountFilter();
         this.removeTagArrayItem(type);
         break;
       case FilterTypes.loanClosingBalance:
