@@ -116,6 +116,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _prePopulateFromSchedDData: any;
   protected _parentTransactionModel: TransactionModel;
 
+  /**
+   * Indicates the Form Group is loaded.  Used by "hybrid" parent classes of this base class
+   * having both "static" and "dynamic" form fields as found in Sched F Debt Payment.
+   */
+  protected loaded = false;
+
   private _reportType: any = null;
   private _cloned = false;
   private _types: any = [];
@@ -435,6 +441,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
+    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+      this.loaded = true;
+    }
 
     // When coming from Reports where this component is not a child
     // as it is in F3X component, the form data must be set in this way
