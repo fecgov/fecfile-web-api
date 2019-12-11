@@ -1834,7 +1834,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             this.returnToParent(ScheduleActions.add);
           } else if (saveAction === SaveActions.updateOnly) {
             this._completedCloning = true;
-            this.viewTransactions();
+            if(this.isShedH4OrH6TransactionType(this.transactionType)) {
+              this.goH4OrH6Summary(this.transactionType);
+            }else {
+              this.viewTransactions();
+            }
           } else {
             if (saveAction === SaveActions.saveOnly) {
               // sched D subtran must have payee fields pre-poulated after saving one
@@ -4016,7 +4020,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         direction: 'next',
         step: 'step_3',
         previousStep: 'step_2',
-        transactionType: 'ALLOC_H4_SUM'
+        transactionType: 'ALLOC_H4_SUM',
+        action: ScheduleActions.add
       };
       this.status.emit(emitObj);
     }
@@ -4032,7 +4037,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           direction: 'next',
           step: 'step_3',
           previousStep: 'step_2',
-          transactionType: 'ALLOC_H6_SUM'
+          transactionType: 'ALLOC_H6_SUM',
+          action: ScheduleActions.add
         };
       this.status.emit(emitObj);
     }
