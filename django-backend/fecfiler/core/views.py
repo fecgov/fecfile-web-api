@@ -5623,11 +5623,8 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, prev_yr):
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT COALESCE(coh_cop, 0) from public.sched_l where cmte_id = %s AND cvg_end_date = %s AND delete_ind is distinct from 'Y'",
-                [cmte_id, prev_cvg_end_dt],
-            )
-            if cursor.rowcount == 0:
+            cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", [cmte_id, prev_cvg_end_dt])
+            if (cursor.rowcount == 0):
                 coh_cop = 0
             else:
                 result = cursor.fetchone()
