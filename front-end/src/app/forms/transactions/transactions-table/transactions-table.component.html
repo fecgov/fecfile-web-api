@@ -180,7 +180,8 @@
                     <i class="far fa-copy"></i> Clone
                   </button>
                   <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
-                    <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" class="dropdown-item"
+                    <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable() && 
+                    trx.transactionTypeIdentifier !== 'LOAN_FROM_BANK' && trx.transactionTypeIdentifier !== 'LOAN_FROM_IND'" class="dropdown-item"
                       (click)="trashTransaction(trx)">
                       <i class="trash-icon"></i> Trash
                     </button>
@@ -369,7 +370,8 @@
                   <button class="dropdown-item" (click)="exportAllSelected()">
                     <i class="file-export-icon"></i> Export
                   </button>
-                  <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
+                  <button *ngIf="checkIfTrashable()" 
+                  class="dropdown-item" (click)="trashAllSelected()">
                     <i class="trash-icon"></i> Trash
                   </button>
                 </div>
@@ -443,7 +445,8 @@
                       <i class="far fa-copy"></i> Clone
                     </button>
                     <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
-                      <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" class="dropdown-item"
+                      <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable() && trx.transactionTypeIdentifier !== 'LOAN_REPAY_MADE'" 
+                      class="dropdown-item"
                         (click)="trashTransaction(trx)">
                         <i class="trash-icon"></i> Trash
                       </button>

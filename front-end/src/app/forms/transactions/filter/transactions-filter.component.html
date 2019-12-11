@@ -34,7 +34,7 @@
           </div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" *ngIf="transactionCategory !== 'loans-and-debts'">
         <div class="card-header transactions__filter-title" (click)="toggleDateFilterItem()">
           Date
           <i class="float-right" aria-hidden="true" 
@@ -248,7 +248,7 @@
               type="number"
               min="0" value="0"
               name="minamount"
-              [(ngModel)]="filterLoanAmountMin"
+              [(ngModel)]="filterLoanClosingBalanceMin"
               class="form-control"
               id="filter-amount-min"
               aria-label="Filter Min Amount"
@@ -266,7 +266,7 @@
               type="number"
               name="maxamount"
               min="0" value="0"
-              [(ngModel)]="filterLoanAmountMax"
+              [(ngModel)]="filterLoanClosingBalanceMax"
               class="form-control"
               id="filter-amount-max"
               aria-label="Filter Max Amount"
