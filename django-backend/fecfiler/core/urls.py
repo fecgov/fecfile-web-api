@@ -18,6 +18,11 @@ urlpatterns = [
         views.get_transaction_categories,
         name="get_transaction_categories",
     ),
+    url(
+        r"^core/get_transaction_types$",
+        views.get_transaction_types,
+        name="get_transaction_types",
+    ),
     url(r"^core/get_report_types$", views.get_report_types, name="get_report_types"),
     url(
         r"^core/get_dynamic_forms_fields$",
