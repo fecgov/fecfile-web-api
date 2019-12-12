@@ -190,6 +190,40 @@ def get_transaction_categories(request):
     except Exception as e:
         return Response("The get_transaction_categories API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+
+"""
+********************************************************************************************************************************
+GET TRANSACTION TYPES API- CORE APP - FNE 1477, FNE1497 - BY ZOBAIR SALEEM
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_transaction_types(request):
+
+    try:
+        with connection.cursor() as cursor:
+            forms_obj= {}
+            form_type = request.query_params.get('form_type')
+
+            cursor.execute("select tran_identifier,tran_desc,category_type  from ref_transaction_types where form_type = %s", [form_type])
+            rows = cursor.fetchall()
+
+            transaction_types_dict=[]
+            for row in rows:
+                transaction_type = {
+                    'name': row[0],
+                    'text': row[1],
+                    'categoryType': row[2]
+                    }
+                transaction_types_dict.append(transaction_type)
+            response = transaction_types_dict
+                
+        if not bool(response):
+            return Response("No entries were found for the form_type: {}".format(form_type), status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return Response(response, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_transaction_types API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 """
 ********************************************************************************************************************************
 GET REPORT TYPES API- CORE APP - SPRINT 6 - FNE 471 - BY PRAVEEN JINKA 
@@ -5639,11 +5673,8 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, prev_yr):
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT COALESCE(coh_cop, 0) from public.sched_l where cmte_id = %s AND cvg_end_date = %s AND delete_ind is distinct from 'Y'",
-                [cmte_id, prev_cvg_end_dt],
-            )
-            if cursor.rowcount == 0:
+            cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", [cmte_id, prev_cvg_end_dt])
+            if (cursor.rowcount == 0):
                 coh_cop = 0
             else:
                 result = cursor.fetchone()
