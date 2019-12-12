@@ -2115,12 +2115,12 @@ def get_trans_query(category_type, cmte_id, param_string):
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     elif category_type == 'other_tran':
-        query_string = """SELECT report_id, schedule, report_type, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
-                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
-                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, 
-                                entity_id, entity_type, deleteddate  from all_other_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + """ """
-
+        query_string = """SELECT report_id, schedule, report_type, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, 
+                          name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, 
+                                election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate  
+                            from all_other_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ """ 
     else:
         query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
@@ -2375,7 +2375,17 @@ def get_all_transactions(request):
         # ADDED the below code to access transactions across reports
         if 'reportid' in request.data and str(request.data.get('reportid')) not in ['',"", "null", "none"]:
             report_list = superceded_report_id_list(request.data.get('reportid'))
-            param_string += " AND report_id in ('{}')".format("', '".join(report_list))
+            if ctgry_type != 'other_tran':
+                param_string += " AND report_id in ('{}')".format("', '".join(report_list))
+            else:
+                param_string = param_string + """AND ((transaction_table != 'sched_h2' AND report_id in ('{0}')) 
+                                                OR 
+                                                (transaction_table = 'sched_h2' AND report_id in ('{0}') AND ratio_code = 'n')
+                                                OR
+                                                (transaction_table = 'sched_h2' AND name IN (
+                                                SELECT h4.activity_event_identifier FROM public.sched_h4 h4
+                                                WHERE  h4.report_id in ('{0}')
+                                                AND h4.cmte_id = '{1}')))""".format("', '".join(report_list), cmte_id)
 
         # To determine if we are searching for regular or trashed transactions
         if 'trashed_flag' in request.data and str(request.data.get('trashed_flag')).lower() == 'true':
@@ -2426,7 +2436,8 @@ def get_all_transactions(request):
                 else:
                     transaction_dict = {trans.get('transaction_id'): trans for trans in transaction_list}
                     for tran_id,transaction in transaction_dict.items():
-                        total_amount += transaction.get('transaction_amount', 0.0)
+                        if transaction.get('memo_code') != 'X':
+                            total_amount += transaction.get('transaction_amount', 0.0)
                         if transaction.get('back_ref_transaction_id') is not None and transaction.get('back_ref_transaction_id') in transaction_dict: 
                             parent = transaction_dict.get(transaction.get('back_ref_transaction_id'))
                             if 'child' not in parent:
