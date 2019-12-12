@@ -467,6 +467,7 @@ export class TransactionsService {
         name = 'loan_balance';
         break;
       case 'loanBeginningBalance':
+      case 'debtBeginningBalance':
         name = 'loan_beginning_balance';
         break;
       case 'loanClosingBalance':

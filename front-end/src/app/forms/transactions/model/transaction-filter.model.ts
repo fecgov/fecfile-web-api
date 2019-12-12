@@ -26,6 +26,8 @@ export class TransactionFilterModel {
   filterLoanClosingBalanceMin: any;
   filterLoanClosingBalanceMax: any;
   filterSchedule: string;
+  filterDebtBeginningBalanceMin: number;
+  filterDebtBeginningBalanceMax: number;
 
   constructor() {}
 }
