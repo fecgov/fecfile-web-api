@@ -1,4 +1,13 @@
-import { Component, OnInit, ViewEncapsulation, Output, EventEmitter, Input, SimpleChanges, OnChanges } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewEncapsulation,
+  Output,
+  EventEmitter,
+  Input,
+  SimpleChanges,
+  OnChanges
+} from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
@@ -11,7 +20,7 @@ import {
   ConfirmModalComponent,
   ModalHeaderClassEnum
 } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { TransactionsService } from '../../transactions/service/transactions.service';
+import { TransactionsService, GetTransactionsResponse } from '../../transactions/service/transactions.service';
 import { ReportTypeService } from '../../form-3x/report-type/report-type.service';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { mockChildPayments } from './mock.json';
@@ -35,7 +44,6 @@ export enum DebtSumarysActions {
   ]
 })
 export class DebtSummaryComponent implements OnInit, OnChanges {
-
   @Input()
   public forceChangeDetection: Date;
 
@@ -81,6 +89,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
     private _utilService: UtilService,
     private _dialogService: DialogService,
     private _debtSummaryService: DebtSummaryService,
+    private _transactionsService: TransactionsService
   ) {}
 
   /**
@@ -106,7 +115,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
 
   /**
    * Get the debt summary data onChange.
-   * 
+   *
    * @param changes
    */
   public ngOnChanges(changes: SimpleChanges) {
@@ -164,11 +173,11 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
         // }
 
         // TODO - this is temporary fix to map fields to the right attributes until service response is fixed
-        res.forEach((debt: any) => {
-          // temp code for developing the child payments
-          debt.child = mockChildPayments;
-          // temp code end
-        });
+        // res.forEach((debt: any) => {
+        //   // temp code for developing the child payments
+        //   debt.child = mockChildPayments;
+        //   // temp code end
+        // });
 
         const debtModelL = this._debtSummaryService.mapFromServerFields(res);
         this.debtModel = debtModelL;
@@ -377,12 +386,11 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       step: 'step_3',
       previousStep: 'step_2',
       action: DebtSumarysActions.edit,
-      // transactionCategory: debt.transactionTypeIdentifier,
       scheduleType: 'sched_d',
       transactionDetail: {
         transactionModel: {
           transactionId: debt.transactionId,
-          type: debt.transactionTypeIdentifier, // should come from API
+          type: debt.transactionTypeDescription,
           transactionTypeIdentifier: debt.transactionTypeIdentifier,
           apiCall: '/sd/schedD' // should come from API
         }
@@ -390,7 +398,8 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
     });
   }
 
-  // TODO use this for edit debt once api has all fields needed for edit.
+  // TODO temporarily use this for edit debt. once api has all fields needed for edit sched D,
+  // both Debt and Debt payments may use the same method.
   public editDebtPayment(debtPayment: DebtSummaryModel) {
     const emptyValidForm = {};
     this.status.emit({
@@ -399,11 +408,11 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       step: 'step_3',
       previousStep: 'step_2',
       action: DebtSumarysActions.edit,
-      scheduleType: 'sched_f', // debtPayment.scheduleType,
+      scheduleType: debtPayment.scheduleType,
       transactionDetail: {
         transactionModel: {
           transactionId: debtPayment.transactionId,
-          type: debtPayment.transactionTypeIdentifier,
+          type: debtPayment.transactionTypeDescription,
           transactionTypeIdentifier: debtPayment.transactionTypeIdentifier,
           apiCall: debtPayment.apiCall
         }
@@ -437,6 +446,39 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
               ModalHeaderClassEnum.successHeader
             );
           });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  /**
+   * Trash the debt payment.
+   *
+   * @param payment the payment to trash
+   */
+  public trashDebtPayment(payment: DebtSummaryModel): void {
+    const trx = new TransactionModel({});
+    trx.transactionId = payment.transactionId;
+    this._dialogService
+      .confirm(
+        'You are about to delete this transaction ' + payment.transactionId + '.',
+        ConfirmModalComponent,
+        'Caution!'
+      )
+      .then(res => {
+        if (res === 'okay') {
+          this._transactionsService
+            .trashOrRestoreTransactions('3X', 'trash', payment.reportId, [trx])
+            .subscribe((res: GetTransactionsResponse) => {
+              this.getPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + payment.transactionId,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
         } else if (res === 'cancel') {
         }
       });
