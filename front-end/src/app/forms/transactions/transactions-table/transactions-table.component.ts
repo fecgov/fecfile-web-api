@@ -25,6 +25,8 @@ import { TransactionTypeService } from '../../form-3x/transaction-type/transacti
 import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { filter } from 'rxjs/operators';
 import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
+import { Subject } from 'rxjs';
+import 'rxjs/add/operator/takeUntil';
 
 const transactionCategoryOptions = [];
 
@@ -135,6 +137,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private clonedTransaction: any;
   private _previousUrl: any;
 
+  //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
+  //there is no unsubscribe() for activateRoute but while cycling between 'Transactions' and 'Recycling Bin' views
+  //subscriptions are piling up, causing a single api call to be made n+1 times. 
+  private onDestroy$ = new Subject();
+
   constructor(
     private _transactionsService: TransactionsService,
     private _transactionsMessageService: TransactionsMessageService,
@@ -170,8 +177,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.reportId = reportId;
         this.getPage(this.config.currentPage);
       });
+      
 
-    _activatedRoute.queryParams.subscribe(p => {
+    let routeSubscription = _activatedRoute.queryParams;
+    routeSubscription.takeUntil(this.onDestroy$).subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       this.getPage(1);
       this.clonedTransaction = {};
@@ -267,78 +276,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         }
       }
     });
-    // this.getTransactionsPage(1);
   }
-
-  // /**
-  //  * Obtain the Report ID from local storage.
-  //  */
-  // private _getReportIdFromStorage() {
-  //   let reportId = '0';
-  //   let form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
-
-  //   if (form3XReportType === null || typeof form3XReportType === 'undefined') {
-  //     form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
-  //   }
-
-  //   console.log('viewTransactions form3XReportType', form3XReportType);
-
-  //   if (typeof form3XReportType === 'object' && form3XReportType !== null) {
-  //     if (form3XReportType.hasOwnProperty('reportId')) {
-  //       reportId = form3XReportType.reportId;
-  //     } else if (form3XReportType.hasOwnProperty('reportid')) {
-  //       reportId = form3XReportType.reportid;
-  //     }
-  //   }
-  //   return reportId;
-  // }
-
-  // TODO: DANGER - this ngDoCheck() implementation can get is an infinite loop and should be replaced by a message service
-  // public ngDoCheck(): void {
-  //   const step: string = this._activatedRoute.snapshot.queryParams.step;
-  //   const forceGet: string = this._activatedRoute.snapshot.queryParams.forceGet;
-
-  //   // // TODO replace this with a message.  The report ID is needed when viewing transactions
-  //   // // from the indv-recipt.
-  //   // if (this.reportId !== undefined && !this.pageReceived) {
-  //   //   this.getPage(this.config.currentPage);
-
-  //   //   if (!this.pageReceived) {
-  //   //     this.pageReceived = true;
-  //   //   }
-  //   // }
-  //   // // Prevent looping
-  //   // if (step !== 'transactions' && !this.routeData.reportId) {
-  //   //   this.pageReceived = false;
-  //   // }
-
-  //   if (step === 'transactions') {
-  //     // if (
-  //     //   (this.reportId !== undefined && !this.pageReceivedTransactions) ||
-  //     //   (this.reportId !== undefined && forceGet === 'true')
-  //     // ) {
-  //     if (this.reportId !== undefined && !this.pageReceivedTransactions) {
-  //       this.getPage(this.config.currentPage);
-
-  //       if (!this.pageReceivedTransactions) {
-  //         this.pageReceivedTransactions = true;
-  //       }
-  //     }
-  //   } else if (step === 'reports') {
-  //     if (this.reportId !== undefined && !this.pageReceivedReports) {
-  //       this.getPage(this.config.currentPage);
-
-  //       if (!this.pageReceivedReports) {
-  //         this.pageReceivedReports = true;
-  //       }
-  //     }
-  //   } else {
-  //     // console.log(`step ${step} not supported`);
-  //     // if (this.transactionId) {
-  //     //   this.getPage(this.config.currentPage);
-  //     // }
-  //   }
-  // }
 
   /**
    * A method to run when component is destroyed.
@@ -348,6 +286,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
     this.loadTransactionsSubscription.unsubscribe();
+    this.onDestroy$.next(true);
   }
 
   /**
@@ -431,6 +370,24 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       categoryType = 'other_tran';
     }
 
+    /* let categorySpecificColumns = localStorage.getItem(this.transactionSortableColumnsLSK) ? JSON.parse(localStorage.getItem(this.transactionSortableColumnsLSK)):null;
+    let applicableFilters;
+    if(this.filters && this.sortableColumns && categorySpecificColumns){
+      applicableFilters = this._transactionsService.removeFilters(this.filters,this.sortableColumns, categorySpecificColumns);
+    }
+    else{
+      applicableFilters = this.filters;
+    } */
+
+    let actualFilters : TransactionFilterModel = this._utilService.deepClone(this.filters);
+    if(actualFilters){
+      if(categoryType === 'loans_tran'){
+        actualFilters.filterDateFrom = null;
+        actualFilters.filterDateTo = null
+      }
+
+    }
+    
     this._transactionsService
       .getFormTransactions(
         this.formType,
@@ -439,7 +396,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.config.itemsPerPage,
         serverSortColumnName,
         sortedCol.descending,
-        this.filters,
+        // this.filters,
+        // applicableFilters,
+        actualFilters,
         categoryType,
         false,
         this._allTransactions
@@ -517,6 +476,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
+    const serverSortColumnName = this._transactionsService.mapToSingleServerName(this.currentSortedColumnName);
+
     let categoryType = 'receipts_tran';
 
     if (this.transactionCategory === 'disbursements') {
@@ -533,7 +494,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.reportId,
         page,
         this.config.itemsPerPage,
-        this.currentSortedColumnName,
+        serverSortColumnName,
         sortedCol.descending,
         this.filters,
         categoryType,
@@ -1209,7 +1170,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     if (localStorage.getItem(key) != null) {
       const trxCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
       for (const col of trxCols) {
-        this._tableService.getColumnByName(col.colName, this.sortableColumns).visible = col.visible;
+        const columnByName = this._tableService.getColumnByName(col.colName, this.sortableColumns)
+        if(columnByName){
+          columnByName.visible = col.visible;
+        }
       }
     }
   }
@@ -1415,6 +1379,17 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public goToEndorsersSummary(trx:any){
     trx.scheduleType="sched_c_es";
     trx.endorser = {back_ref_transaction_id: trx.transactionId};
+    this.editTransaction(trx);
+  }
+
+  public goToLoanRepayment(trx:any){
+    trx.scheduleType="sched_c_loan_payment"
+    trx.backRefTransactionId = trx.transactionId;
+    this.editTransaction(trx);
+  }
+
+  public goToDebtPayment(trx:any){
+    trx.scrollDebtPaymentButtonIntoView = true;
     this.editTransaction(trx);
   }
 }

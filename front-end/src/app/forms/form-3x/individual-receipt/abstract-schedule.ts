@@ -116,6 +116,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _prePopulateFromSchedDData: any;
   protected _parentTransactionModel: TransactionModel;
 
+  /**
+   * Indicates the Form Group is loaded.  Used by "hybrid" parent classes of this base class
+   * having both "static" and "dynamic" form fields as found in Sched F Debt Payment.
+   */
+  protected loaded = false;
+
   private _reportType: any = null;
   private _cloned = false;
   private _types: any = [];
@@ -163,7 +169,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _currencyPipe: CurrencyPipe,
     private _decimalPipe: DecimalPipe,
     private _reportTypeService: ReportTypeService,
-    private _typeaheadService: TypeaheadService,
+    protected _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
     private _f3xMessageService: F3xMessageService,
     private _transactionsMessageService: TransactionsMessageService,
@@ -384,6 +390,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
+
+
   }
 
   /**
@@ -433,6 +441,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
+    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+      this.loaded = true;
+    }
 
     // When coming from Reports where this component is not a child
     // as it is in F3X component, the form data must be set in this way
@@ -521,7 +532,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
      */
 
     if (this.isFieldName(fieldName, 'zip_code') ||
-        this.isFieldName(fieldName, 'subordinate_cmte_zip')) {
+      this.isFieldName(fieldName, 'subordinate_cmte_zip')) {
       formValidators.push(alphaNumeric());
     } else if (this.isFieldName(fieldName, 'contribution_date') || this.isFieldName(fieldName, 'expenditure_date')) {
       this._reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
@@ -841,24 +852,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _getFedNonFedPercentage() {
 
     if (this.transactionType !== 'ALLOC_FEA_DISB_DEBT' &&
-        this.transactionType !== 'ALLOC_EXP_DEBT'
-        &&
-        this.transactionType !== 'ALLOC_EXP' &&
-        this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
-        this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
-        this.transactionType !== 'ALLOC_EXP_STAF_REIM' &&
-        this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
-        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
-        this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
-        this.transactionType !== 'ALLOC_EXP_VOID'
-        &&
-        this.transactionType !== 'ALLOC_FEA_DISB' &&
-        this.transactionType !== 'ALLOC_FEA_CC_PAY' &&
-        this.transactionType !== 'ALLOC_FEA_CC_PAY_MEMO' &&
-        this.transactionType !== 'ALLOC_FEA_STAF_REIM' &&
-        this.transactionType !== 'ALLOC_FEA_STAF_REIM_MEMO' &&       
-        this.transactionType !== 'ALLOC_FEA_VOID'
-        ) {
+      this.transactionType !== 'ALLOC_EXP_DEBT'
+      &&
+      this.transactionType !== 'ALLOC_EXP' &&
+      this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
+      this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
+      this.transactionType !== 'ALLOC_EXP_STAF_REIM' &&
+      this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
+      this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
+      this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
+      this.transactionType !== 'ALLOC_EXP_VOID'
+      &&
+      this.transactionType !== 'ALLOC_FEA_DISB' &&
+      this.transactionType !== 'ALLOC_FEA_CC_PAY' &&
+      this.transactionType !== 'ALLOC_FEA_CC_PAY_MEMO' &&
+      this.transactionType !== 'ALLOC_FEA_STAF_REIM' &&
+      this.transactionType !== 'ALLOC_FEA_STAF_REIM_MEMO' &&
+      this.transactionType !== 'ALLOC_FEA_VOID'
+    ) {
       return;
     }
 
@@ -913,7 +924,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           }
         }
       },
-      errorRes => {}
+      errorRes => { }
     );
   }
 
@@ -1392,7 +1403,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
 
     const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => { });
 
     if (isChildForm) {
       this._selectedChangeWarnChild[name] = name;
@@ -1422,7 +1433,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
 
     const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => { });
 
     if (isChildForm) {
       this._selectedCandidateChangeWarnChild[name] = name;
@@ -1586,10 +1597,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           }
           // }
         } else if (field === 'donor_cmte_id' ||
-                   field === 'payee_cmte_id' ||
-                   field === 'beneficiary_cmte_id' ||
-                   field === 'designating_cmte_id' ||
-                   field === 'subordinate_cmte_id') {
+          field === 'payee_cmte_id' ||
+          field === 'beneficiary_cmte_id' ||
+          field === 'designating_cmte_id' ||
+          field === 'subordinate_cmte_id') {
           // added this condition as formControl value is entire entity object
           // when we perform auto lookup.
           const typeAheadField = this.frmIndividualReceipt.get(field).value;
@@ -1832,7 +1843,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             this.returnToParent(ScheduleActions.add);
           } else if (saveAction === SaveActions.updateOnly) {
             this._completedCloning = true;
-            this.viewTransactions();
+            if(this.isShedH4OrH6TransactionType(this.transactionType)) {
+              this.goH4OrH6Summary(this.transactionType);
+            }else {
+              this.viewTransactions();
+            }
           } else {
             if (saveAction === SaveActions.saveOnly) {
               // sched D subtran must have payee fields pre-poulated after saving one
@@ -2109,7 +2124,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this._dialogService
                   .confirm(
                     'Transaction has been successfully deleted and sent to the recycle bin. ' +
-                      this._transactionToEdit.transactionId,
+                    this._transactionToEdit.transactionId,
                     ConfirmModalComponent,
                     'Success!',
                     false,
@@ -2590,6 +2605,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       })
     );
 
+
   /**
    * Search for entities when Candidate ID input value changes.
    */
@@ -2841,7 +2857,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       'ALLOC_H5_SUM',
       'ALLOC_H5_SUM_P',
       'ALLOC_H4_TYPES',
-      'ALLOC_H6_TYPES'
+      'ALLOC_H6_TYPES',
+      'LA_ENTRY',
+      'LB_ENTRY'
     ];
     // var a = [1,2,3];
     // Do not call dynaic form for statis transaction types
@@ -2902,15 +2920,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       this.activityEventTypes = committeeTypeEvent.eventTypes;
                     }
 
-                    if((this.transactionType === 'ALLOC_FEA_DISB' ||
+                    if ((this.transactionType === 'ALLOC_FEA_DISB' ||
                       this.transactionType === 'ALLOC_FEA_CC_PAY' ||
                       this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
                       this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
                       this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
                       this.transactionType == 'ALLOC_FEA_VOID') &&
                       'H6' === committeeTypeEvent.committeeTypeCategory) {
-                        this.activityEventTypes = committeeTypeEvent.eventTypes;
-                      }
+                      this.activityEventTypes = committeeTypeEvent.eventTypes;
+                    }
                   }
                 }
               }
@@ -3312,6 +3330,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
           }
         }
+        //move the payment button into view if flag is set.
+        if (this._transactionToEdit && this._transactionToEdit.scrollDebtPaymentButtonIntoView) {
+          let button = document.getElementById("jfMemoDropdown");
+          button.scrollIntoView();
+        }
       }
     });
   }
@@ -3472,7 +3495,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  public showHideEntityType(entityTypeGroup: string) {}
+  public showHideEntityType(entityTypeGroup: string) { }
 
   // public isMemoCodeReadOnly(fieldName: string) {
   //   if (this.isFieldName(fieldName, 'memo_code')) {
@@ -3570,7 +3593,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.transactionType !== 'ALLOC_FEA_CC_PAY' &&
       this.transactionType !== 'ALLOC_FEA_CC_PAY_MEMO' &&
       this.transactionType !== 'ALLOC_FEA_STAF_REIM' &&
-      this.transactionType !== 'ALLOC_FEA_STAF_REIM_MEMO' &&       
+      this.transactionType !== 'ALLOC_FEA_STAF_REIM_MEMO' &&
       this.transactionType !== 'ALLOC_FEA_VOID'
     ) {
       return;
@@ -3970,7 +3993,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public isShedH4OrH6TransactionType(transactionType: string): boolean {
 
-    if(transactionType === 'ALLOC_EXP' ||
+    if (transactionType === 'ALLOC_EXP' ||
       transactionType === 'ALLOC_EXP_CC_PAY' ||
       //transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
       transactionType === 'ALLOC_EXP_STAF_REIM' ||
@@ -3985,15 +4008,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       transactionType === 'ALLOC_FEA_STAF_REIM' ||
       //transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
       transactionType === 'ALLOC_FEA_VOID') {
-        return true;
-    }else {
-        return false
+      return true;
+    } else {
+      return false
     }
   }
 
   public goH4OrH6Summary(transactionType: string) {
 
-    if(transactionType === 'ALLOC_EXP' ||
+    if (transactionType === 'ALLOC_EXP' ||
       transactionType === 'ALLOC_EXP_CC_PAY' ||
       transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
       transactionType === 'ALLOC_EXP_STAF_REIM' ||
@@ -4001,28 +4024,31 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
       transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
       transactionType === 'ALLOC_EXP_VOID') {
+      const emitObj: any = {
+        form: this.frmIndividualReceipt,
+        direction: 'next',
+        step: 'step_3',
+        previousStep: 'step_2',
+        transactionType: 'ALLOC_H4_SUM',
+        action: ScheduleActions.add
+      };
+      this.status.emit(emitObj);
+    }
+
+    if (transactionType === 'ALLOC_FEA_DISB' ||
+      transactionType === 'ALLOC_FEA_CC_PAY' ||
+      transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+      transactionType === 'ALLOC_FEA_STAF_REIM' ||
+      transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+      transactionType === 'ALLOC_FEA_VOID') {
         const emitObj: any = {
           form: this.frmIndividualReceipt,
           direction: 'next',
           step: 'step_3',
           previousStep: 'step_2',
-          transactionType: 'ALLOC_H4_SUM'
+          transactionType: 'ALLOC_H6_SUM',
+          action: ScheduleActions.add
         };
-        this.status.emit(emitObj);
-    }
-
-    if(transactionType === 'ALLOC_FEA_DISB' ||
-      transactionType === 'ALLOC_FEA_CC_PAY' ||
-      transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
-      transactionType === 'ALLOC_FEA_STAF_REIM' ||
-      transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
-      transactionType === 'ALLOC_FEA_VOID') {const emitObj: any = {
-        form: this.frmIndividualReceipt,
-        direction: 'next',
-        step: 'step_3',
-        previousStep: 'step_2',
-        transactionType: 'ALLOC_H6_SUM'
-      };
       this.status.emit(emitObj);
     }
   }

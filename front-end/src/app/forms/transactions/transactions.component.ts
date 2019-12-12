@@ -294,7 +294,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     }
 
     // Amount
-    if (filters.filterAmountMin && filters.filterAmountMax) {
+    if (this._isNotNullorUndefined(filters.filterAmountMin) && this._isNotNullorUndefined(filters.filterAmountMax)) {
       const amountGroup = [];
       amountGroup.push({
         filterAmountMin: filters.filterAmountMin,
@@ -313,7 +313,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     }
 
     // Aggregate Amount
-    if (filters.filterAggregateAmountMin && filters.filterAggregateAmountMax) {
+    if (this._isNotNullorUndefined(filters.filterAggregateAmountMin) && this._isNotNullorUndefined(filters.filterAggregateAmountMax)) {
       const amountGroup = [];
       amountGroup.push({
         filterAggregateAmountMin: filters.filterAggregateAmountMin,
@@ -331,8 +331,27 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Loan Amount
+    if (this._isNotNullorUndefined(filters.filterLoanAmountMin) && this._isNotNullorUndefined(filters.filterLoanAmountMax)) {
+      const amountGroup = [];
+      amountGroup.push({
+        filterLoanAmountMin: filters.filterLoanAmountMin,
+        filterLoanAmountMax: filters.filterLoanAmountMax
+      });
+      let amtTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.loanAmount) {
+          amtTag = true;
+          tag.group = amountGroup;
+        }
+      }
+      if (!amtTag) {
+        this.tagArray.push({ type: FilterTypes.loanAmount, prefix: 'Loan Amount', group: amountGroup });
+      }
+    }
+
     // Closing loan balance
-    if (filters.filterLoanClosingBalanceMin && filters.filterLoanClosingBalanceMax) {
+    if (this._isNotNullorUndefined(filters.filterLoanClosingBalanceMin) && this._isNotNullorUndefined(filters.filterLoanClosingBalanceMax)) {
       const amountGroup = [];
       amountGroup.push({
         filterLoanClosingBalanceMin: filters.filterLoanClosingBalanceMin,
@@ -346,7 +365,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
       }
       if (!amtTag) {
-        this.tagArray.push({ type: FilterTypes.amount, prefix: 'Balance at close', group: amountGroup });
+        this.tagArray.push({ type: FilterTypes.loanClosingBalance, prefix: 'Balance at close', group: amountGroup });
       }
     }
 
@@ -605,6 +624,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.removeFilter(FilterTypes.loanClosingBalance, null);
   }
 
+  /**
+   * Remove the Loan Amount filter tag and inform the filter component to clear it.
+   */
+  public removeLoanAmountFilter() {
+    this.filters.filterLoanAmountMin = null;
+    this.filters.filterLoanAmountMax = null;
+    this.removeFilter(FilterTypes.loanAmount, null);
+  }
+
   public removeMemoFilter() {
     this.filters.filterMemoCode = false;
     this.removeFilter(FilterTypes.memoCode, null);
@@ -682,6 +710,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         break;
       case FilterTypes.aggregateAmount:
         this.removeAggregateAmountFilter();
+        this.removeTagArrayItem(type);
+        break;
+      case FilterTypes.loanAmount:
+        this.removeLoanAmountFilter();
         this.removeTagArrayItem(type);
         break;
       case FilterTypes.loanClosingBalance:
@@ -914,5 +946,18 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     console.log('TransactionsTableComponent printPreview...!');
 
     this._reportTypeService.printPreview('transaction_table_screen', '3X');
+  }
+
+  /**
+   * Returns true if a valid number, and if not a number returns true if not null or undefined. 
+   * @param input 
+   */
+  private _isNotNullorUndefined(input: any){
+    if(typeof input === "number"){
+      return true;
+    }
+    else{
+      return input !== null && input !== undefined;
+    }
   }
 }

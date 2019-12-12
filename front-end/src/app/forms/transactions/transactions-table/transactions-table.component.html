@@ -159,7 +159,8 @@
             {{trx.aggregate | currency:'USD':'symbol-narrow':'1.2-2'}}
           <td>
             <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
-              <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
+              <button class="btn btn-sm btn-primary" [disabled]="trx.transactionTypeIdentifier === 'LOAN_FROM_BANK' 
+              && trx.transactionTypeIdentifier === 'LOAN_FROM_IND'" (click)="restoreTransaction(trx)">
                 <i class="undo-icon"></i>
               </button>
             </div>
@@ -180,7 +181,8 @@
                     <i class="far fa-copy"></i> Clone
                   </button>
                   <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
-                    <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" class="dropdown-item"
+                    <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable() && 
+                    trx.transactionTypeIdentifier !== 'LOAN_FROM_BANK' && trx.transactionTypeIdentifier !== 'LOAN_FROM_IND'" class="dropdown-item"
                       (click)="trashTransaction(trx)">
                       <i class="trash-icon"></i> Trash
                     </button>
@@ -369,7 +371,8 @@
                   <button class="dropdown-item" (click)="exportAllSelected()">
                     <i class="file-export-icon"></i> Export
                   </button>
-                  <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
+                  <button *ngIf="checkIfTrashable()" 
+                  class="dropdown-item" (click)="trashAllSelected()">
                     <i class="trash-icon"></i> Trash
                   </button>
                 </div>
@@ -443,7 +446,8 @@
                       <i class="far fa-copy"></i> Clone
                     </button>
                     <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
-                      <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable()" class="dropdown-item"
+                      <button [disabled]="trx.child ? true:false" *ngIf="checkIfTrashable() && trx.transactionTypeIdentifier !== 'LOAN_REPAY_MADE'" 
+                      class="dropdown-item"
                         (click)="trashTransaction(trx)">
                         <i class="trash-icon"></i> Trash
                       </button>
@@ -722,6 +726,12 @@
                         <i class="trash-icon"></i> Trash
                       </button>
                     </span>
+                  <button class="dropdown-item" (click)="goToLoanRepayment(trx)" *ngIf="trx.apiCall === '/sc/schedC'">
+                    <i class="print-icon"></i> Loan repayment
+                  </button>
+                  <button class="dropdown-item" (click)="goToDebtPayment(trx)" *ngIf="trx.apiCall === '/sd/schedD'">
+                    <i class="print-icon"></i> Make a payment
+                  </button>
                   </div>
                 </div>
               </div>
@@ -905,7 +915,7 @@
               <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
             <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trx.schedule}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trx.scheduleType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')">
               {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
             <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
@@ -968,7 +978,7 @@
               <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
             <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trxChild.schedule}}</td>
+            <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trxChild.scheduleType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>

@@ -161,7 +161,7 @@ export class TransactionTypeComponent implements OnInit {
         window.localStorage.removeItem(`form_${this._formType}_temp_transaction_type`);
       }
 
-      if (this.transactionType !== 'LOAN_SUMMARY') {
+      if (this.transactionType !== 'LOAN_SUMMARY' && this.transactionType !== 'DEBT_OWN_BY_SUMMARY') {
         // Send message to form (indv-receipt) to clear form field vals if they are still populated.
         this._f3xMessageService.sendInitFormMessage('');
       }
@@ -195,6 +195,10 @@ export class TransactionTypeComponent implements OnInit {
       // TODO This should come from the API transaction category.
       if (this.transactionType === 'LOAN_SUMMARY' && this.scheduleType === 'sched_c') {
         this.scheduleType = 'sched_c_ls';
+      }
+
+      if (this.transactionType === 'DEBT_OWN_BY_SUMMARY' && this.scheduleType === 'sched_d') {
+        this.scheduleType = 'sched_d_ds';
       }
 
       this.status.emit({
@@ -287,7 +291,7 @@ export class TransactionTypeComponent implements OnInit {
     localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
 
     this.secondaryOptions = this._mainTransactionCategory[0].options;
-    
+
     /*if (this._mainTransactionCategory[0].options[0].value === 'schedule-h1') {
       this.secondaryOptions[0].options = [
         {
@@ -425,8 +429,6 @@ export class TransactionTypeComponent implements OnInit {
         }
       ];
     } */
-
-    
 
     this.transactionCategorySelected = true;
 

@@ -229,7 +229,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       const formType = JSON.parse(localStorage.getItem('form_3X_report_type'));
       this.cvgStartDate = formType.cvgStartDate;
       this.cvgEndDate = formType.cvgEndDate;
-      if(this.scheduleAction === ScheduleActions.add){
+      if (this.scheduleAction === ScheduleActions.add) {
         formValidators.push(this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate)); //TODO-ZS  -- do null checks. 
       }
     }
@@ -738,6 +738,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           } // typeof res.data
         } // res.hasOwnProperty('data')
 
+
+        //in some instances, transaction_id is being passed as 'transactionId'
+        //TODO - need to combine/standardize the attribute names.
+        if (this.transactionDetail && !this.transactionDetail.transaction_id && this.transactionDetail.transactionId) {
+          this.transactionDetail.transaction_id = this.transactionDetail.transactionId;
+        }
+
         if (this.scheduleAction === ScheduleActions.edit) {
           this._prePopulateFormForEdit(this.transactionDetail);
         }
@@ -838,13 +845,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       action: ScheduleActions.add,
       transactionDetail: {
         transactionModel: {
-          endorser:{
+          endorser: {
             back_ref_transaction_id: this._transactionId,
           },
-          entityId: this._selectedEntityId, 
-          entryScreenScheduleType:'sched_c', 
-          transaction_id: this._transactionId, 
-          c1Exists : this.c1ExistsFlag
+          entityId: this._selectedEntityId,
+          entryScreenScheduleType: 'sched_c',
+          transaction_id: this._transactionId,
+          c1Exists: this.c1ExistsFlag
         }
       }
     };
@@ -921,12 +928,12 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         }
         //also add transactionId if available (edit route)
         if (this.scheduleAction === ScheduleActions.edit && this.transactionDetail) {
-          if(this.transactionDetail.transaction_id){
+          if (this.transactionDetail.transaction_id) {
             LoanObj['transaction_id'] = this.transactionDetail.transaction_id;
           }
           //in some instances, transaction_id is being passed as 'transactionId'
           //TODO - need to combine/standardize the attribute names.
-          else if(this.transactionDetail.transactionId){
+          else if (this.transactionDetail.transactionId) {
             LoanObj['transaction_id'] = this.transactionDetail.transactionId;
           }
         }
@@ -961,7 +968,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
               this._goToLoanRepayment();
             } else if (nextScreen === 'c1') {
               this._goToC1();
-            } else if(nextScreen === 'endorser'){
+            } else if (nextScreen === 'endorser') {
               this.c1ExistsFlag = this._loansService.c1Exists(this.currentLoanData);
               this._goToEndorser();
             }
@@ -983,8 +990,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       }
     }
   }
-  
-  
+
+
 
   private _gotoSummary() {
     const summaryEmitObj: any = {
@@ -1232,5 +1239,5 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       }
     });
   }
-  
+
 }

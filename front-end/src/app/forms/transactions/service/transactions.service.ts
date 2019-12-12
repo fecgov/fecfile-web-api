@@ -44,6 +44,65 @@ export class TransactionsService {
   private _datePipe: DatePipe;
   private _propertyNameConverterMap: Map<string, string> = new Map([['zip', 'zip_code']]);
 
+  private _filterToColMapping =
+    [
+      {
+        "filterName": "filterAmountMin",
+        "relatedCol": "amount"
+      },
+      {
+        "filterName": "filterAmountMax",
+        "relatedCol": "amount"
+      },
+      {
+        "filterName": "filterLoanAmountMin",
+        "relatedCol": "loanAmount"
+      },
+      {
+        "filterName": "filterLoanAmountMax",
+        "relatedCol": "loanAmount"
+      },
+      {
+        "filterName": "filterAggregateAmountMin",
+        "relatedCol": "aggregate"
+      },
+      {
+        "filterName": "filterAggregateAmountMax",
+        "relatedCol": "aggregate"
+      },
+      {
+        "filterName": "filterLoanClosingBalanceMin",
+        "relatedCol": "loanClosingBalance"
+      },
+      {
+        "filterName": "filterLoanClosingBalanceMax",
+        "relatedCol": "loanClosingBalance"
+      },
+      {
+        "filterName": "filterDateFrom",
+        "relatedCol": "date"
+      },
+      {
+        "filterName": "filterDateTo",
+        "relatedCol": "date"
+      }, {
+        "filterName": "filterDeletedDateFrom",
+        "relatedCol": "deletedDate"
+      },
+      {
+        "filterName": "filterDeletedDateTo",
+        "relatedCol": "deletedDate"
+      },
+      {
+        "filterName": "filterMemoCode",
+        "relatedCol": "deletedDate"
+      },
+      {
+        "filterName": "filterElectionCode",
+        "relatedCol": "memoCode"
+      }
+    ]
+
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService,
@@ -82,7 +141,7 @@ export class TransactionsService {
     itemsPerPage: number,
     sortColumnName: string,
     descending: boolean,
-    filters: TransactionFilterModel,
+    filters: any,
     categoryType: string,
     trashed_flag: boolean,
     allTransactionsFlag: boolean
@@ -265,6 +324,28 @@ export class TransactionsService {
     return modelArray;
   }
 
+
+  public removeFilters(appliedFilters:any, currentSortableColumns: any, transactionSpecificColumns:any): any[]{
+    let filteredList = [];
+    for (let filter in appliedFilters){
+      //get associatedColumn for any non-null filters
+      if(typeof filter === "string" && filter.startsWith('filter')){
+        let colObj = this._filterToColMapping.find(element => element.filterName === filter);
+        let relatedCol = '';
+        if(colObj){
+          colObj = colObj[0];
+          relatedCol = colObj.relatedCol;
+          let matchingResults = transactionSpecificColumns.find(element => element.colName === relatedCol);
+          if(matchingResults && matchingResults.length > 0){
+            filteredList.push(filter);
+          }
+        }
+      }
+    }
+    return filteredList;
+  }
+
+
   /**
    * Map Sched server fields to a TransactionModel.
    */
@@ -376,35 +457,35 @@ export class TransactionsService {
       case 'itemized':
         name = 'itemized';
         break;
-      case 'election_code':
-        name = 'electionCode';
+      case 'electionCode':
+        name = 'election_code';
         break;
-      case 'loan_amount':
-        name = 'loanAmount';
+      case 'loanAmount':
+        name = 'loan_amount';
         break;
-      case 'loan_balance':
-        name = 'loanBalance';
+      case 'loanBalance':
+        name = 'loan_balance';
         break;
-      case 'loan_beginning_balance':
-        name = 'loanBeginningBalance';
+      case 'loanBeginningBalance':
+        name = 'loan_beginning_balance';
         break;
-      case 'loan_closing_balance':
-        name = 'loanClosingBalance';
+      case 'loanClosingBalance':
+        name = 'loan_closing_balance';
         break;
-      case 'loan_due_date':
-        name = 'loanDueDate';
+      case 'loanDueDate':
+        name = 'loan_due_date';
         break;
-      case 'loan_incurred_amt':
-        name = 'loanIncurredAmt';
+      case 'loanIncurredAmt':
+        name = 'loan_incurred_amt';
         break;
-      case 'loan_incurred_date':
-        name = 'loanIncurredDate';
+      case 'loanIncurredDate':
+        name = 'loan_incurred_date';
         break;
-      case 'loan_payment_amt':
-        name = 'loanPaymentAmt';
+      case 'loanPaymentAmt':
+        name = 'loan_payment_amt';
         break;
-      case 'loan_payment_to_date':
-        name = 'loanPaymentToDate';
+      case 'loanPaymentToDate':
+        name = 'loan_payment_to_date';
         break;
       default:
     }
@@ -829,7 +910,7 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     return this._http
-      .post(`${environment.apiUrl}${url}`, {transaction_id: transactionId}, {
+      .post(`${environment.apiUrl}${url}`, { transaction_id: transactionId }, {
         headers: httpOptions
       })
       .pipe(
@@ -845,10 +926,12 @@ export class TransactionsService {
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.reportType = row.report_type;
   model.type = row.transaction_type_desc;
+  model.scheduleType = row.schedule;
   model.entityId = row.entity_id;
   model.transactionTypeIdentifier = row.transaction_type_identifier;
   model.apiCall = row.api_call;
   model.transactionId = row.transaction_id;
+  model.backRefTransactionId = row.back_ref_transaction_id;
   model.name = row.name;
   model.street = row.street_1;
   model.street2 = row.street_2;

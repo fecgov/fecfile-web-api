@@ -82,6 +82,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public transferredAmountErr = false;
 
+  public isSaveAndAdd = false;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -338,6 +340,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       if (res) {        
         //this.saveHRes = res;
         this.h5Entries = [];
+
+        this.h5Sum = [];
         this.h5Sum =  res;
         this.h5TableConfig.totalItems = res.length;
       }
@@ -352,6 +356,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     // this.schedH2.patchValue({ fundraising: this.schedH2.get('select_activity_function').value === 'f' ? true : false }, { onlySelf: true });
     // this.schedH2.patchValue({ direct_cand_support: this.schedH2.get('select_activity_function').value === 'd' ? true : false }, { onlySelf: true });
+
+    this.isSaveAndAdd = true;
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
@@ -509,6 +515,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public selectCategoryChange(e) {
+
+    this.isSaveAndAdd = false;
 
     this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true });
 

@@ -251,6 +251,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     }
   }
 
+ 
+
   /**
    * A method to run when component is destroyed.
    */
@@ -466,7 +468,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     filters.filterLoanAmountMin = this.filterLoanAmountMin;
     filters.filterLoanAmountMax = this.filterLoanAmountMax;
     filters.filterLoanClosingBalanceMin = this.filterLoanClosingBalanceMin;
-    filters.filterLoanClosingBalanceMax = this.filterLoanClosingBalanceMin;
+    filters.filterLoanClosingBalanceMax = this.filterLoanClosingBalanceMax;
 
     if (this.filterAmountMin !== null) {
       modified = true;
@@ -636,7 +638,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * filter options on Type.
    */
   private getCategoryTypes() {
-    this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
+   /*  this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
       let categoriesExist = false;
       const categoriesGroupArray = [];
       if (res.data) {
@@ -678,6 +680,32 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         this.transactionCategories = categoriesGroupArray;
         // this.transactionCategories = this._orderByPipe.transform(
         //   res.data.transactionCategories, {property: 'text', direction: 1});
+      } else {
+        this.transactionCategories = [];
+      }
+    }); */
+    this._transactionTypeService.getTransactionTypes(this.formType).subscribe(res => {
+      let categoriesExist = false;
+      let categoriesGroupArray = [];
+        if (res) {
+          categoriesExist = true;
+
+          const receiptsArr = res.filter(obj => obj.categoryType === 'Receipts');
+          const disbursementsArr = res.filter(obj => obj.categoryType === 'Disbursements');
+          const loansAndDebtsArr = res.filter(obj => obj.categoryType === 'Loans and Debts');
+          const otherArr = res.filter(obj => obj.categoryType === 'Other');
+
+          categoriesGroupArray = [
+            {text:'Receipts', options: receiptsArr},
+            {text:'Disbursements', options: disbursementsArr},
+            {text:'Loans and Debts', options: loansAndDebtsArr},
+            {text:'Other', options: otherArr},
+          ];
+
+
+        }
+      if (categoriesExist) {
+        this.transactionCategories = categoriesGroupArray;
       } else {
         this.transactionCategories = [];
       }

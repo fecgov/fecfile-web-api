@@ -23,6 +23,8 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 import { schedFstaticFormFields } from './static-form-fields.json';
+import { Observable } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 /**
  * Schedule F is a sub-transaction of Schedule D.
@@ -42,7 +44,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   @Output() status: EventEmitter<any>;
 
   public showPart2: boolean;
-  public loaded = false;
 
   protected staticFormFields = schedFstaticFormFields;
 
@@ -93,7 +94,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnInit() {
-    this.frmIndividualReceipt = this._fb.group({});
     this.formFieldsPrePopulated = true;
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedFComponent;
     this.transactionType = 'COEXP_PARTY_DEBT';
@@ -101,15 +101,8 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     super.ngOnInit();
     this.showPart2 = false;
     this._setTransactionDetail();
-
-    // temp code - waiting until dynamic forms completes and loads the formGroup
-    // before rendering the static fields, otherwise validation error styling
-    // is not working (input-error-field class).  If dynamic forms deliver
-    // the static fields, then remove this or set a flag when formGroup is ready
+    this.loaded = false;
     super.ngOnChanges(null);
-    setTimeout(() => {
-      this.loaded = true;
-    }, 2000);
   }
 
   public ngOnChanges(changes: SimpleChanges) {
@@ -222,21 +215,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   /**
-   * Override the base class method for specific handling for schedule F.
-   */
-  public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
-    // Don't auto-populate committee fields for sched F payment
-    if (col.name === 'payee_cmte_id') {
-      // const entity = $event.item;
-      // this._selectedCandidate = this._utilService.deepClone(entity);
-      // this._setSetEntityIdTo(this._selectedCandidate, col);
-      // this._selectedCandidateChangeWarn = {};
-    } else {
-      super.handleSelectedOrg($event, col);
-    }
-  }
-
-  /**
    * @override the Base class method.
    *
    * Determine if the field should be shown.
@@ -306,5 +284,67 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     this.showPart2 = false;
     this.clearFormValues();
     this.returnToParent(this.editScheduleAction);
+  }
+
+  /**
+   * Search for Committee Payees when Committee ID input value changes.
+   */
+  searchPayeeCommitteeId = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        const searchTextUpper = searchText.toUpperCase();
+
+        if (
+          searchTextUpper === 'C' ||
+          searchTextUpper === 'C0' ||
+          searchTextUpper === 'C00' ||
+          searchTextUpper === 'C000'
+        ) {
+          return Observable.of([]);
+        }
+
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'payee_cmte_id');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  formatterPayeeCommitteeId = (x: { payee_cmte_id: string }) => {
+    if (typeof x !== 'string') {
+      return x.payee_cmte_id;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * Format a Candidate Entity to display in the Payee Committee ID type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadPayeeCommitteeId(result: any) {
+    const payeeCmteID = result.payee_cmte_id ? result.payee_cmte_id.trim() : '';
+    const candidateId = result.beneficiary_cand_id ? result.beneficiary_cand_id.trim() : '';
+    const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
+    const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
+    let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
+    if (office) {
+      if (office === 'P') {
+        office = 'Presidential';
+      } else if (office === 'S') {
+        office = 'Senate';
+      } else if (office === 'H') {
+        office = 'House';
+      }
+    }
+    const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
+    const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
+
+    return `${payeeCmteID}, ${candidateId}, ${lastName}, ${firstName}, ${office},
+      ${officeState}, ${officeDistrict}`;
   }
 }

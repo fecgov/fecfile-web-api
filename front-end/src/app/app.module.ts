@@ -76,7 +76,7 @@ import { ContactsFilterComponent } from './contacts/filter/contacts-filter.compo
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
 import { SubTransactionsTableComponent } from './forms/transactions/sub-transactions-table/sub-transactions-table.component';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, DatePipe } from '@angular/common';
 import { UtilService } from './shared/utils/util.service';
 import { UserIdleModule } from 'angular-user-idle';
 import { SchedFComponent } from './forms/sched-f/sched-f.component';
@@ -94,6 +94,9 @@ import { SchedH5Component } from './forms/sched-h5/sched-h5.component';
 import { SchedH4Component } from './forms/sched-h4/sched-h4.component';
 import { EndorserSummaryComponent } from './forms/sched-c/endorser-summary/endorser-summary.component';
 import { SchedH6Component } from './forms/sched-h6/sched-h6.component';
+import { DebtSummaryComponent } from './forms/sched-d/debt-summary/debt-summary.component';
+import { SchedLComponent } from './forms/sched-l/sched-l.component';
+import { DebtSummaryService } from './forms/sched-d/debt-summary/service/debt-summary.service';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -144,7 +147,6 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ReportTypeComponent,
     ReportTypeSidebarComponent,
     FinancialSummaryComponent,
-    OrderByPipe,
     ZipCodePipe,
     FilterPipe,
     IndividualReceiptComponent,
@@ -165,12 +167,14 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     EndorserComponent,
     SchedC1Component,
     SchedH3Component,
-    SchedH5Component, 
+    SchedH5Component,
     LoanpaymentComponent,
     SchedH4Component,
     LoanpaymentComponent,
     EndorserSummaryComponent,
     SchedH6Component,
+    DebtSummaryComponent,
+    SchedLComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
   imports: [
@@ -208,9 +212,11 @@ const appInitializerFn = (appConfig: AppConfigService) => {
       deps: [AppConfigService]
     },
     DecimalPipe,
-    UtilService
+    DatePipe,
+    UtilService,
+    OrderByPipe
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AppModule { }
+export class AppModule {}
