@@ -185,7 +185,7 @@
                   [style.height]="'30px'"
                   (blur)="handleOnBlurEvent($event, col)"
                   [ngClass]="
-                    schedH5.get('transferred_amount')?.invalid && (schedH5.touched || schedH5.dirty)
+                    schedH5.get('transferred_amount')?.invalid && (schedH5.touched || schedH5.dirty) && (!isSaveAndAdd)
                       ? 'input-field-error'
                       : ''
                   "
@@ -275,7 +275,7 @@
                 Previous
               </button>
               <a class="btn btn-primary btn-right" (click)="returnToSum()">
-                Save & View Summary
+                View Summary
               </a>
             </div>
           </div>
