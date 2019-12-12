@@ -854,6 +854,7 @@ def get_sched_b_transactions(
                                         nc_soft_account, transaction_type_identifier, 
                                         beneficiary_cmte_name,
                                         beneficiary_cand_entity_id,
+                                        levin_account_id,
                                         aggregate_amt,
                                         create_date
                 FROM public.sched_b WHERE report_id in ('{}')
@@ -876,6 +877,7 @@ def get_sched_b_transactions(
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
                         beneficiary_cmte_name,
                         beneficiary_cand_entity_id,
+                        levin_account_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -899,6 +901,7 @@ def get_sched_b_transactions(
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
                         beneficiary_cmte_name,
                         beneficiary_cand_entity_id,
+                        levin_account_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -935,6 +938,43 @@ def candify_it(cand_json):
         else:
             candify_item[_f] = cand_json.get(_f)
     return candify_item
+
+
+def post_process_it_h4(cursor, cmte_id):
+    """
+    helper function:
+    merge transactions and entities after transactions are loaded
+    """
+    transaction_list = cursor.fetchone()[0]
+    if not transaction_list:
+        return []
+    # if not transaction_list:
+    #     if (
+    #         not back_ref_transaction_id
+    #     ):  # raise exception for non_child transaction loading
+    #         raise NoOPError(
+    #             "No transactions found."
+    #         )
+    #     else:  # return empy list for child transaction loading
+    #         return []
+    merged_list = []
+    for item in transaction_list:
+        entity_id = item.get("payee_entity_id")
+        data = {"entity_id": entity_id, "cmte_id": cmte_id}
+        entity_list = get_entities(data)
+        dictEntity = entity_list[0]
+        # cand_entity = {}
+        # if item.get("beneficiary_cand_entity_id"):
+        #     cand_data = {
+        #         "entity_id": item.get("beneficiary_cand_entity_id"),
+        #         "cmte_id": cmte_id,
+        #     }
+        #     cand_entity = get_entities(cand_data)[0]
+        #     cand_entity = candify_it(cand_entity)
+
+        merged_dict = {**item, **dictEntity}
+        merged_list.append(merged_dict)
+    return merged_list
 
 
 def post_process_it(cursor, cmte_id):

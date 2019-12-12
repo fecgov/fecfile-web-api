@@ -917,7 +917,7 @@ def load_report_receipts_sumamry(cmte_id, report_id):
             cursor.execute(_sql1, (cmte_id, report_id))
             rows = cursor.fetchall()
             for row in rows:
-                if row[0] == "11AI":
+                if row[0] == "1A":
                     result["itemized_receipt_amount"] = row[1]
                 elif row[0] == "11AII":
                     result["non-itemized_receipt_amount"] = row[1]
