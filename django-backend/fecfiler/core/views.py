@@ -190,6 +190,40 @@ def get_transaction_categories(request):
     except Exception as e:
         return Response("The get_transaction_categories API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+
+"""
+********************************************************************************************************************************
+GET TRANSACTION TYPES API- CORE APP - FNE 1477, FNE1497 - BY ZOBAIR SALEEM
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_transaction_types(request):
+
+    try:
+        with connection.cursor() as cursor:
+            forms_obj= {}
+            form_type = request.query_params.get('form_type')
+
+            cursor.execute("select tran_identifier,tran_desc,category_type  from ref_transaction_types where form_type = %s", [form_type])
+            rows = cursor.fetchall()
+
+            transaction_types_dict=[]
+            for row in rows:
+                transaction_type = {
+                    'name': row[0],
+                    'text': row[1],
+                    'categoryType': row[2]
+                    }
+                transaction_types_dict.append(transaction_type)
+            response = transaction_types_dict
+                
+        if not bool(response):
+            return Response("No entries were found for the form_type: {}".format(form_type), status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return Response(response, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_transaction_types API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 """
 ********************************************************************************************************************************
 GET REPORT TYPES API- CORE APP - SPRINT 6 - FNE 471 - BY PRAVEEN JINKA 
@@ -279,7 +313,8 @@ def get_dynamic_forms_fields(request):
                 cmte_type_category = cmte_type_categories[0]
         # print(forms_obj)
         if bool(forms_obj):
-            if transaction_type in ['ALLOC_EXP','ALLOC_EXP_VOID','ALLOC_EXP_CC_PAY','ALLOC_EXP_STAF_REIM','ALLOC_EXP_PMT_TO_PROL', 'ALLOC_EXP_DEBT']:
+            if transaction_type in ['ALLOC_EXP','ALLOC_EXP_VOID','ALLOC_EXP_CC_PAY','ALLOC_EXP_STAF_REIM','ALLOC_EXP_PMT_TO_PROL', 'ALLOC_EXP_DEBT',
+                                    'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM_MEMO', 'ALLOC_EXP_PMT_TO_PROL_MEMO']:
                 if cmte_type_category:
                     for events in forms_obj['data']['committeeTypeEvents']:
                         for eventTypes in events['eventTypes']:

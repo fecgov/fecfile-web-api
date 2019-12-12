@@ -97,6 +97,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     private _schedH2Service: SchedH2Service,
     private _individualReceiptService: IndividualReceiptService,
     private _uService: UtilService,
+    private _decPipe: DecimalPipe,
   ) {    
      super(
       _http,
@@ -123,6 +124,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _schedH2Service;
     _individualReceiptService;
     _uService;
+    _decPipe;
   }
 
 
@@ -204,7 +206,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public setSchedH2() {
     this.schedH2 = new FormGroup({      
-      activity_event_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
+      activity_event_name: new FormControl('', [Validators.maxLength(90), Validators.required]),
       receipt_date: new FormControl(''),
       select_activity_function: new FormControl('', Validators.required),
       fundraising: new FormControl('', Validators.required),
@@ -241,8 +243,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
     this.isSubmit = true;
 
-    if(this.schedH2.status === 'VALID' && 
-        (this.schedH2.get('federal_percent').value + this.schedH2.get('non_federal_percent').value) === 100) {
+    if(this.schedH2.status === 'VALID') {
+      //&& (this.schedH2.get('federal_percent').value + this.schedH2.get('non_federal_percent').value) === 100) {
 
       this.saveH2Ratio(serializedForm);      
       this.schedH2.reset();
@@ -254,7 +256,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     
     this.h2Subscription = this._schedH2Service.getSummary(reportId).subscribe(res =>
       {        
-        if(res) {          
+        if(res) {
+          this.h2Sum = [];
           this.h2Sum =  res;         
           this.tableConfig.totalItems = res.length;           
         }
@@ -313,7 +316,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
  
   public handleFedPercentFieldKeyup(e) {
     if(e.target.value <= 100) {
-      this.schedH2.patchValue({ non_federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
+      this.schedH2.patchValue({ non_federal_percent:
+        this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ non_federal_percent: 0}, { onlySelf: true });
     }
@@ -321,10 +325,29 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public handleNonFedPercentFieldKeyup(e) {
     if(e.target.value <= 100) {
-      this.schedH2.patchValue({ federal_percent: Number(100 - e.target.value)}, { onlySelf: true });
+      this.schedH2.patchValue({ federal_percent:
+        this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true }); 
     }  
+  }
+
+  public handleOnFedBlurEvent(e) {
+    if(e.target.value <= 100) {
+      this.schedH2.patchValue({ non_federal_percent:
+        this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
+    }else {
+      this.schedH2.patchValue({ non_federal_percent: 0}, { onlySelf: true });
+    }
+  }
+
+  public handleOnNonFedBlurEvent(e) {
+    if(e.target.value <= 100) {
+      this.schedH2.patchValue({ federal_percent:
+        this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
+    }else {
+      this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true });
+    }
   }
 
 }

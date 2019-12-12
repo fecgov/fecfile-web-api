@@ -44,6 +44,65 @@ export class TransactionsService {
   private _datePipe: DatePipe;
   private _propertyNameConverterMap: Map<string, string> = new Map([['zip', 'zip_code']]);
 
+  private _filterToColMapping =
+    [
+      {
+        "filterName": "filterAmountMin",
+        "relatedCol": "amount"
+      },
+      {
+        "filterName": "filterAmountMax",
+        "relatedCol": "amount"
+      },
+      {
+        "filterName": "filterLoanAmountMin",
+        "relatedCol": "loanAmount"
+      },
+      {
+        "filterName": "filterLoanAmountMax",
+        "relatedCol": "loanAmount"
+      },
+      {
+        "filterName": "filterAggregateAmountMin",
+        "relatedCol": "aggregate"
+      },
+      {
+        "filterName": "filterAggregateAmountMax",
+        "relatedCol": "aggregate"
+      },
+      {
+        "filterName": "filterLoanClosingBalanceMin",
+        "relatedCol": "loanClosingBalance"
+      },
+      {
+        "filterName": "filterLoanClosingBalanceMax",
+        "relatedCol": "loanClosingBalance"
+      },
+      {
+        "filterName": "filterDateFrom",
+        "relatedCol": "date"
+      },
+      {
+        "filterName": "filterDateTo",
+        "relatedCol": "date"
+      }, {
+        "filterName": "filterDeletedDateFrom",
+        "relatedCol": "deletedDate"
+      },
+      {
+        "filterName": "filterDeletedDateTo",
+        "relatedCol": "deletedDate"
+      },
+      {
+        "filterName": "filterMemoCode",
+        "relatedCol": "deletedDate"
+      },
+      {
+        "filterName": "filterElectionCode",
+        "relatedCol": "memoCode"
+      }
+    ]
+
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService,
@@ -82,7 +141,7 @@ export class TransactionsService {
     itemsPerPage: number,
     sortColumnName: string,
     descending: boolean,
-    filters: TransactionFilterModel,
+    filters: any,
     categoryType: string,
     trashed_flag: boolean,
     allTransactionsFlag: boolean
@@ -264,6 +323,28 @@ export class TransactionsService {
     }
     return modelArray;
   }
+
+
+  public removeFilters(appliedFilters:any, currentSortableColumns: any, transactionSpecificColumns:any): any[]{
+    let filteredList = [];
+    for (let filter in appliedFilters){
+      //get associatedColumn for any non-null filters
+      if(typeof filter === "string" && filter.startsWith('filter')){
+        let colObj = this._filterToColMapping.find(element => element.filterName === filter);
+        let relatedCol = '';
+        if(colObj){
+          colObj = colObj[0];
+          relatedCol = colObj.relatedCol;
+          let matchingResults = transactionSpecificColumns.find(element => element.colName === relatedCol);
+          if(matchingResults && matchingResults.length > 0){
+            filteredList.push(filter);
+          }
+        }
+      }
+    }
+    return filteredList;
+  }
+
 
   /**
    * Map Sched server fields to a TransactionModel.
@@ -829,7 +910,7 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     return this._http
-      .post(`${environment.apiUrl}${url}`, {transaction_id: transactionId}, {
+      .post(`${environment.apiUrl}${url}`, { transaction_id: transactionId }, {
         headers: httpOptions
       })
       .pipe(

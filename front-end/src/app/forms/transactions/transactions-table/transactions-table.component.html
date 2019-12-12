@@ -159,7 +159,8 @@
             {{trx.aggregate | currency:'USD':'symbol-narrow':'1.2-2'}}
           <td>
             <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
-              <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
+              <button class="btn btn-sm btn-primary" [disabled]="trx.transactionTypeIdentifier === 'LOAN_FROM_BANK' 
+              && trx.transactionTypeIdentifier === 'LOAN_FROM_IND'" (click)="restoreTransaction(trx)">
                 <i class="undo-icon"></i>
               </button>
             </div>
