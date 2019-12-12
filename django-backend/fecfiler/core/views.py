@@ -5652,20 +5652,26 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, prev_yr):
         )
 
 
-def get_sl_item_aggregate(report_id, cmte_id):
+def get_sl_item_aggregate(report_id, cmte_id, prev_yr):
     try:
-        # cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        # if prev_yr:
-        #     prev_cvg_year = cvg_start_date.year - 1
-        #     prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
-        # else:
-        #     prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
+        import pdb;pdb.set_trace()
+        if not prev_yr:
+            cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+            from_date = date(cvg_start_date.year, 1,1)
+            to_date = date(cvg_end_date.year, 12, 31)
         with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT SUM(aggregate_amt) from public.sched_a 
-                where cmte_id = %s AND aggregate_amt > 200 AND line_number = '1A' AND report_id= %s  AND delete_ind is distinct from 'Y'""",
-                [cmte_id, report_id]
-            )
+            if prev_yr:
+                cursor.execute("""
+                    SELECT SUM(aggregate_amt) from public.sched_a 
+                    where cmte_id = %s AND aggregate_amt > 200 AND line_number = '1A' AND report_id= %s  AND delete_ind is distinct from 'Y'""",
+                    [cmte_id, report_id]
+                )
+            else:
+                cursor.execute("""
+                    SELECT SUM(aggregate_amt) from public.sched_a 
+                    where cmte_id = %s AND aggregate_amt > 200 AND line_number = '1A' AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y'""",
+                    [cmte_id, from_date, to_date]
+                )
             if cursor.rowcount == 0:
                 agg_amt = 0
             else:
@@ -5678,19 +5684,25 @@ def get_sl_item_aggregate(report_id, cmte_id):
             "The Agg itm_amnt: " + str(e)
         )
 
-def get_sl_unitem_aggregate(report_id, cmte_id):
+def get_sl_unitem_aggregate(report_id, cmte_id, prev_yr):
     try:
-        # cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        # if prev_yr:
-        #     prev_cvg_year = cvg_start_date.year - 1
-        #     prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
-        # else:
-        #     prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
+        if not prev_yr:
+            cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+            from_date = date(cvg_start_date.year, 1,1)
+            to_date = date(cvg_end_date.year, 12, 31)
         with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT SUM(aggregate_amt) from public.sched_a 
-                where cmte_id = %s AND aggregate_amt <= 200 AND line_number = '1A' AND report_id= %s AND delete_ind is distinct from 'Y'""",
-                [cmte_id, report_id])
+            if prev_yr:
+                cursor.execute("""
+                    SELECT SUM(aggregate_amt) from public.sched_a 
+                    where cmte_id = %s AND aggregate_amt <= 200 AND line_number = '1A' AND report_id= %s  AND delete_ind is distinct from 'Y'""",
+                    [cmte_id, report_id]
+                )
+            else:
+                cursor.execute("""
+                    SELECT SUM(aggregate_amt) from public.sched_a 
+                    where cmte_id = %s AND aggregate_amt <= 200 AND line_number = '1A' AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y'""",
+                    [cmte_id,from_date, to_date]
+                )
             if cursor.rowcount == 0:
                 agg_amt = 0
             else:
@@ -5707,10 +5719,10 @@ def get_sl_line_sum_value(line_number, formula, sched_la_line_sum_dict, cmte_id,
     
     val = 0
     if line_number == '1a':
-        return get_sl_item_aggregate(report_id, cmte_id)
+        return get_sl_item_aggregate(report_id, cmte_id, prev_yr)
 
     if line_number == '1b':
-        return get_sl_unitem_aggregate(report_id, cmte_id)
+        return get_sl_unitem_aggregate(report_id, cmte_id, prev_yr)
 
     if line_number == '7':
         if formula == '':
@@ -5800,7 +5812,7 @@ def prepare_Schedl_summary_data(request):
         #     prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
         # else:
         #     prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-        #import pdb;pdb.set_trace()
+        import pdb;pdb.set_trace()
 
         with connection.cursor() as cursor:
             cursor.execute(""" 
@@ -5821,7 +5833,7 @@ def prepare_Schedl_summary_data(request):
             col_lb_line_sum_result = cursor.fetchall()
             col_lb_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_lb_line_sum_result}
            
-
+        
         col_line_sum_dict = {}
         col_line_sum_dict.update(col_la_line_sum)
         col_line_sum_dict.update(col_lb_line_sum)
