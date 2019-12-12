@@ -33,7 +33,8 @@ export enum FilterTypes {
   electionYear = 'electionYear',
   loanAmount = 'loanAmount',
   loanClosingBalance = 'loanClosingBalance',
-  schedule = 'schedule'
+  schedule = 'schedule',
+  debtBeginningBalance = "debtBeginningBalance"
 }
 
 /**
