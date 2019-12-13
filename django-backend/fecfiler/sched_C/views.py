@@ -98,6 +98,97 @@ def check_mandatory_fields_SC(data):
         raise
 
 
+def do_loan_carryover(report_id, cmte_id):
+    """
+    this is the function to handle loan carryover form one report to next report:
+    1. duplicate and carryover all loans:
+    - non-zero loan_balance
+    - outstanding and dangled(not carried over before)
+    - loan report date < current report coverge start(forward carryover only)
+    
+    2. update all records with new transaction_id, new report_id
+    """
+    _sql = """
+    insert into public.sched_d(
+					cmte_id, 
+                    report_id, 
+                    line_num,
+                    transaction_type_identifier, 
+                    transaction_id, 
+                    entity_id, 
+                    beginning_balance, 
+                    balance_at_close, 
+                    incurred_amount, 
+                    payment_amount, 
+					purpose,
+                    back_ref_transaction_id,
+                    create_date
+					)
+					SELECT 
+					c.cmte_id, 
+                    %s, 
+                    c.line_num,
+                    c.transaction_type_identifier, 
+                    get_next_transaction_id('SC'), 
+                    c.entity_id, 
+                    c.election_code,
+                    c.election_other_description,
+                    c.loan_amount_original,
+                    c.loan_payment_to_date,
+                    c.loan_balance,
+                    c.loan_incurred_date,
+                    c.loan_due_date,
+                    c.loan_intrest_rate,
+                    c.is_loan_secured,
+                    c.is_personal_funds,
+                    c.lender_cmte_id,
+                    c.lender_cand_id,
+                    c.lender_cand_last_name,
+                    c.lender_cand_first_name,
+                    c.lender_cand_middle_name,
+                    c.lender_cand_prefix,
+                    c.lender_cand_suffix,
+                    c.lender_cand_office,
+                    c.lender_cand_state,
+                    c.lender_cand_district,
+                    c.memo_code,
+                    c.memo_text,
+                    now()
+            FROM public.sched_c c, public.reports r
+            WHERE 
+            c.cmte_id = %s
+            AND c.loan_balance > 0 
+            AND c.report_id != %s
+            AND c.report_id = r.report_id
+            AND r.cvg_start_date < (
+                        SELECT r.cvg_start_date
+                        FROM   public.reports r
+                        WHERE  r.report_id = %s
+                    )
+            AND c.transaction_id NOT In (
+                select distinct back_ref_transaction_id from public.sched_c
+                where cmte_id = %s
+                and back_ref_transaction_id is not null
+            )
+            AND c.delete_ind is distinct from 'Y'
+    """
+    # query_back_sql = """
+    # select d.back_ref_transaction_id
+    # """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
+            if cursor.rowcount == 0:
+                logger.debug("No carryover happens.")
+            else:
+                logger.debug("debt carryover done with report_id {}".format(report_id))
+                logger.debug("total carryover debts:{}".format(cursor.rowcount))
+                # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
+                logger.debug("carryover done.")
+    except:
+        raise
+
+
 def schedC_sql_dict(data):
     """
     filter out valid fileds for sched_c
