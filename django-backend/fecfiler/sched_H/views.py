@@ -1103,9 +1103,12 @@ def is_new_report(report_id, cmte_id):
             cursor.execute(_sql, (report_id, cmte_id))
             results = cursor.fetchall()
             new_date = results[0][1]
-            old_date = results[1][1]
-            if new_date and old_date and new_date > old_date:
-                return True
+            if len(results) != 2: # no old max date found
+                return False
+            else:
+                old_date = results[1][1]
+                if new_date and old_date and new_date > old_date:
+                    return True
             return False
     except:
         raise
@@ -1182,7 +1185,7 @@ def get_h2_summary_table(request):
     h2 summary need to be h4 transaction-based:
     all the calendar-year based h2 need to show up for current report as long as
     a live h4 transaction refering this h2 exist:
-    h2 report goes with h4, not h2 report_id
+    h2 report goes with h4/h3 transactions, not h2 report_id
 
     update: all h2 items with current report_id need to show up
     """
@@ -1216,6 +1219,22 @@ def get_h2_summary_table(request):
         federal_percent, 
         non_federal_percent 
     FROM   public.sched_h2 
+    WHERE  cmte_id = %s AND delete_ind is distinct from 'Y'
+        AND activity_event_name IN (
+            SELECT activity_event_name 
+            FROM   public.sched_h3 
+            WHERE  report_id = %s
+            AND cmte_id = %s)
+    UNION SELECT activity_event_name, 
+        ( CASE fundraising 
+            WHEN true THEN 'fundraising' 
+            ELSE 'direct_cand_suppot' 
+            END )  AS event_type, 
+        revise_date AS receipt_date, 
+        ratio_code, 
+        federal_percent, 
+        non_federal_percent 
+    FROM   public.sched_h2 
     WHERE  cmte_id = %s AND report_id = %s AND ratio_code = 'n' AND delete_ind is distinct from 'Y'
             ) t;
     """
@@ -1229,7 +1248,7 @@ def get_h2_summary_table(request):
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
             logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-            cursor.execute(_sql, (cmte_id, report_id, cmte_id, cmte_id, report_id))
+            cursor.execute(_sql, (cmte_id, report_id, cmte_id, cmte_id, report_id, cmte_id, cmte_id, report_id))
             json_res = cursor.fetchone()[0]
             # print(json_res)
             if not json_res:
