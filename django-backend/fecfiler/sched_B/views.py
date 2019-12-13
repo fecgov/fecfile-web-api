@@ -267,6 +267,7 @@ def post_sql_schedB(
     beneficiary_cand_suffix,
     aggregate_amt,
     beneficiary_cand_entity_id,
+    levin_account_id
 ):
     """
     db transaction for post a db transaction
@@ -314,11 +315,12 @@ def post_sql_schedB(
                     beneficiary_cand_suffix,
                     aggregate_amt,
                     beneficiary_cand_entity_id,
+                    levin_account_id,
                     last_update_date,
                     create_date
                 )
                 VALUES ("""
-                + ",".join(["%s"] * 40)
+                + ",".join(["%s"] * 41)
                 + ")",
                 [
                     cmte_id,
@@ -359,6 +361,7 @@ def post_sql_schedB(
                     beneficiary_cand_suffix,
                     aggregate_amt,
                     beneficiary_cand_entity_id,
+                    levin_account_id,
                     datetime.datetime.now(),
                     datetime.datetime.now()
                 ],
@@ -474,6 +477,7 @@ def put_sql_schedB(
     beneficiary_cand_suffix,
     aggregate_amt,
     beneficiary_cand_entity_id,
+    levin_account_id,
 ):
     """
     db transaction for saving current sched_b item
@@ -518,6 +522,7 @@ def put_sql_schedB(
                             beneficiary_cand_suffix = %s,
                             aggregate_amt = %s,
                             beneficiary_cand_entity_id = %s,
+                            levin_account_id = %s,
                             last_update_date = %s
                     WHERE transaction_id = %s 
                     AND report_id in ('{}') 
@@ -560,6 +565,7 @@ def put_sql_schedB(
                     beneficiary_cand_suffix,
                     aggregate_amt,
                     beneficiary_cand_entity_id,
+                    levin_account_id,
                     datetime.datetime.now(),
                     transaction_id,
                     cmte_id,
@@ -728,6 +734,7 @@ def post_schedB(datum):
                 datum.get("beneficiary_cand_suffix"),
                 datum.get("aggregate_amt"),
                 datum.get("beneficiary_cand_entity_id"),
+                datum.get("levin_account_id"),
             )
             logger.debug('payment transaction saved.')
             if datum.get('transaction_type_identifier') in SCHED_D_CHILD_LIST:
@@ -904,6 +911,7 @@ def put_schedB(datum):
                 datum.get("beneficiary_cand_suffix"),
                 datum.get("aggregate_amt"),
                 datum.get("beneficiary_cand_entity_id"),
+                datum.get("levin_account_id"),
             )
             logger.debug('sched_b data saved.')
             
@@ -1077,6 +1085,8 @@ def schedB_sql_dict(data):
             "cand_city": data.get("cand_city"),
             "cand_state": data.get("cand_state"),
             "cand_zip_code": data.get("cand_zip_code"),
+            # levin transaction
+            "levin_account_id": data.get("levin_account_id"),
         }
         if "aggregate_amt" in data and check_decimal(data.get("aggregate_amt")):
             datum["aggregate_amt"] = data.get("aggregate_amt")

@@ -887,6 +887,7 @@ def get_sched_b_transactions(
                                         nc_soft_account, transaction_type_identifier, 
                                         beneficiary_cmte_name,
                                         beneficiary_cand_entity_id,
+                                        levin_account_id,
                                         aggregate_amt,
                                         create_date
                 FROM public.sched_b WHERE report_id in ('{}')
@@ -909,6 +910,7 @@ def get_sched_b_transactions(
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
                         beneficiary_cmte_name,
                         beneficiary_cand_entity_id,
+                        levin_account_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -932,6 +934,7 @@ def get_sched_b_transactions(
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
                         beneficiary_cmte_name,
                         beneficiary_cand_entity_id,
+                        levin_account_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -1005,6 +1008,7 @@ def post_process_it_h4(cursor, cmte_id):
         merged_dict = {**item, **dictEntity}
         merged_list.append(merged_dict)
     return merged_list
+
 
 def post_process_it(cursor, cmte_id):
     """
