@@ -2180,6 +2180,10 @@ def filter_get_all_trans(request, param_string):
         param_string = param_string + " AND loan_closing_balance >= '" + str(filt_dict['filterLoanClosingBalanceMin']) + "'"
     if ctgry_type == 'loans_tran' and filt_dict.get('filterLoanClosingBalanceMax') not in [None, 'null']:
         param_string = param_string + " AND loan_closing_balance <= '" + str(filt_dict['filterLoanClosingBalanceMax']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterDebtBeginningBalanceMin') not in [None, 'null']:
+        param_string = param_string + " AND loan_beginning_balance >= '" + str(filt_dict['filterDebtBeginningBalanceMin']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterDebtBeginningBalanceMax') not in [None, 'null']:
+        param_string = param_string + " AND loan_beginning_balance <= '" + str(filt_dict['filterDebtBeginningBalanceMax']) + "'"
     # print(param_string)
     return param_string
 

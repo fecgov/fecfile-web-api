@@ -197,7 +197,10 @@ export class TransactionTypeComponent implements OnInit {
         this.scheduleType = 'sched_c_ls';
       }
 
-      if (this.transactionType === 'DEBT_OWN_BY_SUMMARY' && this.scheduleType === 'sched_d') {
+      if (
+        (this.transactionType === 'DEBT_OWN_BY_SUMMARY' || this.transactionType === 'DEBT_OWN_TO_SUMMARY') &&
+        this.scheduleType === 'sched_d'
+      ) {
         this.scheduleType = 'sched_d_ds';
       }
 

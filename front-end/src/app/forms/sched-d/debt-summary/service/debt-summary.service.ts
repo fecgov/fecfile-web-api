@@ -112,6 +112,7 @@ export class DebtSummaryService {
       model.selected = false;
       model.toggleChild = false;
       model.apiCall = row.api_call;
+      model.reportId = row.report_id;
       model.transactionTypeIdentifier = row.transaction_type_identifier;
       model.transactionTypeDescription = row.transaction_type_description;
       model.scheduleType = row.schedule_type;
@@ -145,7 +146,8 @@ export class DebtSummaryService {
       model.apiCall = row.api_call;
       model.transactionTypeIdentifier = row.transaction_type_identifier;
       model.transactionTypeDescription = row.transaction_type_description;
-      model.scheduleType = row.schedule_type;
+      model.reportId = row.report_id;
+      model.scheduleType = row.schedule_type ? row.schedule_type : row.sched_type;
       model.transactionId = row.transaction_id;
       model.backRefTransactionId = row.back_ref_transaction_id;
       model.entityType = row.entity_type;
