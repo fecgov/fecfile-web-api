@@ -151,6 +151,9 @@ def schedD(request):
                 data["transaction_id"] = check_transaction_id(
                     request.query_params.get("transaction_id")
                 )
+            if 'transaction_type_identifier' in request.query_params:
+                data['transaction_type_identifier'] = request.query_params.get(
+                    'transaction_type_identifier')
             # if "transaction_id" in request.data and check_null_value(
             #     request.data.get("transaction_id")
             # ):
@@ -248,7 +251,8 @@ def delete_schedD(data):
 
     try:
         delete_sql_schedD(
-            data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
+            data.get("cmte_id"), data.get(
+                "report_id"), data.get("transaction_id")
         )
     except Exception as e:
         raise
@@ -338,7 +342,8 @@ def valid_transaction_amounts(data):
     if not payment_amount:
         payment_amount = 0
     return (
-        float(beginning_balance) + float(incurred_amount) - float(payment_amount)
+        float(beginning_balance) +
+        float(incurred_amount) - float(payment_amount)
     ) == float(balance_at_close)
 
 
@@ -393,12 +398,14 @@ def put_schedD(datum):
             put_sql_schedD(datum)
             # do downstream proprgation if necessary
             if not existing_close_balance == current_close_balance:
-                do_downstream_propagation(transaction_id, current_close_balance)
+                do_downstream_propagation(
+                    transaction_id, current_close_balance)
         except Exception as e:
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(
+                    "cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedD function is throwing an error: " + str(e)
@@ -456,7 +463,8 @@ def update_child(transaction_id, new_beginning_balance, new_close_balance):
             WHERE transaction_id = %s 
             AND delete_ind is distinct from 'Y';
         """
-    _v = (new_close_balance, new_close_balance, datetime.datetime.now(), transaction_id)
+    _v = (new_close_balance, new_close_balance,
+          datetime.datetime.now(), transaction_id)
     logger.debug("update child sched_d with values: {}".format(_v))
     do_transaction(_sql, _v)
 
@@ -499,7 +507,8 @@ def do_downstream_propagation(transaction_id, new_balance):
             incurred_amt = child_tran[1]
             payment_amt = child_tran[2]
             new_close_balance = (
-                float(new_beginning_balance) + float(incurred_amt) - float(payment_amt)
+                float(new_beginning_balance) +
+                float(incurred_amt) - float(payment_amt)
             )
             logger.debug("new close balance:{}".format(new_close_balance))
             update_child(child_id, new_beginning_balance, new_close_balance)
@@ -592,7 +601,8 @@ def post_schedD(datum):
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
             else:
-                get_data = {"cmte_id": datum.get("cmte_id"), "entity_id": entity_id}
+                get_data = {"cmte_id": datum.get(
+                    "cmte_id"), "entity_id": entity_id}
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedD function is throwing an error: " + str(e)
@@ -689,7 +699,8 @@ def do_transaction(sql, values):
         with connection.cursor() as cursor:
             cursor.execute(sql, values)
             if cursor.rowcount == 0:
-                raise Exception("The sql transaction: {} failed...".format(sql))
+                raise Exception(
+                    "The sql transaction: {} failed...".format(sql))
     except Exception:
         raise
 
@@ -705,9 +716,12 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
         report_id, cmte_id, back_ref_transaction_id=transaction_id
     )
     # TODO: will add all other transactions later on
-    sched_f_list = get_sched_f_child_transactions(report_id, cmte_id, transaction_id)
-    sched_h4_list = get_sched_h4_child_transactions(report_id, cmte_id, transaction_id)
-    sched_h6_list = get_sched_h6_child_transactions(report_id, cmte_id, transaction_id)
+    sched_f_list = get_sched_f_child_transactions(
+        report_id, cmte_id, transaction_id)
+    sched_h4_list = get_sched_h4_child_transactions(
+        report_id, cmte_id, transaction_id)
+    sched_h6_list = get_sched_h6_child_transactions(
+        report_id, cmte_id, transaction_id)
     return sched_b_list + sched_f_list + sched_h4_list + sched_h6_list
 
     #     childA_forms_obj = get_list_child_schedA(
@@ -743,6 +757,8 @@ def get_schedD(data):
             forms_obj = get_list_schedD(report_id, cmte_id, transaction_id)
 
         else:
+            transaction_type_identifier = data.get(
+                'transaction_type_identifier', '')
             # when laod sched_d in bulk, need to do a carry-over when new report_id
             # passed in: duplicate all non-zero sched_d items with updated report_id
             # new transaction_id, close
@@ -754,17 +770,20 @@ def get_schedD(data):
                 )
             )
             do_carryover(report_id, cmte_id)
-            forms_obj = get_list_all_schedD(report_id, cmte_id)
+            forms_obj = get_list_all_schedD(
+                report_id, cmte_id, transaction_type_identifier)
         logger.debug("total schedD items loaded:{}".format(len(forms_obj)))
         if forms_obj:
             for f_obj in forms_obj:
 
                 tran_id = f_obj.get("transaction_type_identifier")
                 f_obj.update(
-                    {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
+                    {"transaction_type_description": tran_desc_dic.get(
+                        tran_id, "")}
                 )
                 transaction_id = f_obj.get("transaction_id")
-                child_objs = get_child_transactions(report_id, cmte_id, transaction_id)
+                child_objs = get_child_transactions(
+                    report_id, cmte_id, transaction_id)
                 logger.debug("total childs:{}".format(len(child_objs)))
                 if child_objs:
                     logger.debug
@@ -903,19 +922,22 @@ def do_carryover(report_id, cmte_id):
     # """
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
+            cursor.execute(_sql, (report_id, cmte_id,
+                                  report_id, report_id, cmte_id))
             if cursor.rowcount == 0:
                 logger.debug("No carryover happens.")
             else:
-                logger.debug("debt carryover done with report_id {}".format(report_id))
-                logger.debug("total carryover debts:{}".format(cursor.rowcount))
+                logger.debug(
+                    "debt carryover done with report_id {}".format(report_id))
+                logger.debug(
+                    "total carryover debts:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
                 logger.debug("carryover done.")
     except:
         raise
 
 
-def get_list_all_schedD(report_id, cmte_id):
+def get_list_all_schedD(report_id, cmte_id, transaction_type_identifier):
     """
     load sched_d items from DB
     """
@@ -943,14 +965,19 @@ def get_list_all_schedD(report_id, cmte_id):
             AND cmte_id = %s 
             AND delete_ind is distinct from 'Y'
             """
-
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
-                (report_id, cmte_id),
-            )
-
+            type_filter = 'AND transaction_type_identifier = %s'
+            if transaction_type_identifier:
+                cursor.execute(
+                    """SELECT json_agg(t) FROM (""" +
+                    query_string + type_filter + """) t""",
+                    (report_id, cmte_id, transaction_type_identifier),
+                )
+            else:
+                cursor.execute(
+                    """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+                    (report_id, cmte_id),
+                )
             schedD_list = cursor.fetchone()[0]
-
             if schedD_list is None:
                 raise NoOPError(
                     "The Report id:{} does not have any schedD transactions".format(

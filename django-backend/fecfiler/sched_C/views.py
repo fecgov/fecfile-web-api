@@ -107,27 +107,47 @@ def do_loan_carryover(report_id, cmte_id):
     - loan report date < current report coverge start(forward carryover only)
     
     2. update all records with new transaction_id, new report_id
+    3. set new loan back_ref_transaction_id to parent transaction_id
     """
     _sql = """
-    insert into public.sched_d(
+    insert into public.sched_c(
 					cmte_id, 
                     report_id, 
-                    line_num,
+                    line_number,
+					transaction_type,
                     transaction_type_identifier, 
                     transaction_id, 
                     entity_id, 
-                    beginning_balance, 
-                    balance_at_close, 
-                    incurred_amount, 
-                    payment_amount, 
-					purpose,
-                    back_ref_transaction_id,
+                    election_code,
+                    election_other_description,
+                    loan_amount_original,
+                    loan_payment_to_date,
+                    loan_balance,
+                    loan_incurred_date,
+                    loan_due_date,
+                    loan_intrest_rate,
+                    is_loan_secured,
+                    is_personal_funds,
+                    lender_cmte_id,
+                    lender_cand_id,
+                    lender_cand_last_name,
+                    lender_cand_first_name,
+                    lender_cand_middle_name,
+                    lender_cand_prefix,
+                    lender_cand_suffix,
+                    lender_cand_office,
+                    lender_cand_state,
+                    lender_cand_district,
+                    memo_code,
+                    memo_text,
+					back_ref_transaction_id,
                     create_date
 					)
 					SELECT 
 					c.cmte_id, 
                     %s, 
-                    c.line_num,
+                    c.line_number,
+					'',
                     c.transaction_type_identifier, 
                     get_next_transaction_id('SC'), 
                     c.entity_id, 
@@ -153,6 +173,7 @@ def do_loan_carryover(report_id, cmte_id):
                     c.lender_cand_district,
                     c.memo_code,
                     c.memo_text,
+					c.transaction_id,
                     now()
             FROM public.sched_c c, public.reports r
             WHERE 
@@ -181,8 +202,8 @@ def do_loan_carryover(report_id, cmte_id):
             if cursor.rowcount == 0:
                 logger.debug("No carryover happens.")
             else:
-                logger.debug("debt carryover done with report_id {}".format(report_id))
-                logger.debug("total carryover debts:{}".format(cursor.rowcount))
+                logger.debug("loan carryover done with report_id {}".format(report_id))
+                logger.debug("total carryover loans:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
                 logger.debug("carryover done.")
     except:
@@ -691,6 +712,7 @@ def get_schedC(data):
     try:
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
+        do_loan_carryover(report_id, cmte_id)
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedC(report_id, cmte_id, transaction_id)
