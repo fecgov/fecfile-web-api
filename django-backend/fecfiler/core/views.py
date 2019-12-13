@@ -333,7 +333,7 @@ def get_dynamic_forms_fields(request):
                                     cursor.execute(query_string, [cmte_id,report_id])
                                     count = cursor.fetchone()
                                     print(cursor.query)
-                                print(eventTypes['eventType'] + "count: "+str(count[0]))
+                                print(eventTypes['eventType'] + " count: "+str(count[0]))
                                 if count[0] == 0:
                                     eventTypes['hasValue'] = False
                                 else:
