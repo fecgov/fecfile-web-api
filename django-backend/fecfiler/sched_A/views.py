@@ -127,11 +127,13 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
 }
 
 #list of all transaction type identifiers that should auto generate sched_b item in DB
-AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT = {
-                                    "REATT_FROM" : "REATT_MEMO",
-}
+# AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT = {
+#                                     "REATT_FROM" : "REATT_MEMO",
+# }
+AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT = {}
 
-CHILD_SCHEDA_AUTO_UPDATE_PARENT_SCHEDA_DICT = {"REATT_MEMO": "REATT_FROM"}
+# CHILD_SCHEDA_AUTO_UPDATE_PARENT_SCHEDA_DICT = {"REATT_MEMO": "REATT_FROM"}
+CHILD_SCHEDA_AUTO_UPDATE_PARENT_SCHEDA_DICT = {}
 # list of all transaction type identifiers that have itemization rule applied to it
 # TODO: need to update this list: PAR_CON?, PAR_MEMO?, REATT_TO?
 ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST = ['INDV_REC', 'PAR_CON', 'PAR_MEMO', 'IK_REC', 'REATT_FROM', 'REATT_TO']
