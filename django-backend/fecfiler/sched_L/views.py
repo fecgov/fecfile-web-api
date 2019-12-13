@@ -787,16 +787,19 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt):
     load year_to_date receipt aggregation amount
     """
     result = {}
+
     _sql1 = """
-        SELECT line_number, COALESCE(sum(contribution_amount),0) as total_amt
+        SELECT (CASE WHEN contribution_amount >= 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
         FROM public.sched_a t1 
         WHERE t1.memo_code IS NULL 
         AND t1.cmte_id = %s
         AND t1.contribution_date BETWEEN %s AND %s
         AND t1.delete_ind is distinct from 'Y' 
-        AND transaction_type_identifier like 'LEVIN_%'
-        GROUP BY line_number
+        AND substr(t1.transaction_type_identifier,1,5) = 'LEVIN'
+        AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
+        GROUP BY item_ind
     """
+
     _sql2 = """
         SELECT COALESCE(sum(contribution_amount),0)
         FROM public.sched_a t1 
@@ -806,15 +809,16 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt):
         AND t1.delete_ind is distinct from 'Y' 
         AND transaction_type_identifier = 'LEVIN_OTH_REC'
     """
+
     try:
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             cursor.execute(_sql1, (cmte_id, start_dt, end_dt))
             rows = cursor.fetchall()
             for row in rows:
-                if row[0] == "11AI":
+                if row[0] == "Y":
                     result["itemized_receipt_amount_ytd"] = row[1]
-                elif row[0] == "11AII":
+                elif row[0] == "N":
                     result["non-itemized_receipt_amount_ytd"] = row[1]
                 else:
                     pass
@@ -882,7 +886,7 @@ def load_report_disbursements_sumamry(cmte_id, report_id):
     return result
 
 
-def load_report_receipts_sumamry(cmte_id, report_id):
+def load_report_receipts_summary(cmte_id, report_id):
     """
     query db and caculcate the summary data for receipts:
     1. itemized receipts: line_number = 11AI
