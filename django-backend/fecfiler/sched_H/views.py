@@ -1136,41 +1136,45 @@ def do_h2_carryover(report_id, cmte_id):
                     revise_date,
                     federal_percent,
                     non_federal_percent,
+                    back_ref_transaction_id,
                     create_date
 					)
 					SELECT 
-					cmte_id, 
+					h.cmte_id, 
                     %s, 
-                    line_number,
-                    transaction_type_identifier, 
-                    transaction_type,
+                    h.line_number,
+                    h.transaction_type_identifier, 
+                    h.transaction_type,
                     get_next_transaction_id('SH'), 
-                    activity_event_name,
-                    fundraising,
-                    direct_cand_support, 
+                    h.activity_event_name,
+                    h.fundraising,
+                    h.direct_cand_support, 
                     's',
-                    revise_date,
-                    federal_percent,
-                    non_federal_percent,
+                    h.revise_date,
+                    h.federal_percent,
+                    h.non_federal_percent,
+                    h.transaction_id,
                     now()
-            FROM public.sched_h2
+            FROM public.sched_h2 h, public.reports r
             WHERE 
-            cmte_id = %s
-            AND report_id in (
-                SELECT report_id
-                FROM sched_h2
-                WHERE revise_date = (
-	            SELECT
-                    MAX(revise_date)
-                    FROM sched_h2
-                    WHERE cmte_id = %s
-                    AND delete_ind is distinct from 'Y')
-            ) 
-            AND delete_ind is distinct from 'Y'
+            h.cmte_id = %s
+            AND h.report_id != %s
+            AND h.report_id = r.report_id
+            AND r.cvg_start_date < (
+                        SELECT r.cvg_start_date
+                        FROM   public.reports r
+                        WHERE  r.report_id = %s
+                    )
+            AND h.transaction_id NOT In (
+                select distinct h2.back_ref_transaction_id from public.sched_h2 h2
+                where h2.cmte_id = %s
+                and h2.back_ref_transaction_id is not null
+            )
+            AND h.delete_ind is distinct from 'Y'
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (report_id, cmte_id, cmte_id))
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
             if cursor.rowcount == 0:
                 logger.debug('No valid h2 items found.')
             logger.debug(
@@ -1241,10 +1245,10 @@ def get_h2_summary_table(request):
     try:
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
-        logger.debug('checking if it is a new report')
-        if is_new_report(report_id, cmte_id):
-            logger.debug('new report: do h2 carryover.')
-            do_h2_carryover(report_id, cmte_id)
+        # logger.debug('checking if it is a new report')
+        # if is_new_report(report_id, cmte_id):
+        logger.debug('check and do h2 carryover.')
+        do_h2_carryover(report_id, cmte_id)
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
             logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
@@ -1252,7 +1256,8 @@ def get_h2_summary_table(request):
             json_res = cursor.fetchone()[0]
             # print(json_res)
             if not json_res:
-                return Response('Error: no valid h2 data found for this report.')
+                return Response([], status = status.HTTP_200_OK) 
+                    # 'Error: no valid h2 data found for this report.')
         # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
         # start_dt = datetime.date(int(calendar_year), 1, 1)
         # end_dt = datetime.date(int(calendar_year), 12, 31)
