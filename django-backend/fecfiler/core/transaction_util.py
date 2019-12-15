@@ -8,6 +8,31 @@ import datetime
 logger = logging.getLogger(__name__)
 
 
+def delete_child_transaction(table, cmte_id, transaction_id):
+    """
+    delete sql transaction
+    """
+    _sql1 = """UPDATE public.{}""".format(table)
+    _sql2 = """ SET delete_ind = 'Y' 
+            WHERE back_ref_transaction_id = %s AND cmte_id = %s
+        """
+    _v = (transaction_id, cmte_id)
+    logger.debug("delete sql: {}".format(_sql1 + _sql2))
+    do_transaction(_sql1 + _sql2, _v)
+
+
+def restore_child_transaction(table, cmte_id, transaction_id):
+    """
+    restore sql transaction
+    """
+    _sql1 = """UPDATE public.{}""".format(table)
+    _sql2 = """ SET delete_ind = '' 
+            WHERE back_ref_transaction_id = %s AND cmte_id = %s
+        """
+    _v = (transaction_id, cmte_id)
+    do_transaction(_sql1 + sql2, _v)
+
+
 def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
     """
     update parent sched_c transaction when a child payemnt transaction saved
@@ -147,8 +172,8 @@ def do_transaction(sql, values):
     try:
         with connection.cursor() as cursor:
             cursor.execute(sql, values)
-            if cursor.rowcount == 0:
-                raise Exception("The sql transaction: {} failed...".format(sql))
+            # if cursor.rowcount == 0:
+            #     raise Exception("The sql transaction: {} failed...".format(sql))
     except Exception:
         raise
 
@@ -473,7 +498,7 @@ def get_sched_h4_child_transactions(report_id, cmte_id, transaction_id):
                 """SELECT json_agg(t) FROM (""" + _sql + """) t""",
                 [report_id, cmte_id, transaction_id],
             )
-            return post_process_it(cursor, cmte_id)
+            return post_process_it_h4(cursor, cmte_id)
     except:
         raise
 
@@ -516,6 +541,39 @@ def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + _sql + """) t""",
                 [report_id, cmte_id, transaction_id],
+            )
+            return post_process_it(cursor, cmte_id)
+    except:
+        raise
+
+
+def get_sched_c_loan_payments(cmte_id, transaction_id):
+    """
+    load loan payments for a particular loan based on transaction_id
+    """
+    _sql = """
+    SELECT             
+            cmte_id,
+            report_id,
+            transaction_id,
+            back_ref_transaction_id,
+            expenditure_date,
+            expenditure_amount,
+            transaction_type_identifier, 
+            expenditure_purpose, 
+            memo_text
+    FROM public.sched_b
+    WHERE cmte_id = %s 
+    AND back_ref_transaction_id = %s 
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        # if report_id:
+        # _sql = _sql + 'AND report_id = {}'.format(report_id)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + _sql + """) t""",
+                [cmte_id, transaction_id],
             )
             return post_process_it(cursor, cmte_id)
     except:
@@ -843,6 +901,42 @@ def candify_it(cand_json):
             candify_item[_f] = cand_json.get(_f)
     return candify_item
 
+
+def post_process_it_h4(cursor, cmte_id):
+    """
+    helper function:
+    merge transactions and entities after transactions are loaded
+    """
+    transaction_list = cursor.fetchone()[0]
+    if not transaction_list:
+        return []
+    # if not transaction_list:
+    #     if (
+    #         not back_ref_transaction_id
+    #     ):  # raise exception for non_child transaction loading
+    #         raise NoOPError(
+    #             "No transactions found."
+    #         )
+    #     else:  # return empy list for child transaction loading
+    #         return []
+    merged_list = []
+    for item in transaction_list:
+        entity_id = item.get("payee_entity_id")
+        data = {"entity_id": entity_id, "cmte_id": cmte_id}
+        entity_list = get_entities(data)
+        dictEntity = entity_list[0]
+        # cand_entity = {}
+        # if item.get("beneficiary_cand_entity_id"):
+        #     cand_data = {
+        #         "entity_id": item.get("beneficiary_cand_entity_id"),
+        #         "cmte_id": cmte_id,
+        #     }
+        #     cand_entity = get_entities(cand_data)[0]
+        #     cand_entity = candify_it(cand_entity)
+
+        merged_dict = {**item, **dictEntity}
+        merged_list.append(merged_dict)
+    return merged_list
 
 def post_process_it(cursor, cmte_id):
     """

@@ -689,6 +689,8 @@ export class ContactsService {
         if (typeof value === 'string') {
           formData.append(key, value);
 
+        }else if(key === 'phone_number') {
+          formData.append(key, value.toString());
         }
       }
     }

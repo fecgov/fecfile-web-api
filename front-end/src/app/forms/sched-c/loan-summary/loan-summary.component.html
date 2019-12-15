@@ -68,7 +68,7 @@
             <input [(ngModel)]="ln.selected" type="checkbox" (click)="checkForMultiChecked($event)">
           </td>
           <!-- <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{ln.entity_type === 'IND' ? ln.last_name + ', ' + ln.first_name : ln.entity_nm}}</td> -->
-          <td [@fadeInOut] [ngClass]="ln.entity_type === 'ORG' ? 'parent': ''"
+          <td [@fadeInOut] [ngClass]="(ln.entity_type === 'ORG') ? 'parent': ''"
             (click)="ln.entity_type === 'ORG' ? ln.toggleChild = !ln.toggleChild : ''" *ngIf="isColumnVisible('name')">
             {{ln.name}}
             <div *ngIf="ln.entity_type === 'ORG'" class="align_right arrow"
@@ -76,8 +76,12 @@
           </td>
           <td [@fadeInOut] *ngIf="isColumnVisible('loan_amount_original')">
             {{ln.loan_amount_original | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-          <td [@fadeInOut] *ngIf="isColumnVisible('loan_payment_to_date')">
-            {{ln.loan_payment_to_date | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+          <td [@fadeInOut] *ngIf="isColumnVisible('loan_payment_to_date')" [ngClass]="(ln?.payments?.length > 0) ? 'parent': ''"
+          (click)="ln?.payments?.length > 0 ? ln.togglePayments = !ln.togglePayments : ''">
+            {{ln.loan_payment_to_date | currency:'USD':'symbol-narrow':'1.2-2'}}
+            <div *ngIf="ln?.payments?.length > 0" class="align_right arrow"
+              [ngClass]="ln.togglePayments ? 'arrow-top' : 'arrow-bottom'"></div>
+          </td>
           <td [@fadeInOut] *ngIf="isColumnVisible('loan_balance')">
             {{ln.loan_balance | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
           <td [@fadeInOut] *ngIf="isColumnVisible('loan_due_date')">{{ln.loan_due_date | date: 'MM/dd/yyyy' }}</td>
@@ -144,6 +148,35 @@
           </td>
         </tr>
 
+        <ng-container *ngIf="ln?.payments?.length > 0">
+          <tr [ngbCollapse]="ln?.payments?.length > 0 ? !ln.togglePayments: ''" class="payment-bg">
+            <th style="padding-left: 70px;" colspan="2">Type</th>
+            <th colspan = "2">Payment Date</th>
+            <th colspan="3">Payment Amount</th>
+          </tr>
+          <tr [ngbCollapse]="ln?.payments?.length > 0 ? !ln.togglePayments: ''" 
+            *ngFor="let payment of ln.payments;" class="payment-bg">
+            <td style="padding-left: 70px;" colspan="2">Loan Payment</td>
+            <td [@fadeInOut] colspan="2">{{payment.expenditure_date | date: 'MM/dd/yyyy'}}</td>
+            <td [@fadeInOut] colspan="2">{{payment.expenditure_amount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+            <td>
+              <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
+                  <i class="ellipsis-icon"></i>
+                </button>
+                <div id="loanSumamry__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                  <button class="dropdown-item" (click)="editLoanRepayment(payment)">
+                    <i class="edit-icon"></i> Edit
+                  </button>
+                  <button class="dropdown-item" (click)="deleteLoanRepayment(payment)">
+                    <i class="print-icon"></i> Delete
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+        
       </ng-container>
 
     </tbody>
