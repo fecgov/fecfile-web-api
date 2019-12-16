@@ -143,10 +143,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.showTransactions();
       });
 
-      _activatedRoute.queryParams.subscribe(p => {
+      //Dont think its needed since the transaction-table subscription will catch changes
+      /* _activatedRoute.queryParams.subscribe(p => {
         this.transactionCategory = p.transactionCategory;
-      });
-  }
+      });*/
+    }
 
   private removeFilterAndTag(message: any) {
     if (message.filterName === 'deletedDate') {
