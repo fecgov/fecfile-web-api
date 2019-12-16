@@ -21,7 +21,7 @@ from fecfiler.core.transaction_util import (
     get_sched_h4_child_transactions,
     get_sched_h6_child_transactions,
     get_transaction_type_descriptions,
-    do_carryover_sc_payments,
+    # do_carryover_sc_payments,
 )
 
 from fecfiler.core.views import (

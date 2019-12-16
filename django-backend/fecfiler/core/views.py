@@ -31,6 +31,8 @@ from fuzzywuzzy import fuzz
 import pandas
 import numpy
 
+from fecfiler.core.carryover_helper import do_h1_carryover
+
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
 # Create your views here.
@@ -902,6 +904,8 @@ def reports(request):
             }    
             data = post_reports(datum)
             if type(data) is dict:
+                # do h1 carryover if new report created
+                do_h1_carryover(data.get('cmte_id'), data.get('report_id'))
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
