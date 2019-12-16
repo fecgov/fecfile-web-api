@@ -48,6 +48,7 @@ export class TransactionModel {
   purpose: any;
   reportId: any;
   scrollDebtPaymentButtonIntoView: boolean;
+  isEditable: boolean; 
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';

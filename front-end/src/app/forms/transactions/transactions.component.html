@@ -42,6 +42,7 @@
                 class="btn btn-primary btn-right"
                 type="submit"
                 (click)="showCategories()"
+                [hidden]="allTransactions === 'true'"
               >
                 Return to Transaction Categories
               </button>
@@ -96,6 +97,7 @@
                 class="btn btn-primary btn-left transactions__trx-btn"
                 type="button"
                 (click)="showFilters()"
+                [hidden] = "allTransactions === 'true'"
               >
                 <i class="filter-icon"></i>
                 Filter
@@ -162,12 +164,16 @@
                         >
                           <i class="fas fa-window-close transactions__close-tag"></i>
                           <span *ngIf="tag.type !== 'amount' && tag.type !== 'aggregateAmount' && tag.type !=='loanClosingBalance' &&
-                          tag.type !== 'loanAmount' && tag.type !== 'date' && tag.type !== 'electionYear'">
+                          tag.type !== 'loanAmount' && tag.type !== 'date' && tag.type !== 'deletedDate' && tag.type !== 'electionYear'">
                             <span *ngIf="tag.prefix">{{ tag.prefix }}: </span>{{ gTag }}
                           </span>
                           <span *ngIf="tag.type === 'date'"
                             >{{ tag.prefix }}: {{ gTag.filterDateFrom | date: 'MM/dd/yyyy' }} -
                             {{ gTag.filterDateTo | date: 'MM/dd/yyyy' }}
+                          </span>
+                          <span *ngIf="tag.type === 'deletedDate'"
+                            >{{ tag.prefix }}: {{ gTag.filterDeletedDateFrom | date: 'MM/dd/yyyy' }} -
+                            {{ gTag.filterDeletedDateTo | date: 'MM/dd/yyyy' }}
                           </span>
                           <span *ngIf="tag.type === 'amount'"
                             >{{ tag.prefix }}: {{ gTag.filterAmountMin | currency: 'USD':'symbol-narrow':'1.2-2' }} -

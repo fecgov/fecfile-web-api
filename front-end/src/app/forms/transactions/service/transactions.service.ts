@@ -947,7 +947,7 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.contributorOccupation = row.occupation;
   model.memoCode = row.memo_code;
   model.memoText = row.memo_text;
-  model.deletedDate = row.deleted_date ? row.deleted_date : null;
+  model.deletedDate = row.deleteddate ? row.deleteddate : null;
   model.itemized = row.itemized;
   model.reportStatus = row.reportStatus;
   model.electionCode = row.election_code;
@@ -961,4 +961,6 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.loanIncurredDate = row.loan_incurred_date;
   model.loanPaymentAmt = row.loan_payment_amt;
   model.loanPaymentToDate = row.loan_payment_to_date;
+  model.isEditable = row.isEditable;
+  
 }
