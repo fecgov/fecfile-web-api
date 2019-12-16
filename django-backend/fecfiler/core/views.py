@@ -5654,7 +5654,7 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, prev_yr):
 
 def get_sl_item_aggregate(report_id, cmte_id, prev_yr):
     try:
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         if not prev_yr:
             cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
             from_date = date(cvg_start_date.year, 1,1)
