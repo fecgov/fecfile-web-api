@@ -1205,7 +1205,8 @@ def get_h2_summary_table(request):
         revise_date AS receipt_date, 
         ratio_code, 
         federal_percent, 
-        non_federal_percent 
+        non_federal_percent,
+        transaction_id
     FROM   public.sched_h2 
     WHERE  cmte_id = %s AND delete_ind is distinct from 'Y'
         AND activity_event_name IN (
@@ -1221,7 +1222,8 @@ def get_h2_summary_table(request):
         revise_date AS receipt_date, 
         ratio_code, 
         federal_percent, 
-        non_federal_percent 
+        non_federal_percent,
+        transaction_id
     FROM   public.sched_h2 
     WHERE  cmte_id = %s AND delete_ind is distinct from 'Y'
         AND activity_event_name IN (
@@ -1237,7 +1239,8 @@ def get_h2_summary_table(request):
         revise_date AS receipt_date, 
         ratio_code, 
         federal_percent, 
-        non_federal_percent 
+        non_federal_percent,
+        transaction_id 
     FROM   public.sched_h2 
     WHERE  cmte_id = %s AND report_id = %s AND ratio_code = 'n' AND delete_ind is distinct from 'Y'
             ) t;
