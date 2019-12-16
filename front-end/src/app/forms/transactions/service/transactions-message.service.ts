@@ -21,6 +21,7 @@ export class TransactionsMessageService {
   private switchFilterViewSubject = new Subject<any>();
   private loadTransactionsSubject = new Subject<any>();
   private removeTagSubject = new Subject<any>();
+  private loadDefaultTab = new Subject<any>();
 
   /**
    * A publisher uses this method to send a message to subscribers
@@ -84,6 +85,22 @@ export class TransactionsMessageService {
 
   public sendRemoveTagMessage(message:any){
     this.removeTagSubject.next(message);
+  }
+
+
+  /**
+   * A method for subscribers of loading default tab
+   */
+  public getLoadDefaultTabMessage(): Observable<any> {
+    return this.loadDefaultTab.asObservable();
+  }
+
+  public clearLoadDefaultTabMessage(){
+    this.loadDefaultTab.next();
+  }
+
+  public sendLoadDefaultTabMessage(message:any){
+    this.loadDefaultTab.next(message);
   }
 
 

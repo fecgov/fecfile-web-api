@@ -140,35 +140,36 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private _previousUrl: any;
   public apiError: boolean = false;
 
-  private _filterToTransactionTypeMap : any = 
-  [
-    {filterName:'filterCategoriesText', options: ['receipts', 'disbursements','loans-and-debts','other']},
-    {filterName:'filterAmountMin', options: ['receipts', 'disbursements','other']},
-    {filterName:'filterAmountMax', options: ['receipts', 'disbursements','other']},
-    {filterName:'filterLoanAmountMin', options: ['loans-and-debts']},
-    {filterName:'filterLoanAmountMax', options: ['loans-and-debts']},
-    {filterName:'filterAggregateAmountMin', options: ['receipts']},
-    {filterName:'filterAggregateAmountMax', options: ['receipts']},
-    {filterName:'filterLoanClosingBalanceMin', options: ['loans-and-debts']},
-    {filterName:'filterLoanClosingBalanceMax', options: ['loans-and-debts']},
-    {filterName:'filterDebtBeginningBalanceMin', options: ['loans-and-debts']},
-    {filterName:'filterDebtBeginningBalanceMax', options: ['loans-and-debts']},
-    {filterName:'filterDateFrom', options: ['receipts', 'disbursements','other']},
-    {filterName:'filterDateTo', options: ['receipts', 'disbursements','other']},
-    // {filterName:'filterDeletedDateFrom', options: ['receipts', 'disbursements','loans-and-debts','other']},
-    // {filterName:'filterDeletedDateTo', options: ['receipts', 'disbursements','loans-and-debts','other']},
-    {filterName:'filterMemoCode', options: ['receipts', 'disbursements','loans-and-debts','other']},
-    {filterName:'filterElectionCode', options: ['disbursements']},
-    {filterName:'filterElectionYearFrom', options: ['disbursements']},
-    {filterName:'filterElectionYearTo', options: ['disbursements']},
-    {filterName:'filterSchedule', options: ['other']},
-    {filterName:'states', options: ['receipts', 'disbursements','loans-and-debts','other']}
-  ];
+  private _filterToTransactionTypeMap: any =
+    [
+      { filterName: 'filterCategoriesText', options: ['receipts', 'disbursements', 'loans-and-debts', 'other'] },
+      { filterName: 'filterAmountMin', options: ['receipts', 'disbursements', 'other'] },
+      { filterName: 'filterAmountMax', options: ['receipts', 'disbursements', 'other'] },
+      { filterName: 'filterLoanAmountMin', options: ['loans-and-debts'] },
+      { filterName: 'filterLoanAmountMax', options: ['loans-and-debts'] },
+      { filterName: 'filterAggregateAmountMin', options: ['receipts'] },
+      { filterName: 'filterAggregateAmountMax', options: ['receipts'] },
+      { filterName: 'filterLoanClosingBalanceMin', options: ['loans-and-debts'] },
+      { filterName: 'filterLoanClosingBalanceMax', options: ['loans-and-debts'] },
+      { filterName: 'filterDebtBeginningBalanceMin', options: ['loans-and-debts'] },
+      { filterName: 'filterDebtBeginningBalanceMax', options: ['loans-and-debts'] },
+      { filterName: 'filterDateFrom', options: ['receipts', 'disbursements', 'other'] },
+      { filterName: 'filterDateTo', options: ['receipts', 'disbursements', 'other'] },
+      // {filterName:'filterDeletedDateFrom', options: ['receipts', 'disbursements','loans-and-debts','other']},
+      // {filterName:'filterDeletedDateTo', options: ['receipts', 'disbursements','loans-and-debts','other']},
+      { filterName: 'filterMemoCode', options: ['receipts', 'disbursements', 'loans-and-debts', 'other'] },
+      { filterName: 'filterElectionCode', options: ['disbursements'] },
+      { filterName: 'filterElectionYearFrom', options: ['disbursements'] },
+      { filterName: 'filterElectionYearTo', options: ['disbursements'] },
+      { filterName: 'filterSchedule', options: ['other'] },
+      { filterName: 'states', options: ['receipts', 'disbursements', 'loans-and-debts', 'other'] }
+    ];
 
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
   //there is no unsubscribe() for activateRoute but while cycling between 'Transactions' and 'Recycling Bin' views
   //subscriptions are piling up, causing a single api call to be made n+1 times. 
   private onDestroy$ = new Subject();
+  loadDefaultReceiptsTabSubscription: Subscription;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -180,7 +181,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _receiptService: IndividualReceiptService,
-    private _transactionTypeService: TransactionTypeService, 
+    private _transactionTypeService: TransactionTypeService,
     private _loanService: LoanService
   ) {
     this.showPinColumnsSubscription = this._transactionsMessageService.getShowPinColumnMessage().subscribe(message => {
@@ -199,13 +200,28 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.getPage(this.config.currentPage);
       });
 
+    this.loadDefaultReceiptsTabSubscription = this._transactionsMessageService.getLoadDefaultTabMessage()
+    .subscribe(p => {
+      this.transactionCategory = p.transactionCategory;
+      this.reportId = p.reportId;
+      this._router.navigate([`/forms/form/${this.formType}`],{
+        queryParams: {
+          step: p.step,
+          reportId: p.reportId,
+          edit: p.edit,
+          transactionCategory: p.transactionCategory,
+          allTransactions: p.allTransactions
+        }
+      });
+    })
+
     this.loadTransactionsSubscription = this._transactionsMessageService
       .getLoadTransactionsMessage()
       .subscribe((reportId: any) => {
         this.reportId = reportId;
         this.getPage(this.config.currentPage);
       });
-      
+
 
     let routeSubscription = _activatedRoute.queryParams;
     routeSubscription.takeUntil(this.onDestroy$).subscribe(p => {
@@ -297,7 +313,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           ) {
             transactionCategoryOptions.push(
               this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options[
-                transactionCategoryOptionOptionsIndex
+              transactionCategoryOptionOptionsIndex
               ]
             );
           }
@@ -314,6 +330,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
     this.loadTransactionsSubscription.unsubscribe();
+    this.loadDefaultReceiptsTabSubscription.unsubscribe();
     this.onDestroy$.next(true);
   }
 
@@ -408,7 +425,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     } */
 
     let actualFilters: TransactionFilterModel = this.removeUnapplicableFilters(this.transactionCategory);
-    
+
     this._transactionsService
       .getFormTransactions(
         this.formType,
@@ -468,28 +485,28 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   private removeUnapplicableFilters(categoryType: string) {
     let actualFilters: TransactionFilterModel = this._utilService.deepClone(this.filters);
-    
+
     if (actualFilters) {
       let filterNames = this._filterToTransactionTypeMap.map(f => f.filterName);
-      
+
       //for the four tabs
-      for(let filter in actualFilters){
-        if(filter && filter.startsWith('filter') && actualFilters[filter]){ // do a possible null check?
-          
+      for (let filter in actualFilters) {
+        if (filter && filter.startsWith('filter') && actualFilters[filter]) { // do a possible null check?
+
           let applicableTransactions = [];
           this._filterToTransactionTypeMap.forEach(e => {
-            if(e.filterName === filter){
+            if (e.filterName === filter) {
               applicableTransactions = e.options;
             }
           });
-          if(applicableTransactions && applicableTransactions.length > 0 && !applicableTransactions.includes(categoryType)){
+          if (applicableTransactions && applicableTransactions.length > 0 && !applicableTransactions.includes(categoryType)) {
             actualFilters[filter] = null;
           }
         }
       }
 
       //for deleted_date based on view
-      if(!this.isRecycleBinViewActive()){
+      if (!this.isRecycleBinViewActive()) {
         actualFilters.filterDeletedDateFrom = null;
         actualFilters.filterDeletedDateTo = null;
         this._transactionsMessageService.sendRemoveTagMessage({
@@ -497,14 +514,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         })
       }
     }
-/*     this._transactionsMessageService.sendApplyFiltersMessage({
-      filters: actualFilters, isClearKeyword: false
-    }) */
+    /*     this._transactionsMessageService.sendApplyFiltersMessage({
+          filters: actualFilters, isClearKeyword: false
+        }) */
     return actualFilters;
   }
 
   public changeTransactionCategory(transactionCategory) {
-    this._router.navigate([], {
+    this._router.navigate([`/forms/form/${this.formType}`], {
       queryParams: {
         step: this._activatedRoute.snapshot.queryParams.step,
         reportId: this._activatedRoute.snapshot.queryParams.reportId,
@@ -839,11 +856,11 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     const selectedTransactions: Array<TransactionModel> = [];
     for (const trx of this.transactionsModel) {
       if (trx.selected) {
-        if(!trx.isEditable){
+        if (!trx.isEditable) {
           unEditableTypesArray.push(trx.type);
         }
-        if(this.transactionCategory === 'receipts' || this.transactionCategory === 'disbursements'){
-          if(trx.child){
+        if (this.transactionCategory === 'receipts' || this.transactionCategory === 'disbursements') {
+          if (trx.child) {
             parentTransactionsArray.push(trx.type);
           }
         }
@@ -852,25 +869,25 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       }
     }
 
-    if(unEditableTypesArray.length > 0 || parentTransactionsArray.length > 0){
+    if (unEditableTypesArray.length > 0 || parentTransactionsArray.length > 0) {
       let message = '';
-      if(unEditableTypesArray.length > 0){
-        message += "You cannot delete the following selected transaction types because they are auto-generated. "; 
+      if (unEditableTypesArray.length > 0) {
+        message += "You cannot delete the following selected transaction types because they are auto-generated. ";
         let unEditableTypesSet = new Set(unEditableTypesArray);
-        unEditableTypesSet.forEach(transactionType =>{
+        unEditableTypesSet.forEach(transactionType => {
           message += `    \n \u2022 ${transactionType}`;
         });
         message += `\n\n`;
       }
-      
-      if(parentTransactionsArray.length > 0){
+
+      if (parentTransactionsArray.length > 0) {
         message += "You cannot delete the following selected transaction types because they are linked to child transactions. Please delete them first";
         let parentTransactionsSet = new Set(parentTransactionsArray);
-        parentTransactionsSet.forEach(transactionType =>{
+        parentTransactionsSet.forEach(transactionType => {
           message += `    \n \u2022 ${transactionType}`;
         });
       }
-      
+
       this._dialogService.confirm(
         message,
         ConfirmModalComponent,
@@ -879,9 +896,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         ModalHeaderClassEnum.errorHeader
       );
     }
-    else{
+    else {
       trxIds = trxIds.substr(0, trxIds.length - 2);
-  
+
       this._dialogService
         .confirm('You are about to delete these transactions.   ' + trxIds, ConfirmModalComponent, 'Caution!')
         .then(res => {
@@ -890,7 +907,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
               .trashOrRestoreTransactions(this.formType, 'trash', this.reportId, selectedTransactions)
               .subscribe((res: GetTransactionsResponse) => {
                 this.getTransactionsPage(this.config.currentPage);
-  
+
                 let afterMessage = '';
                 if (selectedTransactions.length === 1) {
                   afterMessage = `Transaction ${selectedTransactions[0].transactionId}
@@ -898,7 +915,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
                 } else {
                   afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + trxIds;
                 }
-  
+
                 this._dialogService.confirm(
                   afterMessage,
                   ConfirmModalComponent,
@@ -1277,7 +1294,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       const trxCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
       for (const col of trxCols) {
         const columnByName = this._tableService.getColumnByName(col.colName, this.sortableColumns)
-        if(columnByName){
+        if (columnByName) {
           columnByName.visible = col.visible;
         }
       }
@@ -1427,7 +1444,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'electionYear'
       ];
     } else if (this.transactionCategory === 'loans-and-debts') {
-      defaultSortColumns = ['type', 'name', 'loanClosingBalance','loanIncurredDate'];
+      defaultSortColumns = ['type', 'name', 'loanClosingBalance', 'loanIncurredDate'];
       otherSortColumns = [
         'transactionId',
         'street',
@@ -1476,24 +1493,24 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  public goToC1(trx:any) {
-    trx.scheduleType='sched_c1';
+  public goToC1(trx: any) {
+    trx.scheduleType = 'sched_c1';
     this.editTransaction(trx);
   }
 
-  public goToEndorsersSummary(trx:any){
-    trx.scheduleType="sched_c_es";
-    trx.endorser = {back_ref_transaction_id: trx.transactionId};
+  public goToEndorsersSummary(trx: any) {
+    trx.scheduleType = "sched_c_es";
+    trx.endorser = { back_ref_transaction_id: trx.transactionId };
     this.editTransaction(trx);
   }
 
-  public goToLoanRepayment(trx:any){
-    trx.scheduleType="sched_c_loan_payment"
+  public goToLoanRepayment(trx: any) {
+    trx.scheduleType = "sched_c_loan_payment"
     trx.backRefTransactionId = trx.transactionId;
     this.editTransaction(trx);
   }
 
-  public goToDebtPayment(trx:any){
+  public goToDebtPayment(trx: any) {
     trx.scrollDebtPaymentButtonIntoView = true;
     this.editTransaction(trx);
   }

@@ -1,3 +1,4 @@
+import { TransactionsMessageService } from './../../transactions/service/transactions-message.service';
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -64,7 +65,8 @@ export class TransactionSidebarComponent implements OnInit {
     private _router: Router,
     private _formsService: FormsService,
     private _dialogService: DialogService,
-    private _typeaheadService: TypeaheadService
+    private _typeaheadService: TypeaheadService, 
+    private _transactionMessageService: TransactionsMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -320,6 +322,17 @@ export class TransactionSidebarComponent implements OnInit {
           }
         });
     }
+  }
+
+  public goToAllTransactions(){
+    this._transactionMessageService.sendLoadDefaultTabMessage(
+      {
+        step: 'transactions',
+        reportId: this.reportId,
+        edit: this.editMode,
+        transactionCategory: 'receipts'
+      }
+    )
   }
 
   public selectedTypeAheadValue(e): void {
