@@ -7,87 +7,6 @@ import datetime
 logger = logging.getLogger(__name__)
 
 
-def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):
-    """
-    do carryover on sched_b debt payments
-    -- Deprecated
-    """
-    _sql = """
-    INSERT INTO public.sched_b(
-        cmte_id, report_id, line_number, transaction_type, 
-            transaction_id, back_ref_transaction_id, back_ref_sched_name, 
-            entity_id, expenditure_date, expenditure_amount, 
-            semi_annual_refund_bundled_amount, expenditure_purpose, 
-            category_code, memo_code, memo_text, election_code, 
-            election_other_description, beneficiary_cmte_id, 
-            other_name, other_street_1, 
-            other_street_2, other_city, other_state, other_zip, 
-            nc_soft_account, transaction_type_identifier, 
-            beneficiary_cmte_name,
-            beneficiary_cand_entity_id,
-            aggregate_amt,
-            create_date
-					)
-    SELECT cmte_id, %s, line_number, transaction_type, 
-            get_next_transaction_id('SB'), %s, back_ref_sched_name, 
-            entity_id, expenditure_date, expenditure_amount, 
-            semi_annual_refund_bundled_amount, expenditure_purpose, 
-            category_code, memo_code, memo_text, election_code, 
-            election_other_description, beneficiary_cmte_id, 
-            other_name, other_street_1, 
-            other_street_2, other_city, other_state, other_zip, 
-            nc_soft_account, transaction_type_identifier, 
-            beneficiary_cmte_name,
-            beneficiary_cand_entity_id,
-            aggregate_amt,
-            now()
-    FROM public.sched_b 
-    WHERE cmte_id = %s 
-    AND back_ref_transaction_id = %s 
-    AND delete_ind is distinct from 'Y'
-    """
-    _v = [report_id, current_id, cmte_id, parent_id]
-    do_transaction(_sql, _v)
-    logger.debug("sched_b carryover done.")
-
-
-def do_carryover_sc_payments(cmte_id, report_id, rowcount):
-    """
-    -- Deprecated
-    carry over all debt payment child transactions, including:
-    sched_b
-    sched_e
-    sched_f
-    sched_h4
-    sched_h6
-    """
-
-    # first query the parent-child relationship in sched_d for current report
-    # need this informattion for carrying over all the payments
-    _sql = """
-    select back_ref_transaction_id as parent_id, transaction_id as current_id 
-    from public.sched_d d
-    where d.cmte_id = %s
-    and d.report_id = %s
-    and d.delete_ind is distinct from 'Y'
-    order by create_date desc, last_update_date desc
-    """
-    try:
-        # new_beginning_balance = new_balance
-        with connection.cursor() as cursor:
-            cursor.execute(_sql, [cmte_id, report_id])
-            for i in range(rowcount):
-                parent_id = cursor.fetchone()[0]
-                current_id = cursor.fetchone()[1]
-                carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id)
-                # carryover_sched_e_payments(cmte_id, report_id, parent_id, current_id)
-                # carryover_sched_f_payments(cmte_id, report_id, parent_id, current_id)
-                # carryover_sched_h4_payments(cmte_id, report_id, parent_id, current_id)
-                # carryover_sched_h6_payments(cmte_id, report_id, parent_id, current_id)
-    except:
-        raise
-
-
 def delete_child_transaction(table, cmte_id, transaction_id):
     """
     delete sql transaction
@@ -156,12 +75,14 @@ def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
                 payment_amount = 0
             balance_at_close = data[1]
             logger.debug("loan current payment amt:{}".format(payment_amount))
-            logger.debug("loan current payment amt:{}".format(balance_at_close))
+            logger.debug(
+                "loan current payment amt:{}".format(balance_at_close))
             new_payment_amount = (
                 float(payment_amount) + float(new_payment) - float(old_payment)
             )
             new_balance_at_close = (
-                float(balance_at_close) - float(new_payment) + float(old_payment)
+                float(balance_at_close) -
+                float(new_payment) + float(old_payment)
             )
         logger.debug(
             "update parent with new payment {}, new balance {}".format(
@@ -224,7 +145,8 @@ def update_sched_d_parent(cmte_id, transaction_id, new_payment, old_payment=0):
                 float(payment_amount) + float(new_payment) - float(old_payment)
             )
             new_balance_at_close = (
-                float(balance_at_close) - float(new_payment) + float(old_payment)
+                float(balance_at_close) -
+                float(new_payment) + float(old_payment)
             )
         logger.debug(
             "update parent with payment {}, close_b {}".format(
@@ -252,7 +174,8 @@ def do_transaction(sql, values):
     try:
         with connection.cursor() as cursor:
             cursor.execute(sql, values)
-            logger.debug("transaction done with rowcount:{}".format(cursor.rowcount))
+            logger.debug(
+                "transaction done with rowcount:{}".format(cursor.rowcount))
             # if cursor.rowcount == 0:
             #     raise Exception("The sql transaction: {} failed...".format(sql))
     except Exception:
@@ -291,7 +214,8 @@ def update_parent_purpose(data):
             # Insert data into schedA table
             logger.debug("update parent purpose with sql:{}".format(_sql))
             logger.debug(
-                "update parent {} with purpose:{}".format(parent_tran_id, purpose)
+                "update parent {} with purpose:{}".format(
+                    parent_tran_id, purpose)
             )
             # print(report_id, cmte_id)
             cursor.execute(_sql, [purpose, parent_tran_id, report_id, cmte_id])
@@ -348,7 +272,8 @@ def populate_transaction_types():
         with connection.cursor() as cursor:
             cursor.execute(_sql)
             if cursor.rowcount == 0:
-                raise Exception("bummer, no transaction_types found in the database.")
+                raise Exception(
+                    "bummer, no transaction_types found in the database.")
             for row in cursor.fetchall():
                 tran_dic[row[0]] = (row[1], row[2])
         return tran_dic
@@ -376,7 +301,8 @@ def get_transaction_type_descriptions():
         with connection.cursor() as cursor:
             cursor.execute(_sql)
             if cursor.rowcount == 0:
-                raise Exception("bummer, no transaction_types found in the database.")
+                raise Exception(
+                    "bummer, no transaction_types found in the database.")
             for row in cursor.fetchall():
                 tran_dic[row[0]] = row[1]
         # logger.debug("transaction desc loaded:{}".format(tran_dic))
@@ -960,9 +886,11 @@ def candify_it(cand_json):
     candify_item = {}
     for _f in cand_json:
         if _f == "entity_id":
-            candify_item["beneficiary_cand_entity_id"] = cand_json.get("entity_id")
+            candify_item["beneficiary_cand_entity_id"] = cand_json.get(
+                "entity_id")
         elif _f == "ref_cand_cmte_id":
-            candify_item["beneficiary_cand_id"] = cand_json.get("ref_cand_cmte_id")
+            candify_item["beneficiary_cand_id"] = cand_json.get(
+                "ref_cand_cmte_id")
             candify_item["cand_id"] = cand_json.get("ref_cand_cmte_id")
         elif _f in ["occupation", "employer"]:
             continue
@@ -1069,4 +997,3 @@ def cmte_type(cmte_id):
                 )
     except Exception as err:
         raise Exception(f"cmte_type function is throwing an error: {err}")
-
