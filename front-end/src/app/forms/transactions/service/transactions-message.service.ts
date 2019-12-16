@@ -11,6 +11,7 @@ import { ActiveView } from '../transactions.component';
   providedIn: 'root'
 })
 export class TransactionsMessageService {
+ 
   private subject = new Subject<any>();
   private applyFiltersSubject = new Subject<any>();
   private doKeywordFilterSearchSubject = new Subject<any>();
@@ -19,6 +20,7 @@ export class TransactionsMessageService {
   private removeFilterSubject = new Subject<any>();
   private switchFilterViewSubject = new Subject<any>();
   private loadTransactionsSubject = new Subject<any>();
+  private removeTagSubject = new Subject<any>();
 
   /**
    * A publisher uses this method to send a message to subscribers
@@ -67,6 +69,24 @@ export class TransactionsMessageService {
   public getApplyFiltersMessage(): Observable<any> {
     return this.applyFiltersSubject.asObservable();
   }
+
+
+  /**
+   * A method for subscribers of Remove Tag message
+   */
+  public getRemoveTagMessage(): Observable<any> {
+    return this.removeTagSubject.asObservable();
+  }
+
+  public clearRemoveTagMessage(){
+    this.removeTagSubject.next();
+  }
+
+  public sendRemoveTagMessage(message:any){
+    this.removeTagSubject.next(message);
+  }
+
+
 
   /**
    * A publisher uses this method to send a message to subscribers
