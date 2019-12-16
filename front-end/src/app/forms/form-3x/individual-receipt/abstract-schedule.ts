@@ -1009,7 +1009,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if ($event.hasOwnProperty('hasValue')) {
       if ($event.hasValue === false) {
         if ($event.hasOwnProperty('scheduleType')) {
-          //this._handleNoH1H2($event.scheduleType);
+          this._handleNoH1H2($event.scheduleType);
         } else {
           this._handleNoH1H2(null);
         }
