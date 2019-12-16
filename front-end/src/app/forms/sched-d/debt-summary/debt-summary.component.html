@@ -156,6 +156,8 @@
   </table>
   <hr />
   <div class="d-flex justify-content-center debtSumamry__table-pagination-container">
-    <pagination-controls (pageChange)="currentPageNumber = $event"> </pagination-controls>
+    <pagination-controls 
+      (pageChange)="onPageChange($event)">
+    </pagination-controls>
   </div>
 </div>
