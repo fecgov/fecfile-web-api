@@ -1457,7 +1457,6 @@ def put_sql_schedH3(data):
                   transferred_amount= %s,
                   memo_code= %s,
                   memo_text= %s,
-                  create_date= %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
@@ -2940,7 +2939,6 @@ def put_sql_schedH5(data):
                   memo_code= %s,
                   memo_text = %s,
                   back_ref_transaction_id = %s,
-                  create_date= %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
