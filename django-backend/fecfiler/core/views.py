@@ -31,6 +31,8 @@ from fuzzywuzzy import fuzz
 import pandas
 import numpy
 
+from fecfiler.core.carryover_helper import do_h1_carryover
+
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
 # Create your views here.
@@ -902,6 +904,8 @@ def reports(request):
             }    
             data = post_reports(datum)
             if type(data) is dict:
+                # do h1 carryover if new report created
+                do_h1_carryover(data.get('cmte_id'), data.get('report_id'))
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
@@ -2113,7 +2117,7 @@ def get_trans_query(category_type, cmte_id, param_string):
 
     elif category_type == 'loans_tran':
         query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
-                          purpose_description, loan_amount, loan_payment_to_date, loan_balance, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
+                          purpose_description, loan_amount, loan_payment_to_date, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
                           loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, true as "isEditable" from all_loans_debts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 

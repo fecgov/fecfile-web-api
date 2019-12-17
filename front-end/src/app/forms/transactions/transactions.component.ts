@@ -12,29 +12,12 @@ import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
 import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
+import { FilterTypes } from './enums/filterTypes.enum';
 
 export enum ActiveView {
   transactions = 'transactions',
   recycleBin = 'recycleBin',
   edit = 'edit'
-}
-
-export enum FilterTypes {
-  keyword = 'keyword',
-  category = 'category',
-  amount = 'amount',
-  aggregateAmount = 'aggregateAmount',
-  date = 'date',
-  deletedDate = 'deletedDate',
-  state = 'state',
-  memoCode = 'memoCode',
-  itemizations = 'itemizations',
-  electionCodes = 'electionCodes',
-  electionYear = 'electionYear',
-  loanAmount = 'loanAmount',
-  loanClosingBalance = 'loanClosingBalance',
-  schedule = 'schedule',
-  debtBeginningBalance = "debtBeginningBalance"
 }
 
 /**
@@ -90,6 +73,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public transactionCategory: string = '';
   public transactionTypeText = '';
 
+  public allTransactions: boolean = false;
+
   private _step: string = '';
   private _formType: string = '';
 
@@ -103,6 +88,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Subscription for showing the TransactionsEditComponent.
    */
   private editTransactionSubscription: Subscription;
+  
+  private removeFiltersSubscription: Subscription;
 
   /**
    * Subscription for showing all Transactions.
@@ -113,6 +100,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   private filters: TransactionFilterModel = new TransactionFilterModel();
   private readonly filtersLSK = 'transactions.filters';
+  removeTagsSubscription: any;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -137,6 +125,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
       });
 
+     this.removeTagsSubscription = this._transactionsMessageService.getRemoveTagMessage()
+    .subscribe((message: any) => {
+      this.removeTagArrayItem(message.type);
+    }); 
+
     this.editTransactionSubscription = this._transactionsMessageService
       .getEditTransactionMessage()
       .subscribe((trx: TransactionModel) => {
@@ -150,9 +143,16 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.showTransactions();
       });
 
-      _activatedRoute.queryParams.subscribe(p => {
+      //Dont think its needed since the transaction-table subscription will catch changes
+      /* _activatedRoute.queryParams.subscribe(p => {
         this.transactionCategory = p.transactionCategory;
-      });
+      });*/
+    }
+
+  private removeFilterAndTag(message: any) {
+    if (message.filterName === 'deletedDate') {
+      this.removeDeletedDateFilter();
+    }
   }
 
   /**
@@ -164,6 +164,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
     const reportIdRoute = this._activatedRoute.snapshot.paramMap.get('report_id');
     this._step = this._activatedRoute.snapshot.paramMap.get('step');
+    this.allTransactions = this._activatedRoute.snapshot.queryParams.allTransactions;
 
     console.log('TransactionsComponent this._step', this._step);
     this.routeData = { accessedByRoute: true, formType: this.formType, reportId: reportIdRoute };
@@ -230,6 +231,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     localStorage.removeItem('Transaction_Table_Screen');
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
     this.applyFiltersSubscription.unsubscribe();
+    this.removeTagsSubscription.unsubscribe();
     this.editTransactionSubscription.unsubscribe();
     this.showTransactionsSubscription.unsubscribe();
   }
@@ -291,6 +293,26 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
       if (!dateTag) {
         this.tagArray.push({ type: FilterTypes.date, prefix: 'Date', group: dateGroup });
+      }
+    }
+
+    // Date
+    if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
+      const dateGroup = [];
+      dateGroup.push({
+        filterDeletedDateFrom: filters.filterDeletedDateFrom,
+        filterDeletedDateTo: filters.filterDeletedDateTo
+      });
+      // is tag showing? Then modify it is the curr position
+      let deletedDateTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.deletedDate) {
+          deletedDateTag = true;
+          tag.group = dateGroup;
+        }
+      }
+      if (!deletedDateTag) {
+        this.tagArray.push({ type: FilterTypes.deletedDate, prefix: 'Deleted Date', group: dateGroup });
       }
     }
 
@@ -599,6 +621,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Remove the Date filter tag and inform the filter component to clear it.
+   */
+  public removeDeletedDateFilter() {
+    this.filters.filterDeletedDateFrom = null;
+    this.filters.filterDeletedDateTo = null;
+    this.removeFilter('deletedDate', null);
+  }
+
+  /**
    * Remove the Amount filter tag and inform the filter component to clear it.
    */
   public removeAmountFilter() {
@@ -705,6 +736,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.removeDateFilter();
         this.removeTagArrayItem(type);
         break;
+      case FilterTypes.deletedDate:
+          this.removeDeletedDateFilter();
+          this.removeTagArrayItem(type);
+          break;
       case FilterTypes.amount:
         this.removeAmountFilter();
         this.removeTagArrayItem(type);

@@ -20,7 +20,8 @@ import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsService } from '../service/transactions.service';
 import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
 import { Subscription } from 'rxjs/Subscription';
-import { FilterTypes, ActiveView } from '../transactions.component';
+import { ActiveView } from '../transactions.component';
+import { FilterTypes } from "../enums/filterTypes.enum";
 import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
 import { ActivatedRoute } from '@angular/router';
 
@@ -124,6 +125,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     { option: 'general', selected: false },
     { option: 'other', selected: false }
   ];
+  
   public filterCategoriesText = '';
   public filterAmountMin: number;
   public filterAmountMax: number;
@@ -144,6 +146,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public filterElectionYearFrom: string;
   public filterElectionYearTo: string;
   public filterSchedule: string;
+
   public dateFilterValidation: ValidationErrorModel;
   public deletedDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
@@ -153,6 +156,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public debtBeginningBalanceFilterValidation: ValidationErrorModel;
   public transactionCategory: string = '';
   public editMode: boolean = false;
+
 
   /**
    * Subscription for removing selected filters.

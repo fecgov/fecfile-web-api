@@ -33,7 +33,7 @@
         *ngIf="!allTransactions"
       >
       </transaction-sidebar>
-      <app-transactions-filter [hidden]="!isShowFilters" title="Filters" [formType]="formType">
+      <app-transactions-filter [hidden]="!allTransactions && !isShowFilters" title="Filters" [formType]="formType">
       </app-transactions-filter>
     </div>
   </div>
