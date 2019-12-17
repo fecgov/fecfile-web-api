@@ -475,7 +475,8 @@ def auto_generate_sched_a(data):
         data.get('election_other_description'),
         data.get('donor_cmte_id'),
         data.get('donor_cmte_name'),
-        data.get('transaction_type_identifier')
+        data.get('transaction_type_identifier'),
+        data.get('levin_account_id')
         )
     logger.debug('auto-generation done.')
 
