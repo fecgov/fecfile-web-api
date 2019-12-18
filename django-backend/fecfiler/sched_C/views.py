@@ -713,7 +713,7 @@ def get_schedC(data):
     try:
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
-        do_loan_carryover(report_id, cmte_id)
+        # do_loan_carryover(report_id, cmte_id)
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedC(report_id, cmte_id, transaction_id)
@@ -1063,8 +1063,160 @@ def schedC(request):
         raise NotImplementedError
 
 
+
 @api_view(['GET'])
 def get_outstanding_loans(request):
+    """
+    Get all loans with an outstanding balance
+    this api is used to enable the sched_c summary page
+    need to return:
+    1. name/bank (this is the entity name)
+    2. original loan
+    3. cumulative payemnt to date
+    4. outstanding balance
+    5. due date
+    adding transaction_types to get transaction_type specific loans
+    valid ransction_type values:
+    LOANS_OWED_BY_CMTE
+    LOANS_OWED_TO_CMTE
+
+    a loan is outstanding if:
+    1. it has a outstannding balance(>0) in current report
+    2. it has live payment(even the balance become 0) in current report
+    """
+    valid_transaction_types = [
+        'LOANS_OWED_BY_CMTE',
+        'LOANS_OWED_TO_CMTE',
+    ]
+    logger.debug('POST request received.')
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        if not report_id:
+            raise Exception('report_id is required.')
+        do_loan_carryover(report_id, cmte_id)
+        if 'transaction_type_identifier' in request.query_params:
+            tran_type = request.query_params.get('transaction_type_identifier')
+            if not tran_type in valid_transaction_types: 
+                raise Exception('Error: invalid transaction types.')
+            _sql = """
+                SELECT Json_agg(t) 
+                FROM   (SELECT 
+                            e.entity_name,
+                            e.entity_type, 
+                            e.last_name,
+                            e.first_name,
+                            e.middle_name,
+                            e.preffix as prefix,
+                            e.suffix, 
+                            c.transaction_id,
+                            c.loan_amount_original, 
+                            c.loan_payment_to_date, 
+                            c.loan_balance, 
+                            c.loan_due_date,
+                            c.transaction_type_identifier 
+                        FROM   public.sched_c c, 
+                            public.entity e 
+                        WHERE c.cmte_id = %s
+                        AND c.transaction_type_identifier = %s
+                        AND c.entity_id = e.entity_id
+                        AND c.report_id = %s 
+                        AND delete_ind is distinct from 'Y'
+                        ) t
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, tran_type, report_id])
+                json_result = cursor.fetchone()[0] 
+            
+        else:
+            _sql = """
+                SELECT Json_agg(t) 
+                    FROM   (SELECT 
+                                e.entity_name,
+                                e.entity_type, 
+                                e.last_name,
+                                e.first_name,
+                                e.middle_name,
+                                e.preffix as prefix,
+                                e.suffix, 
+                                c.transaction_id,
+                                c.loan_amount_original, 
+                                c.loan_payment_to_date, 
+                                c.loan_balance, 
+                                c.loan_due_date,
+                                c.transaction_type_identifier
+                            FROM   public.sched_c c, 
+                                public.entity e 
+                            WHERE c.cmte_id = %s
+                            AND c.entity_id = e.entity_id
+                            AND c.report_id = %s 
+                            AND c.delete_ind is distinct from 'Y'
+                            UNION
+                            SELECT e.entity_name, 
+                                e.entity_type, 
+                                e.last_name, 
+                                e.first_name, 
+                                e.middle_name, 
+                                e.preffix AS prefix, 
+                                e.suffix, 
+                                c.transaction_id, 
+                                c.loan_amount_original, 
+                                c.loan_payment_to_date, 
+                                c.loan_balance, 
+                                c.loan_due_date, 
+                                c.transaction_type_identifier 
+                            FROM   PUBLIC.sched_c c, 
+                                PUBLIC.entity e 
+                            WHERE  c.entity_id = e.entity_id 
+                            AND    c.transaction_id IN 
+                            ( 
+                                    SELECT back_ref_transaction_id 
+                                    FROM   sched_b 
+                                    WHERE  cmte_id = %s 
+                                    AND    report_id = %s
+                                    AND    (transaction_type_identifier = 'LOAN_REPAY_MADE' OR
+                                    transaction_type_identifier = 'LOAN_REPAY_RCVD')
+                                    AND    delete_ind IS distinct from 'Y')
+                            ) t
+                """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
+                json_result = cursor.fetchone()[0] 
+
+        if not json_result:
+            return Response([], status=status.HTTP_200_OK)
+        else:
+            logger.debug('total outstanding loans:{}'.format(len(json_result)))
+            for tran in json_result:
+                transaction_id = tran.get('transaction_id')
+                loan_pyaments_obj = get_sched_c_loan_payments(
+                    cmte_id,transaction_id)
+                for obj in loan_pyaments_obj:
+                    obj.update(API_CALL_SB)
+                logger.debug('getting all c1 childs...')
+                childC1_forms_obj = get_sched_c1_child(
+                    cmte_id, transaction_id)
+                # print(childC1_forms_obj)
+                for obj in childC1_forms_obj:
+                    obj.update(API_CALL_SC1)
+                logger.debug('getting all sched_c2 childs...')
+                childC2_forms_obj = get_sched_c2_child(
+                    cmte_id, transaction_id)
+                # print(childC2_forms_obj)
+                for obj in childC2_forms_obj:
+                    obj.update(API_CALL_SC2)
+                child_tran = childC1_forms_obj + childC2_forms_obj
+                if child_tran:
+                    tran['child'] = child_tran
+                if loan_pyaments_obj:
+                    tran['payments'] = loan_pyaments_obj
+            return Response(json_result, status=status.HTTP_200_OK)
+
+    except:
+        raise
+
+@api_view(['GET'])
+def get_outstanding_loans_old(request):
     """
     Get all loans with an outstanding balance
     this api is used to enable the sched_c summary page
