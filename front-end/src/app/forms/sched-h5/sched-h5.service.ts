@@ -7,6 +7,11 @@ import { environment } from '../../../environments/environment';
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
+export enum SchedHActions {
+  add = 'add',
+  edit = 'edit'
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -137,7 +142,7 @@ export class SchedH5Service {
       );
   }
 
-  public saveAndGetSummary(ratio: any, reportId: string): Observable<any> {
+  public saveAndGetSummary(ratio: any, reportId: string, scheduleAction: SchedHActions): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     const url = '/sh5/schedH5';
@@ -154,35 +159,65 @@ export class SchedH5Service {
       }
     }
 
-    return this._http
-      .post(
-        `${environment.apiUrl}${url}`, ratio,
-        {
-          headers: httpOptions
-        }
-      )
-      .pipe(map(res => {
-          if (res) {
-            console.log('Save H3Ratio res: ', res);
-
-            //get summary
-            //this.getSummary(reportId);
-
-            let sub: Subscription;
-            let sum: any;
-            sub = this.getSummary(reportId).subscribe(res =>
-              {
-                if(res) {
-                  sum =  res;
-                }
-              });
-
-            return sum;
+    if (scheduleAction === SchedHActions.add) {
+      return this._http
+        .post(
+          `${environment.apiUrl}${url}`, ratio,
+          {
+            headers: httpOptions
           }
-          return false;
-      })
-      );
+        )
+        .pipe(map(res => {
+            if (res) {
+              console.log('Save H5Ratio res: ', res);
 
+              //get summary
+              //this.getSummary(reportId);
+
+              let sub: Subscription;
+              let sum: any;
+              sub = this.getSummary(reportId).subscribe(res =>
+                {
+                  if(res) {
+                    sum =  res;
+                  }
+                });
+
+              return sum;
+            }
+            return false;
+        })
+        );
+      }else if(scheduleAction === SchedHActions.edit) {
+        return this._http
+        .put(
+          `${environment.apiUrl}${url}`, ratio,
+          {
+            headers: httpOptions
+          }
+        )
+        .pipe(map(res => {
+            if (res) {
+              console.log('Edit H5Ratio res: ', res);
+
+              //get summary
+              //this.getSummary(reportId);
+
+              let sub: Subscription;
+              let sum: any;
+              sub = this.getSummary(reportId).subscribe(res =>
+                {
+                  if(res) {
+                    sum =  res;
+                  }
+                });
+
+              return sum;
+            }
+            return false;
+        })
+        );
+      }
 
   }
 

@@ -96,6 +96,7 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     private _actRoute: ActivatedRoute,
     private _schedH6Service: SchedH6Service,
     private _individualReceiptService: IndividualReceiptService,
+    private _tranMessageService: TransactionsMessageService,
   ) {    
      super(
       _http,
@@ -121,6 +122,7 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     );
     _schedH6Service;
     _individualReceiptService;
+    _tranMessageService;
   }
 
 
@@ -276,7 +278,6 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
         }        
       }
     }
-    console.log('9: ', items);
   }
 
   public mapFromServerFields(serverData: any) {
@@ -314,6 +315,26 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     console.log('91: ', modelArray);
 
     return modelArray;
+  }
+
+  public editTransaction(trx: any): void {
+    this.scheduleAction = ScheduleActions.edit;
+
+    trx.apiCall = '/sh6/schedH6';
+    trx.activityEventIdentifier = trx.activity_event_identifier;
+    trx.activityEventType = trx.activity_event_type;
+    trx.backRefTransactionId = trx.back_ref_transaction_id;
+    trx.entityName = trx.entity_name;
+    trx.entityType = trx.entity_type;
+    trx.expenditureDate = trx.expenditure_date;
+    trx.fedShareAmount = trx.fed_share_amount;
+
+    trx.transactionId = trx.transaction_id;
+    trx.transactionTypeIdentifier = trx.transaction_type_identifier;
+
+    trx.type = 'H6';
+
+    this._tranMessageService.sendEditTransactionMessage(trx);
   }
   
 }

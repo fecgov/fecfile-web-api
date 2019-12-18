@@ -3160,7 +3160,8 @@ def get_list_schedH5(report_id, cmte_id, transaction_id):
             gotv_amount,
             generic_campaign_amount,
             memo_code,
-            memo_text ,
+            memo_text,
+            back_ref_transaction_id,
             create_date,
             last_update_date
             FROM public.sched_h5
@@ -3214,6 +3215,7 @@ def get_h5_summary(request):
             # GET single row from schedA table
             _sql = """SELECT json_agg(t) FROM ( SELECT
             transaction_id,
+            back_ref_transaction_id,
             account_name,
             receipt_date,
             coalesce(
