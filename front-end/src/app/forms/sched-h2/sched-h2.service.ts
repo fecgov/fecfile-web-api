@@ -6,6 +6,11 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../environments/environment';
 import { map } from 'rxjs/operators';
 
+export enum SchedHActions {
+  add = 'add',
+  edit = 'edit'
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -26,7 +31,6 @@ export class SchedH2Service {
 
     let params = new HttpParams();
     params = params.append('report_id', reportId);
-    
     return this._http
       .get(
         `${environment.apiUrl}${url}`,      
@@ -41,11 +45,11 @@ export class SchedH2Service {
             return res;
           }
           return false;
-      })
+          })
       );
   }
 
-  public saveH2Ratio(ratio: any): Observable<any> {
+  public saveH2Ratio(ratio: any, scheduleAction: SchedHActions): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     const url = '/sh2/schedH2';
@@ -62,21 +66,40 @@ export class SchedH2Service {
       }
     }
  
-    return this._http
-      .post(
-        `${environment.apiUrl}${url}`, ratio,    
-        {
-          headers: httpOptions
-        }
-      )
-      .pipe(map(res => {
-          if (res) {
-            console.log('Save H2Ratio res: ', res);
-            return res;
+    if (scheduleAction === SchedHActions.add) {
+      return this._http
+        .post(
+          `${environment.apiUrl}${url}`, ratio,
+          {
+            headers: httpOptions
           }
-          return false;
-      })
+        )
+        .pipe(map(res => {
+            if (res) {
+              console.log('Save H2Ratio res: ', res);
+              return res;
+            }
+            return false;
+        })
       );
+    }else if(scheduleAction === SchedHActions.edit) {
+      return this._http
+        .put(
+          `${environment.apiUrl}${url}`, ratio,
+          {
+            headers: httpOptions
+          }
+        )
+        .pipe(map(res => {
+            if (res) {
+              console.log('Edit H2Ratio res: ', res);
+              return res;
+            }
+            return false;
+        })
+      );
+
+    }
   }
     
 }
