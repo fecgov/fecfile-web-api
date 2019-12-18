@@ -5652,23 +5652,23 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, prev_yr):
             "The prev_cash_on_hand_cop(sl) function is throwing an error: " + str(e)
         )
 
-def get_sl_cash_on_hand_cop_current(report_id, cmte_id, prev_yr):
-    try:
-        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", [cmte_id, prev_cvg_end_dt])
-            if (cursor.rowcount == 0):
-                coh_cop = 0
-            else:
-                result = cursor.fetchone()
-                coh_cop = result[0]
+# def get_sl_cash_on_hand_cop_current(report_id, cmte_id, prev_yr):
+#     try:
+#         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+#         prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
+#         with connection.cursor() as cursor:
+#             cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", [cmte_id, prev_cvg_end_dt])
+#             if (cursor.rowcount == 0):
+#                 coh_cop = 0
+#             else:
+#                 result = cursor.fetchone()
+#                 coh_cop = result[0]
 
-        return coh_cop
-    except Exception as e:
-        raise Exception(
-            "The prev_cash_on_hand_cop(sl) function is throwing an error: " + str(e)
-        )
+#         return coh_cop
+#     except Exception as e:
+#         raise Exception(
+#             "The prev_cash_on_hand_cop(sl) function is throwing an error: " + str(e)
+#         )
 
 
 def get_sl_item_aggregate(report_id, cmte_id, prev_yr):
@@ -5808,8 +5808,7 @@ def prepare_Schedl_summary_data(request):
             cursor.execute("""
                 SELECT line_number, sum(contribution_amount) from public.sched_a 
                 where cmte_id = '%s' AND report_id = '%s'  And line_number in ('1A','2') group by line_number;""" %(cmte_id, report_id))
-            #print(cursor.query)
-            #commented by Mahendra 10052019
+           
             sched_la_line_sum_result = cursor.fetchall()
             sched_la_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_la_line_sum_result}
         with connection.cursor() as cursor:
@@ -5828,13 +5827,6 @@ def prepare_Schedl_summary_data(request):
         col_la_line_sum = {}
         col_lb_line_sum = {}
 
-        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        # if prev_yr:
-        #     prev_cvg_year = cvg_start_date.year - 1
-        #     prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
-        # else:
-        #     prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-        import pdb;pdb.set_trace()
 
         with connection.cursor() as cursor:
             cursor.execute(""" 
@@ -5865,7 +5857,7 @@ def prepare_Schedl_summary_data(request):
                 ('1c', '1a + 1b'), ('3', '1c+2'), ('4a', ''),('4b', ''), ('4c', ''), 
                 ('4d', ''), ('4e', '4a+4b+4c+4d'), ('5', ''), ('6', '4e+5'), ('7', ''), ('8', '3'), ('9', '7+8'), 
                 ('10', '6'), ('11', '9 - 10')]
-
+        
         col_la_dict_original = OrderedDict()
         for i in col_la:
             col_la_dict_original[i[0]] = i[1]
@@ -5875,7 +5867,8 @@ def prepare_Schedl_summary_data(request):
                                                                schedule_la_lb_line_sum_dict, cmte_id, report_id, True)
            
             schedule_la_lb_line_sum_dict[line_number] = final_col_la_dict[line_number]
-
+            # print(get_sl_line_sum_value,"1111111111111111111111111111111111111")
+            # print(final_col_la_dict,"1111111111111111111111111111111111111111111111111111")   
         
 
         col_lb = [('1a', ''), ('2', ''),
@@ -5892,6 +5885,8 @@ def prepare_Schedl_summary_data(request):
                                                                col_line_sum_dict,
                                                                cmte_id, report_id, False)
             col_line_sum_dict[line_number] = final_col_lb_dict[line_number]
+
+
        
         for i in final_col_la_dict:
             la_val = final_col_la_dict[i]
