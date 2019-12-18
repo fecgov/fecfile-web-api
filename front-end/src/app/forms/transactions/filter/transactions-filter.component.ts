@@ -167,6 +167,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * Subscription for switch filters for ActiveView of the traansaction table.
    */
   private switchFilterViewSubscription: Subscription;
+  
+  private clearAllFiltersSubscription: Subscription;
 
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
@@ -207,6 +209,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             console.log('unexpected ActiveView received: ' + message);
         }
       });
+
+    this.clearAllFiltersSubscription = this._transactionsMessageService
+    .getClearAllFiltersMessage()
+    .subscribe(message => {
+      this.clearFilters();
+    })
 
     _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
@@ -272,6 +280,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.removeFilterSubscription.unsubscribe();
     this.switchFilterViewSubscription.unsubscribe();
+    this.clearAllFiltersSubscription.unsubscribe();
   }
 
   /**

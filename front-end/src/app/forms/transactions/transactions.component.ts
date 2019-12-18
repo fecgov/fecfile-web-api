@@ -143,10 +143,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.showTransactions();
       });
 
-      //Dont think its needed since the transaction-table subscription will catch changes
-      /* _activatedRoute.queryParams.subscribe(p => {
+      _activatedRoute.queryParams.subscribe(p => {
         this.transactionCategory = p.transactionCategory;
-      });*/
+      });
     }
 
   private removeFilterAndTag(message: any) {

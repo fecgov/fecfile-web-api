@@ -7,7 +7,7 @@ import { TransactionModel } from '../../model/transaction.model';
   templateUrl: './trash-confirm.component.html',
   styleUrls: ['./trash-confirm.component.scss']
 })
-export class TrashConfirmComponent implements OnInit {
+export class TrashConfirmComponent1 implements OnInit {
 
   @Input()
   public modalTitle: string;

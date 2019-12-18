@@ -23,6 +23,8 @@ export class TypeaheadComponent {
   @Input() public fieldName: string;
   @Input() public columnProperties: any;
   @Output() selectedItem: EventEmitter<any> = new EventEmitter<any>();
+
+  public col:any;
   /**
    * TODO: Emit this data out to parent as output.
    */
