@@ -72,6 +72,10 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public isSubmit = false;
 
+  public transaction_id: string;
+
+  private editTransactionSubscription: Subscription;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -98,6 +102,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     private _individualReceiptService: IndividualReceiptService,
     private _uService: UtilService,
     private _decPipe: DecimalPipe,
+    private _tranMessageService: TransactionsMessageService,
   ) {    
      super(
       _http,
@@ -125,6 +130,12 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _individualReceiptService;
     _uService;
     _decPipe;
+
+    this.editTransactionSubscription = this._tranMessageService
+      .getEditTransactionMessage()
+      .subscribe((trx: TransactionModel) => {
+        this.editH2(trx);
+      });
   }
 
 
@@ -209,8 +220,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       activity_event_name: new FormControl('', [Validators.maxLength(90), Validators.required]),
       receipt_date: new FormControl(''),
       select_activity_function: new FormControl('', Validators.required),
-      fundraising: new FormControl('', Validators.required),
-      direct_cand_support: new FormControl('', Validators.required),
+      //fundraising: new FormControl('', Validators.required),
+      //direct_cand_support: new FormControl('', Validators.required),
       ratio_code: new FormControl('', Validators.required),
       federal_percent: new FormControl('', [Validators.min(0), Validators.max(100), Validators.required]),
       non_federal_percent: new FormControl('', [Validators.min(0), Validators.max(100), Validators.required])
@@ -219,36 +230,51 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   
   public clearFormValues() {
     this.schedH2.reset();
+    if(this.scheduleAction === ScheduleActions.edit) {
+      this.scheduleAction = ScheduleActions.add
+    }
   }
 
   public saveAndAddMore(): void {
+    this.isSubmit = true;
     this.doValidate();    
   }
 
   public doValidate() {
+    if(this.schedH2.status === 'VALID') {
     
-    this.schedH2.patchValue({ fundraising: this.schedH2.get('select_activity_function').value === 'f' ? true : false }, { onlySelf: true });
-    this.schedH2.patchValue({ direct_cand_support: this.schedH2.get('select_activity_function').value === 'd' ? true : false }, { onlySelf: true });
+    //this.schedH2.patchValue({ fundraising: this.schedH2.get('select_activity_function').value === 'f' ? true : false }, { onlySelf: true });
+    //this.schedH2.patchValue({ direct_cand_support: this.schedH2.get('select_activity_function').value === 'd' ? true : false }, { onlySelf: true });
 
     const formObj = this.schedH2.getRawValue();
 
     //formObj['report_id'] = 0;
     formObj['report_id'] = this._individualReceiptService.getReportIdFromStorage(this.formType);
     formObj['transaction_type_identifier'] = "ALLOC_H2_RATIO";
+
+    formObj['fundraising'] = this.schedH2.get('select_activity_function').value === 'f' ? true : false ;
+    formObj['direct_cand_support'] = this.schedH2.get('select_activity_function').value === 'd' ? true : false;
     
     formObj['federal_percent'] = ((this.schedH2.get('federal_percent').value) / 100).toFixed(2);
     formObj['non_federal_percent'] = ((this.schedH2.get('non_federal_percent').value) / 100).toFixed(2);
+
+    if(this.scheduleAction === ScheduleActions.edit) {
+      formObj['transaction_id'] = this.transaction_id
+    };
     
     const serializedForm = JSON.stringify(formObj);
 
     this.isSubmit = true;
 
-    if(this.schedH2.status === 'VALID') {
+    //if(this.schedH2.status === 'VALID') {
       //&& (this.schedH2.get('federal_percent').value + this.schedH2.get('non_federal_percent').value) === 100) {
 
-      this.saveH2Ratio(serializedForm);      
+      this.saveH2Ratio(serializedForm, this.scheduleAction);
       this.schedH2.reset();
       this.isSubmit = false;
+    }else {
+      this.schedH2.markAsDirty();
+      this.schedH2.markAsTouched();
     }
   }
 
@@ -264,9 +290,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       });        
   }
 
-  public saveH2Ratio(ratio: any) {
+  public saveH2Ratio(ratio: any, scheduleAction) {
     
-    this._schedH2Service.saveH2Ratio(ratio).subscribe(res => {
+    this._schedH2Service.saveH2Ratio(ratio, scheduleAction).subscribe(res => {
       if (res) {        
         this.saveHRes = res;
       }
@@ -276,6 +302,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public returnToSum(): void {
 
     this.saveAndAddMore();
+    if( this.scheduleAction === ScheduleActions.edit) {
+      this.scheduleAction = ScheduleActions.add;
+    }
 
     this.isSubmit = false;
 
@@ -348,6 +377,60 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     }else {
       this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true });
     }
+  }
+
+  public editH2(item) {
+    this.returnToAdd();
+    this.scheduleAction = ScheduleActions.edit;
+
+    this.transaction_id = item.transaction_id;
+
+    this.schedH2.patchValue({ activity_event_name: item.activity_event_name}, { onlySelf: true });
+    this.schedH2.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
+    this.schedH2.patchValue({ select_activity_function: item.event_type  === 'fundraising' ? 'f' : 'd'}, { onlySelf: true });
+    this.schedH2.patchValue({ ratio_code: 's'}, { onlySelf: true });
+    this.schedH2.patchValue({ federal_percent: this._decPipe.transform(item.federal_percent * 100, '.2-2')}, { onlySelf: true });
+    this.schedH2.patchValue({ non_federal_percent: this._decPipe.transform(item.non_federal_percent * 100, '.2-2')}, { onlySelf: true });
+
+    /* for all transaction edit
+    this.transaction_id = item.transactionId;
+
+    this.schedH2.patchValue({ activity_event_name: item.activity_event_name}, { onlySelf: true });
+    this.schedH2.patchValue({ receipt_date: item.date}, { onlySelf: true });
+    this.schedH2.patchValue({ select_activity_function: item.entityType  === 'fundraising' ? 'f' : 'd'}, { onlySelf: true });
+    this.schedH2.patchValue({ ratio_code: 's'}, { onlySelf: true });
+    this.schedH2.patchValue({ federal_percent: this._decPipe.transform(item.federalPercent * 100, '.2-2')}, { onlySelf: true });
+    this.schedH2.patchValue({ non_federal_percent: this._decPipe.transform(item.nonfederalPercent * 100, '.2-2')}, { onlySelf: true });
+    */
+
+  }
+
+  public saveEdit() {
+    if(this.schedH2.status === 'VALID') {
+      this.returnToSum();
+    }else {
+      this.schedH2.markAsDirty();
+      this.schedH2.markAsTouched();
+      this.isSubmit = true;
+    }
+  }
+
+  public cancelReturnToSum(): void {
+
+    if( this.scheduleAction === ScheduleActions.edit) {
+      this.scheduleAction = ScheduleActions.add;
+    }
+
+    this.isSubmit = false;
+
+    this.schedH2.reset();
+
+    this.transactionType = 'ALLOC_H2_SUM';
+
+    this.receiptDateErr = false;
+
+    this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+
   }
 
 }
