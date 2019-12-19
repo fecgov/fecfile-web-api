@@ -904,8 +904,9 @@ def reports(request):
             }    
             data = post_reports(datum)
             if type(data) is dict:
+                print(data)
                 # do h1 carryover if new report created
-                do_h1_carryover(data.get('cmte_id'), data.get('report_id'))
+                do_h1_carryover(data.get('cmteid'), data.get('reportid'))
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)

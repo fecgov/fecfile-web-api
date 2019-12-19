@@ -44,7 +44,6 @@ export enum DebtSumarysActions {
   ]
 })
 export class DebtSummaryComponent implements OnInit, OnChanges {
-
   @Input()
   public forceChangeDetection: Date;
 

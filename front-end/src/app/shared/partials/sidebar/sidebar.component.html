@@ -33,7 +33,7 @@
           </button>
         </div>
         <div class="sidebar__nav--links"  [ngClass]="{'d-none': myFormsHidden === true}">
-          <ul class="links-list" *ngFor="let committee_form of committee_forms || async">
+          <ul class="links-list" *ngFor="let committee_form of committee_forms">
             <li
               class="links-list__item"
               *ngIf="(committee_form.category === 'My Forms')"
@@ -109,7 +109,7 @@
           </button>
         </div>
         <div class="sidebar__nav--links" [ngClass]="{'d-none': otherFormsHidden === true}">
-          <ul class="links-list" *ngFor="let committee_form of committee_forms || async" >
+          <ul class="links-list" *ngFor="let committee_form of committee_forms " >
             <li
               class="links-list__item"
               [attr.data-FormType]="committee_form.form_type_mini"

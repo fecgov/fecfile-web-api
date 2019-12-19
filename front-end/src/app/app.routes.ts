@@ -98,6 +98,7 @@ export const AppRoutes: Routes = [
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],
+       // runGuardsAndResolvers: 'paramsOrQueryParamsChange',
         children: [
           {
             path: ':form_step',
@@ -127,4 +128,4 @@ export const AppRoutes: Routes = [
   { path: '**', redirectTo: '' }
 ];
 
-export const routing = RouterModule.forRoot(AppRoutes);
+export const routing = RouterModule.forRoot(AppRoutes, {useHash: true, enableTracing: false});

@@ -36,6 +36,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
   entityTypes: any = [{ code: 'IND', description: 'Individual' }, { code: 'ORG', description: 'Organization' }];
   outstandingLoanBalance: number;
   public _contributionAmountMax = 12;
+  public filterexpenditure_date;
 
   private _loanTransactionId;
 

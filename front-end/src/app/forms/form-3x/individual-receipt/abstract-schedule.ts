@@ -120,7 +120,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Indicates the Form Group is loaded.  Used by "hybrid" parent classes of this base class
    * having both "static" and "dynamic" form fields as found in Sched F Debt Payment.
    */
-  protected loaded = false;
+  public loaded = false;
 
   private _reportType: any = null;
   private _cloned = false;
@@ -3511,7 +3511,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   //   return false;
   // }
 
-  protected clearFormValues(): void {
+  public clearFormValues(): void {
     this._transactionToEdit = null;
 
     this._selectedEntity = null;

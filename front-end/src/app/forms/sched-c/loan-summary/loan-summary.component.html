@@ -17,7 +17,7 @@
       <tr>
         <th class="loanSumamry__table-checkbox">
           <!-- *ngIf="isLoanSummryViewActive()" -->
-          <input [@fadeInOut] [(ngModel)]="allLoanSummrysSelected" type="checkbox"
+          <input [@fadeInOut] [(ngModel)]="allLoanSelected" type="checkbox"
             (change)="changeAllLoanSummrysSelected()">
         </th>
         <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')"

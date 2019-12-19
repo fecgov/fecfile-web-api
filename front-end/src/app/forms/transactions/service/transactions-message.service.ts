@@ -22,6 +22,7 @@ export class TransactionsMessageService {
   private loadTransactionsSubject = new Subject<any>();
   private removeTagSubject = new Subject<any>();
   private loadDefaultTab = new Subject<any>();
+  private clearAllFiltersSubject = new Subject<any>();
 
   /**
    * A publisher uses this method to send a message to subscribers
@@ -91,6 +92,21 @@ export class TransactionsMessageService {
   /**
    * A method for subscribers of loading default tab
    */
+  public getClearAllFiltersMessage(): Observable<any> {
+    return this.clearAllFiltersSubject.asObservable();
+  }
+
+  public clearClearAllFiltersMessage(){
+    this.clearAllFiltersSubject.next();
+  }
+
+  public sendClearAllFiltersMessage(message:any){
+    this.clearAllFiltersSubject.next(message);
+  }
+
+ /**
+   * Method to clear All filters and tags. 
+   */
   public getLoadDefaultTabMessage(): Observable<any> {
     return this.loadDefaultTab.asObservable();
   }
@@ -102,8 +118,6 @@ export class TransactionsMessageService {
   public sendLoadDefaultTabMessage(message:any){
     this.loadDefaultTab.next(message);
   }
-
-
 
   /**
    * A publisher uses this method to send a message to subscribers

@@ -212,7 +212,7 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
    * Determine the state for scrolling.  The category tye wasn't displaying
    * properly in edge with animation.  If edge, don't apply the state with animation.
    */
-  public determineScrollState() {
+  public determineScrollState(input:any) {
     if (this.msEdge) {
       return !this.isHideStateFilter ? 'openNoAnimate' : 'closedNoAnimate';
     } else {
@@ -220,7 +220,7 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
     }
   }
 
-  public determineScrollType() {
+  public determineScrollType(input:any) {
     if (this.msEdge) {
       return !this.isHideTypeFilter ? 'openNoAnimate' : 'closedNoAnimate';
     } else {

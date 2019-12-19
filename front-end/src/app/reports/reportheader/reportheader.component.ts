@@ -117,7 +117,7 @@ private readonly filtersLSK = 'reports.filters';
 
   }
  
-  private showFilter() : void {
+  public showFilter() : void {
 
     if (this.showSideBar){
         this.showSideBar=false;
