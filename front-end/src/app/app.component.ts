@@ -137,8 +137,8 @@ export class AppComponent {
 
   @HostListener('window:beforeunload', ['$event'])
   beforeunloadHandler(event) {
-      // localStorage.clear();
-      // this._sessionService.destroy();
+       localStorage.clear();
+       this._sessionService.destroy();
   }
 
   @HostListener('keypress') onKeyPress() {
