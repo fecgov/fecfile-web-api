@@ -7,7 +7,7 @@ import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { UtilService } from 'src/app/shared/utils/util.service';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe, DatePipe } from '@angular/common';
 import { ReportTypeService } from '../form-3x/report-type/report-type.service';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
@@ -76,6 +76,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   private editTransactionSubscription: Subscription;
 
+  public cloned = false;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -103,6 +105,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     private _uService: UtilService,
     private _decPipe: DecimalPipe,
     private _tranMessageService: TransactionsMessageService,
+    private _datePipe: DatePipe,
   ) {    
      super(
       _http,
@@ -130,6 +133,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _individualReceiptService;
     _uService;
     _decPipe;
+    _datePipe;
 
     this.editTransactionSubscription = this._tranMessageService
       .getEditTransactionMessage()
@@ -233,6 +237,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     if(this.scheduleAction === ScheduleActions.edit) {
       this.scheduleAction = ScheduleActions.add
     }
+    this.cloned = false;
   }
 
   public saveAndAddMore(): void {
@@ -379,7 +384,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     }
   }
 
-  public editH2(item) {
+  public editH2(item: any) {
     this.returnToAdd();
     this.scheduleAction = ScheduleActions.edit;
 
@@ -430,6 +435,25 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.receiptDateErr = false;
 
     this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+
+    this.cloned = false;
+
+  }
+
+  public cloneH2(item: any) {
+    this.returnToAdd();
+    this.scheduleAction = ScheduleActions.edit;
+    this.cloned = true;
+
+    this.transaction_id = item.transaction_id;
+
+    this.schedH2.patchValue({ activity_event_name: item.activity_event_name}, { onlySelf: true });
+
+    const today: any = new Date();
+    this.schedH2.patchValue({ receipt_date: this._datePipe.transform(today, 'yyyy-MM-dd')}, { onlySelf: true });
+
+    this.schedH2.patchValue({ select_activity_function: item.event_type  === 'fundraising' ? 'f' : 'd'}, { onlySelf: true });
+    this.schedH2.patchValue({ ratio_code: item.ratio_code }, { onlySelf: true });
 
   }
 
