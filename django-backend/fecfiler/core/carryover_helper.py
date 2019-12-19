@@ -11,11 +11,11 @@ def is_pac(cmte_id):
     _sql = """
     SELECT cmte_type_category
     FROM committee_master
-    WHERE cmte_id = %s
+    WHERE cmte_id = %s;
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (cmte_id))
+            cursor.execute(_sql, [cmte_id])
             if cursor.rowcount > 0:
                 return cursor.fetchone()[0] == 'PAC'
         return False
@@ -26,12 +26,12 @@ def is_pac(cmte_id):
 def is_pty(cmte_id):
     _sql = """
     SELECT cmte_type_category
-    FROM committee_master
-    WHERE cmte_id = %s
+    FROM public.committee_master
+    WHERE cmte_id = %s;
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (cmte_id))
+            cursor.execute(_sql, [cmte_id])
             if cursor.rowcount > 0:
                 return cursor.fetchone()[0] == 'PTY'
         return False
@@ -49,7 +49,7 @@ def do_pty_h1_carryover(cmte_id, report_id):
         and clone it with current report id
     """
     count_sql = """
-    select count(*) from public sched_h1
+    select transaction_id from public.sched_h1
     where cmte_id = %s and report_id = %s
     and delete_ind is distinct from 'Y'
     """
@@ -104,6 +104,7 @@ def do_pty_h1_carryover(cmte_id, report_id):
         with connection.cursor() as cursor:
             cursor.execute(count_sql, (cmte_id, report_id))
             if cursor.rowcount == 0:
+                logger.debug('no h1 found in current report. need carryover:')
                 cursor.execute(carryover_sql, (report_id, cmte_id))
                 if cursor.rowcount != 1:
                     raise Exception('error on h1 carryover.')
@@ -148,23 +149,23 @@ def do_pac_h1_carryover(cmte_id, report_id):
              public_communications, 
              back_ref_transaction_id, 
              create_date) 
-    SELECT h1.cmte_id, 
+    SELECT h.cmte_id, 
         %s, 
-        h1.line_number, 
-        h1.transaction_type_identifier, 
-        h1.transaction_type, 
+        h.line_number, 
+        h.transaction_type_identifier, 
+        h.transaction_type, 
         get_next_transaction_id('SH'), 
-        h1.presidential_only, 
-        h1.presidential_and_senate, 
-        h1.senate_only, 
-        h1.non_pres_and_non_senate, 
-        h1.federal_percent, 
-        h1.non_federal_percent, 
-        h1.election_year, 
-        h1.administrative, 
-        h1.generic_voter_drive, 
-        h1.public_communications, 
-        h1.transaction_id, 
+        h.presidential_only, 
+        h.presidential_and_senate, 
+        h.senate_only, 
+        h.non_pres_and_non_senate, 
+        h.federal_percent, 
+        h.non_federal_percent, 
+        h.election_year, 
+        h.administrative, 
+        h.generic_voter_drive, 
+        h.public_communications, 
+        h.transaction_id, 
         Now() 
     FROM  public.sched_h1 h, public.reports r
             WHERE 
@@ -198,9 +199,16 @@ def do_pac_h1_carryover(cmte_id, report_id):
 
 
 def do_h1_carryover(cmte_id, report_id):
+    """
+    doing h1 carryover
+    """
+    logger.debug('doing h1 caryover with cmte_id {} and report_id {}'.format(
+        cmte_id, report_id))
     if is_pty(cmte_id):
+        logger.debug('party h1 carryover...')
         do_pty_h1_carryover(cmte_id, report_id)
     elif is_pac(cmte_id):
+        logger.debug('pac h1 carryover...')
         do_pac_h1_carryover(cmte_id, report_id)
     else:
         pass
