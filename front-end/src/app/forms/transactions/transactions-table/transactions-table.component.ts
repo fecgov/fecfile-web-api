@@ -134,7 +134,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
   private columnOptionCount = 0;
   private maxColumnOption = 6;
-  private readonly maxColumnOptionReadOnly = 6;
+  public readonly maxColumnOptionReadOnly = 6;
   private allTransactionsSelected: boolean;
   private clonedTransaction: any;
   private _previousUrl: any;
@@ -155,8 +155,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       { filterName: 'filterDebtBeginningBalanceMax', options: ['loans-and-debts'] },
       { filterName: 'filterDateFrom', options: ['receipts', 'disbursements', 'other'] },
       { filterName: 'filterDateTo', options: ['receipts', 'disbursements', 'other'] },
-      // {filterName:'filterDeletedDateFrom', options: ['receipts', 'disbursements','loans-and-debts','other']},
-      // {filterName:'filterDeletedDateTo', options: ['receipts', 'disbursements','loans-and-debts','other']},
       { filterName: 'filterMemoCode', options: ['receipts', 'disbursements', 'loans-and-debts', 'other'] },
       { filterName: 'filterElectionCode', options: ['disbursements'] },
       { filterName: 'filterElectionYearFrom', options: ['disbursements'] },
@@ -164,6 +162,25 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       { filterName: 'filterSchedule', options: ['other'] },
       { filterName: 'states', options: ['receipts', 'disbursements', 'loans-and-debts', 'other'] }
     ];
+
+    private _filterToTypeMap : any = [
+      { filterName: 'filterAmountMin', filterType: FilterTypes.amount },
+      { filterName: 'filterAmountMax', filterType: FilterTypes.amount },
+      { filterName: 'filterLoanAmountMin', filterType: FilterTypes.loanAmount },
+      { filterName: 'filterLoanAmountMax', filterType: FilterTypes.loanAmount },
+      { filterName: 'filterAggregateAmountMin', filterType: FilterTypes.aggregateAmount },
+      { filterName: 'filterAggregateAmountMax', filterType: FilterTypes.aggregateAmount },
+      { filterName: 'filterLoanClosingBalanceMin', filterType: FilterTypes.loanClosingBalance },
+      { filterName: 'filterLoanClosingBalanceMax', filterType: FilterTypes.loanClosingBalance },
+      { filterName: 'filterDebtBeginningBalanceMin', filterType: FilterTypes.debtBeginningBalance },
+      { filterName: 'filterDebtBeginningBalanceMax', filterType: FilterTypes.debtBeginningBalance },
+      { filterName: 'filterDateFrom', filterType: FilterTypes.date },
+      { filterName: 'filterDateTo', filterType: FilterTypes.date },
+      { filterName: 'filterElectionCode', filterType: FilterTypes.electionCodes },
+      { filterName: 'filterElectionYearFrom', filterType: FilterTypes.electionYear },
+      { filterName: 'filterElectionYearTo', filterType: FilterTypes.electionYear },
+      { filterName: 'filterSchedule', filterType: FilterTypes.schedule },
+  ]
 
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
   //there is no unsubscribe() for activateRoute but while cycling between 'Transactions' and 'Recycling Bin' views
@@ -201,6 +218,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       });
 
     this.loadDefaultReceiptsTabSubscription = this._transactionsMessageService.getLoadDefaultTabMessage()
+    .takeUntil(this.onDestroy$)
     .subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       this.reportId = p.reportId;
@@ -434,8 +452,6 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.config.itemsPerPage,
         serverSortColumnName,
         sortedCol.descending,
-        // this.filters,
-        // applicableFilters,
         actualFilters,
         categoryType,
         false,
@@ -501,6 +517,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           });
           if (applicableTransactions && applicableTransactions.length > 0 && !applicableTransactions.includes(categoryType)) {
             actualFilters[filter] = null;
+
+            //clear the form on the screen for that filter & remove the tag
+            this.filters[filter] = null;
+            let filterType = this._filterToTypeMap.filter(e => e.filterName === filter);
+            if(filterType && filterType.length > 0){
+              this._transactionsMessageService.sendRemoveTagMessage({ 'type' : filterType[0].filterType});
+            }
+
           }
         }
       }
@@ -521,6 +545,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   public changeTransactionCategory(transactionCategory) {
+
+    //clear all filters first
+    this._transactionsMessageService.sendClearAllFiltersMessage({});
+
     this._router.navigate([`/forms/form/${this.formType}`], {
       queryParams: {
         step: this._activatedRoute.snapshot.queryParams.step,

@@ -1,3 +1,4 @@
+import { LoanMessageService } from './../../sched-c/service/loan-message.service';
 import { TransactionModel } from './../../transactions/model/transaction.model';
 import { Component, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
@@ -30,6 +31,7 @@ import { AbstractScheduleParentEnum } from '../individual-receipt/abstract-sched
   encapsulation: ViewEncapsulation.None
 })
 export class F3xComponent implements OnInit {
+  public loadingData = false;
   public currentStep: string = 'step_1';
   public editMode: boolean = true;
   public step: string = '';
@@ -80,7 +82,8 @@ export class F3xComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
-    private _f3xMessageService: F3xMessageService
+    private _f3xMessageService: F3xMessageService, 
+    private _loanMessageService: LoanMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -491,6 +494,9 @@ export class F3xComponent implements OnInit {
       } else if (this.scheduleType === 'sched_c_ls') {
         this.scheduleType = 'sched_c_ls';
         this.scheduleCAction = ScheduleActions.loanSummary;
+
+        //send message to refresh data for loan summary
+        this._loanMessageService.sendLoanSummaryRefreshMessage({});    
       } else if (this.scheduleType === 'sched_c_loan_payment') {
         //this is being done in case loan payment is being accessed from transaction table,
         //a flag is needed to return back to the transaction table's 'disbursement tab'

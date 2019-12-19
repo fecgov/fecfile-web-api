@@ -1,3 +1,6 @@
+import { SchedH5Component } from './forms/sched-h5/sched-h5.component';
+import { TrashConfirmComponent1 } from './forms/transactions/transactions-table/trash-confirm/trash-confirm.component';
+import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { LoanpaymentComponent } from './forms/sched-c/loanpayment/loanpayment.component';
 import { HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
@@ -38,7 +41,6 @@ import { FormsComponent } from './forms/forms.component';
 import { TransactionsFilterTypeComponent } from './forms/transactions/filter/filter-type/transactions-filter-type.component';
 import { TransactionsFilterComponent } from './forms/transactions/filter/transactions-filter.component';
 import { TransactionsTableComponent } from './forms/transactions/transactions-table/transactions-table.component';
-import { TrashConfirmComponent } from './forms/transactions/transactions-table/trash-confirm/trash-confirm.component';
 import { TransactionsComponent } from './forms/transactions/transactions.component';
 import { LoginComponent } from './login/login.component';
 import { ProfileComponent } from './profile/profile.component';
@@ -57,7 +59,6 @@ import { StepsComponent } from './shared/partials/steps/steps.component';
 import { SubmitComponent } from './shared/partials/submit/submit.component';
 import { ValidateComponent } from './shared/partials/validate/validate.component';
 import { FilterPipe } from './shared/pipes/filter/filter.pipe';
-import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { SafeHTMLPipe } from './shared/pipes/safeHTML/safe-html.pipe';
 import { ZipCodePipe } from './shared/pipes/zip-code/zip-code.pipe';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -90,13 +91,18 @@ import { EndorserComponent } from './forms/sched-c/endorser/endorser.component';
 import { EndorserService } from './forms/sched-c/endorser/service/endorser.service';
 import { SchedC1Component } from './forms/sched-c1/sched-c1.component';
 import { SchedH3Component } from './forms/sched-h3/sched-h3.component';
-import { SchedH5Component } from './forms/sched-h5/sched-h5.component';
 import { SchedH4Component } from './forms/sched-h4/sched-h4.component';
 import { EndorserSummaryComponent } from './forms/sched-c/endorser-summary/endorser-summary.component';
 import { SchedH6Component } from './forms/sched-h6/sched-h6.component';
 import { DebtSummaryComponent } from './forms/sched-d/debt-summary/debt-summary.component';
 import { SchedLComponent } from './forms/sched-l/sched-l.component';
 import { DebtSummaryService } from './forms/sched-d/debt-summary/service/debt-summary.service';
+import { ContactsFilterTypeComponent } from './contacts/filter/filter-type/contacts-filter-type.component';
+import { TrashConfirmComponent2 } from './contacts/contacts-table/trash-confirm/trash-confirm.component';
+import { TrashConfirmComponent3 } from './forms/sched-c/loan-summary/trash-confirm/trash-confirm.component';
+import { SchedH5Component_TOBEDELETED } from './forms/form-3x/sched-h5/sched-h5.component';
+import { SchedH6Component_TOBEDELETED } from './forms/form-3x/sched-h6/sched-h6.component';
+import { SchedH1Component_TOBEDELETED } from './forms/sched-h1/sched-h1.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -122,7 +128,9 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TransactionsFilterComponent,
     TransactionsFilterTypeComponent,
     SubTransactionsTableComponent,
-    TrashConfirmComponent,
+    TrashConfirmComponent1,
+    TrashConfirmComponent2,
+    TrashConfirmComponent3,
     F99Component,
     TypeComponent,
     ReasonComponent,
@@ -154,6 +162,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ReportheaderComponent,
     ReportdetailsComponent,
     SafeHTMLPipe,
+    OrderByPipe,
     ReportsFilterTypeComponent,
     ContactsComponent,
     ContactsTableComponent,
@@ -174,9 +183,15 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     EndorserSummaryComponent,
     SchedH6Component,
     DebtSummaryComponent,
-    SchedLComponent
+    SchedLComponent, 
+    ContactsFilterTypeComponent,
+    SchedH5Component_TOBEDELETED,
+    SchedH6Component_TOBEDELETED,
+    SchedH1Component_TOBEDELETED
+
+
   ],
-  entryComponents: [ConfirmModalComponent, TrashConfirmComponent],
+  entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
     BrowserModule,
     NgSelectModule,

@@ -64,8 +64,8 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
-  private allDebtSelected: boolean;
-  private currentPageNumber = 1;
+  public allDebtSelected: boolean;
+  public currentPageNumber = 1;
 
   /**.
    * Array of columns to be made sortable.
