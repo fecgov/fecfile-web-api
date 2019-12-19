@@ -4030,7 +4030,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         step: 'step_3',
         previousStep: 'step_2',
         transactionType: 'ALLOC_H4_SUM',
-        action: ScheduleActions.add
+        action: ScheduleActions.add,
+        transactionTypeText: 'H4 Transaction List'
       };
       this.status.emit(emitObj);
     }
@@ -4047,7 +4048,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           step: 'step_3',
           previousStep: 'step_2',
           transactionType: 'ALLOC_H6_SUM',
-          action: ScheduleActions.add
+          action: ScheduleActions.add,
+          transactionTypeText: 'H6 Transaction List'
         };
       this.status.emit(emitObj);
     }
