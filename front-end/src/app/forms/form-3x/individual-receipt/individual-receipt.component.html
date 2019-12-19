@@ -451,7 +451,11 @@
               placement="bottom-left" (openChange)="multipleMemoDropdownChanged($event)">
               <button class="btn btn-primary dropdown-toggle" id="jfMemoDropdown" ngbDropdownToggle>
                 <i class="plus-icon-circle" aria-hidden="true"></i>
-                <ng-container *ngIf="transactionType === 'DEBT_TO_VENDOR'; else jfTransferMemo">
+                <ng-container 
+                  *ngIf="
+                    transactionType === 'DEBT_TO_VENDOR' ||
+                    transactionType === 'DEBT_BY_VENDOR';
+                    else jfTransferMemo">
                   Make a Payment on Debt
                 </ng-container>
                 <ng-template #jfTransferMemo>Add JF Transfer Memo</ng-template>

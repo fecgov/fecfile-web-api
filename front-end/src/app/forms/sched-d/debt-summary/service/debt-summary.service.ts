@@ -39,7 +39,13 @@ export class DebtSummaryService {
     let params = new HttpParams();
     params = params.append('report_id', reportId);
 
+    // Getting the summary debts requires the transactionType for the transaction not the summary.
     if (transactionType) {
+      if (transactionType === 'DEBT_OWN_BY_SUMMARY') {
+        transactionType = 'DEBT_BY_VENDOR';
+      } else if (transactionType === 'DEBT_OWN_TO_SUMMARY') {
+        transactionType = 'DEBT_TO_VENDOR';
+      }
       params = params.append('transaction_type_identifier', transactionType);
     }
 
