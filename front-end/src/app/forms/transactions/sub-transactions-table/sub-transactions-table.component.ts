@@ -220,6 +220,12 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
    * @param trx the Transaction to edit
    */
   public editTransaction(trx: TransactionModel): void {
+    if(this.isH4OrH6() === 'H4') {
+      trx.apiCall = '/sh4/schedH4';
+    }else if(this.isH4OrH6() === 'H6') {
+      trx.apiCall = '/sh6/schedH6';
+    }
+
     this._transactionsMessageService.sendEditTransactionMessage(trx);
   }
 
