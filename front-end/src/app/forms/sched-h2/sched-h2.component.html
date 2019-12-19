@@ -24,7 +24,8 @@
           <h2>
             Allocation Ratios
             <!-- <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container> -->
-            <ng-container *ngIf="scheduleAction === editScheduleAction"> / Edit </ng-container>
+            <ng-container *ngIf="scheduleAction === editScheduleAction && !cloned"> / Edit </ng-container>
+            <ng-container *ngIf="scheduleAction === editScheduleAction && cloned"> / Clone </ng-container>
           </h2>
         </div>
         <div class="float-right" ngbDropdown>
@@ -92,6 +93,7 @@
                 class="form-control col-md-10"
                 type="text"
                 formControlName="activity_event_name"
+                [maxlength]="90"
                 [ngClass]="
                   schedH2.get('activity_event_name')?.invalid && (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error'
@@ -209,8 +211,9 @@
               </div>
               <input
                 class="form-control"
-                type="number"
+                type="text"
                 formControlName="federal_percent"
+                [maxlength]="5"
                 [ngClass]="
                   schedH2.get('federal_percent')?.invalid && (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error'
@@ -239,8 +242,9 @@
               </div>
               <input
                 class="form-control"
-                type="number"
+                type="text"
                 formControlName="non_federal_percent"
+                [maxlength]="5"
                 [ngClass]="
                   schedH2.get('non_federal_percent')?.invalid && (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error'
@@ -368,7 +372,7 @@
                       <div id="sched-h2__dropdown-action" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                         <button class="dropdown-item" (click)="editH2(item)"><i class="fas fa-edit"></i> Edit</button>
                         <button class="dropdown-item"><i class="fas fa-print"></i> Print</button>
-                        <button class="dropdown-item"><i class="fas fa-copy"></i> Clone</button>
+                        <button class="dropdown-item" (click)="cloneH2(item)"><i class="fas fa-copy"></i> Clone</button>
                         <button class="dropdown-item"><i class="fas fa-trash"></i> Trash</button>
                       </div>
                     </div>
