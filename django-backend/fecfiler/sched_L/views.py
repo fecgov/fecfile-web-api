@@ -1129,14 +1129,15 @@ def get_sla_summary_table(request):
         _sql_p1 = """
         SELECT json_agg(t) FROM
         (
-            SELECT * 
-            FROM public.sched_a 
-            WHERE cmte_id = %s
-            AND report_id = %s
-            AND transaction_type_identifier in ("""
+            SELECT a.*, l.levin_account_name 
+            FROM public.sched_a a, public.levin_account l
+            WHERE a.cmte_id = %s
+            AND a.report_id = %s
+            AND a.levin_account_id = l.levin_account_id
+            AND a.transaction_type_identifier in ("""
 
         _sql_p2 = """)
-            AND delete_ind is distinct from 'Y'
+            AND a.delete_ind is distinct from 'Y'
         ) t
         """
 
@@ -1191,14 +1192,15 @@ def get_slb_summary_table(request):
         _sql_p1 = """
         SELECT json_agg(t) FROM
         (
-            SELECT * 
-            FROM public.sched_b 
-            WHERE cmte_id = %s
-            AND report_id = %s
-            AND transaction_type_identifier in ("""
+            SELECT b.*, l.levin_account_name
+            FROM public.sched_b b, levin_account l 
+            WHERE b.cmte_id = %s
+            AND b.report_id = %s
+            AND b.levin_account_id = l.levin_account_id
+            AND b.transaction_type_identifier in ("""
 
         _sql_p2 = """)
-            AND delete_ind is distinct from 'Y'
+            AND b.delete_ind is distinct from 'Y'
         ) t
         """
 

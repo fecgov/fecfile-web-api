@@ -2421,6 +2421,7 @@ def get_all_transactions(request):
         output_list = []
         total_amount = 0.0
         with connection.cursor() as cursor:
+            logger.debug('query all transactions with sql:{}'.format(trans_query_string))
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             # print(cursor.query)
             data_row = cursor.fetchone()
