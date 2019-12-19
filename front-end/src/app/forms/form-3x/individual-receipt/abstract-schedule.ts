@@ -798,7 +798,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   private _adjustDebtBalanceAtClose() {
-    if (this.transactionType !== 'DEBT_TO_VENDOR') {
+    if (this.transactionType !== 'DEBT_TO_VENDOR' &&
+        this.transactionType !== 'DEBT_BY_VENDOR') {
       return;
     }
     if (
@@ -3340,7 +3341,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   private _calculateDebtAmountFields(trx: any) {
-    if (trx.transaction_type_identifier !== 'DEBT_TO_VENDOR') {
+    if (trx.transaction_type_identifier !== 'DEBT_TO_VENDOR' &&
+        trx.transaction_type_identifier !== 'DEBT_BY_VENDOR') {
       return;
     }
 

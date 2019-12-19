@@ -55,6 +55,8 @@ export class F3xComponent implements OnInit {
   public transactionType = '';
   public transactionTypeTextSchedF = '';
   public transactionTypeSchedF = '';
+  public transactionTypeTextDebtSummary = '';
+  public transactionTypeDebtSummary = '';
   public transactionDetailSchedC: any;
   public scheduleType = '';
   public isShowFilters = false;
@@ -338,7 +340,7 @@ export class F3xComponent implements OnInit {
               return;
             }
 
-            if (this._handleScheduleD()) {
+            if (this._handleScheduleD(e)) {
               return;
             }
 
@@ -535,9 +537,11 @@ export class F3xComponent implements OnInit {
    * Special handling for Sched D.  For example, don't call dynamic forms for Summary.
    * @returns true if schedule D and should stop processing
    */
-  private _handleScheduleD(): boolean {
+  private _handleScheduleD(e: any): boolean {
     let finish = false;
     if (this.scheduleType === 'sched_d_ds') {
+      this.transactionTypeDebtSummary = e.transactionType;
+      this.transactionTypeTextDebtSummary = e.transactionTypeText;
       this.forceChangeDetectionDebtSummary = new Date();
       this.canContinue();
       finish = true;
