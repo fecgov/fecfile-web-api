@@ -1,13 +1,14 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { LoanModel } from '../../model/loan.model';
+import { TransactionModel } from '../../../transactions/model/transaction.model';
 
 @Component({
   selector: 'app-trash-confirm',
   templateUrl: './trash-confirm.component.html',
   styleUrls: ['./trash-confirm.component.scss']
 })
-export class TrashConfirmComponent implements OnInit {
+export class TrashConfirmComponent3 implements OnInit {
 
   @Input()
   public modalTitle: string;
@@ -25,6 +26,8 @@ export class TrashConfirmComponent implements OnInit {
   public modalParent: ConfirmModalComponent;
 
   public Loans: Array<LoanModel>;
+
+  public transactions: Array<TransactionModel>;
 
 
   public constructor() { }

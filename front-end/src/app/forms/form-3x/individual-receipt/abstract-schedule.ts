@@ -120,7 +120,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Indicates the Form Group is loaded.  Used by "hybrid" parent classes of this base class
    * having both "static" and "dynamic" form fields as found in Sched F Debt Payment.
    */
-  protected loaded = false;
+  public loaded = false;
 
   private _reportType: any = null;
   private _cloned = false;
@@ -798,7 +798,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   private _adjustDebtBalanceAtClose() {
-    if (this.transactionType !== 'DEBT_TO_VENDOR') {
+    if (this.transactionType !== 'DEBT_TO_VENDOR' &&
+        this.transactionType !== 'DEBT_BY_VENDOR') {
       return;
     }
     if (
@@ -3340,7 +3341,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   private _calculateDebtAmountFields(trx: any) {
-    if (trx.transaction_type_identifier !== 'DEBT_TO_VENDOR') {
+    if (trx.transaction_type_identifier !== 'DEBT_TO_VENDOR' &&
+        trx.transaction_type_identifier !== 'DEBT_BY_VENDOR') {
       return;
     }
 
@@ -3509,7 +3511,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   //   return false;
   // }
 
-  protected clearFormValues(): void {
+  public clearFormValues(): void {
     this._transactionToEdit = null;
 
     this._selectedEntity = null;
@@ -4030,7 +4032,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         step: 'step_3',
         previousStep: 'step_2',
         transactionType: 'ALLOC_H4_SUM',
-        action: ScheduleActions.add
+        action: ScheduleActions.add,
+        transactionTypeText: 'H4 Transaction List'
       };
       this.status.emit(emitObj);
     }
@@ -4047,7 +4050,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           step: 'step_3',
           previousStep: 'step_2',
           transactionType: 'ALLOC_H6_SUM',
-          action: ScheduleActions.add
+          action: ScheduleActions.add,
+          transactionTypeText: 'H6 Transaction List'
         };
       this.status.emit(emitObj);
     }

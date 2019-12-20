@@ -905,8 +905,9 @@ def reports(request):
             }    
             data = post_reports(datum)
             if type(data) is dict:
+                print(data)
                 # do h1 carryover if new report created
-                do_h1_carryover(data.get('cmte_id'), data.get('report_id'))
+                do_h1_carryover(data.get('cmteid'), data.get('reportid'))
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
@@ -2421,6 +2422,7 @@ def get_all_transactions(request):
         output_list = []
         total_amount = 0.0
         with connection.cursor() as cursor:
+            logger.debug('query all transactions with sql:{}'.format(trans_query_string))
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
             print(cursor.query)
             data_row = cursor.fetchone()
@@ -4960,6 +4962,26 @@ def get_next_transaction_id(trans_char):
     except Exception:
         raise
 
+def get_sched_h_transaction_table(transaction_id):
+    """
+    helper function for querying transaction table name for sched h
+    """
+    _sql = """
+    select transaction_table 
+    from all_other_transactions_view 
+    where transaction_id = %s;
+    """
+    try:
+        with connection.cursor() as cursor:
+            logger.debug("fetching transaction table name for {}".format(transaction_id))
+            # cursor.execute(table_schema_sql, (transaction_table))
+            cursor.execute(_sql, [transaction_id]) 
+            if cursor.rowcount == 0:
+                raise Exception('transaction_id not found.')
+            return cursor.fetchone()[0]
+    except:
+        raise
+
 @api_view(['POST'])
 def clone_a_transaction(request):
     """
@@ -4971,6 +4993,9 @@ def clone_a_transaction(request):
     2. transaction amount is set to 0
     3. create date is also today's date 
     4. last update date has null value
+
+    update 20191220: sched_h clone function added. transaction_table for a 
+    transaction_id is fetched from all_other_transactions_view
     """
     # TODO: need to update this list for ohter transactions
     logger.debug('request for cloning a transaction:{}'.format(request.data))
@@ -4989,6 +5014,8 @@ def clone_a_transaction(request):
     if transaction_id[0:2] in transaction_tables:
         transaction_table = transaction_tables.get(transaction_id[0:2])
         # raise Exception('Error: invalid transaction id found.')
+    elif transaction_id[0:2] == 'SH':
+        transaction_table = get_sched_h_transaction_table(transaction_id)
     else:
         raise Exception('Error: invalid transaction id found.')
 
@@ -5013,6 +5040,7 @@ def clone_a_transaction(request):
         replace_list = ['transaction_id', 'create_date', 'last_update_date']
         tmp_list = [col if col not in replace_list else '%s' for col in columns]
         select_str = ','.join(tmp_list)
+        print('select_str:{}'.format(select_str))
 
         # set transaction date to today's date and transaction amount to 0
         from datetime import date
@@ -5023,6 +5051,16 @@ def clone_a_transaction(request):
         if transaction_id.startswith('SB'):
             select_str = select_str.replace('expenditure_date', "'"+_today+"'")
             select_str = select_str.replace('expenditure_amount', "'"+'0.00'+"'")
+        if transaction_id.startswith('SH') and transaction_table == 'sched_h4':
+            select_str = select_str.replace('expenditure_date', "'"+_today+"'")
+            select_str = select_str.replace('total_amount', "'"+'0.00'+"'")
+            select_str = select_str.replace('non_fed_share_amount', "'"+'0.00'+"'")
+            select_str = select_str.replace('fed_share_amount', "'"+'0.00'+"'")
+        if transaction_id.startswith('SH') and transaction_table == 'sched_h6':
+            select_str = select_str.replace('expenditure_date', "'"+_today+"'")
+            select_str = select_str.replace('total_fred_levin_amount', "'"+'0.00'+"'")
+            select_str = select_str.replace('federal_share', "'"+'0.00'+"'")
+            select_str = select_str.replace('levin_share', "'"+'0.00'+"'")
             # exclude_list = ['expenditure_date', 'expenditure_amount'] 
         # select_str = insert_str.replace(',transaction_id,', ',%s,'
         # ).replace('create_date', '%s'

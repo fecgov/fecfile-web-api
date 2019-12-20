@@ -119,8 +119,8 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
   private columnOptionCount = 0;
   private maxColumnOption = 5;
-  private allEndorserSelected: boolean;
-  private currentPageNumber: number = 1;
+  public allEndorserSelected: boolean;
+  public currentPageNumber: number = 1;
 
   constructor(
     private _LoanService: LoanService,

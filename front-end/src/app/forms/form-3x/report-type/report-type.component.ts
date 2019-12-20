@@ -55,6 +55,7 @@ export class ReportTypeComponent implements OnInit {
   public tooltipPosition = 'right';
   public tooltipLeft = 'auto';
   public customFormValidation: any;
+  public reportsLoading: boolean;
 
   private _committeeDetails: any = null;
   private _dueDate: string = null;

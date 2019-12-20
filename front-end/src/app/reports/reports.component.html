@@ -17,7 +17,7 @@
 						</tr>
 					</thead>	
 					<tbody>
-						<tr *ngFor="let report of reports || async">
+						<tr *ngFor="let report of reports | async">
 							<td text-align="left">{{report.form_type}}</td>
 							<td text-align="left">{{report.is_submitted ? 'Submitted' :'Saved'}}</td>
 							<td text-align="right" >{{report.is_submitted ? report.id : ''}}</td>

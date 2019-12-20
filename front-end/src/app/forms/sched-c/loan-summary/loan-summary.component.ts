@@ -133,8 +133,9 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 
   private columnOptionCount = 0;
   private maxColumnOption = 5;
-  private allLoanSelected: boolean;
-  private currentPageNumber: number = 1;
+  public allLoanSelected: boolean;
+  public currentPageNumber: number = 1;
+  private _loanSummaryRefreshDataSubscription: Subscription;
 
   constructor(
     private _LoanService: LoanService,
@@ -157,7 +158,13 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
           this.getPage(this.config.currentPage)
         }
       );
-
+    
+    this._loanSummaryRefreshDataSubscription = this._LoanMessageService.getLoanSummaryRefreshMessage()
+    .subscribe(
+      message => {
+        this.loadPage();
+      }
+    )
   }
   /**
    * Initialize the component.
@@ -167,6 +174,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
+    // this.loadPage();
+  }
+
+  private loadPage() {
     const paginateConfig: PaginationInstance = {
       id: 'forms__ctn-table-pagination',
       itemsPerPage: 10,
@@ -175,17 +186,13 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.config = paginateConfig;
     // this.config.currentPage = 1;
     this.tableType = ActiveView.loanSummary;
-
     this.getCachedValues();
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
-
     for (const col of this.sortableColumns) {
       if (col.checked) {
         this.columnOptionCount++;
       }
     }
-
-
     this.getPage(this.config.currentPage);
   }
 
@@ -201,6 +208,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
+    this._loanSummaryRefreshDataSubscription.unsubscribe();
   }
 
 

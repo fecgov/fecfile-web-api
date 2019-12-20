@@ -27,7 +27,7 @@ export class DebtSummaryService {
   /**
    * Get the Debts comprising the Debt Summary.
    */
-  public getDebts(): Observable<any> {
+  public getDebts(transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/sd/schedD';
@@ -38,6 +38,16 @@ export class DebtSummaryService {
 
     let params = new HttpParams();
     params = params.append('report_id', reportId);
+
+    // Getting the summary debts requires the transactionType for the transaction not the summary.
+    if (transactionType) {
+      if (transactionType === 'DEBT_OWN_BY_SUMMARY') {
+        transactionType = 'DEBT_BY_VENDOR';
+      } else if (transactionType === 'DEBT_OWN_TO_SUMMARY') {
+        transactionType = 'DEBT_TO_VENDOR';
+      }
+      params = params.append('transaction_type_identifier', transactionType);
+    }
 
     return this._http
       .get(`${environment.apiUrl}${url}`, {

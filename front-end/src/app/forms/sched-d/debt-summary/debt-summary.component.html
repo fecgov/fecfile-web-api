@@ -1,7 +1,5 @@
 <div class="header-content">
-  <h1>
-    F3X / Schedule-D / Debt Summary
-  </h1>
+  <h1>F3X / Schedule-D / {{ transactionTypeText }}</h1>
   <br />
 </div>
 <div class="debtSumamry__table-container">
@@ -53,7 +51,7 @@
       </tr>
     </thead>
     <tbody>
-      <ng-container *ngFor="let debt of debtModel | paginate: { itemsPerPage: 10, currentPage: currentPageNumber }">
+      <ng-container *ngFor="let debt of debtModel | paginate: { itemsPerPage: 10, currentPage: p }">
         <tr>
           <td>
             <input [(ngModel)]="debt.selected" type="checkbox" (click)="checkForMultiChecked($event)" />
@@ -95,31 +93,6 @@
             </div>
           </td>
         </tr>
-        <!-- <tr [ngbCollapse]="debt.child ? !debt.toggleChild : ''" *ngFor="let debtChild of debt.child" class="child-bg">
-          <td></td>
-          <td class="child-bg-text">{{ debtChild.name }}</td>
-          <td class="child-bg-text">{{ debt.paymentDate | date: 'MM/dd/yyyy' }}</td>
-          <td></td>
-          <td></td>
-          <td class="child-bg-text">{{ debtChild.paymentAmt | currency: 'USD':'symbol-narrow':'1.2-2' }}</td>
-          <td></td>
-          <td>
-            <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-              <button class="btn btn-sm btn-primary" ngbDropdownToggle >
-                <i class="ellipsis-icon"></i>
-              </button>
-              <div id="debtSumamry__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                <button class="dropdown-item" (click)="editDebtPayment(debtChild)">
-                  <i class="edit-icon"></i> Edit
-                </button>
-                <button class="dropdown-item" (click)="trashDebtPayment(debtChild)">
-                  <i class="trash-icon"></i> Trash
-                </button>
-              </div>
-            </div>
-          </td>
-        </tr> -->
-
         <ng-container *ngIf="debt?.child?.length > 0">
           <tr [ngbCollapse]="debt?.child?.length > 0 ? !debt.toggleChild : ''" class="payment-bg">
             <th style="padding-left: 70px;" colspan="3">Type</th>
@@ -156,6 +129,6 @@
   </table>
   <hr />
   <div class="d-flex justify-content-center debtSumamry__table-pagination-container">
-    <pagination-controls (pageChange)="currentPageNumber = $event"> </pagination-controls>
+    <pagination-controls (pageChange)="p = $event"></pagination-controls>
   </div>
 </div>
