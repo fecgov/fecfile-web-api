@@ -116,8 +116,8 @@ SCHEDULE_TO_TABLE_DICT = { 'SA': ['sched_a'],
     'SL': ['sched_l']
 }
 
-NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER = ['LOAN_FROM_IND', 'LOAN_FROM_BANK', 'LOAN_OWN_TO_CMTE_OUT', 'IK_OUT', 'IK_BC_OUT', 
-    'PARTY_IK_OUT', 'PARTY_IK_BC_OUT', 'PAC_IK_OUT', 'PAC_IK_BC_OUT', 'IK_TRAN_OUT', 'IK_TRAN_FEA_OUT']
+# NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER = ['LOAN_FROM_IND', 'LOAN_FROM_BANK', 'LOAN_OWN_TO_CMTE_OUT', 'IK_OUT', 'IK_BC_OUT', 
+#     'PARTY_IK_OUT', 'PARTY_IK_BC_OUT', 'PAC_IK_OUT', 'PAC_IK_BC_OUT', 'IK_TRAN_OUT', 'IK_TRAN_FEA_OUT']
 
 logger = logging.getLogger(__name__)
 # aws s3 bucket connection
@@ -319,7 +319,8 @@ def get_dynamic_forms_fields(request):
         # print(forms_obj)
         if bool(forms_obj):
             if transaction_type in ['ALLOC_EXP','ALLOC_EXP_VOID','ALLOC_EXP_CC_PAY','ALLOC_EXP_STAF_REIM','ALLOC_EXP_PMT_TO_PROL', 'ALLOC_EXP_DEBT',
-                                    'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM_MEMO', 'ALLOC_EXP_PMT_TO_PROL_MEMO']:
+                                    'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM_MEMO', 'ALLOC_EXP_PMT_TO_PROL_MEMO', 'ALLOC_FEA_DISB',
+                                    'ALLOC_FEA_CC_PAY','ALLOC_FEA_STAF_REIM','ALLOC_FEA_CC_PAY_MEMO','ALLOC_FEA_STAF_REIM_MEMO','ALLOC_FEA_VOID','ALLOC_FEA_DISB_DEBT']:
                 if cmte_type_category:
                     for events in forms_obj['data']['committeeTypeEvents']:
                         for eventTypes in events['eventTypes']:
@@ -2109,30 +2110,30 @@ TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FN
 def get_trans_query(category_type, cmte_id, param_string):
         
     if category_type == 'disbursements_tran':
-        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+        query_string = """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
-                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, true as "isEditable" from all_disbursements_transactions_view
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild from all_disbursements_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     elif category_type == 'loans_tran':
-        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
+        query_string = """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
                           purpose_description, loan_amount, loan_payment_to_date, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
-                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, true as "isEditable" from all_loans_debts_transactions_view
+                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild from all_loans_debts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     elif category_type == 'other_tran':
-        query_string = """SELECT report_id, schedule, report_type, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, 
+        query_string = """SELECT report_id, schedule, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, 
                           name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, 
-                                election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, true as "isEditable"
+                                election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild
                             from all_other_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """ 
     else:
-        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+        query_string = """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
-                                transaction_type_identifier, entity_id, entity_type, deleteddate, true as "isEditable" from all_receipts_transactions_view
+                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild from all_receipts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
     return query_string
 
@@ -2421,7 +2422,7 @@ def get_all_transactions(request):
         total_amount = 0.0
         with connection.cursor() as cursor:
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
-            # print(cursor.query)
+            print(cursor.query)
             data_row = cursor.fetchone()
             if data_row and data_row[0]:
                 transaction_list = data_row[0]
@@ -2449,8 +2450,8 @@ def get_all_transactions(request):
                     for tran_id,transaction in transaction_dict.items():
                         if transaction.get('memo_code') != 'X':
                             total_amount += transaction.get('transaction_amount', 0.0)
-                        if transaction.get('transaction_type_identifier') in NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER:
-                            transaction['isEditable'] = False
+                        # if transaction.get('transaction_type_identifier') in NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER:
+                        #     transaction['isEditable'] = False
                         if transaction.get('back_ref_transaction_id') is not None and transaction.get('back_ref_transaction_id') in transaction_dict: 
                             parent = transaction_dict.get(transaction.get('back_ref_transaction_id'))
                             if 'child' not in parent:

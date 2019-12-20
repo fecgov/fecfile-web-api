@@ -337,7 +337,7 @@ def post_sql_schedA(cmte_id,
                 levin_account_id, 
                 transaction_type_identifier
             ])
-            if corsur.rowcount != 1:
+            if cursor.rowcount != 1:
                 logger.debug('post_sql_schedA failed.')
 
     except Exception:
