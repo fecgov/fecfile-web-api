@@ -1138,7 +1138,7 @@ def get_sla_summary_table(request):
         _sql_p1 = """
         SELECT json_agg(t) FROM
         (
-            SELECT a.*, l.levin_account_name, tp.tran_desc, e.first_name, e.last_name, e.entity_name 
+            SELECT a.*, l.levin_account_name, tp.tran_desc, e.first_name, e.last_name, e.entity_name, e.entity_type 
             FROM public.sched_a a, public.levin_account l, public.entity e, public.ref_transaction_types tp
             WHERE a.cmte_id = %s
             AND a.report_id = %s
@@ -1205,7 +1205,7 @@ def get_slb_summary_table(request):
         _sql_p1 = """
         SELECT json_agg(t) FROM
         (
-            SELECT b.*, l.levin_account_name, tp.tran_desc, e.first_name, e.last_name, e.entity_name
+            SELECT b.*, l.levin_account_name, tp.tran_desc, e.first_name, e.last_name, e.entity_name, e.entity_type
             FROM public.sched_b b, public.levin_account l, public.entity e, public.ref_transaction_types tp
             WHERE b.cmte_id = %s
             AND b.report_id = %s
