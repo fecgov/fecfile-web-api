@@ -579,6 +579,7 @@ def get_fed_nonfed_share(request):
         start_dt = datetime.date(int(calendar_year), 1, 1)
         end_dt = datetime.date(int(calendar_year), 12, 31)
         event_name = request.query_params.get('activity_event_identifier') 
+        transaction_type_identifier = request.query_params.get('transaction_type_identifier') 
 
         if event_name: # event-based, goes to h2
             _sql = """
@@ -678,7 +679,10 @@ def get_fed_nonfed_share(request):
         # fed_percent = float(cursor.fetchone()[0])
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
-        new_aggregate_amount = aggregate_amount + float(total_amount)
+        if not transaction_type_identifier.endswith('_MEMO'):
+            new_aggregate_amount = aggregate_amount + float(total_amount)
+        else:
+            new_aggregate_amount = aggregate_amount
         return JsonResponse(
             {
                 'fed_share': '{0:.2f}'.format(fed_share), 

@@ -48,11 +48,13 @@ def do_pty_h1_carryover(cmte_id, report_id):
         do carryover - grab the most recent h1 item 
         and clone it with current report id
     """
+
     count_sql = """
     select transaction_id from public.sched_h1
     where cmte_id = %s and report_id = %s
-    and delete_ind is distinct from 'Y'
+    and delete_ind is distinct from 'Y';
     """
+
     carryover_sql = """
     INSERT INTO sched_h1 
             (cmte_id, 
@@ -103,12 +105,14 @@ def do_pty_h1_carryover(cmte_id, report_id):
     try:
         with connection.cursor() as cursor:
             cursor.execute(count_sql, (cmte_id, report_id))
-            if cursor.rowcount == 0:
+            print(cursor.fetchone())
+            print(cursor.rowcount)
+            if not cursor.rowcount:
                 logger.debug('no h1 found in current report. need carryover:')
                 cursor.execute(carryover_sql, (report_id, cmte_id))
                 if cursor.rowcount != 1:
-                    raise Exception('error on h1 carryover.')
-                logger.debug('pty h1 carryover done.')
+                    logger.debug('no valid h1 found for carryover.')
+            logger.debug('pty h1 carryover done.')
     except:
         raise
 
@@ -213,6 +217,77 @@ def do_h1_carryover(cmte_id, report_id):
     else:
         pass
 
+
+def do_h2_carryover(cmte_id, report_id):
+    """
+    this is the function to handle h2 carryover form one report to next report:
+    1. load all h2 items with distinct event names from last report
+    2. update all records with new transaction_id, new report_id
+    3. set ration code to 's' - same as previously
+    4. copy all other fields
+    """
+    _sql = """
+    insert into public.sched_h2(
+                    cmte_id,
+                    report_id,
+                    line_number,
+                    transaction_type_identifier,
+                    transaction_type,
+                    transaction_id,
+                    activity_event_name,
+                    fundraising,
+                    direct_cand_support,
+                    ratio_code,
+                    revise_date,
+                    federal_percent,
+                    non_federal_percent,
+                    back_ref_transaction_id,
+                    create_date
+					)
+					SELECT 
+					h.cmte_id, 
+                    %s, 
+                    h.line_number,
+                    h.transaction_type_identifier, 
+                    h.transaction_type,
+                    get_next_transaction_id('SH'), 
+                    h.activity_event_name,
+                    h.fundraising,
+                    h.direct_cand_support, 
+                    's',
+                    h.revise_date,
+                    h.federal_percent,
+                    h.non_federal_percent,
+                    h.transaction_id,
+                    now()
+            FROM public.sched_h2 h, public.reports r
+            WHERE 
+            h.cmte_id = %s
+            AND h.report_id != %s
+            AND h.report_id = r.report_id
+            AND r.cvg_start_date < (
+                        SELECT r.cvg_start_date
+                        FROM   public.reports r
+                        WHERE  r.report_id = %s
+                    )
+            AND h.transaction_id NOT In (
+                select distinct h2.back_ref_transaction_id from public.sched_h2 h2
+                where h2.cmte_id = %s
+                and h2.back_ref_transaction_id is not null
+            )
+            AND h.delete_ind is distinct from 'Y'
+    """
+    try:
+        logger.debug('doing h2 carryover...')
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
+            if cursor.rowcount == 0:
+                logger.debug('No valid h2 items found.')
+            logger.debug(
+                'h2 carryover done with report_id {}'.format(report_id))
+            logger.debug('total carryover h2 items:{}'.format(cursor.rowcount))
+    except:
+        raise
 
 def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):
     """
