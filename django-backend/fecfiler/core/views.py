@@ -31,7 +31,10 @@ from fuzzywuzzy import fuzz
 import pandas
 import numpy
 
-from fecfiler.core.carryover_helper import do_h1_carryover
+from fecfiler.core.carryover_helper import (
+    do_h1_carryover,
+    do_h2_carryover,
+)
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
@@ -905,9 +908,10 @@ def reports(request):
             }    
             data = post_reports(datum)
             if type(data) is dict:
-                print(data)
+                # print(data)
                 # do h1 carryover if new report created
                 do_h1_carryover(data.get('cmteid'), data.get('reportid'))
+                do_h2_carryover(data.get('cmteid'), data.get('reportid'))
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
@@ -2387,6 +2391,10 @@ def get_all_transactions(request):
         
         # ADDED the below code to access transactions across reports
         if 'reportid' in request.data and str(request.data.get('reportid')) not in ['',"", "null", "none"]:
+            # add carryover code here so that carryover can be triggered by get_all_transactions
+            if int(request.data.get('reportid')) != 0:
+                do_h1_carryover(cmte_id, request.data.get('reportid'))
+                do_h2_carryover(cmte_id, request.data.get('reportid'))
             report_list = superceded_report_id_list(request.data.get('reportid'))
             if ctgry_type != 'other_tran':
                 param_string += " AND report_id in ('{}')".format("', '".join(report_list))
