@@ -22,7 +22,7 @@ export class SchedH3Service {
     private _cookieService: CookieService,
   ) { }
 
-  public getActivityOrEventIdentifiers(activity_event_type: string): Observable<any> {
+  public getActivityOrEventIdentifiers(activity_event_type: string, reportId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     const url = '/sh2/get_h2_type_events';
@@ -32,6 +32,7 @@ export class SchedH3Service {
 
     let params = new HttpParams();
     params = params.append('activity_event_type', activity_event_type);
+    params = params.append('report_id', reportId);
     
     return this._http
       .get(

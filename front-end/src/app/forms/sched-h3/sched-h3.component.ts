@@ -300,9 +300,11 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   
   public setActivityOrEventIdentifier(category: string) {
 
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
     this.identifiers = [];
     this.h3Subscription = 
-      this._schedH3Service.getActivityOrEventIdentifiers(category)
+      this._schedH3Service.getActivityOrEventIdentifiers(category, reportId)
       .subscribe(res =>
         {
           if(res) {            
