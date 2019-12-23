@@ -1041,6 +1041,7 @@ def get_h2_type_events(request):
     logger.debug('get_h2_type_events with request:{}'.format(request.query_params))
     cmte_id = request.user.username
     event_type = request.query_params.get('activity_event_type').strip()
+    report_id = request.query_params.get('report_id').strip()
     if event_type not in ['fundraising', 'direct_cand_support']:
         raise Exception('missing or non-valid event type value')
     if event_type == 'fundraising':
@@ -1048,21 +1049,25 @@ def get_h2_type_events(request):
         SELECT json_agg(t) from (
         SELECT activity_event_name 
         FROM   public.sched_h2 
-        WHERE  cmte_id = '{}'
-            AND fundraising = true) t;
-        """.format(cmte_id)
+        WHERE  cmte_id = %s
+        AND report_id = %s
+        AND fundraising = true
+        AND delete_ind is distinct from 'Y') t
+        """
     else:
         _sql = """
         SELECT json_agg(t) from(
         SELECT activity_event_name 
         FROM   public.sched_h2 
-        WHERE  cmte_id = '{}'
-            AND direct_cand_support = true) t;
-        """.format(cmte_id)
+        WHERE  cmte_id = %s 
+        AND report_id = %s
+        AND direct_cand_support = true
+        AND delete_ind is distinct from 'Y') t
+        """
     try:
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
-            cursor.execute(_sql)
+            cursor.execute(_sql, [cmte_id, report_id])
             json_res = cursor.fetchone()[0]
             # print(json_res)
             if not json_res:
