@@ -444,6 +444,35 @@ export class F3xComponent implements OnInit {
         }
       } else if (e.hasOwnProperty('otherSchedHTransactionType')) {
         this.transactionType = e.otherSchedHTransactionType;
+
+        if(this.transactionType === 'ALLOC_H4_SUM') {
+          this.transactionTypeText = 'H4 Transaction List'
+        }else if (
+          this.transactionType === 'ALLOC_H4_TYPES' ||
+          this.transactionType === 'ALLOC_EXP' ||
+          this.transactionType === 'ALLOC_EXP_CC_PAY' ||
+          this.transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+          this.transactionType === 'ALLOC_EXP_STAF_REIM' ||
+          this.transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+          this.transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+          this.transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+          this.transactionType === 'ALLOC_EXP_VOID') {
+            this.transactionTypeText = 'H4 Entry'
+        }
+
+        if(this.transactionType === 'ALLOC_H6_SUM') {
+          this.transactionTypeText = 'H6 Transaction List'
+        }else if (
+          this.transactionType === 'ALLOC_H6_TYPES' ||
+          this.transactionType === 'ALLOC_FEA_DISB' ||
+          this.transactionType === 'ALLOC_FEA_CC_PAY' ||
+          this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+          this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
+          this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+          this.transactionType === 'ALLOC_FEA_VOID') {
+            this.transactionTypeText = 'H6 Entry'
+        }
+
       }
     }
   }

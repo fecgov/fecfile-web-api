@@ -905,7 +905,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName).subscribe(
+    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType).subscribe(
       res => {
         if (res) {
           if (res.fed_share) {
@@ -2872,7 +2872,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       'ALLOC_H4_TYPES',
       'ALLOC_H6_TYPES',
       'LA_ENTRY',
-      'LB_ENTRY'
+      'LB_ENTRY',
+      'ALLOC_H4_SUM',
+      'ALLOC_H6_SUM'
     ];
     // var a = [1,2,3];
     // Do not call dynaic form for statis transaction types
