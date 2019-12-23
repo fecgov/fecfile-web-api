@@ -811,13 +811,14 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.schedH5.patchValue({ account_name: item.account_name}, { onlySelf: true });
     this.schedH5.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
-    this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(item.transferred_amount, '.2-2')}, { onlySelf: true });
+    this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(
+      this.convertFormattedAmountToDecimal(item.transferred_amount), '.2-2')}, { onlySelf: true });
 
     this.h5Entries = this.h5Entries.filter(obj => obj !== item);
 
     let sum = 0;
     this.h5Entries.forEach(obj => {
-     sum += obj.transferred_amount;
+     sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
     })
 
     this.schedH5.patchValue({ total_amount_transferred:

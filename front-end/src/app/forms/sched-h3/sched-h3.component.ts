@@ -865,13 +865,14 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH3.patchValue({ category: item.activity_event_type}, { onlySelf: true });
     this.schedH3.patchValue({ activity_event_name: item.activity_event_name}, { onlySelf: true });
     this.schedH3.patchValue({ transferred_amount: this._decPipe.transform(item.transferred_amount, '.2-2')}, { onlySelf: true });
-    this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(item.aggregate_amount, '.2-2')}, { onlySelf: true });
+    this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(
+      this.convertFormattedAmountToDecimal(item.aggregate_amount), '.2-2')}, { onlySelf: true });
 
     this.h3Entries = this.h3Entries.filter(obj => obj !== item);
 
     let sum = 0;
     this.h3Entries.forEach(obj => {
-     sum += obj.transferred_amount;
+     sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
     })
 
     this.schedH3.patchValue({ total_amount_transferred:
