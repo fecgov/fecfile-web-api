@@ -5807,15 +5807,17 @@ def prepare_Schedl_summary_data(request):
         #schedule_a_b_line_sum_dict = {}
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT line_number, sum(contribution_amount) from public.sched_a 
-                where cmte_id = '%s' AND report_id = '%s'  And line_number in ('1A','2') group by line_number;""" %(cmte_id, report_id))
+                SELECT sa.line_number, sum(sa.contribution_amount), la.levin_account_name from public.sched_a sa
+                join levin_account la on sa.levin_account_id = la.levin_account_id  
+                where cmte_id = '%s' AND report_id = '%s'  And line_number in ('1A','2') group by group by sa.line_number,la.levin_account_name;""" %(cmte_id, report_id))
            
             sched_la_line_sum_result = cursor.fetchall()
             sched_la_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_la_line_sum_result}
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT line_number, sum(expenditure_amount) from public.sched_b 
-                where cmte_id = '%s' AND report_id = '%s' AND line_number in  ('4A', '4B','4C','4D','5') group by line_number;""" %(cmte_id, report_id))
+                SELECT sb.line_number, sum(sb.contribution_amount), la.levin_account_name from public.sched_b sb
+                join levin_account la on sb.levin_account_id = la.levin_account_id 
+                where cmte_id = '%s' AND report_id = '%s' AND line_number in  ('4A', '4B','4C','4D','5')  group by group by sb.line_number,la.levin_account_name;""" %(cmte_id, report_id))
             #print(cursor.query)
             #commented by Mahendra 10052019
             sched_lb_line_sum_result = cursor.fetchall()
