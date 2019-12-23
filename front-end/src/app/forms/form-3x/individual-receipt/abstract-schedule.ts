@@ -449,7 +449,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     // as it is in F3X component, the form data must be set in this way
     // to avoid race condition
     if (this._transactionToEdit) {
-      this._setFormDataValues(this._transactionToEdit.transactionId, this._transactionToEdit.apiCall);
+      this._setFormDataValues(this._transactionToEdit.transactionId, this._transactionToEdit.apiCall, this._transactionToEdit.reportId);
     }
 
     // get form data API is passing X for memo code value.
@@ -1703,7 +1703,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
 
-      this._receiptService.saveSchedule(this.formType, this.scheduleAction).subscribe(res => {
+      //if the reportId is present in the queryParams, that is the one that should be used instead 
+      //of using from local storage as it can very easily cause inconsistencies. 
+      let reportId = null;
+      if(this._activatedRoute && this._activatedRoute.snapshot && 
+        this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
+           reportId = this._activatedRoute.snapshot.queryParams.reportId;
+      }
+
+      this._receiptService.saveSchedule(this.formType, this.scheduleAction, reportId).subscribe(res => {
         if (res) {
           this._transactionToEdit = null;
 
@@ -2108,7 +2116,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       });
     } else {
       let reportId = this._receiptService.getReportIdFromStorage(this.formType);
-      if (!reportId) {
+      if (!reportId && this._activatedRoute && this._activatedRoute.snapshot && 
+        this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
+           reportId = this._activatedRoute.snapshot.queryParams.reportId
+      }
+      else{
         reportId = '0';
       }
       this._dialogService
@@ -3175,7 +3187,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this._selectedCandidateChangeWarnChild = {};
 
         // this.transactionType = formData.transactionTypeIdentifier;
-        this._setFormDataValues(formData.transactionId, formData.apiCall);
+        this._setFormDataValues(formData.transactionId, formData.apiCall, formData.reportId);
       }
     }
   }
@@ -3185,8 +3197,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    *
    * @param transactionId
    */
-  private _setFormDataValues(transactionId: string, apiCall: string) {
-    const reportId = this._receiptService.getReportIdFromStorage(this.formType);
+  private _setFormDataValues(transactionId: string, apiCall: string, reportId: string) {
+    if(!reportId){
+      reportId = this._receiptService.getReportIdFromStorage(this.formType);
+    }
     this.subTransactions = [];
     this._receiptService.getDataSchedule(reportId, transactionId, apiCall).subscribe(res => {
       if (Array.isArray(res)) {

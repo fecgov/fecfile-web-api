@@ -78,7 +78,7 @@ export class IndividualReceiptService {
    * @param      {string}           formType  The form type
    * @param      {ScheduleActions}  scheduleAction  The type of action to save (add, edit)
    */
-  public saveSchedule(formType: string, scheduleAction: ScheduleActions): Observable<any> {
+  public saveSchedule(formType: string, scheduleAction: ScheduleActions, reportId: string = null): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
@@ -104,10 +104,12 @@ export class IndividualReceiptService {
      */
     formData.append('cmte_id', committeeDetails.committeeid);
     // With Edit Report Functionality
-    if (reportType.hasOwnProperty('reportId')) {
+    if (reportType && reportType.hasOwnProperty('reportId')) {
       formData.append('report_id', reportType.reportId);
-    } else if (reportType.hasOwnProperty('reportid')) {
+    } else if (reportType && reportType.hasOwnProperty('reportid')) {
       formData.append('report_id', reportType.reportid);
+    } else if(reportId && reportId !== "0" && reportId !== "undefined"){
+      formData.append('report_id',reportId);
     }
 
     console.log();
@@ -274,7 +276,9 @@ export class IndividualReceiptService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     let params = new HttpParams();
-    params = params.append('report_id', reportId);
+    if(reportId && reportId !== 'undefined' && reportId !== 'null' && reportId !== '0' && reportId !== ''){
+      params = params.append('report_id', reportId);
+    }
     if (transactionId) {
       params = params.append('transaction_id', transactionId);
     }

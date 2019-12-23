@@ -106,7 +106,7 @@ export class TransactionsService {
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService,
-    private _receiptService: IndividualReceiptService,
+    private _receiptService: IndividualReceiptService, 
     private _messageService: MessageService
   ) {
     // mock out the recycle trx
@@ -156,7 +156,7 @@ export class TransactionsService {
     // const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
 
     const request: any = {};
-    if (!allTransactionsFlag) {
+    if (!allTransactionsFlag && reportId && reportId !== 'undefined') {
       request.reportid = reportId;
     }
 
@@ -871,7 +871,7 @@ export class TransactionsService {
     for (const trx of transactions) {
       actions.push({
         action: action,
-        report_id: reportId,
+        report_id: trx.reportId && trx.reportId !== 'undefined'? trx.reportId :reportId, 
         transaction_id: trx.transactionId
       });
     }
@@ -925,6 +925,7 @@ export class TransactionsService {
   }
 }
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
+  model.reportId = row.report_id;
   model.reportType = row.report_type;
   model.type = row.transaction_type_desc;
   model.scheduleType = row.schedule;
@@ -949,7 +950,7 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.memoText = row.memo_text;
   model.deletedDate = row.deleteddate ? row.deleteddate : null;
   model.itemized = row.itemized;
-  model.reportStatus = row.reportStatus;
+  model.reportstatus = row.reportstatus;
   model.electionCode = row.election_code;
   model.electionYear = row.election_year;
   model.loanAmount = row.loan_amount;
@@ -961,6 +962,6 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.loanIncurredDate = row.loan_incurred_date;
   model.loanPaymentAmt = row.loan_payment_amt;
   model.loanPaymentToDate = row.loan_payment_to_date;
-  model.isEditable = row.isEditable;
+  model.iseditable = row.iseditable;
   
 }

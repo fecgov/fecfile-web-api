@@ -26,6 +26,8 @@ import { SchedH3Service } from './sched-h3.service';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 import { isNumeric } from 'rxjs/util/isNumeric';
+import { SchedHMessageServiceService } from '../sched-h-service/sched-h-message-service.service';
+import { SchedHServiceService } from '../sched-h-service/sched-h-service.service';
 
 @Component({
   selector: 'app-sched-h3',
@@ -86,6 +88,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public transaction_id: string;
   public h3EntrieEdit: any;
   public back_ref_transaction_id: string;
+  populateFormForEdit: Subscription;
 
   constructor(
     _http: HttpClient,
@@ -108,12 +111,14 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
+    private _schedHMessageServiceService: SchedHMessageServiceService,
     private _actRoute: ActivatedRoute,
     private _schedH3Service: SchedH3Service,
     private _individualReceiptService: IndividualReceiptService,
     private _uService: UtilService,    
     private _formBuilder: FormBuilder,
     private _decPipe: DecimalPipe,
+    private _schedHService: SchedHServiceService
   ) {
     super(
       _http,
@@ -142,6 +147,17 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _uService;
     _formBuilder;
     _decPipe;
+
+    this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
+    .subscribe(p => {
+      if(p.scheduleType === 'Schedule H3'){
+        let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
+          if(res && res.length === 1){
+            this.editH3(res[0]);
+          }
+        });
+      }
+    })
   }
 
   public ngOnInit() {
@@ -214,6 +230,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnDestroy(): void {
+    this.populateFormForEdit.unsubscribe();
     super.ngOnDestroy();
   }
 

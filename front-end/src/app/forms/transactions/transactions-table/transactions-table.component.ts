@@ -482,6 +482,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
               this.transactionsModel[transactionModelIndex].cloned = true;
               this.editTransaction(this.transactionsModel[transactionModelIndex]);
             }
+            // loop through any children as well
+            else{
+              if(this.transactionsModel[transactionModelIndex].child && this.transactionsModel[transactionModelIndex].child.length > 0){
+                for(let childTransactionModelIndex = 0;
+                  childTransactionModelIndex < this.transactionsModel[transactionModelIndex].child.length;
+                  childTransactionModelIndex++){
+                    if (this.transactionsModel[transactionModelIndex].child[childTransactionModelIndex].transactionId === this.clonedTransaction.transaction_id) {
+                      this.transactionsModel[transactionModelIndex].child[childTransactionModelIndex].cloned = true;
+                      this.editTransaction(this.transactionsModel[transactionModelIndex].child[childTransactionModelIndex]);
+                    }
+                  }
+              }
+            }
+          
           }
         }
 
@@ -547,7 +561,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public changeTransactionCategory(transactionCategory) {
 
     //clear all filters first
-    this._transactionsMessageService.sendClearAllFiltersMessage({});
+    // this._transactionsMessageService.sendClearAllFiltersMessage({});
 
     this._router.navigate([`/forms/form/${this.formType}`], {
       queryParams: {
@@ -878,13 +892,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public trashAllSelected(): void {
     let trxIds = '';
-    // let isEditable = true;
+    // let iseditable = true;
     let unEditableTypesArray = [];
     let parentTransactionsArray = [];
     const selectedTransactions: Array<TransactionModel> = [];
     for (const trx of this.transactionsModel) {
       if (trx.selected) {
-        if (!trx.isEditable) {
+        if (!trx.iseditable) {
           unEditableTypesArray.push(trx.type);
         }
         if (this.transactionCategory === 'receipts' || this.transactionCategory === 'disbursements') {
@@ -1134,25 +1148,23 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  public checkIfEditMode() {
-    if (!this.editMode) {
-      this._dialogService
-        .confirm(
-          'This report has been filed with the FEC. If you want to change, you must Amend the report',
-          ConfirmModalComponent,
-          'Warning',
-          true,
-          ModalHeaderClassEnum.warningHeader,
-          null,
-          'Return to Reports'
-        )
-        .then(res => {
-          if (res === 'okay') {
-          } else if (res === 'cancel') {
-            this._router.navigate(['/reports']);
-          }
-        });
-    }
+  public checkIfEditMode(trx:any = null) {
+    this._dialogService
+      .confirm(
+        'This report has been filed with the FEC. If you want to change, you must Amend the report',
+        ConfirmModalComponent,
+        'Warning',
+        true,
+        ModalHeaderClassEnum.warningHeader,
+        null,
+        'Return to Reports'
+      )
+      .then(res => {
+        if (res === 'okay') {
+        } else if (res === 'cancel') {
+          this._router.navigate(['/reports']);
+        }
+      });
   }
 
   /**
@@ -1269,7 +1281,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Determine if transactions may be trashed.
    * Transactions tied to a Filed Report may not be trashed.
    * Since all transactions are tied to a single report,
-   * only 1 transaction with a reportStatus of FILED is necessary to check.
+   * only 1 transaction with a reportstatus of FILED is necessary to check.
    * Loop through the array and if any are filed, none may be trashed.
    *
    * @returns true if Transactions are permitted to be trashed.
@@ -1282,7 +1294,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       return false;
     }
     for (const trx of this.transactionsModel) {
-      if (trx.reportStatus === 'FILED') {
+      if (trx.reportstatus === 'FILED') {
         return false;
       }
     }
