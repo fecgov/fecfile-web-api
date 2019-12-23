@@ -1217,7 +1217,7 @@ def get_h2_summary_table(request):
         non_federal_percent,
         transaction_id
     FROM   public.sched_h2 
-    WHERE  cmte_id = %s AND delete_ind is distinct from 'Y'
+    WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
         AND activity_event_name IN (
             SELECT activity_event_identifier 
             FROM   public.sched_h4 
@@ -1234,7 +1234,7 @@ def get_h2_summary_table(request):
         non_federal_percent,
         transaction_id
     FROM   public.sched_h2 
-    WHERE  cmte_id = %s AND delete_ind is distinct from 'Y'
+    WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
         AND activity_event_name IN (
             SELECT activity_event_name 
             FROM   public.sched_h3 
@@ -1264,7 +1264,7 @@ def get_h2_summary_table(request):
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
             logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-            cursor.execute(_sql, (cmte_id, report_id, cmte_id, cmte_id, report_id, cmte_id, cmte_id, report_id))
+            cursor.execute(_sql, (cmte_id, report_id, report_id, cmte_id, cmte_id, report_id, report_id, cmte_id, cmte_id, report_id))
             json_res = cursor.fetchone()[0]
             # print(json_res)
             if not json_res:
