@@ -132,6 +132,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
    * Get the Debt Summaries for the Report
    */
   public getDebtSummaries(): void {
+    this.debtModel = [];
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
 
