@@ -162,7 +162,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this._loanSummaryRefreshDataSubscription = this._LoanMessageService.getLoanSummaryRefreshMessage()
     .subscribe(
       message => {
-        this.loadPage();
+        this.loadPage(message);
       }
     )
   }
@@ -174,10 +174,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    // this.loadPage();
+    this.loadPage();
   }
 
-  private loadPage() {
+  private loadPage(message: any = null) {
     const paginateConfig: PaginationInstance = {
       id: 'forms__ctn-table-pagination',
       itemsPerPage: 10,
@@ -193,7 +193,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         this.columnOptionCount++;
       }
     }
-    this.getPage(this.config.currentPage);
+    this.getPage(this.config.currentPage, message);
   }
 
   public goToPage(pageEvent: any) {
@@ -217,14 +217,14 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 	 *
 	 * @param page the page containing the Loan to get
 	 */
-  public getPage(page: number): void {
+  public getPage(page: number, message: any = null): void {
 
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
     console.log(" getPage this.tableType", this.tableType)
     switch (this.tableType) {
       case this.LoanView:
-        this.getLoanPage(page);
+        this.getLoanPage(page, message);
         break;
       default:
         break;
@@ -237,7 +237,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 	 *
 	 * @param page the page containing the Loan to get
 	 */
-  public getLoanPage(page: number): void {
+  public getLoanPage(page: number, message: any = null): void {
 
     this.config.currentPage = page;
 
@@ -260,7 +260,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     const serverSortColumnName = this._LoanService.
       mapToSingleServerName(this.currentSortedColumnName);
 
-    this._LoanService.getLoan()
+    this._LoanService.getLoan(message)
       //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
       .subscribe((res: any) => {
 
