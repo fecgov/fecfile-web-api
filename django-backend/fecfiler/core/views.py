@@ -5671,7 +5671,7 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, prev_yr):
 #         )
 
 
-def get_sl_item_aggregate(report_id, cmte_id, prev_yr):
+def get_sl_item_aggregate(report_id, cmte_id, prev_yr,levin_accnt_name):
     try:
         # import pdb;pdb.set_trace()
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
@@ -5685,13 +5685,13 @@ def get_sl_item_aggregate(report_id, cmte_id, prev_yr):
                 cursor.execute("""
                     SELECT SUM(aggregate_amt) from public.sched_a 
                     where cmte_id = %s AND aggregate_amt > 200 AND line_number = '1A' AND report_id= %s  AND delete_ind is distinct from 'Y'""",
-                    [cmte_id, report_id]
+                    [cmte_id, report_id,levin_accnt_name]
                 )
             else:
                 cursor.execute("""
                     SELECT SUM(aggregate_amt) from public.sched_a 
                     where cmte_id = %s AND aggregate_amt > 200 AND line_number = '1A' AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y'""",
-                    [cmte_id, from_date, to_date]
+                    [cmte_id, from_date, to_date,levin_accnt_name]
                 )
             if cursor.rowcount == 0:
                 agg_amt = 0
@@ -5705,7 +5705,7 @@ def get_sl_item_aggregate(report_id, cmte_id, prev_yr):
             "The Agg itm_amnt: " + str(e)
         )
 
-def get_sl_unitem_aggregate(report_id, cmte_id, prev_yr):
+def get_sl_unitem_aggregate(report_id, cmte_id, prev_yr, levin_accnt_name):
     try:
         if not prev_yr:
             cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
@@ -5717,13 +5717,13 @@ def get_sl_unitem_aggregate(report_id, cmte_id, prev_yr):
                 cursor.execute("""
                     SELECT SUM(aggregate_amt) from public.sched_a 
                     where cmte_id = %s AND aggregate_amt <= 200 AND line_number = '1A' AND report_id= %s  AND delete_ind is distinct from 'Y'""",
-                    [cmte_id, report_id]
+                    [cmte_id, report_id, levin_accnt_name]
                 )
             else:
                 cursor.execute("""
                     SELECT SUM(aggregate_amt) from public.sched_a 
                     where cmte_id = %s AND aggregate_amt <= 200 AND line_number = '1A' AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y'""",
-                    [cmte_id,from_date, to_date]
+                    [cmte_id,from_date, to_date, levin_accnt_name]
                 )
             if cursor.rowcount == 0:
                 agg_amt = 0
@@ -5737,14 +5737,14 @@ def get_sl_unitem_aggregate(report_id, cmte_id, prev_yr):
             "The Agg unitem_amnt: " + str(e)
         )
 
-def get_sl_line_sum_value(line_number, formula, sched_la_line_sum_dict, cmte_id, report_id, prev_yr=None):
+def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_sum_dict, cmte_id, report_id, prev_yr=None):
     
     val = 0
     if line_number == '1a':
-        return get_sl_item_aggregate(report_id, cmte_id, prev_yr)
+        return get_sl_item_aggregate(report_id, cmte_id, prev_yr, levin_accnt_name)
 
     if line_number == '1b':
-        return get_sl_unitem_aggregate(report_id, cmte_id, prev_yr)
+        return get_sl_unitem_aggregate(report_id, cmte_id, prev_yr, levin_accnt_name)
 
     if line_number == '7':
         if formula == '':
@@ -5756,6 +5756,7 @@ def get_sl_line_sum_value(line_number, formula, sched_la_line_sum_dict, cmte_id,
         return val
 
  
+ 
     if formula == "":
         val += sched_la_line_sum_dict.get(line_number, 0) if sched_la_line_sum_dict.get(line_number, 0) else 0
         return val
@@ -5765,8 +5766,8 @@ def get_sl_line_sum_value(line_number, formula, sched_la_line_sum_dict, cmte_id,
     if len(formula_split) == 1:
         if '-' in formula_split[0]:
             cl_n = formula_split[0].replace(' ', '')
-            val += get_sl_line_sum_value(cl_n.split('-')[0], "", sched_la_line_sum_dict, cmte_id,
-                                          report_id) - get_sl_line_sum_value(cl_n.split('-')[1], "", sched_la_line_sum_dict, cmte_id,
+            val += get_sl_line_sum_value(cl_n.split('-')[0],levin_accnt_name, "", sched_la_line_sum_dict, cmte_id,
+                                          report_id) - get_sl_line_sum_value(cl_n.split('-')[1],levin_accnt_name, "", sched_la_line_sum_dict, cmte_id,
                                           report_id)
         else:
             line_number = formula_split[0]
@@ -5775,11 +5776,11 @@ def get_sl_line_sum_value(line_number, formula, sched_la_line_sum_dict, cmte_id,
     else:
         for cl_n in formula_split:
             if '-' in cl_n:
-                val += get_sl_line_sum_value(cl_n.split('-')[0], "", sched_la_line_sum_dict, cmte_id,
-                                          report_id) - get_sl_line_sum_value(cl_n.split('-')[1], "", sched_la_line_sum_dict, cmte_id,
+                val += get_sl_line_sum_value(cl_n.split('-')[0],levin_accnt_name, "", sched_la_line_sum_dict, cmte_id,
+                                          report_id) - get_sl_line_sum_value(cl_n.split('-')[1],levin_accnt_name, "", sched_la_line_sum_dict, cmte_id,
                                           report_id)
             else:
-                val += get_sl_line_sum_value(cl_n, "", sched_la_line_sum_dict, cmte_id, report_id)
+                val += get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)
     return val
 
 
@@ -5830,9 +5831,10 @@ def prepare_Schedl_summary_data(request):
 
         with connection.cursor() as cursor:
             cursor.execute(""" 
-                SELECT line_number, sum(contribution_amount) from public.sched_a 
+                SELECT sa.line_number, sum(sa.contribution_amount), la.levin_account_name from public.sched_a sa
+                join levin_account la on sa.levin_account_id = la.levin_account_id  
                 where cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND line_number in ('1A','2') AND
-                delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
+                delete_ind is distinct from 'Y' group by group by sa.line_number,la.levin_account_name;""", [cmte_id, from_date, to_date])
             #print(cursor.query)     
             #commented by Mahendra 10052019
             col_la_line_sum_result = cursor.fetchall()
@@ -5840,9 +5842,10 @@ def prepare_Schedl_summary_data(request):
            
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT line_number, sum(expenditure_amount) from public.sched_b 
+                SELECT sb.line_number, sum(sb.contribution_amount), la.levin_account_name from public.sched_b sb
+                join levin_account la on sb.levin_account_id = la.levin_account_id 
                 where cmte_id = %s AND expenditure_date >= %s AND expenditure_date <= %s AND line_number in  ('4A', '4B','4C','4D','5') AND
-                delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
+                delete_ind is distinct from 'Y' group by group by sb.line_number,la.levin_account_name;""", [cmte_id, from_date, to_date])
             
             col_lb_line_sum_result = cursor.fetchall()
             col_lb_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_lb_line_sum_result}
@@ -5942,16 +5945,29 @@ def prepare_Schedl_summary_data(request):
                              '11': 'coh_cop_ytd'}
         #import pdb;pdb.set_trace()
         update_str = ""
+        levin_accnt_name = ""
+        sum_value = 0
         for i in update_col_la_dict:
-            sum_value = final_col_la_dict.get(i, None)
-            if sum_value in ["",None, "None"]:
+            dict_value = final_col_la_dict.get(i, None)
+            if dict_value in ["",None, "None"]:
                 sum_value = 0
+                levin_accnt_name = ''
+            else:
+              sum_value = dict_value[0]
+              levin_accnt_name = dict_value[1]
             update_str += "%s=%s," % (update_col_la_dict[i], str(sum_value))
+            update_str += "%s=%s," % ('levin_account_name', str(levin_accnt_name))
         for i in update_col_lb_dict:
-            sum_value = final_col_lb_dict.get(i, None)
-            if sum_value in ["",None, "None"]:
+            dict_value = final_col_lb_dict.get(i, None)
+            if dict_value in ["",None, "None"]:
                 sum_value = 0
+                levin_accnt_name = ''
+            else:
+              sum_value = dict_value[0]
+              levin_accnt_name = dict_value[1]
+
             update_str += "%s=%s," % (update_col_lb_dict[i], str(sum_value))
+            update_str += "%s=%s," % ('levin_account_name', str(levin_accnt_name))
 
         update_str = update_str[:-1]
         with connection.cursor() as cursor:
@@ -5961,4 +5977,3 @@ def prepare_Schedl_summary_data(request):
         return Response({'Response':'Success'}, status= status.HTTP_200_OK)
     except Exception as e:
         return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    
