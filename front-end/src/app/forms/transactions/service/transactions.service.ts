@@ -106,7 +106,7 @@ export class TransactionsService {
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService,
-    private _receiptService: IndividualReceiptService, //fasdfa
+    private _receiptService: IndividualReceiptService, 
     private _messageService: MessageService
   ) {
     // mock out the recycle trx
