@@ -815,6 +815,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.convertFormattedAmountToDecimal(item.transferred_amount), '.2-2')}, { onlySelf: true });
 
     this.h5Entries = this.h5Entries.filter(obj => obj !== item);
+    this.h5Ratios.child = this.h5Ratios.child.filter(obj => obj !== item);
 
     let sum = 0;
     this.h5Entries.forEach(obj => {
