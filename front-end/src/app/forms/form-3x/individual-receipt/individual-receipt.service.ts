@@ -43,7 +43,24 @@ export class IndividualReceiptService {
     params = params.append('transaction_type', transactionType);
 
     // H4/H6 require report ID for determining H1/H2 exists
-    if (transactionType === 'ALLOC_EXP_DEBT' || transactionType === 'ALLOC_FEA_DISB_DEBT') {
+    if (transactionType === 'ALLOC_EXP_DEBT' || transactionType === 'ALLOC_FEA_DISB_DEBT'
+      ||
+      transactionType === 'ALLOC_EXP' ||
+      transactionType === 'ALLOC_EXP_CC_PAY' ||
+      transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+      transactionType === 'ALLOC_EXP_STAF_REIM' ||
+      transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+      transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+      transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+      transactionType === 'ALLOC_EXP_VOID'
+      ||
+      transactionType === 'ALLOC_FEA_DISB' ||
+      transactionType === 'ALLOC_FEA_CC_PAY' ||
+      transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+      transactionType === 'ALLOC_FEA_STAF_REIM' ||
+      transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+      transactionType === 'ALLOC_FEA_VOID'
+    ) {
       const reportId = this.getReportIdFromStorage(formType);
       if (reportId) {
         params = params.append('reportId', reportId);
