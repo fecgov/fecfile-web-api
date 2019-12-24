@@ -869,6 +869,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       this.convertFormattedAmountToDecimal(item.aggregate_amount), '.2-2')}, { onlySelf: true });
 
     this.h3Entries = this.h3Entries.filter(obj => obj !== item);
+    this.h3Ratios.child = this.h3Ratios.child.filter(obj => obj !== item);
 
     let sum = 0;
     this.h3Entries.forEach(obj => {
