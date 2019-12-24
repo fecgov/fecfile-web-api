@@ -2873,6 +2873,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       'ALLOC_H6_TYPES',
       'LA_ENTRY',
       'LB_ENTRY',
+      'LA_SUM',
+      'LB_SUM',
       'ALLOC_H4_SUM',
       'ALLOC_H6_SUM'
     ];
