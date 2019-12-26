@@ -253,11 +253,16 @@ export class ContactsService {
       model.phoneNumber = row.phone_number;
       model.entity_name = row.entity_name;
       model.candOffice = row.candOffice;
-      model.candOfficeState = row.candOfficeState
+      model.candOfficeState = row.candOfficeState;
       model.candOfficeDistrict = row.candOfficeDistrict;
       model.activeTransactionsCnt = row.active_transactions_cnt;
       model.candCmteId = row.candCmteId;
       model.deletedDate = row.deleteddate;
+
+      model.candOffice = row.candoffice;
+      model.candOfficeState = row.candofficestate;
+      model.candCmteId = row.candcmteid;
+
       modelArray.push(model);
     }
     return modelArray;
@@ -688,6 +693,22 @@ export class ContactsService {
       if (value !== null) {
         if (typeof value === 'string') {
           formData.append(key, value);
+
+          if(key === 'office_Sought') {
+            formData.append('candOffice', value.toString());
+          }
+
+          if(key === 'Office_State') {
+            formData.append('candOfficeState', value.toString());
+          }
+
+          if(key === 'candidate_id') {
+            formData.append('candCmteId', value.toString());
+          }
+
+          if(key === 'Prefix') {
+            formData.append('prefix', value.toString());
+          }
 
         }else if(key === 'phone_number') {
           formData.append(key, value.toString());
