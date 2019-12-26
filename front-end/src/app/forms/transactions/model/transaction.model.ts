@@ -24,7 +24,7 @@ export class TransactionModel {
   memoText: string;
   selected: boolean;
   itemized: string;
-  reportStatus: string;
+  reportstatus: string;
   toggleChild: boolean;
   child: TransactionModel[] = [];
   cloned: boolean;
@@ -48,7 +48,7 @@ export class TransactionModel {
   purpose: any;
   reportId: any;
   scrollDebtPaymentButtonIntoView: boolean;
-  isEditable: boolean; 
+  iseditable: boolean; 
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
@@ -88,7 +88,7 @@ export class TransactionModel {
     this.reportType = transaction.reportType ? transaction.reportType : '';
     this.selected = transaction.selected;
     this.itemized = transaction.itemized;
-    this.reportStatus = transaction.reportStatus;
+    this.reportstatus = transaction.reportstatus;
     this.toggleChild = transaction.toggleChild;
     this.child = transaction.child;
     this.activityEventType = transaction.activityEventType;

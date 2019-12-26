@@ -213,7 +213,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.clearAllFiltersSubscription = this._transactionsMessageService
     .getClearAllFiltersMessage()
     .subscribe(message => {
-      this.clearFilters();
+      this.clearAndApplyFilters();
     })
 
     _activatedRoute.queryParams.subscribe(p => {

@@ -28,6 +28,8 @@ import { SortableColumnModel } from 'src/app/shared/services/TableService/sortab
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { SchedH2Service } from './sched-h2.service';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
+import { SchedHMessageServiceService } from '../sched-h-service/sched-h-message-service.service';
+import { SchedHServiceService } from '../sched-h-service/sched-h-service.service';
 
 
 @Component({
@@ -77,6 +79,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   private editTransactionSubscription: Subscription;
 
   public cloned = false;
+  populateFormForEdit: Subscription;
 
   constructor(
     _http: HttpClient,
@@ -106,6 +109,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     private _decPipe: DecimalPipe,
     private _tranMessageService: TransactionsMessageService,
     private _datePipe: DatePipe,
+    private _schedHMessageServiceService: SchedHMessageServiceService,
+    private _schedHService: SchedHServiceService
   ) {    
      super(
       _http,
@@ -140,6 +145,17 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       .subscribe((trx: TransactionModel) => {
         this.editH2(trx);
       });
+
+    this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
+    .subscribe(p => {
+      if(p.scheduleType === 'Schedule H2'){
+        let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
+          if(res && res.length === 1){
+            this.editH2(res[0]);
+          }
+        });
+      }
+    })
   }
 
 
@@ -192,6 +208,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnDestroy(): void {
+    this.populateFormForEdit.unsubscribe();
     super.ngOnDestroy();
   }
 

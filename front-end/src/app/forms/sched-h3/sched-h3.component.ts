@@ -26,6 +26,8 @@ import { SchedH3Service } from './sched-h3.service';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 import { isNumeric } from 'rxjs/util/isNumeric';
+import { SchedHMessageServiceService } from '../sched-h-service/sched-h-message-service.service';
+import { SchedHServiceService } from '../sched-h-service/sched-h-service.service';
 
 @Component({
   selector: 'app-sched-h3',
@@ -86,6 +88,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public transaction_id: string;
   public h3EntrieEdit: any;
   public back_ref_transaction_id: string;
+  populateFormForEdit: Subscription;
 
   constructor(
     _http: HttpClient,
@@ -108,12 +111,14 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
+    private _schedHMessageServiceService: SchedHMessageServiceService,
     private _actRoute: ActivatedRoute,
     private _schedH3Service: SchedH3Service,
     private _individualReceiptService: IndividualReceiptService,
     private _uService: UtilService,    
     private _formBuilder: FormBuilder,
     private _decPipe: DecimalPipe,
+    private _schedHService: SchedHServiceService
   ) {
     super(
       _http,
@@ -142,6 +147,17 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _uService;
     _formBuilder;
     _decPipe;
+
+    this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
+    .subscribe(p => {
+      if(p.scheduleType === 'Schedule H3'){
+        let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
+          if(res && res.length === 1){
+            this.editH3(res[0]);
+          }
+        });
+      }
+    })
   }
 
   public ngOnInit() {
@@ -214,6 +230,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnDestroy(): void {
+    this.populateFormForEdit.unsubscribe();
     super.ngOnDestroy();
   }
 
@@ -300,9 +317,11 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   
   public setActivityOrEventIdentifier(category: string) {
 
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
     this.identifiers = [];
     this.h3Subscription = 
-      this._schedH3Service.getActivityOrEventIdentifiers(category)
+      this._schedH3Service.getActivityOrEventIdentifiers(category, reportId)
       .subscribe(res =>
         {
           if(res) {            
@@ -846,13 +865,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH3.patchValue({ category: item.activity_event_type}, { onlySelf: true });
     this.schedH3.patchValue({ activity_event_name: item.activity_event_name}, { onlySelf: true });
     this.schedH3.patchValue({ transferred_amount: this._decPipe.transform(item.transferred_amount, '.2-2')}, { onlySelf: true });
-    this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(item.aggregate_amount, '.2-2')}, { onlySelf: true });
+    this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(
+      this.convertFormattedAmountToDecimal(item.aggregate_amount), '.2-2')}, { onlySelf: true });
 
     this.h3Entries = this.h3Entries.filter(obj => obj !== item);
+    this.h3Ratios.child = this.h3Ratios.child.filter(obj => obj !== item);
 
     let sum = 0;
     this.h3Entries.forEach(obj => {
-     sum += obj.transferred_amount;
+     sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
     })
 
     this.schedH3.patchValue({ total_amount_transferred:

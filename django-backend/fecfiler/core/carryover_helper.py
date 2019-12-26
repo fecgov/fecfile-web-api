@@ -48,11 +48,13 @@ def do_pty_h1_carryover(cmte_id, report_id):
         do carryover - grab the most recent h1 item 
         and clone it with current report id
     """
+
     count_sql = """
     select transaction_id from public.sched_h1
     where cmte_id = %s and report_id = %s
-    and delete_ind is distinct from 'Y'
+    and delete_ind is distinct from 'Y';
     """
+
     carryover_sql = """
     INSERT INTO sched_h1 
             (cmte_id, 
@@ -103,12 +105,14 @@ def do_pty_h1_carryover(cmte_id, report_id):
     try:
         with connection.cursor() as cursor:
             cursor.execute(count_sql, (cmte_id, report_id))
-            if cursor.rowcount == 0:
+            print(cursor.fetchone())
+            print(cursor.rowcount)
+            if not cursor.rowcount:
                 logger.debug('no h1 found in current report. need carryover:')
                 cursor.execute(carryover_sql, (report_id, cmte_id))
                 if cursor.rowcount != 1:
-                    raise Exception('error on h1 carryover.')
-                logger.debug('pty h1 carryover done.')
+                    logger.debug('no valid h1 found for carryover.')
+            logger.debug('pty h1 carryover done.')
     except:
         raise
 
@@ -212,6 +216,272 @@ def do_h1_carryover(cmte_id, report_id):
         do_pac_h1_carryover(cmte_id, report_id)
     else:
         pass
+
+
+def do_h2_carryover(cmte_id, report_id):
+    """
+    this is the function to handle h2 carryover form one report to next report:
+    1. load all h2 items with distinct event names from last report
+    2. update all records with new transaction_id, new report_id
+    3. set ration code to 's' - same as previously
+    4. copy all other fields
+    """
+    _sql = """
+    insert into public.sched_h2(
+                    cmte_id,
+                    report_id,
+                    line_number,
+                    transaction_type_identifier,
+                    transaction_type,
+                    transaction_id,
+                    activity_event_name,
+                    fundraising,
+                    direct_cand_support,
+                    ratio_code,
+                    revise_date,
+                    federal_percent,
+                    non_federal_percent,
+                    back_ref_transaction_id,
+                    create_date
+					)
+					SELECT 
+					h.cmte_id, 
+                    %s, 
+                    h.line_number,
+                    h.transaction_type_identifier, 
+                    h.transaction_type,
+                    get_next_transaction_id('SH'), 
+                    h.activity_event_name,
+                    h.fundraising,
+                    h.direct_cand_support, 
+                    's',
+                    h.revise_date,
+                    h.federal_percent,
+                    h.non_federal_percent,
+                    h.transaction_id,
+                    now()
+            FROM public.sched_h2 h, public.reports r
+            WHERE 
+            h.cmte_id = %s
+            AND h.report_id != %s
+            AND h.report_id = r.report_id
+            AND r.cvg_start_date < (
+                        SELECT r.cvg_start_date
+                        FROM   public.reports r
+                        WHERE  r.report_id = %s
+                    )
+            AND h.transaction_id NOT In (
+                select distinct h2.back_ref_transaction_id from public.sched_h2 h2
+                where h2.cmte_id = %s
+                and h2.back_ref_transaction_id is not null
+            )
+            AND h.delete_ind is distinct from 'Y'
+    """
+    try:
+        logger.debug('doing h2 carryover...')
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
+            if cursor.rowcount == 0:
+                logger.debug('No valid h2 items found.')
+            logger.debug(
+                'h2 carryover done with report_id {}'.format(report_id))
+            logger.debug('total carryover h2 items:{}'.format(cursor.rowcount))
+    except:
+        raise
+
+
+def do_loan_carryover(cmte_id, report_id):
+    """
+    this is the function to handle loan carryover form one report to next report:
+    1. duplicate and carryover all loans:
+    - non-zero loan_balance
+    - outstanding and dangled(not carried over before)
+    - loan report date < current report coverge start(forward carryover only)
+    
+    2. update all records with new transaction_id, new report_id
+    3. set new loan back_ref_transaction_id to parent transaction_id
+    """
+    _sql = """
+    insert into public.sched_c(
+					cmte_id, 
+                    report_id, 
+                    line_number,
+					transaction_type,
+                    transaction_type_identifier, 
+                    transaction_id, 
+                    entity_id, 
+                    election_code,
+                    election_other_description,
+                    loan_amount_original,
+                    loan_payment_to_date,
+                    loan_balance,
+                    loan_incurred_date,
+                    loan_due_date,
+                    loan_intrest_rate,
+                    is_loan_secured,
+                    is_personal_funds,
+                    lender_cmte_id,
+                    lender_cand_id,
+                    lender_cand_last_name,
+                    lender_cand_first_name,
+                    lender_cand_middle_name,
+                    lender_cand_prefix,
+                    lender_cand_suffix,
+                    lender_cand_office,
+                    lender_cand_state,
+                    lender_cand_district,
+                    memo_code,
+                    memo_text,
+					back_ref_transaction_id,
+                    create_date
+					)
+					SELECT 
+					c.cmte_id, 
+                    %s, 
+                    c.line_number,
+					'',
+                    c.transaction_type_identifier, 
+                    get_next_transaction_id('SC'), 
+                    c.entity_id, 
+                    c.election_code,
+                    c.election_other_description,
+                    c.loan_amount_original,
+                    c.loan_payment_to_date,
+                    c.loan_balance,
+                    c.loan_incurred_date,
+                    c.loan_due_date,
+                    c.loan_intrest_rate,
+                    c.is_loan_secured,
+                    c.is_personal_funds,
+                    c.lender_cmte_id,
+                    c.lender_cand_id,
+                    c.lender_cand_last_name,
+                    c.lender_cand_first_name,
+                    c.lender_cand_middle_name,
+                    c.lender_cand_prefix,
+                    c.lender_cand_suffix,
+                    c.lender_cand_office,
+                    c.lender_cand_state,
+                    c.lender_cand_district,
+                    c.memo_code,
+                    c.memo_text,
+					c.transaction_id,
+                    now()
+            FROM public.sched_c c, public.reports r
+            WHERE 
+            c.cmte_id = %s
+            AND c.loan_balance > 0 
+            AND c.report_id != %s
+            AND c.report_id = r.report_id
+            AND r.cvg_start_date < (
+                        SELECT r.cvg_start_date
+                        FROM   public.reports r
+                        WHERE  r.report_id = %s
+                    )
+            AND c.transaction_id NOT In (
+                select distinct back_ref_transaction_id from public.sched_c
+                where cmte_id = %s
+                and back_ref_transaction_id is not null
+            )
+            AND c.delete_ind is distinct from 'Y'
+    """
+    # query_back_sql = """
+    # select d.back_ref_transaction_id
+    # """
+    logger.debug('doing loan carryover...')
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
+            if cursor.rowcount == 0:
+                logger.debug("No carryover happens.")
+            else:
+                logger.debug("loan carryover done with report_id {}".format(report_id))
+                logger.debug("total carryover loans:{}".format(cursor.rowcount))
+                # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
+        logger.debug("carryover done.")
+    except:
+        raise
+
+
+def do_debt_carryover(cmte_id, report_id):
+    """
+    this is the function to handle debt carryover form one report to next report:
+    1. load all non-zero close_balance sched_d and make sure:
+    - debt incurred date < report coverge start
+    - only load non-parent items
+
+    2. update all records with new transaction_id, new report_id
+    3. copy close_balance to starting_balance, leave all other amount 0
+    4. insert sched_c into db
+    """
+    _sql = """
+    insert into public.sched_d(
+					cmte_id, 
+                    report_id, 
+                    line_num,
+                    transaction_type_identifier, 
+                    transaction_id, 
+                    entity_id, 
+                    beginning_balance, 
+                    balance_at_close, 
+                    incurred_amount, 
+                    payment_amount, 
+					purpose,
+                    back_ref_transaction_id,
+                    create_date
+					)
+					SELECT 
+					d.cmte_id, 
+                    %s, 
+                    d.line_num,
+                    d.transaction_type_identifier, 
+                    get_next_transaction_id('SD'), 
+                    d.entity_id, 
+                    d.balance_at_close, 
+                    d.balance_at_close, 
+                    0, 
+                    0, 
+					d.purpose,
+                    d.transaction_id,
+                    now()
+            FROM public.sched_d d, public.reports r
+            WHERE 
+            d.cmte_id = %s
+            AND d.balance_at_close > 0 
+            AND d.report_id != %s
+            AND d.report_id = r.report_id
+            AND r.cvg_start_date < (
+                        SELECT r.cvg_start_date
+                        FROM   public.reports r
+                        WHERE  r.report_id = %s
+                    )
+            AND d.transaction_id NOT In (
+                select distinct d1.back_ref_transaction_id from public.sched_d d1
+                where d1.cmte_id = %s
+                and d1.back_ref_transaction_id is not null
+                and d1.delete_ind is distinct from 'Y'
+            )
+            AND d.delete_ind is distinct from 'Y' ;
+    """
+    # query_back_sql = """
+    # select d.back_ref_transaction_id
+    # """
+    logger.debug('doing debt carryover...')
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id,
+                                  report_id, report_id, cmte_id))
+            if cursor.rowcount == 0:
+                logger.debug("No carryover happens.")
+            else:
+                logger.debug(
+                    "debt carryover done with report_id {}".format(report_id))
+                logger.debug(
+                    "total carryover debts:{}".format(cursor.rowcount))
+                # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
+                logger.debug("carryover done.")
+    except:
+        rais
 
 
 def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):

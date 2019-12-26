@@ -892,7 +892,7 @@ def do_carryover(report_id, cmte_id):
                     get_next_transaction_id('SD'), 
                     d.entity_id, 
                     d.balance_at_close, 
-                    0, 
+                    d.balance_at_close, 
                     0, 
                     0, 
 					d.purpose,

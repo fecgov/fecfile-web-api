@@ -579,6 +579,7 @@ def get_fed_nonfed_share(request):
         start_dt = datetime.date(int(calendar_year), 1, 1)
         end_dt = datetime.date(int(calendar_year), 12, 31)
         event_name = request.query_params.get('activity_event_identifier') 
+        transaction_type_identifier = request.query_params.get('transaction_type_identifier') 
 
         if event_name: # event-based, goes to h2
             _sql = """
@@ -678,7 +679,10 @@ def get_fed_nonfed_share(request):
         # fed_percent = float(cursor.fetchone()[0])
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
-        new_aggregate_amount = aggregate_amount + float(total_amount)
+        if not transaction_type_identifier.endswith('_MEMO'):
+            new_aggregate_amount = aggregate_amount + float(total_amount)
+        else:
+            new_aggregate_amount = aggregate_amount
         return JsonResponse(
             {
                 'fed_share': '{0:.2f}'.format(fed_share), 
@@ -1037,6 +1041,7 @@ def get_h2_type_events(request):
     logger.debug('get_h2_type_events with request:{}'.format(request.query_params))
     cmte_id = request.user.username
     event_type = request.query_params.get('activity_event_type').strip()
+    report_id = request.query_params.get('report_id').strip()
     if event_type not in ['fundraising', 'direct_cand_support']:
         raise Exception('missing or non-valid event type value')
     if event_type == 'fundraising':
@@ -1044,21 +1049,25 @@ def get_h2_type_events(request):
         SELECT json_agg(t) from (
         SELECT activity_event_name 
         FROM   public.sched_h2 
-        WHERE  cmte_id = '{}'
-            AND fundraising = true) t;
-        """.format(cmte_id)
+        WHERE  cmte_id = %s
+        AND report_id = %s
+        AND fundraising = true
+        AND delete_ind is distinct from 'Y') t
+        """
     else:
         _sql = """
         SELECT json_agg(t) from(
         SELECT activity_event_name 
         FROM   public.sched_h2 
-        WHERE  cmte_id = '{}'
-            AND direct_cand_support = true) t;
-        """.format(cmte_id)
+        WHERE  cmte_id = %s 
+        AND report_id = %s
+        AND direct_cand_support = true
+        AND delete_ind is distinct from 'Y') t
+        """
     try:
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
-            cursor.execute(_sql)
+            cursor.execute(_sql, [cmte_id, report_id])
             json_res = cursor.fetchone()[0]
             # print(json_res)
             if not json_res:
@@ -1208,7 +1217,7 @@ def get_h2_summary_table(request):
         non_federal_percent,
         transaction_id
     FROM   public.sched_h2 
-    WHERE  cmte_id = %s AND delete_ind is distinct from 'Y'
+    WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
         AND activity_event_name IN (
             SELECT activity_event_identifier 
             FROM   public.sched_h4 
@@ -1225,7 +1234,7 @@ def get_h2_summary_table(request):
         non_federal_percent,
         transaction_id
     FROM   public.sched_h2 
-    WHERE  cmte_id = %s AND delete_ind is distinct from 'Y'
+    WHERE  cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'
         AND activity_event_name IN (
             SELECT activity_event_name 
             FROM   public.sched_h3 
@@ -1255,7 +1264,7 @@ def get_h2_summary_table(request):
         with connection.cursor() as cursor:
             logger.debug('query with _sql:{}'.format(_sql))
             logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
-            cursor.execute(_sql, (cmte_id, report_id, cmte_id, cmte_id, report_id, cmte_id, cmte_id, report_id))
+            cursor.execute(_sql, (cmte_id, report_id, report_id, cmte_id, cmte_id, report_id, report_id, cmte_id, cmte_id, report_id))
             json_res = cursor.fetchone()[0]
             # print(json_res)
             if not json_res:

@@ -31,7 +31,12 @@ from fuzzywuzzy import fuzz
 import pandas
 import numpy
 
-from fecfiler.core.carryover_helper import do_h1_carryover
+from fecfiler.core.carryover_helper import (
+    do_h1_carryover,
+    do_h2_carryover,
+    do_loan_carryover,
+    do_debt_carryover,
+)
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
@@ -343,13 +348,13 @@ def get_dynamic_forms_fields(request):
                                     eventTypes['hasValue'] = True
                             elif eventTypes['eventType'] in ['DF', 'DC']:
                                 query_string = """SELECT json_agg(t) FROM (SELECT activity_event_name AS "activityEventType", transaction_id AS "transactionId", activity_event_name AS "activityEventDescription" 
-                                        FROM public.sched_h2 WHERE cmte_id = %s AND {} AND delete_ind IS DISTINCT FROM 'Y') AS t"""
+                                        FROM public.sched_h2 WHERE cmte_id = %s AND report_id = %s AND {} AND delete_ind IS DISTINCT FROM 'Y') AS t"""
                                 if eventTypes['eventType'] == 'DF':
                                     query_string = query_string.format("fundraising = true")
                                 elif eventTypes['eventType'] == 'DC':
                                     query_string = query_string.format("direct_cand_support = true")
                                 with connection.cursor() as cursor:
-                                    cursor.execute(query_string, [cmte_id])
+                                    cursor.execute(query_string, [cmte_id, report_id])
                                     print(cursor.query)
                                     activityEventTypes = cursor.fetchone()
                                 # print(eventTypes['eventType'] + 'activityEventTypes: '+ str(activityEventTypes[0]))
@@ -905,9 +910,13 @@ def reports(request):
             }    
             data = post_reports(datum)
             if type(data) is dict:
-                print(data)
+                # print(data)
                 # do h1 carryover if new report created
                 do_h1_carryover(data.get('cmteid'), data.get('reportid'))
+                do_h2_carryover(data.get('cmteid'), data.get('reportid'))
+                do_loan_carryover(data.get('cmteid'), data.get('reportid'))
+                do_debt_carryover(data.get('cmteid'), data.get('reportid'))
+
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
@@ -2387,6 +2396,12 @@ def get_all_transactions(request):
         
         # ADDED the below code to access transactions across reports
         if 'reportid' in request.data and str(request.data.get('reportid')) not in ['',"", "null", "none"]:
+            # add carryover code here so that carryover can be triggered by get_all_transactions
+            if int(request.data.get('reportid')) != 0:
+                do_h1_carryover(cmte_id, request.data.get('reportid'))
+                do_h2_carryover(cmte_id, request.data.get('reportid'))
+                do_loan_carryover(cmte_id, request.data.get('reportid'))
+                do_debt_carryover(cmte_id, request.data.get('reportid'))
             report_list = superceded_report_id_list(request.data.get('reportid'))
             if ctgry_type != 'other_tran':
                 param_string += " AND report_id in ('{}')".format("', '".join(report_list))

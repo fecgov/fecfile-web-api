@@ -22,6 +22,8 @@ import { MessageService } from '../../../shared/services/MessageService/message.
 import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
 import { AbstractScheduleParentEnum } from '../individual-receipt/abstract-schedule-parent.enum';
+import { SchedHMessageServiceService } from '../../sched-h-service/sched-h-message-service.service';
+import { SchedHServiceService } from '../../sched-h-service/sched-h-service.service';
 
 @Component({
   selector: 'app-f3x',
@@ -85,7 +87,9 @@ export class F3xComponent implements OnInit {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _f3xMessageService: F3xMessageService, 
-    private _loanMessageService: LoanMessageService
+    private _loanMessageService: LoanMessageService, 
+    private _schedHMessageServce:SchedHMessageServiceService, 
+    private _schedHService: SchedHServiceService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -314,6 +318,8 @@ export class F3xComponent implements OnInit {
               e.transactionDetail.transactionModel.cloned
             ) {
               this._cloned = true;
+            }else{
+              this._cloned = false;
             }
 
             this.extractScheduleType(e);
@@ -337,6 +343,10 @@ export class F3xComponent implements OnInit {
             }
 
             if (this._handleScheduleC(e)) {
+              return;
+            }
+
+            if (this._handleScheduleH(e)) {
               return;
             }
 
@@ -400,7 +410,13 @@ export class F3xComponent implements OnInit {
             }
             this._setTransactionTypeBySchedule(transactionTypeText, transactionType, this.scheduleType);
           }
-          this.canContinue();
+
+          //transactionModel is being passed in so to leverage the reportId if present instead of getting from localStorage
+          if(e && e.transactionDetail && e.transactionDetail.transactionModel){
+            this.canContinue(e.transactionDetail.transactionModel);  
+          }else{
+            this.canContinue();
+          }
         } else if (typeof e.form === 'string') {
           if (e.form === this.formType) {
             if (e.hasOwnProperty('reportTypeRadio')) {
@@ -428,6 +444,35 @@ export class F3xComponent implements OnInit {
         }
       } else if (e.hasOwnProperty('otherSchedHTransactionType')) {
         this.transactionType = e.otherSchedHTransactionType;
+
+        if(this.transactionType === 'ALLOC_H4_SUM') {
+          this.transactionTypeText = 'H4 Transaction List'
+        }else if (
+          this.transactionType === 'ALLOC_H4_TYPES' ||
+          this.transactionType === 'ALLOC_EXP' ||
+          this.transactionType === 'ALLOC_EXP_CC_PAY' ||
+          this.transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+          this.transactionType === 'ALLOC_EXP_STAF_REIM' ||
+          this.transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+          this.transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+          this.transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+          this.transactionType === 'ALLOC_EXP_VOID') {
+            this.transactionTypeText = 'H4 Entry'
+        }
+
+        if(this.transactionType === 'ALLOC_H6_SUM') {
+          this.transactionTypeText = 'H6 Transaction List'
+        }else if (
+          this.transactionType === 'ALLOC_H6_TYPES' ||
+          this.transactionType === 'ALLOC_FEA_DISB' ||
+          this.transactionType === 'ALLOC_FEA_CC_PAY' ||
+          this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+          this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
+          this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+          this.transactionType === 'ALLOC_FEA_VOID') {
+            this.transactionTypeText = 'H6 Entry'
+        }
+
       }
     }
   }
@@ -449,6 +494,12 @@ export class F3xComponent implements OnInit {
 
     //default to sched_a ?
     this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
+
+ /*    //Schedule H's need to be remapped too
+     if(e.scheduleType === 'Schedule H3'){
+      this.scheduleType = 'sched_h3';
+      this.transactionType = 'ALLOC_H3_RATIO';
+    } */
   }
 
   /**
@@ -498,7 +549,11 @@ export class F3xComponent implements OnInit {
         this.scheduleCAction = ScheduleActions.loanSummary;
 
         //send message to refresh data for loan summary
-        this._loanMessageService.sendLoanSummaryRefreshMessage({});    
+        let msg : any = {};
+        if(transaction.reportId && transaction.reportId !== 'undefined'){
+          msg.reportId = transaction.reportId;
+        }
+        this._loanMessageService.sendLoanSummaryRefreshMessage(msg);    
       } else if (this.scheduleType === 'sched_c_loan_payment') {
         //this is being done in case loan payment is being accessed from transaction table,
         //a flag is needed to return back to the transaction table's 'disbursement tab'
@@ -523,13 +578,48 @@ export class F3xComponent implements OnInit {
       } else if (this.scheduleType === 'sched_c1') {
         this.forceChangeDetectionC1 = new Date();
       }
-      this.canContinue();
+      if(transactionDetail && transactionDetail.transactionModel){
+        this.canContinue(transactionDetail.transactionModel);  
+      }else{
+        this.canContinue();
+      }
       finish = true;
       //setting the transaction detail for @input in 'add' scenario for loan payment
       if (transactionDetail) {
         this.transactionDetailSchedC = transactionDetail.transactionModel;
       }
     }
+    return finish;
+  }
+
+   /**
+   * Handle Schedule H forms.
+   * @returns true if schedule H and should stop processing
+   */
+  private _handleScheduleH(transaction: any): boolean {
+    let transactionDetail = transaction.transactionDetail;
+    let finish = false;
+
+      if (this.scheduleType === 'Schedule H3') {
+        this.scheduleAction = ScheduleActions.edit;
+        this.transactionType = 'ALLOC_H3_RATIO';
+        this.scheduleType = 'sched_h3';
+        finish = true;
+      }
+      else if(this.scheduleType === 'Schedule H2'){
+        this.scheduleAction = ScheduleActions.edit;
+        this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
+        this.scheduleType = 'sched_h2';
+        finish = true;
+      }
+      
+      this._schedHMessageServce.sendpopulateHFormForEditMessage(transaction);
+      if(transactionDetail && transactionDetail.transactionModel){
+        this.canContinue(transactionDetail.transactionModel);  
+      }else{
+        this.canContinue();
+      }
+
     return finish;
   }
 
@@ -610,39 +700,53 @@ export class F3xComponent implements OnInit {
   /**
    * Determines ability to continue.
    */
-  public canContinue(): void {
+  public canContinue(transactionModel:any = null): void {
+    let reportId = ''; 
+    if(transactionModel && transactionModel.reportId && transactionModel.reportId !== "0" && transactionModel.reportId !== "undefined"){
+      reportId = transactionModel.reportId.toString();
+    }
     if (this.frm && this.direction) {
       localStorage.setItem(`reportId`, this._reportId);
+      
+      let queryParamsObj :any = {
+        step: this.step,
+        edit: this.editMode,
+        transactionCategory: this.transactionCategory
+      }
+      
+      if (reportId){
+        queryParamsObj.reportId = reportId;
+      }
+
       if (this.direction === 'next') {
         if (this.frm.valid) {
           this.step = this._step;
-
+          queryParamsObj.step = this.step;
+          
           if (this._cloned) {
+            queryParamsObj.cloned =  this._cloned;
             this._router.navigate([`/forms/form/${this.formType}`], {
-              queryParams: {
-                step: this.step,
-                edit: this.editMode,
-                transactionCategory: this.transactionCategory,
-                cloned: this._cloned
-              }
+              queryParams: queryParamsObj
             });
           } else {
             this._router.navigate([`/forms/form/${this.formType}`], {
-              queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory }
+              queryParams: queryParamsObj
             });
           }
         } else if (this.frm === 'preview') {
           this.step = this._step;
+          queryParamsObj.step = this.step;
 
           this._router.navigate([`/forms/form/${this.formType}`], {
-            queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory }
+            queryParams: queryParamsObj
           });
         }
       } else if (this.direction === 'previous') {
         this.step = this._step;
+        queryParamsObj.step = this.step;
 
         this._router.navigate([`/forms/form/${this.formType}`], {
-          queryParams: { step: this.step, edit: this.editMode, transactionCategory: this.transactionCategory }
+          queryParams: queryParamsObj
         });
       }
     }

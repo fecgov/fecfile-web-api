@@ -36,7 +36,8 @@ from fecfiler.sched_D.views import do_transaction
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-MANDATORY_FIELDS_SCHED_L = ["cmte_id", "report_id", "transaction_id", "record_id"]
+MANDATORY_FIELDS_SCHED_L = ["cmte_id",
+                            "report_id", "transaction_id", "record_id"]
 
 LA_TRANSACTIONS = [
     "LEVIN_OTHER_REC",
@@ -165,7 +166,7 @@ def put_schedL(data):
 def put_sql_schedL(data):
     """
     update a schedule_L item                    
-            
+
     """
     _sql = """UPDATE public.sched_l
               SET transaction_type_identifier = %s, 
@@ -572,7 +573,8 @@ def delete_schedL(data):
     try:
 
         delete_sql_schedL(
-            data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
+            data.get("cmte_id"), data.get(
+                "report_id"), data.get("transaction_id")
         )
     except Exception as e:
         raise
@@ -604,7 +606,8 @@ def schedL(request):
                 datum["record_id"] = levin_acct_id
                 levin_account = get_levin_account(cmte_id, levin_acct_id)
                 if levin_account:
-                    datum["account_name"] = levin_account[0].get("levin_account_name")
+                    datum["account_name"] = levin_account[0].get(
+                        "levin_account_name")
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
@@ -663,7 +666,8 @@ def schedL(request):
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
+                data["report_id"] = check_report_id(
+                    request.data.get("report_id"))
             else:
                 raise Exception("Missing Input: report_id is mandatory")
             if "transaction_id" in request.data and check_null_value(
@@ -712,7 +716,8 @@ def schedL(request):
                 datum["record_id"] = levin_acct_id
                 levin_account = get_levin_account(cmte_id, levin_acct_id)
                 if levin_account:
-                    datum["account_name"] = levin_account[0].get("levin_account_name")
+                    datum["account_name"] = levin_account[0].get(
+                        "levin_account_name")
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
             # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
@@ -832,7 +837,8 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt):
             ) + float(result["other_sl_receipt_amount"])
 
     except Exception as e:
-        raise Exception("Error happens when query ytd receipts amount:" + str(e))
+        raise Exception(
+            "Error happens when query ytd receipts amount:" + str(e))
 
     return result
 
@@ -965,7 +971,8 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr):
         return coh_cop
     except Exception as e:
         raise Exception(
-            "The prev_cash_on_hand_cop function is throwing an error: " + str(e)
+            "The prev_cash_on_hand_cop function is throwing an error: " +
+            str(e)
         )
 
 
@@ -1014,7 +1021,8 @@ def get_sl_summary_table(request):
             raise Exception("Missing Input: calendar_year is mandatory")
 
         report_id = check_report_id(request.query_params.get("report_id"))
-        calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
+        calendar_year = check_calendar_year(
+            request.query_params.get("calendar_year"))
 
         # period_args = [
         cal_start = (datetime.date(int(calendar_year), 1, 1),)
@@ -1031,7 +1039,8 @@ def get_sl_summary_table(request):
         # query and calcualte YTD receipt amount
         response.update(load_ytd_receipts_summary(cmte_id, cal_start, cal_end))
         # query and calculate YTD disbursement amount
-        response.update(load_ytd_disbursements_summary(cmte_id, cal_start, cal_end))
+        response.update(load_ytd_disbursements_summary(
+            cmte_id, cal_start, cal_end))
 
         # calculate cash summary
         coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
@@ -1129,11 +1138,13 @@ def get_sla_summary_table(request):
         _sql_p1 = """
         SELECT json_agg(t) FROM
         (
-            SELECT a.*, l.levin_account_name 
-            FROM public.sched_a a, public.levin_account l
+            SELECT a.*, l.levin_account_name, tp.tran_desc, e.first_name, e.last_name, e.entity_name, e.entity_type 
+            FROM public.sched_a a, public.levin_account l, public.entity e, public.ref_transaction_types tp
             WHERE a.cmte_id = %s
             AND a.report_id = %s
             AND a.levin_account_id = l.levin_account_id
+            AND a.entity_id = e.entity_id
+            AND a.transaction_type_identifier = tp.tran_identifier 
             AND a.transaction_type_identifier in ("""
 
         _sql_p2 = """)
@@ -1148,7 +1159,8 @@ def get_sla_summary_table(request):
         #     raise Exception("Missing Input: calendar_year is mandatory")
 
         report_id = check_report_id(request.query_params.get("report_id"))
-        transaction_tps = ["'" + tp + "'" for tp in LA_TRANSACTIONS if "MEMO" not in tp]
+        transaction_tps = ["'" + tp +
+                           "'" for tp in LA_TRANSACTIONS if "MEMO" not in tp]
         tps_str = ",".join(transaction_tps)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
         logger.debug("transaction_types:{}".format(tps_str))
@@ -1161,7 +1173,8 @@ def get_sla_summary_table(request):
                 for obj in result:
                     if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
                         memo_objs = get_la_memos(
-                            cmte_id, obj.get("report_id"), obj.get("transaction_id")
+                            cmte_id, obj.get("report_id"), obj.get(
+                                "transaction_id")
                         )
                         if memo_objs:
                             obj["child"] = memo_objs
@@ -1192,11 +1205,13 @@ def get_slb_summary_table(request):
         _sql_p1 = """
         SELECT json_agg(t) FROM
         (
-            SELECT b.*, l.levin_account_name
-            FROM public.sched_b b, levin_account l 
+            SELECT b.*, l.levin_account_name, tp.tran_desc, e.first_name, e.last_name, e.entity_name, e.entity_type
+            FROM public.sched_b b, public.levin_account l, public.entity e, public.ref_transaction_types tp
             WHERE b.cmte_id = %s
             AND b.report_id = %s
             AND b.levin_account_id = l.levin_account_id
+            AND b.entity_id = e.entity_id
+            AND b.transaction_type_identifier = tp.tran_identifier
             AND b.transaction_type_identifier in ("""
 
         _sql_p2 = """)
@@ -1211,7 +1226,8 @@ def get_slb_summary_table(request):
         #     raise Exception("Missing Input: calendar_year is mandatory")
 
         report_id = check_report_id(request.query_params.get("report_id"))
-        transaction_tps = ["'" + tp + "'" for tp in LB_TRANSACTIONS if "MEMO" not in tp]
+        transaction_tps = ["'" + tp +
+                           "'" for tp in LB_TRANSACTIONS if "MEMO" not in tp]
         tps_str = ",".join(transaction_tps)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
         logger.debug("transaction_types:{}".format(tps_str))
@@ -1234,4 +1250,3 @@ def get_slb_summary_table(request):
             "The get_slb_summary_table API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
-
