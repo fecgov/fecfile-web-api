@@ -2018,7 +2018,7 @@ def get_h3_aggregate_amount(request):
         if not json_res:
             return Response(
                 {
-                    "total_amount_transferred": 0
+                    "aggregate_amount": 0
                 }, 
                     status = status.HTTP_200_OK)
         # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
