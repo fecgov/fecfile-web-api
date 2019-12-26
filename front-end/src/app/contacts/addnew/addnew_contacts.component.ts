@@ -476,7 +476,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
     if (this._selectedEntity) {
       //this.showWarn(col.text);
-      this.frmContact.patchValue({ candOffice: this._selectedEntity.candOffice}, { onlySelf: true });
+      //this.frmContact.patchValue({ candOffice: this._selectedEntity.candOffice}, { onlySelf: true });
+      this.frmContact.patchValue({ office_Sought: this._selectedEntity.name }, { onlySelf: true });
     } else {
       let officeCode = null;
       if (candOfficeOption.$ngOptionLabel) {
@@ -488,8 +489,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           }
         }
       }
+      //this.frmContact.patchValue({ candOffice: officeCode }, { onlySelf: true });
       
-      this.frmContact.patchValue({ candOffice: officeCode }, { onlySelf: true });
+      this.frmContact.patchValue({ office_Sought: candOfficeOption.code }, { onlySelf: true });
     }
   }
   
@@ -497,8 +499,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
     if (this._selectedEntity) {
       //this.showWarn(col.text);
-      this.frmContact.patchValue({ candOfficeState: this._selectedEntity.candOfficeState}, { onlySelf: true });
+      //this.frmContact.patchValue({ candOfficeState: this._selectedEntity.candOfficeState}, { onlySelf: true });
+      this.frmContact.patchValue({ Office_State: this._selectedEntity.name }, { onlySelf: true });
     } else {
+      /*
       let officeStateCode = null;
       if (officeStateOption.$ngOptionLabel) {
         officeStateCode = officeStateOption.$ngOptionLabel;
@@ -511,6 +515,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       }
       
       this.frmContact.patchValue({ candOfficeState: officeStateCode }, { onlySelf: true });
+      */
+      this.frmContact.patchValue({ Office_State: officeStateOption.code }, { onlySelf: true });
     }
   }
 
@@ -1204,6 +1210,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ last_name: lastName }, { onlySelf: true });
         this.frmContact.patchValue({ middle_name: middleName }, { onlySelf: true });
         this.frmContact.patchValue({ prefix: prefix }, { onlySelf: true });
+        this.frmContact.patchValue({ Prefix: prefix }, { onlySelf: true });
         this.frmContact.patchValue({ suffix: suffix }, { onlySelf: true });
 
         this.frmContact.patchValue({ entity_type: formData.entity_type }, { onlySelf: true });
@@ -1225,6 +1232,13 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         
         this.frmContact.patchValue({ candCmteId: formData.candCmteId }, { onlySelf: true });
         this.frmContact.patchValue({ officeSought: formData.officeSought }, { onlySelf: true });
+
+        this.frmContact.patchValue({ candidate_id: formData.candCmteId }, { onlySelf: true });
+        this.frmContact.patchValue({ office_Sought: formData.candOffice }, { onlySelf: true });
+        this.frmContact.patchValue({ Office_State: formData.candOfficeState }, { onlySelf: true });
+
+        this.frmContact.patchValue({ commitee_id: formData.candCmteId }, { onlySelf: true });
+
         //this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
         //this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
       }
@@ -1344,6 +1358,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
       if(this.scheduleAction === ContactActions.edit) {
         contactObj.id = this.transactionToEdit.id;
+        contactObj.entity_type = this.frmContact.get('entity_type').value;
+      }
+
+      if(this.frmContact.get('commitee_id')) {
+        contactObj.candCmteId = this.frmContact.get('commitee_id').value;
       }
 
       localStorage.setItem('contactObj', JSON.stringify(contactObj));
