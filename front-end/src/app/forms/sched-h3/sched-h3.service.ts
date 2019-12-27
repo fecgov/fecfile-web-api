@@ -272,5 +272,37 @@ export class SchedH3Service {
 
 
   }
+
+  public getH3AggregateAmount(activity_event_name: string, reportId: string, parentId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/sh3/get_h3_aggregate_amount';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let params = new HttpParams();
+    params = params.append('activity_event_name', activity_event_name);
+    params = params.append('report_id', reportId);
+    params = params.append('parent_id', parentId);
+
+    return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          params,
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
+            console.log('H3 Aggregate Amount res: ', res);
+            return res;
+          }
+          return false;
+      })
+      );
+
+  }
     
 }
