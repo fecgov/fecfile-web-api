@@ -1821,7 +1821,7 @@ def get_sched_h3_breakdown(request):
     except Exception as e:
         raise Exception('Error on fetching h3 break down')
         
-def load_h3_aggregate_amount(cmte_id, report_id):
+def load_h3_aggregate_amount(cmte_id, report_id, back_ref_transaction_id):
     """
     query and caclcualte event_type or event_name based on aggregate amount 
     for current report
@@ -1835,19 +1835,31 @@ def load_h3_aggregate_amount(cmte_id, report_id):
             FROM   public.sched_h3 
             WHERE  cmte_id = %s
                 AND report_id = %s
+                AND back_ref_transaction_id = %s
+                AND delete_ind is distinct from 'Y'
             GROUP BY activity_event_name
-            UNION
-            SELECT activity_event_type as event, 
-                   SUM(transferred_amount) as sum
-            FROM   public.sched_h3 
-            WHERE  cmte_id = %s
-                AND report_id = %s
-            GROUP BY activity_event_type
             ) t
-    """.format(cmte_id, report_id, cmte_id, report_id)
+    """
+    # _sql = """
+    # SELECT json_agg(t) FROM(
+    #         SELECT activity_event_name as event, 
+    #                SUM(transferred_amount) as sum
+    #         FROM   public.sched_h3 
+    #         WHERE  cmte_id = %s
+    #             AND report_id = %s
+    #         GROUP BY activity_event_name
+    #         UNION
+    #         SELECT activity_event_type as event, 
+    #                SUM(transferred_amount) as sum
+    #         FROM   public.sched_h3 
+    #         WHERE  cmte_id = %s
+    #             AND report_id = %s
+    #         GROUP BY activity_event_type
+    #         ) t
+    # """.format(cmte_id, report_id, cmte_id, report_id)
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
+            cursor.execute(_sql, [cmte_id, report_id, back_ref_transaction_id])
             # cursor.execute(_sql)
             records = cursor.fetchone()[0]
             if records:
@@ -1876,7 +1888,7 @@ def get_h3_summary(request):
         logger.debug('get_h3_summary...')
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
-        aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
+        # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
         logger.debug('cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -1913,11 +1925,13 @@ def get_h3_summary(request):
             if _sum: 
                 for _rec in _sum:
                     if _rec['activity_event_name']:
+                        aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id, _rec.get('back_ref_transaction_id'))
                         _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'], 0)
-                    elif _rec['activity_event_type']:
-                        _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
+                    # elif _rec['activity_event_type']:
+                    #     _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
                     else:
-                        pass
+                        _rec['aggregate_amount'] = 0
+                        # pass
             return Response( _sum, status = status.HTTP_200_OK )
     except:
         raise 
