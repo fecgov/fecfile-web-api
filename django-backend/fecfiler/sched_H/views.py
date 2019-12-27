@@ -1430,21 +1430,40 @@ def schedH3_sql_dict(data):
     except:
         raise Exception('invalid request data.')
 
+def update_h3_total_amount(data):
+    """
+    update total amount for all transactions have the same parent_id
+    """
+    _sql = """
+    UPDATE sched_h3 
+    SET    total_amount_transferred = (
+        SELECT Sum(transferred_amount) 
+        FROM   sched_h3 
+        WHERE 
+              back_ref_transaction_id = %s) 
+    WHERE  ( back_ref_transaction_id = %s 
+          OR transaction_id = %s ) 
+    """
+    back_ref_transaction_id = data.get('back_ref_transaction_id')
+    _v = [back_ref_transaction_id] * 3
+    do_transaction(_sql, _v)
 
 def put_schedH3(data):
     """
     update sched_H3 item
     here we are assuming entity_id are always referencing something already in our DB
     """
+    # back_ref_transaction_id = data.get('back_ref_transaction_id')
     try:
         check_mandatory_fields_SH3(data)
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH3(data)
+            update_h3_total_amount(data)
         except Exception as e:
             raise Exception(
                 'The put_sql_schedH3 function is throwing an error: ' + str(e))
-        return data
+        return get_schedH3(data)
     except:
         raise
 
@@ -1455,18 +1474,18 @@ def put_sql_schedH3(data):
             
     """
     _sql = """UPDATE public.sched_h3
-              SET transaction_type_identifier= %s, 
-                  back_ref_transaction_id= %s,
-                  back_ref_sched_name= %s,
-                  account_name= %s,
-                  activity_event_type= %s,
-                  activity_event_name= %s,
-                  receipt_date= %s,
-                  total_amount_transferred= %s,
-                  transferred_amount= %s,
-                  memo_code= %s,
-                  memo_text= %s,
-                  last_update_date= %s
+              SET transaction_type_identifier = %s, 
+                  back_ref_transaction_id = %s,
+                  back_ref_sched_name = %s,
+                  account_name = %s,
+                  activity_event_type = %s,
+                  activity_event_name = %s,
+                  receipt_date = %s,
+                  total_amount_transferred = %s,
+                  transferred_amount = %s,
+                  memo_code = %s,
+                  memo_text = %s,
+                  last_update_date = %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
         """
@@ -1590,11 +1609,12 @@ def get_schedH3(data):
             forms_obj = get_list_all_schedH3(report_id, cmte_id)
             # print('---')
             # print(forms_obj)
-            for _obj in forms_obj:
-                transaction_id = _obj.get('transaction_id')
-                child_list = get_child_schedH3(transaction_id, report_id, cmte_id)
-                if child_list:
-                    _obj['child'] = child_list
+            if forms_obj:
+                for _obj in forms_obj:
+                    transaction_id = _obj.get('transaction_id')
+                    child_list = get_child_schedH3(transaction_id, report_id, cmte_id)
+                    if child_list:
+                        _obj['child'] = child_list
         return forms_obj
     except:
         raise
@@ -1986,7 +2006,7 @@ def get_h3_aggregate_amount(request):
             WHERE  cmte_id = %s
                 AND report_id = %s
                     AND activity_event_name = %s
-                    AND back_ref_transaction_id = %
+                    AND back_ref_transaction_id = %s
                     AND delete_ind is distinct from 'Y'
             ) t
             """
@@ -2076,6 +2096,7 @@ def schedH3(request):
 
             output = get_schedH3(data)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+
         except Exception as e:
             return Response("The schedH3 API - POST is throwing an exception: "
                             + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -2094,7 +2115,11 @@ def schedH3(request):
                 data['transaction_id'] = check_transaction_id(
                     request.query_params.get('transaction_id'))
             datum = get_schedH3(data)
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            if datum:
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            else:
+                return JsonResponse([], status=status.HTTP_200_OK, safe=False)
+
         except NoOPError as e:
             logger.debug(e)
             forms_obj = []
@@ -2150,7 +2175,7 @@ def schedH3(request):
             # else:
             data = put_schedH3(datum)
             # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            return JsonResponse(data[0], status=status.HTTP_201_CREATED, safe=False)
         except Exception as e:
             logger.debug(e)
             return Response("The schedH3 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
