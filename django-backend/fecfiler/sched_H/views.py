@@ -2006,7 +2006,7 @@ def get_h3_aggregate_amount(request):
             WHERE  cmte_id = %s
                 AND report_id = %s
                     AND activity_event_name = %s
-                    AND back_ref_transaction_id = %
+                    AND back_ref_transaction_id = %s
                     AND delete_ind is distinct from 'Y'
             ) t
             """
