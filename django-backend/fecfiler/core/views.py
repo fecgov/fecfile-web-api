@@ -5997,7 +5997,12 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
             to_date = cvg_end_date
             with connection.cursor() as cursor:
                 cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.account_name = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", 
-              [ cmte_id, to_date, levin_accnt_name])
+                [cmte_id, to_date, levin_accnt_name])
+                if (cursor.rowcount == 0):
+                    coh_cop = 0
+                else:
+                    result = cursor.fetchone()
+                    coh_cop = result[0]
         else:
             current_yr = datetime.datetime.now().year
             if current_yr == cvg_end_date.year:
@@ -6010,12 +6015,12 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
                 prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
             with connection.cursor() as cursor:
                 cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.account_name = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", 
-                  [cmte_id, prev_cvg_end_dt, levin_accnt_name])
-        if (cursor.rowcount == 0):
-            coh_cop = 0
-        else:
-            result = cursor.fetchone()
-            coh_cop = result[0]
+                [cmte_id, prev_cvg_end_dt, levin_accnt_name])
+                if (cursor.rowcount == 0):
+                    coh_cop = 0
+                else:
+                    result = cursor.fetchone()
+                    coh_cop = result[0]
 
         return coh_cop
     except Exception as e:
@@ -6360,7 +6365,7 @@ def prepare_Schedl_summary_data(request):
               sum_value = dict_value[0]
               levin_accnt_name = dict_value[1]
             update_str += "%s=%s," % (update_col_la_dict[i], str(sum_value))
-            update_str += "%s=%s," % ('levin_account_name', str(levin_accnt_name))
+            # update_str += "%s='%s'," % ('account_name', str(levin_accnt_name))
         for i in update_col_lb_dict:
             dict_value = final_col_lb_dict.get(i, None)
             if dict_value in ["",None, "None"]:
@@ -6371,14 +6376,14 @@ def prepare_Schedl_summary_data(request):
               levin_accnt_name = dict_value[1]
 
             update_str += "%s=%s," % (update_col_lb_dict[i], str(sum_value))
-            update_str += "%s=%s," % ('levin_account_name', levin_accnt_name)
+        update_str += "%s='%s'," % ('account_name', str(levin_accnt_name))
 
         print(update_str)
+        import pdb;pdb.set_trace()
         update_str = update_str[:-1]
-        # with connection.cursor() as cursor:
-
-        #     update_query = """update public.sched_l set %s WHERE cmte_id = '%s' AND report_id = '%s';"""%(update_str, cmte_id, report_id)
-        #     cursor.execute(update_query)
+        with connection.cursor() as cursor:
+            update_query = """update public.sched_l set %s WHERE cmte_id = '%s' AND report_id = '%s';"""%(update_str, cmte_id, report_id)
+            cursor.execute(update_query)
         return Response({'Response':'Success'}, status= status.HTTP_200_OK)
     except Exception as e:
         return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
