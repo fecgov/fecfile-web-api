@@ -325,6 +325,81 @@ def update_aggregate_on_transaction(
             )
         )
 
+@api_view(['GET'])
+def get_sched_e_ytd_amount(request):
+    """
+    get YTD amount based onelection code and office:
+    if so_cand_office == 'P':
+        only check against 'election code'
+    if so_cand_office == 'S':
+        need to check against election_code and so_cand_state
+    if so_cand_office == 'H':
+        need election_code, so_cand_state and so_cand_dsitrict
+    """
+    try:
+        cmte_id = request.user.username
+        cand_office = request.query_params.get('so_cand_office')
+        if not cand_office:
+            raise Exception('so_cand_office is required for this api.')
+        election_code = request.query_params.get('election_code')
+        if not election_code:
+            raise Exception('election_code is required for this api.')
+        if cand_office == 'P':
+            _sql = """
+            SELECT calendar_ytd_amount 
+            FROM public.sched_e
+            WHERE cmte_id = %s
+            AND so_cand_office = %s 
+            AND election_code = %s 
+            AND delete_ind is distinct from 'Y'
+            """
+            _v = (cmte_id, cand_office, election_code)
+        elif cand_office == 'S':
+            cand_state = request.query_params.get('so_cand_state')
+            if not cand_state:
+                raise Exception('cand_state is required for cand_office S')
+            _sql = """
+            SELECT calendar_ytd_amount 
+            FROM public.sched_e
+            WHERE cmte_id = %s
+            AND so_cand_office = %s 
+            AND election_code = %s 
+            AND so_cand_state = %s 
+            AND delete_ind is distinct from 'Y'
+            """
+            _v = (cmte_id, cand_office, election_code, cand_state)
+        elif cand_office == 'H':
+            cand_state = request.query_params.get('so_cand_state')
+            cand_district = request.query_params.get('so_cand_district')
+            if not cand_state:
+                raise Exception('cand_state is required for cand_office H')
+            if not cand_district:
+                raise Exception('cand_district is required for cand_office H')
+            _sql = """
+            SELECT calendar_ytd_amount 
+            FROM public.sched_e
+            WHERE cmte_id = %s
+            AND so_cand_office = %s 
+            AND election_code = %s 
+            AND so_cand_state = %s 
+            AND so_cand_district = %s 
+            AND delete_ind is distinct from 'Y'
+            """
+            _v = (cmte_id, cand_office, election_code, cand_state, cand_district)
+        else:
+            raise Exception('invalid cand_office value.')
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _v)
+            if not cursor.rowcount:
+                logger.debug('no valid ytd value found.')
+                ytd_amt = 0
+            else:
+                ytd_amt = cursor.fetchone()[0]
+                logger.debug('ytd_amt fetched:{}'.format(ytd_amt))
+        return JsonResponse({'ytd_amount':ytd_amt}, status=status.HTTP_200_OK, safe=False)
+    except:
+        raise
+
 
 def get_transactions_election_and_office(start_date, end_date, data):
     """
@@ -336,6 +411,8 @@ def get_transactions_election_and_office(start_date, end_date, data):
     when both dissemination_date and disbursement_date are available, 
     we take priority on dissemination_date 
     """
+    _sql = ''
+    _params = set([])
     if data.get("so_cand_office") == "P":
         _sql = """
         SELECT  
@@ -388,7 +465,7 @@ def get_transactions_election_and_office(start_date, end_date, data):
             AND COALESCE(dissemination_date, disbursement_date) <= %s
             AND election_code = %s
             AND so_cand_state = %s
-            AND so_cand_dsitrict = %s
+            AND so_cand_district = %s
             AND delete_ind is distinct FROM 'Y' 
             ORDER BY transaction_dt ASC, create_date ASC;  
         """
