@@ -634,6 +634,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     formObj['transaction_id'] = this.transaction_id;
     formObj['back_ref_transaction_id'] = this.back_ref_transaction_id;
 
+    formObj['aggregate_amount'] = this.convertFormattedAmountToDecimal(formObj.aggregate_amount);
+
     delete formObj.total_amount_transferred;
 
     this.isSubmit = true;
@@ -780,13 +782,29 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         val = this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
       }
 
+      /*
       let aggregate_amount = 0;
       if(this.schedH3.get('aggregate_amount').value){
         aggregate_amount = this.convertFormattedAmountToDecimal(this.schedH3.get('aggregate_amount').value);
       }
+      */
 
-      if(this.scheduleAction === ScheduleActions.add && this.showAggregateAmount) {
-        this.schedH3.patchValue({aggregate_amount: this._decPipe.transform(aggregate_amount + val, '.2-2')}, { onlySelf: true });
+      const activity_event_name = this.schedH3.get('activity_event_name').value;
+      const activity_event_type = this.schedH3.get('category').value;
+
+      if(activity_event_name && (activity_event_type === 'DC' || activity_event_type === 'DF')) {
+
+        let aggregate_amount = 0;
+        this.h3Entries.filter(obj => obj.activity_event_name === activity_event_name)
+        .forEach(obj => {
+          aggregate_amount += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+        });
+
+        if(this.scheduleAction === ScheduleActions.add && this.showAggregateAmount) {
+          this.schedH3.patchValue({aggregate_amount: this._decPipe.transform(aggregate_amount + val, '.2-2')}, { onlySelf: true });
+        }
+      }else {
+        this.schedH3.patchValue({aggregate_amount: 0}, { onlySelf: true });
       }
 
       this.changeTotalAndAggrAmount();
@@ -888,6 +906,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.showIdentifer = true;
 
+    this.showIdentiferSelect = false;
+    this.showAggregateAmount = false;
+
     if(item.activity_event_type === 'DC' || item.activity_event_type === 'DF') {
       this.showIdentiferSelect = true;
       this.showAggregateAmount = true;
@@ -953,11 +974,18 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         this.total_amount_edit - this.transferred_amount_edit + val, '.2-2')}, { onlySelf: true });
 
       const activity_event_name = this.schedH3.get('activity_event_name').value;
+      const activity_event_type = this.schedH3.get('category').value;
 
-      if(activity_event_name) {
+      if(activity_event_name && (activity_event_type === 'DC' || activity_event_type === 'DF')) {
+        let sum = 0;
+        this.h3Entries.filter(obj => obj.activity_event_name === activity_event_name)
+        .forEach(obj => {
+          sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+        });
+
         if(this.showAggregateAmount && activity_event_name === this.activity_event_name_edit ) {
           this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(
-            this.aggregate_amount_edit - this.transferred_amount_edit + val, '.2-2')}, { onlySelf: true });
+            sum + val, '.2-2')}, { onlySelf: true });
         }else {
           this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(val, '.2-2')}, { onlySelf: true });
         }
@@ -969,8 +997,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     let sum = 0;
     const activity_event_name = this.schedH3.get('activity_event_name').value;
+    const activity_event_type = this.schedH3.get('category').value;
 
-    if(activity_event_name) {
+    if(activity_event_name && activity_event_type === 'DC' || activity_event_type === 'DF') {
       this.h3Entries.filter(obj => obj.activity_event_name === activity_event_name)
       .forEach(obj => {
         sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
