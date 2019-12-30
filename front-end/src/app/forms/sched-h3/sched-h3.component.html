@@ -183,6 +183,11 @@
                   formControlName="activity_event_name"
                   class="form-control"
                   (change)="selectActivityOrEventChange($event)"
+                  [ngClass]="
+                    schedH3.get('activity_event_name')?.invalid && (schedH3.touched || schedH3.dirty) && isSubmit
+                      ? 'input-field-error'
+                      : ''
+                  "
                 >
                   <option value="" selected>Activity or Event Identifier</option>
                   <option *ngFor="let identifier of identifiers" [value]="identifier.activity_event_name">
@@ -319,7 +324,7 @@
                     {{ item.transferred_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
                   </td>
                   <td class="summary_text_amt">
-                    {{ item.aggregate_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
+                    {{ item.aggregate_amount === 0 ? '' : (item.aggregate_amount | currency: 'USD':'symbol-narrow':'1.2-2') }}
                   </td>
 
                   <td class="bulk_action">
@@ -444,7 +449,7 @@
                   <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                     <button class="dropdown-item" (click)="editH3(item)"><i class="fas fa-edit"></i> Edit</button>
                     <button class="dropdown-item" (click)="printH3(item)"><i class="fas fa-print"></i> Print</button>
-                    <button class="dropdown-item" (click)="trashH3(item)"><i class="fas fa-trash"></i> Trash</button>
+                    <button class="dropdown-item" (click)="trashTransaction(item)"><i class="fas fa-trash"></i> Trash</button>
                   </div>
                 </div>
               </td>
