@@ -214,7 +214,6 @@
                   [attr.name]="'transferred_amount'"
                   [style.width]="'50%'"
                   [style.height]="'30px'"
-                  (keyup)="handleAmountKeyup($event)"
                   (blur)="handleOnBlurEvent($event, col)"
                   [ngClass]="
                     schedH3.get('transferred_amount')?.invalid && (schedH3.touched || schedH3.dirty) && isSubmit
@@ -433,7 +432,7 @@
               <td>{{ item.receipt_date | date: 'MM/dd/yyyy' }}</td>
               <td class="summary_text_amt">{{ item.transferred_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}</td>
               <td class="summary_text_amt">
-                {{ item.total_amount_transferred | currency: 'USD':'symbol-narrow':'1.2-2' }}
+                {{ item.aggregate_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
               </td>
 
               <td class="bulk_action">
@@ -445,7 +444,6 @@
                   <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                     <button class="dropdown-item" (click)="editH3(item)"><i class="fas fa-edit"></i> Edit</button>
                     <button class="dropdown-item" (click)="printH3(item)"><i class="fas fa-print"></i> Print</button>
-                    <button class="dropdown-item"><i class="fas fa-copy"></i> Clone</button>
                     <button class="dropdown-item" (click)="trashH3(item)"><i class="fas fa-trash"></i> Trash</button>
                   </div>
                 </div>

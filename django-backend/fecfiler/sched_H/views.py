@@ -1430,21 +1430,40 @@ def schedH3_sql_dict(data):
     except:
         raise Exception('invalid request data.')
 
+def update_h3_total_amount(data):
+    """
+    update total amount for all transactions have the same parent_id
+    """
+    _sql = """
+    UPDATE sched_h3 
+    SET    total_amount_transferred = (
+        SELECT Sum(transferred_amount) 
+        FROM   sched_h3 
+        WHERE 
+              back_ref_transaction_id = %s) 
+    WHERE  ( back_ref_transaction_id = %s 
+          OR transaction_id = %s ) 
+    """
+    back_ref_transaction_id = data.get('back_ref_transaction_id')
+    _v = [back_ref_transaction_id] * 3
+    do_transaction(_sql, _v)
 
 def put_schedH3(data):
     """
     update sched_H3 item
     here we are assuming entity_id are always referencing something already in our DB
     """
+    # back_ref_transaction_id = data.get('back_ref_transaction_id')
     try:
         check_mandatory_fields_SH3(data)
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH3(data)
+            update_h3_total_amount(data)
         except Exception as e:
             raise Exception(
                 'The put_sql_schedH3 function is throwing an error: ' + str(e))
-        return data
+        return get_schedH3(data)
     except:
         raise
 
@@ -1455,18 +1474,18 @@ def put_sql_schedH3(data):
             
     """
     _sql = """UPDATE public.sched_h3
-              SET transaction_type_identifier= %s, 
-                  back_ref_transaction_id= %s,
-                  back_ref_sched_name= %s,
-                  account_name= %s,
-                  activity_event_type= %s,
-                  activity_event_name= %s,
-                  receipt_date= %s,
-                  total_amount_transferred= %s,
-                  transferred_amount= %s,
-                  memo_code= %s,
-                  memo_text= %s,
-                  last_update_date= %s
+              SET transaction_type_identifier = %s, 
+                  back_ref_transaction_id = %s,
+                  back_ref_sched_name = %s,
+                  account_name = %s,
+                  activity_event_type = %s,
+                  activity_event_name = %s,
+                  receipt_date = %s,
+                  total_amount_transferred = %s,
+                  transferred_amount = %s,
+                  memo_code = %s,
+                  memo_text = %s,
+                  last_update_date = %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
         """
@@ -1590,11 +1609,12 @@ def get_schedH3(data):
             forms_obj = get_list_all_schedH3(report_id, cmte_id)
             # print('---')
             # print(forms_obj)
-            for _obj in forms_obj:
-                transaction_id = _obj.get('transaction_id')
-                child_list = get_child_schedH3(transaction_id, report_id, cmte_id)
-                if child_list:
-                    _obj['child'] = child_list
+            if forms_obj:
+                for _obj in forms_obj:
+                    transaction_id = _obj.get('transaction_id')
+                    child_list = get_child_schedH3(transaction_id, report_id, cmte_id)
+                    if child_list:
+                        _obj['child'] = child_list
         return forms_obj
     except:
         raise
@@ -1801,7 +1821,7 @@ def get_sched_h3_breakdown(request):
     except Exception as e:
         raise Exception('Error on fetching h3 break down')
         
-def load_h3_aggregate_amount(cmte_id, report_id):
+def load_h3_aggregate_amount(cmte_id, report_id, back_ref_transaction_id):
     """
     query and caclcualte event_type or event_name based on aggregate amount 
     for current report
@@ -1815,19 +1835,31 @@ def load_h3_aggregate_amount(cmte_id, report_id):
             FROM   public.sched_h3 
             WHERE  cmte_id = %s
                 AND report_id = %s
+                AND back_ref_transaction_id = %s
+                AND delete_ind is distinct from 'Y'
             GROUP BY activity_event_name
-            UNION
-            SELECT activity_event_type as event, 
-                   SUM(transferred_amount) as sum
-            FROM   public.sched_h3 
-            WHERE  cmte_id = %s
-                AND report_id = %s
-            GROUP BY activity_event_type
             ) t
-    """.format(cmte_id, report_id, cmte_id, report_id)
+    """
+    # _sql = """
+    # SELECT json_agg(t) FROM(
+    #         SELECT activity_event_name as event, 
+    #                SUM(transferred_amount) as sum
+    #         FROM   public.sched_h3 
+    #         WHERE  cmte_id = %s
+    #             AND report_id = %s
+    #         GROUP BY activity_event_name
+    #         UNION
+    #         SELECT activity_event_type as event, 
+    #                SUM(transferred_amount) as sum
+    #         FROM   public.sched_h3 
+    #         WHERE  cmte_id = %s
+    #             AND report_id = %s
+    #         GROUP BY activity_event_type
+    #         ) t
+    # """.format(cmte_id, report_id, cmte_id, report_id)
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
+            cursor.execute(_sql, [cmte_id, report_id, back_ref_transaction_id])
             # cursor.execute(_sql)
             records = cursor.fetchone()[0]
             if records:
@@ -1856,7 +1888,7 @@ def get_h3_summary(request):
         logger.debug('get_h3_summary...')
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
-        aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
+        # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
         logger.debug('cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -1893,11 +1925,13 @@ def get_h3_summary(request):
             if _sum: 
                 for _rec in _sum:
                     if _rec['activity_event_name']:
+                        aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id, _rec.get('back_ref_transaction_id'))
                         _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'], 0)
-                    elif _rec['activity_event_type']:
-                        _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
+                    # elif _rec['activity_event_type']:
+                    #     _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
                     else:
-                        pass
+                        _rec['aggregate_amount'] = 0
+                        # pass
             return Response( _sum, status = status.HTTP_200_OK )
     except:
         raise 
@@ -1964,6 +1998,70 @@ def get_h3_total_amount(request):
     except:
         raise        
 
+@api_view(['GET'])
+def get_h3_aggregate_amount(request):
+    """
+    get h3 aggregate_amount for editing purpose
+    if a event_name is provided, will get the total amount based on event name
+    if a event_type is provided, will get the total amount based on event type
+    # TODO: this api need to be updated to calcuate a aggreaget amount
+    """
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        parent_id = request.query_params.get('parent_id')
+        logger.debug('get_h3_total_amount with request:{}'.format(request.query_params))
+        if 'activity_event_name' in request.query_params: 
+            event_name = request.query_params.get('activity_event_name') 
+            _sql = """
+            SELECT json_agg(t) from(
+            SELECT sum(transferred_amount) as aggregate_amount
+            FROM   public.sched_h3 
+            WHERE  cmte_id = %s
+                AND report_id = %s
+                    AND activity_event_name = %s
+                    AND back_ref_transaction_id = %s
+                    AND delete_ind is distinct from 'Y'
+            ) t
+            """
+            with connection.cursor() as cursor:
+                logger.debug('query with _sql:{}'.format(_sql))
+                # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+                cursor.execute(_sql, (cmte_id, report_id, event_name, parent_id))
+                json_res = cursor.fetchone()[0]
+        else:
+            event_type = request.query_params.get('activity_event_type') 
+            if not event_type:
+                raise Exception("event name or event type is required for this api")
+            _sql = """
+            SELECT json_agg(t) from(
+            SELECT sum(transferred_amount) as aggregate_amount
+            FROM   public.sched_h3 
+            WHERE  cmte_id = %s
+            AND report_id = %s
+                AND activity_event_type = %s
+            ) t
+            """ 
+            with connection.cursor() as cursor:
+                logger.debug('query with _sql:{}'.format(_sql))
+                # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+                cursor.execute(_sql, (cmte_id, report_id, event_type))
+                json_res = cursor.fetchone()[0]
+        
+            # print(json_res)
+        if not json_res:
+            return Response(
+                {
+                    "aggregate_amount": 0
+                }, 
+                    status = status.HTTP_200_OK)
+        # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        # start_dt = datetime.date(int(calendar_year), 1, 1)
+        # end_dt = datetime.date(int(calendar_year), 12, 31)
+        return Response( json_res[0], status = status.HTTP_200_OK)
+    except:
+        raise        
+
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH3(request):
     
@@ -2012,6 +2110,7 @@ def schedH3(request):
 
             output = get_schedH3(data)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+
         except Exception as e:
             return Response("The schedH3 API - POST is throwing an exception: "
                             + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -2030,7 +2129,11 @@ def schedH3(request):
                 data['transaction_id'] = check_transaction_id(
                     request.query_params.get('transaction_id'))
             datum = get_schedH3(data)
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            if datum:
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            else:
+                return JsonResponse([], status=status.HTTP_200_OK, safe=False)
+
         except NoOPError as e:
             logger.debug(e)
             forms_obj = []
@@ -2086,7 +2189,7 @@ def schedH3(request):
             # else:
             data = put_schedH3(datum)
             # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            return JsonResponse(data[0], status=status.HTTP_201_CREATED, safe=False)
         except Exception as e:
             logger.debug(e)
             return Response("The schedH3 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
