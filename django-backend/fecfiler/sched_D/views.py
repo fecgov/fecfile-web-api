@@ -16,6 +16,7 @@ from rest_framework.response import Response
 
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
+    get_sched_a_transactions,
     get_sched_b_transactions,
     get_sched_f_child_transactions,
     get_sched_h4_child_transactions,
@@ -46,6 +47,7 @@ from fecfiler.sched_A.views import get_next_transaction_id
 # Create your views here.
 logger = logging.getLogger(__name__)
 
+API_CALL_SA = {"api_call": "/sb/schedA", "sched_type": "sched_a"}
 API_CALL_SB = {"api_call": "/sb/schedB", "sched_type": "sched_b"}
 API_CALL_SF = {"api_call": "/sf/schedF", "sched_type": "sched_f"}
 API_CALL_SE = {"api_call": "/se/schedE", "sched_type": "sched_e"}
@@ -711,7 +713,9 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
     sched_b, ached_e, sched_f, sched_h4, sched_h6
     TODO: need to add sched_e child data later on
     """
-
+    sched_a_list = get_sched_a_transactions(
+        report_id, cmte_id, back_ref_transaction_id=transaction_id
+    )
     sched_b_list = get_sched_b_transactions(
         report_id, cmte_id, back_ref_transaction_id=transaction_id
     )
@@ -722,7 +726,7 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
         report_id, cmte_id, transaction_id)
     sched_h6_list = get_sched_h6_child_transactions(
         report_id, cmte_id, transaction_id)
-    return sched_b_list + sched_f_list + sched_h4_list + sched_h6_list
+    return sched_a_list + sched_b_list + sched_f_list + sched_h4_list + sched_h6_list
 
     #     childA_forms_obj = get_list_child_schedA(
     #     report_id, cmte_id, transaction_id)
@@ -799,6 +803,8 @@ def get_schedD(data):
                             }
                         )
                         obj.update({"back_ref_api_call": "/sd/schedD"})
+                        if obj["transaction_id"].startswith("SA"):
+                            obj.update(API_CALL_SA)
                         if obj["transaction_id"].startswith("SB"):
                             obj.update(API_CALL_SB)
                         if obj["transaction_id"].startswith("SE"):
