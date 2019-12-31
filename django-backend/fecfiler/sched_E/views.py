@@ -32,7 +32,7 @@ from fecfiler.sched_A.views import (
     find_form_type,
     find_aggregate_date,
 )
-from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent
+from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent, get_line_number_trans_type
 from fecfiler.sched_D.views import do_transaction
 
 # TODO: add date validation: disbur and dissem should have at least one of them
@@ -163,7 +163,26 @@ def schedE_sql_dict(data):
         "cand_election_year",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        datum =  {k: v for k, v in data.items() if k in valid_fields}
+        # so_ fields remapping to work with dynamic form
+        # TODO: may need db fields renaming in the future
+        so_cand_fields = [
+            "so_cand_id",
+            "so_cand_last_name",
+            "so_cand_fist_name",
+            "so_cand_middle_name",
+            "so_cand_prefix",
+            "so_cand_suffix",
+            "so_cand_office",
+            "so_cand_district",
+            "so_cand_state",
+        ]
+        for _f in so_cand_fields:
+            if _f.replace('so_', '') in data:
+                datum[_f] = data.get(_f.replace('so_', ''))
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        return datum
     except:
         raise Exception("invalid request data.")
 
@@ -918,7 +937,7 @@ def schedE(request):
                 )
                 data = put_schedE(datum)
             else:
-                print(datum)
+                # print(datum)
                 data = post_schedE(datum)
             # Associating child transactions to parent and storing them to DB
 
