@@ -405,6 +405,12 @@ export class F3xComponent implements OnInit {
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
                     prePopulateFromSchedD: e.prePopulateFromSchedD
                   });
+                } else if (e.hasOwnProperty('prePopulateFromSchedL')) {
+                  this._f3xMessageService.sendPopulateFormMessage({
+                    key: 'prePopulateFromSchedL',
+                    abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+                    prePopulateFromSchedL: e.prePopulateFromSchedL
+                  });
                 }
               }
             }
