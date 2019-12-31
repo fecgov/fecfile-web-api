@@ -398,6 +398,7 @@
                         bindValue="levin_account_id" 
                         bindLabel="levin_account_name" 
                         [selectOnTab]="true"
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)

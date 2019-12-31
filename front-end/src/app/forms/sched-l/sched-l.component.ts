@@ -186,9 +186,9 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     super.ngOnDestroy();
   }
 
-  setDefaultValues() {
-    this.schedL.patchValue({ratio_code:'n'}, { onlySelf: true });
-  }
+  /*setDefaultValues() {
+    this.schedL.patchValue({levin_account_id: '6'}, { onlySelf: true });
+  }*/
 
   public getReportId(): string {
 
@@ -233,7 +233,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
           this.schedLsModel = this.mapFromServerFields(res);
           this.setArrow(this.schedLsModel);
 
-          this.schedLsModel = this.schedLsModel .filter(obj => obj.memo_code !== 'X');
+          //this.schedLsModel = this.schedLsModel .filter(obj => obj.memo_code !== 'X');
           this.tableConfig.totalItems = this.schedLsModel.length;
         }
       });

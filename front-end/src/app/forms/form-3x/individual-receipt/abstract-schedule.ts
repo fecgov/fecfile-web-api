@@ -114,6 +114,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected formFieldsPrePopulated = false;
   protected staticFormFields = null;
   protected _prePopulateFromSchedDData: any;
+  protected _prePopulateFromSchedLData: any;
   protected _parentTransactionModel: TransactionModel;
 
   /**
@@ -214,6 +215,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               }
             }
             break;
+          case 'prePopulateFromSchedL':
+              // set class variable '_prePopulateFromSchedLData' to be referenced once the formGroup
+              // has been loaded by the get dynamic fields API call.
+              if (message) {
+                if (message.prePopulateFromSchedL) {
+                  // only load form for the AbstractSchudule parent in the view
+                  if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+                    // Patch fix for sched F payment - It does not have the subTransactionInfo
+                    // when determining action so force it here.
+                    this.scheduleAction = ScheduleActions.addSubTransaction;
+                    this._prePopulateFromSchedLData = message.prePopulateFromSchedL;
+                  }
+                }
+              }
+              break;
           default:
             console.log('message key not supported: ' + message.key);
         }
@@ -1841,6 +1857,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             } else if (this.subTransactionInfo) {
               if (this.subTransactionInfo.scheduleType === 'sched_d' && this.subTransactionInfo.isParent === true) {
                 addSubTransEmitObj.prePopulateFromSchedD = res;
+              } else if (this.subTransactionInfo.scheduleType === 'sched_a' && this.subTransactionInfo.isParent === true) {
+                  if (this.subTransactionInfo.subTransactionType === 'LEVIN_PARTN_MEMO') {
+                    if (res.hasOwnProperty('levin_account_id')) {
+                      addSubTransEmitObj.prePopulateFromSchedL = res;
+                      /*this.frmIndividualReceipt.controls['levin_account_id'].setValue(
+                        res.levin_account_id
+                      );*/
+                    }
+                  }
               }
             }
             this.status.emit(addSubTransEmitObj);
@@ -1865,6 +1890,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 if (this.subTransactionInfo.scheduleType === 'sched_d' && this.subTransactionInfo.isParent === false) {
                   this._prePopulateFromSchedDData = res;
                   this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
+                } else if (this.subTransactionInfo.scheduleType === 'sched_a' && this.subTransactionInfo.isParent === false) {
+                  if (this.subTransactionInfo.subTransactionType === 'LEVIN_PARTN_MEMO') {
+                    this._prePopulateFromSchedLData = res;
+                    this._prePopulateFromSchedL(this._prePopulateFromSchedLData);
+                  }
                 }
               }
             }
@@ -3015,9 +3045,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       apiCall = apiCall ? apiCall : '';
 
       let schedDSubTran = false;
+      let schedLSubTran = false;
       if (this.subTransactionInfo) {
         if (this.subTransactionInfo.scheduleType === 'sched_d' && this.subTransactionInfo.isParent === false) {
           schedDSubTran = true;
+        } else if (this.subTransactionInfo.scheduleType === 'sched_a' && this.subTransactionInfo.isParent === false) {
+          if (this.subTransactionInfo.subTransactionType === 'LEVIN_PARTN_MEMO') {
+            schedLSubTran = true;
+            /*if (res.hasOwnProperty('levin_account_id')) {
+              prePopulateFieldArray.push({ name: 'levin_account_id', value: res.levin_account_id });
+            }*/
+          }
         }
       }
 
@@ -3030,6 +3068,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       ) {
         this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
         this._prePopulateFromSchedDData = null;
+      }
+      // If Data for sched L sub-tran has been received by the message service,
+      // pre-populate the formGroup now that the dynamic form API call is complete.
+      if (
+        this._prePopulateFromSchedLData &&
+        schedLSubTran &&
+        this.scheduleAction === ScheduleActions.addSubTransaction
+      ) {
+        this._prePopulateFromSchedL(this._prePopulateFromSchedLData);
+        this._prePopulateFromSchedLData = null;
       }
     });
   }
@@ -3101,6 +3149,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.handleEntityTypeChange(this.selectedEntityType);
         }
       }
+    }
+    this._prePopulateFormField(fieldArray);
+  }
+
+  /**
+   * Sched L Account ID will be auto-populated for child transaction
+   *
+   * @param schedLData
+   */
+  protected _prePopulateFromSchedL(schedLData: any) {
+    const fieldArray = [];
+    if (schedLData.hasOwnProperty('levin_account_id')) {
+      this._prePopulateFormFieldHelper(schedLData, 'levin_account_id', fieldArray);
     }
     this._prePopulateFormField(fieldArray);
   }
@@ -3986,7 +4047,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
         prePopulateFieldArray.push({ name: 'purpose_description', value: earmarkMemoPurpose });
         prePopulateFieldArray.push({ name: 'expenditure_purpose', value: earmarkMemoPurpose });
-      }
+      }/* else if (this.subTransactionInfo.subTransactionType === 'LEVIN_PARTN_MEMO') {
+          if (res.hasOwnProperty('levin_account_id')) {
+            prePopulateFieldArray.push({ name: 'levin_account_id', value: res.levin_account_id });
+          }
+      }*/
     }
     return prePopulateFieldArray;
   }
