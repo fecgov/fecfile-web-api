@@ -212,6 +212,31 @@ def put_schedE(data):
     here we are assuming entity_id are always referencing something already in our DB
     """
     try:
+        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        logger.debug("saving sched_e with data:{}".format(data))
+        if "payee_entity_id" in data:
+            logger.debug("update payee entity with data:{}".format(data))
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("payee_entity_id"),
+            }
+
+            # # need this update for FEC entity
+            # if get_data["entity_id"].startswith("FEC"):
+            #     get_data["cmte_id"] = "C00000000"
+            old_entity = get_entities(get_data)[0]
+            new_entity = put_entities(data)
+            payee_rollback_flag = True
+        else:
+            logger.debug("saving new entity:{}".format(data))
+            new_entity = post_entities(data)
+            logger.debug("new entity created:{}".format(new_entity))
+            payee_rollback_flag = False
+
+        # continue to save transaction
+        entity_id = new_entity.get("entity_id")
+        # print('post_scheda {}'.format(entity_id))
+        data["payee_entity_id"] = entity_id
         check_mandatory_fields_SE(data)
         # check_transaction_id(data.get('transaction_id'))
         existing_expenditure = get_existing_expenditure_amount(
@@ -229,9 +254,16 @@ def put_schedE(data):
                         existing_expenditure,
                     )
         except Exception as e:
+                        # remove entiteis if saving sched_e fails
+            if payee_rollback_flag:
+                entity_data = put_entities(old_entity)
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedE function is throwing an error: " + str(e)
             )
+        update_aggregate_amt_se(data)
         return data
     except:
         raise
@@ -610,12 +642,12 @@ def post_schedE(data):
                 get_data["cmte_id"] = "C00000000"
             old_entity = get_entities(get_data)[0]
             new_entity = put_entities(data)
-            rollback_flag = True
+            payee_rollback_flag = True
         else:
             logger.debug("saving new entity:{}".format(data))
             new_entity = post_entities(data)
             logger.debug("new entity created:{}".format(new_entity))
-            rollback_flag = False
+            payee_rollback_flag = False
 
         # continue to save transaction
         entity_id = new_entity.get("entity_id")
@@ -626,7 +658,7 @@ def post_schedE(data):
         validate_se_data(data)
         validate_negative_transaction(data)
         validate_parent_transaction_exist(data)
-        # TODO: add code for saving payee entity
+        # TODO: add code for saving completing_entity
 
         try:
             logger.debug("saving new sched_e item with data:{}".format(data))
@@ -640,8 +672,8 @@ def post_schedE(data):
                     data.get("expenditure_amount"),
                 )
         except Exception as e:
-            # remove entiteis if saving sched_a fails
-            if rollback_flag:
+            # remove entiteis if saving sched_e fails
+            if payee_rollback_flag:
                 entity_data = put_entities(old_entity)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
