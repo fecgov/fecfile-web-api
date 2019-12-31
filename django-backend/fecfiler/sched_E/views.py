@@ -338,7 +338,7 @@ def get_sched_e_ytd_amount(request):
     """
     try:
         cmte_id = request.user.username
-        cand_office = request.query_params.get('so_cand_office')
+        cand_office = request.query_params.get('cand_office')
         if not cand_office:
             raise Exception('so_cand_office is required for this api.')
         election_code = request.query_params.get('election_code')
@@ -355,7 +355,7 @@ def get_sched_e_ytd_amount(request):
             """
             _v = (cmte_id, cand_office, election_code)
         elif cand_office == 'S':
-            cand_state = request.query_params.get('so_cand_state')
+            cand_state = request.query_params.get('cand_state')
             if not cand_state:
                 raise Exception('cand_state is required for cand_office S')
             _sql = """
@@ -369,8 +369,8 @@ def get_sched_e_ytd_amount(request):
             """
             _v = (cmte_id, cand_office, election_code, cand_state)
         elif cand_office == 'H':
-            cand_state = request.query_params.get('so_cand_state')
-            cand_district = request.query_params.get('so_cand_district')
+            cand_state = request.query_params.get('cand_state')
+            cand_district = request.query_params.get('cand_district')
             if not cand_state:
                 raise Exception('cand_state is required for cand_office H')
             if not cand_district:
