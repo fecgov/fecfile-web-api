@@ -14,7 +14,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { TransactionsService } from '../transactions/service/transactions.service';
+import { TransactionsService, GetTransactionsResponse } from '../transactions/service/transactions.service';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
@@ -30,6 +30,10 @@ import { SchedH2Service } from './sched-h2.service';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 import { SchedHMessageServiceService } from '../sched-h-service/sched-h-message-service.service';
 import { SchedHServiceService } from '../sched-h-service/sched-h-service.service';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 
 @Component({
@@ -110,7 +114,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     private _tranMessageService: TransactionsMessageService,
     private _datePipe: DatePipe,
     private _schedHMessageServiceService: SchedHMessageServiceService,
-    private _schedHService: SchedHServiceService
+    private _schedHService: SchedHServiceService,
+    private _tranService: TransactionsService,
+    private _dlService: DialogService,
   ) {    
      super(
       _http,
@@ -139,6 +145,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _uService;
     _decPipe;
     _datePipe;
+    _tranService;
+    _dlService;
 
     this.editTransactionSubscription = this._tranMessageService
       .getEditTransactionMessage()
@@ -474,5 +482,31 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   }
 
+  public trashTransaction(trx: any): void {
+
+    trx.report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    trx.transactionId = trx.transaction_id;
+
+    this._dlService
+      .confirm('You are about to delete this transaction ' + trx.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._tranService
+            .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
+            .subscribe((res: GetTransactionsResponse) => {
+              //this.getTransactionsPage(this.config.currentPage);
+              this._dlService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+              this.getH2Sum(trx.report_id);
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
 }
 
