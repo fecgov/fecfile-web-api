@@ -253,7 +253,7 @@
 
                         <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                           <button class="dropdown-item" (click)="editH5Sub(item)"><i class="fas fa-edit"></i> Edit</button>
-                          <button class="dropdown-item" (click)="trashH5(item)"><i class="fas fa-trash"></i> Trash</button>
+                          <button class="dropdown-item" (click)="trashSubTransaction(item)"><i class="fas fa-trash"></i> Trash</button>
                         </div>
                       </div>
                     </td>
@@ -360,8 +360,7 @@
                     <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                       <button class="dropdown-item" (click)="editH5(report)"><i class="fas fa-edit"></i> Edit</button>
                       <button class="dropdown-item" (click)="printH2(report)"><i class="fas fa-print"></i> Print</button>
-                      <button class="dropdown-item"><i class="fas fa-copy"></i> Clone</button>
-                      <button class="dropdown-item" (click)="trashH2(report)"><i class="fas fa-trash"></i> Trash</button>
+                      <button class="dropdown-item" (click)="trashTransaction(report)"><i class="fas fa-trash"></i> Trash</button>
                     </div>
                   </div>
                 </td>
