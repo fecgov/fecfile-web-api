@@ -32,7 +32,7 @@ from fecfiler.sched_A.views import (
     find_form_type,
     find_aggregate_date,
 )
-from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent
+from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent, get_line_number_trans_type
 from fecfiler.sched_D.views import do_transaction
 
 # TODO: add date validation: disbur and dissem should have at least one of them
@@ -163,7 +163,26 @@ def schedE_sql_dict(data):
         "cand_election_year",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        datum =  {k: v for k, v in data.items() if k in valid_fields}
+        # so_ fields remapping to work with dynamic form
+        # TODO: may need db fields renaming in the future
+        so_cand_fields = [
+            "so_cand_id",
+            "so_cand_last_name",
+            "so_cand_fist_name",
+            "so_cand_middle_name",
+            "so_cand_prefix",
+            "so_cand_suffix",
+            "so_cand_office",
+            "so_cand_district",
+            "so_cand_state",
+        ]
+        for _f in so_cand_fields:
+            if _f.replace('so_', '') in data:
+                datum[_f] = data.get(_f.replace('so_', ''))
+        datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            data.get('transaction_type_identifier'))
+        return datum
     except:
         raise Exception("invalid request data.")
 
@@ -193,6 +212,31 @@ def put_schedE(data):
     here we are assuming entity_id are always referencing something already in our DB
     """
     try:
+        # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
+        logger.debug("saving sched_e with data:{}".format(data))
+        if "payee_entity_id" in data:
+            logger.debug("update payee entity with data:{}".format(data))
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("payee_entity_id"),
+            }
+
+            # # need this update for FEC entity
+            # if get_data["entity_id"].startswith("FEC"):
+            #     get_data["cmte_id"] = "C00000000"
+            old_entity = get_entities(get_data)[0]
+            new_entity = put_entities(data)
+            payee_rollback_flag = True
+        else:
+            logger.debug("saving new entity:{}".format(data))
+            new_entity = post_entities(data)
+            logger.debug("new entity created:{}".format(new_entity))
+            payee_rollback_flag = False
+
+        # continue to save transaction
+        entity_id = new_entity.get("entity_id")
+        # print('post_scheda {}'.format(entity_id))
+        data["payee_entity_id"] = entity_id
         check_mandatory_fields_SE(data)
         # check_transaction_id(data.get('transaction_id'))
         existing_expenditure = get_existing_expenditure_amount(
@@ -210,9 +254,16 @@ def put_schedE(data):
                         existing_expenditure,
                     )
         except Exception as e:
+                        # remove entiteis if saving sched_e fails
+            if payee_rollback_flag:
+                entity_data = put_entities(old_entity)
+            else:
+                get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
+                remove_entities(get_data)
             raise Exception(
                 "The put_sql_schedE function is throwing an error: " + str(e)
             )
+        update_aggregate_amt_se(data)
         return data
     except:
         raise
@@ -338,7 +389,7 @@ def get_sched_e_ytd_amount(request):
     """
     try:
         cmte_id = request.user.username
-        cand_office = request.query_params.get('so_cand_office')
+        cand_office = request.query_params.get('cand_office')
         if not cand_office:
             raise Exception('so_cand_office is required for this api.')
         election_code = request.query_params.get('election_code')
@@ -355,7 +406,7 @@ def get_sched_e_ytd_amount(request):
             """
             _v = (cmte_id, cand_office, election_code)
         elif cand_office == 'S':
-            cand_state = request.query_params.get('so_cand_state')
+            cand_state = request.query_params.get('cand_state')
             if not cand_state:
                 raise Exception('cand_state is required for cand_office S')
             _sql = """
@@ -369,8 +420,8 @@ def get_sched_e_ytd_amount(request):
             """
             _v = (cmte_id, cand_office, election_code, cand_state)
         elif cand_office == 'H':
-            cand_state = request.query_params.get('so_cand_state')
-            cand_district = request.query_params.get('so_cand_district')
+            cand_state = request.query_params.get('cand_state')
+            cand_district = request.query_params.get('cand_district')
             if not cand_state:
                 raise Exception('cand_state is required for cand_office H')
             if not cand_district:
@@ -591,12 +642,12 @@ def post_schedE(data):
                 get_data["cmte_id"] = "C00000000"
             old_entity = get_entities(get_data)[0]
             new_entity = put_entities(data)
-            rollback_flag = True
+            payee_rollback_flag = True
         else:
             logger.debug("saving new entity:{}".format(data))
             new_entity = post_entities(data)
             logger.debug("new entity created:{}".format(new_entity))
-            rollback_flag = False
+            payee_rollback_flag = False
 
         # continue to save transaction
         entity_id = new_entity.get("entity_id")
@@ -607,7 +658,7 @@ def post_schedE(data):
         validate_se_data(data)
         validate_negative_transaction(data)
         validate_parent_transaction_exist(data)
-        # TODO: add code for saving payee entity
+        # TODO: add code for saving completing_entity
 
         try:
             logger.debug("saving new sched_e item with data:{}".format(data))
@@ -621,8 +672,8 @@ def post_schedE(data):
                     data.get("expenditure_amount"),
                 )
         except Exception as e:
-            # remove entiteis if saving sched_a fails
-            if rollback_flag:
+            # remove entiteis if saving sched_e fails
+            if payee_rollback_flag:
                 entity_data = put_entities(old_entity)
             else:
                 get_data = {"cmte_id": data.get("cmte_id"), "entity_id": entity_id}
@@ -918,7 +969,7 @@ def schedE(request):
                 )
                 data = put_schedE(datum)
             else:
-                print(datum)
+                # print(datum)
                 data = post_schedE(datum)
             # Associating child transactions to parent and storing them to DB
 

@@ -2398,7 +2398,8 @@ def get_all_transactions(request):
         if 'reportid' in request.data and str(request.data.get('reportid')) not in ['',"", "null", "none"]:
             # add carryover code here so that carryover can be triggered by get_all_transactions
             if int(request.data.get('reportid')) != 0:
-                do_h1_carryover(cmte_id, request.data.get('reportid'))
+                # disable h1 carryover triggered by this API call
+                # do_h1_carryover(cmte_id, request.data.get('reportid'))
                 do_h2_carryover(cmte_id, request.data.get('reportid'))
                 do_loan_carryover(cmte_id, request.data.get('reportid'))
                 do_debt_carryover(cmte_id, request.data.get('reportid'))
@@ -5073,7 +5074,7 @@ def clone_a_transaction(request):
             select_str = select_str.replace('fed_share_amount', "'"+'0.00'+"'")
         if transaction_id.startswith('SH') and transaction_table == 'sched_h6':
             select_str = select_str.replace('expenditure_date', "'"+_today+"'")
-            select_str = select_str.replace('total_fred_levin_amount', "'"+'0.00'+"'")
+            select_str = select_str.replace('total_fed_levin_amount', "'"+'0.00'+"'")
             select_str = select_str.replace('federal_share', "'"+'0.00'+"'")
             select_str = select_str.replace('levin_share', "'"+'0.00'+"'")
             # exclude_list = ['expenditure_date', 'expenditure_amount'] 
