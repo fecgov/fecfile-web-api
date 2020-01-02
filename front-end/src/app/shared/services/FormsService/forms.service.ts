@@ -735,13 +735,15 @@ export class FormsService {
   }
 
   public HasUnsavedData(screenType: string): boolean {
-    let screenSaved: any = JSON.parse(localStorage.getItem(`${screenType}saved`));
-    if (screenSaved.hasOwnProperty('saved')) {
-      if (screenSaved !== null) {
-        let screenStatus: boolean = screenSaved.saved;
+    if (screenType != null) {
+      const screenSaved: any = JSON.parse(localStorage.getItem(`${screenType}saved`));
+        if (screenSaved !== null) {
+          if (screenSaved.hasOwnProperty('saved')) {
+          const screenStatus: boolean = screenSaved.saved;
 
-        if (!screenStatus) {
-          return true;
+          if (!screenStatus) {
+            return true;
+          }
         }
       }
     }

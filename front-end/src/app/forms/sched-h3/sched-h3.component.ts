@@ -704,7 +704,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         }else {
           this.schedH3.patchValue({aggregate_amount: 0.00}, { onlySelf: true });
         }
-  */      
+  */
         this.schedH3.patchValue({category: ''}, { onlySelf: true });
         this.showIdentifer = false;
       }
@@ -1033,6 +1033,10 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public trashTransaction(trx: any): void {
+
+    trx.report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    trx.transactionId = trx.transaction_id;
+
     this._dlService
       .confirm('You are about to delete this transaction ' + trx.transaction_id + '.', ConfirmModalComponent, 'Caution!')
       .then(res => {
@@ -1048,7 +1052,45 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
                 false,
                 ModalHeaderClassEnum.successHeader
               );
+              this.setH3Sum();
             });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  public trashSubTransaction(trx: any): void {
+    this._dlService
+      .confirm('You are about to delete this transaction.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this.h3Entries = this.h3Entries.filter(obj => obj !== trx);
+          this.h3Ratios.child = this.h3Ratios.child.filter(obj => obj !== trx);
+          this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+
+          let sum = 0;
+          this.h3Entries.forEach(obj => {
+          sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+          })
+
+          this.schedH3.patchValue({ total_amount_transferred:
+            this._decPipe.transform(sum, '.2-2')}, { onlySelf: true });
+
+          let agg = 0;
+          this.h3Entries.filter(obj => obj.activity_event_name === trx.activity_event_name).forEach(obj => {
+          agg += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+          })
+          this.h3Entries.filter(obj => obj.activity_event_name === trx.activity_event_name).forEach(obj => {
+            obj.aggregate_amount = agg;
+          })
+
+          this._dlService.confirm(
+            'Transaction has been successfully deleted.',
+            ConfirmModalComponent,
+            'Success!',
+            false,
+            ModalHeaderClassEnum.successHeader
+          )
         } else if (res === 'cancel') {
         }
       });

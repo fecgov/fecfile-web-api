@@ -258,7 +258,7 @@
       </footer>
     </section>
 
-    <section *ngIf="transactionType === 'LA_SUM'">
+    <section *ngIf="transactionType === 'LA_SUM' || transactionType === 'LB_SUM'">
       <ng-container>              
         <table class="table table-striped table-hover table__sortable">
           <thead>
@@ -289,7 +289,7 @@
           </thead>
           <tbody>
             <ng-container *ngFor="let item of schedLsModel | paginate: tableConfig">
-                <tr *ngIf="item.memo_code !=='X' || item.arrow_dir ==='show'"
+                <tr 
                   [ngStyle]="{'background-color': item.memo_code !=='X' ? '' : '#D9EDF6'}">
                   <td>
                     <input type="checkbox" (click)="checkForMultiChecked($event)">
@@ -317,9 +317,9 @@
                     </div>
                   </td>
                   <td>
-                      {{ item.contribution_date != '' ? (item.contribution_date | date: 'MM/dd/yyyy') : (item.expenditure_date | date: 'MM/dd/yyyy')}}
+                      {{ transactionType == 'LA_SUM' ? (item.contribution_date | date: 'MM/dd/yyyy') : (item.expenditure_date | date: 'MM/dd/yyyy')}}
                   </td>
-                  <td>{{ item.contribution_amount != '' ? (item.contribution_amount | currency:'USD':'symbol-narrow':'1.2-2') : 
+                  <td>{{ transactionType == 'LA_SUM' ? (item.contribution_amount | currency:'USD':'symbol-narrow':'1.2-2') : 
                       (item.expenditure_amount | currency:'USD':'symbol-narrow':'1.2-2')}}</td>
                   <td>
                       <div *ngIf="item.memo_code == 'X'"><input type="checkbox" checked onclick="return false;">Memo</div>

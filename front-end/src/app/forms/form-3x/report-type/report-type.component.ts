@@ -457,7 +457,7 @@ export class ReportTypeComponent implements OnInit {
             }
           });
 
-          if (Array.isArray(currentReport)) {
+          if (Array.isArray(currentReport) && currentReport.length > 0) {
             const selectedReport: any = currentReport[0];
 
             this.frmReportType.controls['reportTypeRadio'].setValue(selectedReport.report_type);

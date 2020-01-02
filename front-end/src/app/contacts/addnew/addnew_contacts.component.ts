@@ -1264,21 +1264,44 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this._setForm(this.formFields);
   }
 
-  public cancelStep(): void {
-    if(this.scheduleAction !== this.editScheduleAction) {
-      this.frmContact.reset();
-      this._router.navigate([`/contacts`]);
-    }else {
-      this.status.emit({
-        editView: false
-      })
-    }
+  public cancelStepWithWarning(): void {
+     this._dialogService.confirm(
+         '', ConfirmModalComponent, '', true)
+         .then(res => {
+           if (res === 'okay' ? true : false ) {
+             if (this.scheduleAction !== this.editScheduleAction) {
+               this.frmContact.reset();
+               this._router.navigate([`/contacts`]);
+             } else {
+               this.status.emit({
+                 editView: false
+               });
+             }
+           }
+         });
+
+
   }
-  
+
+  public cancelStep(): void {
+
+            if (this.scheduleAction !== this.editScheduleAction) {
+              this.frmContact.reset();
+              this._router.navigate([`/contacts`]);
+            } else {
+              this.status.emit({
+                editView: false
+              });
+            }
+
+  }
+
+
   public viewContacts(): void {
-    
-    if (this.frmContact.dirty || this.frmContact.touched){
-      localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
+
+    if (this.frmContact.dirty || this.frmContact.touched) {
+      this.doValidateContact('viewContacts');
+      // localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
     }
     this._router.navigate([`/contacts`]);
   }
@@ -1373,9 +1396,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           this.frmContact.reset();
           this._selectedEntity = null;
           localStorage.removeItem(contactObj);
-          if (callFrom === 'viewContacts') {
-            this._router.navigate([`/contacts`]);
-          }
           localStorage.setItem('contactsaved', JSON.stringify({ saved: true }));
           //window.scrollTo(0, 0);
 
@@ -1399,7 +1419,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    *
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
-  /*public async canDeactivate(): Promise<boolean> {
+  public async canDeactivate(): Promise<boolean> {
+    console.log('value for contact back', this._formsService.HasUnsavedData('contact'))
     if (this._formsService.HasUnsavedData('contact')) {
       let result: boolean = null;
       result = await this._dialogService
@@ -1420,5 +1441,5 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     } else {
       return true;
   }
- }*/
+ }
 }
