@@ -254,6 +254,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     _activatedRoute.queryParams.subscribe(p => {
       this._transactionCategory = p.transactionCategory;
       this._cloned = p.cloned || p.cloned === 'true' ? true : false;
+      this._completedCloning = p.completedCloning || p.completedCloning === 'true' ? true : false;
     });
   }
 
@@ -959,8 +960,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     // const scheduleName = (activityEventType === 'DF' || activityEventType === 'DC') ? 'H2' : 'H1';
     // const scheduleType = (activityEventType === 'DF' || activityEventType === 'DC') ? 'sched_h2' : 'sched_h1';
 
-    const scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
-    const scheduleType = activityEventScheduleType;
+    // const scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
+    // const scheduleType = activityEventScheduleType;
+
+    let scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
+    let scheduleType = activityEventScheduleType;
+
+    if(activityEventScheduleType === 'sched_h6') {
+      scheduleName = 'H1';
+      scheduleType = 'sched_h1';
+    }
 
     const message =
       `Please add Schedule ${scheduleName} before proceeding with adding the ` +
