@@ -921,7 +921,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType).subscribe(
+    const reportId = this._receiptService.getReportIdFromStorage(this.formType);
+
+    this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName,
+        this.transactionType, reportId).subscribe(
       res => {
         if (res) {
           if (res.fed_share) {
