@@ -573,6 +573,7 @@ def get_fed_nonfed_share(request):
     logger.debug('get_fed_nonfed_share with request:{}'.format(request.query_params))
     try:
         cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
         cmte_type_category = request.query_params.get('cmte_type_category')
         total_amount = request.query_params.get('total_amount')
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
@@ -586,13 +587,15 @@ def get_fed_nonfed_share(request):
             select federal_percent 
             from public.sched_h2 
             where cmte_id = %s 
+            and report_id = %s
             and activity_event_name = %s
             and delete_ind is distinct from 'Y'
+            order by create_date desc, last_update_date desc;
             """
             with connection.cursor() as cursor:
                 logger.debug('query with _sql:{}'.format(_sql))
                 logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
-                cursor.execute(_sql, (cmte_id, event_name))
+                cursor.execute(_sql, (cmte_id, report_id, event_name))
                 if not cursor.rowcount:
                     raise Exception('Error: no h1 data found.')
                 fed_percent = float(cursor.fetchone()[0])
@@ -624,12 +627,13 @@ def get_fed_nonfed_share(request):
                 select federal_percent from public.sched_h1
                 where election_year = %s
                 and cmte_id = %s
+                and report_id = %s
                 and delete_ind is distinct from 'Y'
                 order by create_date desc, last_update_date desc
                 """
                 logger.debug('sql for query h1:{}'.format(_sql))
                 with connection.cursor() as cursor:
-                    cursor.execute(_sql, (calendar_year, cmte_id))
+                    cursor.execute(_sql, (calendar_year, cmte_id, report_id))
                     if not cursor.rowcount:
                         raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
@@ -649,13 +653,14 @@ def get_fed_nonfed_share(request):
                 select federal_percent from public.sched_h1
                 where election_year = %s
                 and cmte_id = %s
+                and report_id = %s
                 """
                 activity_part = """and {} = true """.format(h1_event_type)
                 order_part = 'order by create_date desc, last_update_date desc'
                 _sql = _sql + activity_part + order_part
                 logger.debug('sql for query h1:{}'.format(_sql))
                 with connection.cursor() as cursor:
-                    cursor.execute(_sql, (calendar_year, cmte_id))
+                    cursor.execute(_sql, (calendar_year, cmte_id, report_id))
                     if not cursor.rowcount:
                         raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
@@ -679,7 +684,7 @@ def get_fed_nonfed_share(request):
         # fed_percent = float(cursor.fetchone()[0])
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
-        if not transaction_type_identifier.endswith('_MEMO'):
+        if transaction_type_identifier and not transaction_type_identifier.endswith('_MEMO'):
             new_aggregate_amount = aggregate_amount + float(total_amount)
         else:
             new_aggregate_amount = aggregate_amount
