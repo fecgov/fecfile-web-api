@@ -1146,7 +1146,8 @@ def do_h2_carryover(report_id, cmte_id):
                     federal_percent,
                     non_federal_percent,
                     back_ref_transaction_id,
-                    create_date
+                    create_date,
+                    last_update_date
 					)
 					SELECT 
 					h.cmte_id, 
@@ -1163,6 +1164,7 @@ def do_h2_carryover(report_id, cmte_id):
                     h.federal_percent,
                     h.non_federal_percent,
                     h.transaction_id,
+                    h.create_date,
                     now()
             FROM public.sched_h2 h, public.reports r
             WHERE 
@@ -2088,9 +2090,9 @@ def schedH3(request):
                 if 'child' in request.data:
                     for _c in request.data['child']:
                         parent_data = data 
-                        _c.update(parent_data)
+                        # _c.update(parent_data)
                         _c['back_ref_transaction_id'] = parent_data['transaction_id']
-                        _c = schedH3_sql_dict(request.data)
+                        _c = schedH3_sql_dict(_c)
                         put_schedH3(_c) 
             else:
                 # print(datum)
