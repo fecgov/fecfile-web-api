@@ -959,8 +959,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     // const scheduleName = (activityEventType === 'DF' || activityEventType === 'DC') ? 'H2' : 'H1';
     // const scheduleType = (activityEventType === 'DF' || activityEventType === 'DC') ? 'sched_h2' : 'sched_h1';
 
-    const scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
-    const scheduleType = activityEventScheduleType;
+    // const scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
+    // const scheduleType = activityEventScheduleType;
+
+    let scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
+    let scheduleType = activityEventScheduleType;
+
+    if(activityEventScheduleType === 'sched_h6') {
+      scheduleName = 'H1';
+      scheduleType = 'sched_h1';
+    }
 
     const message =
       `Please add Schedule ${scheduleName} before proceeding with adding the ` +
@@ -1876,10 +1884,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else if (saveAction === SaveActions.saveForReturnToNewParent) {
             this.returnToParent(ScheduleActions.add);
           } else if (saveAction === SaveActions.updateOnly) {
-            this._completedCloning = true;
             if(this.isShedH4OrH6TransactionType(this.transactionType)) {
               this.goH4OrH6Summary(this.transactionType);
             }else {
+              this._completedCloning = true;
               this.viewTransactions();
             }
           } else {
