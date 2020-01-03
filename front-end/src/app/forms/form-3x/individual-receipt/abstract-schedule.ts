@@ -254,7 +254,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     _activatedRoute.queryParams.subscribe(p => {
       this._transactionCategory = p.transactionCategory;
       this._cloned = p.cloned || p.cloned === 'true' ? true : false;
-      this._completedCloning = p.completedCloning || p.completedCloning === 'true' ? true : false;
     });
   }
 
@@ -1885,10 +1884,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else if (saveAction === SaveActions.saveForReturnToNewParent) {
             this.returnToParent(ScheduleActions.add);
           } else if (saveAction === SaveActions.updateOnly) {
-            this._completedCloning = true;
             if(this.isShedH4OrH6TransactionType(this.transactionType)) {
               this.goH4OrH6Summary(this.transactionType);
             }else {
+              this._completedCloning = true;
               this.viewTransactions();
             }
           } else {
