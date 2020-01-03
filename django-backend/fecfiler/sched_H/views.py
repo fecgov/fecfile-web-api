@@ -2088,9 +2088,9 @@ def schedH3(request):
                 if 'child' in request.data:
                     for _c in request.data['child']:
                         parent_data = data 
-                        _c.update(parent_data)
+                        # _c.update(parent_data)
                         _c['back_ref_transaction_id'] = parent_data['transaction_id']
-                        _c = schedH3_sql_dict(request.data)
+                        _c = schedH3_sql_dict(_c)
                         put_schedH3(_c) 
             else:
                 # print(datum)
