@@ -897,8 +897,9 @@ def get_form99list(request):
                                             deleteddate    
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
-                                            WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
-                                            WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
+                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
+                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                            ELSE 'current'
                                         END AS viewtype,
                                             deleteddate
                                          FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
@@ -910,8 +911,9 @@ def get_form99list(request):
                                             deleteddate    
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
-                                            WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
-                                            WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
+                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
+                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                            ELSE 'current'
                                         END AS viewtype,
                                             deleteddate
                                          FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
@@ -947,8 +949,9 @@ def get_form99list(request):
                                             superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, 
                                             delete_ind, create_date, last_update_date, report_type_desc, 
                                          CASE
-                                            WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
-                                            WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
+                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
+                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                            ELSE 'current'
                                         END AS viewtype, deleteddate
                                          FROM public.reports_view WHERE cmte_id = %s AND (delete_ind <> 'Y' OR delete_ind is NULL) AND last_update_date is not null 
                                     ) t1
@@ -961,8 +964,9 @@ def get_form99list(request):
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, 
                                             superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
-                                            WHEN (date_part('year', last_update_date) < date_part('year', now())) THEN 'archieve'
-                                            WHEN (date_part('year', last_update_date) = date_part('year', now())) THEN 'current'
+                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
+                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                            ELSE 'current'
                                         END AS viewtype, deleteddate
                                          FROM public.reports_view WHERE cmte_id = %s  AND (delete_ind <> 'Y' OR delete_ind is NULL) AND last_update_date is not null 
                                     ) t1
