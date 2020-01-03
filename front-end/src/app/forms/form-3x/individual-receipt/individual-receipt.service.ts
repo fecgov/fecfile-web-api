@@ -426,7 +426,8 @@ export class IndividualReceiptService {
     });
   }
 
-  public getFedNonFedPercentage(amount: string, activityEvent: string, activityEventName: string, transactionType: string): Observable<any> {
+  public getFedNonFedPercentage(amount: string, activityEvent: string, activityEventName: string,
+    transactionType: string, reportId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sh1/get_fed_nonfed_share';
     let httpOptions = new HttpHeaders();
@@ -455,6 +456,10 @@ export class IndividualReceiptService {
 
     if (transactionType) {
       params = params.append('transaction_type_identifier', transactionType);
+    }
+
+    if (reportId) {
+      params = params.append('report_id', reportId);
     }
 
     return this._http.get(`${environment.apiUrl}${url}`, {

@@ -805,8 +805,12 @@ def get_schedD(data):
                         obj.update({"back_ref_api_call": "/sd/schedD"})
                         if obj["transaction_id"].startswith("SA"):
                             obj.update(API_CALL_SA)
+                            obj['transaction_amount'] = obj.pop('contribution_amount')
+                            obj['transaction_date'] = obj.pop('contribution_date')
                         if obj["transaction_id"].startswith("SB"):
                             obj.update(API_CALL_SB)
+                            obj['transaction_amount'] = obj.pop('expenditure_amount')
+                            obj['transaction_date'] = obj.pop('expenditure_date')
                         if obj["transaction_id"].startswith("SE"):
                             obj.update(API_CALL_SE)
                         if obj["transaction_id"].startswith("SF"):
