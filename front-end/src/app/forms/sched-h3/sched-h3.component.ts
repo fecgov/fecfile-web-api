@@ -912,6 +912,16 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public saveEdit() {
+    const activity_event_type = this.schedH3.get('category').value;
+
+    if(activity_event_type !== 'DC' && activity_event_type !== 'DF') {
+      this.schedH3.controls['activity_event_name'].clearValidators();
+      this.schedH3.controls['activity_event_name'].updateValueAndValidity();
+    }else {
+      this.schedH3.controls['activity_event_name'].setValidators([Validators.required]);
+      this.schedH3.controls['activity_event_name'].updateValueAndValidity();
+    }
+
     if(this.schedH3.status === 'VALID') {
       this.saveAndAddMore();
       this.addEntries();
