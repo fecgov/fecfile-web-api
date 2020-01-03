@@ -136,6 +136,7 @@ export class DebtSummaryService {
       model.incurredAmt = row.incurred_amount ? row.incurred_amount : 0;
       model.paymentAmt = row.payment_amount ? row.payment_amount : 0;
       model.closingBalance = row.balance_at_close ? row.balance_at_close : 0;
+      model.paymentDate = row.last_update_date;
       modelArray.push(model);
     }
     return modelArray;
@@ -163,8 +164,8 @@ export class DebtSummaryService {
       model.entityType = row.entity_type;
       this._setDebtName(row);
       model.name = row.name;
-      model.paymentAmt = row.expenditure_amount ? row.expenditure_amount : 0;
-      model.paymentDate = row.expenditure_date;
+      model.paymentAmt = row.transaction_amount ? row.transaction_amount : 0;
+      model.paymentDate = row.transaction_date;
       modelArray.push(model);
     }
     return modelArray;
