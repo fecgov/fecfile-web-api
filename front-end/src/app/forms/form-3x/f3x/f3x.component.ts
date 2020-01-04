@@ -711,8 +711,20 @@ export class F3xComponent implements OnInit {
     if(transactionModel && transactionModel.reportId && transactionModel.reportId !== "0" && transactionModel.reportId !== "undefined"){
       reportId = transactionModel.reportId.toString();
     }
+    else if(this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
+      reportId = this._activatedRoute.snapshot.queryParams.reportId;
+    }
+    //if not present, only then fall back on localStorage
+    //TODO-local storage is being used throughout the application to retain state and it should be changed as this can cause inconsistencies. 
+    //this is just a temp fix. 
+    else if(localStorage.getItem('reportId') && localStorage.getItem('reportId') !== '0' && localStorage.getItem('reportId') !== 'undefined'){
+      reportId = localStorage.getItem('reportId');
+    }
+    
     if (this.frm && this.direction) {
-      localStorage.setItem(`reportId`, this._reportId);
+      if(this._reportId){
+        localStorage.setItem(`reportId`, this._reportId);
+      }
       
       let queryParamsObj :any = {
         step: this.step,
