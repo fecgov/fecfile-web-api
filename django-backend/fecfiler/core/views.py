@@ -5635,19 +5635,14 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
         prev_yr = False
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
 
-        if not yr_to_dat:
+        if yr_to_dat:
             #cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
             from_date = date(cvg_start_date.year, 1,1)
             #to_date = date(cvg_end_date.year, 12, 31)
-            to_date = cvg_end_date
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.account_name = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", 
-                [cmte_id, to_date, levin_accnt_name])
-                if (cursor.rowcount == 0):
-                    coh_cop = 0
-                else:
-                    result = cursor.fetchone()
-                    coh_cop = result[0]
+            prev_cvg_year = cvg_start_date.year - 1
+            prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
+
+            print(prev_cvg_end_dt,'prevvvvvvvvvvvvvvvvvvvvvvvv')
         else:
             current_yr = datetime.datetime.now().year
             if current_yr != cvg_end_date.year:
@@ -5658,15 +5653,17 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
             else:
                 #prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
                 prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
+            print(prev_cvg_end_dt,'first')
 
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.account_name = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", 
-                [cmte_id, prev_cvg_end_dt, levin_accnt_name])
-                if (cursor.rowcount == 0):
-                    coh_cop = 0
-                else:
-                    result = cursor.fetchone()
-                    coh_cop = result[0]
+        
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.account_name = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", 
+            [cmte_id, prev_cvg_end_dt, levin_accnt_name])
+            if (cursor.rowcount == 0):
+                coh_cop = 0
+            else:
+                result = cursor.fetchone()
+                coh_cop = result[0]
 
         return coh_cop
     except Exception as e:
@@ -5751,7 +5748,7 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
     val = 0
     if line_number == '1a':
         sl_item_val = get_sl_item_aggregate(report_id, cmte_id, prev_yr, levin_accnt_name)
-        print(sl_item_val,'-item vel',levin_accnt_name)
+        #print(sl_item_val,'-item vel',levin_accnt_name)
         
         return sl_item_val,levin_accnt_name
 
@@ -5760,10 +5757,13 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
         return sl_unitem_val,levin_accnt_name
 
     if line_number == '7':
+        print(formula,'line 77777777777777777777')
         if formula == '':
           val = get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, False)
+          
         else:
           val = get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, True)
+          print(val,'77777777777777777777777777777777')
        
         return val,levin_accnt_name
 
@@ -5777,6 +5777,8 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
     if formula == "0":
         return val,levin_accnt_name
     formula_split = formula.replace(' ', '').split('+')
+
+    #print(formula_split,'formula_split')
     
     if len(formula_split) == 1:
         if '-' in formula_split[0]:
@@ -5797,9 +5799,12 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
                                           report_id) - get_sl_line_sum_value(cl_n.split('-')[1],levin_accnt_name, "", sched_la_line_sum_dict, cmte_id,
                                           report_id)[0]
             else:
+
+                #print(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id,'addddddddddddddddddddddddddddddddddddddddddddddddd')
               
-                line_val = get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)
+                #line_val = get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)
                 val += get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)[0]
+                print(val,'val-add')
                
     return val,levin_accnt_name
 
@@ -5878,8 +5883,8 @@ def prepare_Schedl_summary_data(request):
         
 
 
-        col_la = [('1a', ''),('1b', ''), ('2', ''),
-                ('1c', '1a + 1b'), ('3', '1c+2'), ('4a', ''),('4b', ''), ('4c', ''), 
+        col_la = [('1a', ''),('1b', ''),
+                ('1c', '1a+1b'),('2', ''),('3', '1c+2'), ('4a', ''),('4b', ''), ('4c', ''), 
                 ('4d', ''), ('4e', '4a+4b+4c+4d'), ('5', ''), ('6', '4e+5'), ('7', ''), ('8', '3'), ('9', '7+8'), 
                 ('10', '6'), ('11', '9 - 10')]
         
@@ -5893,9 +5898,10 @@ def prepare_Schedl_summary_data(request):
 
        
         levin_name = ''
+        prev_levin_name = ''
         for line_number in col_la_dict_original:
             
-            levin_name = schedule_la_lb_line_sum_dict.get(line_number)[1] if schedule_la_lb_line_sum_dict.get(line_number) else ''
+            levin_name = schedule_la_lb_line_sum_dict.get(line_number)[1] if schedule_la_lb_line_sum_dict.get(line_number) else prev_levin_name
             #print(line_number,levin_name,'------------line_number lllllllllllllllllllllllllllllllllllll')
             
             final_col_la_dict[line_number] = get_sl_line_sum_value(line_number,levin_name, 
@@ -5904,12 +5910,12 @@ def prepare_Schedl_summary_data(request):
            
            
             schedule_la_lb_line_sum_dict[line_number] = final_col_la_dict[line_number]
-            print(schedule_la_lb_line_sum_dict,'vallllllllllllllllllllllllllllllllllll scaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+            #print(schedule_la_lb_line_sum_dict,'vallllllllllllllllllllllllllllllllllll scaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
    
         
 
-        col_lb = [('1a', ''), ('2', ''),
-                ('1b', ''), ('1c', '1a + 1b'), ('3', '1c+2'), ('4a', ''),('4b', ''), ('4c', ''), 
+        col_lb = [('1a', ''),
+                ('1b', ''), ('1c', '1a+1b'), ('2', ''), ('3', '1c+2'), ('4a', ''),('4b', ''), ('4c', ''), 
                 ('4d', ''), ('4e', '4a+4b+4c+4d'), ('5', ''), ('6', '4e+5'), ('7', 'prev'), ('8', '3'), ('9', '7+8'), 
                 ('10', '6'), ('11', '9 - 10')]
 
@@ -5919,12 +5925,14 @@ def prepare_Schedl_summary_data(request):
         for i in col_lb:
             col_lb_dict_original[i[0]] = i[1]
         final_col_lb_dict = {}
+        prev_levin_name = ''
         for line_number in col_lb_dict_original:
-            levin_name = col_line_sum_dict.get(line_number)[1] if col_line_sum_dict.get(line_number) else ''
-            final_col_lb_dict[line_number] = get_sl_line_sum_value(line_number[0],levin_name, col_lb_dict_original[line_number],
+            levin_name = col_line_sum_dict.get(line_number)[1] if col_line_sum_dict.get(line_number) else prev_levin_name
+            final_col_lb_dict[line_number] = get_sl_line_sum_value(line_number,levin_name, col_lb_dict_original[line_number],
                                                                col_line_sum_dict,
                                                                cmte_id, report_id, False)
             col_line_sum_dict[line_number] = final_col_lb_dict[line_number]
+            prev_levin_name = levin_name
 
 
        
