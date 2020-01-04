@@ -848,6 +848,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
             .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               //this.getTransactionsPage(this.config.currentPage);
+              this.setH5Sum();
               this._dlService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
                 ConfirmModalComponent,
@@ -856,7 +857,6 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
                 ModalHeaderClassEnum.successHeader
               );
             });
-            this.setH5Sum();
         } else if (res === 'cancel') {
         }
       });

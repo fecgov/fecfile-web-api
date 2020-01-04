@@ -386,6 +386,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
             .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               //this.getTransactionsPage(this.config.currentPage);
+              this.getH4Sum(trx.report_id);
               this._dlService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
                 ConfirmModalComponent,
@@ -394,7 +395,6 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
                 ModalHeaderClassEnum.successHeader
               );
             });
-            this.getH4Sum(trx.report_id);
         } else if (res === 'cancel') {
         }
       });
