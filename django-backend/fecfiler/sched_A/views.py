@@ -855,9 +855,9 @@ def post_schedA(datum):
                     child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
                     logger.debug('child data:{}'.format(child_datum))
                     
-                    in_kind_entity_name = get_in_kind_entity_name(entity_data)
+                    # in_kind_entity_name = get_in_kind_entity_name(entity_data)
                     logger.debug('child in kind name:{}'.format(in_kind_entity_name))
-                    child_datum['expenditure_purpose'] = "In-Kind " + in_kind_entity_name
+                    child_datum['expenditure_purpose'] = "In-Kind " + datum.get('purpose_description', " ")
 
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
                         child_datum['beneficiary_cmte_id'] = None
@@ -866,7 +866,7 @@ def post_schedA(datum):
                 elif datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT:
                     child_datum = copy.deepcopy(datum)
                     child_datum['back_ref_transaction_id'] = datum.get('transaction_id')
-                    child_datum['purpose_description'] = "In-Kind #" + transaction_id
+                    child_datum['purpose_description'] = "In-Kind " + datum.get('purpose_description', " ")
                     child_datum['transaction_type_identifier'] = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(datum.get('transaction_type_identifier'))
                     child_datum['line_number'], child_datum['transaction_type'] = get_line_number_trans_type(child_datum.get('transaction_type_identifier'))
                     child_data = post_schedA(child_datum)
