@@ -5632,7 +5632,6 @@ Creating API FOR UPDATING Schedule-L SUMMARY TABLE - CORE APP - SPRINT 25 - FNE 
 
 def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
     try:
-        import pdb;pdb.set_trace()
         prev_yr = False
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
 
@@ -5644,27 +5643,24 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
 
             print(prev_cvg_end_dt,'prevvvvvvvvvvvvvvvvvvvvvvvv')
-        else:
-            current_yr = datetime.datetime.now().year
-            if current_yr != cvg_end_date.year:
-                prev_yr = True
-            if prev_yr:
-                prev_cvg_year = cvg_start_date.year - 1
-                prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
-            else:
-                #prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-                prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-            print(prev_cvg_end_dt,'first')
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.account_name = %s AND t1.cvg_end_date <= %s AND t1.delete_ind is distinct from 'Y' order by t1.cvg_end_date desc limit 1", 
+                [cmte_id, levin_accnt_name, prev_cvg_end_dt])
+                if (cursor.rowcount == 0):
+                    coh_cop = 0
+                else:
+                    result = cursor.fetchone()
+                    coh_cop = result[0]
 
-        
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.account_name = %s AND t1.cvg_end_date < %s AND t1.delete_ind is distinct from 'Y' order by t1.cvg_end_date desc", 
-            [cmte_id, levin_accnt_name, cvg_end_date])
-            if (cursor.rowcount == 0):
-                coh_cop = 0
-            else:
-                result = cursor.fetchone()
-                coh_cop = result[0]
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.account_name = %s AND t1.cvg_end_date < %s AND t1.delete_ind is distinct from 'Y' order by t1.cvg_end_date desc limit 1", 
+                [cmte_id, levin_accnt_name, cvg_end_date])
+                if (cursor.rowcount == 0):
+                    coh_cop = 0
+                else:
+                    result = cursor.fetchone()
+                    coh_cop = result[0]
 
         return coh_cop
     except Exception as e:
@@ -5676,11 +5672,13 @@ def get_sl_item_aggregate(report_id, cmte_id, prev_yr,levin_accnt_name):
     try:
         # import pdb;pdb.set_trace()
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        import pdb;pdb.set_trace()
         if not prev_yr:
             #cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
             from_date = date(cvg_start_date.year, 1,1)
             #to_date = date(cvg_end_date.year, 12, 31)
             to_date = cvg_end_date
+
         with connection.cursor() as cursor:
             if prev_yr:
                 cursor.execute("""
@@ -5758,7 +5756,6 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
         return sl_unitem_val,levin_accnt_name
 
     if line_number == '7':
-        import pdb;pdb.set_trace()
         print(formula,'line 77777777777777777777')
         if formula == '':
           val = get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, False)
