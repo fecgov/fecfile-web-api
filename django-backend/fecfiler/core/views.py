@@ -5803,7 +5803,11 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
                 #print(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id,'addddddddddddddddddddddddddddddddddddddddddddddddd')
               
                 #line_val = get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)
-                val += get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)[0]
+                val_l_changed = sched_la_line_sum_dict.get(cl_n, 0)[0] if sched_la_line_sum_dict.get(cl_n, 0) else 0
+                if val_l_changed:
+                    val += val_l_changed
+                else:
+                    val += get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)[0]
                 print(val,'val-add')
                
     return val,levin_accnt_name
@@ -5812,7 +5816,7 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
 @api_view(['POST'])
 def prepare_Schedl_summary_data(request):
     try:
-        import ipdb;ipdb.set_trace()
+        # import ipdb;ipdb.set_trace()
         cmte_id = request.user.username
         param_string = ""
         report_id = request.data.get('report_id')
@@ -5935,7 +5939,6 @@ def prepare_Schedl_summary_data(request):
             prev_levin_name = levin_name
 
 
-       
         for i in final_col_la_dict:
             la_val = final_col_la_dict[i]
             lb_val = final_col_lb_dict.get(i)
