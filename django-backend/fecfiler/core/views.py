@@ -5632,6 +5632,7 @@ Creating API FOR UPDATING Schedule-L SUMMARY TABLE - CORE APP - SPRINT 25 - FNE 
 
 def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
     try:
+        import pdb;pdb.set_trace()
         prev_yr = False
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
 
@@ -5657,8 +5658,8 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
 
         
         with connection.cursor() as cursor:
-            cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.cvg_end_date = %s AND t1.account_name = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'", 
-            [cmte_id, prev_cvg_end_dt, levin_accnt_name])
+            cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.account_name = %s AND t1.cvg_end_date < %s AND t1.delete_ind is distinct from 'Y' order by t1.cvg_end_date desc", 
+            [cmte_id, levin_accnt_name, cvg_end_date])
             if (cursor.rowcount == 0):
                 coh_cop = 0
             else:
@@ -5757,10 +5758,10 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
         return sl_unitem_val,levin_accnt_name
 
     if line_number == '7':
+        import pdb;pdb.set_trace()
         print(formula,'line 77777777777777777777')
         if formula == '':
           val = get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, False)
-          
         else:
           val = get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, True)
           print(val,'77777777777777777777777777777777')
@@ -5902,11 +5903,10 @@ def prepare_Schedl_summary_data(request):
 
        
         levin_name = ''
-        prev_levin_name = ''
         for line_number in col_la_dict_original:
-            
-            levin_name = schedule_la_lb_line_sum_dict.get(line_number)[1] if schedule_la_lb_line_sum_dict.get(line_number) else prev_levin_name
-            #print(line_number,levin_name,'------------line_number lllllllllllllllllllllllllllllllllllll')
+            if not levin_name:
+                levin_name = schedule_la_lb_line_sum_dict.get(line_number)[1] if schedule_la_lb_line_sum_dict.get(line_number) else ''
+                #print(line_number,levin_name,'------------line_number lllllllllllllllllllllllllllllllllllll')
             
             final_col_la_dict[line_number] = get_sl_line_sum_value(line_number,levin_name, 
                                                                col_la_dict_original[line_number],
@@ -5929,14 +5929,13 @@ def prepare_Schedl_summary_data(request):
         for i in col_lb:
             col_lb_dict_original[i[0]] = i[1]
         final_col_lb_dict = {}
-        prev_levin_name = ''
         for line_number in col_lb_dict_original:
-            levin_name = col_line_sum_dict.get(line_number)[1] if col_line_sum_dict.get(line_number) else prev_levin_name
+            if not levin_name:
+                levin_name = col_line_sum_dict.get(line_number)[1] if col_line_sum_dict.get(line_number) else ''
             final_col_lb_dict[line_number] = get_sl_line_sum_value(line_number,levin_name, col_lb_dict_original[line_number],
                                                                col_line_sum_dict,
                                                                cmte_id, report_id, False)
             col_line_sum_dict[line_number] = final_col_lb_dict[line_number]
-            prev_levin_name = levin_name
 
 
         for i in final_col_la_dict:
