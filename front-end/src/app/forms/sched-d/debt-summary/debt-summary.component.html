@@ -15,9 +15,9 @@
         <th [class]="getSortClass('name')" (click)="changeSortDirection('name')">
           Name
         </th>
-        <th [class]="getSortClass('paymentDate')" (click)="changeSortDirection('paymentDate')">
+        <!-- <th [class]="getSortClass('paymentDate')" (click)="changeSortDirection('paymentDate')">
           Date
-        </th>
+        </th> -->
         <th [class]="getSortClass('beginningBalance')" (click)="changeSortDirection('beginningBalance')">
           Beginning Balance<br />(for this period)
         </th>
@@ -59,9 +59,9 @@
           <td>
             {{ debt.name }}
           </td>
-          <td>
+          <!-- <td>
             {{ debt.paymentDate | date: 'MM/dd/yyyy' }}
-          </td>
+          </td> -->
           <td>
             {{ debt.beginningBalance | currency: 'USD':'symbol-narrow':'1.2-2' }}
           </td>
@@ -95,7 +95,7 @@
         </tr>
         <ng-container *ngIf="debt?.child?.length > 0">
           <tr [ngbCollapse]="debt?.child?.length > 0 ? !debt.toggleChild : ''" class="payment-bg">
-            <th style="padding-left: 70px;" colspan="3">Type</th>
+            <th style="padding-left: 70px;" colspan="2">Type</th>
             <th colspan="2">Payment Date</th>
             <th colspan="3">Payment Amount</th>
           </tr>
@@ -104,7 +104,7 @@
             *ngFor="let payment of debt.child"
             class="payment-bg"
           >
-            <td style="padding-left: 70px;" colspan="3">{{ payment.transactionTypeDescription }}</td>
+            <td style="padding-left: 70px;" colspan="2">{{ payment.transactionTypeDescription }}</td>
             <td [@fadeInOut] colspan="2">{{ payment.paymentDate | date: 'MM/dd/yyyy' }}</td>
             <td [@fadeInOut] colspan="2">{{ payment.paymentAmt | currency: 'USD':'symbol-narrow':'1.2-2' }}</td>
             <td>
