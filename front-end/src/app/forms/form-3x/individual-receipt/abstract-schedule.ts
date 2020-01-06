@@ -2608,6 +2608,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       debounceTime(500),
       distinctUntilChanged(),
       switchMap(searchText => {
+        if (searchText.length === 0) {
+          this.clearFormValues();
+        }
         if (searchText) {
           return this._typeaheadService.getContacts(searchText, 'entity_name');
         } else {
@@ -2615,7 +2618,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       })
     );
-
   /**
    * Search for entities when organization/entity_name input value changes.
    */
