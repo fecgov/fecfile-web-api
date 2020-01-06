@@ -159,7 +159,7 @@
           </div>
         </div>
         <div class="row col coord_expenditure_text">
-          <h3>Check if the Ratio is:</h3>
+          <h3>Ratio is:</h3>
           <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
             <i class="info-icon" aria-hidden="true"></i>
             <span class="sr-only">Click here for more information</span>
@@ -168,8 +168,8 @@
         <div class="row subtitle">
           <div class="row col-md-12">
             <div class="col-md-4">
-              <input type="radio" formControlName="ratio_code" value="n" id="ratio1"/>
-              <label for="ratio1"
+              <input type="radio" formControlName="ratio_code" value="n" id="ratio1" onclick="this.checked = false;"/>
+              <label class="radio_gray"
                 [ngClass]="
                   schedH2.get('ratio_code')?.invalid && (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error'
@@ -179,8 +179,8 @@
               </label>
             </div>
             <div class="col-md-4">
-              <input type="radio" formControlName="ratio_code" value="r" id="ratio2"/>
-              <label for="ratio2"
+              <input type="radio" formControlName="ratio_code" value="r" id="ratio2" onclick="this.checked = false;"/>
+              <label class="radio_gray"
                 [ngClass]="
                   schedH2.get('ratio_code')?.invalid && (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error'
@@ -190,8 +190,8 @@
               </label>
             </div>
             <div class="col-md-4">
-              <input type="radio" formControlName="ratio_code" value="s" id="ratio3"/>
-              <label for="ratio3"
+              <input type="radio" formControlName="ratio_code" value="s" id="ratio3" onclick="this.checked = false;"/>
+              <label class="radio_gray"
                 [ngClass]="
                   schedH2.get('ratio_code')?.invalid && (schedH2.touched || schedH2.dirty) && isSubmit
                     ? 'input-field-error'
@@ -219,7 +219,6 @@
                     ? 'input-field-error'
                     : ''
                 "
-                (keyup)="handleFedPercentFieldKeyup($event)"
                 (blur)="handleOnFedBlurEvent($event)"
               />
               <div class="input-group-prepend">
@@ -250,7 +249,6 @@
                     ? 'input-field-error'
                     : ''
                 "
-                (keyup)="handleNonFedPercentFieldKeyup($event)"
                 (blur)="handleOnNonFedBlurEvent($event)"
               />
               <div class="input-group-prepend">

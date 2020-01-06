@@ -60,7 +60,8 @@ export enum SaveActions {
   saveForReturnToNewParent = 'saveForReturnToNewParent',
   saveForAddSub = 'saveForAddSub',
   saveForEditSub = 'saveForEditSub',
-  updateOnly = 'updateOnly'
+  updateOnly = 'updateOnly',
+  saveForReturnToSummary = 'saveForReturnToSUmmary',
 }
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
@@ -1893,6 +1894,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               this._completedCloning = true;
               this.viewTransactions();
             }
+          } else if (saveAction === SaveActions.saveForReturnToSummary) {
+            if(this.isShedH4OrH6TransactionType(this.transactionType)) {
+              this.goH4OrH6Summary(this.transactionType);
+            }
           } else {
             if (saveAction === SaveActions.saveOnly) {
               // sched D subtran must have payee fields pre-poulated after saving one
@@ -2157,6 +2162,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       });
     } else {
       let reportId = this._receiptService.getReportIdFromStorage(this.formType);
+      /*
       if (!reportId && this._activatedRoute && this._activatedRoute.snapshot && 
         this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
            reportId = this._activatedRoute.snapshot.queryParams.reportId
@@ -2164,6 +2170,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       else{
         reportId = '0';
       }
+      */
+     if (!reportId) {
+       if(this._activatedRoute && this._activatedRoute.snapshot &&
+        this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
+          reportId = this._activatedRoute.snapshot.queryParams.reportId
+        }
+        else{
+          reportId = '0';
+        }
+     }
       this._dialogService
         .confirm(
           'You are about to delete this transaction ' + this._transactionToEdit.transactionId + '.',
@@ -4151,5 +4167,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         };
       this.status.emit(emitObj);
     }
+  }
+
+  public saveForReturnToSummary (): void {
+    this._doValidateReceipt(SaveActions.saveForReturnToSummary);
   }
 }
