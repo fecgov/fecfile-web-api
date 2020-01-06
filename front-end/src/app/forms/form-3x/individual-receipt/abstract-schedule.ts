@@ -922,6 +922,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
+    if ((activityEvent === 'DC' || activityEvent === 'DF') && !activityEventName) {
+      return;
+    }
+
     const reportId = this._receiptService.getReportIdFromStorage(this.formType);
 
     this._receiptService.getFedNonFedPercentage(totalAmount, activityEvent, activityEventName,
@@ -978,19 +982,22 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       `Please add Schedule ${scheduleName} before proceeding with adding the ` +
       `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
     this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
-      const emitObj: any = {
-        form: this.frmIndividualReceipt,
-        direction: 'next',
-        step: 'step_3',
-        previousStep: 'step_2',
-        scheduleType: scheduleType,
-        action: ScheduleActions.add
-      };
-      if (scheduleType === 'sched_h2') {
-        emitObj.transactionType = 'ALLOC_H2_RATIO';
-        emitObj.transactionTypeText = 'Allocation Ratios';
+      if (res === 'okay') {
+        const emitObj: any = {
+          form: this.frmIndividualReceipt,
+          direction: 'next',
+          step: 'step_3',
+          previousStep: 'step_2',
+          scheduleType: scheduleType,
+          action: ScheduleActions.add
+        };
+        if (scheduleType === 'sched_h2') {
+          emitObj.transactionType = 'ALLOC_H2_RATIO';
+          emitObj.transactionTypeText = 'Allocation Ratios';
+        }
+        this.status.emit(emitObj);
+      } else if(res === 'cancel') {
       }
-      this.status.emit(emitObj);
     });
   }
 
