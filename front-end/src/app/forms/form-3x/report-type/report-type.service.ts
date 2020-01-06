@@ -182,6 +182,7 @@ export class ReportTypeService {
               if (res['reportid']) {
                 reportObj.reportId = res['reportid'];
                 window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
+                localStorage.setItem(`reportId`, res['reportid']);
               }
             }
             return res;
