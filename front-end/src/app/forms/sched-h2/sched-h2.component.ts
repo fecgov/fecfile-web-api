@@ -14,7 +14,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { TransactionsService } from '../transactions/service/transactions.service';
+import { TransactionsService, GetTransactionsResponse } from '../transactions/service/transactions.service';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
@@ -30,6 +30,10 @@ import { SchedH2Service } from './sched-h2.service';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 import { SchedHMessageServiceService } from '../sched-h-service/sched-h-message-service.service';
 import { SchedHServiceService } from '../sched-h-service/sched-h-service.service';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 
 @Component({
@@ -81,6 +85,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public cloned = false;
   populateFormForEdit: Subscription;
 
+  public fedRatio: number;
+  public nonfedRatio: number;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -110,7 +117,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     private _tranMessageService: TransactionsMessageService,
     private _datePipe: DatePipe,
     private _schedHMessageServiceService: SchedHMessageServiceService,
-    private _schedHService: SchedHServiceService
+    private _schedHService: SchedHServiceService,
+    private _tranService: TransactionsService,
+    private _dlService: DialogService,
   ) {    
      super(
       _http,
@@ -139,6 +148,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _uService;
     _decPipe;
     _datePipe;
+    _tranService;
+    _dlService;
 
     this.editTransactionSubscription = this._tranMessageService
       .getEditTransactionMessage()
@@ -205,6 +216,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.status.emit({
       otherSchedHTransactionType: this.transactionType
     });
+    if(!this.schedH2.get('ratio_code').value) {
+      this.schedH2.patchValue({ratio_code:'n'}, { onlySelf: true });
+    }
   }
 
   public ngOnDestroy(): void {
@@ -380,25 +394,31 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
         this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true }); 
-    }  
+    }
   }
 
   public handleOnFedBlurEvent(e) {
     if(e.target.value <= 100) {
       this.schedH2.patchValue({ non_federal_percent:
         this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
+      this.schedH2.patchValue({ federal_percent:
+        this._decPipe.transform(Number(e.target.value), '.2-2')}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ non_federal_percent: 0}, { onlySelf: true });
     }
+    this.setRatioCodeWithValueChange(e.target.value);
   }
 
   public handleOnNonFedBlurEvent(e) {
     if(e.target.value <= 100) {
       this.schedH2.patchValue({ federal_percent:
         this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
+      this.schedH2.patchValue({ non_federal_percent:
+        this._decPipe.transform(e.target.value, '.2-2')}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true });
     }
+    this.setRatioCodeWithValueChange(e.target.value); 
   }
 
   public editH2(item: any) {
@@ -410,9 +430,12 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH2.patchValue({ activity_event_name: item.activity_event_name}, { onlySelf: true });
     this.schedH2.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
     this.schedH2.patchValue({ select_activity_function: item.event_type  === 'fundraising' ? 'f' : 'd'}, { onlySelf: true });
-    this.schedH2.patchValue({ ratio_code: 's'}, { onlySelf: true });
+    this.schedH2.patchValue({ ratio_code: item.ratio_code}, { onlySelf: true });
     this.schedH2.patchValue({ federal_percent: this._decPipe.transform(item.federal_percent * 100, '.2-2')}, { onlySelf: true });
     this.schedH2.patchValue({ non_federal_percent: this._decPipe.transform(item.non_federal_percent * 100, '.2-2')}, { onlySelf: true });
+
+    this.fedRatio = item.federal_percent * 100;
+    this.nonfedRatio = item.non_federal_percent * 100;
 
     /* for all transaction edit
     this.transaction_id = item.transactionId;
@@ -429,6 +452,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public saveEdit() {
     if(this.schedH2.status === 'VALID') {
+      this.fedRatio = 0;
+      this.nonfedRatio = 0;
       this.returnToSum();
     }else {
       this.schedH2.markAsDirty();
@@ -474,5 +499,44 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   }
 
+  public trashTransaction(trx: any): void {
+
+    trx.report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    trx.transactionId = trx.transaction_id;
+
+    this._dlService
+      .confirm('You are about to delete this transaction ' + trx.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._tranService
+            .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
+            .subscribe((res: GetTransactionsResponse) => {
+              //this.getTransactionsPage(this.config.currentPage);
+              this.getH2Sum(trx.report_id);
+              this._dlService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  public setRatioCodeWithValueChange(ratio: number) {
+    if(this.schedH2.get('ratio_code').value === 's' &&
+       (this.schedH2.get('federal_percent').value !== this.fedRatio ||
+       this.schedH2.get('non_federal_percent').value !== this.nonfedRatio)
+    ) {
+        this.schedH2.patchValue({ratio_code:'r'}, { onlySelf: true });
+    }else if(this.schedH2.get('ratio_code').value === 'r' &&
+      Number(this.schedH2.get('federal_percent').value) === this.fedRatio &&
+      Number(this.schedH2.get('non_federal_percent').value) === this.nonfedRatio) {
+        this.schedH2.patchValue({ratio_code:'s'}, { onlySelf: true });
+    }
+  }
 }
 

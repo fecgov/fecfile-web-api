@@ -14,7 +14,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { TransactionsService } from '../transactions/service/transactions.service';
+import { TransactionsService, GetTransactionsResponse } from '../transactions/service/transactions.service';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
@@ -25,6 +25,10 @@ import { Observable, Subscription } from 'rxjs';
 import { SchedH5Service } from './sched-h5.service';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-sched-h5',
@@ -114,6 +118,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     private _uService: UtilService,
     private _formBuilder: FormBuilder,
     private _decPipe: DecimalPipe,
+    private _tranService: TransactionsService,
+    private _dlService: DialogService,
   ) {
     super(
       _http,
@@ -142,6 +148,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _uService;
     _formBuilder;
     _decPipe;
+    _tranService;
+    _dlService;
   }
 
   public ngOnInit() {
@@ -825,6 +833,62 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH5.patchValue({ total_amount_transferred:
       this._decPipe.transform(sum, '.2-2')}, { onlySelf: true });
 
+  }
+
+  public trashTransaction(trx: any): void {
+
+    trx.report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    trx.transactionId = trx.transaction_id;
+
+    this._dlService
+      .confirm('You are about to delete this transaction ' + trx.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._tranService
+            .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
+            .subscribe((res: GetTransactionsResponse) => {
+              //this.getTransactionsPage(this.config.currentPage);
+              this.setH5Sum();
+              this._dlService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  public trashSubTransaction(trx: any): void {
+    this._dlService
+      .confirm('You are about to delete this transaction.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this.h5Entries = this.h5Entries.filter(obj => obj !== trx);
+          this.h5Ratios.child = this.h5Ratios.child.filter(obj => obj !== trx);
+          this.h5EntryTableConfig.totalItems = this.h5Entries.length;
+
+          let sum = 0;
+          this.h5Entries.forEach(obj => {
+          sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+          })
+
+          this.schedH5.patchValue({ total_amount_transferred:
+            this._decPipe.transform(sum, '.2-2')}, { onlySelf: true });
+
+          this._dlService.confirm(
+            'Transaction has been successfully deleted.',
+            ConfirmModalComponent,
+            'Success!',
+            false,
+            ModalHeaderClassEnum.successHeader
+          );
+        } else if (res === 'cancel') {
+        }
+      });
   }
 
 }

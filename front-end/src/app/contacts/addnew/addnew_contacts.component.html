@@ -109,6 +109,7 @@
                       "
                       id="typeahead-template-last-name"
                       [ngbTypeahead]="searchLastName"
+                      [focusFirst]=false
                       [resultTemplate]="rt"
                       [inputFormatter]="formatterLastName"
                       (selectItem)="handleSelectedItem($event)"
@@ -131,6 +132,7 @@
                       "
                       id="typeahead-template-first-name"
                       [ngbTypeahead]="searchFirstName"
+                      [focusFirst]=false
                       [resultTemplate]="rt"
                       [inputFormatter]="formatterFirstName"
                       (selectItem)="handleSelectedItem($event)"
@@ -154,6 +156,7 @@
                     "
                     id="typeahead-template-entity-name"
                     [ngbTypeahead]="searchOrg"
+                    [focusFirst]=false
                     [resultTemplate]="rtOrg"
                     [inputFormatter]="formatterOrgName"
                     (selectItem)="handleSelectedOrgItem($event)"
@@ -405,7 +408,7 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" (click)="cancelStep()">
+              <button class="btn btn-previous btn-left" type="button"  (click)= "(frmContact.touched || frmContact.dirty) ? cancelStepWithWarning() : cancelStep() ">
                 Cancel
               </button>
               

@@ -14,7 +14,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { TransactionsService } from '../transactions/service/transactions.service';
+import { TransactionsService, GetTransactionsResponse } from '../transactions/service/transactions.service';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
@@ -29,6 +29,10 @@ import { TableService } from 'src/app/shared/services/TableService/table.service
 import { SchedH6Service } from './sched-h6.service';
 import { SchedH6Model } from './sched-h6.model';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 
 @Component({
@@ -71,7 +75,9 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
 
   public schedH6sModel: Array<SchedH6Model>;
   public schedH6sModelL: Array<SchedH6Model>;
-   
+
+  private clonedTransaction: any;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -97,7 +103,10 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     private _schedH6Service: SchedH6Service,
     private _individualReceiptService: IndividualReceiptService,
     private _tranMessageService: TransactionsMessageService,
-  ) {    
+    private _tranService: TransactionsService,
+    private _rt: Router,
+    private _dlService: DialogService,
+    ) {
      super(
       _http,
       _fb,
@@ -123,6 +132,9 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     _schedH6Service;
     _individualReceiptService;
     _tranMessageService;
+    _tranService;
+    _rt;
+    _dlService;
   }
 
 
@@ -312,8 +324,6 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     
     }
 
-    console.log('91: ', modelArray);
-
     return modelArray;
   }
 
@@ -321,13 +331,6 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     this.scheduleAction = ScheduleActions.edit;
 
     trx.apiCall = '/sh6/schedH6';
-    trx.activityEventIdentifier = trx.activity_event_identifier;
-    trx.activityEventType = trx.activity_event_type;
-    trx.backRefTransactionId = trx.back_ref_transaction_id;
-    trx.entityName = trx.entity_name;
-    trx.entityType = trx.entity_type;
-    trx.expenditureDate = trx.expenditure_date;
-    trx.fedShareAmount = trx.fed_share_amount;
 
     trx.transactionId = trx.transaction_id;
     trx.transactionTypeIdentifier = trx.transaction_type_identifier;
@@ -335,6 +338,52 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     trx.type = 'H6';
 
     this._tranMessageService.sendEditTransactionMessage(trx);
+  }
+
+  public cloneTransaction(trx: any): void {
+    this._tranService
+      .cloneTransaction(trx.transaction_id)
+      .subscribe((cloneTransactionResponse: TransactionModel) => {
+        if (cloneTransactionResponse[0] && cloneTransactionResponse[0].hasOwnProperty('transaction_id')) {
+          //this.getTransactionsPage(this.config.currentPage);
+          this.clonedTransaction = cloneTransactionResponse[0];
+
+          this.clonedTransaction.reportId = cloneTransactionResponse[0].report_id;
+
+          this.editTransaction(cloneTransactionResponse[0]);
+
+          this._rt.navigate([`/forms/form/3X`], {
+            queryParams: { step: 'step_3', reportId: trx.reportId, edit: true, cloned: true, transactionCategory: 'other'}
+          });
+        }
+      });
+  }
+
+  public trashTransaction(trx: any): void {
+
+    trx.report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    trx.transactionId = trx.transaction_id;
+
+    this._dlService
+      .confirm('You are about to delete this transaction ' + trx.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._tranService
+            .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
+            .subscribe((res: GetTransactionsResponse) => {
+              //this.getTransactionsPage(this.config.currentPage);
+              this.getH6Sum(trx.report_id);
+              this._dlService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
   }
   
 }

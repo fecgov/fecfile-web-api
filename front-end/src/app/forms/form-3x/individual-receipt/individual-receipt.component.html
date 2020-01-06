@@ -182,7 +182,8 @@
                                 : ''
                             " id="typeahead-template-org" [ngbTypeahead]="searchOrg" [focusFirst]=false
                           [resultTemplate]="rtOrg" [inputFormatter]="formatterOrgName"
-                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" 
+                          [attr.readonly]="isFieldReadOnly(col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cand_id')" class="form-control"
@@ -536,7 +537,10 @@
 
               <ng-template #allOtherTrx>
                 <div *ngIf="scheduleAction === editScheduleAction; else createActions">
-                  <button class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                  <button *ngIf="!isShedH4OrH6TransactionType(transactionType) || cloned" class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                    Cancel
+                  </button>
+                  <button *ngIf="isShedH4OrH6TransactionType(transactionType) && !cloned" class="btn btn-previous btn-left" type="button" (click)="goH4OrH6Summary(transactionType)">
                     Cancel
                   </button>
                   <button class="btn btn-secondary btn-right" (click)="updateOnly()">
@@ -573,7 +577,7 @@
                       (click)="previousStep()">
                       Previous
                     </button>
-                    <button class="btn btn-primary btn-right" (click)="goH4OrH6Summary(transactionType)">
+                    <button class="btn btn-primary btn-right" (click)="saveForReturnToSummary()">
                       Summary
                     </button>
                     <button class="btn btn-previous btn-right" (click)="saveOnly()">
