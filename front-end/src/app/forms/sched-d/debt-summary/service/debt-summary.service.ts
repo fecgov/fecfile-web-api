@@ -163,8 +163,9 @@ export class DebtSummaryService {
       model.entityType = row.entity_type;
       this._setDebtName(row);
       model.name = row.name;
-      model.paymentAmt = row.expenditure_amount ? row.expenditure_amount : 0;
-      model.paymentDate = row.expenditure_date;
+      model.paymentAmt = row.expenditure_amount ? row.expenditure_amount : row.contribution_amount;
+      model.paymentDate = row.expenditure_date ? row.expenditure_date : row.contribution_date;
+
       modelArray.push(model);
     }
     return modelArray;

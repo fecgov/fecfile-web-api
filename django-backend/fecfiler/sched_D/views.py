@@ -47,7 +47,7 @@ from fecfiler.sched_A.views import get_next_transaction_id
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-API_CALL_SA = {"api_call": "/sb/schedA", "sched_type": "sched_a"}
+API_CALL_SA = {"api_call": "/sa/schedA", "sched_type": "sched_a"}
 API_CALL_SB = {"api_call": "/sb/schedB", "sched_type": "sched_b"}
 API_CALL_SF = {"api_call": "/sf/schedF", "sched_type": "sched_f"}
 API_CALL_SE = {"api_call": "/se/schedE", "sched_type": "sched_e"}
@@ -805,12 +805,12 @@ def get_schedD(data):
                         obj.update({"back_ref_api_call": "/sd/schedD"})
                         if obj["transaction_id"].startswith("SA"):
                             obj.update(API_CALL_SA)
-                            obj['transaction_amount'] = obj.pop('contribution_amount')
-                            obj['transaction_date'] = obj.pop('contribution_date')
+                            # obj['transaction_amount'] = obj.pop('contribution_amount')
+                            # obj['transaction_date'] = obj.pop('contribution_date')
                         if obj["transaction_id"].startswith("SB"):
                             obj.update(API_CALL_SB)
-                            obj['transaction_amount'] = obj.pop('expenditure_amount')
-                            obj['transaction_date'] = obj.pop('expenditure_date')
+                            # obj['transaction_amount'] = obj.pop('expenditure_amount')
+                            # obj['transaction_date'] = obj.pop('expenditure_date')
                         if obj["transaction_id"].startswith("SE"):
                             obj.update(API_CALL_SE)
                         if obj["transaction_id"].startswith("SF"):

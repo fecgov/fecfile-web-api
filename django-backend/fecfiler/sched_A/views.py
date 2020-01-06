@@ -69,6 +69,7 @@ PAC_AGGREGATE_TYPES_1 = ['IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC', 'BUS_L
 # TODO: no sure this list is used in this module
 SINGLE_TRANSACTION_SCHEDA_LIST = ['INDV_REC',
                                   'OTH_REC',
+                                  'OTH_REC_DEBT',
                                   'IND_RECNT',
                                   'PTY_RCNT',
                                   'PAC_RCNT',
@@ -141,7 +142,7 @@ ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST = ['INDV_REC', 'PAR_CON', 'PAR_MEMO
 # Updating itemized_ind for the below list
 ITEMIZED_IND_UPDATE_TRANSACTION_TYPE_IDENTIFIER = ['INDV_REC', 'PARTN_REC', 'IK_REC', 'REATT_FROM', 'RET_REC', 'TRIB_REC', 'IND_NP_HQ_ACC', 'TRIB_NP_HQ_ACC',
 'IND_NP_CONVEN_ACC', 'TRIB_NP_CONVEN_ACC', 'EAR_REC_RECNT_ACC', 'EAR_REC_CONVEN_ACC', 'EAR_REC_HQ_ACC', 'IND_REC_NON_CONT_ACC', 'BUS_LAB_NON_CONT_ACC',
-'OFFSET_TO_OPEX', 'TRIB_NP_RECNT_ACC', 'IND_NP_RECNT_ACC', 'IND_RECNT_REC', 'OTH_REC']
+'OFFSET_TO_OPEX', 'TRIB_NP_RECNT_ACC', 'IND_NP_RECNT_ACC', 'IND_RECNT_REC', 'OTH_REC', 'OTH_REC_DEBT']
 
 # DICTIONARY OF ALL TRANSACTIONS TYPE IDENTIFIERS THAT ARE IMPLEMENTED AS 2 TRANSACTIONS IN 1 SCREEN FOR SCHED_A TO SCHED_A TABLE
 # the earmark list is emptied becuase the parent and child are saved with different api calls
@@ -855,9 +856,9 @@ def post_schedA(datum):
                     child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
                     logger.debug('child data:{}'.format(child_datum))
                     
-                    in_kind_entity_name = get_in_kind_entity_name(entity_data)
-                    logger.debug('child in kind name:{}'.format(in_kind_entity_name))
-                    child_datum['expenditure_purpose'] = "In-Kind " + in_kind_entity_name
+                    # in_kind_entity_name = get_in_kind_entity_name(entity_data)
+                    # logger.debug('child in kind name:{}'.format(in_kind_entity_name))
+                    child_datum['expenditure_purpose'] = "In-Kind " + datum.get('purpose_description', " ")
 
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
                         child_datum['beneficiary_cmte_id'] = None
@@ -866,7 +867,7 @@ def post_schedA(datum):
                 elif datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT:
                     child_datum = copy.deepcopy(datum)
                     child_datum['back_ref_transaction_id'] = datum.get('transaction_id')
-                    child_datum['purpose_description'] = "In-Kind #" + transaction_id
+                    child_datum['purpose_description'] = "In-Kind " + datum.get('purpose_description', " ")
                     child_datum['transaction_type_identifier'] = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(datum.get('transaction_type_identifier'))
                     child_datum['line_number'], child_datum['transaction_type'] = get_line_number_trans_type(child_datum.get('transaction_type_identifier'))
                     child_data = post_schedA(child_datum)

@@ -85,6 +85,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public cloned = false;
   populateFormForEdit: Subscription;
 
+  public fedRatio: number;
+  public nonfedRatio: number;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -213,6 +216,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.status.emit({
       otherSchedHTransactionType: this.transactionType
     });
+    if(!this.schedH2.get('ratio_code').value) {
+      this.schedH2.patchValue({ratio_code:'n'}, { onlySelf: true });
+    }
   }
 
   public ngOnDestroy(): void {
@@ -388,25 +394,31 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
         this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true }); 
-    }  
+    }
   }
 
   public handleOnFedBlurEvent(e) {
     if(e.target.value <= 100) {
       this.schedH2.patchValue({ non_federal_percent:
         this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
+      this.schedH2.patchValue({ federal_percent:
+        this._decPipe.transform(Number(e.target.value), '.2-2')}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ non_federal_percent: 0}, { onlySelf: true });
     }
+    this.setRatioCodeWithValueChange(e.target.value);
   }
 
   public handleOnNonFedBlurEvent(e) {
     if(e.target.value <= 100) {
       this.schedH2.patchValue({ federal_percent:
         this._decPipe.transform(Number(100 - e.target.value), '.2-2')}, { onlySelf: true });
+      this.schedH2.patchValue({ non_federal_percent:
+        this._decPipe.transform(e.target.value, '.2-2')}, { onlySelf: true });
     }else {
       this.schedH2.patchValue({ federal_percent: 0}, { onlySelf: true });
     }
+    this.setRatioCodeWithValueChange(e.target.value); 
   }
 
   public editH2(item: any) {
@@ -418,9 +430,12 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH2.patchValue({ activity_event_name: item.activity_event_name}, { onlySelf: true });
     this.schedH2.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
     this.schedH2.patchValue({ select_activity_function: item.event_type  === 'fundraising' ? 'f' : 'd'}, { onlySelf: true });
-    this.schedH2.patchValue({ ratio_code: 's'}, { onlySelf: true });
+    this.schedH2.patchValue({ ratio_code: item.ratio_code}, { onlySelf: true });
     this.schedH2.patchValue({ federal_percent: this._decPipe.transform(item.federal_percent * 100, '.2-2')}, { onlySelf: true });
     this.schedH2.patchValue({ non_federal_percent: this._decPipe.transform(item.non_federal_percent * 100, '.2-2')}, { onlySelf: true });
+
+    this.fedRatio = item.federal_percent * 100;
+    this.nonfedRatio = item.non_federal_percent * 100;
 
     /* for all transaction edit
     this.transaction_id = item.transactionId;
@@ -437,6 +452,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public saveEdit() {
     if(this.schedH2.status === 'VALID') {
+      this.fedRatio = 0;
+      this.nonfedRatio = 0;
       this.returnToSum();
     }else {
       this.schedH2.markAsDirty();
@@ -495,6 +512,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
             .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               //this.getTransactionsPage(this.config.currentPage);
+              this.getH2Sum(trx.report_id);
               this._dlService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
                 ConfirmModalComponent,
@@ -502,11 +520,23 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
                 false,
                 ModalHeaderClassEnum.successHeader
               );
-              this.getH2Sum(trx.report_id);
             });
         } else if (res === 'cancel') {
         }
       });
+  }
+
+  public setRatioCodeWithValueChange(ratio: number) {
+    if(this.schedH2.get('ratio_code').value === 's' &&
+       (this.schedH2.get('federal_percent').value !== this.fedRatio ||
+       this.schedH2.get('non_federal_percent').value !== this.nonfedRatio)
+    ) {
+        this.schedH2.patchValue({ratio_code:'r'}, { onlySelf: true });
+    }else if(this.schedH2.get('ratio_code').value === 'r' &&
+      Number(this.schedH2.get('federal_percent').value) === this.fedRatio &&
+      Number(this.schedH2.get('non_federal_percent').value) === this.nonfedRatio) {
+        this.schedH2.patchValue({ratio_code:'s'}, { onlySelf: true });
+    }
   }
 }
 

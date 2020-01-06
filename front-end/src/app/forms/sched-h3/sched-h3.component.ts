@@ -539,8 +539,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public setH3SumP() {
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
-    this.h3Subscription = this._schedH3Service.getBreakDown(this.getReportId()).subscribe(res =>
+    this.h3Subscription = this._schedH3Service.getBreakDown(reportId).subscribe(res =>
       {        
         if(res) {
           this.h3SumP = [];
@@ -647,7 +648,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)
       this.h3Ratios.total_amount_transferred = total_amount_transferred;
   
-      formObj['report_id'] = this.getReportId();
+      formObj['report_id'] = reportId; //this.getReportId();
       formObj['transaction_type_identifier'] = 'TRAN_FROM_NON_FED_ACC';
       formObj['activity_event_type'] = this.schedH3.get('category').value;
 
@@ -1055,6 +1056,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
             .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               //this.getTransactionsPage(this.config.currentPage);
+              this.setH3Sum();
               this._dlService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
                 ConfirmModalComponent,
@@ -1062,7 +1064,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
                 false,
                 ModalHeaderClassEnum.successHeader
               );
-              this.setH3Sum();
             });
         } else if (res === 'cancel') {
         }

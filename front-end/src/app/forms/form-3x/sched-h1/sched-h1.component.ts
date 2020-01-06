@@ -71,7 +71,7 @@ export class SchedH1Component implements OnInit {
     }
     console.log(reportType);
     if (reportType.hasOwnProperty('reportId')) {
-      h1_obj['reprot_id'] = reportType.reportId;
+      h1_obj['report_id'] = reportType.reportId;
       // formData.append('report_id', reportType.reportId);
     } else if (reportType.hasOwnProperty('reportid')) {
       // formData.append('report_id', reportType.reportid);
