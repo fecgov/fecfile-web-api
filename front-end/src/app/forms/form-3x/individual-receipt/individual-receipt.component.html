@@ -182,7 +182,8 @@
                                 : ''
                             " id="typeahead-template-org" [ngbTypeahead]="searchOrg" [focusFirst]=false
                           [resultTemplate]="rtOrg" [inputFormatter]="formatterOrgName"
-                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" 
+                          [attr.readonly]="isFieldReadOnly(col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cand_id')" class="form-control"
