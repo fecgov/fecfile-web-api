@@ -330,7 +330,7 @@ def get_dynamic_forms_fields(request):
                     for events in forms_obj['data']['committeeTypeEvents']:
                         for eventTypes in events['eventTypes']:
                             if eventTypes['eventType'] in ['PC', 'AD', 'GV']:
-                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND delete_ind IS DISTINCT FROM 'Y' AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y' AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
                                 if eventTypes['eventType'] == 'PC':
                                     query_string += " AND public_communications = true"
                                 elif eventTypes['eventType'] == 'AD':
@@ -338,7 +338,7 @@ def get_dynamic_forms_fields(request):
                                 elif eventTypes['eventType'] == 'GV':
                                     query_string += " AND generic_voter_drive = true"
                                 with connection.cursor() as cursor:
-                                    cursor.execute(query_string, [cmte_id,report_id])
+                                    cursor.execute(query_string, [cmte_id,report_id, report_id])
                                     count = cursor.fetchone()
                                     print(cursor.query)
                                 print(eventTypes['eventType'] + " count: "+str(count[0]))
@@ -364,9 +364,9 @@ def get_dynamic_forms_fields(request):
                                 else:
                                     eventTypes['hasValue'] = False
                             elif eventTypes['eventType'] in ['VR', 'VI', 'GO', 'GC', 'EA']:
-                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND delete_ind IS DISTINCT FROM 'Y' AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y' AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
                                 with connection.cursor() as cursor:
-                                    cursor.execute(query_string, [cmte_id,report_id])
+                                    cursor.execute(query_string, [cmte_id,report_id, report_id])
                                     count = cursor.fetchone()
                                     print(cursor.query)
                                 print(eventTypes['eventType'] + "count: "+str(count[0]))
