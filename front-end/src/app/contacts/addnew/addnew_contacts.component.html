@@ -109,6 +109,7 @@
                       "
                       id="typeahead-template-last-name"
                       [ngbTypeahead]="searchLastName"
+                      [focusFirst]=false
                       [resultTemplate]="rt"
                       [inputFormatter]="formatterLastName"
                       (selectItem)="handleSelectedItem($event)"
