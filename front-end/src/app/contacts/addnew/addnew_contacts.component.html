@@ -132,6 +132,7 @@
                       "
                       id="typeahead-template-first-name"
                       [ngbTypeahead]="searchFirstName"
+                      [focusFirst]=false
                       [resultTemplate]="rt"
                       [inputFormatter]="formatterFirstName"
                       (selectItem)="handleSelectedItem($event)"
@@ -155,6 +156,7 @@
                     "
                     id="typeahead-template-entity-name"
                     [ngbTypeahead]="searchOrg"
+                    [focusFirst]=false
                     [resultTemplate]="rtOrg"
                     [inputFormatter]="formatterOrgName"
                     (selectItem)="handleSelectedOrgItem($event)"
