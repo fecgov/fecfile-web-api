@@ -857,7 +857,7 @@ def post_schedA(datum):
                     logger.debug('child data:{}'.format(child_datum))
                     
                     # in_kind_entity_name = get_in_kind_entity_name(entity_data)
-                    logger.debug('child in kind name:{}'.format(in_kind_entity_name))
+                    # logger.debug('child in kind name:{}'.format(in_kind_entity_name))
                     child_datum['expenditure_purpose'] = "In-Kind " + datum.get('purpose_description', " ")
 
                     if datum.get('transaction_type_identifier') in ['IK_TRAN', 'IK_TRAN_FEA']:
