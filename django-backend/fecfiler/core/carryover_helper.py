@@ -208,6 +208,23 @@ def do_h1_carryover(cmte_id, report_id):
     """
     logger.debug('doing h1 caryover with cmte_id {} and report_id {}'.format(
         cmte_id, report_id))
+
+    _sql = """
+    SELECT extract(day from cvg_start_date) as d, 
+    extract(month from cvg_start_date) as m 
+    FROM public.reports
+    WHERE report_id = %s and cmte_id = %s
+    """
+    with connection.cursor() as cursor:
+        # cursor.execute(count_sql, (report_id, cmte_id, report_id, cmte_id))
+        # if cursor.rowcount == 0:
+        cursor.execute(_sql, (report_id, cmte_id))
+        if cursor.rowcount:
+            _res = cursor.fetchone()
+            if int(_res[0]) == 1 and int(_res[1] == 1):
+                logger.debug('new year report, no h1 carryover needed.')
+                return
+
     if is_pty(cmte_id):
         logger.debug('party h1 carryover...')
         do_pty_h1_carryover(cmte_id, report_id)
@@ -280,7 +297,8 @@ def do_h2_carryover(cmte_id, report_id):
     try:
         logger.debug('doing h2 carryover...')
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
+            cursor.execute(_sql, (report_id, cmte_id,
+                                  report_id, report_id, cmte_id))
             if cursor.rowcount == 0:
                 logger.debug('No valid h2 items found.')
             logger.debug(
@@ -297,7 +315,7 @@ def do_loan_carryover(cmte_id, report_id):
     - non-zero loan_balance
     - outstanding and dangled(not carried over before)
     - loan report date < current report coverge start(forward carryover only)
-    
+
     2. update all records with new transaction_id, new report_id
     3. set new loan back_ref_transaction_id to parent transaction_id
     """
@@ -391,12 +409,15 @@ def do_loan_carryover(cmte_id, report_id):
     logger.debug('doing loan carryover...')
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
+            cursor.execute(_sql, (report_id, cmte_id,
+                                  report_id, report_id, cmte_id))
             if cursor.rowcount == 0:
                 logger.debug("No carryover happens.")
             else:
-                logger.debug("loan carryover done with report_id {}".format(report_id))
-                logger.debug("total carryover loans:{}".format(cursor.rowcount))
+                logger.debug(
+                    "loan carryover done with report_id {}".format(report_id))
+                logger.debug(
+                    "total carryover loans:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
         logger.debug("carryover done.")
     except:
