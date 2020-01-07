@@ -133,7 +133,7 @@ export class SignComponent implements OnInit {
   public async canDeactivate(): Promise<boolean> {
     if (this.hasUnsavedData()) {
       let result: boolean = null;
-
+      console.log('true');
       result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
         let val: boolean = null;
 
@@ -148,6 +148,7 @@ export class SignComponent implements OnInit {
 
       return result;
     } else {
+      console.log('no unsaved data false');
       return true;
     }
   }
@@ -884,8 +885,13 @@ export class SignComponent implements OnInit {
    */
   public goToPreviousStep(): void {
     if (this.formType === '99') {
+      console.log('im in previous');
+      this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+      this._form_details['additional_email_1'] = '';
+      this._form_details['additional_email_2'] = '';
+      localStorage.setItem(`form_99_details`, JSON.stringify(this._form_details));
       this.frmSaved = false;
-
+      console.log('Email 1' +  this._form_details.additional_email_1);
       this.status.emit({
         form: {},
         direction: 'previous',
@@ -904,7 +910,33 @@ export class SignComponent implements OnInit {
       this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: 'step_2', edit: this.editMode } });
     }
   }
+  public cancelStepWithWarning(): void {
+    this._dialogService.confirm(
+        '', ConfirmModalComponent, '', true)
+        .then(res => {
+          if (res === 'okay' ? true : false ) {
+            console.log('im here value of res:' + res);
+            this.goToPreviousStep();
+          }
+        });
 
+
+  }
+  private getDirtyEmail(): boolean{
+    console.warn('dirty');
+    if (this._form_details) {
+      if (this.formType === '99') {
+        if (this._form_details.additional_email_1.length <= 0) {
+          console.log(this._form_details.additional_email_1.length);
+          return false;
+        }
+        console.log(this._form_details.additional_email_1.length);
+        return  true;
+      }
+
+    }
+    return false;
+  }
   public printPreview(): void {
     if (this.formType === '99') {
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
