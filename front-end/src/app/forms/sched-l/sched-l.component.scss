@@ -1,4 +1,5 @@
 @import '../../shared/scss/global';
+@import '../../forms/form-3x/financial-summary/financial-summary.component.scss';
 
 .sched-l-container {
   padding-right: 10px;
@@ -221,7 +222,7 @@
 
   .summary_text_amt_level_1{
     background-color: #979A9A  !important;
-    text-align: center;
+    text-align: right;
     height: 35px !important;
     padding-top: 10px !important;
     vertical-align: middle !important;
@@ -232,18 +233,18 @@
 
   .summary_text_level_3{
     //background-color: #E5E7E9  !important;
-    padding-left: 40% !important;
-    height: 35px !important;
+    padding-left: 50px !important;
+    /*height: 35px !important;
     padding-top: 10px !important;
     vertical-align: middle !important;
     margin-top: 1px  !important;
    // margin-bottom: 1px  !important;
-    text-align: left;
+    text-align: left;*/
   }
 
-  .summary_text_level_3:hover{
+  /*.summary_text_level_3:hover{
     cursor: pointer !important;
-  }
+  }*/
   .child-options-label:hover{
     cursor: pointer !important;
   }

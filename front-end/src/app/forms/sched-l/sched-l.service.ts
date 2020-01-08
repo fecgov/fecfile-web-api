@@ -48,6 +48,33 @@ export class SchedLService {
       );
   }
 
+  public getSummary(reportId: string, levinAccountId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/sl/get_sl_summary_table';
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    let params = new HttpParams();
+    params = params.append('report_id', reportId);
+    params = params.append('calendar_year', '2019');
+    return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          params,
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
+            console.log('SL Summary res: ', res);
+            return res;
+          }
+          return false;
+      })
+      );
+  }
+
   /*public saveH4Ratio(ratio: any): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();

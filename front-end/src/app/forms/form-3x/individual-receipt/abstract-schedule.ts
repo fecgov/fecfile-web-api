@@ -2947,6 +2947,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       'LB_ENTRY',
       'LA_SUM',
       'LB_SUM',
+      'L_SUM',
       'ALLOC_H4_SUM',
       'ALLOC_H6_SUM'
     ];
