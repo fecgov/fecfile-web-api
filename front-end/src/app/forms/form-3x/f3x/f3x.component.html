@@ -88,7 +88,8 @@
         <div [hidden]="transactionType === 'ALLOC_H4_TYPES' || transactionType === 'ALLOC_H4_SUM'
          || transactionType === 'ALLOC_H6_TYPES' || transactionType === 'ALLOC_H6_SUM'
          || transactionType === 'LA_ENTRY' || transactionType === 'LB_ENTRY' 
-         || transactionType === 'LA_SUM' || transactionType === 'LB_SUM'">
+         || transactionType === 'LA_SUM' || transactionType === 'LB_SUM'
+         || transactionType === 'L_SUM'">
           <f3x-individual-receipt
             [hidden]="
               scheduleType !== 'sched_a' &&
@@ -239,7 +240,8 @@
         </app-sched-h6>
         <app-sched-l
           [hidden]="transactionType !== 'LA_ENTRY' && transactionType !== 'LB_ENTRY' && 
-          transactionType !== 'LA_SUM' && transactionType !== 'LB_SUM'"
+          transactionType !== 'LA_SUM' && transactionType !== 'LB_SUM'
+          && transactionType !== 'L_SUM'"
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"
