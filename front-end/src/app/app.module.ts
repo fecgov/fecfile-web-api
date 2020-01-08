@@ -103,6 +103,7 @@ import { TrashConfirmComponent3 } from './forms/sched-c/loan-summary/trash-confi
 import { SchedH5Component_TOBEDELETED } from './forms/form-3x/sched-h5/sched-h5.component';
 import { SchedH6Component_TOBEDELETED } from './forms/form-3x/sched-h6/sched-h6.component';
 import { SchedH1Component_TOBEDELETED } from './forms/sched-h1/sched-h1.component';
+import { SchedEComponent } from './forms/form-3x/sched-e/sched-e/sched-e.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -187,7 +188,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ContactsFilterTypeComponent,
     SchedH5Component_TOBEDELETED,
     SchedH6Component_TOBEDELETED,
-    SchedH1Component_TOBEDELETED
+    SchedH1Component_TOBEDELETED,
+    SchedEComponent
 
 
   ],

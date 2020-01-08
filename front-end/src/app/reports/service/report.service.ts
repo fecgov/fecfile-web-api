@@ -565,4 +565,22 @@ export class ReportsService {
         return false;
       });
   }
+
+  public getCoverageDates(reportId: string): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let url: string = '/core/get_coverage_dates';
+    let params = new HttpParams();
+
+    params = params.append('report_id', reportId);
+
+    return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          params,
+          headers: httpOptions
+        }
+      );
+  }
 }

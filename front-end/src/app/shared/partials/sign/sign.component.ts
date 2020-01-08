@@ -922,8 +922,7 @@ export class SignComponent implements OnInit {
 
 
   }
-  private getDirtyEmail(): boolean{
-    console.warn('dirty');
+  public getDirtyEmail(): boolean {
     if (this._form_details) {
       if (this.formType === '99') {
         if (this._form_details.additional_email_1.length <= 0) {

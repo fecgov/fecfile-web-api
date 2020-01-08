@@ -28,8 +28,13 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities, superceded_report_id_list)
-from fecfiler.sched_A.views import (get_list_child_schedA,
-                                    get_next_transaction_id, post_schedA, post_sql_schedA)
+from fecfiler.sched_A.views import (
+    get_list_child_schedA,
+    get_next_transaction_id, 
+    post_schedA, 
+    post_sql_schedA,
+    put_sql_schedA,
+    )
 from fecfiler.sched_B.views import get_list_child_schedB, post_schedB
 from fecfiler.sched_D.views import do_transaction
 
@@ -316,6 +321,7 @@ def put_schedC(data):
             # rollback_data = get_schedC(data)
             logger.debug('updating loan with data:{}'.format(data))
             put_sql_schedC(data)
+            update_auto_sched_a(data)
 
         except Exception as e:
             # rollback entity data
@@ -410,6 +416,102 @@ def validate_sc_data(data):
     """
     check_mandatory_fields_SC(data)
     # check_data_types(data)
+
+def get_auto_sched_a_id(transaction_id):
+    """
+    helpder function to query auto sched_a transaction id
+    """
+    _sql = """
+    SELECT transaction_id from public.sched_a
+    WHERE back_ref_transaction_id = %s
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+
+            # UPDATE delete_ind flag on a single row from Sched_A table
+            cursor.execute(_sql, [transaction_id])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    """The Transaction ID: {} is either already deleted
+                    or does not exist in schedC table""".format(transaction_id))
+            tran_id = cursor.fetchone()[0]
+            print('trying update auto sched_a:{}'.format(tran_id))
+            return tran_id
+    except Exception:
+        raise
+
+
+def update_auto_sched_a(data):
+    """
+    update a auto-generated sched_a transaction when a loan is made:
+    1. need to check the auto_map
+    2. map the fields from sched_c to sched_a
+    3. get the existing transaction_id
+    3. create a sched_a and make it a child of sched_c( fill in back_ref fields)
+
+    Q1: do we need to update the aggregate_amt and update line_number
+    """
+    logger.debug('update_auto_sched_a with data:{}'.format(data))
+    field_mapper = {
+        "contribution_date" : "loan_incurred_date",
+        "contribution_amount" : "loan_amount_original",
+    }
+    # set up parent
+    parent_id = data['transaction_id']
+    data['back_ref_transaction_id'] = parent_id
+    data['back_ref_sched_name'] = parent_id[0:2] 
+    # get a new sched_a id0:2
+    
+    data['transaction_id'] = get_auto_sched_a_id(parent_id)
+    # fill in purpose - hardcoded - TODO: confirm on this
+    data['purpose_description'] = 'Loan received: {}'.format(
+        data.get('transaction_type_identifier')
+        )
+    # set transaction type and line num
+    # AUTO_SCHED_A_MAP = { 
+    # 'LOAN_FROM_IND' : 'LOAN_FROM_IND_REC',
+    # 'LOAN_FROM_BANK' : 'LOAN_FROM_BANK_REC',
+    # }
+    if data['entity_type'] == 'IND':
+        data['transaction_type_identifier'] = 'LOAN_FROM_IND'
+    elif data['entity_type'] == 'ORG':
+        data['transaction_type_identifier'] = 'LOAN_FROM_BANK'
+    else:
+        raise Exception('Error: invalid entity type for loan')
+    # AUTO_SCHED_A_MAP.get(
+    #     data['transaction_type_identifier']
+    #     )
+    # TODO: will enable this when db update done
+    data['line_number'], data['transaction_type'] = get_line_number_trans_type(
+        data.get('transaction_type_identifier')
+        )
+    for _f in field_mapper:
+        data[_f] = data.get(field_mapper.get(_f))
+    # TODO: not sure we need to return child data or not
+    logger.debug('update a auto sched_a item with loan data:{}'.format(data))
+    put_sql_schedA(
+        data.get('cmte_id'), 
+        data.get('report_id'),
+        data.get('line_number'),
+        data.get('transaction_type'),
+        data.get('transaction_id'),
+        data.get('back_ref_transaction_id'),
+        data.get('back_ref_sched_name'),
+        data.get('entity_id'),
+        data.get('contribution_date'),
+        data.get('contribution_amount'),
+        data.get('purpose_description'),
+        data.get('memo_code'),
+        data.get('memo_text'),
+        data.get('election_code'),
+        data.get('election_other_description'),
+        data.get('donor_cmte_id'),
+        data.get('donor_cmte_name'),
+        data.get('levin_account_id'),
+        data.get('transaction_type_identifier'),
+        )
+    logger.debug('auto-generation done.')
 
 def auto_generate_sched_a(data):
     """

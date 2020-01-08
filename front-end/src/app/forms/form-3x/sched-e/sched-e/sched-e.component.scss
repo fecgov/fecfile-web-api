@@ -1,7 +1,6 @@
-@import '../../shared/scss/global';
-@import '../../forms/form-3x/financial-summary/financial-summary.component.scss';
+@import '../../../../shared/scss/global';
 
-.sched-l-container {
+.individual-receipt-container {
   padding-right: 10px;
   .row {
     margin-left: 0;
@@ -61,10 +60,6 @@
       @include clearfix();
     }
     section {
-      .coord_expenditure_text {
-        padding-top: 3em;
-        padding-bottom: 1em;
-      }
       .content {
         min-height: 100vh;
         position: relative;
@@ -94,8 +89,9 @@
           }
           textarea {
             &.form-control {
-              overflow: scroll;
+              resize: none;
               width: 400px;
+              height: 150px;
             }
           }
           .forms__big_checkbox {
@@ -105,14 +101,6 @@
             -webkit-transform: scale(1.9); /* Safari and Chrome */
             -o-transform: scale(1.9); /* Opera */
             margin: 10px;
-          }
-          .forms__big_radio {
-            -webkit-transform: scale(2.9);
-            -ms-transform: scale(2.9); /* IE */
-            -moz-transform: scale(2.9); /* FF */
-            -webkit-transform: scale(2.9); /* Safari and Chrome */
-            -o-transform: scale(2.9); /* Opera */
-            margin: 23px;
           }
           label {
             font-family: sans-serif;
@@ -126,20 +114,29 @@
           .ng-select.forms__select {
             &.forms__select-error {
               .ng-select-container {
-                border: 1px solid $red;
+                // border: 1px solid $red;
               }
             }
             .ng-select-container {
+              // Not working
               height: 45px;
             }
           }
+          // Not working
+          // .ng-select-container {
+          //   height: 45px !important;
+          // }
           .ng-dropdown-panel {
             .ng-dropdown-panel-items {
               .ng-option {
                 &.ng-option-marked {
                   background-color: $mercury;
                 }
+                &.ng-option-selected{
+                  background-color: #4aa2fb;
+                }
               }
+             
             }
           }
         }
@@ -207,86 +204,4 @@
       @include clearfix();
     }
   }
-
-  .subtitle {
-    //font: 29;
-    padding-left: 30px !important;
-    padding-top: 30px !important;
-    padding-bottom: 30px !important;
-  }
-
-  .summary_text_amt{
-    text-align: right;
-    padding-right: 100px ;
-  }
-
-  .summary_text_amt_level_1{
-    background-color: #979A9A  !important;
-    text-align: right;
-    height: 35px !important;
-    padding-top: 10px !important;
-    vertical-align: middle !important;
-    padding-right: 4px !important;
-    margin-top: 1px  !important;
-    //margin-bottom: 1px  !important;
-  }
-
-  .summary_text_level_3{
-    //background-color: #E5E7E9  !important;
-    padding-left: 50px !important;
-    /*height: 35px !important;
-    padding-top: 10px !important;
-    vertical-align: middle !important;
-    margin-top: 1px  !important;
-   // margin-bottom: 1px  !important;
-    text-align: left;*/
-  }
-
-  /*.summary_text_level_3:hover{
-    cursor: pointer !important;
-  }*/
-  .child-options-label:hover{
-    cursor: pointer !important;
-  }
-  input[type="radio"]:hover{
-    cursor: pointer !important;
-  }
-
-  .ngx-pagination .current{
-    padding: 0.1875rem 0.625rem;
-    background: #9B9B9B !important;;
-    color: #fefefe;
-    cursor: default;
-  }
-
-  .ngx-pagination a, .ngx-pagination button {
-    color: #9B9B9B !important;;
-    display: block;
-    padding: 0.1875rem 0.625rem;
-    border-radius: 0;
-  }
-  
-  .dropdown-toggle:after {
-    border: none;
-  }
 }
-
-
-.summary_text_amt_level_1{
-    background-color: #979A9A  !important;
-    text-align: right;
-    height: 35px !important;
-    padding-top: 10px !important;
-    vertical-align: middle !important;
-    padding-right: 4px !important;
-    margin-top: 1px  !important;
-    //margin-bottom: 1px  !important;
-  }
-
-  .td-arrow {
-    margin-left: auto !important;
-    .amend-arrow {
-      margin-left: 20%;
-      color: #0062cc;
-    }
-  }

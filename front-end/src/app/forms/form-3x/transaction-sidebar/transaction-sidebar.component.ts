@@ -1,3 +1,4 @@
+import { state } from '@angular/animations';
 import { TransactionsMessageService } from './../../transactions/service/transactions-message.service';
 import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -299,8 +300,12 @@ export class TransactionSidebarComponent implements OnInit {
         localStorage.getItem('Receipts_Entry_Screen') === 'Yes' ||
         localStorage.getItem('Reports_Edit_Screen') === 'Yes'
       ) {
+        let queryParamsMap : any = { step: 'step_2', transactionCategory: e.target.value};
+        if(this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
+          queryParamsMap.reportId = this._activatedRoute.snapshot.queryParams.reportId;
+        }
         this._router.navigate([`/forms/form/${this._formType}`], {
-          queryParams: { step: 'step_2', transactionCategory: e.target.value }
+          queryParams: queryParamsMap
         });
       }
     } else {

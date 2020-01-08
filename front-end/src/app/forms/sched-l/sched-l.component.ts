@@ -59,10 +59,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   public showPart2: boolean;
   public loaded = false;
   public schedL: FormGroup;
-   
-										
-					  
-					   
+
 
   public lSubscription: Subscription;
   public lSum: any;
@@ -174,6 +171,11 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     if (this.transactionType === 'LA_SUM' || this.transactionType === 'LB_SUM') {
       this.getTransactions(this._individualReceiptService.getReportIdFromStorage(this.formType), this.transactionType);
     }
+
+    if (this.transactionType === 'L_SUM') {
+      this.getSummary(this._individualReceiptService.getReportIdFromStorage(this.formType), this.transactionType);
+    }
+
   }
 
   ngDoCheck() {
@@ -235,6 +237,24 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
 
           //this.schedLsModel = this.schedLsModel .filter(obj => obj.memo_code !== 'X');
           this.tableConfig.totalItems = this.schedLsModel.length;
+        }
+      });
+  }
+
+  public getSummary(reportId: string, levinAccountId: string) {
+    //this.schedLsModel = [];
+    this.lSubscription = this._schedLService.getSummary(reportId, levinAccountId).subscribe(res =>
+      {
+        if (res) {
+          this.lSum = [];
+          this.lSum =  res;
+          //this.tableConfig.totalItems = res.length;*/
+          //this.schedLsModelL = this.mapFromServerFields(res);
+          //this.schedLsModel = this.mapFromServerFields(res);
+          //this.setArrow(this.schedLsModel);
+
+          //this.schedLsModel = this.schedLsModel .filter(obj => obj.memo_code !== 'X');
+          //this.tableConfig.totalItems = this.schedLsModel.length;
         }
       });
   }
