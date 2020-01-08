@@ -510,9 +510,7 @@ export class F3xComponent implements OnInit {
     }
 
     //TODO-Remove this elseif once transactions are moved to Disubursements
-    if (
-      e.schedulueType = 'Schedule E'
-    ) {
+    if (e.scheduleType === 'Schedule E') {
       e.scheduleType = 'sched_e';
     }
 
