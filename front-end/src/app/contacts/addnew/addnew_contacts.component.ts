@@ -152,7 +152,26 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     }
   }
 
-  public ngDoCheck(): void {}
+  // tslint:disable-next-line:use-life-cycle-interface
+  public ngDoCheck(): void {
+    if (this.frmContact.touched || this.frmContact.dirty) {
+      if (this.frmContact.valid) {
+        const isSaved = localStorage.getItem('contactsaved');
+        console.log('isSaved' + isSaved);
+        if (!isSaved) {
+          this.frmContact.markAsDirty();
+          this.frmContact.markAsTouched();
+        } else {
+          this.frmContact.markAsUntouched();
+          this.frmContact.markAsPristine();
+        }
+        } else {
+        this.frmContact.markAsTouched();
+        this.frmContact.markAsDirty();
+        localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
+      }
+    }
+  }
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
