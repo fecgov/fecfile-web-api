@@ -930,6 +930,7 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.type = row.transaction_type_desc;
   model.scheduleType = row.schedule;
   model.entityId = row.entity_id;
+  model.entityType = row.entity_type;
   model.transactionTypeIdentifier = row.transaction_type_identifier;
   model.apiCall = row.api_call;
   model.transactionId = row.transaction_id;
