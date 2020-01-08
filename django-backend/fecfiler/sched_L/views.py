@@ -775,7 +775,8 @@ def load_ytd_disbursements_summary(cmte_id, start_dt, end_dt, levin_account_id=N
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             if levin_account_id:
-                cursor.execute(_sql, (cmte_id, start_dt, end_dt, levin_account_id))
+                cursor.execute(
+                    _sql, (cmte_id, start_dt, end_dt, levin_account_id))
             else:
                 cursor.execute(_sql, (cmte_id, start_dt, end_dt))
             # rows = cursor.fetchall()
@@ -816,7 +817,7 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
     """
     result = {}
     result["itemized_receipt_amount_ytd"] = 0
-    result["non-itemized_receipt_amount_ytd"] = 0
+    result["non_itemized_receipt_amount_ytd"] = 0
     result["other_sl_receipt_amount_ytd"] = 0
 
     if levin_account_id:
@@ -843,7 +844,7 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
             AND t1.delete_ind is distinct from 'Y' 
             AND transaction_type_identifier = 'LEVIN_OTH_REC'
         """
-        
+
     else:
         _sql1 = """
             SELECT (CASE WHEN contribution_amount >= 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
@@ -871,7 +872,8 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             if levin_account_id:
-                cursor.execute(_sql1, (cmte_id, start_dt, end_dt, levin_account_id))
+                cursor.execute(_sql1, (cmte_id, start_dt,
+                                       end_dt, levin_account_id))
             else:
                 cursor.execute(_sql1, (cmte_id, start_dt, end_dt))
             # print(cursor.rowcount)
@@ -881,15 +883,16 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
                     if row[0] == "Y":
                         result["itemized_receipt_amount_ytd"] = row[1]
                     elif row[0] == "N":
-                        result["non-itemized_receipt_amount_ytd"] = row[1]
+                        result["non_itemized_receipt_amount_ytd"] = row[1]
                     else:
                         pass
-            result["itemized_non-itemized_combined_ytd"] = float(
+            result["itemized_non_itemized_combined_ytd"] = float(
                 result["itemized_receipt_amount_ytd"]
-            ) + float(result["non-itemized_receipt_amount_ytd"])
+            ) + float(result["non_itemized_receipt_amount_ytd"])
 
             if levin_account_id:
-                cursor.execute(_sql2, (cmte_id, start_dt, end_dt, levin_account_id))
+                cursor.execute(_sql2, (cmte_id, start_dt,
+                                       end_dt, levin_account_id))
             else:
                 cursor.execute(_sql2, (cmte_id, start_dt, end_dt))
             # print(cursor.rowcount)
@@ -897,7 +900,7 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
                 result["other_sl_receipt_amount_ytd"] = cursor.fetchone()[0]
 
             result["total_receipt_amount_ytd"] = float(
-                result["itemized_non-itemized_combined_ytd"]
+                result["itemized_non_itemized_combined_ytd"]
             ) + float(result["other_sl_receipt_amount_ytd"])
 
     except Exception as e:
@@ -1037,7 +1040,7 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
         'loading receipts summary: cmte_id {}, report_id {}'.format(cmte_id, report_id))
     result = {}
     result["itemized_receipt_amount"] = 0
-    result["non-itemized_receipt_amount"] = 0
+    result["non_itemized_receipt_amount"] = 0
     try:
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
@@ -1053,16 +1056,16 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
                     if row[0] == "1A":
                         result["itemized_receipt_amount"] = row[1]
                     elif row[0] == "11AII":
-                        result["non-itemized_receipt_amount"] = row[1]
+                        result["non_itemized_receipt_amount"] = row[1]
                     else:
                         pass
                 # else:
                 #     result["itemized_receipt_amount"] = 0
                 #     result["non-itemized_receipt_amount"] = 0
 
-            result["itemized_non-itemized_combined"] = float(
+            result["itemized_non_itemized_combined"] = float(
                 result["itemized_receipt_amount"]
-            ) + float(result["non-itemized_receipt_amount"])
+            ) + float(result["non_itemized_receipt_amount"])
 
             logger.debug('loading other la transactions:')
             if levin_account_id:
@@ -1075,7 +1078,7 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
             else:
                 result["other_sl_receipt_amount"] = 0
             result["total_receipt_amount"] = float(
-                result["itemized_non-itemized_combined"]
+                result["itemized_non_itemized_combined"]
             ) + float(result["other_sl_receipt_amount"])
             logger.debug('receipts summary:{}'.format(result))
     except Exception as e:
@@ -1106,7 +1109,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
                     """,
                     [cmte_id, prev_cvg_end_dt, levin_account_id],
                 )
-                
+
             else:
                 cursor.execute(
                     """
@@ -1189,22 +1192,28 @@ def get_sl_summary_table(request):
         # query and calculate receipt amount for current report
         levin_account_id = request.query_params.get('levin_account_id')
         if levin_account_id:
-            response.update(load_report_receipts_summary(cmte_id, report_id, levin_account_id))
-            response.update(load_report_disbursements_sumamry(cmte_id, report_id, levin_account_id))
-            response.update(load_ytd_receipts_summary(cmte_id, cal_start, cal_end, levin_account_id))
+            response.update(load_report_receipts_summary(
+                cmte_id, report_id, levin_account_id))
+            response.update(load_report_disbursements_sumamry(
+                cmte_id, report_id, levin_account_id))
+            response.update(load_ytd_receipts_summary(
+                cmte_id, cal_start, cal_end, levin_account_id))
             response.update(load_ytd_disbursements_summary(
-            cmte_id, cal_start, cal_end, levin_account_id))
-            coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False, levin_account_id)
-            coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True, levin_account_id)
+                cmte_id, cal_start, cal_end, levin_account_id))
+            coh_bop_report = get_cash_on_hand_cop(
+                report_id, cmte_id, False, levin_account_id)
+            coh_bop_ytd = get_cash_on_hand_cop(
+                report_id, cmte_id, True, levin_account_id)
         else:
             response.update(load_report_receipts_summary(cmte_id, report_id))
-            response.update(load_report_disbursements_sumamry(cmte_id, report_id))
-            response.update(load_ytd_receipts_summary(cmte_id, cal_start, cal_end))
+            response.update(
+                load_report_disbursements_sumamry(cmte_id, report_id))
+            response.update(load_ytd_receipts_summary(
+                cmte_id, cal_start, cal_end))
             response.update(load_ytd_disbursements_summary(
-            cmte_id, cal_start, cal_end))
+                cmte_id, cal_start, cal_end))
             coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
             coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
-
 
         # # query and calculate disbursement amount for current report
         # response.update(load_report_disbursements_sumamry(cmte_id, report_id))
