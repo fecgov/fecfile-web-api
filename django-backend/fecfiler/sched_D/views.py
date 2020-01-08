@@ -809,15 +809,15 @@ def get_schedD(data):
                             # obj['transaction_date'] = obj.pop('contribution_date')
                         if obj["transaction_id"].startswith("SB"):
                             obj.update(API_CALL_SB)
-                            # obj['transaction_amount'] = obj.pop('expenditure_amount')
-                            # obj['transaction_date'] = obj.pop('expenditure_date')
                         if obj["transaction_id"].startswith("SE"):
                             obj.update(API_CALL_SE)
                         if obj["transaction_id"].startswith("SF"):
                             obj.update(API_CALL_SF)
                         if "levin_share" in obj:
+                            obj['expenditure_amount'] = obj.get('total_fed_levin_amount', 0.0)
                             obj.update(API_CALL_SH6)
                         if "non_fed_share_amount" in obj:
+                            obj['expenditure_amount'] = obj.get('total_amount', 0.0)
                             obj.update(API_CALL_SH4)
                         f_obj["child"] = child_objs
         return forms_obj
