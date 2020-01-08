@@ -4177,6 +4177,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public saveForReturnToSummary (): void {
-    this._doValidateReceipt(SaveActions.saveForReturnToSummary);
+    if (this.frmIndividualReceipt.pristine) {
+      this.goH4OrH6Summary(this.transactionType);
+    }else {
+      if((this.frmIndividualReceipt.touched || this.frmIndividualReceipt.dirty) && this.frmIndividualReceipt.invalid) {
+        this._dialogService
+        .confirm('You have unsaved changes! If you leave, your changes will be lost.', ConfirmModalComponent, 'Caution!')
+        .then(res => {
+          if (res === 'okay') {
+            this.goH4OrH6Summary(this.transactionType);
+          } else if (res === 'cancel') {
+          }
+        });
+      }else if(this.frmIndividualReceipt.valid) {
+        this._doValidateReceipt(SaveActions.saveForReturnToSummary);
+      }
+    }
   }
 }
