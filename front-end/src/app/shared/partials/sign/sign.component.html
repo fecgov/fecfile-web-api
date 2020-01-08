@@ -273,7 +273,7 @@
       </div>
       <div class="grid-row border-top space-bottom">
         <div class="grid-row__col grid-row__col--6">
-          <button type="button" class="btn btn-previous btn-left" (click)="goToPreviousStep()">
+          <button type="button" class="btn btn-previous btn-left" (click)="(this.getDirtyEmail()) ? cancelStepWithWarning() : goToPreviousStep() ">
             Previous
           </button>
         </div>
