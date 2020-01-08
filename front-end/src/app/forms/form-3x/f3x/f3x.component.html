@@ -97,7 +97,7 @@
               scheduleType !== 'sched_d' &&
               scheduleType !== 'sched_h4' &&
               scheduleType !== 'sched_h6' &&
-              scheduleType !== 'sched_L'
+              scheduleType !== 'sched_L' 
             "
             [transactionTypeText]="transactionTypeText"
             [transactionType]="transactionType"
@@ -106,6 +106,16 @@
             (status)="onNotify($event)"
           >
           </f3x-individual-receipt>
+          <app-sched-e
+            *ngIf="scheduleType === 'sched_e'"
+            [hidden]="scheduleType !== 'sched_e'"
+            [transactionTypeText]="transactionTypeText"
+            [transactionType]="transactionType"
+            [scheduleAction]="scheduleAction"
+            [scheduleType]="scheduleType"
+            (status)="onNotify($event)"
+          >
+          </app-sched-e>
         </div>
         <app-sched-f
           [hidden]="scheduleType !== 'sched_f'"

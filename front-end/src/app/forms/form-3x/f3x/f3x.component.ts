@@ -509,6 +509,11 @@ export class F3xComponent implements OnInit {
       e.scheduleType = 'sched_c_loan_payment';
     }
 
+    //TODO-Remove this elseif once transactions are moved to Disubursements
+    if (e.scheduleType === 'Schedule E') {
+      e.scheduleType = 'sched_e';
+    }
+
     //default to sched_a ?
     this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
 

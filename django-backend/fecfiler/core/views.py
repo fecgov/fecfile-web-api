@@ -330,7 +330,7 @@ def get_dynamic_forms_fields(request):
                     for events in forms_obj['data']['committeeTypeEvents']:
                         for eventTypes in events['eventTypes']:
                             if eventTypes['eventType'] in ['PC', 'AD', 'GV']:
-                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y' AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y'"
                                 if eventTypes['eventType'] == 'PC':
                                     query_string += " AND public_communications = true"
                                 elif eventTypes['eventType'] == 'AD':
@@ -338,7 +338,7 @@ def get_dynamic_forms_fields(request):
                                 elif eventTypes['eventType'] == 'GV':
                                     query_string += " AND generic_voter_drive = true"
                                 with connection.cursor() as cursor:
-                                    cursor.execute(query_string, [cmte_id,report_id, report_id])
+                                    cursor.execute(query_string, [cmte_id,report_id])
                                     count = cursor.fetchone()
                                     print(cursor.query)
                                 print(eventTypes['eventType'] + " count: "+str(count[0]))
@@ -364,9 +364,9 @@ def get_dynamic_forms_fields(request):
                                 else:
                                     eventTypes['hasValue'] = False
                             elif eventTypes['eventType'] in ['VR', 'VI', 'GO', 'GC', 'EA']:
-                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y' AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y'"
                                 with connection.cursor() as cursor:
-                                    cursor.execute(query_string, [cmte_id,report_id, report_id])
+                                    cursor.execute(query_string, [cmte_id,report_id])
                                     count = cursor.fetchone()
                                     print(cursor.query)
                                 print(eventTypes['eventType'] + "count: "+str(count[0]))
@@ -2407,14 +2407,19 @@ def get_all_transactions(request):
             if ctgry_type != 'other_tran':
                 param_string += " AND report_id in ('{}')".format("', '".join(report_list))
             else:
-                param_string = param_string + """AND ((transaction_table != 'sched_h2' AND report_id in ('{0}')) 
+                param_string = param_string + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
                                                 OR 
-                                                (transaction_table = 'sched_h2' AND report_id in ('{0}') AND ratio_code = 'n')
+                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
                                                 OR
                                                 (transaction_table = 'sched_h2' AND name IN (
                                                 SELECT h4.activity_event_identifier FROM public.sched_h4 h4
-                                                WHERE  h4.report_id in ('{0}')
-                                                AND h4.cmte_id = '{1}')))""".format("', '".join(report_list), cmte_id)
+                                                WHERE  h4.report_id = '{0}'
+                                                AND h4.cmte_id = '{1}'
+                                                UNION
+                                                SELECT h3.activity_event_name
+                                                FROM   public.sched_h3 h3
+                                                WHERE  h3.report_id = '{0}'
+                                                AND h3.cmte_id = '{1}')))""".format(request.data.get('reportid'), cmte_id)
 
         # To determine if we are searching for regular or trashed transactions
         if 'trashed_flag' in request.data and str(request.data.get('trashed_flag')).lower() == 'true':
@@ -5732,6 +5737,35 @@ def get_sched_c_loanPayment_dynamic_forms_fields(request):
         return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return Response("The get_sched_c_loanPayment_dynamic_forms_fields API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+"""
+********************************************************************************************************************************
+GET COVERAGE DATES BASED ON A REPORT ID - BY ZOBAIR SALEEM
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_coverage_dates(request):
+
+    try:
+        cmte_id = request.user.username
+        report_id =request.query_params.get('report_id')
+        
+        with connection.cursor() as cursor:
+            forms_obj= {}
+            cursor.execute("SELECT cvg_start_date, cvg_end_date FROM reports where report_id = %s ", [report_id])
+            
+            row = cursor.fetchone()
+            data_row = list(row)
+
+            forms_obj = {
+                'cvg_start_date':data_row[0],
+                'cvg_end_date':data_row[1]
+                }
+
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_coverage_datess API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
 
 """
 ********************************************************************************************************************************
