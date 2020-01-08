@@ -681,7 +681,6 @@
           </tr>
         </thead>
         <tbody>
-            
           <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
             <tr>
               <td>
@@ -691,9 +690,10 @@
               <td [@fadeInOut] *ngIf="isColumnVisible('type')">
                 {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
               
-              <td [@fadeInOut] [ngClass]="trx.entityId.startsWith('ORG') ? 'parent': ''" (click)="trx.entityId.startsWith('ORG')? trx.toggleChild = !trx.toggleChild: ''"
+              <td [@fadeInOut] [ngClass]="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE')? 'parent': ''" 
+              (click)="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE') ? trx.toggleChild = !trx.toggleChild: ''"
                 *ngIf="isColumnVisible('name')">{{trx.name}}
-                <div *ngIf="trx.entityId.startsWith('ORG')" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
+                <div *ngIf="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE')" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
               </td>
               <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
               <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
@@ -757,7 +757,8 @@
                 </div>
               </td>
             </tr>
-            <tr *ngIf="trx?.entityId?.startsWith('ORG')" [ngbCollapse]="trx?.entityId?.startsWith('ORG') ? !trx.toggleChild: ''"
+            <tr *ngIf="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE')" 
+            [ngbCollapse]="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE') ? !trx.toggleChild: ''"
               class="child-bg">
               <td style="padding-left: 70px;" colspan="5">Schedule C1</td>
               <td>
@@ -773,7 +774,8 @@
                 </div>
               </td>
             </tr>
-            <tr *ngIf="trx?.entityId?.startsWith('ORG')" [ngbCollapse]="trx?.entityId?.startsWith('ORG') ? !trx.toggleChild: ''"
+            <tr *ngIf="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE')" 
+            [ngbCollapse]="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE') ? !trx.toggleChild: ''"
             class="child-bg">
             <td style="padding-left: 70px;" colspan="5">Endorsers</td>
             <td>

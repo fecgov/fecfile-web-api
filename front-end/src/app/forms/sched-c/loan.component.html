@@ -77,7 +77,8 @@
                         (frmLoan.touched || frmLoan.dirty)
                           ? 'input-field-error'
                           : ''
-                      " id="typeahead-template-last-name" [ngbTypeahead]="searchLastName" [resultTemplate]="rt"
+                      " id="typeahead-template-last-name" [ngbTypeahead]="searchLastName" [focusFirst]=false 
+                        [resultTemplate]="rt"
                         [inputFormatter]="formatterLastName" (selectItem)="handleSelectedItem($event)" />
                       <input *ngIf="col?.name === 'first_name'" class="form-control" [style.width]="col?.width"
                         [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
@@ -87,7 +88,8 @@
                         (frmLoan.touched || frmLoan.dirty)
                           ? 'input-field-error'
                           : ''
-                      " id="typeahead-template-first-name" [ngbTypeahead]="searchFirstName" [resultTemplate]="rt"
+                      " id="typeahead-template-first-name" [ngbTypeahead]="searchFirstName" [focusFirst]=false
+                        [resultTemplate]="rt"
                         [inputFormatter]="formatterFirstName" (selectItem)="handleSelectedItem($event)" />
 
                       <input *ngIf="col?.name === 'entity_name'" class="form-control" [style.width]="col?.width"
@@ -99,7 +101,7 @@
                         ? 'input-field-error'
                         : ''
                     " id="typeahead-template-entity-name" [ngbTypeahead]="searchOrg" [resultTemplate]="rtOrg"
-                        [inputFormatter]="formatterOrgName" (selectItem)="handleSelectedOrgItem($event)" />
+                      [focusFirst]=false [inputFormatter]="formatterOrgName" (selectItem)="handleSelectedOrgItem($event)" />
 
                     </div>
                     <div class="error-text" *ngIf="
