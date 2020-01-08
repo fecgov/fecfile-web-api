@@ -163,21 +163,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _formService: FormsService,
     private _receiptService: IndividualReceiptService,
     private _contactsService: ContactsService,
-    private _activatedRoute: ActivatedRoute,
+    protected _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
     private _router: Router,
-    private _utilService: UtilService,
+    protected _utilService: UtilService,
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
-    private _decimalPipe: DecimalPipe,
+    protected _decimalPipe: DecimalPipe,
     private _reportTypeService: ReportTypeService,
     protected _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
     private _f3xMessageService: F3xMessageService,
     private _transactionsMessageService: TransactionsMessageService,
-    private _contributionDateValidator: ContributionDateValidator,
+    protected _contributionDateValidator: ContributionDateValidator,
     private _transactionsService: TransactionsService,
-    private _reportsService: ReportsService
+    protected _reportsService: ReportsService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -458,6 +458,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     });
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
+    
+    //once the parent is initialized, send message to any child subscriptions to perform any applicable actions
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls){
+    this._messageService.sendMessage({'parentFormPopulated': true});
+    }
+
     if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
       this.loaded = true;
     }
@@ -1573,7 +1579,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       const receiptObj: any = {};
 
       for (const field in this.frmIndividualReceipt.controls) {
-        if (field === 'contribution_date' || field === 'expenditure_date') {
+        if (field === 'contribution_date' || field === 'expenditure_date' || field === 'disbursement_date' || field === 'dissemination_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else if (field === this._childFieldNamePrefix + 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
@@ -2455,7 +2461,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private _patchFormFields(fieldNames: string[], entity: any, namePrefix: string) {
+  protected _patchFormFields(fieldNames: string[], entity: any, namePrefix: string) {
     if (fieldNames) {
       for (const fieldName of fieldNames) {
         const patch = {};
@@ -3243,6 +3249,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
+    
   }
 
   private _prePopulateFormForEditOrView(transactionDetail: any) {
@@ -3691,7 +3698,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * with parent name fields
    */
   public populatePurpose(fieldName: string) {
-    if (
+    if (this.subTransactionInfo && 
       !this.subTransactionInfo.isEarmark && !this.subTransactionInfo.isParent
       // this.transactionType !== 'EAR_REC' &&
       // this.transactionType !== 'CON_EAR_UNDEP' &&

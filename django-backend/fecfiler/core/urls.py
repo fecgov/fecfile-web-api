@@ -191,4 +191,9 @@ urlpatterns = [
         views. prepare_Schedl_summary_data,
         name=" prepare_Schedl_summary_data",
     ),
+    url(
+        r"^core/get_coverage_dates$",
+        views.get_coverage_dates,
+        name="get_coverage_dates",
+    ),
 ]

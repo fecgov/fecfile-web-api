@@ -5740,6 +5740,35 @@ def get_sched_c_loanPayment_dynamic_forms_fields(request):
 
 """
 ********************************************************************************************************************************
+GET COVERAGE DATES BASED ON A REPORT ID - BY ZOBAIR SALEEM
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_coverage_dates(request):
+
+    try:
+        cmte_id = request.user.username
+        report_id =request.query_params.get('report_id')
+        
+        with connection.cursor() as cursor:
+            forms_obj= {}
+            cursor.execute("SELECT cvg_start_date, cvg_end_date FROM reports where report_id = %s ", [report_id])
+            
+            row = cursor.fetchone()
+            data_row = list(row)
+
+            forms_obj = {
+                'cvg_start_date':data_row[0],
+                'cvg_end_date':data_row[1]
+                }
+
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_coverage_datess API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+********************************************************************************************************************************
 END LOAN REPAYMENT DYNAMIC FORM FIELDS API
 ********************************************************************************************************************************
 """
