@@ -110,6 +110,8 @@ def schedE_sql_dict(data):
     filter out valid fileds for sched_E
     """
     valid_fields = [
+        "cmte_id",
+        "report_id",
         "transaction_type_identifier",
         "transaction_id",
         "back_ref_transaction_id",
@@ -669,7 +671,7 @@ def post_schedE(data):
             logger.debug("update payee entity with data:{}".format(data))
             get_data = {
                 "cmte_id": data.get("cmte_id"),
-                "entity_id": data.get("payee_entity_id"),
+                "entity_id": data.get("entity_id"),
             }
 
             # need this update for FEC entity
@@ -734,8 +736,12 @@ def post_schedE(data):
             if payee_rollback_flag:
                 entity_data = put_entities(old_entity)
             else:
-                get_data = {"cmte_id": data.get(
-                    "cmte_id"), "entity_id": entity_id}
+                
+                get_data = {
+                    "cmte_id": data.get("cmte_id"), 
+                    "entity_id": payee_entity_id
+                    }
+                logger.debug('exception happened, removing payee entity:{}'.format(payee_entity_id))
                 remove_entities(get_data)
 
             if completing_rollback_flag:
@@ -745,6 +751,7 @@ def post_schedE(data):
                     "cmte_id":data.get("cmte_id"),
                     "entity_id":data.get('completing_entity_id')
                 }
+                logger.debug('removing completing entity:{}'.format(data.get('completing_entity_id')))
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedE function is throwing an error: " + str(e)
