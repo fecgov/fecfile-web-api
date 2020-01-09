@@ -3337,6 +3337,7 @@ def get_h5_summary(request):
             back_ref_transaction_id,
             account_name,
             receipt_date,
+            total_amount_transferred,
             coalesce(
                 voter_registration_amount,
                 voter_id_amount,
