@@ -383,20 +383,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     });
 
     this.h3Entries = [];
-    
-    /*
-    this.schedH3.patchValue({account_name: ''}, { onlySelf: true });  
-    this.schedH3.patchValue({receipt_date: ''}, { onlySelf: true });   
-    this.schedH3.patchValue({total_amount_transferred: ''}, { onlySelf: true });
-    this.h3Entries = [];
-    this.schedH3.patchValue({ category: ''}, { onlySelf: true });
-    this.schedH3.markAsUntouched()
-    this.showIdentifer = false;
-    
-    this.schedH3.patchValue({ activity_event_name: ''}, { onlySelf: true });
-    this.schedH3.patchValue({ transferred_amount: ''}, { onlySelf: true });
-    this.schedH3.patchValue({ aggregate_amount: ''}, { onlySelf: true });
-    */
 
     this.receiptDateErr = false;
 
@@ -1105,6 +1091,24 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         } else if (res === 'cancel') {
         }
       });
+  }
+
+  public goSummary() {
+
+    this.isSubmit = true;
+
+    if(this.schedH3.touched || this.schedH3.dirty) {
+      this._dlService
+      .confirm('You have unsaved changes! If you leave, your changes will be lost.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this.returnToSum();
+        } else if (res === 'cancel') {
+        }
+      });
+    }else {
+      this.returnToSum();
+    }
   }
 
 }

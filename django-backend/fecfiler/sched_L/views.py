@@ -281,7 +281,7 @@ def post_schedL(data):
     try:
         # check_mandatory_fields_SL(datum, MANDATORY_FIELDS_SCHED_L)
         data["transaction_id"] = get_next_transaction_id("SL")
-        print(data)
+        # print(data)
         validate_sl_data(data)
         try:
             post_sql_schedL(data)
@@ -616,7 +616,7 @@ def schedL(request):
                 )
                 data = put_schedL(datum)
             else:
-                print(datum)
+                # print(datum)
                 data = post_schedL(datum)
             # Associating child transactions to parent and storing them to DB
 
@@ -738,131 +738,222 @@ def schedL(request):
         raise NotImplementedError
 
 
-def load_ytd_disbursements_summary(cmte_id, start_dt, end_dt):
+def load_ytd_disbursements_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
     """
     load year_to_date disbursement amount
     """
     result = {}
-    _sql = """
-        SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-        FROM public.sched_b t1 
-        WHERE t1.memo_code IS NULL 
-        AND t1.cmte_id = %s
-        AND t1.expenditure_date BETWEEN %s and %s
-        AND t1.delete_ind is distinct from 'Y' 
-        AND t1.transaction_type_identifier like 'LEVIN_%'
-        GROUP BY t1.transaction_type_identifier 
-    """
+    result["voter_registration_disbursement_ytd"] = 0
+    result["voter_ID_disbursement_ytd"] = 0
+    result["GOTV_disbursement_ytd"] = 0
+    result["generic_campaign_disbursement_ytd"] = 0
+    result["other_disbursement_ytd"] = 0
+    if levin_account_id:
+        _sql = """
+            SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
+            FROM public.sched_b t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.expenditure_date BETWEEN %s and %s
+            AND t1.levin_account_id = %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND substr(t1.transaction_type_identifier,1,6) = 'LEVIN_'
+            GROUP BY t1.transaction_type_identifier 
+        """
+    else:
+        _sql = """
+            SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
+            FROM public.sched_b t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.expenditure_date BETWEEN %s and %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND substr(t1.transaction_type_identifier,1,6) = 'LEVIN_'
+            GROUP BY t1.transaction_type_identifier 
+        """
     try:
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute(_sql, (cmte_id, report_id))
+            if levin_account_id:
+                cursor.execute(
+                    _sql, (cmte_id, start_dt, end_dt, levin_account_id))
+            else:
+                cursor.execute(_sql, (cmte_id, start_dt, end_dt))
             # rows = cursor.fetchall()
-            for row in cursor.fetchall():
-                if row[0] == "LEVIN_VOTER_REG":
-                    result["voter_registration_disbursement_ytd"] = row[1]
-                elif row[0] == "LEVIN_VOTER_ID":
-                    result["voter_ID_disbursement_ytd"] = row[1]
-                elif row[0] == "LEVIN_GOTV":
-                    result["GOTV_disbursement_ytd"] = row[1]
-                elif row[0] == "LEVIN_GEN":
-                    result["generic_campaign_disbursement_ytd"] = row[1]
-                elif row[0] == "LEVIN_OTH_DISB":
-                    result["other_disbursement_ytd"] = row[1]
-                else:
-                    pass
+            if cursor.rowcount:
+                for row in cursor.fetchall():
+                    if row[0] == "LEVIN_VOTER_REG":
+                        result["voter_registration_disbursement_ytd"] = row[1]
+                    elif row[0] == "LEVIN_VOTER_ID":
+                        result["voter_ID_disbursement_ytd"] = row[1]
+                    elif row[0] == "LEVIN_GOTV":
+                        result["GOTV_disbursement_ytd"] = row[1]
+                    elif row[0] == "LEVIN_GEN":
+                        result["generic_campaign_disbursement_ytd"] = row[1]
+                    elif row[0] == "LEVIN_OTH_DISB":
+                        result["other_disbursement_ytd"] = row[1]
+                    else:
+                        pass
             result["line4_subtotal_ytd"] = (
                 float(result["voter_registration_disbursement_ytd"])
-                + float(result["voter_I_disbursement_ytd"])
+                + float(result["voter_ID_disbursement_ytd"])
                 + float(result["GOTV_disbursement_ytd"])
-                + float(result["generic__ytd"])
+                + float(result["generic_campaign_disbursement_ytd"])
             )
-            result["total_disbursemenmt_amount_ytd"] = float(
+            result["total_disbursement_amount_ytd"] = float(
                 result["other_disbursement_ytd"]
             ) + float(result["line4_subtotal_ytd"])
     except Exception as e:
         raise Exception(
             "Error happens when query and calcualte dsibursements:" + str(e)
         )
+    # print('dsibursement ytd:{}'.format(result))
     return result
 
 
-def load_ytd_receipts_summary(cmte_id, start_dt, end_dt):
+def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
     """
     load year_to_date receipt aggregation amount
     """
     result = {}
+    result["itemized_receipt_amount_ytd"] = 0
+    result["non_itemized_receipt_amount_ytd"] = 0
+    result["other_sl_receipt_amount_ytd"] = 0
 
-    _sql1 = """
-        SELECT (CASE WHEN contribution_amount >= 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
-        FROM public.sched_a t1 
-        WHERE t1.memo_code IS NULL 
-        AND t1.cmte_id = %s
-        AND t1.contribution_date BETWEEN %s AND %s
-        AND t1.delete_ind is distinct from 'Y' 
-        AND substr(t1.transaction_type_identifier,1,5) = 'LEVIN'
-        AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
-        GROUP BY item_ind
-    """
+    if levin_account_id:
+        _sql1 = """
+            SELECT (CASE WHEN contribution_amount >= 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
+            FROM public.sched_a t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.contribution_date BETWEEN %s AND %s
+            AND t1.levin_account_id = %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND substr(t1.transaction_type_identifier,1,5) = 'LEVIN'
+            AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
+            GROUP BY item_ind
+        """
 
-    _sql2 = """
-        SELECT COALESCE(sum(contribution_amount),0)
-        FROM public.sched_a t1 
-        WHERE t1.memo_code IS NULL 
-        AND t1.cmte_id = %s
-        AND t1.contribution_date BETWEEN %s AND %s 
-        AND t1.delete_ind is distinct from 'Y' 
-        AND transaction_type_identifier = 'LEVIN_OTH_REC'
-    """
+        _sql2 = """
+            SELECT COALESCE(sum(contribution_amount),0)
+            FROM public.sched_a t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.contribution_date BETWEEN %s AND %s
+            AND t1.levin_account_id = %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND transaction_type_identifier = 'LEVIN_OTH_REC'
+        """
+
+    else:
+        _sql1 = """
+            SELECT (CASE WHEN contribution_amount >= 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
+            FROM public.sched_a t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.contribution_date BETWEEN %s AND %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND substr(t1.transaction_type_identifier,1,5) = 'LEVIN'
+            AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
+            GROUP BY item_ind
+        """
+
+        _sql2 = """
+            SELECT COALESCE(sum(contribution_amount),0)
+            FROM public.sched_a t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.contribution_date BETWEEN %s AND %s 
+            AND t1.delete_ind is distinct from 'Y' 
+            AND transaction_type_identifier = 'LEVIN_OTH_REC'
+        """
 
     try:
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute(_sql1, (cmte_id, start_dt, end_dt))
-            rows = cursor.fetchall()
-            for row in rows:
-                if row[0] == "Y":
-                    result["itemized_receipt_amount_ytd"] = row[1]
-                elif row[0] == "N":
-                    result["non-itemized_receipt_amount_ytd"] = row[1]
-                else:
-                    pass
-            result["itemized_non-itemized_combined_ytd"] = float(
+            if levin_account_id:
+                cursor.execute(_sql1, (cmte_id, start_dt,
+                                       end_dt, levin_account_id))
+            else:
+                cursor.execute(_sql1, (cmte_id, start_dt, end_dt))
+            # print(cursor.rowcount)
+            if cursor.rowcount:
+                rows = cursor.fetchall()
+                for row in rows:
+                    if row[0] == "Y":
+                        result["itemized_receipt_amount_ytd"] = row[1]
+                    elif row[0] == "N":
+                        result["non_itemized_receipt_amount_ytd"] = row[1]
+                    else:
+                        pass
+            result["itemized_non_itemized_combined_ytd"] = float(
                 result["itemized_receipt_amount_ytd"]
-            ) + float(result["non-itemized_receipt_amount_ytd"])
-            cursor.execute(_sql2, (cmte_id, start_dt, end_dt))
-            result["other_sl_receipt_amount_ytd"] = cursor.fetchone()[0]
+            ) + float(result["non_itemized_receipt_amount_ytd"])
+
+            if levin_account_id:
+                cursor.execute(_sql2, (cmte_id, start_dt,
+                                       end_dt, levin_account_id))
+            else:
+                cursor.execute(_sql2, (cmte_id, start_dt, end_dt))
+            # print(cursor.rowcount)
+            if cursor.rowcount:
+                result["other_sl_receipt_amount_ytd"] = cursor.fetchone()[0]
+
             result["total_receipt_amount_ytd"] = float(
-                result["itemized_non-itemized_combined"]
-            ) + float(result["other_sl_receipt_amount"])
+                result["itemized_non_itemized_combined_ytd"]
+            ) + float(result["other_sl_receipt_amount_ytd"])
 
     except Exception as e:
         raise Exception(
             "Error happens when query ytd receipts amount:" + str(e))
-
+    # print(result)
     return result
 
 
-def load_report_disbursements_sumamry(cmte_id, report_id):
+def load_report_disbursements_sumamry(cmte_id, report_id, levin_account_id=None):
     """
     query db for report-wise disbursement data
     """
     result = {}
-    _sql = """
-        SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
-        FROM public.sched_b t1 
-        WHERE t1.memo_code IS NULL 
-        AND t1.cmte_id = %s
-        AND t1.report_id = %s
-        AND t1.delete_ind is distinct from 'Y' 
-        AND t1.transaction_type_identifier like 'LEVIN_%'
-        GROUP BY t1.transaction_type_identifier
-    """
+    result["voter_registration_disbursement"] = 0
+    result["voter_ID_disbursement"] = 0
+    result["GOTV_disbursement"] = 0
+    result["generic_campaign_disbursement"] = 0
+    result["other_disbursement"] = 0
+    if not levin_account_id:
+        _sql = """
+            SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
+            FROM public.sched_b t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.report_id = %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND substring(t1.transaction_type_identifier,1,6) = 'LEVIN_'
+            GROUP BY t1.transaction_type_identifier
+        """
+    else:
+        _sql = """
+            SELECT t1.transaction_type_identifier, COALESCE(sum(t1.expenditure_amount),0) as total_amt
+            FROM public.sched_b t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.report_id = %s
+            AND t1.levin_account_id = %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND substring(t1.transaction_type_identifier,1,6) = 'LEVIN_'
+            GROUP BY t1.transaction_type_identifier
+        """
+
     try:
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute(_sql, (cmte_id, report_id))
-            # rows = cursor.fetchall()
+            if levin_account_id:
+                cursor.execute(_sql, (cmte_id, report_id, levin_account_id))
+            else:
+                cursor.execute(_sql, (cmte_id, report_id))
+            # rows = cursor.fetchall()isbursm
+            # print('disbursement rowcount: {}'.format(cursor.rowcount))
+            # print(result)
             for row in cursor.fetchall():
                 if row[0] == "LEVIN_VOTER_REG":
                     result["voter_registration_disbursement"] = row[1]
@@ -877,22 +968,23 @@ def load_report_disbursements_sumamry(cmte_id, report_id):
                 else:
                     pass
             result["line4_subtotal"] = (
-                float(result["voter registration disbursement"])
-                + float(result["voter ID disbursement"])
-                + float(result["GOTV disbursement"])
-                + float(result["generic campaign disbursement"])
+                float(result["voter_registration_disbursement"])
+                + float(result["voter_ID_disbursement"])
+                + float(result["GOTV_disbursement"])
+                + float(result["generic_campaign_disbursement"])
             )
             result["total_disbursement_amount"] = float(
                 result["other_disbursement"]
             ) + float(result["line4_subtotal"])
     except Exception as e:
         raise Exception(
-            "Error happens when query and calcualte dsibursements:" + str(e)
+            "Error happens when query and calcualte disbursements:" + str(e)
         )
+    # print(result)
     return result
 
 
-def load_report_receipts_summary(cmte_id, report_id):
+def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
     """
     query db and caculcate the summary data for receipts:
     1. itemized receipts: line_number = 11AI
@@ -901,47 +993,94 @@ def load_report_receipts_summary(cmte_id, report_id):
     4. other receipts
     5. all_total: 3 + other 
     """
-    _sql1 = """
-        SELECT line_number, COALESCE(sum(contribution_amount),0) as total_amt
-        FROM public.sched_a t1 
-        WHERE t1.memo_code IS NULL 
-        AND t1.cmte_id = %s
-        AND t1.report_id = %s
-        AND t1.delete_ind is distinct from 'Y' 
-        AND transaction_type_identifier like 'LEVIN_%'
-        GROUP BY line_number
-    """
-    _sql2 = """
-        SELECT COALESCE(sum(contribution_amount),0)
-        FROM public.sched_a t1 
-        WHERE t1.memo_code IS NULL 
-        AND t1.cmte_id = %s
-        AND t1.report_id = %s
-        AND t1.delete_ind is distinct from 'Y' 
-        AND transaction_type_identifier = 'LEVIN_OTH_REC'
-    """
+    if not levin_account_id:
+        _sql1 = """
+            SELECT line_number, COALESCE(sum(contribution_amount),0) as total_amt
+            FROM public.sched_a t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.report_id = %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
+            GROUP BY line_number
+        """
+        _sql2 = """
+            SELECT COALESCE(sum(contribution_amount),0)
+            FROM public.sched_a t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.report_id = %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.transaction_type_identifier = 'LEVIN_OTH_REC'
+        """
+    else:
+        _sql1 = """
+            SELECT line_number, COALESCE(sum(contribution_amount),0) as total_amt
+            FROM public.sched_a t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.report_id = %s
+            AND t1.levin_account_id = %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
+            GROUP BY line_number
+        """
+        _sql2 = """
+            SELECT COALESCE(sum(contribution_amount),0)
+            FROM public.sched_a t1 
+            WHERE t1.memo_code IS NULL 
+            AND t1.cmte_id = %s
+            AND t1.report_id = %s
+            AND t1.levin_account_id = %s
+            AND t1.delete_ind is distinct from 'Y' 
+            AND t1.transaction_type_identifier = 'LEVIN_OTH_REC'
+        """
+
+    logger.debug(
+        'loading receipts summary: cmte_id {}, report_id {}'.format(cmte_id, report_id))
     result = {}
+    result["itemized_receipt_amount"] = 0
+    result["non_itemized_receipt_amount"] = 0
     try:
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            cursor.execute(_sql1, (cmte_id, report_id))
-            rows = cursor.fetchall()
-            for row in rows:
-                if row[0] == "1A":
-                    result["itemized_receipt_amount"] = row[1]
-                elif row[0] == "11AII":
-                    result["non-itemized_receipt_amount"] = row[1]
-                else:
-                    pass
-            result["itemized_non-itemized_combined"] = float(
-                result["itemized_receipt_amount"]
-            ) + float(result["non-itemized_receipt_amount"])
-            cursor.execute(_sql2, (cmte_id, report_id))
-            result["other_sl_receipt_amount"] = cursor.fetchone()[0]
-            result["total_receipt_amount"] = float(
-                result["itemized_non-itemized_combined"]
-            ) + float(result["other_sl_receipt_amount"])
+            if levin_account_id:
+                cursor.execute(_sql1, (cmte_id, report_id, levin_account_id))
+            else:
+                cursor.execute(_sql1, (cmte_id, report_id))
+            logger.debug('rows retrieved:{}'.format(cursor.rowcount))
+            if cursor.rowcount:
+                rows = cursor.fetchall()
+                for row in rows:
+                    # print(row)
+                    if row[0] == "1A":
+                        result["itemized_receipt_amount"] = row[1]
+                    elif row[0] == "11AII":
+                        result["non_itemized_receipt_amount"] = row[1]
+                    else:
+                        pass
+                # else:
+                #     result["itemized_receipt_amount"] = 0
+                #     result["non-itemized_receipt_amount"] = 0
 
+            result["itemized_non_itemized_combined"] = float(
+                result["itemized_receipt_amount"]
+            ) + float(result["non_itemized_receipt_amount"])
+
+            logger.debug('loading other la transactions:')
+            if levin_account_id:
+                cursor.execute(_sql2, (cmte_id, report_id, levin_account_id))
+            else:
+                cursor.execute(_sql2, (cmte_id, report_id))
+            # print(cursor.rowcount)
+            if cursor.rowcount:
+                result["other_sl_receipt_amount"] = cursor.fetchone()[0]
+            else:
+                result["other_sl_receipt_amount"] = 0
+            result["total_receipt_amount"] = float(
+                result["itemized_non_itemized_combined"]
+            ) + float(result["other_sl_receipt_amount"])
+            logger.debug('receipts summary:{}'.format(result))
     except Exception as e:
         raise Exception(
             "Error happens when query and calcualte receipts amount:" + str(e)
@@ -949,7 +1088,7 @@ def load_report_receipts_summary(cmte_id, report_id):
     return result
 
 
-def get_cash_on_hand_cop(report_id, cmte_id, prev_yr):
+def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         if prev_yr:
@@ -958,10 +1097,30 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr):
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT COALESCE(coh_cop, 0) from public.sched_l where cmte_id = %s AND cvg_end_dt = %s AND delete_ind is distinct from 'Y'",
-                [cmte_id, prev_cvg_end_dt],
-            )
+            if levin_account_id:
+                cursor.execute(
+                    """
+                    SELECT COALESCE(coh_cop, 0) 
+                    FROM public.sched_l 
+                    WHERE cmte_id = %s 
+                    AND cvg_end_date = %s 
+                    AND record_id = %s
+                    AND delete_ind is distinct from 'Y'
+                    """,
+                    [cmte_id, prev_cvg_end_dt, levin_account_id],
+                )
+
+            else:
+                cursor.execute(
+                    """
+                    SELECT COALESCE(coh_cop, 0) 
+                    FROM public.sched_l 
+                    WHERE cmte_id = %s 
+                    AND cvg_end_date = %s 
+                    AND delete_ind is distinct from 'Y'
+                    """,
+                    [cmte_id, prev_cvg_end_dt],
+                )
             if cursor.rowcount == 0:
                 coh_cop = 0
             else:
@@ -1031,31 +1190,55 @@ def get_sl_summary_table(request):
         # report_id,
         # ]
         # query and calculate receipt amount for current report
-        response.update(load_report_receipts_summary(cmte_id, report_id))
+        levin_account_id = request.query_params.get('levin_account_id')
+        if levin_account_id:
+            response.update(load_report_receipts_summary(
+                cmte_id, report_id, levin_account_id))
+            response.update(load_report_disbursements_sumamry(
+                cmte_id, report_id, levin_account_id))
+            response.update(load_ytd_receipts_summary(
+                cmte_id, cal_start, cal_end, levin_account_id))
+            response.update(load_ytd_disbursements_summary(
+                cmte_id, cal_start, cal_end, levin_account_id))
+            coh_bop_report = get_cash_on_hand_cop(
+                report_id, cmte_id, False, levin_account_id)
+            coh_bop_ytd = get_cash_on_hand_cop(
+                report_id, cmte_id, True, levin_account_id)
+        else:
+            response.update(load_report_receipts_summary(cmte_id, report_id))
+            response.update(
+                load_report_disbursements_sumamry(cmte_id, report_id))
+            response.update(load_ytd_receipts_summary(
+                cmte_id, cal_start, cal_end))
+            response.update(load_ytd_disbursements_summary(
+                cmte_id, cal_start, cal_end))
+            coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
+            coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
 
-        # query and calculate disbursement amount for current report
-        response.update(load_report_disbursements_sumamry(cmte_id, report_id))
+        # # query and calculate disbursement amount for current report
+        # response.update(load_report_disbursements_sumamry(cmte_id, report_id))
 
-        # query and calcualte YTD receipt amount
-        response.update(load_ytd_receipts_summary(cmte_id, cal_start, cal_end))
-        # query and calculate YTD disbursement amount
-        response.update(load_ytd_disbursements_summary(
-            cmte_id, cal_start, cal_end))
+        # # query and calcualte YTD receipt amount
+        # response.update(load_ytd_receipts_summary(cmte_id, cal_start, cal_end))
+        # # query and calculate YTD disbursement amount
+        # response.update(load_ytd_disbursements_summary(
+        #     cmte_id, cal_start, cal_end))
 
-        # calculate cash summary
-        coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
-        coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
+        # # calculate cash summary
+        # coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
+        # coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
+        # print(response)
         coh_cop_report = (
             coh_bop_report
             + response.get("total_receipt_amount")
-            - response.get("total_dsibursement_amount")
+            - response.get("total_disbursement_amount")
         )
         coh_cop_ytd = (
             coh_bop_ytd
             + response.get("total_receipt_amount_ytd")
             + response.get("total_disbursement_amount_ytd")
         )
-        cach_summary = {
+        cash_summary = {
             "coh_bop_report": coh_bop_report,
             "coh_bop_ytd": coh_bop_ytd,
             "coh_cop_report": coh_cop_report,
@@ -1167,7 +1350,7 @@ def get_sla_summary_table(request):
         with connection.cursor() as cursor:
             cursor.execute(_sql_p1 + tps_str + _sql_p2, [cmte_id, report_id])
             result = cursor.fetchone()[0]
-            print(result)
+            # print(result)
             # adding memo child transactions
             if result:
                 for obj in result:
@@ -1234,7 +1417,7 @@ def get_slb_summary_table(request):
         with connection.cursor() as cursor:
             cursor.execute(_sql_p1 + tps_str + _sql_p2, [cmte_id, report_id])
             result = cursor.fetchone()[0]
-            print(result)
+            # print(result)
             # adding memo child transactions
             # if result:
             #     for obj in result:

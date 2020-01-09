@@ -154,7 +154,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.editTransactionSubscription = this._tranMessageService
       .getEditTransactionMessage()
       .subscribe((trx: TransactionModel) => {
-        this.editH2(trx);
+        if (trx.transactionTypeIdentifier === 'ALLOC_H2_RATIO') {
+          this.editH2(trx);
+        }
       });
 
     this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
@@ -257,7 +259,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       select_activity_function: new FormControl('', Validators.required),
       //fundraising: new FormControl('', Validators.required),
       //direct_cand_support: new FormControl('', Validators.required),
-      ratio_code: new FormControl('', Validators.required),
+      ratio_code: new FormControl(''),
       federal_percent: new FormControl('', [Validators.min(0), Validators.max(100), Validators.required]),
       non_federal_percent: new FormControl('', [Validators.min(0), Validators.max(100), Validators.required])
     });
@@ -336,28 +338,66 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   }
  
   public returnToSum(): void {
+    this.isSubmit = true;
+    if(this.schedH2.pristine) {
+      this.transactionType = 'ALLOC_H2_SUM';
+      this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+    }else {
+      if(this.schedH2.status === 'VALID') {
 
-    this.saveAndAddMore();
-    if( this.scheduleAction === ScheduleActions.edit) {
-      this.scheduleAction = ScheduleActions.add;
+        this.saveAndAddMore();
+
+        if( this.scheduleAction === ScheduleActions.edit) {
+          this.scheduleAction = ScheduleActions.add;
+        }
+
+        this.isSubmit = false;
+
+        this.schedH2.reset();
+
+        this.transactionType = 'ALLOC_H2_SUM';
+
+        this.receiptDateErr = false;
+
+        this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+      }else {
+        //this.isSubmit = true;
+        if((this.schedH2.get('activity_event_name').value === '' ||
+            this.schedH2.get('activity_event_name').value === null)  &&
+            this.schedH2.get('select_activity_function').value === null &&
+            this.schedH2.get('federal_percent').value === null &&
+            this.schedH2.get('non_federal_percent').value === null &&
+            this.schedH2.get('receipt_date').value === null) {
+          this.transactionType = 'ALLOC_H2_SUM';
+          this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+        }else {
+          this._dlService
+          .confirm('You have unsaved changes! If you leave, your changes will be lost.', ConfirmModalComponent, 'Caution!')
+          .then(res => {
+            if (res === 'okay') {
+              this.schedH2.reset();
+              this.transactionType = 'ALLOC_H2_SUM';
+              this.receiptDateErr = false;
+              this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+              //this.isSubmit = true;
+              this.schedH2.markAsDirty();
+              this.schedH2.markAsTouched();
+              window.scrollTo(0, 0);
+            } else if (res === 'cancel') {
+            }
+          });
+        }
+      }
+
     }
-
-    this.isSubmit = false;
-
-    this.schedH2.reset();
-
-    this.transactionType = 'ALLOC_H2_SUM';
-
-    this.receiptDateErr = false;
-   
-    this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
 
   }
 
   public returnToAdd(): void {
     this.transactionType = 'ALLOC_H2_RATIO';
 
-    this.receiptDateErr = false;  
+    this.receiptDateErr = false;
+    this.isSubmit = false;
   }
 
   public receiptDateChanged(receiptDate: string) {
