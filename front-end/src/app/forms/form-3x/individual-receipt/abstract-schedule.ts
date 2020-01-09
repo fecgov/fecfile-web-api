@@ -2148,7 +2148,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       step: 'step_2'
     });
   }
-
+  /**
+   * Save the current transaction if valid  and show transactions
+   * if invalid show unsaved confirmation and navigate accordingly
+   */
+  public saveOrWarn(): void {
+    if (this.frmIndividualReceipt.valid) {
+      this.saveOnly();
+      this.viewTransactions();
+    } else {
+      this._dialogService.confirm(
+          '', ConfirmModalComponent, '', true)
+          .then(res => {
+            if (res === 'okay' ? true : false) {
+              this.viewTransactions();
+            }
+          });
+    }
+  }
   /**
    * Navigate to the Transactions.
    */
