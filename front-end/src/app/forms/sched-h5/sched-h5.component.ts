@@ -369,6 +369,9 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     // this.schedH2.patchValue({ fundraising: this.schedH2.get('select_activity_function').value === 'f' ? true : false }, { onlySelf: true });
     // this.schedH2.patchValue({ direct_cand_support: this.schedH2.get('select_activity_function').value === 'd' ? true : false }, { onlySelf: true });
 
+    const accountName = this.schedH5.get('account_name').value;
+    const receipt_date = this.schedH5.get('receipt_date').value;
+
     this.isSaveAndAdd = true;
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
@@ -427,10 +430,17 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         this.h5EntrieEdit = formObj;
       }
 
-      this.schedH5.patchValue({category: ''}, { onlySelf: true });
-      this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true });
+      //this.schedH5.patchValue({category: ''}, { onlySelf: true });
+      //this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true });
 
       this.isSubmit = false;
+
+      this.schedH5.reset();
+      this.schedH5.patchValue({account_name: accountName}, { onlySelf: true });
+      this.schedH5.patchValue({receipt_date: receipt_date}, { onlySelf: true });
+      this.schedH5.patchValue({category: ''}, { onlySelf: true });
+      this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true });
+      this.schedH5.patchValue({total_amount_transferred:  this._decPipe.transform(total_amount_transferred, '.2-2')}, { onlySelf: true });
 
       //this.saveH5(serializedForm);
       //this.schedH5.reset();
@@ -729,6 +739,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         this.convertFormattedAmountToDecimal(
           this.schedH5.get('transferred_amount').value), '.2-2')}, { onlySelf: true });
       this.schedH5.controls['transferred_amount'].setErrors(null);
+
+      if(this.scheduleAction === ScheduleActions.edit) {
+        this.schedH5.patchValue({total_amount_transferred: this._decPipe.transform(
+          this.convertFormattedAmountToDecimal(
+            this.schedH5.get('transferred_amount').value), '.2-2')}, { onlySelf: true });
+      }
     }else {
       this.transferredAmountErr = true
       this.schedH5.controls['transferred_amount'].setErrors({'incorrect': true});  
@@ -785,7 +801,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH5.patchValue({ account_name: item.account_name}, { onlySelf: true });
     this.schedH5.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
     this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(item.transfer_amount, '.2-2')}, { onlySelf: true });
-    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.transfer_amount, '.2-2')}, { onlySelf: true });
+    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.total_amount_transferred, '.2-2')}, { onlySelf: true });
 
   }
 
@@ -889,6 +905,24 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         } else if (res === 'cancel') {
         }
       });
+  }
+
+  public goSummary() {
+
+    this.isSubmit = true;
+
+    if(this.schedH5.touched || this.schedH5.dirty) {
+      this._dlService
+      .confirm('You have unsaved changes! If you leave, your changes will be lost.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this.returnToSum();
+        } else if (res === 'cancel') {
+        }
+      });
+    }else {
+      this.returnToSum();
+    }
   }
 
 }

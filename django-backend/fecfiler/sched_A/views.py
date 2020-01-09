@@ -197,6 +197,8 @@ SCHEDULE_TO_TABLE_DICT = { 'SA': ['sched_a'],
     'SL': ['sched_l']
 }
 
+SCHEDULE_TO_CHILD_TABLE_DICT = { 'SD': ['sched_a', 'sched_b', 'sched_e', 'sched_f', 'sched_h4', 'sched_h6']}
+
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
     try:
@@ -1555,6 +1557,32 @@ END - AGGREGATE AMOUNT API - SCHED_A APP
 TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP TO AVOID FUNCTION USAGE RESTRICTIONS) - PRAVEEN
 ******************************************************************************************************************************
 """
+def get_child_transactions_to_trash(table_list, transaction_id, _delete='Y'):
+    """ Get a list of all child transactions specifically for schedule D that should be deleted when a schedule D transaction is deleted"""
+    try:
+        child_transactions = []
+        if _delete == 'Y':
+            action = 'trash'
+        else:
+            action = 'restore'
+        for table in table_list:
+            with connection.cursor() as cursor:
+                _sql = """
+                SELECT json_agg(t) FROM
+                (SELECT report_id, transaction_id, '{}' AS action
+                FROM public.{}
+                WHERE back_ref_transaction_id = %s) as t
+                """.format(action, table)
+                cursor.execute(_sql, [transaction_id])
+                logger.debug(cursor.query)
+                forms_obj = cursor.fetchone()
+            if forms_obj and forms_obj[0]:
+                child_transactions.extend(forms_obj[0])
+        return child_transactions
+
+    except Exception as e:
+        raise Exception('The get_child_transactions function is throwing an error:' + str(e))
+
 def trash_restore_sql_transaction(table_list, report_id, transaction_id, _delete='Y'):
     """trash or restore sched_a transaction by updating delete_ind"""
     try:
@@ -1576,6 +1604,8 @@ def trash_restore_sql_transaction(table_list, report_id, transaction_id, _delete
             raise Exception(
                 """The transaction ID: {1} is either already deleted
                  or does not exist in {0} table""".format(','.join(table_list), transaction_id))
+        else:
+            return transaction_id
     except Exception:
         raise
 
@@ -1601,7 +1631,9 @@ def trash_restore_transactions(request):
         }
  
     """
-    for _action in request.data.get('actions', []):
+    deleted_transaction_ids = []
+    _actions = request.data.get('actions', [])
+    for _action in _actions:
         report_id = _action.get('report_id', '')
         transaction_id = _action.get('transaction_id', '')
         cmte_id = request.user.username
@@ -1614,26 +1646,28 @@ def trash_restore_transactions(request):
             if table_list:
                 if transaction_id[:2] == 'SA':
                     datum = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
-                    trash_restore_sql_transaction( table_list,
+                    deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
                         report_id,
                         transaction_id, 
-                        _delete)
+                        _delete))
                     update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
                     ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
                 else:
-                    trash_restore_sql_transaction( table_list,
+                    if transaction_id[:2] in SCHEDULE_TO_CHILD_TABLE_DICT and _delete == 'Y':
+                        child_table_list = SCHEDULE_TO_CHILD_TABLE_DICT.get(transaction_id[:2])
+                        _actions.extend(get_child_transactions_to_trash(child_table_list, transaction_id, _delete))
+                    deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
                         report_id,
                         transaction_id, 
-                        _delete)
+                        _delete))
             else:
-                raise Exception('The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT.'.format(transaction_id))
+                raise Exception('The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT. Deleted transactions are: {}'.format(transaction_id, ','.join(deleted_transaction_ids)))
         except Exception as e:
-            return Response("The trash_restore_transactions API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
-    return Response({"result":"success"}, status=status.HTTP_200_OK)
+            return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
+                status=status.HTTP_400_BAD_REQUEST)
+    return Response({"result":"success", "deletedTransactions":"{}".format(",".join(deleted_transaction_ids))}, status=status.HTTP_200_OK)
 """
 ******************************************************************************************************************************
 END - TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP)
 ******************************************************************************************************************************
 """
-
