@@ -56,7 +56,8 @@ export class SchedLService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     let params = new HttpParams();
     params = params.append('report_id', reportId);
-    params = params.append('calendar_year', '2019');
+    params = params.append('levin_account_id', levinAccountId);
+    params = params.append('calendar_year', new Date().getFullYear().toString());
     return this._http
       .get(
         `${environment.apiUrl}${url}`,
