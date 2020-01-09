@@ -533,11 +533,18 @@ export class F3xComponent implements OnInit {
    */
   private _populateFormForEdit(e: any, schedule: AbstractScheduleParentEnum) {
     e.transactionDetail.action = this.scheduleAction;
-    this._f3xMessageService.sendPopulateFormMessage({
+    const emitObject: any = {
       key: 'fullForm',
       abstractScheduleComponent: schedule,
       transactionModel: e.transactionDetail
-    });
+    };
+    if ((e.transactionDetail.transactionModel.transactionTypeIdentifier === 'DEBT_TO_VENDOR' ||
+      e.transactionDetail.transactionModel.transactionTypeIdentifier === 'DEBT_BY_VENDOR')
+      && e.returnToDebtSummary) {
+        emitObject.returnToDebtSummary = true;
+        emitObject.returnToDebtSummaryInfo = e.returnToDebtSummaryInfo;
+      }
+    this._f3xMessageService.sendPopulateFormMessage(emitObject);
   }
 
   /**

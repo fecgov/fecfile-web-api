@@ -441,7 +441,7 @@
           [subTransactionsTableType]="subTransactionsTableType">
         </app-sub-transactions-table>
         <div class="forms__btn-container">
-          <button *ngIf="!subTransactionInfo?.isEarmark &&
+          <button id="addSingleChildButton" *ngIf="!subTransactionInfo?.isEarmark &&
                         subTransactionInfo?.isParent && !multipleSubTransactionInfo" 
             class="btn btn-primary btn-left"
             (click)="saveForAddSub()">
@@ -537,7 +537,7 @@
 
               <ng-template #allOtherTrx>
                 <div *ngIf="scheduleAction === editScheduleAction; else createActions">
-                  <button *ngIf="!isShedH4OrH6TransactionType(transactionType) || cloned" class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                  <button *ngIf="!isShedH4OrH6TransactionType(transactionType) || cloned" class="btn btn-previous btn-left" type="button" (click)="cancel()">
                     Cancel
                   </button>
                   <button *ngIf="isShedH4OrH6TransactionType(transactionType) && !cloned" class="btn btn-previous btn-left" type="button" (click)="goH4OrH6Summary(transactionType)">

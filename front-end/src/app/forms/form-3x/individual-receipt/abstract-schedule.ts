@@ -156,6 +156,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _committeeDetails: any;
   private _cmteTypeCategory: string;
   private _completedCloning: boolean = false;
+  private _returnToDebtSummary = false;
+  private _returnToDebtSummaryInfo: any;
 
   constructor(
     private _http: HttpClient,
@@ -189,6 +191,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           case 'fullForm':
             // only load form for the AbstractSchudule parent in the view
             if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+              this._checkForReturnToDebtSummary(message);
               this._prePopulateFormForEditOrView(message.transactionModel);
             }
             break;
@@ -278,6 +281,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.memoDropdownSize = null;
     this.totalAmountReadOnly = true;
     this._completedCloning = false;
+    this._returnToDebtSummary = false;
 
     if (localStorage.getItem('committee_details') !== null) {
       this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
@@ -1901,9 +1905,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else if (saveAction === SaveActions.saveForReturnToNewParent) {
             this.returnToParent(ScheduleActions.add);
           } else if (saveAction === SaveActions.updateOnly) {
-            if(this.isShedH4OrH6TransactionType(this.transactionType)) {
+            if (this.isShedH4OrH6TransactionType(this.transactionType)) {
               this.goH4OrH6Summary(this.transactionType);
-            }else {
+            } else if (this._returnToDebtSummary &&
+              (this.transactionType === 'DEBT_TO_VENDOR' || this.transactionType === 'DEBT_BY_VENDOR')) {
+                this._goDebtSummary();
+            } else {
               this._completedCloning = true;
               this.viewTransactions();
             }
@@ -3454,9 +3461,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
           }
         }
-        //move the payment button into view if flag is set.
+        // move the payment button into view if flag is set.
         if (this._transactionToEdit && this._transactionToEdit.scrollDebtPaymentButtonIntoView) {
-          let button = document.getElementById("jfMemoDropdown");
+          let button = document.getElementById('jfMemoDropdown');
+          if (button === null) {
+            button = document.getElementById('addSingleChildButton');
+          }
           button.scrollIntoView();
         }
       }
@@ -4141,6 +4151,40 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     } else {
       return false
     }
+  }
+
+  private  _checkForReturnToDebtSummary(message: any) {
+    this._returnToDebtSummary = false;
+    if (message.returnToDebtSummary) {
+      this._returnToDebtSummary = true;
+      this._returnToDebtSummaryInfo = message.returnToDebtSummaryInfo;
+    }
+  }
+
+  /**
+   * If originated from Debt Summary return there othrwise go to the transactions.
+   */
+  public cancel(): void {
+    if (this._returnToDebtSummary &&
+      (this.transactionType === 'DEBT_TO_VENDOR' || this.transactionType === 'DEBT_BY_VENDOR')) {
+      this._goDebtSummary();
+    } else {
+      this.viewTransactions();
+    }
+  }
+
+  private _goDebtSummary(): void {
+    const emitObj: any = {
+      form: this.frmIndividualReceipt,
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      action: ScheduleActions.add,
+      transactionType: this._returnToDebtSummaryInfo.transactionType,
+      transactionTypeText: this._returnToDebtSummaryInfo.transactionTypeText,
+      scheduleType: 'sched_d_ds'
+    };
+    this.status.emit(emitObj);
   }
 
   public goH4OrH6Summary(transactionType: string) {
