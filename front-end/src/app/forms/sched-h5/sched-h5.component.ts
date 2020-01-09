@@ -801,7 +801,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH5.patchValue({ account_name: item.account_name}, { onlySelf: true });
     this.schedH5.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
     this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(item.transfer_amount, '.2-2')}, { onlySelf: true });
-    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.transfer_amount, '.2-2')}, { onlySelf: true });
+    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.total_amount_transferred, '.2-2')}, { onlySelf: true });
 
   }
 
