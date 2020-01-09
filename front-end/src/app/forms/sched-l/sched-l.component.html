@@ -355,9 +355,7 @@
         </table>
         </ng-container>
     </section>
-    
-    <div class="financial-summary-container">
-      <section *ngIf="transactionType === 'L_SUM'">
+    <section *ngIf="lSum && transactionType === 'L_SUM'">
         <div class="financial-summary-content">
           <div class="row">
             <div class="tab-container" [ngSwitch]="viewMode">
@@ -365,7 +363,27 @@
           <!--<ng-container>-->
                 <table class="summary_table_text">
                   <tbody class="summary_text">
-                      <tr>
+                    <tr>
+                      <td colspan="3">
+                        <div class="row">
+                          <div class="grid-col">
+                            <b>Levin Account:&nbsp;&nbsp;</b>
+                            <ng-select #levinAccountSelect 
+                              [items]="levinAccounts" 
+                              class="forms__select" 
+                              bindValue="levin_account_id" 
+                              bindLabel="levin_account_name" 
+                              (change)="getSummaryByLevinAccount($event)"
+                              placeholder="Select Account"
+                              [selectOnTab]="true"
+                              [ngStyle]= "{ 'width': '450px' }">
+                            </ng-select>
+                          </div>
+                        </div>
+                        <p></p>
+                      </td>
+                    </tr>  
+                    <tr>
                         <td width=50%>
                           <div class="summary_text_level_1" >
                             1. RECEIPTS
@@ -678,8 +696,10 @@
           </div>
         </div>
       <!--</ng-container>-->
-    </section>
-  </div>
+    
+  </section>
+
+  
     
   </form>
 </div>

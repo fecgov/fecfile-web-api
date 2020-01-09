@@ -110,6 +110,8 @@ def schedE_sql_dict(data):
     filter out valid fileds for sched_E
     """
     valid_fields = [
+        "cmte_id",
+        "report_id",
         "transaction_type_identifier",
         "transaction_id",
         "back_ref_transaction_id",
@@ -631,6 +633,30 @@ def validate_negative_transaction(data):
             raise Exception("current transaction amount need to be negative!")
 
 
+def post_completing_entities(data):
+    """
+    a warpper function for saving completing entity
+    """
+    comp_data = {k.replace('completing_',''):v for k,v in data.items() if k.startswith('completing_')}
+    comp_data['cmte_id'] = data.get('cmte_id')
+    if 'prefix' in comp_data:
+        comp_data['preffix'] = comp_data.get('prefix')
+    comp_data['entity_type'] = 'IND'
+    logger.debug('post_completing_entity with data:{}'.format(comp_data))
+    return post_entities(comp_data)
+
+def put_completing_entities(data):
+    """
+    helper function to filter  completing entity data and save it
+    """
+    comp_data = {k.replace('completing_',''):v for k,v in data.items() if k.startswith('completing_')}
+    comp_data['cmte_id'] = data.get('cmte_id')
+    if 'prefix' in comp_data:
+        comp_data['preffix'] = comp_data.get('prefix')
+    comp_data['entity_type'] = 'IND'
+    logger.debug('put_auth_entity with data:{}'.format(comp_data))
+    return put_entities(comp_data)
+
 def post_schedE(data):
     """
     function for handling POST request for se, need to:
@@ -641,11 +667,11 @@ def post_schedE(data):
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
         logger.debug("saving sched_e with data:{}".format(data))
-        if "payee_entity_id" in data:
+        if "entity_id" in data:
             logger.debug("update payee entity with data:{}".format(data))
             get_data = {
                 "cmte_id": data.get("cmte_id"),
-                "entity_id": data.get("payee_entity_id"),
+                "entity_id": data.get("entity_id"),
             }
 
             # need this update for FEC entity
@@ -661,14 +687,37 @@ def post_schedE(data):
             payee_rollback_flag = False
 
         # continue to save transaction
-        entity_id = new_entity.get("entity_id")
+        payee_entity_id = new_entity.get("entity_id")
         # print('post_scheda {}'.format(entity_id))
-        data["payee_entity_id"] = entity_id
+        data["payee_entity_id"] = payee_entity_id
+
+        if 'completing_entity_id' in data:
+            logger.debug("update completing entity with data:{}".format(data))
+            get_data = {
+                "cmte_id": data.get("cmte_id"),
+                "entity_id": data.get("completing_entity_id"),
+            }
+
+            # need this update for FEC entity
+            if get_data["entity_id"].startswith("FEC"):
+                get_data["cmte_id"] = "C00000000"
+            old_completing_entity = get_entities(get_data)[0]
+            new_completing_entity = put_completing_entities(data)
+            completing_rollback_flag = True
+        else:
+            logger.debug("saving new completing entity:{}".format(data))
+            new_completing_entity = post_completing_entities(data)
+            logger.debug("new entity created:{}".format(new_entity))
+            completing_rollback_flag = False
+        data['completing_entity_id'] = new_completing_entity.get('entity_id')
+
         data["transaction_id"] = get_next_transaction_id("SE")
         # print(data)
+
         validate_se_data(data)
         validate_negative_transaction(data)
         validate_parent_transaction_exist(data)
+        data = schedE_sql_dict(data)
         # TODO: add code for saving completing_entity
 
         try:
@@ -687,8 +736,22 @@ def post_schedE(data):
             if payee_rollback_flag:
                 entity_data = put_entities(old_entity)
             else:
-                get_data = {"cmte_id": data.get(
-                    "cmte_id"), "entity_id": entity_id}
+                
+                get_data = {
+                    "cmte_id": data.get("cmte_id"), 
+                    "entity_id": payee_entity_id
+                    }
+                logger.debug('exception happened, removing payee entity:{}'.format(payee_entity_id))
+                remove_entities(get_data)
+
+            if completing_rollback_flag:
+                entity_data = put_entities(old_completing_entity)
+            else:
+                get_data = {
+                    "cmte_id":data.get("cmte_id"),
+                    "entity_id":data.get('completing_entity_id')
+                }
+                logger.debug('removing completing entity:{}'.format(data.get('completing_entity_id')))
                 remove_entities(get_data)
             raise Exception(
                 "The post_sql_schedE function is throwing an error: " + str(e)
@@ -971,7 +1034,8 @@ def schedE(request):
             else:
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
-            datum = schedE_sql_dict(request.data)
+            # datum = schedE_sql_dict(request.data)
+            datum = request.data.copy()
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
             if "transaction_id" in request.data and check_null_value(

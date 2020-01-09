@@ -92,6 +92,9 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public h5EntrieEdit: any;
   public back_ref_transaction_id: string;
 
+  public transferred_amount_edit = 0;
+  public total_amount_edit = 0;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -730,6 +733,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public handleOnBlurEvent($event: any, col: any) {
+
+    let val = 0;
+    if(this.schedH5.get('transferred_amount').value){
+      val = this.convertFormattedAmountToDecimal(this.schedH5.get('transferred_amount').value);
+    }
+
     const entry = $event.target.value.replace(/,/g, ``);
     if(this.isNumber(entry)) {
       this.transferredAmountErr = false;
@@ -741,9 +750,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH5.controls['transferred_amount'].setErrors(null);
 
       if(this.scheduleAction === ScheduleActions.edit) {
-        this.schedH5.patchValue({total_amount_transferred: this._decPipe.transform(
-          this.convertFormattedAmountToDecimal(
-            this.schedH5.get('transferred_amount').value), '.2-2')}, { onlySelf: true });
+        this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(
+          this.total_amount_edit - this.transferred_amount_edit + val, '.2-2')}, { onlySelf: true });
       }
     }else {
       this.transferredAmountErr = true
@@ -801,7 +809,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH5.patchValue({ account_name: item.account_name}, { onlySelf: true });
     this.schedH5.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
     this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(item.transfer_amount, '.2-2')}, { onlySelf: true });
-    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.transfer_amount, '.2-2')}, { onlySelf: true });
+    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.total_amount_transferred, '.2-2')}, { onlySelf: true });
+
+    this.transferred_amount_edit = item.transfer_amount
+    this.total_amount_edit = item.total_amount_transferred;
 
   }
 

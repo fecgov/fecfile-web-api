@@ -173,7 +173,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     }
 
     if (this.transactionType === 'L_SUM') {
-      this.getSummary(this._individualReceiptService.getReportIdFromStorage(this.formType), this.transactionType);
+      this.getSummary(this._individualReceiptService.getReportIdFromStorage(this.formType), '');
     }
 
   }
@@ -242,23 +242,28 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public getSummary(reportId: string, levinAccountId: string) {
-    //this.schedLsModel = [];
-    this.lSubscription = this._schedLService.getSummary(reportId, levinAccountId).subscribe(res =>
-      {
+    this.lSubscription = this._schedLService.getSummary(reportId, levinAccountId).subscribe(res => {
         if (res) {
           this.lSum = [];
           this.lSum =  res;
-          //this.tableConfig.totalItems = res.length;*/
-          //this.schedLsModelL = this.mapFromServerFields(res);
-          //this.schedLsModel = this.mapFromServerFields(res);
-          //this.setArrow(this.schedLsModel);
-
-          //this.schedLsModel = this.schedLsModel .filter(obj => obj.memo_code !== 'X');
-          //this.tableConfig.totalItems = this.schedLsModel.length;
+        }
+      });
+    this._individualReceiptService.getLevinAccounts().subscribe(res => {
+        if (res) {
+          this.levinAccounts = res;
         }
       });
   }
- 
+
+  public getSummaryByLevinAccount(account: any): void {
+    let levinAccountId = '';
+    if (account && account.levin_account_id) {
+      levinAccountId = account.levin_account_id;
+    }
+    this.getSummary(this._individualReceiptService.getReportIdFromStorage(this.formType), levinAccountId);
+
+  }
+
   public returnToSum(): void {
     this.transactionType = 'LA_SUM';
     this.getTransactions(this._individualReceiptService.getReportIdFromStorage(this.formType), this.transactionType);
