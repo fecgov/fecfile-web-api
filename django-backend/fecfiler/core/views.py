@@ -2423,7 +2423,7 @@ def get_all_transactions(request):
                                                 OR 
                                                 (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
                                                 OR
-                                                (transaction_table = 'sched_h2' AND name IN (
+                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
                                                 SELECT h4.activity_event_identifier FROM public.sched_h4 h4
                                                 WHERE  h4.report_id = '{0}'
                                                 AND h4.cmte_id = '{1}'
