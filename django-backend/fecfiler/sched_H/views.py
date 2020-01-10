@@ -623,17 +623,24 @@ def get_fed_nonfed_share(request):
                 raise Exception('Error: event type is required.')
             
             if cmte_type_category == 'PTY':
+                # _sql = """
+                # select federal_percent from public.sched_h1
+                # where election_year = %s
+                # and cmte_id = %s
+                # and report_id = %s
+                # and delete_ind is distinct from 'Y'
+                # order by create_date desc, last_update_date desc
+                # """
                 _sql = """
                 select federal_percent from public.sched_h1
                 where election_year = %s
                 and cmte_id = %s
-                and report_id = %s
                 and delete_ind is distinct from 'Y'
                 order by create_date desc, last_update_date desc
                 """
                 logger.debug('sql for query h1:{}'.format(_sql))
                 with connection.cursor() as cursor:
-                    cursor.execute(_sql, (calendar_year, cmte_id, report_id))
+                    cursor.execute(_sql, (calendar_year, cmte_id))
                     if not cursor.rowcount:
                         raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
