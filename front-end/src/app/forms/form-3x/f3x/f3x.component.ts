@@ -634,6 +634,12 @@ export class F3xComponent implements OnInit {
         this.scheduleType = 'sched_h2';
         finish = true;
       }
+      else if(this.scheduleType === 'Schedule H1'){
+        this.scheduleAction = ScheduleActions.edit;
+        this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
+        this.scheduleType = 'sched_h1';
+        finish = true;
+      }
       
       this._schedHMessageServce.sendpopulateHFormForEditMessage(transaction);
       if(transactionDetail && transactionDetail.transactionModel){

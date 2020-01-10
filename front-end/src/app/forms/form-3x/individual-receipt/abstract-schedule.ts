@@ -645,7 +645,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         this.frmIndividualReceipt.controls[dateField].updateValueAndValidity();
       } else {
-        if (this.frmIndividualReceipt.controls[dateField]) {
+        if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls[dateField]) {
           this.frmIndividualReceipt.controls[dateField].setValidators([
             this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
@@ -659,7 +659,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         this.frmIndividualReceipt.controls['child*' + dateField].updateValueAndValidity();
       } else {
-        if (this.frmIndividualReceipt.controls['child*' + dateField]) {
+        if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['child*' + dateField]) {
           this.frmIndividualReceipt.controls['child*' + dateField].setValidators([
             this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate),
             Validators.required

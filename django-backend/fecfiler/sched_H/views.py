@@ -1745,6 +1745,14 @@ def get_list_schedH3(report_id, cmte_id, transaction_id):
             if schedH3_list is None:
                 raise NoOPError('No sched_H3 transaction found for transaction_id {}'.format(
                     transaction_id))
+            if schedH3_list: 
+                for _rec in schedH3_list:
+                    if _rec['activity_event_name']:
+                        aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id, _rec.get('back_ref_transaction_id'))
+                        _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'], 0)
+                    else:
+                        _rec['aggregate_amount'] = 0
+                        # pass
             merged_list = []
             for dictH3 in schedH3_list:
                 merged_list.append(dictH3)

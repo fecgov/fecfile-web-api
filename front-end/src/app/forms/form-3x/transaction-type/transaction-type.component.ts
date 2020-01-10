@@ -282,165 +282,25 @@ export class TransactionTypeComponent implements OnInit {
    */
   private _setSecondaryTransactionCategories(): void {
     this._mainTransactionCategory = this.transactionCategories.filter(el => el.value === this.transactionCategory);
-    const mainTransactionTypeText: string = this._mainTransactionCategory[0].text;
-    const mainTransactionTypeValue: string = this._mainTransactionCategory[0].value;
-    const transactionObj: any = {
-      mainTransactionTypeText,
-      mainTransactionTypeValue,
-      transactionType: '',
-      childTransactionType: ''
-    };
-
-    localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
-
-    this.secondaryOptions = this._mainTransactionCategory[0].options;
-
-    /*if (this._mainTransactionCategory[0].options[0].value === 'schedule-h1') {
-      this.secondaryOptions[0].options = [
-        {
-          info: "Funds received from the committee's non-federal bank account",
-          infoIcon: 'TRUE',
-          name: 'schedule-h1',
-          scheduleType: 'sched_h1',
-          text: 'Allocation Ratios',
-          type: 'radio',
-          // value: ""
-          value: 'ALLOC_H1'
-        }
-
-      ];
-    }
-
-    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-    if (committeeDetails.cmte_type_category === 'PTY' && this._mainTransactionCategory[0].options[1].value === 'schedule-h2') {
-      this.secondaryOptions[1].options = [
-        {
-          info: "Funds received from the committee's non-federal bank account",
-          infoIcon: 'TRUE',
-          name: 'schedule-h3',
-          scheduleType: 'sched_h2',
-          text: 'Allocation Ratios',
-          type: 'radio',
-          value: 'ALLOC_H2_RATIO'
-        },
-        {
-          info: "Funds received from the committee's non-federal bank account",
-          infoIcon: 'TRUE',
-          name: 'schedule-h3',
-          scheduleType: 'sched_h2',
-          text: 'Allocation Ratios Summary',
-          type: 'radio',
-          value: 'ALLOC_H2_SUM'
-        }
-      ];
-    }
-
-    //for h3
-    if (this._mainTransactionCategory[0].options[2].value === 'schedule-h3') {
-      this.secondaryOptions[2].options = [
-        {
-          info: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal Activity',
-          infoIcon: 'TRUE',
-          name: 'schedule-h3',
-          scheduleType: 'sched_h3',
-          text: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal Activity',
-          type: 'radio',
-          value: 'ALLOC_H3_RATIO'
-        },
-        {
-          info: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Summary',
-          infoIcon: 'TRUE',
-          name: 'schedule-h3',
-          scheduleType: 'sched_h3',
-          text: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Summary',
-          type: 'radio',
-          value: 'ALLOC_H3_SUM'
-        },
-        {
-          info: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Period Totals',
-          infoIcon: 'TRUE',
-          name: 'schedule-h3',
-          scheduleType: 'sched_h3',
-          text: 'Transfers from Nonfederal Accounts for Allocated Federal-Nonfederal - Period Totals',
-          type: 'radio',
-          value: 'ALLOC_H3_SUM_P'
-        }
-      ];
-    }
-
-    //for h4
-    if (this._mainTransactionCategory[0].options[3].value === 'schedule-h4') {
-      this.secondaryOptions[3].options = [
-        {
-          info: 'Disbursements Types',
-          infoIcon: 'TRUE',
-          name: 'schedule-h4',
-          scheduleType: 'sched_h4',
-          text: 'Disbursements Types',
-          type: 'radio',
-          value: 'ALLOC_H4_TYPES'
-        },
-        {
-          info: 'Disbursements from Allocated Federal / Nonfederal Activity',
-          infoIcon: 'TRUE',
-          name: 'schedule-h4',
-          scheduleType: 'sched_h4',
-          text: 'Disbursements from Allocated Federal / Nonfederal Activity',
-          type: 'radio',
-          value: 'ALLOC_EXP_DEBT'
-        },
-        {
-          info: 'Disbursements for Allocated Federal/Nonfederal Activity Summary',
-          infoIcon: 'TRUE',
-          name: 'schedule-h4',
-          scheduleType: 'sched_h4',
-          text: 'Disbursements for Allocated Federal/Nonfederal Activity Summary',
-          type: 'radio',
-          value: 'ALLOC_H4_SUM'
-        }
-      ];
-    }
-
-    if (this._mainTransactionCategory[0].options[4].value === 'schedule-h5') {
-      this.secondaryOptions[4].options = [
-        {
-          info: 'Transfers of Levin Funds Received for Allocated Federal Election Activity',
-          infoIcon: 'TRUE',
-          name: 'schedule-h5',
-          scheduleType: 'sched_h5',
-          text: 'Transfers of Levin Funds Received for Allocated Federal Election Activity',
-          type: 'radio',
-          value: 'ALLOC_H5_RATIO'
-        },
-        {
-          info: 'Transfers from Levin Funds for Allocated Federal Election Activity',
-          infoIcon: 'TRUE',
-          name: 'schedule-h5',
-          scheduleType: 'sched_h5',
-          text: 'Transfers from Levin Funds for Allocated Federal Election Activity',
-          type: 'radio',
-          value: 'ALLOC_H5_SUM'
-        },
-        {
-          info: 'Total For Breakdown of Transfers Received - Levin Funds',
-          infoIcon: 'TRUE',
-          name: 'schedule-h5',
-          scheduleType: 'sched_h5',
-          text: 'Total For Breakdown of Transfers Received - Levin Funds',
-          type: 'radio',
-          value: 'ALLOC_H5_SUM_P'
-        }
-      ];
-    } */
-
-    this.transactionCategorySelected = true;
-
-    this.transactionTypeFailed = false;
-
-    if (this.transactionCategory) {
-      this.tranasctionCategoryVal = this.transactionCategory;
-
-      this.transactionCategory = '';
+    if(this._mainTransactionCategory && this._mainTransactionCategory.length > 0){
+      const mainTransactionTypeText: string = this._mainTransactionCategory[0].text;
+      const mainTransactionTypeValue: string = this._mainTransactionCategory[0].value;
+      const transactionObj: any = {
+        mainTransactionTypeText,
+        mainTransactionTypeValue,
+        transactionType: '',
+        childTransactionType: ''
+      };
+  
+      localStorage.setItem(`form_${this._formType}_temp_transaction_type`, JSON.stringify(transactionObj));
+      this.secondaryOptions = this._mainTransactionCategory[0].options;
+      this.transactionCategorySelected = true;
+      this.transactionTypeFailed = false;
+      if (this.transactionCategory) {
+        this.tranasctionCategoryVal = this.transactionCategory;
+  
+        this.transactionCategory = '';
+      }
     }
   }
 
