@@ -3716,8 +3716,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * with parent name fields
    */
   public populatePurpose(fieldName: string) {
-    if (this.subTransactionInfo && 
-      !this.subTransactionInfo.isEarmark && !this.subTransactionInfo.isParent
+    // Purpose description is pre-populatng for Individual Receipt
+    // Added below condition on 01/10/2020.
+    if (!this.subTransactionInfo) {
+      return;
+    }
+    if (!this.subTransactionInfo.isEarmark && !this.subTransactionInfo.isParent
       // this.transactionType !== 'EAR_REC' &&
       // this.transactionType !== 'CON_EAR_UNDEP' &&
       // this.transactionType !== 'CON_EAR_DEP_1'
