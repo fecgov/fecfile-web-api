@@ -225,10 +225,10 @@ def do_h1_carryover(cmte_id, report_id):
                 logger.debug('new year report, no h1 carryover needed.')
                 return
 
-    if is_pty(cmte_id):
-        logger.debug('party h1 carryover...')
-        do_pty_h1_carryover(cmte_id, report_id)
-    elif is_pac(cmte_id):
+    # if is_pty(cmte_id):
+    #     logger.debug('party h1 carryover...')
+    #     do_pty_h1_carryover(cmte_id, report_id)
+    if is_pac(cmte_id):
         logger.debug('pac h1 carryover...')
         do_pac_h1_carryover(cmte_id, report_id)
     else:
