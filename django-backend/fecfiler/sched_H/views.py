@@ -318,8 +318,10 @@ def get_schedH1(data):
 def get_list_all_schedH1(report_id, cmte_id):
     """
     load all transactions for a report
+    Note: for PTY, H1 is election year based
     """
     try:
+        election_yr = election_year(report_id)
         with connection.cursor() as cursor:
             # GET single row from schedA table
             _sql = """SELECT json_agg(t) FROM ( SELECT
@@ -342,10 +344,10 @@ def get_list_all_schedH1(report_id, cmte_id):
             create_date ,
             last_update_date
             FROM public.sched_h1
-            WHERE report_id = %s AND cmte_id = %s
+            WHERE election_year = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
             """
-            cursor.execute(_sql, (report_id, cmte_id))
+            cursor.execute(_sql, (election_yr, cmte_id))
             schedH1_list = cursor.fetchone()[0]
             if schedH1_list is None:
                 raise NoOPError('No sched_H1 transaction found for report_id {} and cmte_id: {}'.format(
