@@ -15,6 +15,7 @@ export class SchedH4Model {
     entity_name: string;
     entity_type: string;
     arrow_dir: string;
+    child: SchedH4Model[] = [];
     constructor(schedH4: any) {        
         this.cmte_id = schedH4.cmte_id ? schedH4.cmte_id : '';
         this.report_id = schedH4.report_id ? schedH4.report_id : '';
@@ -32,5 +33,6 @@ export class SchedH4Model {
         this.entity_name = schedH4.entity_name ? schedH4.entity_name : '';
         this.entity_type = schedH4.entity_type ? schedH4.entity_type : '';
         this.arrow_dir = schedH4.arrow_dir ? schedH4.arrow_dir : '';
+        this.child = schedH4.child;
     }
 }
