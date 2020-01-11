@@ -227,10 +227,8 @@
                             </div>
                         </td>
                         
-                    
-                        <div *ngIf="itemChild.memo_code !=='X' || itemChild.arrow_dir ==='show'"
-                          [ngStyle]="{'background-color': '#D9EDF6'}">
-                          <tr *ngFor="let itemChild of item.child;">
+                      </tr>
+                        <tr [ngStyle]="{'background-color': '#D9EDF6'}" *ngFor="let itemChild of item.child;">
                             <td>
                                 <input type="checkbox" (click)="checkForMultiChecked($event)">
                             </td>
@@ -284,10 +282,7 @@
                                     </div>
                                 </div>
                             </td>
-                          </tr>
-                        </div>
-
-                      </tr>
+                         </tr>
                     </ng-container>
                 </tbody>
             </table>              

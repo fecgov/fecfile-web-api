@@ -719,14 +719,6 @@ export class F3xComponent implements OnInit {
       // this.transactionTypeTextSchedF = transactionTypeText;
       // this.scheduleFAction = this.scheduleAction;
     } else if (scheduleType.startsWith('sched_c')) {
-    } if(scheduleType === 'Schedule H4') {
-      this.transactionType = transactionType;
-      this.scheduleFAction = this.scheduleAction;
-      this.scheduleType = 'sched_h4';
-    } else if(scheduleType === 'Schedule H6') {
-      this.transactionType = transactionType;
-      this.scheduleFAction = this.scheduleAction;      
-      this.scheduleType = 'sched_h6';
     } else {
       this.transactionType = transactionType;
       this.transactionTypeText = transactionTypeText;
