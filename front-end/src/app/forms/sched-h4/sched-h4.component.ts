@@ -76,7 +76,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
   public schedH4sModelL: Array<SchedH4Model>;
 
   private clonedTransaction: any;
-   
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -255,7 +255,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     this.transactionType = "ALLOC_H4_TYPES"
 
     //this.transactionType = 'ALLOC_EXP_DEBT'; //'ALLOC_H4_RATIO';
-  }1
+  }
 
   public previousStep(): void {
     
@@ -271,14 +271,16 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
   public clickArrow(item: SchedH4Model) {
     if(item.arrow_dir === 'down') {
       let indexRep = this.schedH4sModel.indexOf(item);
+      this.schedH4sModel[indexRep].child = [];
       if (indexRep > -1) {
         let tmp: Array<SchedH4Model> = this.schedH4sModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id);
         for(let entry of tmp) {
           entry.arrow_dir = 'show';
-          this.schedH4sModel.splice(indexRep + 1, 0, entry);
-          indexRep++;
+          //this.schedH4sModel.splice(indexRep + 1, 0, entry);
+          this.schedH4sModel[indexRep].child.push(entry);
+          //indexRep++;
         }
-        this.tableConfig.totalItems = this.schedH4sModel.length;
+        //this.tableConfig.totalItems = this.schedH4sModel.length;
       }
       this.schedH4sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'up';
       

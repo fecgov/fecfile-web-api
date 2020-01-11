@@ -23,6 +23,7 @@ export class TransactionsMessageService {
   private removeTagSubject = new Subject<any>();
   private loadDefaultTab = new Subject<any>();
   private clearAllFiltersSubject = new Subject<any>();
+  private removeH1TransactionsSubject = new Subject<any>();
 
   /**
    * A publisher uses this method to send a message to subscribers
@@ -239,5 +240,17 @@ export class TransactionsMessageService {
 
   public getLoadTransactionsMessage(): Observable<any> {
     return this.loadTransactionsSubject.asObservable();
+  }
+
+  public sendRemoveH1TransactionsMessage(message: any) {
+    this.removeH1TransactionsSubject.next(message);
+  }
+
+  public clearRemoveH1TransactionsMessage() {
+    this.removeH1TransactionsSubject.next();
+  }
+
+  public getRemoveH1TransactionsMessage(): Observable<any> {
+    return this.removeH1TransactionsSubject.asObservable();
   }
 }
