@@ -533,6 +533,17 @@ def schedH1(request):
             # end of handling
             datum['report_id'] = report_id
             datum['cmte_id'] = request.user.username
+            datum['transaction_type_identifier'] = 'ALLOC_H1'
+            # print('----')
+            if (not report_id) or (report_id == '0'):
+                datum['election_year'] = None
+            else:    
+                datum['election_year'] = election_year(report_id)
+            # print('....')
+            if cmte_type(cmte_id) == 'PTY':
+                datum['administrative'] = True
+                datum['generic_voter_drive'] = True
+                datum['public_communications'] = True
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
