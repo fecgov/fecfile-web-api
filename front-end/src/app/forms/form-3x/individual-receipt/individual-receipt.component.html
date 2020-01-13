@@ -517,7 +517,7 @@
                 <ng-template #createEarMarkTrx>
                   <button *ngIf="!subTransactionInfo || subTransactionInfo?.isParent" class="btn btn-previous btn-left" type="button"
                     (click)="previousStep()">
-                    Previous !!!Create Earmark
+                    Previous
                   </button>
                   <button *ngIf="subTransactionInfo?.isParent" class="btn btn-primary btn-right"
                     (click)="saveForAddEarmark()">
@@ -525,7 +525,7 @@
                   </button>
                   <button *ngIf="subTransactionInfo?.isParent === false"
                     class="btn btn-secondary btn-right" (click)="saveAndReturnToNewParent()">
-                    Save &amp; Add Transaction !!!Create Earmark
+                    Save &amp; Add Transaction
                   </button>
                   <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
                     (click)="saveAndReturnToParent()">
@@ -557,14 +557,14 @@
                   <div *ngIf="!isShedH4OrH6TransactionType(transactionType)">
                     <button *ngIf="!subTransactionInfo || subTransactionInfo?.isParent" class="btn btn-previous btn-left" type="button"
                       (click)="previousStep()">
-                      Previous !!!create acton
+                      Previous
                     </button>
                     <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false" class="btn btn-previous btn-left"
                       type="button" (click)="returnToParent(editScheduleAction)">
                       Cancel
                     </button>
                     <button class="btn btn-secondary btn-right" (click)="saveOnly()">
-                      Save &amp; Add Transaction !!!create action
+                      Save &amp; Add Transaction
                     </button>
                     <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
                       (click)="saveAndReturnToParent()">
