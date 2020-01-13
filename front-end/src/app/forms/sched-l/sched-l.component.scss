@@ -282,7 +282,7 @@
    // margin-bottom: 1px  !important;
   }
   .summary_text_level_3{
-    background-color: #E5E7E9  !important;
+    /*background-color: #E5E7E9  !important;*/
     padding-left: 100px;
     height: 35px !important;
     padding-top: 10px !important;
@@ -368,6 +368,12 @@
     margin-top: 1px  !important;
     //padding-right: 2px !important;
   }
+
+  .summary_level_3{
+    background-color: #E5E7E9  !important;
+    padding-left: 50px;
+  }
+
   .summary_bg_color_gray_blue{
     background-color: #E5E7E9  !important;
   }

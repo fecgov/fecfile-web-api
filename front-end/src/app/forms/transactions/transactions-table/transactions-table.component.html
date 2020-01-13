@@ -965,7 +965,9 @@
                       <button class="dropdown-item" (click)="printTransaction(trx)">
                         <i class="fas fa-print"></i> Print
                       </button>
-                      <button class="dropdown-item" (click)="cloneTransaction(trx)">
+                      <button *ngIf="trx.scheduleType !== 'Schedule H1' && trx.scheduleType !== 'Schedule H2' && 
+                                    trx.scheduleType !== 'Schedule H3' && trx.scheduleType !== 'Schedule H5'" 
+                      class="dropdown-item" (click)="cloneTransaction(trx)">
                         <i class="far fa-copy"></i> Clone
                       </button>
                       <span [title]="trx.child ? 'This transaction cannot be deleted because of the linked sub transactions.':''">
@@ -1024,7 +1026,10 @@
                       <button class="dropdown-item" (click)="printTransaction(trxChild)">
                         <i class="fas fa-print"></i> Print
                       </button>
-                      <button class="dropdown-item" (click)="cloneTransaction(trxChild)">
+                      <button class="dropdown-item" 
+                      *ngIf="trxChild.scheduleType !== 'Schedule H1' && trxChild.scheduleType !== 'Schedule H2' && 
+                                    trxChild.scheduleType !== 'Schedule H3' && trxChild.scheduleType !== 'Schedule H5'"
+                      (click)="cloneTransaction(trxChild)">
                         <i class="far fa-copy"></i> Clone
                       </button>
                       <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">

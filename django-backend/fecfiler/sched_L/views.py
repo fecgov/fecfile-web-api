@@ -822,7 +822,7 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
 
     if levin_account_id:
         _sql1 = """
-            SELECT (CASE WHEN contribution_amount >= 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
+            SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
             FROM public.sched_a t1 
             WHERE t1.memo_code IS NULL 
             AND t1.cmte_id = %s
@@ -847,7 +847,7 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
 
     else:
         _sql1 = """
-            SELECT (CASE WHEN contribution_amount >= 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
+            SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
             FROM public.sched_a t1 
             WHERE t1.memo_code IS NULL 
             AND t1.cmte_id = %s
@@ -995,14 +995,14 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
     """
     if not levin_account_id:
         _sql1 = """
-            SELECT line_number, COALESCE(sum(contribution_amount),0) as total_amt
+            SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
             FROM public.sched_a t1 
             WHERE t1.memo_code IS NULL 
             AND t1.cmte_id = %s
             AND t1.report_id = %s
             AND t1.delete_ind is distinct from 'Y' 
             AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
-            GROUP BY line_number
+            GROUP BY item_ind
         """
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
@@ -1015,7 +1015,7 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
         """
     else:
         _sql1 = """
-            SELECT line_number, COALESCE(sum(contribution_amount),0) as total_amt
+            SELECT (CASE WHEN t1.aggregate_amt > 200 THEN 'Y' ELSE 'N' END) as item_ind, COALESCE(sum(contribution_amount),0) as total_amt
             FROM public.sched_a t1 
             WHERE t1.memo_code IS NULL 
             AND t1.cmte_id = %s
@@ -1023,7 +1023,7 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
             AND t1.levin_account_id = %s
             AND t1.delete_ind is distinct from 'Y' 
             AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
-            GROUP BY line_number
+            GROUP BY item_ind
         """
         _sql2 = """
             SELECT COALESCE(sum(contribution_amount),0)
@@ -1185,7 +1185,10 @@ def get_sl_summary_table(request):
 
         # period_args = [
         cal_start = (datetime.date(int(calendar_year), 1, 1),)
-        cal_end = (datetime.date(int(calendar_year), 12, 31),)
+        # cal_end = (datetime.date(int(calendar_year), 12, 31),)
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        cal_end = cvg_end_date
+
         # cmte_id,
         # report_id,
         # ]

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -130,6 +130,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     private _schedHService: SchedHServiceService,
     private _tranService: TransactionsService,
     private _dlService: DialogService,
+    private _changeDet: ChangeDetectorRef
   ) {
     super(
       _http,
@@ -226,6 +227,10 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
     this.showPart2 = false;
+
+    if(this.transactionType === 'ALLOC_H3_RATIO'){
+      this.setH3();
+    }
 
     if(this.transactionType === 'ALLOC_H3_SUM') {
       this.setH3Sum();

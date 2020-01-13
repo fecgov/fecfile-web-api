@@ -652,7 +652,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         this.frmIndividualReceipt.controls[dateField].updateValueAndValidity();
       } else {
-        if (this.frmIndividualReceipt.controls[dateField]) {
+        if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls[dateField]) {
           this.frmIndividualReceipt.controls[dateField].setValidators([
             this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
@@ -666,7 +666,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         this.frmIndividualReceipt.controls['child*' + dateField].updateValueAndValidity();
       } else {
-        if (this.frmIndividualReceipt.controls['child*' + dateField]) {
+        if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['child*' + dateField]) {
           this.frmIndividualReceipt.controls['child*' + dateField].setValidators([
             this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate),
             Validators.required
@@ -3787,13 +3787,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * with parent name fields
    */
   public populatePurpose(fieldName: string) {
-    if (
-      this.subTransactionInfo &&
-      !this.subTransactionInfo.isEarmark &&
-      !this.subTransactionInfo.isParent &&
+    // Purpose description is pre-populatng for Individual Receipt
+    // Added below condition on 01/10/2020.
+    if (!this.subTransactionInfo) {
+      return;
+    }
+    if (!this.subTransactionInfo.isEarmark && !this.subTransactionInfo.isParent
       // this.transactionType !== 'EAR_REC' &&
       // this.transactionType !== 'CON_EAR_UNDEP' &&
       // this.transactionType !== 'CON_EAR_DEP_1'
+      &&
       this.transactionType !== 'ALLOC_EXP' &&
       this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
       this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
@@ -3801,7 +3804,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
       this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
       this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
-      this.transactionType !== 'ALLOC_EXP_VOID' &&
+      this.transactionType !== 'ALLOC_EXP_VOID'
+      &&
       this.transactionType !== 'ALLOC_FEA_DISB' &&
       this.transactionType !== 'ALLOC_FEA_CC_PAY' &&
       this.transactionType !== 'ALLOC_FEA_CC_PAY_MEMO' &&
