@@ -321,7 +321,8 @@ def put_schedC(data):
             # rollback_data = get_schedC(data)
             logger.debug('updating loan with data:{}'.format(data))
             put_sql_schedC(data)
-            update_auto_sched_a(data)
+            data_copy = data.copy()
+            update_auto_sched_a(data_copy)
 
         except Exception as e:
             # rollback entity data
