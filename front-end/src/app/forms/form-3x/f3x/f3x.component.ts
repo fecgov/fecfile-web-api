@@ -499,6 +499,34 @@ export class F3xComponent implements OnInit {
         } else if (this.transactionType === 'ALLOC_FEA_VOID') {
           this.transactionTypeText = 'VOID';
         }
+        // Levin Account Transaction Types
+        if (this.transactionType === 'LEVIN_INDV_REC') {
+          this.transactionTypeText = 'Schedule L-A Entry / Individual Receipt';
+        } else if (this.transactionType === 'LEVIN_ORG_REC') {
+          this.transactionTypeText = 'Schedule L-A Entry / Business Receipt';
+        } else if (this.transactionType === 'LEVIN_PARTN_REC') {
+          this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt';
+        } else if (this.transactionType === 'LEVIN_PARTN_MEMO') {
+          this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt Memo';
+        } else if (this.transactionType === 'LEVIN_PAC_REC') {
+          this.transactionTypeText = 'Schedule L-A Entry / PAC Receipt';
+        } else if (this.transactionType === 'LEVIN_NON_FED_REC') {
+          this.transactionTypeText = 'Schedule L-A Entry / Non-Federal PAC Receipt';
+        } else if (this.transactionType === 'LEVIN_TRIB_REC') {
+          this.transactionTypeText = 'Schedule L-A Entry / Tribal Receipt';
+        } else if (this.transactionType === 'LEVIN_OTH_REC') {
+          this.transactionTypeText = 'Schedule L-A Entry / Other Receipt';
+        } else if (this.transactionType === 'LEVIN_VOTER_REG') {
+          this.transactionTypeText = 'Schedule L-B Entry / Voter Registration';
+        } else if (this.transactionType === 'LEVIN_VOTER_ID') {
+          this.transactionTypeText = 'Schedule L-B Entry / Voter ID';
+        } else if (this.transactionType === 'LEVIN_GEN') {
+          this.transactionTypeText = 'Schedule L-B Entry / Generic Campaign Activity';
+        } else if (this.transactionType === 'LEVIN_OTH_DISB') {
+          this.transactionTypeText = 'Schedule L-B Entry / Other Disbursement';
+        } else if (this.transactionType === 'LEVIN_GOTV') {
+          this.transactionTypeText = 'Schedule L-B Entry / Get out the Vote (GOTV)';
+        }
       }
     }
   }
