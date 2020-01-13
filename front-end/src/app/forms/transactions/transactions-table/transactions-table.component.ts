@@ -1041,6 +1041,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
                 ModalHeaderClassEnum.successHeader
               );
             });
+
+            if(trx.scheduleType === 'Schedule H1') {
+              this._transactionsMessageService.sendRemoveH1TransactionsMessage(trx);
+            }
         } else if (res === 'cancel') {
         }
       });

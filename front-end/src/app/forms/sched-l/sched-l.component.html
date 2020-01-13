@@ -355,9 +355,7 @@
         </table>
         </ng-container>
     </section>
-    
-    <div class="financial-summary-container">
-      <section *ngIf="transactionType === 'L_SUM'">
+    <section *ngIf="lSum && transactionType === 'L_SUM'">
         <div class="financial-summary-content">
           <div class="row">
             <div class="tab-container" [ngSwitch]="viewMode">
@@ -365,18 +363,38 @@
           <!--<ng-container>-->
                 <table class="summary_table_text">
                   <tbody class="summary_text">
-                      <tr>
-                        <td width=50%>
+                    <tr>
+                      <td colspan="3">
+                        <div class="row">
+                          <div class="grid-col">
+                            <b>Levin Account:&nbsp;&nbsp;</b>
+                            <ng-select #levinAccountSelect 
+                              [items]="levinAccounts" 
+                              class="forms__select" 
+                              bindValue="levin_account_id" 
+                              bindLabel="levin_account_name" 
+                              (change)="getSummaryByLevinAccount($event)"
+                              placeholder="Select Account"
+                              [selectOnTab]="true"
+                              [ngStyle]= "{ 'width': '450px' }">
+                            </ng-select>
+                          </div>
+                        </div>
+                        <p></p>
+                      </td>
+                    </tr>  
+                    <tr>
+                        <td width=60%>
                           <div class="summary_text_level_1" >
                             1. RECEIPTS
                           </div>
                         </td>
-                        <td width=25%>
+                        <td width=20%>
                           <div class="summary_text_amt_level_1" >
                             Current Period
                           </div>
                         </td>
-                        <td width=25%>
+                        <td width=20%>
                           <div class="summary_text_amt_level_1" >
                             Calendar Year-to-Date
                           </div>
@@ -384,7 +402,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               1a. Itemized Receipts From Persons
                           </div>
                         </td>
@@ -401,7 +419,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               1b. Unitemized Receipts From Persons
                           </div>
                         </td>
@@ -418,7 +436,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               1c. Total Receipts From Persons
                           </div>
                         </td>
@@ -486,7 +504,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               4(a) Voter Registration DISBURSEMENTS
                           </div>
                         </td>
@@ -503,7 +521,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               4(b) Voter ID DISBURSEMENTS
                           </div>
                         </td>
@@ -520,7 +538,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               4(c). GOTV DISBURSEMENTS
                           </div>
                         </td>
@@ -537,7 +555,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               4(d). Generic Campaign DISBURSEMENTS
                           </div>
                         </td>
@@ -588,7 +606,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               7. CASH ON HAND (Beginning)
                           </div>
                         </td>
@@ -605,7 +623,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               8. RECEIPTS
                           </div>
                         </td>
@@ -622,7 +640,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               9. SUBTOTAL
                           </div>
                         </td>
@@ -639,7 +657,7 @@
                       </tr>
                       <tr>
                         <td>
-                          <div class="summary_text_level_3" >
+                          <div class="summary_text_level_3 summary_level_3" >
                               10. DISBURSEMENTS
                           </div>
                         </td>
@@ -678,8 +696,10 @@
           </div>
         </div>
       <!--</ng-container>-->
-    </section>
-  </div>
+    
+  </section>
+
+  
     
   </form>
 </div>

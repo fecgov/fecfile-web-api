@@ -318,8 +318,10 @@ def get_schedH1(data):
 def get_list_all_schedH1(report_id, cmte_id):
     """
     load all transactions for a report
+    Note: for PTY, H1 is election year based
     """
     try:
+        election_yr = election_year(report_id)
         with connection.cursor() as cursor:
             # GET single row from schedA table
             _sql = """SELECT json_agg(t) FROM ( SELECT
@@ -342,10 +344,10 @@ def get_list_all_schedH1(report_id, cmte_id):
             create_date ,
             last_update_date
             FROM public.sched_h1
-            WHERE report_id = %s AND cmte_id = %s
+            WHERE election_year = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
             """
-            cursor.execute(_sql, (report_id, cmte_id))
+            cursor.execute(_sql, (election_yr, cmte_id))
             schedH1_list = cursor.fetchone()[0]
             if schedH1_list is None:
                 raise NoOPError('No sched_H1 transaction found for report_id {} and cmte_id: {}'.format(
@@ -517,6 +519,7 @@ def schedH1(request):
 
     elif request.method == 'PUT':
         try:
+            cmte_id = request.user.username
             datum = schedH1_sql_dict(request.data)
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 datum['transaction_id'] = request.data.get('transaction_id')
@@ -532,7 +535,18 @@ def schedH1(request):
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
             datum['report_id'] = report_id
-            datum['cmte_id'] = request.user.username
+            datum['cmte_id'] = cmte_id
+            datum['transaction_type_identifier'] = 'ALLOC_H1'
+            # print('----')
+            if (not report_id) or (report_id == '0'):
+                datum['election_year'] = None
+            else:    
+                datum['election_year'] = int(election_year(report_id))
+            # print('....')
+            if cmte_type(cmte_id) == 'PTY':
+                datum['administrative'] = True
+                datum['generic_voter_drive'] = True
+                datum['public_communications'] = True
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
@@ -623,17 +637,24 @@ def get_fed_nonfed_share(request):
                 raise Exception('Error: event type is required.')
             
             if cmte_type_category == 'PTY':
+                # _sql = """
+                # select federal_percent from public.sched_h1
+                # where election_year = %s
+                # and cmte_id = %s
+                # and report_id = %s
+                # and delete_ind is distinct from 'Y'
+                # order by create_date desc, last_update_date desc
+                # """
                 _sql = """
                 select federal_percent from public.sched_h1
                 where election_year = %s
                 and cmte_id = %s
-                and report_id = %s
                 and delete_ind is distinct from 'Y'
                 order by create_date desc, last_update_date desc
                 """
                 logger.debug('sql for query h1:{}'.format(_sql))
                 with connection.cursor() as cursor:
-                    cursor.execute(_sql, (calendar_year, cmte_id, report_id))
+                    cursor.execute(_sql, (calendar_year, cmte_id))
                     if not cursor.rowcount:
                         raise Exception('Error: no h1 data found.')
                     fed_percent = float(cursor.fetchone()[0])
@@ -1745,6 +1766,14 @@ def get_list_schedH3(report_id, cmte_id, transaction_id):
             if schedH3_list is None:
                 raise NoOPError('No sched_H3 transaction found for transaction_id {}'.format(
                     transaction_id))
+            if schedH3_list: 
+                for _rec in schedH3_list:
+                    if _rec['activity_event_name']:
+                        aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id, _rec.get('back_ref_transaction_id'))
+                        _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'], 0)
+                    else:
+                        _rec['aggregate_amount'] = 0
+                        # pass
             merged_list = []
             for dictH3 in schedH3_list:
                 merged_list.append(dictH3)
@@ -3337,6 +3366,7 @@ def get_h5_summary(request):
             back_ref_transaction_id,
             account_name,
             receipt_date,
+            total_amount_transferred,
             coalesce(
                 voter_registration_amount,
                 voter_id_amount,

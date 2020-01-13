@@ -197,7 +197,7 @@
         </app-debt-summary>
 
         <app-sched-h1
-          *ngIf="scheduleType === 'sched_h1'"
+          [hidden]="scheduleType !== 'sched_h1'"
           [scheduleAction]="scheduleAction"
           [scheduleType]="scheduleType"
           (status)="onNotify($event)"

@@ -71,7 +71,7 @@ API_CALL_SC2 = {'api_call':'/sc/schedC2'}
 
 # need to generate auto sched_a items when a loan is made by a committee
 AUTO_SCHED_A_MAP = { 
-    'LOANS_OWED_BY_CMTE' : ['LOAN_FROM_IND','LOAN_FORM_BANK']
+    'LOANS_OWED_BY_CMTE' : ['LOAN_FROM_IND','LOAN_FROM_BANK']
 }
 
 # need to generate auto sched_b item when 
@@ -321,7 +321,8 @@ def put_schedC(data):
             # rollback_data = get_schedC(data)
             logger.debug('updating loan with data:{}'.format(data))
             put_sql_schedC(data)
-            update_auto_sched_a(data)
+            data_copy = data.copy()
+            update_auto_sched_a(data_copy)
 
         except Exception as e:
             # rollback entity data
@@ -2134,6 +2135,7 @@ def schedC1(request):
             datum = request.data.copy()
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            datum['transaction_type_identifier'] = 'SC1'
             if 'prefix' in request.data:
                 datum['preffix'] = request.data.get('prefix')
             # print(datum)
