@@ -343,6 +343,11 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       previousStep: 'step_2',
       action: DebtSumarysActions.edit,
       scheduleType: debtPayment.scheduleType,
+      returnToDebtSummary: true,
+      returnToDebtSummaryInfo: {
+        transactionType: this.transactionType,
+        transactionTypeText: this.transactionTypeText
+      },
       transactionDetail: {
         transactionModel: {
           transactionId: debtPayment.transactionId,

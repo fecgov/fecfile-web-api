@@ -438,7 +438,9 @@
         <app-sub-transactions-table [hidden]="!isShowChildTransactions()" 
           [subTransactions]="subTransactions"
           [formType]="formType"
-          [subTransactionsTableType]="subTransactionsTableType">
+          [subTransactionsTableType]="subTransactionsTableType"
+          [returnToDebtSummary]="returnToDebtSummary"
+          [returnToDebtSummaryInfo]="returnToDebtSummaryInfo">
         </app-sub-transactions-table>
         <div class="forms__btn-container">
           <button id="addSingleChildButton" *ngIf="!subTransactionInfo?.isEarmark &&
@@ -515,7 +517,7 @@
                 <ng-template #createEarMarkTrx>
                   <button *ngIf="!subTransactionInfo || subTransactionInfo?.isParent" class="btn btn-previous btn-left" type="button"
                     (click)="previousStep()">
-                    Previous
+                    Previous !!!Create Earmark
                   </button>
                   <button *ngIf="subTransactionInfo?.isParent" class="btn btn-primary btn-right"
                     (click)="saveForAddEarmark()">
@@ -523,7 +525,7 @@
                   </button>
                   <button *ngIf="subTransactionInfo?.isParent === false"
                     class="btn btn-secondary btn-right" (click)="saveAndReturnToNewParent()">
-                    Save &amp; Add Transaction
+                    Save &amp; Add Transaction !!!Create Earmark
                   </button>
                   <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
                     (click)="saveAndReturnToParent()">
@@ -555,14 +557,14 @@
                   <div *ngIf="!isShedH4OrH6TransactionType(transactionType)">
                     <button *ngIf="!subTransactionInfo || subTransactionInfo?.isParent" class="btn btn-previous btn-left" type="button"
                       (click)="previousStep()">
-                      Previous
+                      Previous !!!create acton
                     </button>
                     <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false" class="btn btn-previous btn-left"
                       type="button" (click)="returnToParent(editScheduleAction)">
                       Cancel
                     </button>
                     <button class="btn btn-secondary btn-right" (click)="saveOnly()">
-                      Save &amp; Add Transaction
+                      Save &amp; Add Transaction !!!create action
                     </button>
                     <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
                       (click)="saveAndReturnToParent()">

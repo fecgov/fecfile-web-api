@@ -88,6 +88,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Subscription for showing the TransactionsEditComponent.
    */
   private editTransactionSubscription: Subscription;
+
+  /**
+   * Subscription for transactions to return to Debt Summary
+   */
+  private editDebtSummaryTransactionSubscription: Subscription;
   
   private removeFiltersSubscription: Subscription;
 
@@ -125,16 +130,23 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
       });
 
-     this.removeTagsSubscription = this._transactionsMessageService.getRemoveTagMessage()
-    .subscribe((message: any) => {
-      this.removeTagArrayItem(message.type);
-    }); 
+    this.removeTagsSubscription = this._transactionsMessageService.getRemoveTagMessage()
+      .subscribe((message: any) => {
+        this.removeTagArrayItem(message.type);
+      });
 
     this.editTransactionSubscription = this._transactionsMessageService
       .getEditTransactionMessage()
       .subscribe((trx: TransactionModel) => {
         this.transactionToEdit = trx;
         this.showEdit();
+      });
+
+    this.editDebtSummaryTransactionSubscription = this._transactionsMessageService
+      .getEditDebtSummaryTransactionMessage()
+      .subscribe((message: any) => {
+        this.transactionToEdit = message.trx;
+        this.showEdit(message.debtSummary);
       });
 
     this.showTransactionsSubscription = this._transactionsMessageService
@@ -232,6 +244,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.applyFiltersSubscription.unsubscribe();
     this.removeTagsSubscription.unsubscribe();
     this.editTransactionSubscription.unsubscribe();
+    this.editDebtSummaryTransactionSubscription.unsubscribe();
     this.showTransactionsSubscription.unsubscribe();
   }
 
@@ -871,9 +884,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   /**
    * Show edit for a single transaction.
    */
-  public showEdit() {
+  public showEdit(debtSummary?: any) {
     const emptyValidForm = this._fb.group({});
-    this.showTransaction.emit({
+
+    const emitObj: any = {
       form: emptyValidForm,
       direction: 'next',
       step: 'step_3',
@@ -884,7 +898,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       transactionDetail: {
         transactionModel: this.transactionToEdit
       }
-    });
+    };
+    if (debtSummary) {
+      if (debtSummary.returnToDebtSummary) {
+        emitObj.returnToDebtSummary = debtSummary.returnToDebtSummary;
+        emitObj.returnToDebtSummaryInfo = debtSummary.returnToDebtSummaryInfo;
+      }
+    }
+    this.showTransaction.emit(emitObj);
 
     this.showCategories();
 
