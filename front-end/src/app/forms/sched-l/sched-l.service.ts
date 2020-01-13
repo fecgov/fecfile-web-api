@@ -16,10 +16,13 @@ export class SchedLService {
     private _cookieService: CookieService,
   ) { }
 
-  public getSummary(reportId: string): Observable<any> {
+  public getTransactions(reportId: string, levinType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
-    const url = '/sl/schedL';
+    let url = '/sl/get_sla_summary_table';
+    if (levinType === 'LB_SUM') {
+      url = '/sl/get_slb_summary_table';
+    }
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -37,7 +40,34 @@ export class SchedLService {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('H4 Summary res: ', res);
+            console.log('SL Transactions res: ', res);
+            return res;
+          }
+          return false;
+      })
+      );
+  }
+
+  public getSummary(reportId: string, levinAccountId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/sl/get_sl_summary_table';
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    let params = new HttpParams();
+    params = params.append('report_id', reportId);
+    params = params.append('calendar_year', '2019');
+    return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          params,
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
+            console.log('SL Summary res: ', res);
             return res;
           }
           return false;

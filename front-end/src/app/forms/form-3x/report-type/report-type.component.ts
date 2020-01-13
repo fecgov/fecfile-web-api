@@ -55,6 +55,7 @@ export class ReportTypeComponent implements OnInit {
   public tooltipPosition = 'right';
   public tooltipLeft = 'auto';
   public customFormValidation: any;
+  public reportsLoading: boolean;
 
   private _committeeDetails: any = null;
   private _dueDate: string = null;
@@ -456,7 +457,7 @@ export class ReportTypeComponent implements OnInit {
             }
           });
 
-          if (Array.isArray(currentReport)) {
+          if (Array.isArray(currentReport) && currentReport.length > 0) {
             const selectedReport: any = currentReport[0];
 
             this.frmReportType.controls['reportTypeRadio'].setValue(selectedReport.report_type);

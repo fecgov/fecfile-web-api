@@ -15,7 +15,7 @@ RUN npm install -g @angular/cli
 # add app
 COPY . /usr/src/app
 
-RUN ng build --configuration=local
+RUN node --max-old-space-size=3072 /usr/src/app/node_modules/.bin/ng build --aot --source-map=true --configuration=local
 
 # start app
 #CMD ng serve --host 0.0.0.0

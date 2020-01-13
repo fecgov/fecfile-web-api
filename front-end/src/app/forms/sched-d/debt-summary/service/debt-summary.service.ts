@@ -27,7 +27,7 @@ export class DebtSummaryService {
   /**
    * Get the Debts comprising the Debt Summary.
    */
-  public getDebts(): Observable<any> {
+  public getDebts(transactionType: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/sd/schedD';
@@ -38,6 +38,16 @@ export class DebtSummaryService {
 
     let params = new HttpParams();
     params = params.append('report_id', reportId);
+
+    // Getting the summary debts requires the transactionType for the transaction not the summary.
+    if (transactionType) {
+      if (transactionType === 'DEBT_OWN_BY_SUMMARY') {
+        transactionType = 'DEBT_BY_VENDOR';
+      } else if (transactionType === 'DEBT_OWN_TO_SUMMARY') {
+        transactionType = 'DEBT_TO_VENDOR';
+      }
+      params = params.append('transaction_type_identifier', transactionType);
+    }
 
     return this._http
       .get(`${environment.apiUrl}${url}`, {
@@ -112,6 +122,7 @@ export class DebtSummaryService {
       model.selected = false;
       model.toggleChild = false;
       model.apiCall = row.api_call;
+      model.reportId = row.report_id;
       model.transactionTypeIdentifier = row.transaction_type_identifier;
       model.transactionTypeDescription = row.transaction_type_description;
       model.scheduleType = row.schedule_type;
@@ -145,14 +156,16 @@ export class DebtSummaryService {
       model.apiCall = row.api_call;
       model.transactionTypeIdentifier = row.transaction_type_identifier;
       model.transactionTypeDescription = row.transaction_type_description;
-      model.scheduleType = row.schedule_type;
+      model.reportId = row.report_id;
+      model.scheduleType = row.schedule_type ? row.schedule_type : row.sched_type;
       model.transactionId = row.transaction_id;
       model.backRefTransactionId = row.back_ref_transaction_id;
       model.entityType = row.entity_type;
       this._setDebtName(row);
       model.name = row.name;
-      model.paymentAmt = row.expenditure_amount ? row.expenditure_amount : 0;
-      model.paymentDate = row.expenditure_date;
+      model.paymentAmt = row.expenditure_amount ? row.expenditure_amount : row.contribution_amount;
+      model.paymentDate = row.expenditure_date ? row.expenditure_date : row.contribution_date;
+
       modelArray.push(model);
     }
     return modelArray;

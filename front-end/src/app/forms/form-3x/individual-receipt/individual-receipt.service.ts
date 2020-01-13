@@ -43,7 +43,24 @@ export class IndividualReceiptService {
     params = params.append('transaction_type', transactionType);
 
     // H4/H6 require report ID for determining H1/H2 exists
-    if (transactionType === 'ALLOC_EXP_DEBT' || transactionType === 'ALLOC_FEA_DISB_DEBT') {
+    if (transactionType === 'ALLOC_EXP_DEBT' || transactionType === 'ALLOC_FEA_DISB_DEBT'
+      ||
+      transactionType === 'ALLOC_EXP' ||
+      transactionType === 'ALLOC_EXP_CC_PAY' ||
+      transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+      transactionType === 'ALLOC_EXP_STAF_REIM' ||
+      transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+      transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+      transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+      transactionType === 'ALLOC_EXP_VOID'
+      ||
+      transactionType === 'ALLOC_FEA_DISB' ||
+      transactionType === 'ALLOC_FEA_CC_PAY' ||
+      transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+      transactionType === 'ALLOC_FEA_STAF_REIM' ||
+      transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+      transactionType === 'ALLOC_FEA_VOID'
+    ) {
       const reportId = this.getReportIdFromStorage(formType);
       if (reportId) {
         params = params.append('reportId', reportId);
@@ -78,7 +95,7 @@ export class IndividualReceiptService {
    * @param      {string}           formType  The form type
    * @param      {ScheduleActions}  scheduleAction  The type of action to save (add, edit)
    */
-  public saveSchedule(formType: string, scheduleAction: ScheduleActions): Observable<any> {
+  public saveSchedule(formType: string, scheduleAction: ScheduleActions, reportId: string = null): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let url: string = '/sa/schedA';
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
@@ -104,10 +121,12 @@ export class IndividualReceiptService {
      */
     formData.append('cmte_id', committeeDetails.committeeid);
     // With Edit Report Functionality
-    if (reportType.hasOwnProperty('reportId')) {
+    if (reportType && reportType.hasOwnProperty('reportId')) {
       formData.append('report_id', reportType.reportId);
-    } else if (reportType.hasOwnProperty('reportid')) {
+    } else if (reportType && reportType.hasOwnProperty('reportid')) {
       formData.append('report_id', reportType.reportid);
+    } else if(reportId && reportId !== "0" && reportId !== "undefined"){
+      formData.append('report_id',reportId);
     }
 
     console.log();
@@ -274,7 +293,9 @@ export class IndividualReceiptService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     let params = new HttpParams();
-    params = params.append('report_id', reportId);
+    if(reportId && reportId !== 'undefined' && reportId !== 'null' && reportId !== '0' && reportId !== ''){
+      params = params.append('report_id', reportId);
+    }
     if (transactionId) {
       params = params.append('transaction_id', transactionId);
     }
@@ -405,7 +426,8 @@ export class IndividualReceiptService {
     });
   }
 
-  public getFedNonFedPercentage(amount: string, activityEvent: string, activityEventName: string): Observable<any> {
+  public getFedNonFedPercentage(amount: string, activityEvent: string, activityEventName: string,
+    transactionType: string, reportId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sh1/get_fed_nonfed_share';
     let httpOptions = new HttpHeaders();
@@ -430,6 +452,14 @@ export class IndividualReceiptService {
     }
     if (activityEventName) {
       params = params.append('activity_event_identifier', activityEventName);
+    }
+
+    if (transactionType) {
+      params = params.append('transaction_type_identifier', transactionType);
+    }
+
+    if (reportId) {
+      params = params.append('report_id', reportId);
     }
 
     return this._http.get(`${environment.apiUrl}${url}`, {

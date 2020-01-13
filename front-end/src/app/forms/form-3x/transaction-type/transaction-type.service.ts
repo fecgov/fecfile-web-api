@@ -48,4 +48,27 @@ export class TransactionTypeService {
       headers: httpOptions
     });
   }
+
+  /**
+   * Get all transaction types 
+   * @param formType 
+   */
+  public getTransactionTypes(formType: string): Observable<any> {
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let url = '';
+    let params = new HttpParams();
+
+    url = '/core/get_transaction_types';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('form_type', 'F3X');
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      params,
+      headers: httpOptions
+    });
+  }
 }

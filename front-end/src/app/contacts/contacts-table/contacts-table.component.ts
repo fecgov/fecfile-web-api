@@ -114,8 +114,8 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   private keywordFilterSearchSubscription: Subscription;
 
   private columnOptionCount = 0;
-  private maxColumnOption = 5;
-  private allContactsSelected: boolean;
+  public maxColumnOption = 5;
+  public allContactsSelected: boolean;
 
   constructor(
     private _contactsService: ContactsService,

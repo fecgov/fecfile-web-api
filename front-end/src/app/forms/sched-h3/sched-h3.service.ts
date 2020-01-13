@@ -7,6 +7,11 @@ import { environment } from '../../../environments/environment';
 import { map } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 
+export enum SchedHActions {
+  add = 'add',
+  edit = 'edit'
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,7 +22,7 @@ export class SchedH3Service {
     private _cookieService: CookieService,
   ) { }
 
-  public getActivityOrEventIdentifiers(activity_event_type: string): Observable<any> {
+  public getActivityOrEventIdentifiers(activity_event_type: string, reportId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     const url = '/sh2/get_h2_type_events';
@@ -27,6 +32,7 @@ export class SchedH3Service {
 
     let params = new HttpParams();
     params = params.append('activity_event_type', activity_event_type);
+    params = params.append('report_id', reportId);
     
     return this._http
       .get(
@@ -135,7 +141,7 @@ export class SchedH3Service {
       );
   }
 
-  public saveH3Ratio(ratio: any): Observable<any> {
+  public saveH3Ratio(ratio: any,  scheduleAction: SchedHActions): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     const url = '/sh3/schedH3';
@@ -152,69 +158,150 @@ export class SchedH3Service {
       }
     }
 
+    if (scheduleAction === SchedHActions.add) {
+      return this._http
+        .post(
+          `${environment.apiUrl}${url}`, ratio,
+          {
+            headers: httpOptions
+          }
+        )
+        .pipe(map(res => {
+            if (res) {
+              console.log('Save H3Ratio res: ', res);
+              return res;
+            }
+            return false;
+        })
+      );
+    }else if(scheduleAction === SchedHActions.edit) {
+      return this._http
+        .put(
+          `${environment.apiUrl}${url}`, ratio,
+          {
+            headers: httpOptions
+          }
+        )
+        .pipe(map(res => {
+            if (res) {
+              console.log('Edit H3Ratio res: ', res);
+              return res;
+            }
+            return false;
+        })
+      );
+    }
+  }
+
+  public saveAndGetSummary(ratio: any, reportId: string, scheduleAction: SchedHActions): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/sh3/schedH3';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const formData: FormData = new FormData();
+    for (const [key, value] of Object.entries(ratio)) {
+      if (value !== null) {
+        if (typeof value === 'string') {
+          formData.append(key, value);
+        }
+      }
+    }
+
+    if (scheduleAction === SchedHActions.add) {
+      return this._http
+        .post(
+          `${environment.apiUrl}${url}`, ratio,
+          {
+            headers: httpOptions
+          }
+        )
+        .pipe(map(res => {
+            if (res) {
+              console.log('Save H3Ratio res: ', res);
+
+              //get summary
+              //this.getSummary(reportId);
+
+              let sub: Subscription;
+              let sum: any;
+              sub = this.getSummary(reportId).subscribe(res =>
+                {
+                  if(res) {
+                    sum =  res;
+                  }
+                });
+
+              return sum;
+            }
+            return false;
+        })
+        );
+      }else if(scheduleAction === SchedHActions.edit) {
+        return this._http
+        .put(
+          `${environment.apiUrl}${url}`, ratio,
+          {
+            headers: httpOptions
+          }
+        )
+        .pipe(map(res => {
+            if (res) {
+              console.log('Edit H3Ratio res: ', res);
+
+              //get summary
+              //this.getSummary(reportId);
+
+              let sub: Subscription;
+              let sum: any;
+              sub = this.getSummary(reportId).subscribe(res =>
+                {
+                  if(res) {
+                    sum =  res;
+                  }
+                });
+
+              return sum;
+            }
+            return false;
+        })
+        );
+      }
+
+
+  }
+
+  public getH3AggregateAmount(activity_event_name: string, reportId: string, parentId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/sh3/get_h3_aggregate_amount';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let params = new HttpParams();
+    params = params.append('activity_event_name', activity_event_name);
+    params = params.append('report_id', reportId);
+    params = params.append('parent_id', parentId);
+
     return this._http
-      .post(
-        `${environment.apiUrl}${url}`, ratio,    
+      .get(
+        `${environment.apiUrl}${url}`,
         {
+          params,
           headers: httpOptions
         }
       )
       .pipe(map(res => {
           if (res) {
-            console.log('Save H3Ratio res: ', res);
+            console.log('H3 Aggregate Amount res: ', res);
             return res;
           }
           return false;
       })
       );
-  }
-
-  public saveAndGetSummary(ratio: any, reportId: string): Observable<any> {
-    const token: string = JSON.parse(this._cookieService.get('user'));
-    let httpOptions =  new HttpHeaders();
-    const url = '/sh3/schedH3';
-
-    httpOptions = httpOptions.append('Content-Type', 'application/json');
-    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-
-    const formData: FormData = new FormData();
-    for (const [key, value] of Object.entries(ratio)) {
-      if (value !== null) {
-        if (typeof value === 'string') {
-          formData.append(key, value);
-        }
-      }
-    }
-
-    return this._http
-      .post(
-        `${environment.apiUrl}${url}`, ratio,
-        {
-          headers: httpOptions
-        }
-      )
-      .pipe(map(res => {
-          if (res) {
-            console.log('Save H3Ratio res: ', res);
-
-            //get summary
-            //this.getSummary(reportId);
-
-            let sub: Subscription;
-            let sum: any;
-            sub = this.getSummary(reportId).subscribe(res =>
-              {
-                if(res) {
-                  sum =  res;
-                }
-              });
-
-            return sum;
-          }
-          return false;
-      })
-      );
-
 
   }
     

@@ -182,7 +182,8 @@
                                 : ''
                             " id="typeahead-template-org" [ngbTypeahead]="searchOrg" [focusFirst]=false
                           [resultTemplate]="rtOrg" [inputFormatter]="formatterOrgName"
-                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" 
+                          [attr.readonly]="isFieldReadOnly(col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_id') ||
                                   isFieldName(col?.name, 'beneficiary_cand_id')" class="form-control"
@@ -398,6 +399,7 @@
                         bindValue="levin_account_id" 
                         bindLabel="levin_account_name" 
                         [selectOnTab]="true"
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -446,16 +448,27 @@
             <i class="plus-icon-circle" aria-hidden="true"></i>
             Add {{ subTransactionInfo.subTransactionTypeDescription }}
           </button>
+          <button *ngIf="subTransactionInfo?.isParent && multipleSubTransactionInfo
+              && multipleSubTransactionInfo?.length > 0 && transactionType === 'DEBT_BY_VENDOR'" 
+            class="btn btn-primary btn-left"
+            (click)="saveForAddMemoSub(multipleSubTransactionInfo[0])">
+            <i class="plus-icon-circle" aria-hidden="true"></i>
+            Make a Payment on Debt
+          </button>          
           <div [ngStyle]="{'min-height': memoDropdownSize}" style="height: auto">
-            <div *ngIf="subTransactionInfo?.isParent && multipleSubTransactionInfo" ngbDropdown class="d-inline-block"
+            <div *ngIf="subTransactionInfo?.isParent && multipleSubTransactionInfo
+                && transactionType !== 'DEBT_BY_VENDOR'" 
+              ngbDropdown class="d-inline-block"
               placement="bottom-left" (openChange)="multipleMemoDropdownChanged($event)">
               <button class="btn btn-primary dropdown-toggle" id="jfMemoDropdown" ngbDropdownToggle>
                 <i class="plus-icon-circle" aria-hidden="true"></i>
-                <ng-container *ngIf="transactionType === 'DEBT_TO_VENDOR'; else jfTransferMemo">
+                <ng-container 
+                  *ngIf="
+                    transactionType === 'DEBT_TO_VENDOR';
+                    else jfTransferMemo">
                   Make a Payment on Debt
                 </ng-container>
                 <ng-template #jfTransferMemo>Add JF Transfer Memo</ng-template>
-                
                 <i class="dropdown-icon" aria-hidden="true"></i>
               </button>
               <div ngbDropdownMenu aria-labelledby="jfMemoDropdown" id="jfMemoDropdown-menu">
@@ -524,7 +537,10 @@
 
               <ng-template #allOtherTrx>
                 <div *ngIf="scheduleAction === editScheduleAction; else createActions">
-                  <button class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                  <button *ngIf="!isShedH4OrH6TransactionType(transactionType) || cloned" class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                    Cancel
+                  </button>
+                  <button *ngIf="isShedH4OrH6TransactionType(transactionType) && !cloned" class="btn btn-previous btn-left" type="button" (click)="goH4OrH6Summary(transactionType)">
                     Cancel
                   </button>
                   <button class="btn btn-secondary btn-right" (click)="updateOnly()">
@@ -561,7 +577,7 @@
                       (click)="previousStep()">
                       Previous
                     </button>
-                    <button class="btn btn-primary btn-right" (click)="goH4OrH6Summary(transactionType)">
+                    <button class="btn btn-primary btn-right" (click)="saveForReturnToSummary()">
                       Summary
                     </button>
                     <button class="btn btn-previous btn-right" (click)="saveOnly()">

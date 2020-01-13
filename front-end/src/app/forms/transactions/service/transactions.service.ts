@@ -44,10 +44,69 @@ export class TransactionsService {
   private _datePipe: DatePipe;
   private _propertyNameConverterMap: Map<string, string> = new Map([['zip', 'zip_code']]);
 
+  private _filterToColMapping =
+    [
+      {
+        "filterName": "filterAmountMin",
+        "relatedCol": "amount"
+      },
+      {
+        "filterName": "filterAmountMax",
+        "relatedCol": "amount"
+      },
+      {
+        "filterName": "filterLoanAmountMin",
+        "relatedCol": "loanAmount"
+      },
+      {
+        "filterName": "filterLoanAmountMax",
+        "relatedCol": "loanAmount"
+      },
+      {
+        "filterName": "filterAggregateAmountMin",
+        "relatedCol": "aggregate"
+      },
+      {
+        "filterName": "filterAggregateAmountMax",
+        "relatedCol": "aggregate"
+      },
+      {
+        "filterName": "filterLoanClosingBalanceMin",
+        "relatedCol": "loanClosingBalance"
+      },
+      {
+        "filterName": "filterLoanClosingBalanceMax",
+        "relatedCol": "loanClosingBalance"
+      },
+      {
+        "filterName": "filterDateFrom",
+        "relatedCol": "date"
+      },
+      {
+        "filterName": "filterDateTo",
+        "relatedCol": "date"
+      }, {
+        "filterName": "filterDeletedDateFrom",
+        "relatedCol": "deletedDate"
+      },
+      {
+        "filterName": "filterDeletedDateTo",
+        "relatedCol": "deletedDate"
+      },
+      {
+        "filterName": "filterMemoCode",
+        "relatedCol": "deletedDate"
+      },
+      {
+        "filterName": "filterElectionCode",
+        "relatedCol": "memoCode"
+      }
+    ]
+
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService,
-    private _receiptService: IndividualReceiptService,
+    private _receiptService: IndividualReceiptService, 
     private _messageService: MessageService
   ) {
     // mock out the recycle trx
@@ -82,7 +141,7 @@ export class TransactionsService {
     itemsPerPage: number,
     sortColumnName: string,
     descending: boolean,
-    filters: TransactionFilterModel,
+    filters: any,
     categoryType: string,
     trashed_flag: boolean,
     allTransactionsFlag: boolean
@@ -97,7 +156,7 @@ export class TransactionsService {
     // const serverSortColumnName = this.mapToSingleServerName(sortColumnName);
 
     const request: any = {};
-    if (!allTransactionsFlag) {
+    if (!allTransactionsFlag && reportId && reportId !== 'undefined') {
       request.reportid = reportId;
     }
 
@@ -265,6 +324,28 @@ export class TransactionsService {
     return modelArray;
   }
 
+
+  public removeFilters(appliedFilters:any, currentSortableColumns: any, transactionSpecificColumns:any): any[]{
+    let filteredList = [];
+    for (let filter in appliedFilters){
+      //get associatedColumn for any non-null filters
+      if(typeof filter === "string" && filter.startsWith('filter')){
+        let colObj = this._filterToColMapping.find(element => element.filterName === filter);
+        let relatedCol = '';
+        if(colObj){
+          colObj = colObj[0];
+          relatedCol = colObj.relatedCol;
+          let matchingResults = transactionSpecificColumns.find(element => element.colName === relatedCol);
+          if(matchingResults && matchingResults.length > 0){
+            filteredList.push(filter);
+          }
+        }
+      }
+    }
+    return filteredList;
+  }
+
+
   /**
    * Map Sched server fields to a TransactionModel.
    */
@@ -376,35 +457,36 @@ export class TransactionsService {
       case 'itemized':
         name = 'itemized';
         break;
-      case 'election_code':
-        name = 'electionCode';
+      case 'electionCode':
+        name = 'election_code';
         break;
-      case 'loan_amount':
-        name = 'loanAmount';
+      case 'loanAmount':
+        name = 'loan_amount';
         break;
-      case 'loan_balance':
-        name = 'loanBalance';
+      case 'loanBalance':
+        name = 'loan_balance';
         break;
-      case 'loan_beginning_balance':
-        name = 'loanBeginningBalance';
+      case 'loanBeginningBalance':
+      case 'debtBeginningBalance':
+        name = 'loan_beginning_balance';
         break;
-      case 'loan_closing_balance':
-        name = 'loanClosingBalance';
+      case 'loanClosingBalance':
+        name = 'loan_closing_balance';
         break;
-      case 'loan_due_date':
-        name = 'loanDueDate';
+      case 'loanDueDate':
+        name = 'loan_due_date';
         break;
-      case 'loan_incurred_amt':
-        name = 'loanIncurredAmt';
+      case 'loanIncurredAmt':
+        name = 'loan_incurred_amt';
         break;
-      case 'loan_incurred_date':
-        name = 'loanIncurredDate';
+      case 'loanIncurredDate':
+        name = 'loan_incurred_date';
         break;
-      case 'loan_payment_amt':
-        name = 'loanPaymentAmt';
+      case 'loanPaymentAmt':
+        name = 'loan_payment_amt';
         break;
-      case 'loan_payment_to_date':
-        name = 'loanPaymentToDate';
+      case 'loanPaymentToDate':
+        name = 'loan_payment_to_date';
         break;
       default:
     }
@@ -789,7 +871,7 @@ export class TransactionsService {
     for (const trx of transactions) {
       actions.push({
         action: action,
-        report_id: reportId,
+        report_id: trx.reportId && trx.reportId !== 'undefined'? trx.reportId :reportId, 
         transaction_id: trx.transactionId
       });
     }
@@ -829,7 +911,7 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     return this._http
-      .post(`${environment.apiUrl}${url}`, {transaction_id: transactionId}, {
+      .post(`${environment.apiUrl}${url}`, { transaction_id: transactionId }, {
         headers: httpOptions
       })
       .pipe(
@@ -843,10 +925,12 @@ export class TransactionsService {
   }
 }
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
+  model.reportId = row.report_id;
   model.reportType = row.report_type;
   model.type = row.transaction_type_desc;
   model.scheduleType = row.schedule;
   model.entityId = row.entity_id;
+  model.entityType = row.entity_type;
   model.transactionTypeIdentifier = row.transaction_type_identifier;
   model.apiCall = row.api_call;
   model.transactionId = row.transaction_id;
@@ -865,9 +949,9 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.contributorOccupation = row.occupation;
   model.memoCode = row.memo_code;
   model.memoText = row.memo_text;
-  model.deletedDate = row.deleted_date ? row.deleted_date : null;
+  model.deletedDate = row.deleteddate ? row.deleteddate : null;
   model.itemized = row.itemized;
-  model.reportStatus = row.reportStatus;
+  model.reportstatus = row.reportstatus;
   model.electionCode = row.election_code;
   model.electionYear = row.election_year;
   model.loanAmount = row.loan_amount;
@@ -879,4 +963,6 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.loanIncurredDate = row.loan_incurred_date;
   model.loanPaymentAmt = row.loan_payment_amt;
   model.loanPaymentToDate = row.loan_payment_to_date;
+  model.iseditable = row.iseditable;
+  
 }

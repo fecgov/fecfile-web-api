@@ -21,7 +21,7 @@ export class SubmitComponent implements OnInit {
 
   private _reportId: number;
   private _subscription: Subscription;
-  private _checkStatus: boolean = true;
+  public checkStatus: boolean = true;
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
@@ -90,7 +90,7 @@ export class SubmitComponent implements OnInit {
   }
 
   public goToDashboard(): void {
-    if (!this._checkStatus) {
+    if (!this.checkStatus) {
       this._router.navigateByUrl('dashboard');
     } else {
       this._formsComponent.canDeactivate();
@@ -103,9 +103,9 @@ export class SubmitComponent implements OnInit {
         res => {
           if (res && res.fec_status === 'Accepted') {
             this.FEC_Id = res.fec_id;
-            this._checkStatus = false;
+            this.checkStatus = false;
           } else {
-            this._checkStatus = true;
+            this.checkStatus = true;
           }
         },
         error => {

@@ -12,28 +12,12 @@ import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
 import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
+import { FilterTypes } from './enums/filterTypes.enum';
 
 export enum ActiveView {
   transactions = 'transactions',
   recycleBin = 'recycleBin',
   edit = 'edit'
-}
-
-export enum FilterTypes {
-  keyword = 'keyword',
-  category = 'category',
-  amount = 'amount',
-  aggregateAmount = 'aggregateAmount',
-  date = 'date',
-  deletedDate = 'deletedDate',
-  state = 'state',
-  memoCode = 'memoCode',
-  itemizations = 'itemizations',
-  electionCodes = 'electionCodes',
-  electionYear = 'electionYear',
-  loanAmount = 'loanAmount',
-  loanClosingBalance = 'loanClosingBalance',
-  schedule = 'schedule'
 }
 
 /**
@@ -89,6 +73,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public transactionCategory: string = '';
   public transactionTypeText = '';
 
+  public allTransactions: boolean = false;
+
   private _step: string = '';
   private _formType: string = '';
 
@@ -102,6 +88,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    * Subscription for showing the TransactionsEditComponent.
    */
   private editTransactionSubscription: Subscription;
+  
+  private removeFiltersSubscription: Subscription;
 
   /**
    * Subscription for showing all Transactions.
@@ -112,6 +100,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   private filters: TransactionFilterModel = new TransactionFilterModel();
   private readonly filtersLSK = 'transactions.filters';
+  removeTagsSubscription: any;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -136,6 +125,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
       });
 
+     this.removeTagsSubscription = this._transactionsMessageService.getRemoveTagMessage()
+    .subscribe((message: any) => {
+      this.removeTagArrayItem(message.type);
+    }); 
+
     this.editTransactionSubscription = this._transactionsMessageService
       .getEditTransactionMessage()
       .subscribe((trx: TransactionModel) => {
@@ -152,6 +146,12 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       _activatedRoute.queryParams.subscribe(p => {
         this.transactionCategory = p.transactionCategory;
       });
+    }
+
+  private removeFilterAndTag(message: any) {
+    if (message.filterName === 'deletedDate') {
+      this.removeDeletedDateFilter();
+    }
   }
 
   /**
@@ -163,6 +163,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
     const reportIdRoute = this._activatedRoute.snapshot.paramMap.get('report_id');
     this._step = this._activatedRoute.snapshot.paramMap.get('step');
+    this.allTransactions = this._activatedRoute.snapshot.queryParams.allTransactions;
 
     console.log('TransactionsComponent this._step', this._step);
     this.routeData = { accessedByRoute: true, formType: this.formType, reportId: reportIdRoute };
@@ -229,6 +230,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     localStorage.removeItem('Transaction_Table_Screen');
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
     this.applyFiltersSubscription.unsubscribe();
+    this.removeTagsSubscription.unsubscribe();
     this.editTransactionSubscription.unsubscribe();
     this.showTransactionsSubscription.unsubscribe();
   }
@@ -293,8 +295,28 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Date
+    if (filters.filterDeletedDateFrom && filters.filterDeletedDateTo) {
+      const dateGroup = [];
+      dateGroup.push({
+        filterDeletedDateFrom: filters.filterDeletedDateFrom,
+        filterDeletedDateTo: filters.filterDeletedDateTo
+      });
+      // is tag showing? Then modify it is the curr position
+      let deletedDateTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.deletedDate) {
+          deletedDateTag = true;
+          tag.group = dateGroup;
+        }
+      }
+      if (!deletedDateTag) {
+        this.tagArray.push({ type: FilterTypes.deletedDate, prefix: 'Deleted Date', group: dateGroup });
+      }
+    }
+
     // Amount
-    if (filters.filterAmountMin && filters.filterAmountMax) {
+    if (this._isNotNullorUndefined(filters.filterAmountMin) && this._isNotNullorUndefined(filters.filterAmountMax)) {
       const amountGroup = [];
       amountGroup.push({
         filterAmountMin: filters.filterAmountMin,
@@ -313,7 +335,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     }
 
     // Aggregate Amount
-    if (filters.filterAggregateAmountMin && filters.filterAggregateAmountMax) {
+    if (this._isNotNullorUndefined(filters.filterAggregateAmountMin) && this._isNotNullorUndefined(filters.filterAggregateAmountMax)) {
       const amountGroup = [];
       amountGroup.push({
         filterAggregateAmountMin: filters.filterAggregateAmountMin,
@@ -331,8 +353,27 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Loan Amount
+    if (this._isNotNullorUndefined(filters.filterLoanAmountMin) && this._isNotNullorUndefined(filters.filterLoanAmountMax)) {
+      const amountGroup = [];
+      amountGroup.push({
+        filterLoanAmountMin: filters.filterLoanAmountMin,
+        filterLoanAmountMax: filters.filterLoanAmountMax
+      });
+      let amtTag = false;
+      for (const tag of this.tagArray) {
+        if (tag.type === FilterTypes.loanAmount) {
+          amtTag = true;
+          tag.group = amountGroup;
+        }
+      }
+      if (!amtTag) {
+        this.tagArray.push({ type: FilterTypes.loanAmount, prefix: 'Loan Amount', group: amountGroup });
+      }
+    }
+
     // Closing loan balance
-    if (filters.filterLoanClosingBalanceMin && filters.filterLoanClosingBalanceMax) {
+    if (this._isNotNullorUndefined(filters.filterLoanClosingBalanceMin) && this._isNotNullorUndefined(filters.filterLoanClosingBalanceMax)) {
       const amountGroup = [];
       amountGroup.push({
         filterLoanClosingBalanceMin: filters.filterLoanClosingBalanceMin,
@@ -346,7 +387,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         }
       }
       if (!amtTag) {
-        this.tagArray.push({ type: FilterTypes.amount, prefix: 'Balance at close', group: amountGroup });
+        this.tagArray.push({ type: FilterTypes.loanClosingBalance, prefix: 'Balance at close', group: amountGroup });
       }
     }
 
@@ -579,6 +620,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Remove the Date filter tag and inform the filter component to clear it.
+   */
+  public removeDeletedDateFilter() {
+    this.filters.filterDeletedDateFrom = null;
+    this.filters.filterDeletedDateTo = null;
+    this.removeFilter('deletedDate', null);
+  }
+
+  /**
    * Remove the Amount filter tag and inform the filter component to clear it.
    */
   public removeAmountFilter() {
@@ -603,6 +653,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.filters.filterLoanClosingBalanceMin = null;
     this.filters.filterLoanClosingBalanceMax = null;
     this.removeFilter(FilterTypes.loanClosingBalance, null);
+  }
+
+  /**
+   * Remove the Loan Amount filter tag and inform the filter component to clear it.
+   */
+  public removeLoanAmountFilter() {
+    this.filters.filterLoanAmountMin = null;
+    this.filters.filterLoanAmountMax = null;
+    this.removeFilter(FilterTypes.loanAmount, null);
   }
 
   public removeMemoFilter() {
@@ -676,12 +735,20 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.removeDateFilter();
         this.removeTagArrayItem(type);
         break;
+      case FilterTypes.deletedDate:
+          this.removeDeletedDateFilter();
+          this.removeTagArrayItem(type);
+          break;
       case FilterTypes.amount:
         this.removeAmountFilter();
         this.removeTagArrayItem(type);
         break;
       case FilterTypes.aggregateAmount:
         this.removeAggregateAmountFilter();
+        this.removeTagArrayItem(type);
+        break;
+      case FilterTypes.loanAmount:
+        this.removeLoanAmountFilter();
         this.removeTagArrayItem(type);
         break;
       case FilterTypes.loanClosingBalance:
@@ -914,5 +981,18 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     console.log('TransactionsTableComponent printPreview...!');
 
     this._reportTypeService.printPreview('transaction_table_screen', '3X');
+  }
+
+  /**
+   * Returns true if a valid number, and if not a number returns true if not null or undefined. 
+   * @param input 
+   */
+  private _isNotNullorUndefined(input: any){
+    if(typeof input === "number"){
+      return true;
+    }
+    else{
+      return input !== null && input !== undefined;
+    }
   }
 }

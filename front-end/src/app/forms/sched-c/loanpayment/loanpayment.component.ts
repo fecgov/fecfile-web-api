@@ -36,6 +36,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
   entityTypes: any = [{ code: 'IND', description: 'Individual' }, { code: 'ORG', description: 'Organization' }];
   outstandingLoanBalance: number;
   public _contributionAmountMax = 12;
+  public filterexpenditure_date;
 
   private _loanTransactionId;
 
@@ -307,11 +308,14 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
       let httpOptions = new HttpHeaders();
       httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-      if (reportType.hasOwnProperty('reportId')) {
+      if (reportType && reportType.hasOwnProperty('reportId')) {
         formData.append('report_id', reportType.reportId);
-      } else if (reportType.hasOwnProperty('reportid')) {
+      } else if (reportType && reportType.hasOwnProperty('reportid')) {
         formData.append('report_id', reportType.reportid);
-      }
+      } else if(this._activatedRoute && this._activatedRoute.snapshot && 
+        this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
+          formData.append('report_id', this._activatedRoute.snapshot.queryParams.reportId);
+        }
 
       formData.append('cmte_id', committeeDetails.committeeid);
       formData.append('transaction_type_identifier', 'LOAN_REPAY_MADE');
@@ -342,7 +346,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
           .post(`${environment.apiUrl}${url}`, formData, {
             headers: httpOptions
           })
-          .subscribe(res => {
+          .subscribe((res:any) => {
             if (res) {
               console.log('success!!!')
 
@@ -357,7 +361,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
 
 
               //navigate to Loan Summary here
-              this._goToLoanSummary();
+              this._goToLoanSummary(res.report_id);
               // return res;
             }
             console.log('success but no response.. failure?')
@@ -370,7 +374,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
           .put(`${environment.apiUrl}${url}`, formData, {
             headers: httpOptions
           })
-          .subscribe(res => {
+          .subscribe((res : any) => {
             if (res) {
               //update sidebar
               this._receiptService.getSchedule(formType, res).subscribe(resp => {
@@ -382,7 +386,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
               });
 
               //navigate to Loan Summary here
-              this._goToLoanSummary();
+              this._goToLoanSummary(res.report_id);
               // return res;
             }
             console.log('success but no response.. failure?')
@@ -430,14 +434,18 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
     });
   }
 
-  private _goToLoanSummary() {
-    const loanRepaymentEmitObj: any = {
+  private _goToLoanSummary(reportId:string = null) {
+    let loanRepaymentEmitObj: any = {
       form: {},
       direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
       scheduleType: 'sched_c_ls',
     };
+
+    if(reportId && reportId !== 'undefined' && reportId !== '0'){
+      loanRepaymentEmitObj.reportId = reportId;
+    }
     this.status.emit(loanRepaymentEmitObj);
   }
 

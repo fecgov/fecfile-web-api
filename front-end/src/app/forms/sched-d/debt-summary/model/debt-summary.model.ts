@@ -5,6 +5,7 @@ export class DebtSummaryModel {
   backRefTransactionId: string;
   transactionTypeIdentifier: string;
   transactionTypeDescription: string;
+  reportId: string;
   selected: boolean;
   toggleChild: boolean;
   child: DebtSummaryModel[] = [];
@@ -24,6 +25,7 @@ export class DebtSummaryModel {
     this.transactionTypeIdentifier = debtSummary.transactionTypeIdentifier ? debtSummary.transactionTypeIdentifier : '';
     this.transactionTypeDescription = debtSummary.transactionTypeDescription ? debtSummary.transactionTypeDescription : '';
     this.name = debtSummary.name ? debtSummary.name : '';
+    this.reportId = debtSummary.reportId ? debtSummary.reportId : '';
     this.selected = debtSummary.selected;
     this.toggleChild = debtSummary.toggleChild;
     this.child = debtSummary.child;

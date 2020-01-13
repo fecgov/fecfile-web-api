@@ -5,7 +5,7 @@ export interface IAccount{
     street2: string;
     city: string;
     state: string;
-    zipcod: string;
+    zipcode: string;
     treasurerprefix: string;
     treasurerfirstname: string;
     treasurermiddlename: string;
@@ -18,6 +18,13 @@ export interface IAccount{
     treasurercity: string;
     treasurerstate: string;
     treasurerzipcode: string;
+    bankName: string;
+    bankAddress1: string;
+    bankAddress2: string;
+    bankCity: string;
+    bankState: string;
+    bankZip: string;
+    candidatePrefix: string;
 }
  export class Account implements IAccount{
     public committeeid: string;
@@ -26,7 +33,7 @@ export interface IAccount{
     public street2: string;
     public city: string;
     public state: string;
-    public zipcod: string;
+    public zipcode: string;
     public treasurerprefix: string;
     public treasurerfirstname: string;
     public treasurermiddlename: string;
@@ -38,5 +45,12 @@ export interface IAccount{
     public treasurerstreet2: string;
     public treasurercity: string;
     public treasurerstate: string;
-    public treasurerzipcode: string;     
+    public treasurerzipcode: string;  
+    public bankName: string;
+    public bankAddress1: string;
+    public bankAddress2: string;
+    public bankCity: string;
+    public bankState: string;
+    public bankZip: string;
+    public candidatePrefix: string;   
  }

@@ -20,7 +20,8 @@ import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsService } from '../service/transactions.service';
 import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
 import { Subscription } from 'rxjs/Subscription';
-import { FilterTypes, ActiveView } from '../transactions.component';
+import { ActiveView } from '../transactions.component';
+import { FilterTypes } from "../enums/filterTypes.enum";
 import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
 import { ActivatedRoute } from '@angular/router';
 
@@ -115,6 +116,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public isHideElectionYear: boolean;
   public isHideloanClosingBalanceFilter: boolean;
   public isHideScheduleFilter: boolean;
+  public isHideDebtBeginningBalanceFilter: boolean;
   public transactionCategories: any = [];
   public states: any = [];
   public itemizations: any = [];
@@ -123,6 +125,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     { option: 'general', selected: false },
     { option: 'other', selected: false }
   ];
+  
   public filterCategoriesText = '';
   public filterAmountMin: number;
   public filterAmountMax: number;
@@ -132,6 +135,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public filterAggregateAmountMax: number;
   public filterLoanClosingBalanceMin: number;
   public filterLoanClosingBalanceMax: number;
+  public filterDebtBeginningBalanceMin: number;
+  public filterDebtBeginningBalanceMax: number;
   public filterDateFrom: Date = null;
   public filterDateTo: Date = null;
   public filterDeletedDateFrom: Date = null;
@@ -141,14 +146,17 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public filterElectionYearFrom: string;
   public filterElectionYearTo: string;
   public filterSchedule: string;
+
   public dateFilterValidation: ValidationErrorModel;
   public deletedDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
   public aggregateAmountFilterValidation: ValidationErrorModel;
   public yearFilterValidation: ValidationErrorModel;
   public loanClosingBalanceFilterValidation: ValidationErrorModel;
+  public debtBeginningBalanceFilterValidation: ValidationErrorModel;
   public transactionCategory: string = '';
   public editMode: boolean = false;
+
 
   /**
    * Subscription for removing selected filters.
@@ -159,6 +167,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * Subscription for switch filters for ActiveView of the traansaction table.
    */
   private switchFilterViewSubscription: Subscription;
+  
+  private clearAllFiltersSubscription: Subscription;
 
   // TODO put in a transactions constants ts file for multi component use.
   private readonly filtersLSK = 'transactions.filters';
@@ -200,6 +210,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         }
       });
 
+    this.clearAllFiltersSubscription = this._transactionsMessageService
+    .getClearAllFiltersMessage()
+    .subscribe(message => {
+      this.clearAndApplyFilters();
+    })
+
     _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       if (p.edit === 'true' || p.edit === true) {
@@ -227,6 +243,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.filterLoanAmountMax = null;
     this.filterAggregateAmountMin = null;
     this.filterAggregateAmountMax = null;
+    this.filterLoanClosingBalanceMin = null;
+    this.filterLoanClosingBalanceMax = null;
+    this.filterDebtBeginningBalanceMin = null;
+    this.filterDebtBeginningBalanceMax = null;
 
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
@@ -234,6 +254,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.isHideAmountFilter = true;
     this.isHideAggregateAmountFilter = true;
     this.isHideloanClosingBalanceFilter = true;
+    this.isHideDebtBeginningBalanceFilter = true;
     this.isHideStateFilter = true;
     this.isHideMemoFilter = true;
     this.isHideItemizationFilter = true;
@@ -251,12 +272,15 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     }
   }
 
+ 
+
   /**
    * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
     this.removeFilterSubscription.unsubscribe();
     this.switchFilterViewSubscription.unsubscribe();
+    this.clearAllFiltersSubscription.unsubscribe();
   }
 
   /**
@@ -292,6 +316,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   public toggleBalanceAtCloseFilterItem() {
     this.isHideloanClosingBalanceFilter = !this.isHideloanClosingBalanceFilter;
+  }
+
+  /**
+   * Toggle visibility of the Debt Beginning Balance filter
+   */
+  public toggleDebtBeginningBalanceFilterItem() {
+    this.isHideDebtBeginningBalanceFilter = !this.isHideDebtBeginningBalanceFilter;
   }
 
   /**
@@ -466,7 +497,9 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     filters.filterLoanAmountMin = this.filterLoanAmountMin;
     filters.filterLoanAmountMax = this.filterLoanAmountMax;
     filters.filterLoanClosingBalanceMin = this.filterLoanClosingBalanceMin;
-    filters.filterLoanClosingBalanceMax = this.filterLoanClosingBalanceMin;
+    filters.filterLoanClosingBalanceMax = this.filterLoanClosingBalanceMax;
+    filters.filterDebtBeginningBalanceMin = this.filterDebtBeginningBalanceMin;
+    filters.filterDebtBeginningBalanceMax = this.filterDebtBeginningBalanceMax;
 
     if (this.filterAmountMin !== null) {
       modified = true;
@@ -490,6 +523,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       modified = true;
     }
     if (this.filterLoanClosingBalanceMax !== null) {
+      modified = true;
+    }
+    if (this.filterDebtBeginningBalanceMin !== null) {
+      modified = true;
+    }
+    if (this.filterDebtBeginningBalanceMax !== null) {
       modified = true;
     }
 
@@ -583,7 +622,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.filterLoanAmountMax = null;
     this.filterLoanClosingBalanceMin = null;
     this.filterLoanClosingBalanceMax = null;
-    
+    this.filterDebtBeginningBalanceMin = null;
+    this.filterDebtBeginningBalanceMax = null;
 
     this.filterDateFrom = null;
     this.filterDateTo = null;
@@ -636,7 +676,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * filter options on Type.
    */
   private getCategoryTypes() {
-    this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
+   /*  this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
       let categoriesExist = false;
       const categoriesGroupArray = [];
       if (res.data) {
@@ -678,6 +718,32 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         this.transactionCategories = categoriesGroupArray;
         // this.transactionCategories = this._orderByPipe.transform(
         //   res.data.transactionCategories, {property: 'text', direction: 1});
+      } else {
+        this.transactionCategories = [];
+      }
+    }); */
+    this._transactionTypeService.getTransactionTypes(this.formType).subscribe(res => {
+      let categoriesExist = false;
+      let categoriesGroupArray = [];
+        if (res) {
+          categoriesExist = true;
+
+          const receiptsArr = res.filter(obj => obj.categoryType === 'Receipts');
+          const disbursementsArr = res.filter(obj => obj.categoryType === 'Disbursements');
+          const loansAndDebtsArr = res.filter(obj => obj.categoryType === 'Loans and Debts');
+          const otherArr = res.filter(obj => obj.categoryType === 'Other');
+
+          categoriesGroupArray = [
+            {text:'Receipts', options: receiptsArr},
+            {text:'Disbursements', options: disbursementsArr},
+            {text:'Loans and Debts', options: loansAndDebtsArr},
+            {text:'Other', options: otherArr},
+          ];
+
+
+        }
+      if (categoriesExist) {
+        this.transactionCategories = categoriesGroupArray;
       } else {
         this.transactionCategories = [];
       }
@@ -780,6 +846,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         this.filterLoanClosingBalanceMax = this.cachedFilters.filterLoanClosingBalanceMax;
         this.isHideloanClosingBalanceFilter = !(this.filterLoanClosingBalanceMin > 0 && this.filterLoanClosingBalanceMax > 0);
 
+        this.filterDebtBeginningBalanceMin = this.cachedFilters.filterDebtBeginningBalanceMin;
+        this.filterDebtBeginningBalanceMax = this.cachedFilters.filterDebtBeginningBalanceMax;
+        this.isHideDebtBeginningBalanceFilter = !(this.filterDebtBeginningBalanceMin > 0 && this.filterDebtBeginningBalanceMax > 0);
+
         this.filterDateFrom = this.cachedFilters.filterDateFrom;
         this.filterDateTo = this.cachedFilters.filterDateTo;
         this.isHideDateFilter = this.filterDateFrom && this.filterDateFrom ? false : true;
@@ -810,6 +880,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.amountFilterValidation = new ValidationErrorModel(null, false);
     this.aggregateAmountFilterValidation = new ValidationErrorModel(null, false);
     this.yearFilterValidation = new ValidationErrorModel(null, false);
+    this.loanClosingBalanceFilterValidation = new ValidationErrorModel(null, false);
+    this.debtBeginningBalanceFilterValidation = new ValidationErrorModel(null, false);
   }
 
   /**
@@ -933,6 +1005,25 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       this.isHideloanClosingBalanceFilter = false;
       return false;
     }
+    
+    if (this.filterDebtBeginningBalanceMin !== null && this.filterDebtBeginningBalanceMax === null) {
+      this.debtBeginningBalanceFilterValidation.isError = true;
+      this.debtBeginningBalanceFilterValidation.message = 'Maximum Amount is required';
+      this.isHideDebtBeginningBalanceFilter = false;
+      return false;
+    }
+    if (this.filterDebtBeginningBalanceMax !== null && this.filterDebtBeginningBalanceMin === null) {
+      this.debtBeginningBalanceFilterValidation.isError = true;
+      this.debtBeginningBalanceFilterValidation.message = 'Minimum Amount is required';
+      this.isHideDebtBeginningBalanceFilter = false;
+      return false;
+    }
+    if (this.filterDebtBeginningBalanceMin > this.filterDebtBeginningBalanceMax) {
+      this.debtBeginningBalanceFilterValidation.isError = true;
+      this.debtBeginningBalanceFilterValidation.message = 'Maximum is less than Minimum';
+      this.isHideDebtBeginningBalanceFilter = false;
+      return false;
+    }
 
     if (
       this.filterElectionYearFrom !== null &&
@@ -1036,6 +1127,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             this.filterLoanClosingBalanceMin = null;
             this.filterLoanClosingBalanceMax = null;
             break;
+          case FilterTypes.debtBeginningBalance:
+          this.filterDebtBeginningBalanceMin = null;
+          this.filterDebtBeginningBalanceMax = null;
+          break;
           case FilterTypes.memoCode:
             this.filterMemoCode = false;
             break;

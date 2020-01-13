@@ -14,7 +14,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { TransactionsService } from '../transactions/service/transactions.service';
+import { TransactionsService, GetTransactionsResponse } from '../transactions/service/transactions.service';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
@@ -26,6 +26,12 @@ import { SchedH3Service } from './sched-h3.service';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 import { isNumeric } from 'rxjs/util/isNumeric';
+import { SchedHMessageServiceService } from '../sched-h-service/sched-h-message-service.service';
+import { SchedHServiceService } from '../sched-h-service/sched-h-service.service';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-sched-h3',
@@ -83,6 +89,16 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public transferredAmountErr = false;
 
+  public transaction_id: string;
+  public h3EntrieEdit: any;
+  public back_ref_transaction_id: string;
+  populateFormForEdit: Subscription;
+
+  public transferred_amount_edit = 0;
+  public total_amount_edit = 0;
+  public aggregate_amount_edit = 0;
+  public activity_event_name_edit: string;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -104,12 +120,16 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
+    private _schedHMessageServiceService: SchedHMessageServiceService,
     private _actRoute: ActivatedRoute,
     private _schedH3Service: SchedH3Service,
     private _individualReceiptService: IndividualReceiptService,
     private _uService: UtilService,    
     private _formBuilder: FormBuilder,
     private _decPipe: DecimalPipe,
+    private _schedHService: SchedHServiceService,
+    private _tranService: TransactionsService,
+    private _dlService: DialogService,
   ) {
     super(
       _http,
@@ -138,6 +158,19 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _uService;
     _formBuilder;
     _decPipe;
+    _tranService;
+    _dlService;
+
+    this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
+    .subscribe(p => {
+      if(p.scheduleType === 'Schedule H3'){
+        let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
+          if(res && res.length === 1){
+            this.editH3(res[0]);
+          }
+        });
+      }
+    })
   }
 
   public ngOnInit() {
@@ -210,6 +243,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnDestroy(): void {
+    this.populateFormForEdit.unsubscribe();
     super.ngOnDestroy();
   }
 
@@ -256,8 +290,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       account_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
       receipt_date: new FormControl('', Validators.required),
       total_amount_transferred: new FormControl(''),
-      category: new FormControl(''),
-      activity_event_name: new FormControl(''),
+      category: new FormControl('', Validators.required),
+      activity_event_name: new FormControl('', Validators.required),
       transferred_amount: new FormControl('', Validators.required),
       aggregate_amount: new FormControl('')
     });
@@ -296,9 +330,11 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   
   public setActivityOrEventIdentifier(category: string) {
 
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
     this.identifiers = [];
     this.h3Subscription = 
-      this._schedH3Service.getActivityOrEventIdentifiers(category)
+      this._schedH3Service.getActivityOrEventIdentifiers(category, reportId)
       .subscribe(res =>
         {
           if(res) {            
@@ -333,6 +369,10 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       this.addEntries();
     }
 
+    if( this.scheduleAction === ScheduleActions.edit) {
+      this.scheduleAction = ScheduleActions.add;
+    }
+
     this.isSubmit = false;
     this.schedH3.reset();
     this.setH3();
@@ -343,25 +383,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     });
 
     this.h3Entries = [];
-    
-    /*
-    this.schedH3.patchValue({account_name: ''}, { onlySelf: true });  
-    this.schedH3.patchValue({receipt_date: ''}, { onlySelf: true });   
-    this.schedH3.patchValue({total_amount_transferred: ''}, { onlySelf: true });
-    this.h3Entries = [];
-    this.schedH3.patchValue({ category: ''}, { onlySelf: true });
-    this.schedH3.markAsUntouched()
-    this.showIdentifer = false;
-    
-    this.schedH3.patchValue({ activity_event_name: ''}, { onlySelf: true });
-    this.schedH3.patchValue({ transferred_amount: ''}, { onlySelf: true });
-    this.schedH3.patchValue({ aggregate_amount: ''}, { onlySelf: true });
-    */
 
     this.receiptDateErr = false;
 
     this.transactionType = 'ALLOC_H3_SUM';
     //this.setH3Sum();
+
+    this.showIdentifer = false;
+    this.showIdentiferSelect = false;
+    this.showAggregateAmount = false;
   }
 
   public returnToAdd(): void {
@@ -425,15 +455,17 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.schedH3.patchValue({transferred_amount: ''}, { onlySelf: true });
 
+    this.changeTotalAndAggrAmount();
+
   }
 
   public selectActivityOrEventChange(e) {
 
     this.schedH3.patchValue({transferred_amount: ''}, { onlySelf: true });
-    
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
     //this._schedH3Service.getTotalAmount(this.schedH3.get('category').value, reportId);
 
+    /*
     const activity_event_name = this.schedH3.get('activity_event_name').value;
 
     if(activity_event_name) {
@@ -450,6 +482,30 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
           }
         });
     }
+    */
+    if(this.scheduleAction === ScheduleActions.add) {
+      this.getAggregateAmount();
+    }else if(this.scheduleAction === ScheduleActions.edit) {
+
+      this.changeTotalAndAggrAmount();
+
+      const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
+      const activity_event_name = this.schedH3.get('activity_event_name').value;
+
+      if(activity_event_name) {
+        this.h3Subscription = this._schedH3Service.getH3AggregateAmount(activity_event_name, reportId, this.back_ref_transaction_id).subscribe(res =>
+          {
+            if(res) {
+              if(res.aggregate_amount){
+                this.schedH3.patchValue({aggregate_amount: this._decPipe.transform(res.aggregate_amount, '.2-2')}, { onlySelf: true });
+              }else {
+                this.schedH3.patchValue({aggregate_amount: this._decPipe.transform(0, '.2-2')}, { onlySelf: true });
+              }
+            }
+          });
+      }
+    }
   }
   
   public setH3Sum() {
@@ -459,7 +515,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     //this.h3Subscription = this._schedH3Service.getSummary(this.getReportId()).subscribe(res =>
     this.h3Subscription = this._schedH3Service.getSummary(reportId).subscribe(res =>
       {        
-        if(res) {          
+        if(res) {
+          this.h3Sum = [];
           this.h3Sum =  res;         
           this.h3TableConfig.totalItems = res.length;
         }
@@ -468,8 +525,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public setH3SumP() {
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
-    this.h3Subscription = this._schedH3Service.getBreakDown(this.getReportId()).subscribe(res =>
+    this.h3Subscription = this._schedH3Service.getBreakDown(reportId).subscribe(res =>
       {        
         if(res) {
           this.h3SumP = [];
@@ -531,104 +589,130 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public doValidate() {
-
-    if(this.isNumber(this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value))) {
-      this.transferredAmountErr = false;
-      this.schedH3.patchValue({transferred_amount: this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)}, { onlySelf: true });
-      this.schedH3.controls['transferred_amount'].setErrors(null);
-    }else {
-      this.transferredAmountErr = true
-      this.schedH3.controls['transferred_amount'].setErrors({'incorrect': true});
-    }
-
-    //this.schedH3.patchValue({transferred_amount: this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)}, { onlySelf: true });
-    //this.h3Ratios = {};
-
-    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
-    
-    this.h3Ratios['report_id'] = reportId;
-    this.h3Ratios.transaction_type_identifier = 'TRAN_FROM_NON_FED_ACC';
-    
-    //this.h3Ratios.total_amount_transferred = this.schedH3.get('total_amount_transferred').value;
-
-    const formObj = this.schedH3.getRawValue();
-
-    const accountName = this.schedH3.get('account_name').value;
-    const receipt_date = this.schedH3.get('receipt_date').value;
-    
-    //const total_amount_transferred = Number(this.schedH3.get('total_amount_transferred').value) 
-    //  + Number(this.schedH3.get('transferred_amount').value);
-    //const total_amount_transferred = +this.schedH3.get('total_amount_transferred').value 
-    //  + (+this.schedH3.get('transferred_amount').value);
-    const total_amount_transferred = this.convertFormattedAmountToDecimal(this.schedH3.get('total_amount_transferred').value) + 
-      this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)
-    this.h3Ratios.total_amount_transferred = total_amount_transferred;
- 
-    formObj['report_id'] = this.getReportId();
-    formObj['transaction_type_identifier'] = 'TRAN_FROM_NON_FED_ACC';
-    formObj['activity_event_type'] = this.schedH3.get('category').value;
-
-    delete formObj.total_amount_transferred;
-
     this.isSubmit = true;
 
+    const activity_event_type = this.schedH3.get('category').value;
+
+    if(activity_event_type !== 'DC' && activity_event_type !== 'DF') {
+      this.schedH3.controls['activity_event_name'].clearValidators();
+      this.schedH3.controls['activity_event_name'].updateValueAndValidity();
+    }else {
+      this.schedH3.controls['activity_event_name'].setValidators([Validators.required]);
+      this.schedH3.controls['activity_event_name'].updateValueAndValidity();
+    }
+
     if(this.schedH3.status === 'VALID') {
-
-      this.schedH3.patchValue({transferred_amount: this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)}, { onlySelf: true });
-
-      if(this.showAggregateAmount) {
-        //const aggregate_amount = Number(this.schedH3.get('aggregate_amount').value) + Number(this.schedH3.get('transferred_amount').value);
-        const aggregate_amount = +this.schedH3.get('aggregate_amount').value + (+this.schedH3.get('transferred_amount').value);
-
-        //const aggregate_amount = this.convertFormattedAmountToDecimal(this.schedH3.get('aggregate_amount').value) + this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
-        this.schedH3.patchValue({aggregate_amount: aggregate_amount}, { onlySelf: true });
+      if(this.isNumber(this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value))) {
+        this.transferredAmountErr = false;
+        this.schedH3.patchValue({transferred_amount: this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)}, { onlySelf: true });
+        this.schedH3.controls['transferred_amount'].setErrors(null);
       }else {
-        this.schedH3.patchValue({aggregate_amount: 0.00}, { onlySelf: true });
+        this.transferredAmountErr = true
+        this.schedH3.controls['transferred_amount'].setErrors({'incorrect': true});
       }
 
-      this.h3Entries.push(formObj);
-      this.h3EntryTableConfig.totalItems = this.h3Entries.length;
-      this.h3Ratios.child.push(formObj);
+      //this.schedH3.patchValue({transferred_amount: this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)}, { onlySelf: true });
+      //this.h3Ratios = {};
 
-      this.schedH3.reset();
-      this.isSubmit = false;
+      const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
       
-      this.schedH3.patchValue({account_name: accountName}, { onlySelf: true });
-      this.schedH3.patchValue({receipt_date: receipt_date}, { onlySelf: true });
+      this.h3Ratios['report_id'] = reportId;
+      this.h3Ratios.transaction_type_identifier = 'TRAN_FROM_NON_FED_ACC';
+      
+      //this.h3Ratios.total_amount_transferred = this.schedH3.get('total_amount_transferred').value;
 
-      //this.schedH3.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
-      this.schedH3.patchValue({total_amount_transferred:  this._decPipe.transform(total_amount_transferred, '.2-2')}, { onlySelf: true });
-/*
-      if(this.showAggregateAmount) {
-        //const aggregate_amount = Number(this.schedH3.get('aggregate_amount').value) + Number(this.schedH3.get('transferred_amount').value);
-        const aggregate_amount = +this.schedH3.get('aggregate_amount').value + (+this.schedH3.get('transferred_amount').value);
+      const formObj = this.schedH3.getRawValue();
 
-        //const aggregate_amount = this.convertFormattedAmountToDecimal(this.schedH3.get('aggregate_amount').value) + this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
-        this.schedH3.patchValue({aggregate_amount: aggregate_amount}, { onlySelf: true });
-      }else {
-        this.schedH3.patchValue({aggregate_amount: 0.00}, { onlySelf: true });
+      const accountName = this.schedH3.get('account_name').value;
+      const receipt_date = this.schedH3.get('receipt_date').value;
+      
+      //const total_amount_transferred = Number(this.schedH3.get('total_amount_transferred').value) 
+      //  + Number(this.schedH3.get('transferred_amount').value);
+      //const total_amount_transferred = +this.schedH3.get('total_amount_transferred').value 
+      //  + (+this.schedH3.get('transferred_amount').value);
+      const total_amount_transferred = this.convertFormattedAmountToDecimal(this.schedH3.get('total_amount_transferred').value) + 
+        this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)
+      this.h3Ratios.total_amount_transferred = total_amount_transferred;
+  
+      formObj['report_id'] = reportId; //this.getReportId();
+      formObj['transaction_type_identifier'] = 'TRAN_FROM_NON_FED_ACC';
+      formObj['activity_event_type'] = this.schedH3.get('category').value;
+
+      formObj['transaction_id'] = this.transaction_id;
+      formObj['back_ref_transaction_id'] = this.back_ref_transaction_id;
+
+      formObj['aggregate_amount'] = this.convertFormattedAmountToDecimal(formObj.aggregate_amount);
+
+      delete formObj.total_amount_transferred;
+
+      //this.isSubmit = true;
+
+      if(this.schedH3.status === 'VALID') {
+        /*
+        this.schedH3.patchValue({transferred_amount: this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value)}, { onlySelf: true });
+
+        if(this.showAggregateAmount) {
+          //const aggregate_amount = Number(this.schedH3.get('aggregate_amount').value) + Number(this.schedH3.get('transferred_amount').value);
+          const aggregate_amount = +this.schedH3.get('aggregate_amount').value + (+this.schedH3.get('transferred_amount').value);
+
+          //const aggregate_amount = this.convertFormattedAmountToDecimal(this.schedH3.get('aggregate_amount').value) + this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
+          this.schedH3.patchValue({aggregate_amount: aggregate_amount}, { onlySelf: true });
+        }else {
+          this.schedH3.patchValue({aggregate_amount: 0.00}, { onlySelf: true });
+        }
+        */
+        if(this.scheduleAction !== ScheduleActions.edit) {
+          this.h3Entries.push(formObj);
+          this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+          this.h3Ratios.child.push(formObj);
+
+          this.h3Ratios.child.filter(obj => obj.activity_event_name === formObj.activity_event_name)
+            .forEach(obj => obj.aggregate_amount = formObj.aggregate_amount);
+
+        } else {
+          this.h3EntrieEdit = formObj;
+        }
+
+        this.schedH3.reset();
+        this.isSubmit = false;
+
+        this.schedH3.patchValue({account_name: accountName}, { onlySelf: true });
+        this.schedH3.patchValue({receipt_date: receipt_date}, { onlySelf: true });
+
+        //this.schedH3.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
+        this.schedH3.patchValue({total_amount_transferred:  this._decPipe.transform(total_amount_transferred, '.2-2')}, { onlySelf: true });
+  /*
+        if(this.showAggregateAmount) {
+          //const aggregate_amount = Number(this.schedH3.get('aggregate_amount').value) + Number(this.schedH3.get('transferred_amount').value);
+          const aggregate_amount = +this.schedH3.get('aggregate_amount').value + (+this.schedH3.get('transferred_amount').value);
+
+          //const aggregate_amount = this.convertFormattedAmountToDecimal(this.schedH3.get('aggregate_amount').value) + this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
+          this.schedH3.patchValue({aggregate_amount: aggregate_amount}, { onlySelf: true });
+        }else {
+          this.schedH3.patchValue({aggregate_amount: 0.00}, { onlySelf: true });
+        }
+  */
+        this.schedH3.patchValue({category: ''}, { onlySelf: true });
+        this.showIdentifer = false;
       }
-*/      
-      this.schedH3.patchValue({category: ''}, { onlySelf: true });
-      this.showIdentifer = false;
     }
   }
 
-  public saveH3Ratio(ratio: any) {
+  public saveH3Ratio(ratio: any, scheduleAction: any) {
     
-    this._schedH3Service.saveH3Ratio(ratio).subscribe(res => {
-      if (res) {        
+    this._schedH3Service.saveH3Ratio(ratio, scheduleAction).subscribe(res => {
+      if (res) {
         this.saveHRes = res;
         this.h3Entries = [];
       }
     });
   }
 
-  public saveAndGetSummary(ratio: any) {
+  public saveAndGetSummary(ratio: any, scheduleAction: any) {
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
-    this._schedH3Service.saveAndGetSummary(ratio, reportId).subscribe(res => {
+    this._schedH3Service.saveAndGetSummary(ratio, reportId, scheduleAction).subscribe(res => {
       if (res) {
         //this.saveHRes = res;
         this.h3Entries = [];
@@ -639,10 +723,17 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public addEntries() {
-    const serializedForm = JSON.stringify(this.h3Ratios);
+    //const serializedForm = JSON.stringify(this.h3Ratios);
     //this.saveH3Ratio(serializedForm);
 
-    this.saveAndGetSummary(serializedForm);
+    let serializedForm: any;
+    if(this.scheduleAction === ScheduleActions.add) {
+      serializedForm = JSON.stringify(this.h3Ratios);
+    }else if(this.scheduleAction === ScheduleActions.edit) {
+      serializedForm = JSON.stringify(this.h3EntrieEdit);
+    }
+
+    this.saveAndGetSummary(serializedForm, this.scheduleAction);
     this.h3Ratios = {};
     this.h3Ratios['child'] = [];
   }
@@ -650,28 +741,19 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public handleAmountKeyup(e: any) {
     let val = 0;
     if(this.schedH3.get('transferred_amount').value){
-      val = this.schedH3.get('transferred_amount').value;
+      val = this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
     }
 
-    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
     let aggregate_amount = 0;
-
-    const activity_event_name = this.schedH3.get('activity_event_name').value;
-
-    if(activity_event_name) {
-      this.h3Subscription = this._schedH3Service.getTotalAmount(this.schedH3.get('activity_event_name').value, reportId).subscribe(res =>
-        {
-          if(res) {
-            aggregate_amount = Number(res.aggregate_amount);
-          }
-        });
+    if(this.schedH3.get('aggregate_amount').value){
+      aggregate_amount = this.convertFormattedAmountToDecimal(this.schedH3.get('aggregate_amount').value);
     }
-    
-    if(this.showAggregateAmount) {      
+
+    if(this.scheduleAction === ScheduleActions.add && this.showAggregateAmount) {
       this.schedH3.patchValue({aggregate_amount: this._decPipe.transform(aggregate_amount + val, '.2-2')}, { onlySelf: true });
-    }else {
-      this.schedH3.patchValue({aggregate_amount: 0.00}, { onlySelf: true });
     }
+
+    this.changeTotalAndAggrAmount();
   }
 
   public receiptDateChanged(receiptDate: string) {
@@ -702,6 +784,39 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH3.patchValue({transferred_amount: this._decPipe.transform(
         this.convertFormattedAmountToDecimal(
           this.schedH3.get('transferred_amount').value), '.2-2')}, { onlySelf: true });
+
+      let val = 0;
+      if(this.schedH3.get('transferred_amount').value){
+        val = this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
+      }
+
+      /*
+      let aggregate_amount = 0;
+      if(this.schedH3.get('aggregate_amount').value){
+        aggregate_amount = this.convertFormattedAmountToDecimal(this.schedH3.get('aggregate_amount').value);
+      }
+      */
+
+      const activity_event_name = this.schedH3.get('activity_event_name').value;
+      const activity_event_type = this.schedH3.get('category').value;
+
+      if(activity_event_name && (activity_event_type === 'DC' || activity_event_type === 'DF')) {
+
+        let aggregate_amount = 0;
+        this.h3Entries.filter(obj => obj.activity_event_name === activity_event_name)
+        .forEach(obj => {
+          aggregate_amount += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+        });
+
+        if(this.scheduleAction === ScheduleActions.add && this.showAggregateAmount) {
+          this.schedH3.patchValue({aggregate_amount: this._decPipe.transform(aggregate_amount + val, '.2-2')}, { onlySelf: true });
+        }
+      }else {
+        this.schedH3.patchValue({aggregate_amount: 0}, { onlySelf: true });
+      }
+
+      this.changeTotalAndAggrAmount();
+
       this.schedH3.controls['transferred_amount'].setErrors(null);
     }else {
       this.transferredAmountErr = true;
@@ -732,6 +847,268 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.h3Ratios = {};
     this.h3Ratios['child'] = [];
     this.transferredAmountErr = false;
+    if(this.scheduleAction === ScheduleActions.edit) {
+      this.scheduleAction = ScheduleActions.add
+    }
+    this.showIdentiferSelect = false;
+    this.showAggregateAmount = false;
+  }
+
+  public editH3(item) {
+    this.returnToAdd();
+    this.scheduleAction = ScheduleActions.edit;
+
+    this.showIdentifer = true;
+
+    this.transaction_id = item.transaction_id;
+    this.back_ref_transaction_id = item.back_ref_transaction_id;
+
+    if(item.activity_event_type === 'DC' || item.activity_event_type === 'DF') {
+      this.showIdentiferSelect = true;
+      this.showAggregateAmount = true;
+    }
+
+    if(item.activity_event_type === 'AD') {
+      this.totalName = 'Administrative';
+    }else if(item.activity_event_type === 'GV') {
+      this.totalName = 'Generic Voter Drive';
+    }else if(item.activity_event_type === 'EA') {
+      this.totalName = 'Exempt Activities';
+    }else if(item.activity_event_type === 'DF') {
+      this.totalName = 'Activity or Event Identifier';
+      this.setActivityOrEventIdentifier('fundraising');
+    }else if(item.activity_event_type === 'DC') {
+      this.totalName = 'Activity or Event Identifier';
+      this.setActivityOrEventIdentifier('direct_cand_support');
+    }else if(item.activity_event_type === 'PC') {
+      this.totalName = 'Public Communications';
+    }
+
+    this.schedH3.patchValue({ account_name: item.account_name}, { onlySelf: true });
+    this.schedH3.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
+    this.schedH3.patchValue({ total_amount_transferred: this._decPipe.transform(item.total_amount_transferred, '.2-2')}, { onlySelf: true });
+    this.schedH3.patchValue({ category: item.activity_event_type}, { onlySelf: true });
+    this.schedH3.patchValue({ activity_event_name: item.activity_event_name}, { onlySelf: true });
+    this.schedH3.patchValue({ transferred_amount: this._decPipe.transform(item.transferred_amount, '.2-2')}, { onlySelf: true });
+    this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(item.aggregate_amount, '.2-2')}, { onlySelf: true });
+
+    this.transferred_amount_edit = item.transferred_amount;
+    this.total_amount_edit = item.total_amount_transferred;
+    this.aggregate_amount_edit = item.aggregate_amount;
+    this.activity_event_name_edit = item.activity_event_name;
+  }
+
+  public saveEdit() {
+    const activity_event_type = this.schedH3.get('category').value;
+
+    if(activity_event_type !== 'DC' && activity_event_type !== 'DF') {
+      this.schedH3.controls['activity_event_name'].clearValidators();
+      this.schedH3.controls['activity_event_name'].updateValueAndValidity();
+    }else {
+      this.schedH3.controls['activity_event_name'].setValidators([Validators.required]);
+      this.schedH3.controls['activity_event_name'].updateValueAndValidity();
+    }
+
+    if(this.schedH3.status === 'VALID') {
+      this.saveAndAddMore();
+      this.addEntries();
+      this.returnToSum();
+    }else {
+      this.schedH3.markAsDirty();
+      this.schedH3.markAsTouched();
+      this.isSubmit = true;
+    }
+  }
+
+  public editH3Sub(item: any) {
+
+    this.showIdentifer = true;
+
+    this.showIdentiferSelect = false;
+    this.showAggregateAmount = false;
+
+    if(item.activity_event_type === 'DC' || item.activity_event_type === 'DF') {
+      this.showIdentiferSelect = true;
+      this.showAggregateAmount = true;
+    }
+
+    if(item.activity_event_type === 'AD') {
+      this.totalName = 'Administrative';
+    }else if(item.activity_event_type === 'GV') {
+      this.totalName = 'Generic Voter Drive';
+    }else if(item.activity_event_type === 'EA') {
+      this.totalName = 'Exempt Activities';
+    }else if(item.activity_event_type === 'DF') {
+      this.totalName = 'Activity or Event Identifier';
+      this.setActivityOrEventIdentifier('fundraising');
+    }else if(item.activity_event_type === 'DC') {
+      this.totalName = 'Activity or Event Identifier';
+      this.setActivityOrEventIdentifier('direct_cand_support');
+    }else if(item.activity_event_type === 'PC') {
+      this.totalName = 'Public Communications';
+    }
+
+    this.schedH3.patchValue({ account_name: item.account_name}, { onlySelf: true });
+    this.schedH3.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
+    //this.schedH3.patchValue({ total_amount_transferred: this._decPipe.transform(item.total_amount_transferred, '.2-2')}, { onlySelf: true });
+    this.schedH3.patchValue({ category: item.activity_event_type}, { onlySelf: true });
+    this.schedH3.patchValue({ activity_event_name: item.activity_event_name}, { onlySelf: true });
+    this.schedH3.patchValue({ transferred_amount: this._decPipe.transform(item.transferred_amount, '.2-2')}, { onlySelf: true });
+    //this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(
+    //  this.convertFormattedAmountToDecimal(item.aggregate_amount), '.2-2')}, { onlySelf: true });
+
+    this.h3Entries = this.h3Entries.filter(obj => obj !== item);
+    this.h3Ratios.child = this.h3Ratios.child.filter(obj => obj !== item);
+
+    this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+
+    let sum = 0;
+    this.h3Entries.forEach(obj => {
+     sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+    })
+
+    this.schedH3.patchValue({ total_amount_transferred:
+      this._decPipe.transform(sum, '.2-2')}, { onlySelf: true });
+
+    let aggregate_amount = 0;
+    this.h3Entries.filter(obj => obj.activity_event_name === item.activity_event_name)
+      .forEach(obj => {
+        aggregate_amount += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+       });
+    this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(aggregate_amount
+      + item.transferred_amount, '.2-2')}, { onlySelf: true });
+    this.h3Ratios.child.filter(obj => obj.activity_event_name === item.activity_event_name)
+      .forEach(obj => obj.aggregate_amount = aggregate_amount);
+
+  }
+
+  public changeTotalAndAggrAmount() {
+
+    let val = 0;
+    if(this.schedH3.get('transferred_amount').value){
+      val = this.convertFormattedAmountToDecimal(this.schedH3.get('transferred_amount').value);
+    }
+
+    if(this.scheduleAction === ScheduleActions.edit) {
+      this.schedH3.patchValue({ total_amount_transferred: this._decPipe.transform(
+        this.total_amount_edit - this.transferred_amount_edit + val, '.2-2')}, { onlySelf: true });
+
+      const activity_event_name = this.schedH3.get('activity_event_name').value;
+      const activity_event_type = this.schedH3.get('category').value;
+
+      if(activity_event_name && (activity_event_type === 'DC' || activity_event_type === 'DF')) {
+        let sum = 0;
+        this.h3Entries.filter(obj => obj.activity_event_name === activity_event_name)
+        .forEach(obj => {
+          sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+        });
+
+        if(this.showAggregateAmount && activity_event_name === this.activity_event_name_edit ) {
+          this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(
+            sum + val, '.2-2')}, { onlySelf: true });
+        }else {
+          this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(val, '.2-2')}, { onlySelf: true });
+        }
+      }
+    }
+  }
+
+  public getAggregateAmount() {
+
+    let sum = 0;
+    const activity_event_name = this.schedH3.get('activity_event_name').value;
+    const activity_event_type = this.schedH3.get('category').value;
+
+    if(activity_event_name && activity_event_type === 'DC' || activity_event_type === 'DF') {
+      this.h3Entries.filter(obj => obj.activity_event_name === activity_event_name)
+      .forEach(obj => {
+        sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+       });
+
+      this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(sum, '.2-2')}, { onlySelf: true });
+    }
+  }
+
+  public trashTransaction(trx: any): void {
+
+    trx.report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    trx.transactionId = trx.transaction_id;
+
+    this._dlService
+      .confirm('You are about to delete this transaction ' + trx.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._tranService
+            .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
+            .subscribe((res: GetTransactionsResponse) => {
+              //this.getTransactionsPage(this.config.currentPage);
+              this.setH3Sum();
+              this._dlService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  public trashSubTransaction(trx: any): void {
+    this._dlService
+      .confirm('You are about to delete this transaction.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this.h3Entries = this.h3Entries.filter(obj => obj !== trx);
+          this.h3Ratios.child = this.h3Ratios.child.filter(obj => obj !== trx);
+          this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+
+          let sum = 0;
+          this.h3Entries.forEach(obj => {
+          sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+          })
+
+          this.schedH3.patchValue({ total_amount_transferred:
+            this._decPipe.transform(sum, '.2-2')}, { onlySelf: true });
+
+          let agg = 0;
+          this.h3Entries.filter(obj => obj.activity_event_name === trx.activity_event_name).forEach(obj => {
+          agg += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+          })
+          this.h3Entries.filter(obj => obj.activity_event_name === trx.activity_event_name).forEach(obj => {
+            obj.aggregate_amount = agg;
+          })
+
+          this._dlService.confirm(
+            'Transaction has been successfully deleted.',
+            ConfirmModalComponent,
+            'Success!',
+            false,
+            ModalHeaderClassEnum.successHeader
+          )
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  public goSummary() {
+
+    this.isSubmit = true;
+
+    if(this.schedH3.touched || this.schedH3.dirty) {
+      this._dlService
+      .confirm('You have unsaved changes! If you leave, your changes will be lost.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this.returnToSum();
+        } else if (res === 'cancel') {
+        }
+      });
+    }else {
+      this.returnToSum();
+    }
   }
 
 }

@@ -18,7 +18,7 @@
             "port": 9222,
             "sourceMaps": true,
             "diagnosticLogging": true,
-            "url": "http://localhost:4200",
+            "url": "http://localhost:4200/#/",
             "webRoot": "${workspaceRoot}"
         }
     ]

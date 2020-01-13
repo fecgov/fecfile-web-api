@@ -28,8 +28,13 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
                                  undo_delete_entities, superceded_report_id_list)
-from fecfiler.sched_A.views import (get_list_child_schedA,
-                                    get_next_transaction_id, post_schedA, post_sql_schedA)
+from fecfiler.sched_A.views import (
+    get_list_child_schedA,
+    get_next_transaction_id, 
+    post_schedA, 
+    post_sql_schedA,
+    put_sql_schedA,
+    )
 from fecfiler.sched_B.views import get_list_child_schedB, post_schedB
 from fecfiler.sched_D.views import do_transaction
 
@@ -94,6 +99,118 @@ def check_mandatory_fields_SC(data):
         if errors:
             raise Exception(
                 'The following mandatory fields are required in order to save data: {}'.format(','.join(errors)))
+    except:
+        raise
+
+
+def do_loan_carryover(report_id, cmte_id):
+    """
+    this is the function to handle loan carryover form one report to next report:
+    1. duplicate and carryover all loans:
+    - non-zero loan_balance
+    - outstanding and dangled(not carried over before)
+    - loan report date < current report coverge start(forward carryover only)
+    
+    2. update all records with new transaction_id, new report_id
+    3. set new loan back_ref_transaction_id to parent transaction_id
+    """
+    _sql = """
+    insert into public.sched_c(
+					cmte_id, 
+                    report_id, 
+                    line_number,
+					transaction_type,
+                    transaction_type_identifier, 
+                    transaction_id, 
+                    entity_id, 
+                    election_code,
+                    election_other_description,
+                    loan_amount_original,
+                    loan_payment_to_date,
+                    loan_balance,
+                    loan_incurred_date,
+                    loan_due_date,
+                    loan_intrest_rate,
+                    is_loan_secured,
+                    is_personal_funds,
+                    lender_cmte_id,
+                    lender_cand_id,
+                    lender_cand_last_name,
+                    lender_cand_first_name,
+                    lender_cand_middle_name,
+                    lender_cand_prefix,
+                    lender_cand_suffix,
+                    lender_cand_office,
+                    lender_cand_state,
+                    lender_cand_district,
+                    memo_code,
+                    memo_text,
+					back_ref_transaction_id,
+                    create_date
+					)
+					SELECT 
+					c.cmte_id, 
+                    %s, 
+                    c.line_number,
+					'',
+                    c.transaction_type_identifier, 
+                    get_next_transaction_id('SC'), 
+                    c.entity_id, 
+                    c.election_code,
+                    c.election_other_description,
+                    c.loan_amount_original,
+                    c.loan_payment_to_date,
+                    c.loan_balance,
+                    c.loan_incurred_date,
+                    c.loan_due_date,
+                    c.loan_intrest_rate,
+                    c.is_loan_secured,
+                    c.is_personal_funds,
+                    c.lender_cmte_id,
+                    c.lender_cand_id,
+                    c.lender_cand_last_name,
+                    c.lender_cand_first_name,
+                    c.lender_cand_middle_name,
+                    c.lender_cand_prefix,
+                    c.lender_cand_suffix,
+                    c.lender_cand_office,
+                    c.lender_cand_state,
+                    c.lender_cand_district,
+                    c.memo_code,
+                    c.memo_text,
+					c.transaction_id,
+                    now()
+            FROM public.sched_c c, public.reports r
+            WHERE 
+            c.cmte_id = %s
+            AND c.loan_balance > 0 
+            AND c.report_id != %s
+            AND c.report_id = r.report_id
+            AND r.cvg_start_date < (
+                        SELECT r.cvg_start_date
+                        FROM   public.reports r
+                        WHERE  r.report_id = %s
+                    )
+            AND c.transaction_id NOT In (
+                select distinct back_ref_transaction_id from public.sched_c
+                where cmte_id = %s
+                and back_ref_transaction_id is not null
+            )
+            AND c.delete_ind is distinct from 'Y'
+    """
+    # query_back_sql = """
+    # select d.back_ref_transaction_id
+    # """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
+            if cursor.rowcount == 0:
+                logger.debug("No carryover happens.")
+            else:
+                logger.debug("loan carryover done with report_id {}".format(report_id))
+                logger.debug("total carryover loans:{}".format(cursor.rowcount))
+                # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
+                logger.debug("carryover done.")
     except:
         raise
 
@@ -204,6 +321,7 @@ def put_schedC(data):
             # rollback_data = get_schedC(data)
             logger.debug('updating loan with data:{}'.format(data))
             put_sql_schedC(data)
+            update_auto_sched_a(data)
 
         except Exception as e:
             # rollback entity data
@@ -299,6 +417,102 @@ def validate_sc_data(data):
     check_mandatory_fields_SC(data)
     # check_data_types(data)
 
+def get_auto_sched_a_id(transaction_id):
+    """
+    helpder function to query auto sched_a transaction id
+    """
+    _sql = """
+    SELECT transaction_id from public.sched_a
+    WHERE back_ref_transaction_id = %s
+    AND delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+
+            # UPDATE delete_ind flag on a single row from Sched_A table
+            cursor.execute(_sql, [transaction_id])
+            if (cursor.rowcount == 0):
+                raise Exception(
+                    """The Transaction ID: {} is either already deleted
+                    or does not exist in schedC table""".format(transaction_id))
+            tran_id = cursor.fetchone()[0]
+            print('trying update auto sched_a:{}'.format(tran_id))
+            return tran_id
+    except Exception:
+        raise
+
+
+def update_auto_sched_a(data):
+    """
+    update a auto-generated sched_a transaction when a loan is made:
+    1. need to check the auto_map
+    2. map the fields from sched_c to sched_a
+    3. get the existing transaction_id
+    3. create a sched_a and make it a child of sched_c( fill in back_ref fields)
+
+    Q1: do we need to update the aggregate_amt and update line_number
+    """
+    logger.debug('update_auto_sched_a with data:{}'.format(data))
+    field_mapper = {
+        "contribution_date" : "loan_incurred_date",
+        "contribution_amount" : "loan_amount_original",
+    }
+    # set up parent
+    parent_id = data['transaction_id']
+    data['back_ref_transaction_id'] = parent_id
+    data['back_ref_sched_name'] = parent_id[0:2] 
+    # get a new sched_a id0:2
+    
+    data['transaction_id'] = get_auto_sched_a_id(parent_id)
+    # fill in purpose - hardcoded - TODO: confirm on this
+    data['purpose_description'] = 'Loan received: {}'.format(
+        data.get('transaction_type_identifier')
+        )
+    # set transaction type and line num
+    # AUTO_SCHED_A_MAP = { 
+    # 'LOAN_FROM_IND' : 'LOAN_FROM_IND_REC',
+    # 'LOAN_FROM_BANK' : 'LOAN_FROM_BANK_REC',
+    # }
+    if data['entity_type'] == 'IND':
+        data['transaction_type_identifier'] = 'LOAN_FROM_IND'
+    elif data['entity_type'] == 'ORG':
+        data['transaction_type_identifier'] = 'LOAN_FROM_BANK'
+    else:
+        raise Exception('Error: invalid entity type for loan')
+    # AUTO_SCHED_A_MAP.get(
+    #     data['transaction_type_identifier']
+    #     )
+    # TODO: will enable this when db update done
+    data['line_number'], data['transaction_type'] = get_line_number_trans_type(
+        data.get('transaction_type_identifier')
+        )
+    for _f in field_mapper:
+        data[_f] = data.get(field_mapper.get(_f))
+    # TODO: not sure we need to return child data or not
+    logger.debug('update a auto sched_a item with loan data:{}'.format(data))
+    put_sql_schedA(
+        data.get('cmte_id'), 
+        data.get('report_id'),
+        data.get('line_number'),
+        data.get('transaction_type'),
+        data.get('transaction_id'),
+        data.get('back_ref_transaction_id'),
+        data.get('back_ref_sched_name'),
+        data.get('entity_id'),
+        data.get('contribution_date'),
+        data.get('contribution_amount'),
+        data.get('purpose_description'),
+        data.get('memo_code'),
+        data.get('memo_text'),
+        data.get('election_code'),
+        data.get('election_other_description'),
+        data.get('donor_cmte_id'),
+        data.get('donor_cmte_name'),
+        data.get('levin_account_id'),
+        data.get('transaction_type_identifier'),
+        )
+    logger.debug('auto-generation done.')
+
 def auto_generate_sched_a(data):
     """
     auto generate a sched_a transaction when a loan is made:
@@ -363,7 +577,8 @@ def auto_generate_sched_a(data):
         data.get('election_other_description'),
         data.get('donor_cmte_id'),
         data.get('donor_cmte_name'),
-        data.get('transaction_type_identifier')
+        data.get('transaction_type_identifier'),
+        data.get('levin_account_id')
         )
     logger.debug('auto-generation done.')
 
@@ -600,6 +815,7 @@ def get_schedC(data):
     try:
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
+        # do_loan_carryover(report_id, cmte_id)
         if 'transaction_id' in data:
             transaction_id = check_transaction_id(data.get('transaction_id'))
             forms_obj = get_list_schedC(report_id, cmte_id, transaction_id)
@@ -949,8 +1165,160 @@ def schedC(request):
         raise NotImplementedError
 
 
+
 @api_view(['GET'])
 def get_outstanding_loans(request):
+    """
+    Get all loans with an outstanding balance
+    this api is used to enable the sched_c summary page
+    need to return:
+    1. name/bank (this is the entity name)
+    2. original loan
+    3. cumulative payemnt to date
+    4. outstanding balance
+    5. due date
+    adding transaction_types to get transaction_type specific loans
+    valid ransction_type values:
+    LOANS_OWED_BY_CMTE
+    LOANS_OWED_TO_CMTE
+
+    a loan is outstanding if:
+    1. it has a outstannding balance(>0) in current report
+    2. it has live payment(even the balance become 0) in current report
+    """
+    valid_transaction_types = [
+        'LOANS_OWED_BY_CMTE',
+        'LOANS_OWED_TO_CMTE',
+    ]
+    logger.debug('POST request received.')
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        if not report_id:
+            raise Exception('report_id is required.')
+        do_loan_carryover(report_id, cmte_id)
+        if 'transaction_type_identifier' in request.query_params:
+            tran_type = request.query_params.get('transaction_type_identifier')
+            if not tran_type in valid_transaction_types: 
+                raise Exception('Error: invalid transaction types.')
+            _sql = """
+                SELECT Json_agg(t) 
+                FROM   (SELECT 
+                            e.entity_name,
+                            e.entity_type, 
+                            e.last_name,
+                            e.first_name,
+                            e.middle_name,
+                            e.preffix as prefix,
+                            e.suffix, 
+                            c.transaction_id,
+                            c.loan_amount_original, 
+                            c.loan_payment_to_date, 
+                            c.loan_balance, 
+                            c.loan_due_date,
+                            c.transaction_type_identifier 
+                        FROM   public.sched_c c, 
+                            public.entity e 
+                        WHERE c.cmte_id = %s
+                        AND c.transaction_type_identifier = %s
+                        AND c.entity_id = e.entity_id
+                        AND c.report_id = %s 
+                        AND delete_ind is distinct from 'Y'
+                        ) t
+            """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, tran_type, report_id])
+                json_result = cursor.fetchone()[0] 
+            
+        else:
+            _sql = """
+                SELECT Json_agg(t) 
+                    FROM   (SELECT 
+                                e.entity_name,
+                                e.entity_type, 
+                                e.last_name,
+                                e.first_name,
+                                e.middle_name,
+                                e.preffix as prefix,
+                                e.suffix, 
+                                c.transaction_id,
+                                c.loan_amount_original, 
+                                c.loan_payment_to_date, 
+                                c.loan_balance, 
+                                c.loan_due_date,
+                                c.transaction_type_identifier
+                            FROM   public.sched_c c, 
+                                public.entity e 
+                            WHERE c.cmte_id = %s
+                            AND c.entity_id = e.entity_id
+                            AND c.report_id = %s 
+                            AND c.delete_ind is distinct from 'Y'
+                            UNION
+                            SELECT e.entity_name, 
+                                e.entity_type, 
+                                e.last_name, 
+                                e.first_name, 
+                                e.middle_name, 
+                                e.preffix AS prefix, 
+                                e.suffix, 
+                                c.transaction_id, 
+                                c.loan_amount_original, 
+                                c.loan_payment_to_date, 
+                                c.loan_balance, 
+                                c.loan_due_date, 
+                                c.transaction_type_identifier 
+                            FROM   PUBLIC.sched_c c, 
+                                PUBLIC.entity e 
+                            WHERE  c.entity_id = e.entity_id 
+                            AND    c.transaction_id IN 
+                            ( 
+                                    SELECT back_ref_transaction_id 
+                                    FROM   sched_b 
+                                    WHERE  cmte_id = %s 
+                                    AND    report_id = %s
+                                    AND    (transaction_type_identifier = 'LOAN_REPAY_MADE' OR
+                                    transaction_type_identifier = 'LOAN_REPAY_RCVD')
+                                    AND    delete_ind IS distinct from 'Y')
+                            ) t
+                """
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
+                json_result = cursor.fetchone()[0] 
+
+        if not json_result:
+            return Response([], status=status.HTTP_200_OK)
+        else:
+            logger.debug('total outstanding loans:{}'.format(len(json_result)))
+            for tran in json_result:
+                transaction_id = tran.get('transaction_id')
+                loan_pyaments_obj = get_sched_c_loan_payments(
+                    cmte_id,transaction_id)
+                for obj in loan_pyaments_obj:
+                    obj.update(API_CALL_SB)
+                logger.debug('getting all c1 childs...')
+                childC1_forms_obj = get_sched_c1_child(
+                    cmte_id, transaction_id)
+                # print(childC1_forms_obj)
+                for obj in childC1_forms_obj:
+                    obj.update(API_CALL_SC1)
+                logger.debug('getting all sched_c2 childs...')
+                childC2_forms_obj = get_sched_c2_child(
+                    cmte_id, transaction_id)
+                # print(childC2_forms_obj)
+                for obj in childC2_forms_obj:
+                    obj.update(API_CALL_SC2)
+                child_tran = childC1_forms_obj + childC2_forms_obj
+                if child_tran:
+                    tran['child'] = child_tran
+                if loan_pyaments_obj:
+                    tran['payments'] = loan_pyaments_obj
+            return Response(json_result, status=status.HTTP_200_OK)
+
+    except:
+        raise
+
+@api_view(['GET'])
+def get_outstanding_loans_old(request):
     """
     Get all loans with an outstanding balance
     this api is used to enable the sched_c summary page

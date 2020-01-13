@@ -22,6 +22,8 @@ export class LoanMessageService {
   private switchFilterViewSubject = new Subject<any>();
   private populateFormSubject = new Subject<any>();
   private loadFormFieldsSubject = new Subject<any>();
+  private loanSummaryRefreshSubject = new Subject<any>();
+  
   /**
    * A publisher uses this method to send a message to subscribers
    * indicating the Pin Column options are to be shown.
@@ -203,5 +205,17 @@ export class LoanMessageService {
 
   public getLoadFormFieldsMessage(): Observable<any> {
     return this.loadFormFieldsSubject.asObservable();
+  }
+
+  public sendLoanSummaryRefreshMessage(message: any) {
+    this.loanSummaryRefreshSubject.next(message);
+  }
+
+  public clearLoanSummaryRefreshMessage() {
+    this.loanSummaryRefreshSubject.next();
+  }
+
+  public getLoanSummaryRefreshMessage(): Observable<any> {
+    return this.loanSummaryRefreshSubject.asObservable();
   }
 }

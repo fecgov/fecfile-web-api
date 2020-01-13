@@ -64,7 +64,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   // @ViewChild('modalBody')
   // public modalBody;
 
-  private filters: ReportFilterModel;
+  public filters: ReportFilterModel;
 
   public reportsModel: Array<reportModel>;
   //public filterReportsModel: Array<reportModel>;

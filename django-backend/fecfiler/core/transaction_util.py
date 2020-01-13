@@ -76,12 +76,14 @@ def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
                 payment_amount = 0
             balance_at_close = data[1]
             logger.debug("loan current payment amt:{}".format(payment_amount))
-            logger.debug("loan current payment amt:{}".format(balance_at_close))
+            logger.debug(
+                "loan current payment amt:{}".format(balance_at_close))
             new_payment_amount = (
                 float(payment_amount) + float(new_payment) - float(old_payment)
             )
             new_balance_at_close = (
-                float(balance_at_close) - float(new_payment) + float(old_payment)
+                float(balance_at_close) -
+                float(new_payment) + float(old_payment)
             )
         logger.debug(
             "update parent with new payment {}, new balance {}".format(
@@ -144,7 +146,8 @@ def update_sched_d_parent(cmte_id, transaction_id, new_payment, old_payment=0):
                 float(payment_amount) + float(new_payment) - float(old_payment)
             )
             new_balance_at_close = (
-                float(balance_at_close) - float(new_payment) + float(old_payment)
+                float(balance_at_close) -
+                float(new_payment) + float(old_payment)
             )
         logger.debug(
             "update parent with payment {}, close_b {}".format(
@@ -172,6 +175,8 @@ def do_transaction(sql, values):
     try:
         with connection.cursor() as cursor:
             cursor.execute(sql, values)
+            logger.debug(
+                "transaction done with rowcount:{}".format(cursor.rowcount))
             # if cursor.rowcount == 0:
             #     raise Exception("The sql transaction: {} failed...".format(sql))
     except Exception:
@@ -210,7 +215,8 @@ def update_parent_purpose(data):
             # Insert data into schedA table
             logger.debug("update parent purpose with sql:{}".format(_sql))
             logger.debug(
-                "update parent {} with purpose:{}".format(parent_tran_id, purpose)
+                "update parent {} with purpose:{}".format(
+                    parent_tran_id, purpose)
             )
             # print(report_id, cmte_id)
             cursor.execute(_sql, [purpose, parent_tran_id, report_id, cmte_id])
@@ -269,7 +275,8 @@ def populate_transaction_types():
             cursor.execute(_sql)
 
             if cursor.rowcount == 0:
-                raise Exception("bummer, no transaction_types found in the database.")
+                raise Exception(
+                    "bummer, no transaction_types found in the database.")
             for row in cursor.fetchall():
                 tran_dic[row[0]] = (row[1], row[2])
         return tran_dic
@@ -297,7 +304,8 @@ def get_transaction_type_descriptions():
         with connection.cursor() as cursor:
             cursor.execute(_sql)
             if cursor.rowcount == 0:
-                raise Exception("bummer, no transaction_types found in the database.")
+                raise Exception(
+                    "bummer, no transaction_types found in the database.")
             for row in cursor.fetchall():
                 tran_dic[row[0]] = row[1]
         # logger.debug("transaction desc loaded:{}".format(tran_dic))
@@ -819,6 +827,7 @@ def get_sched_b_transactions(
                                         nc_soft_account, transaction_type_identifier, 
                                         beneficiary_cmte_name,
                                         beneficiary_cand_entity_id,
+                                        levin_account_id,
                                         aggregate_amt,
                                         create_date
                 FROM public.sched_b WHERE report_id in ('{}')
@@ -841,6 +850,7 @@ def get_sched_b_transactions(
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
                         beneficiary_cmte_name,
                         beneficiary_cand_entity_id,
+                        levin_account_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -864,6 +874,7 @@ def get_sched_b_transactions(
                         other_state, other_zip, nc_soft_account, transaction_type_identifier, 
                         beneficiary_cmte_name,
                         beneficiary_cand_entity_id,
+                        levin_account_id,
                         aggregate_amt,
                         create_date
                 FROM public.sched_b 
@@ -889,9 +900,11 @@ def candify_it(cand_json):
     candify_item = {}
     for _f in cand_json:
         if _f == "entity_id":
-            candify_item["beneficiary_cand_entity_id"] = cand_json.get("entity_id")
+            candify_item["beneficiary_cand_entity_id"] = cand_json.get(
+                "entity_id")
         elif _f == "ref_cand_cmte_id":
-            candify_item["beneficiary_cand_id"] = cand_json.get("ref_cand_cmte_id")
+            candify_item["beneficiary_cand_id"] = cand_json.get(
+                "ref_cand_cmte_id")
             candify_item["cand_id"] = cand_json.get("ref_cand_cmte_id")
         elif _f in ["occupation", "employer"]:
             continue
@@ -937,6 +950,7 @@ def post_process_it_h4(cursor, cmte_id):
         merged_dict = {**item, **dictEntity}
         merged_list.append(merged_dict)
     return merged_list
+
 
 def post_process_it(cursor, cmte_id):
     """
@@ -999,4 +1013,3 @@ def cmte_type(cmte_id):
                 )
     except Exception as err:
         raise Exception(f"cmte_type function is throwing an error: {err}")
-

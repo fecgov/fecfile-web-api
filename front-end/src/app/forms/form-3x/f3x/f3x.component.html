@@ -33,7 +33,7 @@
         *ngIf="!allTransactions"
       >
       </transaction-sidebar>
-      <app-transactions-filter [hidden]="!isShowFilters" title="Filters" [formType]="formType">
+      <app-transactions-filter [hidden]="!allTransactions && !isShowFilters" title="Filters" [formType]="formType">
       </app-transactions-filter>
     </div>
   </div>
@@ -87,7 +87,9 @@
       <div class="form__step" [hidden]="step !== 'step_3'">
         <div [hidden]="transactionType === 'ALLOC_H4_TYPES' || transactionType === 'ALLOC_H4_SUM'
          || transactionType === 'ALLOC_H6_TYPES' || transactionType === 'ALLOC_H6_SUM'
-         || transactionType === 'LA_ENTRY' || transactionType === 'LB_ENTRY'">
+         || transactionType === 'LA_ENTRY' || transactionType === 'LB_ENTRY' 
+         || transactionType === 'LA_SUM' || transactionType === 'LB_SUM'
+         || transactionType === 'L_SUM'">
           <f3x-individual-receipt
             [hidden]="
               scheduleType !== 'sched_a' &&
@@ -95,7 +97,7 @@
               scheduleType !== 'sched_d' &&
               scheduleType !== 'sched_h4' &&
               scheduleType !== 'sched_h6' &&
-              scheduleType !== 'sched_L'
+              scheduleType !== 'sched_L' 
             "
             [transactionTypeText]="transactionTypeText"
             [transactionType]="transactionType"
@@ -104,6 +106,16 @@
             (status)="onNotify($event)"
           >
           </f3x-individual-receipt>
+          <app-sched-e
+            *ngIf="scheduleType === 'sched_e'"
+            [hidden]="scheduleType !== 'sched_e'"
+            [transactionTypeText]="transactionTypeText"
+            [transactionType]="transactionType"
+            [scheduleAction]="scheduleAction"
+            [scheduleType]="scheduleType"
+            (status)="onNotify($event)"
+          >
+          </app-sched-e>
         </div>
         <app-sched-f
           [hidden]="scheduleType !== 'sched_f'"
@@ -179,6 +191,8 @@
         <app-debt-summary
           *ngIf="scheduleType === 'sched_d_ds'"
           [forceChangeDetection]="forceChangeDetectionDebtSummary"
+          [transactionType]="transactionTypeDebtSummary"
+          [transactionTypeText]="transactionTypeTextDebtSummary"
           (status)="onNotify($event)">          
         </app-debt-summary>
 
@@ -235,7 +249,9 @@
         >
         </app-sched-h6>
         <app-sched-l
-          [hidden]="transactionType !== 'LA_ENTRY' && transactionType !== 'LB_ENTRY'"
+          [hidden]="transactionType !== 'LA_ENTRY' && transactionType !== 'LB_ENTRY' && 
+          transactionType !== 'LA_SUM' && transactionType !== 'LB_SUM'
+          && transactionType !== 'L_SUM'"
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"

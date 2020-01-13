@@ -82,11 +82,19 @@ export class LoanService {
    * @param filters
    * @return     {Observable}
    */
-  public getLoan(): Observable<any> {
+  public getLoan(message: any = null): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/sc/get_outstanding_loans';
-    const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
+
+
+    let reportId : string = '';
+    if(message && message.reportId && message.reportId !== 'undefined' && message.reportId !== '0'){
+      reportId = message.reportId;
+    }
+    else{
+      reportId = this._reportTypeService.getReportIdFromStorage('3X').toString();
+    }
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);

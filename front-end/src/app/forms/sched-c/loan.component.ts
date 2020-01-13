@@ -227,10 +227,12 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     //date validator is only applicable for "add" and not for edit. Also field is being disabled for edit. 
     if (fieldName === 'loan_incurred_date') {
       const formType = JSON.parse(localStorage.getItem('form_3X_report_type'));
-      this.cvgStartDate = formType.cvgStartDate;
-      this.cvgEndDate = formType.cvgEndDate;
-      if (this.scheduleAction === ScheduleActions.add) {
-        formValidators.push(this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate)); //TODO-ZS  -- do null checks. 
+      if(formType){
+        this.cvgStartDate = formType.cvgStartDate;
+        this.cvgEndDate = formType.cvgEndDate;
+        if (this.scheduleAction === ScheduleActions.add) {
+          formValidators.push(this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate)); //TODO-ZS  -- do null checks. 
+        }
       }
     }
 

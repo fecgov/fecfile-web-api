@@ -31,6 +31,13 @@ from fuzzywuzzy import fuzz
 import pandas
 import numpy
 
+from fecfiler.core.carryover_helper import (
+    do_h1_carryover,
+    do_h2_carryover,
+    do_loan_carryover,
+    do_debt_carryover,
+)
+
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
 # Create your views here.
@@ -103,6 +110,19 @@ CREATE OR replace VIEW PUBLIC.dynamic_forms_view AS
               GROUP BY dfbs.form_type, 
                        dfbs.transaction_type;
 """
+
+SCHEDULE_TO_TABLE_DICT = { 'SA': ['sched_a'],
+    'SB': ['sched_b'],
+    'SC': ['sched_c', 'sched_c1', 'sched_c2'],
+    'SD': ['sched_d'],
+    'SE': ['sched_e'],
+    'SF': ['sched_f'],
+    'SH': ['sched_h1', 'sched_h2', 'sched_h3', 'sched_h4', 'sched_h5', 'sched_h6'],
+    'SL': ['sched_l']
+}
+
+# NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER = ['LOAN_FROM_IND', 'LOAN_FROM_BANK', 'LOAN_OWN_TO_CMTE_OUT', 'IK_OUT', 'IK_BC_OUT', 
+#     'PARTY_IK_OUT', 'PARTY_IK_BC_OUT', 'PAC_IK_OUT', 'PAC_IK_BC_OUT', 'IK_TRAN_OUT', 'IK_TRAN_FEA_OUT']
 
 logger = logging.getLogger(__name__)
 # aws s3 bucket connection
@@ -179,6 +199,40 @@ def get_transaction_categories(request):
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
         return Response("The get_transaction_categories API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+********************************************************************************************************************************
+GET TRANSACTION TYPES API- CORE APP - FNE 1477, FNE1497 - BY ZOBAIR SALEEM
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_transaction_types(request):
+
+    try:
+        with connection.cursor() as cursor:
+            forms_obj= {}
+            form_type = request.query_params.get('form_type')
+
+            cursor.execute("select tran_identifier,tran_desc,category_type  from ref_transaction_types where form_type = %s", [form_type])
+            rows = cursor.fetchall()
+
+            transaction_types_dict=[]
+            for row in rows:
+                transaction_type = {
+                    'name': row[0],
+                    'text': row[1],
+                    'categoryType': row[2]
+                    }
+                transaction_types_dict.append(transaction_type)
+            response = transaction_types_dict
+                
+        if not bool(response):
+            return Response("No entries were found for the form_type: {}".format(form_type), status=status.HTTP_400_BAD_REQUEST)                              
+        
+        return Response(response, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_transaction_types API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 """
 ********************************************************************************************************************************
@@ -269,12 +323,14 @@ def get_dynamic_forms_fields(request):
                 cmte_type_category = cmte_type_categories[0]
         # print(forms_obj)
         if bool(forms_obj):
-            if transaction_type in ['ALLOC_EXP','ALLOC_EXP_VOID','ALLOC_EXP_CC_PAY','ALLOC_EXP_STAF_REIM','ALLOC_EXP_PMT_TO_PROL', 'ALLOC_EXP_DEBT']:
+            if transaction_type in ['ALLOC_EXP','ALLOC_EXP_VOID','ALLOC_EXP_CC_PAY','ALLOC_EXP_STAF_REIM','ALLOC_EXP_PMT_TO_PROL', 'ALLOC_EXP_DEBT',
+                                    'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM_MEMO', 'ALLOC_EXP_PMT_TO_PROL_MEMO', 'ALLOC_FEA_DISB',
+                                    'ALLOC_FEA_CC_PAY','ALLOC_FEA_STAF_REIM','ALLOC_FEA_CC_PAY_MEMO','ALLOC_FEA_STAF_REIM_MEMO','ALLOC_FEA_VOID','ALLOC_FEA_DISB_DEBT']:
                 if cmte_type_category:
                     for events in forms_obj['data']['committeeTypeEvents']:
                         for eventTypes in events['eventTypes']:
                             if eventTypes['eventType'] in ['PC', 'AD', 'GV']:
-                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y'"
                                 if eventTypes['eventType'] == 'PC':
                                     query_string += " AND public_communications = true"
                                 elif eventTypes['eventType'] == 'AD':
@@ -285,20 +341,20 @@ def get_dynamic_forms_fields(request):
                                     cursor.execute(query_string, [cmte_id,report_id])
                                     count = cursor.fetchone()
                                     print(cursor.query)
-                                print(eventTypes['eventType'] + "count: "+str(count[0]))
+                                print(eventTypes['eventType'] + " count: "+str(count[0]))
                                 if count[0] == 0:
                                     eventTypes['hasValue'] = False
                                 else:
                                     eventTypes['hasValue'] = True
                             elif eventTypes['eventType'] in ['DF', 'DC']:
                                 query_string = """SELECT json_agg(t) FROM (SELECT activity_event_name AS "activityEventType", transaction_id AS "transactionId", activity_event_name AS "activityEventDescription" 
-                                        FROM public.sched_h2 WHERE cmte_id = %s AND {} AND delete_ind IS DISTINCT FROM 'Y') AS t"""
+                                        FROM public.sched_h2 WHERE cmte_id = %s AND report_id = %s AND {} AND delete_ind IS DISTINCT FROM 'Y') AS t"""
                                 if eventTypes['eventType'] == 'DF':
                                     query_string = query_string.format("fundraising = true")
                                 elif eventTypes['eventType'] == 'DC':
                                     query_string = query_string.format("direct_cand_support = true")
                                 with connection.cursor() as cursor:
-                                    cursor.execute(query_string, [cmte_id])
+                                    cursor.execute(query_string, [cmte_id, report_id])
                                     print(cursor.query)
                                     activityEventTypes = cursor.fetchone()
                                 # print(eventTypes['eventType'] + 'activityEventTypes: '+ str(activityEventTypes[0]))
@@ -308,7 +364,7 @@ def get_dynamic_forms_fields(request):
                                 else:
                                     eventTypes['hasValue'] = False
                             elif eventTypes['eventType'] in ['VR', 'VI', 'GO', 'GC', 'EA']:
-                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND election_year = (SELECT EXTRACT(YEAR FROM cvg_start_date) FROM public.reports WHERE report_id = %s)"
+                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y'"
                                 with connection.cursor() as cursor:
                                     cursor.execute(query_string, [cmte_id,report_id])
                                     count = cursor.fetchone()
@@ -854,6 +910,13 @@ def reports(request):
             }    
             data = post_reports(datum)
             if type(data) is dict:
+                # print(data)
+                # do h1 carryover if new report created
+                do_h1_carryover(data.get('cmteid'), data.get('reportid'))
+                do_h2_carryover(data.get('cmteid'), data.get('reportid'))
+                do_loan_carryover(data.get('cmteid'), data.get('reportid'))
+                do_debt_carryover(data.get('cmteid'), data.get('reportid'))
+
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
@@ -2057,64 +2120,86 @@ TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FN
 def get_trans_query(category_type, cmte_id, param_string):
         
     if category_type == 'disbursements_tran':
-        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+        query_string = """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
-                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate from all_disbursements_transactions_view
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild from all_disbursements_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     elif category_type == 'loans_tran':
-        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
-                          purpose_description, loan_amount, loan_payment_to_date, loan_balance, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
-                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate from all_loans_debts_transactions_view
+        query_string = """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
+                          purpose_description, loan_amount, loan_payment_to_date, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
+                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild from all_loans_debts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     elif category_type == 'other_tran':
-        query_string = """SELECT report_id, schedule, report_type, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
-                                COALESCE(transaction_amount, 0.0) AS transaction_amount, 
-                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, transaction_type_identifier, 
-                                entity_id, entity_type, deleteddate  from all_other_transactions_view
-                            where cmte_id='""" + cmte_id + """' """ + param_string + """ """
-
+        query_string = """SELECT report_id, schedule, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, 
+                          name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, 
+                                election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild
+                            from all_other_transactions_view
+                            where cmte_id='""" + cmte_id + """' """ + param_string + """ """ 
     else:
-        query_string = """SELECT report_id, report_type, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+        query_string = """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
-                                transaction_type_identifier, entity_id, entity_type, deleteddate from all_receipts_transactions_view
+                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild from all_receipts_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
     return query_string
 
 def filter_get_all_trans(request, param_string):
-    if request.method == 'GET':
-        return param_string
+    # if request.method == 'GET':
+    #     return param_string
     filt_dict = request.data.get('filters', {})
-    for f_key, value_d in filt_dict.items():
-        if not value_d or value_d == 'null':
-            continue
-        if 'filterCategories' in f_key:
-            cat_tuple = "('"+"','".join(value_d)+"')"
-            param_string = param_string + " AND transaction_type_desc In " + cat_tuple
-        if 'filterDateFrom' in f_key and 'filterDateTo' in filt_dict.keys():
-            param_string = param_string + " AND transaction_date >= '" + value_d +"' AND transaction_date <= '" + filt_dict['filterDateTo'] +"'"
-        # The below code was added by Praveen. This is added to reuse this function in get_all_trashed_transactions API.
-        if 'filterDeletedDateFrom' in f_key and 'filterDeletedDateTo' in filt_dict.keys():
-            param_string = param_string + " AND date(last_update_date) >= '" + value_d +"' AND date(last_update_date) <= '" + filt_dict['filterDeletedDateTo'] +"'"
-        # End of Addition
-        if 'filterAmountMin' in f_key and 'filterAmountMax' in filt_dict.keys():
-            param_string = param_string + " AND transaction_amount >= " + str(value_d) +" AND transaction_amount <= " + str(filt_dict['filterAmountMax'])
-        if 'filterAggregateAmountMin' in f_key and 'filterAggregateAmountMax' in filt_dict.keys():
-            param_string = param_string + " AND aggregate_amt >= " + str(value_d) +" AND aggregate_amt <= " + str(filt_dict['filterAggregateAmountMax'])
-        if 'filterStates' in f_key:
-            state_tuple = "('"+"','".join(value_d)+"')"
-            param_string = param_string + " AND state In " + state_tuple
-        if 'filterItemizations' in f_key:
-            itemized_tuple = "('"+"','".join(value_d)+"')"
-            param_string = param_string + " AND itemized In " + itemized_tuple
-        if 'filterElectionCodes' in f_key:
-            itemized_tuple = "('"+"','".join(value_d)+"')"
-            param_string = param_string + " AND election_code In " + itemized_tuple
-        if 'filterElectionYearFrom' in f_key and 'filterElectionYearTo' in filt_dict.keys():
-            param_string = param_string + " AND election_year >= '" + value_d +"' AND election_year <= '" + filt_dict['filterElectionYearTo'] +"'"
+    ctgry_type = request.data.get('category_type')
+    # print(filt_dict)
+    if filt_dict.get('filterCategories'):
+        cat_tuple = "('"+"','".join(filt_dict['filterCategories'])+"')"
+        param_string = param_string + " AND transaction_type_desc In " + cat_tuple
+    if filt_dict.get('filterDateFrom') not in [None, 'null']:
+        param_string = param_string + " AND transaction_date >= '" + filt_dict['filterDateFrom'] + "'"
+    if filt_dict.get('filterDateTo') not in [None, 'null']:
+        param_string = param_string + " AND transaction_date <= '" + filt_dict['filterDateTo'] + "'"
+    # The below code was added by Praveen. This is added to reuse this function in get_all_trashed_transactions API.
+    if filt_dict.get('filterDeletedDateFrom') not in [None, 'null']:
+        param_string = param_string + " AND date(last_update_date) >= '" + filt_dict['filterDeletedDateFrom'] + "'"
+    if filt_dict.get('filterDeletedDateTo') not in [None, 'null']:
+        param_string = param_string + " AND date(last_update_date) <= '" + filt_dict['filterDeletedDateTo'] + "'"
+    # End of Addition
+    if filt_dict.get('filterAmountMin') not in [None, 'null']:
+        param_string = param_string + " AND transaction_amount >= '" + str(filt_dict['filterAmountMin']) + "'"
+    if filt_dict.get('filterAmountMax') not in [None, 'null']:
+        param_string = param_string + " AND transaction_amount <= '" + str(filt_dict['filterAmountMax']) + "'"
+    if filt_dict.get('filterAggregateAmountMin') not in [None, 'null']:
+        param_string = param_string + " AND aggregate_amt >= '" + str(filt_dict['filterAggregateAmountMin']) + "'"
+    if filt_dict.get('filterAggregateAmountMax') not in [None, 'null']:
+        param_string = param_string + " AND aggregate_amt <= '" + str(filt_dict['filterAggregateAmountMax']) + "'"
+    if filt_dict.get('filterStates'):
+        state_tuple = "('"+"','".join(filt_dict['filterStates'])+"')"
+        param_string = param_string + " AND state In " + state_tuple
+    if filt_dict.get('filterItemizations'):
+        itemized_tuple = "('"+"','".join(filt_dict['filterItemizations'])+"')"
+        param_string = param_string + " AND itemized In " + itemized_tuple
+    if filt_dict.get('filterElectionCodes'):
+        election_tuple = "('"+"','".join(filt_dict['filterElectionCodes'])+"')"
+        param_string = param_string + " AND election_code In " + election_tuple
+    if filt_dict.get('filterElectionYearFrom') not in [None, 'null']:
+        param_string = param_string + " AND election_year >= '" + filt_dict['filterElectionYearFrom'] + "'"
+    if filt_dict.get('filterElectionYearTo') not in [None, 'null']:
+        param_string = param_string + " AND election_year <= '" + filt_dict['filterElectionYearTo'] + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterLoanAmountMin') not in [None, 'null']:
+        param_string = param_string + " AND loan_amount >= '" + str(filt_dict['filterLoanAmountMin']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterLoanAmountMax') not in [None, 'null']:
+        param_string = param_string + " AND loan_amount <= '" + str(filt_dict['filterLoanAmountMax']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterLoanClosingBalanceMin') not in [None, 'null']:
+        param_string = param_string + " AND loan_closing_balance >= '" + str(filt_dict['filterLoanClosingBalanceMin']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterLoanClosingBalanceMax') not in [None, 'null']:
+        param_string = param_string + " AND loan_closing_balance <= '" + str(filt_dict['filterLoanClosingBalanceMax']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterDebtBeginningBalanceMin') not in [None, 'null']:
+        param_string = param_string + " AND loan_beginning_balance >= '" + str(filt_dict['filterDebtBeginningBalanceMin']) + "'"
+    if ctgry_type == 'loans_tran' and filt_dict.get('filterDebtBeginningBalanceMax') not in [None, 'null']:
+        param_string = param_string + " AND loan_beginning_balance <= '" + str(filt_dict['filterDebtBeginningBalanceMax']) + "'"
+    # print(param_string)
     return param_string
 
 # def get_aggregate_amount(transaction_id):
@@ -2311,8 +2396,30 @@ def get_all_transactions(request):
         
         # ADDED the below code to access transactions across reports
         if 'reportid' in request.data and str(request.data.get('reportid')) not in ['',"", "null", "none"]:
+            # add carryover code here so that carryover can be triggered by get_all_transactions
+            if int(request.data.get('reportid')) != 0:
+                # disable h1 carryover triggered by this API call
+                # do_h1_carryover(cmte_id, request.data.get('reportid'))
+                do_h2_carryover(cmte_id, request.data.get('reportid'))
+                do_loan_carryover(cmte_id, request.data.get('reportid'))
+                do_debt_carryover(cmte_id, request.data.get('reportid'))
             report_list = superceded_report_id_list(request.data.get('reportid'))
-            param_string += " AND report_id in ('{}')".format("', '".join(report_list))
+            if ctgry_type != 'other_tran':
+                param_string += " AND report_id in ('{}')".format("', '".join(report_list))
+            else:
+                param_string = param_string + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
+                                                OR 
+                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
+                                                OR
+                                                (transaction_table = 'sched_h2' AND name IN (
+                                                SELECT h4.activity_event_identifier FROM public.sched_h4 h4
+                                                WHERE  h4.report_id = '{0}'
+                                                AND h4.cmte_id = '{1}'
+                                                UNION
+                                                SELECT h3.activity_event_name
+                                                FROM   public.sched_h3 h3
+                                                WHERE  h3.report_id = '{0}'
+                                                AND h3.cmte_id = '{1}')))""".format(request.data.get('reportid'), cmte_id)
 
         # To determine if we are searching for regular or trashed transactions
         if 'trashed_flag' in request.data and str(request.data.get('trashed_flag')).lower() == 'true':
@@ -2336,8 +2443,9 @@ def get_all_transactions(request):
         output_list = []
         total_amount = 0.0
         with connection.cursor() as cursor:
+            logger.debug('query all transactions with sql:{}'.format(trans_query_string))
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
-            # print(cursor.query)
+            print(cursor.query)
             data_row = cursor.fetchone()
             if data_row and data_row[0]:
                 transaction_list = data_row[0]
@@ -2363,7 +2471,10 @@ def get_all_transactions(request):
                 else:
                     transaction_dict = {trans.get('transaction_id'): trans for trans in transaction_list}
                     for tran_id,transaction in transaction_dict.items():
-                        total_amount += transaction.get('transaction_amount', 0.0)
+                        if transaction.get('memo_code') != 'X':
+                            total_amount += transaction.get('transaction_amount', 0.0)
+                        # if transaction.get('transaction_type_identifier') in NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER:
+                        #     transaction['isEditable'] = False
                         if transaction.get('back_ref_transaction_id') is not None and transaction.get('back_ref_transaction_id') in transaction_dict: 
                             parent = transaction_dict.get(transaction.get('back_ref_transaction_id'))
                             if 'child' not in parent:
@@ -2372,7 +2483,7 @@ def get_all_transactions(request):
                         else:
                             output_list.append(transaction)
             else:
-                status_value = status.HTTP_204_NO_CONTENT
+                status_value = status.HTTP_200_OK
         # logger.debug(output_list)
         total_count = len(output_list)
         paginator = Paginator(output_list, itemsperpage)
@@ -2588,39 +2699,26 @@ def get_list_report_data(report_id, cmte_id):
 @api_view(['POST'])
 def delete_trashed_transactions(request):
     try:
-        #import ipdb;ipdb.set_trace()
-        #message_dict = {}
         committeeid = request.user.username
+        row_count = 0
         for _action in request.data.get('actions', []):
             #report_id = _action.get('report_id', '')
             trans_id = _action.get('transaction_id', '')
-            
-            message='Transaction deleted successfully'
-            #message_dict[trans_id] = message
-            sched_a_obj = get_SA_from_transaction_data(trans_id)[0]
-            #print(sched_a_obj) Mahendra 10052019
-            if sched_a_obj:
-               
-                report_info = get_list_report_data(sched_a_obj['report_id'], committeeid)[0]
-                #print(report_info)
-                if report_info and report_info['status'] == 'Submitted':
-                   message = 'The transaction report is submitted.'
-                   #message_dict[trans_id] = message
-                elif report_info and report_info['status'] == None:
-                    message = 'The transaction report is None.'
-                    #message_dict[trans_id] = message
-                else:
+            table_list = SCHEDULE_TO_TABLE_DICT.get(trans_id[:2])
+            if table_list:
+                for table in table_list:
                     try:
-
                         with connection.cursor() as cursor:
-                            cursor.execute("""Delete FROM public.sched_a where transaction_id = %s;""",[trans_id])
-                            #message = 'Transaction deleted successfully'
+                            cursor.execute("""Delete FROM public.{} where transaction_id = %s;""".format(table),[trans_id])
+                            row_count += cursor.rowcount
                     except Exception as e:
-                        print(e)
-                        message = 'Error in deleting the transaction'
-                        #message_dict[trans_id] = message
-
-        json_result = {'message':message}
+                        raise Exception('delete_trashed_transactions SQl is throwing an error: ' + str(e))
+                if not row_count:
+                    logger.debug('Delete trashed transaction: '+str(trans_id)+' for committee: '+str(committeeid))
+                    raise Exception("""The transaction ID: {1} is either already deleted or does not exist in {0} table""".format(','.join(table_list), trans_id))
+            else:
+                raise Exception('The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT.'.format(trans_id))
+        json_result = {'message':'Transaction deleted successfully'}
         return Response(json_result, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response('The delete_trashed_transactions API is throwing an error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
@@ -4885,6 +4983,26 @@ def get_next_transaction_id(trans_char):
     except Exception:
         raise
 
+def get_sched_h_transaction_table(transaction_id):
+    """
+    helper function for querying transaction table name for sched h
+    """
+    _sql = """
+    select transaction_table 
+    from all_other_transactions_view 
+    where transaction_id = %s;
+    """
+    try:
+        with connection.cursor() as cursor:
+            logger.debug("fetching transaction table name for {}".format(transaction_id))
+            # cursor.execute(table_schema_sql, (transaction_table))
+            cursor.execute(_sql, [transaction_id]) 
+            if cursor.rowcount == 0:
+                raise Exception('transaction_id not found.')
+            return cursor.fetchone()[0]
+    except:
+        raise
+
 @api_view(['POST'])
 def clone_a_transaction(request):
     """
@@ -4896,6 +5014,9 @@ def clone_a_transaction(request):
     2. transaction amount is set to 0
     3. create date is also today's date 
     4. last update date has null value
+
+    update 20191220: sched_h clone function added. transaction_table for a 
+    transaction_id is fetched from all_other_transactions_view
     """
     # TODO: need to update this list for ohter transactions
     logger.debug('request for cloning a transaction:{}'.format(request.data))
@@ -4914,6 +5035,8 @@ def clone_a_transaction(request):
     if transaction_id[0:2] in transaction_tables:
         transaction_table = transaction_tables.get(transaction_id[0:2])
         # raise Exception('Error: invalid transaction id found.')
+    elif transaction_id[0:2] == 'SH':
+        transaction_table = get_sched_h_transaction_table(transaction_id)
     else:
         raise Exception('Error: invalid transaction id found.')
 
@@ -4938,6 +5061,7 @@ def clone_a_transaction(request):
         replace_list = ['transaction_id', 'create_date', 'last_update_date']
         tmp_list = [col if col not in replace_list else '%s' for col in columns]
         select_str = ','.join(tmp_list)
+        print('select_str:{}'.format(select_str))
 
         # set transaction date to today's date and transaction amount to 0
         from datetime import date
@@ -4948,6 +5072,16 @@ def clone_a_transaction(request):
         if transaction_id.startswith('SB'):
             select_str = select_str.replace('expenditure_date', "'"+_today+"'")
             select_str = select_str.replace('expenditure_amount', "'"+'0.00'+"'")
+        if transaction_id.startswith('SH') and transaction_table == 'sched_h4':
+            select_str = select_str.replace('expenditure_date', "'"+_today+"'")
+            select_str = select_str.replace('total_amount', "'"+'0.00'+"'")
+            select_str = select_str.replace('non_fed_share_amount', "'"+'0.00'+"'")
+            select_str = select_str.replace('fed_share_amount', "'"+'0.00'+"'")
+        if transaction_id.startswith('SH') and transaction_table == 'sched_h6':
+            select_str = select_str.replace('expenditure_date', "'"+_today+"'")
+            select_str = select_str.replace('total_fed_levin_amount', "'"+'0.00'+"'")
+            select_str = select_str.replace('federal_share', "'"+'0.00'+"'")
+            select_str = select_str.replace('levin_share', "'"+'0.00'+"'")
             # exclude_list = ['expenditure_date', 'expenditure_amount'] 
         # select_str = insert_str.replace(',transaction_id,', ',%s,'
         # ).replace('create_date', '%s'
@@ -5611,6 +5745,35 @@ def get_sched_c_loanPayment_dynamic_forms_fields(request):
 
 """
 ********************************************************************************************************************************
+GET COVERAGE DATES BASED ON A REPORT ID - BY ZOBAIR SALEEM
+********************************************************************************************************************************
+"""
+@api_view(['GET'])
+def get_coverage_dates(request):
+
+    try:
+        cmte_id = request.user.username
+        report_id =request.query_params.get('report_id')
+        
+        with connection.cursor() as cursor:
+            forms_obj= {}
+            cursor.execute("SELECT cvg_start_date, cvg_end_date FROM reports where report_id = %s ", [report_id])
+            
+            row = cursor.fetchone()
+            data_row = list(row)
+
+            forms_obj = {
+                'cvg_start_date':data_row[0],
+                'cvg_end_date':data_row[1]
+                }
+
+        return Response(forms_obj, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_coverage_datess API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+"""
+********************************************************************************************************************************
 END LOAN REPAYMENT DYNAMIC FORM FIELDS API
 ********************************************************************************************************************************
 """
@@ -5619,24 +5782,38 @@ END LOAN REPAYMENT DYNAMIC FORM FIELDS API
 Creating API FOR UPDATING Schedule-L SUMMARY TABLE - CORE APP - SPRINT 25 - FNE 1800- BY  Yeswanth Kumar Tella
 ********************************************************************************************************************************
 """
-def get_sl_cash_on_hand_cop(report_id, cmte_id, prev_yr):
+
+def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
     try:
+        prev_yr = False
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        if prev_yr:
+
+        if yr_to_dat:
+            #cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+            from_date = date(cvg_start_date.year, 1,1)
+            #to_date = date(cvg_end_date.year, 12, 31)
             prev_cvg_year = cvg_start_date.year - 1
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
+
+            print(prev_cvg_end_dt,'prevvvvvvvvvvvvvvvvvvvvvvvv')
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.account_name = %s AND t1.cvg_end_date <= %s AND t1.delete_ind is distinct from 'Y' order by t1.cvg_end_date desc limit 1", 
+                [cmte_id, levin_accnt_name, prev_cvg_end_dt])
+                if (cursor.rowcount == 0):
+                    coh_cop = 0
+                else:
+                    result = cursor.fetchone()
+                    coh_cop = result[0]
+
         else:
-            prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT COALESCE(coh_cop, 0) from public.sched_l where cmte_id = %s AND cvg_end_date = %s AND delete_ind is distinct from 'Y'",
-                [cmte_id, prev_cvg_end_dt],
-            )
-            if cursor.rowcount == 0:
-                coh_cop = 0
-            else:
-                result = cursor.fetchone()
-                coh_cop = result[0]
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.account_name = %s AND t1.cvg_end_date < %s AND t1.delete_ind is distinct from 'Y' order by t1.cvg_end_date desc limit 1", 
+                [cmte_id, levin_accnt_name, cvg_end_date])
+                if (cursor.rowcount == 0):
+                    coh_cop = 0
+                else:
+                    result = cursor.fetchone()
+                    coh_cop = result[0]
 
         return coh_cop
     except Exception as e:
@@ -5644,26 +5821,38 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, prev_yr):
             "The prev_cash_on_hand_cop(sl) function is throwing an error: " + str(e)
         )
 
-
-def get_sl_item_aggregate(report_id, cmte_id):
+def get_sl_item_aggregate(report_id, cmte_id, prev_yr,levin_accnt_name):
     try:
-        # cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        # if prev_yr:
-        #     prev_cvg_year = cvg_start_date.year - 1
-        #     prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
-        # else:
-        #     prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
+        # import pdb;pdb.set_trace()
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        import pdb;pdb.set_trace()
+        if not prev_yr:
+            #cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+            from_date = date(cvg_start_date.year, 1,1)
+            #to_date = date(cvg_end_date.year, 12, 31)
+            to_date = cvg_end_date
+
         with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT SUM(aggregate_amt) from public.sched_a 
-                where cmte_id = %s AND aggregate_amt > 200 AND line_number = '1A' AND report_id= %s  AND delete_ind is distinct from 'Y'""",
-                [cmte_id, report_id]
-            )
+            if prev_yr:
+                cursor.execute("""
+                    SELECT SUM(aggregate_amt) from public.sched_a sa
+                    join levin_account la on sa.levin_account_id = la.levin_account_id 
+                    where sa.cmte_id = %s AND sa.aggregate_amt > 200 AND sa.line_number = '1A' AND sa.report_id= %s  AND sa.delete_ind is distinct from 'Y'""",
+                    [cmte_id, report_id]
+                )
+            else:
+                cursor.execute("""
+                    SELECT SUM(aggregate_amt) from public.sched_a sa
+                    join levin_account la on sa.levin_account_id = la.levin_account_id 
+                    where sa.cmte_id = %s AND sa.aggregate_amt > 200 AND sa.line_number = '1A' AND sa.contribution_date >= %s AND sa.contribution_date <= %s AND sa.delete_ind is distinct from 'Y'""",
+                    [cmte_id, from_date, to_date]
+                )
             if cursor.rowcount == 0:
                 agg_amt = 0
             else:
                 result = cursor.fetchone()
                 agg_amt = result[0] if result[0] else 0
+        
 
         return agg_amt
     except Exception as e:
@@ -5671,19 +5860,28 @@ def get_sl_item_aggregate(report_id, cmte_id):
             "The Agg itm_amnt: " + str(e)
         )
 
-def get_sl_unitem_aggregate(report_id, cmte_id):
+def get_sl_unitem_aggregate(report_id, cmte_id, prev_yr, levin_accnt_name):
     try:
-        # cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        # if prev_yr:
-        #     prev_cvg_year = cvg_start_date.year - 1
-        #     prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
-        # else:
-        #     prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
+        if not prev_yr:
+            cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+            from_date = date(cvg_start_date.year, 1,1)
+            #to_date = date(cvg_end_date.year, 12, 31)
+            to_date = cvg_end_date
         with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT SUM(aggregate_amt) from public.sched_a 
-                where cmte_id = %s AND aggregate_amt <= 200 AND line_number = '1A' AND report_id= %s AND delete_ind is distinct from 'Y'""",
-                [cmte_id, report_id])
+            if prev_yr:
+                cursor.execute("""
+                    SELECT SUM(aggregate_amt) from public.sched_a sa
+                    join levin_account la on sa.levin_account_id = la.levin_account_id 
+                    where sa.cmte_id = %s AND sa.aggregate_amt <= 200 AND sa.line_number = '1A' AND sa.report_id= %s  AND sa.delete_ind is distinct from 'Y'""",
+                    [cmte_id, report_id]
+                )
+            else:
+                cursor.execute("""
+                    SELECT SUM(aggregate_amt) from public.sched_a sa
+                    join levin_account la on sa.levin_account_id = la.levin_account_id 
+                    where sa.cmte_id = %s AND sa.aggregate_amt <= 200 AND sa.line_number = '1A' AND sa.contribution_date >= %s AND sa.contribution_date <= %s AND sa.delete_ind is distinct from 'Y'""",
+                    [cmte_id,from_date, to_date]
+                )
             if cursor.rowcount == 0:
                 agg_amt = 0
             else:
@@ -5696,57 +5894,79 @@ def get_sl_unitem_aggregate(report_id, cmte_id):
             "The Agg unitem_amnt: " + str(e)
         )
 
-def get_sl_line_sum_value(line_number, formula, sched_la_line_sum_dict, cmte_id, report_id, prev_yr=None):
-    
+def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_sum_dict, cmte_id, report_id, prev_yr=None):
+    #print(line_number, levin_accnt_name, formula, sched_la_line_sum_dict, cmte_id, report_id, prev_yr,'paramss')
+   
     val = 0
     if line_number == '1a':
-        return get_sl_item_aggregate(report_id, cmte_id)
+        sl_item_val = get_sl_item_aggregate(report_id, cmte_id, prev_yr, levin_accnt_name)
+        #print(sl_item_val,'-item vel',levin_accnt_name)
+        
+        return sl_item_val,levin_accnt_name
 
     if line_number == '1b':
-        return get_sl_unitem_aggregate(report_id, cmte_id)
+        sl_unitem_val = get_sl_unitem_aggregate(report_id, cmte_id, prev_yr, levin_accnt_name)
+        return sl_unitem_val,levin_accnt_name
 
     if line_number == '7':
+        print(formula,'line 77777777777777777777')
         if formula == '':
-          val = get_sl_cash_on_hand_cop(report_id, cmte_id, False)
+          val = get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, False)
         else:
-          val = get_sl_cash_on_hand_cop(report_id, cmte_id, True)
-        # print('report_id: '+ report_id + '; cmte_id: ' + cmte_id)
-        # print('rep: '+str(val))
-        return val
+          val = get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, True)
+          print(val,'77777777777777777777777777777777')
+       
+        return val,levin_accnt_name
 
  
+ 
     if formula == "":
-        val += sched_la_line_sum_dict.get(line_number, 0) if sched_la_line_sum_dict.get(line_number, 0) else 0
-        return val
+       
+        val += sched_la_line_sum_dict.get(line_number, 0)[0] if sched_la_line_sum_dict.get(line_number, 0) else 0
+      
+        return val,levin_accnt_name
     if formula == "0":
-        return val
+        return val,levin_accnt_name
     formula_split = formula.replace(' ', '').split('+')
+
+    #print(formula_split,'formula_split')
+    
     if len(formula_split) == 1:
         if '-' in formula_split[0]:
+           
             cl_n = formula_split[0].replace(' ', '')
-            val += get_sl_line_sum_value(cl_n.split('-')[0], "", sched_la_line_sum_dict, cmte_id,
-                                          report_id) - get_sl_line_sum_value(cl_n.split('-')[1], "", sched_la_line_sum_dict, cmte_id,
-                                          report_id)
+            val += get_sl_line_sum_value(cl_n.split('-')[0],levin_accnt_name, "", sched_la_line_sum_dict, cmte_id,
+                                          report_id)[0] - get_sl_line_sum_value(cl_n.split('-')[1],levin_accnt_name, "", sched_la_line_sum_dict, cmte_id,
+                                          report_id)[0]
         else:
+           
             line_number = formula_split[0]
-            val += sched_la_line_sum_dict.get(line_number, 0) if sched_la_line_sum_dict.get(line_number, 0) else 0
+            val += sched_la_line_sum_dict.get(line_number, 0)[0] if sched_la_line_sum_dict.get(line_number, 0) else 0
 
     else:
         for cl_n in formula_split:
             if '-' in cl_n:
-                val += get_sl_line_sum_value(cl_n.split('-')[0], "", sched_la_line_sum_dict, cmte_id,
-                                          report_id) - get_sl_line_sum_value(cl_n.split('-')[1], "", sched_la_line_sum_dict, cmte_id,
-                                          report_id)
+                val += get_sl_line_sum_value(cl_n.split('-')[0],levin_accnt_name, "", sched_la_line_sum_dict, cmte_id,
+                                          report_id) - get_sl_line_sum_value(cl_n.split('-')[1],levin_accnt_name, "", sched_la_line_sum_dict, cmte_id,
+                                          report_id)[0]
             else:
-                val += get_sl_line_sum_value(cl_n, "", sched_la_line_sum_dict, cmte_id, report_id)
-    return val
+
+                #print(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id,'addddddddddddddddddddddddddddddddddddddddddddddddd')
+              
+                #line_val = get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)
+                val_l_changed = sched_la_line_sum_dict.get(cl_n, 0)[0] if sched_la_line_sum_dict.get(cl_n, 0) else 0
+                if val_l_changed:
+                    val += val_l_changed
+                else:
+                    val += get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)[0]
+                print(val,'val-add')
+               
+    return val,levin_accnt_name
 
 
 @api_view(['POST'])
 def prepare_Schedl_summary_data(request):
     try:
-        #print("request.data: ", request.data)
-        #commented by Mahendra 10052019
         # import ipdb;ipdb.set_trace()
         cmte_id = request.user.username
         param_string = ""
@@ -5759,99 +5979,115 @@ def prepare_Schedl_summary_data(request):
         #cdate = date.today()
         from_date = date(cvg_start_date.year, 1,1)
        
-        to_date = date(cvg_end_date.year, 12, 31)
+        to_date = cvg_end_date
        
 
-        #schedule_a_b_line_sum_dict = {}
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT line_number, sum(contribution_amount) from public.sched_a 
-                where cmte_id = '%s' AND report_id = '%s'  And line_number in ('1A','2') group by line_number;""" %(cmte_id, report_id))
-            #print(cursor.query)
-            #commented by Mahendra 10052019
+                SELECT sa.line_number, sum(sa.contribution_amount), la.levin_account_name from public.sched_a sa
+                join levin_account la on sa.levin_account_id = la.levin_account_id  
+                where sa.cmte_id = '%s' AND sa.report_id = '%s'  And line_number in ('1A','2')  group by sa.line_number,la.levin_account_name;""" %(cmte_id, report_id))
+           
             sched_la_line_sum_result = cursor.fetchall()
-            sched_la_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_la_line_sum_result}
+            sched_la_line_sum = {str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2]) for i in sched_la_line_sum_result}
+
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT line_number, sum(expenditure_amount) from public.sched_b 
-                where cmte_id = '%s' AND report_id = '%s' AND line_number in  ('4A', '4B','4C','4D','5') group by line_number;""" %(cmte_id, report_id))
-            #print(cursor.query)
-            #commented by Mahendra 10052019
+                SELECT sb.line_number, sum(sb.expenditure_amount), la.levin_account_name from public.sched_b sb
+                join levin_account la on sb.levin_account_id = la.levin_account_id 
+                where sb.cmte_id = '%s' AND sb.report_id = '%s' AND sb.line_number in  ('4A', '4B','4C','4D','5') group by sb.line_number,la.levin_account_name;""" %(cmte_id, report_id))
+         
             sched_lb_line_sum_result = cursor.fetchall()
-            sched_lb_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in sched_lb_line_sum_result}
+            sched_lb_line_sum = {str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2]) for i in sched_lb_line_sum_result}
         
         schedule_la_lb_line_sum_dict = {}
         schedule_la_lb_line_sum_dict.update(sched_la_line_sum)
         schedule_la_lb_line_sum_dict.update(sched_lb_line_sum)
 
+ 
+
         col_la_line_sum = {}
         col_lb_line_sum = {}
 
-        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        # if prev_yr:
-        #     prev_cvg_year = cvg_start_date.year - 1
-        #     prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
-        # else:
-        #     prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-        #import pdb;pdb.set_trace()
 
         with connection.cursor() as cursor:
             cursor.execute(""" 
-                SELECT line_number, sum(contribution_amount) from public.sched_a 
-                where cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND line_number in ('1A','2') AND
-                delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
-            #print(cursor.query)     
-            #commented by Mahendra 10052019
+                SELECT sa.line_number, sum(sa.contribution_amount), la.levin_account_name from public.sched_a sa
+                join levin_account la on sa.levin_account_id = la.levin_account_id  
+                where sa.cmte_id = %s AND sa.contribution_date >= %s AND sa.contribution_date <= %s AND sa.line_number in ('1A','2') AND
+                sa.delete_ind is distinct from 'Y' group by sa.line_number,la.levin_account_name;""", [cmte_id, from_date, to_date])
+
             col_la_line_sum_result = cursor.fetchall()
-            col_la_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_la_line_sum_result}
+            col_la_line_sum = {str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2]) for i in col_la_line_sum_result}
            
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT line_number, sum(expenditure_amount) from public.sched_b 
-                where cmte_id = %s AND expenditure_date >= %s AND expenditure_date <= %s AND line_number in  ('4A', '4B','4C','4D','5') AND
-                delete_ind is distinct from 'Y' group by line_number;""", [cmte_id, from_date, to_date])
+                SELECT sb.line_number, sum(sb.expenditure_amount), la.levin_account_name from public.sched_b sb
+                join levin_account la on sb.levin_account_id = la.levin_account_id 
+                where sb.cmte_id = %s AND sb.expenditure_date >= %s AND sb.expenditure_date <= %s AND sb.line_number in  ('4A', '4B','4C','4D','5') AND
+                sb.delete_ind is distinct from 'Y' group by sb.line_number,la.levin_account_name;""", [cmte_id, from_date, to_date])
             
             col_lb_line_sum_result = cursor.fetchall()
-            col_lb_line_sum = {str(i[0].lower()): i[1] if i[1] else 0 for i in col_lb_line_sum_result}
+            col_lb_line_sum = {str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2]) for i in col_lb_line_sum_result}
            
-
+        
         col_line_sum_dict = {}
         col_line_sum_dict.update(col_la_line_sum)
         col_line_sum_dict.update(col_lb_line_sum)
 
+        
 
-        col_la = [('1a', ''),('1b', ''), ('2', ''),
-                ('1c', '1a + 1b'), ('3', '1c+2'), ('4a', ''),('4b', ''), ('4c', ''), 
+
+        col_la = [('1a', ''),('1b', ''),
+                ('1c', '1a+1b'),('2', ''),('3', '1c+2'), ('4a', ''),('4b', ''), ('4c', ''), 
                 ('4d', ''), ('4e', '4a+4b+4c+4d'), ('5', ''), ('6', '4e+5'), ('7', ''), ('8', '3'), ('9', '7+8'), 
                 ('10', '6'), ('11', '9 - 10')]
+        
+       
 
         col_la_dict_original = OrderedDict()
         for i in col_la:
             col_la_dict_original[i[0]] = i[1]
         final_col_la_dict = {}
+        #print(col_la_dict_original,';;;;;;;;;;;;;;;;;;;;;;;;;;;;;')
+
+       
+        levin_name = ''
         for line_number in col_la_dict_original:
-            final_col_la_dict[line_number] = get_sl_line_sum_value(line_number, col_la_dict_original[line_number],
+            if not levin_name:
+                levin_name = schedule_la_lb_line_sum_dict.get(line_number)[1] if schedule_la_lb_line_sum_dict.get(line_number) else ''
+                #print(line_number,levin_name,'------------line_number lllllllllllllllllllllllllllllllllllll')
+            
+            final_col_la_dict[line_number] = get_sl_line_sum_value(line_number,levin_name, 
+                                                               col_la_dict_original[line_number],
                                                                schedule_la_lb_line_sum_dict, cmte_id, report_id, True)
            
+           
             schedule_la_lb_line_sum_dict[line_number] = final_col_la_dict[line_number]
-
+            #print(schedule_la_lb_line_sum_dict,'vallllllllllllllllllllllllllllllllllll scaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+   
         
 
-        col_lb = [('1a', ''), ('2', ''),
-                ('1b', ''), ('1c', '1a + 1b'), ('3', '1c+2'), ('4a', ''),('4b', ''), ('4c', ''), 
+        col_lb = [('1a', ''),
+                ('1b', ''), ('1c', '1a+1b'), ('2', ''), ('3', '1c+2'), ('4a', ''),('4b', ''), ('4c', ''), 
                 ('4d', ''), ('4e', '4a+4b+4c+4d'), ('5', ''), ('6', '4e+5'), ('7', 'prev'), ('8', '3'), ('9', '7+8'), 
                 ('10', '6'), ('11', '9 - 10')]
+
+
 
         col_lb_dict_original = OrderedDict()
         for i in col_lb:
             col_lb_dict_original[i[0]] = i[1]
         final_col_lb_dict = {}
         for line_number in col_lb_dict_original:
-            final_col_lb_dict[line_number] = get_sl_line_sum_value(line_number, col_lb_dict_original[line_number],
+            if not levin_name:
+                levin_name = col_line_sum_dict.get(line_number)[1] if col_line_sum_dict.get(line_number) else ''
+            final_col_lb_dict[line_number] = get_sl_line_sum_value(line_number,levin_name, col_lb_dict_original[line_number],
                                                                col_line_sum_dict,
                                                                cmte_id, report_id, False)
             col_line_sum_dict[line_number] = final_col_lb_dict[line_number]
-       
+
+
         for i in final_col_la_dict:
             la_val = final_col_la_dict[i]
             lb_val = final_col_lb_dict.get(i)
@@ -5865,7 +6101,6 @@ def prepare_Schedl_summary_data(request):
            
             final_col_lb_dict[i] = lb_val
             final_col_la_dict[i] = la_val
-
         
 
 
@@ -5904,25 +6139,40 @@ def prepare_Schedl_summary_data(request):
                              '9': 'sub_total_ytd',
                              '10': 'disbursements_ytd',
                              '11': 'coh_cop_ytd'}
-        #import pdb;pdb.set_trace()
+        
         update_str = ""
+        levin_accnt_name = None
+        sum_value = 0
         for i in update_col_la_dict:
-            sum_value = final_col_la_dict.get(i, None)
-            if sum_value in ["",None, "None"]:
+            dict_value = final_col_la_dict.get(i, None)
+            if dict_value in ["",None, "None"]:
                 sum_value = 0
+                levin_accnt_name = None
+            else:
+              sum_value = dict_value[0]
+              levin_accnt_name = dict_value[1]
             update_str += "%s=%s," % (update_col_la_dict[i], str(sum_value))
+            # update_str += "%s='%s'," % ('account_name', str(levin_accnt_name))
         for i in update_col_lb_dict:
-            sum_value = final_col_lb_dict.get(i, None)
-            if sum_value in ["",None, "None"]:
+            dict_value = final_col_lb_dict.get(i, None)
+            if dict_value in ["",None, "None"]:
                 sum_value = 0
-            update_str += "%s=%s," % (update_col_lb_dict[i], str(sum_value))
+                levin_accnt_name = None
+            else:
+              sum_value = dict_value[0]
+              levin_accnt_name = dict_value[1]
 
+            update_str += "%s=%s," % (update_col_lb_dict[i], str(sum_value))
+        update_str += "%s='%s'," % ('account_name', str(levin_accnt_name))
+
+        
         update_str = update_str[:-1]
         with connection.cursor() as cursor:
-
             update_query = """update public.sched_l set %s WHERE cmte_id = '%s' AND report_id = '%s';"""%(update_str, cmte_id, report_id)
             cursor.execute(update_query)
         return Response({'Response':'Success'}, status= status.HTTP_200_OK)
     except Exception as e:
         return Response({'Response':'Failed', 'Message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
     

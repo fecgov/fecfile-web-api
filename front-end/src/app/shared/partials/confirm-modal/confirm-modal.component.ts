@@ -39,6 +39,9 @@ export class ConfirmModalComponent implements OnInit {
   @Input()
   public cancelTitle: string;
 
+  public isShownewReport;
+  public isShowReportExist;
+
   private defaultTitle = 'Warning';
   private defaultMessage = 'You have unsaved changes! If you leave, your changes will be lost.';
   private defaultHeaderClass = ModalHeaderClassEnum.warningHeader;

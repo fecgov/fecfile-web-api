@@ -34,7 +34,7 @@
           </div>
         </div>
       </div>
-      <div class="card">
+      <div class="card" *ngIf="transactionCategory !== 'loans-and-debts'">
         <div class="card-header transactions__filter-title" (click)="toggleDateFilterItem()">
           Date
           <i class="float-right" aria-hidden="true" 
@@ -179,7 +179,7 @@
       </div>
       <div class="card" *ngIf="transactionCategory === 'loans-and-debts'">
         <div class="card-header transactions__filter-title" (click)="toggleAmountFilterItem()">
-          Loan Amount
+          Loan Amount (C)
           <i class="float-right" aria-hidden="true" 
             [ngClass]="toggleFilterDirection(isHideAmountFilter)">
           </i>
@@ -228,7 +228,7 @@
       </div>
       <div class="card" *ngIf="transactionCategory === 'loans-and-debts'">
         <div class="card-header transactions__filter-title" (click)="toggleBalanceAtCloseFilterItem()">
-          Balance at Close
+          Balance at Close (C & D)
           <i class="float-right" aria-hidden="true" 
             [ngClass]="toggleFilterDirection(isHideloanClosingBalanceFilter)">
           </i>
@@ -248,7 +248,7 @@
               type="number"
               min="0" value="0"
               name="minamount"
-              [(ngModel)]="filterLoanAmountMin"
+              [(ngModel)]="filterLoanClosingBalanceMin"
               class="form-control"
               id="filter-amount-min"
               aria-label="Filter Min Amount"
@@ -266,7 +266,7 @@
               type="number"
               name="maxamount"
               min="0" value="0"
-              [(ngModel)]="filterLoanAmountMax"
+              [(ngModel)]="filterLoanClosingBalanceMax"
               class="form-control"
               id="filter-amount-max"
               aria-label="Filter Max Amount"
@@ -275,6 +275,55 @@
           </div>          
         </div>
       </div> 
+      <div class="card" *ngIf="transactionCategory === 'loans-and-debts'">
+        <div class="card-header transactions__filter-title" (click)="toggleDebtBeginningBalanceFilterItem()">
+          Beginning Balance (D)
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideDebtBeginningBalanceFilter)">
+          </i>
+        </div>
+        <div class="card-body" [@openClose]="!isHideDebtBeginningBalanceFilter ? 'open' : 'closed'">
+          <div *ngIf="debtBeginningBalanceFilterValidation?.isError" class="text-error text-center">
+            {{ debtBeginningBalanceFilterValidation.message }}
+          </div>            
+          <label for="filter-amount-min">Minimum</label>
+          <div class="input-group transactions__filter-multi-input">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-amount-min">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="number"
+              min="0" value="0"
+              name="minamount"
+              [(ngModel)]="filterDebtBeginningBalanceMin"
+              class="form-control"
+              id="filter-amount-min"
+              aria-label="Filter Min Amount"
+              aria-describedby="filter-min-amount"
+            >                        
+          </div>
+          <label for="filter-amount-max">Maximum</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="filter-max-amount">
+                  <i class="dollar-sign-icon" aria-hidden="true"></i>
+              </span>
+            </div>
+            <input
+              type="number"
+              name="maxamount"
+              min="0" value="0"
+              [(ngModel)]="filterDebtBeginningBalanceMax"
+              class="form-control"
+              id="filter-amount-max"
+              aria-label="Filter Max Amount"
+              aria-describedby="filter-max-amount"
+            >                        
+          </div>          
+        </div>
+      </div>
 
       <div class="card" *ngIf="transactionCategory === 'receipts'">
           <div class="card-header transactions__filter-title" (click)="toggleAggregateAmountFilterItem()" *ngIf="transactionCategory === 'receipts'">

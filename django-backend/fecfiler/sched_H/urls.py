@@ -21,6 +21,11 @@ urlpatterns = [
         name="get_h3_total_amount",
     ),
     url(
+        r"^sh3/get_h3_aggregate_amount$",
+        views.get_h3_aggregate_amount,
+        name="get_h3_aggregate_amount",
+    ),
+    url(
         r"^sh3/get_h3_summary$",
         views.get_h3_summary,
         name="get_h3_summary",

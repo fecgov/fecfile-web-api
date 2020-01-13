@@ -133,8 +133,9 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 
   private columnOptionCount = 0;
   private maxColumnOption = 5;
-  private allLoanSelected: boolean;
-  private currentPageNumber: number = 1;
+  public allLoanSelected: boolean;
+  public currentPageNumber: number = 1;
+  private _loanSummaryRefreshDataSubscription: Subscription;
 
   constructor(
     private _LoanService: LoanService,
@@ -157,7 +158,13 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
           this.getPage(this.config.currentPage)
         }
       );
-
+    
+    this._loanSummaryRefreshDataSubscription = this._LoanMessageService.getLoanSummaryRefreshMessage()
+    .subscribe(
+      message => {
+        this.loadPage(message);
+      }
+    )
   }
   /**
    * Initialize the component.
@@ -167,6 +174,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
+    this.loadPage();
+  }
+
+  private loadPage(message: any = null) {
     const paginateConfig: PaginationInstance = {
       id: 'forms__ctn-table-pagination',
       itemsPerPage: 10,
@@ -175,18 +186,14 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.config = paginateConfig;
     // this.config.currentPage = 1;
     this.tableType = ActiveView.loanSummary;
-
     this.getCachedValues();
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
-
     for (const col of this.sortableColumns) {
       if (col.checked) {
         this.columnOptionCount++;
       }
     }
-
-
-    this.getPage(this.config.currentPage);
+    this.getPage(this.config.currentPage, message);
   }
 
   public goToPage(pageEvent: any) {
@@ -201,6 +208,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.setCachedValues();
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
+    this._loanSummaryRefreshDataSubscription.unsubscribe();
   }
 
 
@@ -209,14 +217,14 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 	 *
 	 * @param page the page containing the Loan to get
 	 */
-  public getPage(page: number): void {
+  public getPage(page: number, message: any = null): void {
 
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
     console.log(" getPage this.tableType", this.tableType)
     switch (this.tableType) {
       case this.LoanView:
-        this.getLoanPage(page);
+        this.getLoanPage(page, message);
         break;
       default:
         break;
@@ -229,7 +237,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 	 *
 	 * @param page the page containing the Loan to get
 	 */
-  public getLoanPage(page: number): void {
+  public getLoanPage(page: number, message: any = null): void {
 
     this.config.currentPage = page;
 
@@ -252,7 +260,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     const serverSortColumnName = this._LoanService.
       mapToSingleServerName(this.currentSortedColumnName);
 
-    this._LoanService.getLoan()
+    this._LoanService.getLoan(message)
       //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
       .subscribe((res: any) => {
 

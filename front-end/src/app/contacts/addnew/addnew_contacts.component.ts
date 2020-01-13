@@ -152,7 +152,26 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     }
   }
 
-  public ngDoCheck(): void {}
+  // tslint:disable-next-line:use-life-cycle-interface
+  public ngDoCheck(): void {
+    if (this.frmContact.touched || this.frmContact.dirty) {
+      if (this.frmContact.valid) {
+        const isSaved = localStorage.getItem('contactsaved');
+        console.log('isSaved' + isSaved);
+        if (!isSaved) {
+          this.frmContact.markAsDirty();
+          this.frmContact.markAsTouched();
+        } else {
+          this.frmContact.markAsUntouched();
+          this.frmContact.markAsPristine();
+        }
+        } else {
+        this.frmContact.markAsTouched();
+        this.frmContact.markAsDirty();
+        localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
+      }
+    }
+  }
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
@@ -476,7 +495,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
     if (this._selectedEntity) {
       //this.showWarn(col.text);
-      this.frmContact.patchValue({ candOffice: this._selectedEntity.candOffice}, { onlySelf: true });
+      //this.frmContact.patchValue({ candOffice: this._selectedEntity.candOffice}, { onlySelf: true });
+      this.frmContact.patchValue({ office_Sought: this._selectedEntity.name }, { onlySelf: true });
     } else {
       let officeCode = null;
       if (candOfficeOption.$ngOptionLabel) {
@@ -488,8 +508,9 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           }
         }
       }
+      //this.frmContact.patchValue({ candOffice: officeCode }, { onlySelf: true });
       
-      this.frmContact.patchValue({ candOffice: officeCode }, { onlySelf: true });
+      this.frmContact.patchValue({ office_Sought: candOfficeOption.code }, { onlySelf: true });
     }
   }
   
@@ -497,8 +518,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
     if (this._selectedEntity) {
       //this.showWarn(col.text);
-      this.frmContact.patchValue({ candOfficeState: this._selectedEntity.candOfficeState}, { onlySelf: true });
+      //this.frmContact.patchValue({ candOfficeState: this._selectedEntity.candOfficeState}, { onlySelf: true });
+      this.frmContact.patchValue({ Office_State: this._selectedEntity.name }, { onlySelf: true });
     } else {
+      /*
       let officeStateCode = null;
       if (officeStateOption.$ngOptionLabel) {
         officeStateCode = officeStateOption.$ngOptionLabel;
@@ -511,6 +534,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       }
       
       this.frmContact.patchValue({ candOfficeState: officeStateCode }, { onlySelf: true });
+      */
+      this.frmContact.patchValue({ Office_State: officeStateOption.code }, { onlySelf: true });
     }
   }
 
@@ -1204,6 +1229,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         this.frmContact.patchValue({ last_name: lastName }, { onlySelf: true });
         this.frmContact.patchValue({ middle_name: middleName }, { onlySelf: true });
         this.frmContact.patchValue({ prefix: prefix }, { onlySelf: true });
+        this.frmContact.patchValue({ Prefix: prefix }, { onlySelf: true });
         this.frmContact.patchValue({ suffix: suffix }, { onlySelf: true });
 
         this.frmContact.patchValue({ entity_type: formData.entity_type }, { onlySelf: true });
@@ -1225,6 +1251,13 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         
         this.frmContact.patchValue({ candCmteId: formData.candCmteId }, { onlySelf: true });
         this.frmContact.patchValue({ officeSought: formData.officeSought }, { onlySelf: true });
+
+        this.frmContact.patchValue({ candidate_id: formData.candCmteId }, { onlySelf: true });
+        this.frmContact.patchValue({ office_Sought: formData.candOffice }, { onlySelf: true });
+        this.frmContact.patchValue({ Office_State: formData.candOfficeState }, { onlySelf: true });
+
+        this.frmContact.patchValue({ commitee_id: formData.candCmteId }, { onlySelf: true });
+
         //this.frmContact.patchValue({ candOfficeState: formData.candOfficeState }, { onlySelf: true });
         //this.frmContact.patchValue({ candOfficeDistrict: formData.candOfficeDistrict }, { onlySelf: true });
       }
@@ -1250,21 +1283,44 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this._setForm(this.formFields);
   }
 
-  public cancelStep(): void {
-    if(this.scheduleAction !== this.editScheduleAction) {
-      this.frmContact.reset();
-      this._router.navigate([`/contacts`]);
-    }else {
-      this.status.emit({
-        editView: false
-      })
-    }
+  public cancelStepWithWarning(): void {
+     this._dialogService.confirm(
+         '', ConfirmModalComponent, '', true)
+         .then(res => {
+           if (res === 'okay' ? true : false ) {
+             if (this.scheduleAction !== this.editScheduleAction) {
+               this.frmContact.reset();
+               this._router.navigate([`/contacts`]);
+             } else {
+               this.status.emit({
+                 editView: false
+               });
+             }
+           }
+         });
+
+
   }
-  
+
+  public cancelStep(): void {
+
+            if (this.scheduleAction !== this.editScheduleAction) {
+              this.frmContact.reset();
+              this._router.navigate([`/contacts`]);
+            } else {
+              this.status.emit({
+                editView: false
+              });
+            }
+
+  }
+
+
   public viewContacts(): void {
-    
-    if (this.frmContact.dirty || this.frmContact.touched){
-      localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
+
+    if (this.frmContact.dirty || this.frmContact.touched) {
+      this.doValidateContact('viewContacts');
+      // localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
     }
     this._router.navigate([`/contacts`]);
   }
@@ -1344,6 +1400,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
       if(this.scheduleAction === ContactActions.edit) {
         contactObj.id = this.transactionToEdit.id;
+        contactObj.entity_type = this.frmContact.get('entity_type').value;
+      }
+
+      if(this.frmContact.get('commitee_id')) {
+        contactObj.candCmteId = this.frmContact.get('commitee_id').value;
       }
 
       localStorage.setItem('contactObj', JSON.stringify(contactObj));
@@ -1354,9 +1415,6 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           this.frmContact.reset();
           this._selectedEntity = null;
           localStorage.removeItem(contactObj);
-          if (callFrom === 'viewContacts') {
-            this._router.navigate([`/contacts`]);
-          }
           localStorage.setItem('contactsaved', JSON.stringify({ saved: true }));
           //window.scrollTo(0, 0);
 
@@ -1380,7 +1438,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    *
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
-  /*public async canDeactivate(): Promise<boolean> {
+  public async canDeactivate(): Promise<boolean> {
+    console.log('value for contact back', this._formsService.HasUnsavedData('contact'))
     if (this._formsService.HasUnsavedData('contact')) {
       let result: boolean = null;
       result = await this._dialogService
@@ -1401,5 +1460,5 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     } else {
       return true;
   }
- }*/
+ }
 }

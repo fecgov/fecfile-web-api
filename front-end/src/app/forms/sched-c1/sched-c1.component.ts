@@ -50,6 +50,7 @@ export class SchedC1Component implements OnInit, OnChanges {
   public currentC1Data: any;
 
   private _reportId;
+  public editScheduleAction;
 
   constructor(
     private _fb: FormBuilder,
@@ -554,8 +555,12 @@ export class SchedC1Component implements OnInit, OnChanges {
     });
   }
 
-  public print() {
+  public printPreview() {
     alert('Print not yet implemented');
+  }
+
+  public importTransactions() {
+    alert('Import not yet implemented');
   }
 
   public finish() {

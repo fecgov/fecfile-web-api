@@ -44,7 +44,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   @Output() status: EventEmitter<any>;
 
   public showPart2: boolean;
-  public loaded = false;
 
   protected staticFormFields = schedFstaticFormFields;
 
@@ -95,7 +94,6 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnInit() {
-    this.frmIndividualReceipt = this._fb.group({});
     this.formFieldsPrePopulated = true;
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedFComponent;
     this.transactionType = 'COEXP_PARTY_DEBT';
@@ -103,15 +101,8 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     super.ngOnInit();
     this.showPart2 = false;
     this._setTransactionDetail();
-
-    // temp code - waiting until dynamic forms completes and loads the formGroup
-    // before rendering the static fields, otherwise validation error styling
-    // is not working (input-error-field class).  If dynamic forms deliver
-    // the static fields, then remove this or set a flag when formGroup is ready
+    this.loaded = false;
     super.ngOnChanges(null);
-    setTimeout(() => {
-      this.loaded = true;
-    }, 2000);
   }
 
   public ngOnChanges(changes: SimpleChanges) {
