@@ -404,6 +404,13 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
         }
       });
   }
+
+  public checkIfTrashable(item: any): boolean {
+    if(this.schedH4sModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id).length !== 0) {
+      return false;
+    }
+    return true;
+  }
   
 }
 
