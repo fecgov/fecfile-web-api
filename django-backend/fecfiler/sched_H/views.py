@@ -1297,6 +1297,12 @@ def get_h2_summary_table(request):
             # print(json_res)
             if not json_res:
                 return Response([], status = status.HTTP_200_OK) 
+            for _rec in json_res:
+                if _rec['ratio_code'] == 'n':
+                    _rec['trashable'] = bool(count_h2_transactions(cmte_id, report_id, _rec['activity_event_name']))
+                else:
+                    _rec['trashable'] - False
+
                     # 'Error: no valid h2 data found for this report.')
         # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
         # start_dt = datetime.date(int(calendar_year), 1, 1)
@@ -1304,6 +1310,30 @@ def get_h2_summary_table(request):
         return Response( json_res, status = status.HTTP_200_OK)
     except:
         raise
+
+def count_h2_transactions(cmte_id, report_id, activity_event_name):
+    """
+    helpfer function for counting current h2 assoicated transactions
+    """ 
+    _sql = """
+    select count(*) 
+    from all_other_transactions_view 
+    where activity_event_identifier = %s
+    and cmte_id = %s 
+    and report_id = %s
+    and delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            logger.debug('count_h2_transactions with _sql:{}'.format(_sql))
+            
+            logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+            cursor.execute(_sql, (activity_event_name, cmte_id, report_id))
+            return int(cursor.fetchone()[0])
+    except:
+        raise
+
+
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH2(request):
