@@ -71,7 +71,7 @@ API_CALL_SC2 = {'api_call':'/sc/schedC2'}
 
 # need to generate auto sched_a items when a loan is made by a committee
 AUTO_SCHED_A_MAP = { 
-    'LOANS_OWED_BY_CMTE' : ['LOAN_FROM_IND','LOAN_FORM_BANK']
+    'LOANS_OWED_BY_CMTE' : ['LOAN_FROM_IND','LOAN_FROM_BANK']
 }
 
 # need to generate auto sched_b item when 
@@ -2134,6 +2134,7 @@ def schedC1(request):
             datum = request.data.copy()
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            datum['transaction_type_identifier'] = 'SC1'
             if 'prefix' in request.data:
                 datum['preffix'] = request.data.get('prefix')
             # print(datum)

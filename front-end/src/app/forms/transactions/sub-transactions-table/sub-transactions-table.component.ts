@@ -46,6 +46,12 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
   @Input()
   public subTransactions: any[];
 
+  @Input()
+  public returnToDebtSummary: boolean;
+
+  @Input()
+  public returnToDebtSummaryInfo: any;
+
   public transactionsModel: Array<TransactionModel>;
 
   public constructor(
@@ -220,13 +226,22 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
    * @param trx the Transaction to edit
    */
   public editTransaction(trx: TransactionModel): void {
-    if(this.isH4OrH6() === 'H4') {
+    if (this.isH4OrH6() === 'H4') {
       trx.apiCall = '/sh4/schedH4';
-    }else if(this.isH4OrH6() === 'H6') {
+    } else if (this.isH4OrH6() === 'H6') {
       trx.apiCall = '/sh6/schedH6';
     }
-
-    this._transactionsMessageService.sendEditTransactionMessage(trx);
+    if (this.returnToDebtSummary) {
+      const debtSummary = {
+        returnToDebtSummary: this.returnToDebtSummary,
+        returnToDebtSummaryInfo: this.returnToDebtSummaryInfo
+      };
+      this._transactionsMessageService.sendEditDebtSummaryTransactionMessage(
+        {trx: trx, debtSummary: debtSummary}
+      );
+    } else {
+      this._transactionsMessageService.sendEditTransactionMessage(trx);
+    }
   }
 
   public isH4OrH6(): string {

@@ -318,8 +318,10 @@ def get_schedH1(data):
 def get_list_all_schedH1(report_id, cmte_id):
     """
     load all transactions for a report
+    Note: for PTY, H1 is election year based
     """
     try:
+        election_yr = election_year(report_id)
         with connection.cursor() as cursor:
             # GET single row from schedA table
             _sql = """SELECT json_agg(t) FROM ( SELECT
@@ -342,10 +344,10 @@ def get_list_all_schedH1(report_id, cmte_id):
             create_date ,
             last_update_date
             FROM public.sched_h1
-            WHERE report_id = %s AND cmte_id = %s
+            WHERE election_year = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
             """
-            cursor.execute(_sql, (report_id, cmte_id))
+            cursor.execute(_sql, (election_yr, cmte_id))
             schedH1_list = cursor.fetchone()[0]
             if schedH1_list is None:
                 raise NoOPError('No sched_H1 transaction found for report_id {} and cmte_id: {}'.format(
@@ -1752,6 +1754,14 @@ def get_list_schedH3(report_id, cmte_id, transaction_id):
             if schedH3_list is None:
                 raise NoOPError('No sched_H3 transaction found for transaction_id {}'.format(
                     transaction_id))
+            if schedH3_list: 
+                for _rec in schedH3_list:
+                    if _rec['activity_event_name']:
+                        aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id, _rec.get('back_ref_transaction_id'))
+                        _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'], 0)
+                    else:
+                        _rec['aggregate_amount'] = 0
+                        # pass
             merged_list = []
             for dictH3 in schedH3_list:
                 merged_list.append(dictH3)

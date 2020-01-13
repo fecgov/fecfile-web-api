@@ -76,8 +76,10 @@
                 <i class="ellipsis-icon"></i>
               </button>
               <div id="debtSumamry__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                <button class="dropdown-item" (click)="editDebt(debt)"><i class="edit-icon"></i> Edit</button>
-                <button class="dropdown-item" (click)="editDebt(debt)"><i class="edit-icon"></i> Make a Payment</button>
+                <button class="dropdown-item" (click)="editDebt(debt, false)"><i class="edit-icon"></i> Edit</button>
+                <button class="dropdown-item" (click)="editDebt(debt, true)">
+                  <i class="edit-icon"></i> Make a Payment
+                </button>
                 <button class="dropdown-item" (click)="printDebt(debt)"><i class="print-icon"></i> Print</button>
                 <button class="dropdown-item" (click)="trashDebt(debt)"><i class="trash-icon"></i> Trash</button>
               </div>
