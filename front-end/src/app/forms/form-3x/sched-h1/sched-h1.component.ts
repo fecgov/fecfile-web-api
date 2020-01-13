@@ -63,6 +63,7 @@ export class SchedH1Component implements OnInit {
           message => {
             if(message.scheduleType === 'Schedule H1') {
               this.getH1Disable = false;
+              this.scheduleAction = ScheduleActions.add;
               this.form.control.patchValue({ h1_election_year_options: '' }, { onlySelf: true });
             }
           }
@@ -191,6 +192,7 @@ export class SchedH1Component implements OnInit {
           f.reset();
           //also reset this.transaction_id so future transactions dont accidentally use it.
           this.transaction_id = null;
+          this.scheduleAction = ScheduleActions.add;
           this.previousStep();
         });
     }

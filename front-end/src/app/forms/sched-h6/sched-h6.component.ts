@@ -260,12 +260,14 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
   public clickArrow(item: SchedH6Model) {
     if(item.arrow_dir === 'down') {
       let indexRep = this.schedH6sModel.indexOf(item);
+      this.schedH6sModel[indexRep].child = [];
       if (indexRep > -1) {
         let tmp: Array<SchedH6Model> = this.schedH6sModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id);
         for(let entry of tmp) {
           entry.arrow_dir = 'show';
-          this.schedH6sModel.splice(indexRep + 1, 0, entry);
-          indexRep++;
+          //this.schedH6sModel.splice(indexRep + 1, 0, entry);
+          this.schedH6sModel[indexRep].child.push(entry);
+          //indexRep++;
         }
         this.tableConfig.totalItems = this.schedH6sModel.length;
       }
@@ -274,8 +276,12 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
       
     }else if(item.arrow_dir === 'up') {
       //this.schedH6sModel = this.schedH6sModel.filter(obj => obj.memo_code !== 'X');
-      this.schedH6sModel = this.schedH6sModel.filter(obj => obj.back_ref_transaction_id !== item.transaction_id);
-      this.tableConfig.totalItems = this.schedH6sModel.length;
+      //this.schedH6sModel = this.schedH6sModel.filter(obj => obj.back_ref_transaction_id !== item.transaction_id);
+      //this.tableConfig.totalItems = this.schedH6sModel.length;
+
+      let indexRep = this.schedH6sModel.indexOf(item);
+      this.schedH6sModel[indexRep].child = [];
+
 
       this.schedH6sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'down';
     }
@@ -384,6 +390,13 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
         } else if (res === 'cancel') {
         }
       });
+  }
+
+  public checkIfTrashable(item: any): boolean {
+    if(this.schedH6sModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id).length !== 0) {
+      return false;
+    }
+    return true;
   }
   
 }
