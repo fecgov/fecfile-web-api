@@ -519,6 +519,7 @@ def schedH1(request):
 
     elif request.method == 'PUT':
         try:
+            cmte_id = request.user.username
             datum = schedH1_sql_dict(request.data)
             if 'transaction_id' in request.data and check_null_value(request.data.get('transaction_id')):
                 datum['transaction_id'] = request.data.get('transaction_id')
@@ -534,13 +535,13 @@ def schedH1(request):
                 report_id = check_report_id(request.data.get('report_id'))
             # end of handling
             datum['report_id'] = report_id
-            datum['cmte_id'] = request.user.username
+            datum['cmte_id'] = cmte_id
             datum['transaction_type_identifier'] = 'ALLOC_H1'
             # print('----')
             if (not report_id) or (report_id == '0'):
                 datum['election_year'] = None
             else:    
-                datum['election_year'] = election_year(report_id)
+                datum['election_year'] = int(election_year(report_id))
             # print('....')
             if cmte_type(cmte_id) == 'PTY':
                 datum['administrative'] = True
