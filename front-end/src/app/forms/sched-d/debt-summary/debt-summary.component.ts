@@ -303,8 +303,19 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
   /**
    * Show edit for a debt transaction.
    */
-  public editDebt(debt: DebtSummaryModel) {
+  public editDebt(debt: DebtSummaryModel, payment: boolean) {
     const emptyValidForm = {};
+
+    const transactionModel: any = {
+      transactionId: debt.transactionId,
+      type: debt.transactionTypeDescription,
+      transactionTypeIdentifier: debt.transactionTypeIdentifier,
+      apiCall: '/sd/schedD' // should come from API
+    };
+    if (payment) {
+      transactionModel.scrollDebtPaymentButtonIntoView = true;
+    }
+
     this.status.emit({
       form: emptyValidForm,
       direction: 'next',
@@ -312,19 +323,17 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       previousStep: 'step_2',
       action: DebtSumarysActions.edit,
       scheduleType: 'sched_d',
+      returnToDebtSummary: true,
+      returnToDebtSummaryInfo: {
+        transactionType: this.transactionType,
+        transactionTypeText: this.transactionTypeText
+      },
       transactionDetail: {
-        transactionModel: {
-          transactionId: debt.transactionId,
-          type: debt.transactionTypeDescription,
-          transactionTypeIdentifier: debt.transactionTypeIdentifier,
-          apiCall: '/sd/schedD' // should come from API
-        }
+        transactionModel: transactionModel
       }
     });
   }
 
-  // TODO temporarily use this for edit debt. once api has all fields needed for edit sched D,
-  // both Debt and Debt payments may use the same method.
   public editDebtPayment(debtPayment: DebtSummaryModel) {
     const emptyValidForm = {};
     this.status.emit({
@@ -334,6 +343,11 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       previousStep: 'step_2',
       action: DebtSumarysActions.edit,
       scheduleType: debtPayment.scheduleType,
+      returnToDebtSummary: true,
+      returnToDebtSummaryInfo: {
+        transactionType: this.transactionType,
+        transactionTypeText: this.transactionTypeText
+      },
       transactionDetail: {
         transactionModel: {
           transactionId: debtPayment.transactionId,

@@ -16,6 +16,7 @@ export class TransactionsMessageService {
   private applyFiltersSubject = new Subject<any>();
   private doKeywordFilterSearchSubject = new Subject<any>();
   private editTransactionSubject = new Subject<any>();
+  private editDebtSummaryTransactionSubject = new Subject<any>();
   private showTransactionsSubject = new Subject<any>();
   private removeFilterSubject = new Subject<any>();
   private switchFilterViewSubject = new Subject<any>();
@@ -166,6 +167,18 @@ export class TransactionsMessageService {
 
   public getEditTransactionMessage(): Observable<any> {
     return this.editTransactionSubject.asObservable();
+  }
+
+  public sendEditDebtSummaryTransactionMessage(message: any) {
+    this.editDebtSummaryTransactionSubject.next(message);
+  }
+
+  public clearEditDebtSummaryTransactionMessage() {
+    this.editDebtSummaryTransactionSubject.next();
+  }
+
+  public getEditDebtSummaryTransactionMessage(): Observable<any> {
+    return this.editDebtSummaryTransactionSubject.asObservable();
   }
 
   public sendShowTransactionsMessage(message: any) {
