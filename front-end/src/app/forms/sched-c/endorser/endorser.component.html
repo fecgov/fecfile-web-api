@@ -293,7 +293,7 @@
               <button class="btn btn-secondary btn-right" type="button"  (click)="saveEndorser(false)">
                 Save
               </button>
-              <button class="btn btn-secondary btn-right" type="button" (click)=saveEndorser(true)>
+              <button *ngIf="scheduleAction !== 'edit'" class="btn btn-secondary btn-right" type="button" (click)=saveEndorser(true)>
                 Add Endorsers
               </button>
             </div>
