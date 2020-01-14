@@ -3802,7 +3802,7 @@ def schedH5(request):
             #     data = put_schedB(datum)
             #     output = get_schedB(data)
             # else:
-            data = put_schedH5(datum)
+            data = put_schedH5(datum)[0]
             # output = get_schedA(data)
             return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
         except Exception as e:
