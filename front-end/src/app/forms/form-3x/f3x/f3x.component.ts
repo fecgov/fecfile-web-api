@@ -649,21 +649,31 @@ export class F3xComponent implements OnInit {
     let transactionDetail = transaction.transactionDetail;
     let finish = false;
 
-    if (this.scheduleType === 'Schedule H3') {
+    if (this.scheduleType === 'Schedule H1') {
+      this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
       this.scheduleAction = ScheduleActions.edit;
-      this.transactionType = 'ALLOC_H3_RATIO';
-      this.scheduleType = 'sched_h3';
-      finish = true;
+      this.scheduleType = 'sched_h1';
+      finish = true; //since h1 is not extending abstract schedule, it is being handled differently
     } else if (this.scheduleType === 'Schedule H2') {
       this.scheduleAction = ScheduleActions.edit;
       this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
       this.scheduleType = 'sched_h2';
-      finish = true;
-    } else if (this.scheduleType === 'Schedule H1') {
+    } else if (this.scheduleType === 'Schedule H3') {
+      this.scheduleAction = ScheduleActions.edit;
+      this.transactionType = 'ALLOC_H3_RATIO';
+      this.scheduleType = 'sched_h3';
+    } else if (this.scheduleType === 'Schedule H4') {
       this.scheduleAction = ScheduleActions.edit;
       this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
-      this.scheduleType = 'sched_h1';
-      finish = true;
+      this.scheduleType = 'sched_h4';
+    } else if (this.scheduleType === 'Schedule H5') {
+      this.scheduleAction = ScheduleActions.edit;
+      this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
+      this.scheduleType = 'sched_h5';
+    } else if (this.scheduleType === 'Schedule H6') {
+      this.scheduleAction = ScheduleActions.edit;
+      this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
+      this.scheduleType = 'sched_h6';
     }
 
     this._schedHMessageServce.sendpopulateHFormForEditMessage(transaction);

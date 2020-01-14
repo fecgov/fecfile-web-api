@@ -171,7 +171,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
           }
         });
       }
-    })
+    });
   }
 
   public ngOnInit() {
