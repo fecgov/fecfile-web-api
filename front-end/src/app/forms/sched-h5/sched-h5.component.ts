@@ -99,6 +99,9 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public total_amount_edit = 0;
   public populateFormForEdit: Subscription;
 
+  public saveAndAddDisabled = false;
+  public getH1H2ExistSubscription: Subscription;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -600,6 +603,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.totalName = 'Public Communications';
       this.showIdentiferSelect = false
     }
+
+    if(e.target.value !== '') {
+      this._noH1H2Popup(e.target.value)
+    }
   }
 
   public setH5Sum() {
@@ -952,6 +959,57 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     }else {
       this.returnToSum();
     }
+  }
+
+  private _noH1H2Popup(category: string) {
+
+    let activityEventScheduleType = '';
+    if(category === 'DC' || category === 'DF') {
+      activityEventScheduleType = 'sched_h2'
+    }else {
+      activityEventScheduleType = 'sched_h1'
+    }
+
+    const report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
+    this.getH1H2ExistSubscription = this._schedH5Service.getH1H2ExistStatus(report_id, category)
+    .subscribe(res =>
+      {
+        if(res) {
+          if(res.count === 0) {
+
+            this.saveAndAddDisabled = true;
+
+            const scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
+            const scheduleType = activityEventScheduleType;
+
+            const message =
+              `Please add Schedule ${scheduleName} before proceeding with adding the ` +
+              `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
+            this._dlService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
+              if (res === 'okay') {
+                const emitObj: any = {
+                  form: this.frmIndividualReceipt,
+                  direction: 'next',
+                  step: 'step_3',
+                  previousStep: 'step_2',
+                  scheduleType: scheduleType,
+                  action: ScheduleActions.add
+                };
+                if (scheduleType === 'sched_h2') {
+                  emitObj.transactionType = 'ALLOC_H2_RATIO';
+                  emitObj.transactionTypeText = 'Allocation Ratios';
+                }
+                this.status.emit(emitObj);
+              } else if (res === 'cancel') {
+              }
+            });
+          }else {
+            this.saveAndAddDisabled = false;
+          }
+        }
+      }
+    )
   }
 
 }
