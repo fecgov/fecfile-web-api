@@ -1002,6 +1002,7 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
             AND t1.report_id = %s
             AND t1.delete_ind is distinct from 'Y' 
             AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
+            AND t1.transaction_type_identifier != 'LEVIN_OTH_REC'
             GROUP BY item_ind
         """
         _sql2 = """
@@ -1023,6 +1024,7 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
             AND t1.levin_account_id = %s
             AND t1.delete_ind is distinct from 'Y' 
             AND substring(transaction_type_identifier, 1, 6) = 'LEVIN_'
+            AND t1.transaction_type_identifier != 'LEVIN_OTH_REC' 
             GROUP BY item_ind
         """
         _sql2 = """
@@ -1050,12 +1052,13 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
                 cursor.execute(_sql1, (cmte_id, report_id))
             logger.debug('rows retrieved:{}'.format(cursor.rowcount))
             if cursor.rowcount:
+
                 rows = cursor.fetchall()
                 for row in rows:
                     # print(row)
-                    if row[0] == "1A":
+                    if row[0] == "Y":
                         result["itemized_receipt_amount"] = row[1]
-                    elif row[0] == "11AII":
+                    elif row[0] == "N":
                         result["non_itemized_receipt_amount"] = row[1]
                     else:
                         pass
