@@ -564,6 +564,146 @@ def schedH1(request):
     else:
         raise NotImplementedError
 
+
+@api_view(['GET'])
+def validate_h1_h2_exist(request):
+    """
+    validate h1 or h2 exist or not - used to enable h3/h5 warning message
+    
+    """
+
+    logger.debug('validate h1/h2 exist with request:{}'.format(request.query_params))
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        cmte_type_category = request.query_params.get('cmte_type_category')
+        calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        start_dt = datetime.date(int(calendar_year), 1, 1)
+        end_dt = datetime.date(int(calendar_year), 12, 31)
+        event_name = request.query_params.get('activity_event_identifier') 
+        # transaction_type_identifier = request.query_params.get('transaction_type_identifier') 
+        _count = 0
+
+        if event_name: # event-based, goes to h2
+            _sql = """
+            select count(*)
+            from public.sched_h2 
+            where cmte_id = %s 
+            and report_id = %s
+            and activity_event_name = %s
+            and delete_ind is distinct from 'Y'
+            """
+            with connection.cursor() as cursor:
+                logger.debug('query with _sql:{}'.format(_sql))
+                # logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
+                cursor.execute(_sql, (cmte_id, report_id, event_name))
+                if not cursor.rowcount:
+                    raise Exception('Error: something warong with db query.')
+                _count = int(cursor.fetchone()[0])
+
+            # _sql = """
+            # select activity_event_amount_ytd 
+            # from public.sched_h4 
+            # where cmte_id = %s 
+            # and activity_event_identifier = %s
+            # and create_date between %s and %s
+            # and delete_ind is distinct from 'Y'
+            # order by create_date desc, last_update_date desc;
+            # """
+            # with connection.cursor() as cursor:
+            #     cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
+            #     if not cursor.rowcount:
+            #         aggregate_amount = 0 
+            #     else:
+            #         aggregate_amount = float(cursor.fetchone()[0])
+
+        else: # need to go to h1 for ratios
+            activity_event_type = request.query_params.get('activity_event_type')
+
+            if not activity_event_type:
+                raise Exception('Error: event type is required.')
+            
+            if cmte_type_category == 'PTY':
+                # _sql = """
+                # select federal_percent from public.sched_h1
+                # where election_year = %s
+                # and cmte_id = %s
+                # and report_id = %s
+                # and delete_ind is distinct from 'Y'
+                # order by create_date desc, last_update_date desc
+                # """
+                _sql = """
+                select count(*) from public.sched_h1
+                where election_year = %s
+                and cmte_id = %s
+                and delete_ind is distinct from 'Y'
+                """
+                logger.debug('sql for query h1:{}'.format(_sql))
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, (calendar_year, cmte_id))
+                    if not cursor.rowcount:
+                        raise Exception('Error: no valid h1 data found.')
+                    _count = int(cursor.fetchone()[0])
+            elif cmte_type_category == 'PAC':
+                # activity_event_type = request.query_params.get('activity_event_type')
+                # if not activity_event_type:
+                    # return Response('Error: event type is required for this committee.')
+                event_type_code = {
+                    "AD" : "administrative", # TODO: need to fix this typo
+                    "GV" : "generic_voter_drive",
+                    "PC" : "public_communications",
+                }
+                h1_event_type = event_type_code.get(activity_event_type)
+                if not h1_event_type:
+                    return Response('Error: activity type not valid')
+                _sql = """
+                select count(*) from public.sched_h1
+                where election_year = %s
+                and cmte_id = %s
+                and report_id = %s
+                """
+                activity_part = """and {} = true """.format(h1_event_type)
+                # order_part = 'order by create_date desc, last_update_date desc'
+                _sql = _sql + activity_part
+                logger.debug('sql for query h1:{}'.format(_sql))
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, (calendar_year, cmte_id, report_id))
+                    if not cursor.rowcount:
+                        raise Exception('Error: no valid h1 data found.')
+                    _count = int(cursor.fetchone()[0])
+            else:
+                raise Exception('invalid cmte_type_category.')
+
+        #     _sql = """
+        #         select activity_event_amount_ytd 
+        #         from public.sched_h4 
+        #         where cmte_id = %s 
+        #         and activity_event_type = %s
+        #         and create_date between %s and %s
+        #         order by create_date desc, last_update_date desc
+        #     """
+        #     with connection.cursor() as cursor:
+        #         cursor.execute(_sql, (cmte_id, activity_event_type, start_dt, end_dt))
+        #         if not cursor.rowcount:
+        #             aggregate_amount = 0
+        #         else:
+        #             aggregate_amount = float(cursor.fetchone()[0])
+        # # fed_percent = float(cursor.fetchone()[0])
+        # fed_share = float(total_amount) * fed_percent
+        # nonfed_share = float(total_amount) - fed_share
+        # if transaction_type_identifier and not transaction_type_identifier.endswith('_MEMO'):
+        #     new_aggregate_amount = aggregate_amount + float(total_amount)
+        # else:
+        #     new_aggregate_amount = aggregate_amount
+        return JsonResponse(
+            {
+                'count' : _count
+            }, 
+                status = status.HTTP_200_OK
+        )
+    except:
+        raise
+
 @api_view(['GET'])
 def get_fed_nonfed_share(request):
     """
