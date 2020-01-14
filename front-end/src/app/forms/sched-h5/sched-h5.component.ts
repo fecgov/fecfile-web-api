@@ -1,3 +1,5 @@
+import { SchedHServiceService } from './../sched-h-service/sched-h-service.service';
+import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
 import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
@@ -52,6 +54,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
+  @Input() scheduleType: string;
   @Output() status: EventEmitter<any>;
 
   public formType: string;
@@ -94,6 +97,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public transferred_amount_edit = 0;
   public total_amount_edit = 0;
+  public populateFormForEdit: Subscription;
 
   constructor(
     _http: HttpClient,
@@ -123,6 +127,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     private _decPipe: DecimalPipe,
     private _tranService: TransactionsService,
     private _dlService: DialogService,
+    private _schedHMessageServiceService: SchedHMessageServiceService,
+    private _schedHService:SchedHServiceService
   ) {
     super(
       _http,
@@ -153,6 +159,17 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _decPipe;
     _tranService;
     _dlService;
+
+    this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
+    .subscribe(p => {
+      if(p.scheduleType === 'Schedule H5'){
+        let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
+          if(res && res.length === 1){
+            this.editH5(res[0]);
+          }
+        });
+      }
+    })
   }
 
   public ngOnInit() {
@@ -224,6 +241,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnDestroy(): void {
+    this.populateFormForEdit.unsubscribe();
     super.ngOnDestroy();
   }
 

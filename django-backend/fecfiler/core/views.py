@@ -2469,11 +2469,11 @@ def get_all_transactions(request):
                         c1_list = get_core_sched_c1(cmte_id, transaction.get('transaction_id'))
                         # print(c1_list)
                         for c1 in c1_list:
-                            c1['sched_type'] = 'sched_c1'
+                            c1['schedule'] = 'sched_c1'
                             c1['api_call'] = '/sc/schedC1'
                         c2_list = get_core_sched_c2(cmte_id, transaction.get('transaction_id'))
                         for c2 in c2_list:
-                            c2['sched_type'] = 'sched_c2'
+                            c2['schedule'] = 'sched_c2'
                             c2['api_call'] = '/sc/schedC2'
                         if c1_list or c2_list:
                             transaction['child'] = []
