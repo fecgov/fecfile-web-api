@@ -350,6 +350,10 @@ export class F3xComponent implements OnInit {
               return;
             }
 
+            if(this._handleScheduleL(e)){
+              return;
+            }
+
             if (this._handleScheduleD(e)) {
               return;
             }
@@ -705,6 +709,28 @@ export class F3xComponent implements OnInit {
     }
 
     this._schedHMessageServce.sendpopulateHFormForEditMessage(transaction);
+    if (transactionDetail && transactionDetail.transactionModel) {
+      this.canContinue(transactionDetail.transactionModel);
+    } else {
+      this.canContinue();
+    }
+
+    return finish;
+  }
+
+  /**
+   * Handle Schedule L forms.
+   * @returns true if schedule L and should stop processing
+   */
+  private _handleScheduleL(transaction: any): boolean {
+    let transactionDetail = transaction.transactionDetail;
+    let finish = false;
+
+    if (this.scheduleType === 'Schedule L-A' || this.scheduleType === 'Schedule L-B') {
+      this.scheduleAction = ScheduleActions.edit;
+      this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
+      this.scheduleType = 'sched_L';
+    } 
     if (transactionDetail && transactionDetail.transactionModel) {
       this.canContinue(transactionDetail.transactionModel);
     } else {
