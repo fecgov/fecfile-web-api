@@ -3222,6 +3222,29 @@ def schedH5_sql_dict(data):
         raise Exception('invalid request data.')
 
 
+def update_h5_total_amount(data):
+    """
+    update total amount for all transactions have the same parent_id
+    """
+
+    _sql = """
+    UPDATE sched_h5 
+    SET    total_amount_transferred = (
+        SELECT Sum(coalesce(
+                voter_registration_amount,
+                voter_id_amount,
+                gotv_amount,
+                generic_campaign_amount)) 
+        FROM   sched_h5 
+        WHERE 
+              back_ref_transaction_id = %s) 
+    WHERE  ( back_ref_transaction_id = %s 
+          OR transaction_id = %s ) 
+    """
+    back_ref_transaction_id = data.get('back_ref_transaction_id')
+    _v = [back_ref_transaction_id] * 3
+    do_transaction(_sql, _v)
+
 def put_schedH5(data):
     """
     update sched_H5 item
@@ -3232,10 +3255,12 @@ def put_schedH5(data):
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH5(data)
+            logger.debug('update total amount after H5 updates saved with data {}'.format(data))
+            update_h5_total_amount(data)
         except Exception as e:
             raise Exception(
                 'The put_sql_schedH5 function is throwing an error: ' + str(e))
-        return data
+        return get_list_schedH5(data.get('report_id'), data.get('cmte_id'), data.get('transaction_id'))
     except:
         raise
 
@@ -3441,9 +3466,25 @@ def get_list_all_schedH5(report_id, cmte_id):
             gotv_amount,
             generic_campaign_amount,
             memo_code,
-            memo_text ,
+            memo_text,
             create_date,
-            last_update_date
+            last_update_date,
+            coalesce(
+                voter_registration_amount,
+                voter_id_amount,
+                gotv_amount,
+                generic_campaign_amount) as transfer_amount,
+            (
+                CASE 
+                WHEN  voter_registration_amount > 0  
+                THEN 'Voter Registration'
+                WHEN  voter_id_amount > 0 
+                THEN 'Voter ID'
+                WHEN  gotv_amount > 0
+                THEN 'GOTV'
+                ELSE 'Generic Campaign'
+                END
+            ) AS transfer_type
             FROM public.sched_h5
             WHERE report_id = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
@@ -3481,7 +3522,23 @@ def get_list_schedH5(report_id, cmte_id, transaction_id):
             memo_text,
             back_ref_transaction_id,
             create_date,
-            last_update_date
+            last_update_date,
+            coalesce(
+                voter_registration_amount,
+                voter_id_amount,
+                gotv_amount,
+                generic_campaign_amount) as transfer_amount,
+            (
+                CASE 
+                WHEN  voter_registration_amount > 0  
+                THEN 'Voter Registration'
+                WHEN  voter_id_amount > 0 
+                THEN 'Voter ID'
+                WHEN  gotv_amount > 0
+                THEN 'GOTV'
+                ELSE 'Generic Campaign'
+                END
+            ) AS transfer_type
             FROM public.sched_h5
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
@@ -3745,9 +3802,9 @@ def schedH5(request):
             #     data = put_schedB(datum)
             #     output = get_schedB(data)
             # else:
-            data = put_schedH5(datum)
+            data = put_schedH5(datum)[0]
             # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
         except Exception as e:
             logger.debug(e)
             return Response("The schedH5 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)

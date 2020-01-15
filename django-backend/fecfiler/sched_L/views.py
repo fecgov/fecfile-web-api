@@ -1144,8 +1144,8 @@ def get_sl_summary_table(request):
     report-based summary:
     values to be calculated:
     Receipts
-    1. itemized receipts: line_number = 11AI
-    2. non-itemized receipts: line_number = 11AII
+    1. itemized receipts: line_number = 1A, amt > 200
+    2. non-itemized receipts: line_number = 1A, amt <= 200
     3. 1and2_total: itemized + non-itemized
     4. other receipts
     5. all_total: 3 + other
