@@ -539,13 +539,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   
   public setH3Sum() {
 
+    this.h3Sum = [];
+
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
     
     //this.h3Subscription = this._schedH3Service.getSummary(this.getReportId()).subscribe(res =>
     this.h3Subscription = this._schedH3Service.getSummary(reportId).subscribe(res =>
       {        
         if(res) {
-          this.h3Sum = [];
+          //this.h3Sum = [];
           this.h3Sum =  res;         
           this.h3TableConfig.totalItems = res.length;
         }

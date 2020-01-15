@@ -610,6 +610,9 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public setH5Sum() {
+
+    this.h5Sum = [];
+
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
     this.h5Subscription = this._schedH5Service.getSummary(reportId).subscribe(res =>
