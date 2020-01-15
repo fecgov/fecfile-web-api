@@ -593,10 +593,16 @@ def validate_h1_h2_exist(request):
             and report_id = %s
             and delete_ind is distinct from 'Y'
             """
+            add_on = ''
+            if activity_event_type == 'DF':
+                add_on = 'and fundraising is true'
+            else:
+                add_on = 'and direct_cand_support is true'
+
             with connection.cursor() as cursor:
                 logger.debug('query with _sql:{}'.format(_sql))
                 # logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
-                cursor.execute(_sql, (cmte_id, report_id))
+                cursor.execute(_sql + add_on, (cmte_id, report_id))
                 if not cursor.rowcount:
                     raise Exception('Error: something warong with db query.')
                 _count = int(cursor.fetchone()[0])
@@ -1438,10 +1444,12 @@ def get_h2_summary_table(request):
             if not json_res:
                 return Response([], status = status.HTTP_200_OK) 
             for _rec in json_res:
+                _rec['trashable'] = False 
                 if _rec['ratio_code'] == 'n':
-                    _rec['trashable'] = bool(count_h2_transactions(cmte_id, report_id, _rec['activity_event_name']))
-                else:
-                    _rec['trashable'] - False
+                    if count_h2_transactions(cmte_id, report_id, _rec['activity_event_name']) == 0:
+                        _rec['trashable'] = True
+                # else:
+                #     _rec['trashable'] - False
 
                     # 'Error: no valid h2 data found for this report.')
         # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
