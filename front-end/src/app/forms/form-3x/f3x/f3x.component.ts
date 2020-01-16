@@ -744,11 +744,20 @@ export class F3xComponent implements OnInit {
         this.forceChangeDetectionFDebtPayment = new Date();
         if (this.scheduleFAction === ScheduleActions.addSubTransaction) {
           if (e.hasOwnProperty('prePopulateFromSchedD')) {
-            this._f3xMessageService.sendPopulateFormMessage({
+            const emitObject: any = {
               key: 'prePopulateFromSchedD',
               abstractScheduleComponent: AbstractScheduleParentEnum.schedFComponent,
               prePopulateFromSchedD: e.prePopulateFromSchedD
-            });
+            };
+            if (
+              (e.prePopulateFromSchedD.transaction_type_identifier === 'DEBT_TO_VENDOR' ||
+                e.prePopulateFromSchedD.transaction_type_identifier === 'DEBT_BY_VENDOR') &&
+              e.returnToDebtSummary
+            ) {
+              emitObject.returnToDebtSummary = true;
+              emitObject.returnToDebtSummaryInfo = e.returnToDebtSummaryInfo;
+            }
+            this._f3xMessageService.sendPopulateFormMessage(emitObject);
           }
         }
         this.canContinue();
