@@ -81,6 +81,7 @@ import { DecimalPipe, DatePipe } from '@angular/common';
 import { UtilService } from './shared/utils/util.service';
 import { UserIdleModule } from 'angular-user-idle';
 import { SchedFComponent } from './forms/sched-f/sched-f.component';
+import { SchedFCoreComponent } from './forms/sched-f-core/sched-f-core.component';
 import { SchedH1Component } from './forms/form-3x/sched-h1/sched-h1.component';
 import { SchedH2Component } from './forms/sched-h2/sched-h2.component';
 import { LoanComponent } from './forms/sched-c/loan.component';
@@ -184,14 +185,13 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     EndorserSummaryComponent,
     SchedH6Component,
     DebtSummaryComponent,
-    SchedLComponent, 
+    SchedLComponent,
     ContactsFilterTypeComponent,
     SchedH5Component_TOBEDELETED,
     SchedH6Component_TOBEDELETED,
     SchedH1Component_TOBEDELETED,
-    SchedEComponent
-
-
+    SchedEComponent,
+    SchedFCoreComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [

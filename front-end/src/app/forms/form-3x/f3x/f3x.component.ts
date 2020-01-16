@@ -57,6 +57,8 @@ export class F3xComponent implements OnInit {
   public transactionType = '';
   public transactionTypeTextSchedF = '';
   public transactionTypeSchedF = '';
+  public transactionTypeTextSchedFCore = '';
+  public transactionTypeSchedFCore = '';
   public transactionTypeTextDebtSummary = '';
   public transactionTypeDebtSummary = '';
   public transactionDetailSchedC: any;
@@ -66,6 +68,7 @@ export class F3xComponent implements OnInit {
   public scheduleAction: ScheduleActions;
   public scheduleCAction: ScheduleActions;
   public scheduleFAction: ScheduleActions;
+  public scheduleFCoreAction: ScheduleActions;
   public forceChangeDetectionC1: Date;
   public forceChangeDetectionFDebtPayment: Date;
   public forceChangeDetectionDebtSummary: Date;
@@ -555,6 +558,18 @@ export class F3xComponent implements OnInit {
       e.scheduleType = 'sched_e';
     }
 
+    if (e.scheduleType && e.transactionType) {
+      if (
+        e.scheduleType === 'sched_f' &&
+        (e.transactionType === 'COEXP_PARTY' ||
+          e.transactionType === 'COEXP_CC_PAY' ||
+          e.transactionType === 'COEXP_STAF_REIM' ||
+          e.transactionType === 'COEXP_PMT_PROL')
+      ) {
+        e.scheduleType = 'sched_f_core';
+      }
+    }
+
     //default to sched_a ?
     this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
 
@@ -812,7 +827,11 @@ export class F3xComponent implements OnInit {
       this.transactionTypeText = transactionTypeText;
       return;
     }
-    if (scheduleType.startsWith('sched_f')) {
+    if (scheduleType === 'sched_f_core') {
+      this.transactionTypeSchedFCore = transactionType;
+      this.transactionTypeTextSchedFCore = transactionTypeText;
+      this.scheduleFCoreAction = this.scheduleAction;
+    } else if (scheduleType.startsWith('sched_f') && scheduleType !== 'sched_f_core') {
       // this.transactionTypeSchedF = transactionType;
       // this.transactionTypeTextSchedF = transactionTypeText;
       // this.scheduleFAction = this.scheduleAction;
