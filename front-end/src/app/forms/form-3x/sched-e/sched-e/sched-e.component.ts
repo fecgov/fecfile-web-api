@@ -89,7 +89,9 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       );
 
       this.messageSubscription = _messageService.getMessage().subscribe(message => {
+
         if(message && message.parentFormPopulated){
+          this._transactionToEdit = null; // this is being done because this is getting set back to parent transaction due to hierarchical issues. need to investigate further and fix cleanly. 
           this.populateChildData();
         }
       })
@@ -131,10 +133,10 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     
   }
 
-  public ngOnChanges(changes: SimpleChanges) {
+  /* public ngOnChanges(changes: SimpleChanges) {
     this.formType = '3X';
     super.ngOnChanges(changes);
-  }
+  } */
 
   public ngOnDestroy(): void {
     super.ngOnDestroy();
@@ -368,7 +370,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
    this.hiddenFields.push({type:"hidden",name:"full_election_code", value:this.electionCode + this.electionYear});
 
    //Also change the api for subtranscation until dynamic form fields are fixed.
-   this.subTransactionInfo.api_call = "/se/schedE"
+  //  this.subTransactionInfo.api_call = "/se/schedE"
 
     super.saveForAddSub();
   }
@@ -379,7 +381,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
    this.hiddenFields.push({type:"hidden",name:"full_election_code", value:this.electionCode + this.electionYear});
 
    //Also change the api for subtranscation until dynamic form fields are fixed.
-   this.subTransactionInfo.api_call = "/se/schedE";
+  //  this.subTransactionInfo.api_call = "/se/schedE";
 
     super.saveAndReturnToParent();
   }
@@ -390,7 +392,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
      this.hiddenFields.push({type:"hidden",name:"full_election_code", value:this.electionCode + this.electionYear});
   
      //Also change the api for subtranscation until dynamic form fields are fixed.
-     this.subTransactionInfo.api_call = "/se/schedE";
+    //  this.subTransactionInfo.api_call = "/se/schedE";
 
      super.returnToParent(scheduleAction);
    

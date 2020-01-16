@@ -149,7 +149,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _selectedCandidateChangeWarn: any;
   private _selectedCandidateChangeWarnChild: any;
   private _contributionAmountMax: number;
-  private _transactionToEdit: TransactionModel;
+  protected _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
   private _readOnlyMemoCode: boolean;
   private _readOnlyMemoCodeChild: boolean;
@@ -1952,7 +1952,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.transactionType === 'OTH_DISB_DEBT' ||
                 this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
                 this.transactionType === 'COEXP_PARTY_DEBT' ||
-                this.transactionType === 'IE_B4_DISSE_MEMO' ||
+                this.transactionType === 'IE' ||
                 this.transactionType === 'OTH_REC_DEBT'
               )
             ) {
@@ -4266,7 +4266,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.transactionType === 'OTH_DISB_DEBT' ||
         this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
         this.transactionType === 'COEXP_PARTY_DEBT' ||
-        this.transactionType === 'IE_B4_DISSE_MEMO' ||
+        this.transactionType === 'IE' ||
         this.transactionType === 'OTH_REC_DEBT'
       )
     ) {
