@@ -120,7 +120,7 @@ def schedL_sql_dict(data):
         "cvg_end_date",
         "item_receipts",
         "unitem_receipts",
-        "ttl_receipts",
+        "total_c_receipts",
         "other_receipts",
         "total_receipts",
         "voter_reg_disb_amount",
@@ -137,7 +137,7 @@ def schedL_sql_dict(data):
         "coh_cop",
         "item_receipts_ytd",
         "unitem_receipts_ytd",
-        "total_reciepts_ytd",
+        "total_c_receipts_ytd",
         "other_receipts_ytd",
         "total_receipts_ytd",
         "voter_reg_disb_amount_ytd",
@@ -174,8 +174,10 @@ def put_schedL(data):
         check_mandatory_fields_SL(data)
         # check_transaction_id(data.get('transaction_id'))
         try:
+            logger.debug('update sl record with {}'.format(data))
             put_sql_schedL(data)
         except Exception as e:
+            print(e)
             raise Exception(
                 "The put_sql_schedL function is throwing an error: " + str(e)
             )
@@ -187,7 +189,6 @@ def put_schedL(data):
 def put_sql_schedL(data):
     """
     update a schedule_L item                    
-
     """
     _sql = """UPDATE public.sched_l
               SET transaction_type_identifier = %s, 
@@ -198,7 +199,7 @@ def put_sql_schedL(data):
                   cvg_end_date = %s,
                   item_receipts = %s,
                   unitem_receipts = %s,
-                  ttl_receipts = %s,
+                  total_c_receipts = %s,
                   other_receipts = %s,
                   total_receipts = %s,
                   voter_reg_disb_amount = %s,
@@ -215,7 +216,7 @@ def put_sql_schedL(data):
                   coh_cop = %s,
                   item_receipts_ytd = %s,
                   unitem_receipts_ytd = %s,
-                  total_reciepts_ytd = %s,
+                  total_c_receipts_ytd = %s,
                   other_receipts_ytd = %s,
                   total_receipts_ytd = %s,
                   voter_reg_disb_amount_ytd = %s,
@@ -244,7 +245,7 @@ def put_sql_schedL(data):
         data.get("cvg_end_date"),
         data.get("item_receipts"),
         data.get("unitem_receipts"),
-        data.get("ttl_receipts"),
+        data.get("total_c_receipts"),
         data.get("other_receipts"),
         data.get("total_receipts"),
         data.get("voter_reg_disb_amount"),
@@ -261,7 +262,7 @@ def put_sql_schedL(data):
         data.get("coh_cop"),
         data.get("item_receipts_ytd"),
         data.get("unitem_receipts_ytd"),
-        data.get("total_reciepts_ytd"),
+        data.get("total_c_receipts_ytd"),
         data.get("other_receipts_ytd"),
         data.get("total_receipts_ytd"),
         data.get("voter_reg_disb_amount_ytd"),
@@ -1403,7 +1404,7 @@ def update_sl_summary(data):
             'cmte_id':cmte_id,
             'report_id':report_id,
             'record_id':levin_account_id,
-            'levin_account_name': get_levin_account(cmte_id, levin_account_id)[0]['levin_account_name'],
+            'account_name': get_levin_account(cmte_id, levin_account_id)[0]['levin_account_name'],
             'cvg_from_date':cvg_start_date,
             'cvg_end_date':cvg_end_date,
             'transaction_type_identifier':'LEVIN_SUMM',
@@ -1475,7 +1476,7 @@ def update_sl_summary(data):
         sl_data = schedL_sql_dict(sl_data)
         logger.debug('sl data after screening:{}'.format(sl_data))
         transaction_id = get_sl_transaction_id(cmte_id, report_id, levin_account_id)
-        print(transaction_id)
+        # print(transaction_id)
         if not transaction_id:
             logger.debug('no transaction_id found. Saving a new record.')
             post_schedL(sl_data)
