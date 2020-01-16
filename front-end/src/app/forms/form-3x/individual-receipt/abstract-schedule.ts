@@ -587,7 +587,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (validation === 'required') {
           if (validators[validation]) {
             // occuaption and employer will be required dpending on aggregate
-            if (fieldName !== 'employer' && fieldName !== 'occupation') {
+            if (fieldName !== 'employer' && fieldName !== 'occupation' && fieldName !== 'expenditure_purpose') {
               if (fieldName === 'incurred_amount' && this.scheduleAction === ScheduleActions.edit) {
                 // not required but not optinal when editing
               } else {
@@ -712,24 +712,33 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Apply the validation rules when aggregate changes.
    */
   private _listenForAggregateChanges(): void {
-    this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.subscribe(val => {
-      // All validators are replaced here.  Currently the only validator functions
-      // for employer and occupation is the validateAggregate().  The max length is enforced
-      // in the template as an element attribute max.
-      // If additoanl validators need to be added here, there is no replace function in ng,
-      // they must be cleared and all set in an array again. Onc solution is to
-      // store the validators in a class variable array, add this function to the array, and set the
-      // controls's setValidator() using the full array.  Or just get the validations from the
-      // dynamic form fields again in this.formFields[].
+    if ( this.frmIndividualReceipt.get('contribution_aggregate') != null) {
+      this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.subscribe(val => {
+        // All validators are replaced here.  Currently the only validator functions
+        // for employer and occupation is the validateAggregate().  The max length is enforced
+        // in the template as an element attribute max.
+        // If additoanl validators need to be added here, there is no replace function in ng,
+        // they must be cleared and all set in an array again. Onc solution is to
+        // store the validators in a class variable array, add this function to the array, and set the
+        // controls's setValidator() using the full array.  Or just get the validations from the
+        // dynamic form fields again in this.formFields[].
+        const employerControl = this.frmIndividualReceipt.get('employer');
+        employerControl.setValidators([validateAggregate(val, true, 'employer')]);
+        employerControl.updateValueAndValidity();
 
-      const employerControl = this.frmIndividualReceipt.get('employer');
-      employerControl.setValidators([validateAggregate(val, true, 'employer')]);
-      employerControl.updateValueAndValidity();
+        const occupationControl = this.frmIndividualReceipt.get('occupation');
+        occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
+        occupationControl.updateValueAndValidity();
 
-      const occupationControl = this.frmIndividualReceipt.get('occupation');
-      occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
-      occupationControl.updateValueAndValidity();
-    });
+
+      });
+    } else if ( this.frmIndividualReceipt.get('expenditure_amount') != null) {
+      this.frmIndividualReceipt.get('expenditure_amount').valueChanges.subscribe(value => {
+        const expenditurePurposeDesc = this.frmIndividualReceipt.get('expenditure_purpose');
+        expenditurePurposeDesc.setValidators([validateAggregate(value, true, 'expenditure_purpose')]);
+        expenditurePurposeDesc.updateValueAndValidity();
+      });
+    }
   }
 
   /**

@@ -7,6 +7,34 @@ import datetime
 logger = logging.getLogger(__name__)
 
 
+def validate_new_election_year(cmte_id, report_id):
+    """
+    helper function for checking a report a NEW election year:
+    checking cvg_start_date month = 1 and day = 1 
+    """
+
+    _sql = """
+    SELECT extract(day from cvg_start_date) as d, 
+    extract(month from cvg_start_date) as m 
+    FROM public.reports
+    WHERE report_id = %s and cmte_id = %s
+    and delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            # cursor.execute(count_sql, (report_id, cmte_id, report_id, cmte_id))
+            # if cursor.rowcount == 0:
+            cursor.execute(_sql, (report_id, cmte_id))
+            if cursor.rowcount:
+                _res = cursor.fetchone()
+                if int(_res[0]) == 1 and int(_res[1] == 1):
+                    logger.debug("new election year report identified.")
+                    return True
+        return False
+    except:
+        raise
+
+
 def delete_child_transaction(table, cmte_id, transaction_id):
     """
     delete sql transaction
@@ -75,14 +103,12 @@ def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
                 payment_amount = 0
             balance_at_close = data[1]
             logger.debug("loan current payment amt:{}".format(payment_amount))
-            logger.debug(
-                "loan current payment amt:{}".format(balance_at_close))
+            logger.debug("loan current payment amt:{}".format(balance_at_close))
             new_payment_amount = (
                 float(payment_amount) + float(new_payment) - float(old_payment)
             )
             new_balance_at_close = (
-                float(balance_at_close) -
-                float(new_payment) + float(old_payment)
+                float(balance_at_close) - float(new_payment) + float(old_payment)
             )
         logger.debug(
             "update parent with new payment {}, new balance {}".format(
@@ -145,8 +171,7 @@ def update_sched_d_parent(cmte_id, transaction_id, new_payment, old_payment=0):
                 float(payment_amount) + float(new_payment) - float(old_payment)
             )
             new_balance_at_close = (
-                float(balance_at_close) -
-                float(new_payment) + float(old_payment)
+                float(balance_at_close) - float(new_payment) + float(old_payment)
             )
         logger.debug(
             "update parent with payment {}, close_b {}".format(
@@ -174,8 +199,7 @@ def do_transaction(sql, values):
     try:
         with connection.cursor() as cursor:
             cursor.execute(sql, values)
-            logger.debug(
-                "transaction done with rowcount:{}".format(cursor.rowcount))
+            logger.debug("transaction done with rowcount:{}".format(cursor.rowcount))
             # if cursor.rowcount == 0:
             #     raise Exception("The sql transaction: {} failed...".format(sql))
     except Exception:
@@ -214,8 +238,7 @@ def update_parent_purpose(data):
             # Insert data into schedA table
             logger.debug("update parent purpose with sql:{}".format(_sql))
             logger.debug(
-                "update parent {} with purpose:{}".format(
-                    parent_tran_id, purpose)
+                "update parent {} with purpose:{}".format(parent_tran_id, purpose)
             )
             # print(report_id, cmte_id)
             cursor.execute(_sql, [purpose, parent_tran_id, report_id, cmte_id])
@@ -272,8 +295,7 @@ def populate_transaction_types():
         with connection.cursor() as cursor:
             cursor.execute(_sql)
             if cursor.rowcount == 0:
-                raise Exception(
-                    "bummer, no transaction_types found in the database.")
+                raise Exception("bummer, no transaction_types found in the database.")
             for row in cursor.fetchall():
                 tran_dic[row[0]] = (row[1], row[2])
         return tran_dic
@@ -301,8 +323,7 @@ def get_transaction_type_descriptions():
         with connection.cursor() as cursor:
             cursor.execute(_sql)
             if cursor.rowcount == 0:
-                raise Exception(
-                    "bummer, no transaction_types found in the database.")
+                raise Exception("bummer, no transaction_types found in the database.")
             for row in cursor.fetchall():
                 tran_dic[row[0]] = row[1]
         # logger.debug("transaction desc loaded:{}".format(tran_dic))
@@ -886,11 +907,9 @@ def candify_it(cand_json):
     candify_item = {}
     for _f in cand_json:
         if _f == "entity_id":
-            candify_item["beneficiary_cand_entity_id"] = cand_json.get(
-                "entity_id")
+            candify_item["beneficiary_cand_entity_id"] = cand_json.get("entity_id")
         elif _f == "ref_cand_cmte_id":
-            candify_item["beneficiary_cand_id"] = cand_json.get(
-                "ref_cand_cmte_id")
+            candify_item["beneficiary_cand_id"] = cand_json.get("ref_cand_cmte_id")
             candify_item["cand_id"] = cand_json.get("ref_cand_cmte_id")
         elif _f in ["occupation", "employer"]:
             continue
