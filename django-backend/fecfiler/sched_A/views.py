@@ -1731,8 +1731,12 @@ def trash_restore_transactions(request):
                     update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
                     ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
                     # Deleting/Restoring auto generated transactions for Schedule A
-                    if datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
-                        'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']:
+                    if _delete == 'Y' or (_delete != 'Y' and datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
+                        'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']):
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                # Handling aggregate updation for sched_B transactions
+                if transaction_id[:2] == 'SB':
+                    if _delete == 'Y':
                         _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
             elif transaction_id[:2] in ('SC', 'SD'):
                 # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D
