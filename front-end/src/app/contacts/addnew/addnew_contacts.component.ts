@@ -24,7 +24,7 @@ import { alphaNumeric } from '../../shared/utils/forms/validation/alpha-numeric.
 import { floatingPoint } from '../../shared/utils/forms/validation/floating-point.validator';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
 import { Observable, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
@@ -154,11 +154,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
   // tslint:disable-next-line:use-life-cycle-interface
   public ngDoCheck(): void {
-    if (this.frmContact.touched || this.frmContact.dirty) {
+    if (this.frmContact.dirty) {
       if (this.frmContact.valid) {
-        const isSaved = localStorage.getItem('contactsaved');
-        console.log('isSaved' + isSaved);
-        if (!isSaved) {
+        const isSaved = JSON.parse(localStorage.getItem('contactsaved'));
+        console.log('isSaved' + isSaved.saved);
+        if (!isSaved.saved) {
           this.frmContact.markAsDirty();
           this.frmContact.markAsTouched();
         } else {
@@ -167,9 +167,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         }
         } else {
         this.frmContact.markAsTouched();
-        this.frmContact.markAsDirty();
         localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
       }
+    } else {
+      this.frmContact.markAsPristine();
+      this.frmContact.markAsUntouched();
     }
   }
 
@@ -1317,12 +1319,11 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
 
 
   public viewContacts(): void {
-
-    if (this.frmContact.dirty || this.frmContact.touched) {
+    if (this.frmContact.dirty) {
       this.doValidateContact('viewContacts');
-      // localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
-    }
+    } else {
     this._router.navigate([`/contacts`]);
+    }
   }
 
   public saveAndAddMore(): void {
@@ -1421,14 +1422,19 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           if(this.scheduleAction === ContactActions.edit) {
             this.status.emit({
               editView: false
-            })
+            });
           }
-        }
+          if (callFrom === 'viewContacts') {
+            this._router.navigate([`/contacts`]);
+          }}
       });
     } else {
       this.frmContact.markAsDirty();
       this.frmContact.markAsTouched();
       localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
+      if (callFrom === 'viewContacts') {
+        this._router.navigate([`/contacts`]);
+      }
       window.scrollTo(0, 0);
     }
   }
