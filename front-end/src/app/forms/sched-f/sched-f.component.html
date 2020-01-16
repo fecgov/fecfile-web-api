@@ -481,6 +481,20 @@
                           [resultTemplate]="rtPayeeCommitteeId"
                           [inputFormatter]="formatterPayeeCommitteeId"
                           (selectItem)="handleSelectedCandidate($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                        <input *ngIf="isFieldName(col?.name, 'beneficiary_cand_id')" class="form-control"
+                          [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
+                          [attr.name]="col?.name" [attr.value]="col?.value" [maxlength]="col?.validation?.max"
+                          [formControlName]="col?.name" [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-ben-cand-id" 
+                          [ngbTypeahead]="searchCandidateId" 
+                          [focusFirst]=false
+                          [resultTemplate]="rtCandidate" 
+                          [inputFormatter]="formatterCandidateId"
+                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />                          
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_name')" class="form-control"
                           [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"

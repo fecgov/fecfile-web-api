@@ -1,6 +1,6 @@
 import { ReportTypeService } from './../form-3x/report-type/report-type.service';
 import { LoanService } from './../sched-c/service/loan.service';
-import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges, OnChanges, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
@@ -18,7 +18,8 @@ import { validateAmount } from '../../shared/utils/forms/validation/amount.valid
 @Component({
   selector: 'app-sched-c1',
   templateUrl: './sched-c1.component.html',
-  styleUrls: ['./sched-c1.component.scss']
+  styleUrls: ['./sched-c1.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class SchedC1Component implements OnInit, OnChanges {
   @Input() formType: string;

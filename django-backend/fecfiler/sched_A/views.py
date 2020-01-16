@@ -32,6 +32,7 @@ from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     put_sql_agg_amount_schedB, get_list_child_transactionId_schedB,
                                     delete_sql_schedB)
 
+from fecfiler.sched_L.views import update_sl_summary
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -910,6 +911,8 @@ def post_schedA(datum):
         # update line number based on aggregate amount info
         update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
             'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            update_sl_summary(datum)    
         return datum
     except:
         raise
@@ -1104,6 +1107,8 @@ def put_schedA(datum):
             update_date = datum.get('contribution_date')
         update_linenumber_aggamt_transactions_SA(update_date, datum.get(
             'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            update_sl_summary(datum)    
         return datum
     except:
         raise
@@ -1726,8 +1731,12 @@ def trash_restore_transactions(request):
                     update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
                     ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
                     # Deleting/Restoring auto generated transactions for Schedule A
-                    if datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
-                        'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']:
+                    if _delete == 'Y' or (_delete != 'Y' and datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
+                        'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']):
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                # Handling aggregate updation for sched_B transactions
+                if transaction_id[:2] == 'SB':
+                    if _delete == 'Y':
                         _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
             elif transaction_id[:2] in ('SC', 'SD'):
                 # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D

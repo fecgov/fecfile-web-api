@@ -564,6 +564,152 @@ def schedH1(request):
     else:
         raise NotImplementedError
 
+
+@api_view(['GET'])
+def validate_h1_h2_exist(request):
+    """
+    validate h1 or h2 exist or not - used to enable h3/h5 warning message
+    
+    """
+
+    logger.debug('validate h1/h2 exist with request:{}'.format(request.query_params))
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        cmte_type_category = request.query_params.get('cmte_type_category')
+        calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
+        start_dt = datetime.date(int(calendar_year), 1, 1)
+        end_dt = datetime.date(int(calendar_year), 12, 31)
+        activity_event_type = request.query_params.get('activity_event_type')
+        # event_name = request.query_params.get('activity_event_identifier') 
+        # transaction_type_identifier = request.query_params.get('transaction_type_identifier') 
+        _count = 0
+
+        if activity_event_type in ['DF', 'DC']: # event-based, goes to h2
+            _sql = """
+            select count(*)
+            from public.sched_h2 
+            where cmte_id = %s 
+            and report_id = %s
+            and delete_ind is distinct from 'Y'
+            """
+            add_on = ''
+            if activity_event_type == 'DF':
+                add_on = 'and fundraising is true'
+            else:
+                add_on = 'and direct_cand_support is true'
+
+            with connection.cursor() as cursor:
+                logger.debug('query with _sql:{}'.format(_sql))
+                # logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
+                cursor.execute(_sql + add_on, (cmte_id, report_id))
+                if not cursor.rowcount:
+                    raise Exception('Error: something warong with db query.')
+                _count = int(cursor.fetchone()[0])
+
+            # _sql = """
+            # select activity_event_amount_ytd 
+            # from public.sched_h4 
+            # where cmte_id = %s 
+            # and activity_event_identifier = %s
+            # and create_date between %s and %s
+            # and delete_ind is distinct from 'Y'
+            # order by create_date desc, last_update_date desc;
+            # """
+            # with connection.cursor() as cursor:
+            #     cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
+            #     if not cursor.rowcount:
+            #         aggregate_amount = 0 
+            #     else:
+            #         aggregate_amount = float(cursor.fetchone()[0])
+
+        else: # need to go to h1 for ratios
+            # activity_event_type = request.query_params.get('activity_event_type')
+
+            # if not activity_event_type:
+            #     raise Exception('Error: event type is required.')
+            
+            if cmte_type_category == 'PTY':
+                # _sql = """
+                # select federal_percent from public.sched_h1
+                # where election_year = %s
+                # and cmte_id = %s
+                # and report_id = %s
+                # and delete_ind is distinct from 'Y'
+                # order by create_date desc, last_update_date desc
+                # """
+                _sql = """
+                select count(*) from public.sched_h1
+                where election_year = %s
+                and cmte_id = %s
+                and delete_ind is distinct from 'Y'
+                """
+                logger.debug('sql for query h1:{}'.format(_sql))
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, (calendar_year, cmte_id))
+                    if not cursor.rowcount:
+                        raise Exception('Error: no valid h1 data found.')
+                    _count = int(cursor.fetchone()[0])
+            elif cmte_type_category == 'PAC':
+                # activity_event_type = request.query_params.get('activity_event_type')
+                # if not activity_event_type:
+                    # return Response('Error: event type is required for this committee.')
+                event_type_code = {
+                    "AD" : "administrative", # TODO: need to fix this typo
+                    "GV" : "generic_voter_drive",
+                    "PC" : "public_communications",
+                }
+                h1_event_type = event_type_code.get(activity_event_type)
+                if not h1_event_type:
+                    return Response('Error: activity type not valid')
+                _sql = """
+                select count(*) from public.sched_h1
+                where election_year = %s
+                and cmte_id = %s
+                and report_id = %s
+                """
+                activity_part = """and {} = true """.format(h1_event_type)
+                # order_part = 'order by create_date desc, last_update_date desc'
+                _sql = _sql + activity_part
+                logger.debug('sql for query h1:{}'.format(_sql))
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, (calendar_year, cmte_id, report_id))
+                    if not cursor.rowcount:
+                        raise Exception('Error: no valid h1 data found.')
+                    _count = int(cursor.fetchone()[0])
+            else:
+                raise Exception('invalid cmte_type_category.')
+
+        #     _sql = """
+        #         select activity_event_amount_ytd 
+        #         from public.sched_h4 
+        #         where cmte_id = %s 
+        #         and activity_event_type = %s
+        #         and create_date between %s and %s
+        #         order by create_date desc, last_update_date desc
+        #     """
+        #     with connection.cursor() as cursor:
+        #         cursor.execute(_sql, (cmte_id, activity_event_type, start_dt, end_dt))
+        #         if not cursor.rowcount:
+        #             aggregate_amount = 0
+        #         else:
+        #             aggregate_amount = float(cursor.fetchone()[0])
+        # # fed_percent = float(cursor.fetchone()[0])
+        # fed_share = float(total_amount) * fed_percent
+        # nonfed_share = float(total_amount) - fed_share
+        # if transaction_type_identifier and not transaction_type_identifier.endswith('_MEMO'):
+        #     new_aggregate_amount = aggregate_amount + float(total_amount)
+        # else:
+        #     new_aggregate_amount = aggregate_amount
+        return JsonResponse(
+            {
+                'count' : _count
+            }, 
+                status = status.HTTP_200_OK
+        )
+    except:
+        raise
+
 @api_view(['GET'])
 def get_fed_nonfed_share(request):
     """
@@ -1297,6 +1443,14 @@ def get_h2_summary_table(request):
             # print(json_res)
             if not json_res:
                 return Response([], status = status.HTTP_200_OK) 
+            for _rec in json_res:
+                _rec['trashable'] = False 
+                if _rec['ratio_code'] == 'n':
+                    if count_h2_transactions(cmte_id, report_id, _rec['activity_event_name']) == 0:
+                        _rec['trashable'] = True
+                # else:
+                #     _rec['trashable'] - False
+
                     # 'Error: no valid h2 data found for this report.')
         # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
         # start_dt = datetime.date(int(calendar_year), 1, 1)
@@ -1304,6 +1458,30 @@ def get_h2_summary_table(request):
         return Response( json_res, status = status.HTTP_200_OK)
     except:
         raise
+
+def count_h2_transactions(cmte_id, report_id, activity_event_name):
+    """
+    helpfer function for counting current h2 assoicated transactions
+    """ 
+    _sql = """
+    select count(*) 
+    from all_other_transactions_view 
+    where activity_event_identifier = %s
+    and cmte_id = %s 
+    and report_id = %s
+    and delete_ind is distinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            logger.debug('count_h2_transactions with _sql:{}'.format(_sql))
+            
+            logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+            cursor.execute(_sql, (activity_event_name, cmte_id, report_id))
+            return int(cursor.fetchone()[0])
+    except:
+        raise
+
+
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def schedH2(request):
@@ -3052,6 +3230,29 @@ def schedH5_sql_dict(data):
         raise Exception('invalid request data.')
 
 
+def update_h5_total_amount(data):
+    """
+    update total amount for all transactions have the same parent_id
+    """
+
+    _sql = """
+    UPDATE sched_h5 
+    SET    total_amount_transferred = (
+        SELECT Sum(coalesce(
+                voter_registration_amount,
+                voter_id_amount,
+                gotv_amount,
+                generic_campaign_amount)) 
+        FROM   sched_h5 
+        WHERE 
+              back_ref_transaction_id = %s) 
+    WHERE  ( back_ref_transaction_id = %s 
+          OR transaction_id = %s ) 
+    """
+    back_ref_transaction_id = data.get('back_ref_transaction_id')
+    _v = [back_ref_transaction_id] * 3
+    do_transaction(_sql, _v)
+
 def put_schedH5(data):
     """
     update sched_H5 item
@@ -3062,10 +3263,12 @@ def put_schedH5(data):
         #check_transaction_id(data.get('transaction_id'))
         try:
             put_sql_schedH5(data)
+            logger.debug('update total amount after H5 updates saved with data {}'.format(data))
+            update_h5_total_amount(data)
         except Exception as e:
             raise Exception(
                 'The put_sql_schedH5 function is throwing an error: ' + str(e))
-        return data
+        return get_list_schedH5(data.get('report_id'), data.get('cmte_id'), data.get('transaction_id'))
     except:
         raise
 
@@ -3271,9 +3474,25 @@ def get_list_all_schedH5(report_id, cmte_id):
             gotv_amount,
             generic_campaign_amount,
             memo_code,
-            memo_text ,
+            memo_text,
             create_date,
-            last_update_date
+            last_update_date,
+            coalesce(
+                voter_registration_amount,
+                voter_id_amount,
+                gotv_amount,
+                generic_campaign_amount) as transfer_amount,
+            (
+                CASE 
+                WHEN  voter_registration_amount > 0  
+                THEN 'Voter Registration'
+                WHEN  voter_id_amount > 0 
+                THEN 'Voter ID'
+                WHEN  gotv_amount > 0
+                THEN 'GOTV'
+                ELSE 'Generic Campaign'
+                END
+            ) AS transfer_type
             FROM public.sched_h5
             WHERE report_id = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
@@ -3311,7 +3530,23 @@ def get_list_schedH5(report_id, cmte_id, transaction_id):
             memo_text,
             back_ref_transaction_id,
             create_date,
-            last_update_date
+            last_update_date,
+            coalesce(
+                voter_registration_amount,
+                voter_id_amount,
+                gotv_amount,
+                generic_campaign_amount) as transfer_amount,
+            (
+                CASE 
+                WHEN  voter_registration_amount > 0  
+                THEN 'Voter Registration'
+                WHEN  voter_id_amount > 0 
+                THEN 'Voter ID'
+                WHEN  gotv_amount > 0
+                THEN 'GOTV'
+                ELSE 'Generic Campaign'
+                END
+            ) AS transfer_type
             FROM public.sched_h5
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
             AND delete_ind is distinct from 'Y') t
@@ -3575,9 +3810,9 @@ def schedH5(request):
             #     data = put_schedB(datum)
             #     output = get_schedB(data)
             # else:
-            data = put_schedH5(datum)
+            data = put_schedH5(datum)[0]
             # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
         except Exception as e:
             logger.debug(e)
             return Response("The schedH5 API - PUT is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
