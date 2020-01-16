@@ -69,6 +69,9 @@ API_CALL_SB = {'api_call':'/sb/schedB'}
 API_CALL_SC1 = {'api_call':'/sc/schedC1'}
 API_CALL_SC2 = {'api_call':'/sc/schedC2'}
 
+TRAN_TYPE_ID_SC1 = {'transaction_type_identifier':'SC1'};
+TRAN_TYPE_ID_SC2 = {'transaction_type_identifier':'SC2'};
+
 # need to generate auto sched_a items when a loan is made by a committee
 AUTO_SCHED_A_MAP = { 
     'LOANS_OWED_BY_CMTE' : ['LOAN_FROM_IND','LOAN_FROM_BANK']
@@ -321,7 +324,8 @@ def put_schedC(data):
             # rollback_data = get_schedC(data)
             logger.debug('updating loan with data:{}'.format(data))
             put_sql_schedC(data)
-            update_auto_sched_a(data)
+            data_copy = data.copy()
+            update_auto_sched_a(data_copy)
 
         except Exception as e:
             # rollback entity data
@@ -1301,12 +1305,14 @@ def get_outstanding_loans(request):
                 # print(childC1_forms_obj)
                 for obj in childC1_forms_obj:
                     obj.update(API_CALL_SC1)
+                    obj.update(TRAN_TYPE_ID_SC1)
                 logger.debug('getting all sched_c2 childs...')
                 childC2_forms_obj = get_sched_c2_child(
                     cmte_id, transaction_id)
                 # print(childC2_forms_obj)
                 for obj in childC2_forms_obj:
                     obj.update(API_CALL_SC2)
+                    obj.update(TRAN_TYPE_ID_SC2)
                 child_tran = childC1_forms_obj + childC2_forms_obj
                 if child_tran:
                     tran['child'] = child_tran

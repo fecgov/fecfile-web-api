@@ -32,6 +32,7 @@ from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     put_sql_agg_amount_schedB, get_list_child_transactionId_schedB,
                                     delete_sql_schedB)
 
+from fecfiler.sched_L.views import update_sl_summary
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -910,6 +911,8 @@ def post_schedA(datum):
         # update line number based on aggregate amount info
         update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
             'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            update_sl_summary(datum)    
         return datum
     except:
         raise
@@ -1104,6 +1107,8 @@ def put_schedA(datum):
             update_date = datum.get('contribution_date')
         update_linenumber_aggamt_transactions_SA(update_date, datum.get(
             'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            update_sl_summary(datum)    
         return datum
     except:
         raise

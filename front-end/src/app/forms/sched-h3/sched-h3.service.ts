@@ -304,5 +304,44 @@ export class SchedH3Service {
       );
 
   }
+
+  public getH1H2ExistStatus(report_id: string, activity_event_type: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/sh1/validate_h1_h2_exist';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let params = new HttpParams();
+    params = params.append('report_id', report_id);
+    params = params.append('activity_event_type', activity_event_type);
+    params = params.append('calendar_year', new Date().getFullYear().toString());
+
+    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    if (committeeDetails) {
+      if (committeeDetails.cmte_type_category) {
+        params = params.append('cmte_type_category', committeeDetails.cmte_type_category);
+      }
+    }
+
+    return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          params,
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
+            console.log('Validate H1 H2 exist res: ', res);
+            return res;
+          }
+          return false;
+      })
+      );
+
+  }
     
 }

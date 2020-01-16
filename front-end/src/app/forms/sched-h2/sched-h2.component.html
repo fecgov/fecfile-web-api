@@ -370,7 +370,14 @@
                       <div id="sched-h2__dropdown-action" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                         <button class="dropdown-item" (click)="editH2(item)"><i class="fas fa-edit"></i> Edit</button>
                         <button class="dropdown-item"><i class="fas fa-print"></i> Print</button>
-                        <button class="dropdown-item" (click)="trashTransaction(item)"><i class="fas fa-trash"></i> Trash</button>
+                        <div *ngIf="!item.trashable" style="display: inline-block;" tooltip="{{disabledMsg}}">
+                          <button class="dropdown-item" type="button" tooltipClass="form-tooltip"
+                            [disabled]="!item.trashable" (click)="trashTransaction(item)"><i class="fas fa-trash"></i> Trash</button>
+                        </div>
+                        <div *ngIf="item.trashable">
+                          <button class="dropdown-item" type="button" tooltipClass="form-tooltip"
+                            [disabled]="!item.trashable" (click)="trashTransaction(item)"><i class="fas fa-trash"></i> Trash</button>
+                        </div>
                       </div>
                     </div>
                   </td>

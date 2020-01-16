@@ -46,6 +46,8 @@ export class LoanModel {
   selected: boolean;
   payments: any[];
   child: any[];
+  hasC1: any;
+  hasC2: any;
     constructor(loan: any) {
         this.cmte_id = loan.cmte_id ? loan.cmte_id : '';
         this.report_id = loan.report_id ? loan.report_id : 0;
@@ -89,6 +91,8 @@ export class LoanModel {
         this.selected = loan.selected;
         this.child = loan.child;
         this.payments = loan.payments;
+        this.hasC1 = loan.hasC1;
+        this.hasC2 = loan.hasC2;
  
 
     }

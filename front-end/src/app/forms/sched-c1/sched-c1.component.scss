@@ -1,5 +1,15 @@
 @import '../../shared/scss/global';
 
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}
+
 .sched-c1-container {
   padding-right: 10px;
   .row {
@@ -132,6 +142,9 @@
           }
           .ng-select.forms__select ::ng-deep .ng-select-container  {            
             height: 45px;
+          }
+          .ng-select.disable-arrow .ng-arrow-wrapper .ng-arrow {
+            display: none;
           }
           .forms__big_checkbox {
             -webkit-transform: scale(1.9);
