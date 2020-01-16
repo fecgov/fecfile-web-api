@@ -894,24 +894,26 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     let trxIds = '';
     // let iseditable = true;
     let unEditableTypesArray = [];
-    let parentTransactionsArray = [];
+    let linkedTransactionsArray = [];
     const selectedTransactions: Array<TransactionModel> = [];
     for (const trx of this.transactionsModel) {
       if (trx.selected) {
+
+        //this condition only applies to H1 and H2s
+        if (this.transactionCategory === 'other' && !trx.isTrashable) {
+          linkedTransactionsArray.push(trx.type);
+        }
+
         if (!trx.iseditable) {
           unEditableTypesArray.push(trx.type);
         }
-        if (this.transactionCategory === 'receipts' || this.transactionCategory === 'disbursements') {
-          if (trx.child) {
-            parentTransactionsArray.push(trx.type);
-          }
-        }
+        
         selectedTransactions.push(trx);
         trxIds += trx.transactionId + ', ';
       }
     }
 
-    if (unEditableTypesArray.length > 0 || parentTransactionsArray.length > 0) {
+    if (unEditableTypesArray.length > 0 || linkedTransactionsArray.length > 0) {
       let message = '';
       if (unEditableTypesArray.length > 0) {
         message += "You cannot delete the following selected transaction types because they are auto-generated. ";
@@ -922,13 +924,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         message += `\n\n`;
       }
 
-      if (parentTransactionsArray.length > 0) {
-        message += "You cannot delete the following selected transaction types because they are linked to child transactions. Please delete them first";
-        let parentTransactionsSet = new Set(parentTransactionsArray);
-        parentTransactionsSet.forEach(transactionType => {
+      if (linkedTransactionsArray.length > 0) {
+        message += "You cannot delete the following selected transaction types because they are linked to other transactions. Please delete them first.";
+        let linkedTransactionsSet = new Set(linkedTransactionsArray);
+        linkedTransactionsSet.forEach(transactionType => {
           message += `    \n \u2022 ${transactionType}`;
         });
-      }
+      } 
 
       this._dialogService.confirm(
         message,
@@ -1036,7 +1038,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
                 this.trashOrRestoreAfterConfirmation(res, trx);
               })
           }
-          else{
+          else {
             this.trashOrRestoreAfterConfirmation(res, trx);
           }
         } else if (res === 'cancel') {
@@ -1060,14 +1062,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  public showRow(trx:any, sched:string): boolean{
+  public showRow(trx: any, sched: string): boolean {
     let childArray;
-    if(trx && trx.entityType === 'ORG' && (trx.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE')){
-      if(trx.child && trx.child.length > 0){
+    if (trx && trx.entityType === 'ORG' && (trx.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE')) {
+      if (trx.child && trx.child.length > 0) {
         childArray = trx.child.filter(element => {
           return element.scheduleType === sched
         });
-        if(childArray.length > 0){
+        if (childArray.length > 0) {
           return true;
         }
       }

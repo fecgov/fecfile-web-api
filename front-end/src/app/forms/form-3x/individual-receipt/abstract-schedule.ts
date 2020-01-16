@@ -1926,6 +1926,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else if (saveAction === SaveActions.saveForEditSub) {
             this._progressToChild(ScheduleActions.edit, res);
           } else if (saveAction === SaveActions.saveForReturnToParent) {
+            //TODO -- this is a flag that was being used to "track" whether cloning transaction was completed or not. 
+            //it was initially only set for saveAction === SaveActions.updateOnly. But it should most likely be set to true for all
+            //save actions if the save is successful, so the "cloning" process can be cleared. However, since its risky to change in all
+            //places, changing it in the only other place that can possibly be triggered so far in the application.
+            this._completedCloning = true; 
+
             this.returnToParent(ScheduleActions.edit);
           } else if (saveAction === SaveActions.saveForReturnToNewParent) {
             this.returnToParent(ScheduleActions.add);
