@@ -88,8 +88,6 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public fedRatio: number;
   public nonfedRatio: number;
 
-  public disabledMsg = 'The trash button is disabled since there are other Schedule H transactions tied to H2.';
-
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
