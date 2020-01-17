@@ -157,15 +157,17 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     if (this.frmContact.dirty) {
       if (this.frmContact.valid) {
         const isSaved = JSON.parse(localStorage.getItem('contactsaved'));
-        console.log('isSaved' + isSaved.saved);
-        if (!isSaved.saved) {
-          this.frmContact.markAsDirty();
-          this.frmContact.markAsTouched();
-        } else {
-          this.frmContact.markAsUntouched();
-          this.frmContact.markAsPristine();
+        //console.log('isSaved' + isSaved.saved);
+        if(isSaved) {
+          if (!isSaved.saved) {
+            this.frmContact.markAsDirty();
+            this.frmContact.markAsTouched();
+          } else {
+            this.frmContact.markAsUntouched();
+            this.frmContact.markAsPristine();
+          }
         }
-        } else {
+      } else {
         this.frmContact.markAsTouched();
         localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
       }
