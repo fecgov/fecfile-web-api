@@ -53,6 +53,8 @@ import { reportModel } from 'src/app/reports/model/report.model';
 import { entityTypes, committeeEventTypes } from './entity-types-json';
 import { ScheduleActions } from './schedule-actions.enum';
 import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
+import { coordinatedPartyExpenditureFields } from '../../sched-f-core/coordinated-party-expend-fields';
+import { coordinatedPartyExpenditureCCFields } from '../../sched-f-core/coordinated-party-expend-cc-fields';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -159,6 +161,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _committeeDetails: any;
   private _cmteTypeCategory: string;
   private _completedCloning: boolean = false;
+  private _coordinatedPartyExpenditureFields = coordinatedPartyExpenditureFields;
 
   constructor(
     private _http: HttpClient,
@@ -468,7 +471,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._messageService.sendMessage({ parentFormPopulated: true });
     }
 
-    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+      this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
       this.loaded = true;
     }
 
@@ -1935,6 +1939,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else if (saveAction === SaveActions.saveForEditSub) {
             this._progressToChild(ScheduleActions.edit, res);
           } else if (saveAction === SaveActions.saveForReturnToParent) {
+            //TODO -- this is a flag that was being used to "track" whether cloning transaction was completed or not. 
+            //it was initially only set for saveAction === SaveActions.updateOnly. But it should most likely be set to true for all
+            //save actions if the save is successful, so the "cloning" process can be cleared. However, since its risky to change in all
+            //places, changing it in the only other place that can possibly be triggered so far in the application.
+            this._completedCloning = true; 
+
             this.returnToParent(ScheduleActions.edit);
           } else if (saveAction === SaveActions.saveForReturnToNewParent) {
             this.returnToParent(ScheduleActions.add);
@@ -3056,6 +3066,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       });
     }
     this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
+      if (this.transactionType === 'COEXP_PARTY') {
+        res = this._coordinatedPartyExpenditureFields;
+      } else if (this.transactionType === 'COEXP_CC_PAY') {
+        res = coordinatedPartyExpenditureCCFields;
+      }
       if (res) {
         if (res.hasOwnProperty('data')) {
           if (typeof res.data === 'object') {

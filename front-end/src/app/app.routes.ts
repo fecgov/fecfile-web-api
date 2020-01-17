@@ -115,11 +115,12 @@ export const AppRoutes: Routes = [
         path: 'forms/form/edit/:form_id/:report_id',
         component: IndividualReceiptComponent,
         pathMatch: 'full',
-        canActivate: [CanActivateGuard]
+        canActivate: [CanActivateGuard],
+        canDeactivate: [CanDeactivateGuardService]
       },
-      { path: 'addContact', 
-        component: AddNewContactComponent, 
-        pathMatch: 'full', 
+      { path: 'addContact',
+        component: AddNewContactComponent,
+        pathMatch: 'full',
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService]
        },
