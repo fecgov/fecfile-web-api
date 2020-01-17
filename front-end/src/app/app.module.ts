@@ -105,6 +105,7 @@ import { SchedH5Component_TOBEDELETED } from './forms/form-3x/sched-h5/sched-h5.
 import { SchedH6Component_TOBEDELETED } from './forms/form-3x/sched-h6/sched-h6.component';
 import { SchedH1Component_TOBEDELETED } from './forms/sched-h1/sched-h1.component';
 import { SchedEComponent } from './forms/form-3x/sched-e/sched-e/sched-e.component';
+import { HelpComponent } from './help/help.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -191,7 +192,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     SchedH6Component_TOBEDELETED,
     SchedH1Component_TOBEDELETED,
     SchedEComponent,
-    SchedFCoreComponent
+    SchedFCoreComponent,
+    HelpComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
