@@ -572,6 +572,16 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     } else {
       this.loadDynamiceFormFields();
       this.frmContact.patchValue({ entity_type: entityOption.code }, { onlySelf: true });
+
+      if(this.scheduleAction === ContactActions.edit) {
+        if((this.transactionToEdit.entity_type === 'IND' || this.transactionToEdit.entity_type === 'CAN')
+          && (entityOption.code === 'COM' || entityOption.code === 'ORG')) {
+          this.frmContact.patchValue({ entity_name: '' }, { onlySelf: true });
+        }else if((this.transactionToEdit.entity_type === 'COM' || this.transactionToEdit.entity_type === 'ORG')
+          && (entityOption.code === 'IND' || entityOption.code === 'CAN')) {
+          this.frmContact.patchValue({ last_name: '' }, { onlySelf: true });
+        }
+      }
     }
   }
 
