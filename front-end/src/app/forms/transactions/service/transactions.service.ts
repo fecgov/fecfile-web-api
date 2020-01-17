@@ -964,5 +964,6 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.loanPaymentAmt = row.loan_payment_amt;
   model.loanPaymentToDate = row.loan_payment_to_date;
   model.iseditable = row.iseditable;
+  model.isTrashable = row.istrashable;
   
 }
