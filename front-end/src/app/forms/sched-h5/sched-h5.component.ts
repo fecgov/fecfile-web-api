@@ -1,3 +1,5 @@
+import { SchedHServiceService } from './../sched-h-service/sched-h-service.service';
+import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
 import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
@@ -52,6 +54,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
+  @Input() scheduleType: string;
   @Output() status: EventEmitter<any>;
 
   public formType: string;
@@ -92,6 +95,13 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public h5EntrieEdit: any;
   public back_ref_transaction_id: string;
 
+  public transferred_amount_edit = 0;
+  public total_amount_edit = 0;
+  public populateFormForEdit: Subscription;
+
+  public saveAndAddDisabled = false;
+  public getH1H2ExistSubscription: Subscription;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -120,6 +130,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     private _decPipe: DecimalPipe,
     private _tranService: TransactionsService,
     private _dlService: DialogService,
+    private _schedHMessageServiceService: SchedHMessageServiceService,
+    private _schedHService:SchedHServiceService
   ) {
     super(
       _http,
@@ -150,6 +162,17 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _decPipe;
     _tranService;
     _dlService;
+
+    this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
+    .subscribe(p => {
+      if(p.scheduleType === 'Schedule H5'){
+        let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
+          if(res && res.length === 1){
+            this.editH5(res[0]);
+          }
+        });
+      }
+    })
   }
 
   public ngOnInit() {
@@ -221,6 +244,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnDestroy(): void {
+    this.populateFormForEdit.unsubscribe();
     super.ngOnDestroy();
   }
 
@@ -579,9 +603,16 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.totalName = 'Public Communications';
       this.showIdentiferSelect = false
     }
+
+    if(e.target.value !== '') {
+      this._noH1H2Popup(e.target.value)
+    }
   }
 
   public setH5Sum() {
+
+    this.h5Sum = [];
+
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
     this.h5Subscription = this._schedH5Service.getSummary(reportId).subscribe(res =>
@@ -730,6 +761,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public handleOnBlurEvent($event: any, col: any) {
+
+    let val = 0;
+    if(this.schedH5.get('transferred_amount').value){
+      val = this.convertFormattedAmountToDecimal(this.schedH5.get('transferred_amount').value);
+    }
+
     const entry = $event.target.value.replace(/,/g, ``);
     if(this.isNumber(entry)) {
       this.transferredAmountErr = false;
@@ -741,9 +778,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH5.controls['transferred_amount'].setErrors(null);
 
       if(this.scheduleAction === ScheduleActions.edit) {
-        this.schedH5.patchValue({total_amount_transferred: this._decPipe.transform(
-          this.convertFormattedAmountToDecimal(
-            this.schedH5.get('transferred_amount').value), '.2-2')}, { onlySelf: true });
+        this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(
+          this.total_amount_edit - this.transferred_amount_edit + val, '.2-2')}, { onlySelf: true });
       }
     }else {
       this.transferredAmountErr = true
@@ -801,7 +837,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH5.patchValue({ account_name: item.account_name}, { onlySelf: true });
     this.schedH5.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
     this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(item.transfer_amount, '.2-2')}, { onlySelf: true });
-    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.transfer_amount, '.2-2')}, { onlySelf: true });
+    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.total_amount_transferred, '.2-2')}, { onlySelf: true });
+
+    this.transferred_amount_edit = item.transfer_amount
+    this.total_amount_edit = item.total_amount_transferred;
 
   }
 
@@ -923,6 +962,57 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     }else {
       this.returnToSum();
     }
+  }
+
+  private _noH1H2Popup(category: string) {
+
+    let activityEventScheduleType = '';
+    if(category === 'DC' || category === 'DF') {
+      activityEventScheduleType = 'sched_h2'
+    }else {
+      activityEventScheduleType = 'sched_h1'
+    }
+
+    const report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
+    this.getH1H2ExistSubscription = this._schedH5Service.getH1H2ExistStatus(report_id, category)
+    .subscribe(res =>
+      {
+        if(res) {
+          if(res.count === 0) {
+
+            this.saveAndAddDisabled = true;
+
+            const scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
+            const scheduleType = activityEventScheduleType;
+
+            const message =
+              `Please add Schedule ${scheduleName} before proceeding with adding the ` +
+              `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
+            this._dlService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
+              if (res === 'okay') {
+                const emitObj: any = {
+                  form: this.frmIndividualReceipt,
+                  direction: 'next',
+                  step: 'step_3',
+                  previousStep: 'step_2',
+                  scheduleType: scheduleType,
+                  action: ScheduleActions.add
+                };
+                if (scheduleType === 'sched_h2') {
+                  emitObj.transactionType = 'ALLOC_H2_RATIO';
+                  emitObj.transactionTypeText = 'Allocation Ratios';
+                }
+                this.status.emit(emitObj);
+              } else if (res === 'cancel') {
+              }
+            });
+          }else {
+            this.saveAndAddDisabled = false;
+          }
+        }
+      }
+    )
   }
 
 }

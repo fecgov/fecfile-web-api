@@ -903,7 +903,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
           this._LoanService.deleteEndorser(endorser).subscribe(res => {
             this.getPage(this.config.currentPage);
             this._dialogService.confirm(
-              'Transaction has been successfully deleted. ' + endorser.transactionId,
+              'Transaction has been successfully deleted. ' + endorser.transaction_id,
               ConfirmModalComponent,
               'Success!',
               false,

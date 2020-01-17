@@ -14,6 +14,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from fecfiler.sched_L.views import update_sl_summary
+
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
@@ -765,6 +767,8 @@ def post_schedB(datum):
                 "The post_sql_schedB function is throwing an error: " + str(e)
             )
         logger.debug("sched_b transaction saved successfully.")
+        if datum.get('transaction_type_identifier') in SCHED_L_B_TRAN_TYPES:
+            update_sl_summary(datum) 
         return datum
     except Exception as e:
         raise Exception ("post_schedB function is throwing error: " + str(e))
@@ -964,6 +968,8 @@ def put_schedB(datum):
             raise Exception(
                 "The put_sql_schedB function is throwing an error: " + str(e)
             )
+        if datum.get('transaction_type_identifier') in SCHED_L_B_TRAN_TYPES:
+            update_sl_summary(datum) 
         return datum
     except:
         raise

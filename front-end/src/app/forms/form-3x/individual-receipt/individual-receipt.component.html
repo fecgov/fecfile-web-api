@@ -438,10 +438,12 @@
         <app-sub-transactions-table [hidden]="!isShowChildTransactions()" 
           [subTransactions]="subTransactions"
           [formType]="formType"
-          [subTransactionsTableType]="subTransactionsTableType">
+          [subTransactionsTableType]="subTransactionsTableType"
+          [returnToDebtSummary]="returnToDebtSummary"
+          [returnToDebtSummaryInfo]="returnToDebtSummaryInfo">
         </app-sub-transactions-table>
         <div class="forms__btn-container">
-          <button *ngIf="!subTransactionInfo?.isEarmark &&
+          <button id="addSingleChildButton" *ngIf="!subTransactionInfo?.isEarmark &&
                         subTransactionInfo?.isParent && !multipleSubTransactionInfo" 
             class="btn btn-primary btn-left"
             (click)="saveForAddSub()">
@@ -529,7 +531,7 @@
                     (click)="saveAndReturnToParent()">
                     Return to {{ subTransactionInfo.transactionTypeDescription }}
                   </a>
-                  <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="viewTransactions()">
+                  <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="(frmIndividualReceipt.dirty) ? saveOrWarn() : viewTransactions()">
                     View Transactions
                   </a>
                 </ng-template>
@@ -537,7 +539,7 @@
 
               <ng-template #allOtherTrx>
                 <div *ngIf="scheduleAction === editScheduleAction; else createActions">
-                  <button *ngIf="!isShedH4OrH6TransactionType(transactionType) || cloned" class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                  <button *ngIf="!isShedH4OrH6TransactionType(transactionType) || cloned" class="btn btn-previous btn-left" type="button" (click)="cancel()">
                     Cancel
                   </button>
                   <button *ngIf="isShedH4OrH6TransactionType(transactionType) && !cloned" class="btn btn-previous btn-left" type="button" (click)="goH4OrH6Summary(transactionType)">
@@ -568,7 +570,7 @@
                       (click)="saveAndReturnToParent()">
                       Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
                     </a>
-                    <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="viewTransactions()">
+                    <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="(frmIndividualReceipt.dirty) ? saveOrWarn() : viewTransactions()">
                       View Transactions
                     </a>
                   </div>

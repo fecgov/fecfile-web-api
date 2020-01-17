@@ -32,6 +32,7 @@ from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     put_sql_agg_amount_schedB, get_list_child_transactionId_schedB,
                                     delete_sql_schedB)
 
+from fecfiler.sched_L.views import update_sl_summary
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -196,8 +197,6 @@ SCHEDULE_TO_TABLE_DICT = { 'SA': ['sched_a'],
     'SH': ['sched_h1', 'sched_h2', 'sched_h3', 'sched_h4', 'sched_h5', 'sched_h6'],
     'SL': ['sched_l']
 }
-
-SCHEDULE_TO_CHILD_TABLE_DICT = { 'SD': ['sched_a', 'sched_b', 'sched_e', 'sched_f', 'sched_h4', 'sched_h6']}
 
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
@@ -912,6 +911,8 @@ def post_schedA(datum):
         # update line number based on aggregate amount info
         update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
             'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            update_sl_summary(datum)    
         return datum
     except:
         raise
@@ -1106,6 +1107,8 @@ def put_schedA(datum):
             update_date = datum.get('contribution_date')
         update_linenumber_aggamt_transactions_SA(update_date, datum.get(
             'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            update_sl_summary(datum)    
         return datum
     except:
         raise
@@ -1557,34 +1560,84 @@ END - AGGREGATE AMOUNT API - SCHED_A APP
 TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP TO AVOID FUNCTION USAGE RESTRICTIONS) - PRAVEEN
 ******************************************************************************************************************************
 """
-def get_child_transactions_to_trash(table_list, transaction_id, _delete='Y'):
-    """ Get a list of all child transactions specifically for schedule D that should be deleted when a schedule D transaction is deleted"""
+
+def update_parent_amounts_to_trash(transaction_amount, transaction_id, cmte_id, _delete):
+    """FUNCTION TO HANDLE SC SD PARENT AMOUNT UPDATES WHEN SA,SB,SE,SF,SH PAYMENTS ARE DELETED OR RESTORED"""
     try:
-        child_transactions = []
+        dict_map = { 'SC': ['loan_payment_to_date', 'loan_balance'],
+        'SD': ['payment_amount', 'balance_at_close']
+        }
+        table_map = {'SC': 'sched_c',
+        'SD': 'sched_d'
+        }
+        """Mapping variable"""
+        if transaction_id[:2] in dict_map:
+            query_list = dict_map[transaction_id[:2]]
+        else:
+            raise Exception('The update_parent_amounts_to_trash function works only for Sched_C and Sched_D transactions.')
+        """Mapping signs"""
+        if _delete == 'Y':
+            query_list.append('-')
+            query_list.append('+')
+        else:
+            query_list.append('+')
+            query_list.append('-')
+
+        """Mapping value"""
+        query_list.append(str(transaction_amount))
+        print(query_list)
+
+        query_string = """
+            {0} = {0} {2} {4},
+            {1} = {1} {3} {4},
+        """.format(query_list[0], query_list[1], query_list[2], query_list[3], query_list[4])
+
+        _sql = """UPDATE public.{0}
+                SET {1}
+                last_update_date = %s
+                WHERE transaction_id = %s
+                AND cmte_id = %s
+                """.format(table_map[transaction_id[:2]], query_string)
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [datetime.datetime.now(), transaction_id, cmte_id])
+            print(cursor.query)
+            if cursor.rowcount < 1:
+                raise Exception('There is no transaction associcated with the transaction_id: ' + transaction_id)
+    except Exception:
+        raise
+
+def get_child_transactions_to_trash(transaction_id, _delete):
+    """ Get a list of all child transactions specifically for schedule C,D that should be deleted when a schedule C or D transaction is deleted"""
+    try:
         if _delete == 'Y':
             action = 'trash'
+            # Trashing only undeleted transactions
+            param_string = """ AND delete_ind IS DISTINCT FROM 'Y' """
         else:
             action = 'restore'
-        for table in table_list:
-            with connection.cursor() as cursor:
-                _sql = """
-                SELECT json_agg(t) FROM
-                (SELECT report_id, transaction_id, '{}' AS action
-                FROM public.{}
-                WHERE back_ref_transaction_id = %s) as t
-                """.format(action, table)
-                cursor.execute(_sql, [transaction_id])
-                logger.debug(cursor.query)
-                forms_obj = cursor.fetchone()
-            if forms_obj and forms_obj[0]:
-                child_transactions.extend(forms_obj[0])
-        return child_transactions
+            # Restoring only auto generated transactions
+            param_string = """ AND transaction_type_identifier IN ('LOAN_FROM_IND', 'LOAN_FROM_BANK', 'LOAN_OWN_TO_CMTE_OUT', 'SC1',
+            'IK_OUT','IK_BC_OUT','PARTY_IK_OUT','PARTY_IK_BC_OUT','PAC_IK_OUT','PAC_IK_BC_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT')"""
+
+        _sql = """SELECT report_id, transaction_id, '{}' AS action
+                FROM public.all_transactions_view
+                WHERE back_ref_transaction_id = %s""".format(action)
+        with connection.cursor() as cursor:
+            _query = """SELECT json_agg(t) FROM ({}) as t""".format(_sql+param_string)
+            cursor.execute(_query, [transaction_id])
+            logger.debug(cursor.query)
+            forms_obj = cursor.fetchone()
+
+        if forms_obj and forms_obj[0]:
+            return forms_obj[0]
+        else:
+            return []
 
     except Exception as e:
         raise Exception('The get_child_transactions function is throwing an error:' + str(e))
 
 def trash_restore_sql_transaction(table_list, report_id, transaction_id, _delete='Y'):
-    """trash or restore sched_a transaction by updating delete_ind"""
+    """trash or restore transactions which handles all transactions across all tables"""
     try:
         report_list = superceded_report_id_list(report_id)
         row_count = 0
@@ -1606,6 +1659,24 @@ def trash_restore_sql_transaction(table_list, report_id, transaction_id, _delete
                  or does not exist in {0} table""".format(','.join(table_list), transaction_id))
         else:
             return transaction_id
+    except Exception:
+        raise
+
+def get_backref_id_trash(transaction_id, cmte_id):
+    """ function to grab parent transaction id and amount so that we can update parent amounts in SC and SD"""
+    try:
+        _sql = """SELECT back_ref_transaction_id, transaction_amount
+                    FROM public.all_transactions_view
+                    WHERE transaction_id=%s AND cmte_id=%s AND
+                    transaction_type_identifier NOT IN ('LOAN_FROM_IND', 'LOAN_FROM_BANK', 'LOAN_OWN_TO_CMTE_OUT');
+                    """
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [transaction_id, cmte_id])
+            if cursor.rowcount > 0:
+                forms_obj = cursor.fetchone()
+                return forms_obj[0], forms_obj[1]
+            else:
+                return None, None
     except Exception:
         raise
 
@@ -1641,30 +1712,52 @@ def trash_restore_transactions(request):
         action = _action.get('action', '')
         _delete = 'Y' if action == 'trash' else ''
         # get_schedA data, do sql transaction, update aggregation
-        try:
-            table_list = SCHEDULE_TO_TABLE_DICT.get(transaction_id[:2])
-            if table_list:
+        # try:
+        table_list = SCHEDULE_TO_TABLE_DICT.get(transaction_id[:2])
+        if table_list:
+            if transaction_id[:2] in ('SA', 'SB', 'SE', 'SF', 'SH'):
+                # Handling deletion/restoration of payments for schedule C and schedule D
+                back_ref_transaction_id, transaction_amount = get_backref_id_trash(transaction_id, cmte_id)
+                if back_ref_transaction_id and back_ref_transaction_id[:2] in ('SC', 'SD'):
+                    update_parent_amounts_to_trash(transaction_amount, back_ref_transaction_id, cmte_id, _delete)
+                # Deleting/Restoring the transaction
+                deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
+                    report_id,
+                    transaction_id, 
+                    _delete))
+                # Handling aggregate updation for sched_A transactions
                 if transaction_id[:2] == 'SA':
                     datum = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
-                    deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
-                        report_id,
-                        transaction_id, 
-                        _delete))
                     update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
                     ), datum.get('transaction_type_identifier'), datum.get('entity_id'), datum.get('cmte_id'), datum.get('report_id'))
-                else:
-                    if transaction_id[:2] in SCHEDULE_TO_CHILD_TABLE_DICT and _delete == 'Y':
-                        child_table_list = SCHEDULE_TO_CHILD_TABLE_DICT.get(transaction_id[:2])
-                        _actions.extend(get_child_transactions_to_trash(child_table_list, transaction_id, _delete))
-                    deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
-                        report_id,
-                        transaction_id, 
-                        _delete))
+                    # Deleting/Restoring auto generated transactions for Schedule A
+                    if _delete == 'Y' or (_delete != 'Y' and datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
+                        'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']):
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                # Handling aggregate updation for sched_B transactions
+                if transaction_id[:2] == 'SB':
+                    if _delete == 'Y':
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+            elif transaction_id[:2] in ('SC', 'SD'):
+                # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D
+                if _delete == 'Y' or (transaction_id[:2] == 'SC' and _delete != 'Y'):
+                    _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                # Deleting/Restoring the transaction
+                deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
+                    report_id,
+                    transaction_id,
+                    _delete))
             else:
-                raise Exception('The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT. Deleted transactions are: {}'.format(transaction_id, ','.join(deleted_transaction_ids)))
-        except Exception as e:
-            return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
-                status=status.HTTP_400_BAD_REQUEST)
+                # Deleting/Restoring the transaction
+                deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
+                    report_id,
+                    transaction_id, 
+                    _delete))
+        else:
+            raise Exception('The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT. Deleted transactions are: {}'.format(transaction_id, ','.join(deleted_transaction_ids)))
+        # except Exception as e:
+        #     return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
+        #         status=status.HTTP_400_BAD_REQUEST)
     return Response({"result":"success", "deletedTransactions":"{}".format(",".join(deleted_transaction_ids))}, status=status.HTTP_200_OK)
 """
 ******************************************************************************************************************************

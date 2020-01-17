@@ -330,7 +330,13 @@ def get_dynamic_forms_fields(request):
                     for events in forms_obj['data']['committeeTypeEvents']:
                         for eventTypes in events['eventTypes']:
                             if eventTypes['eventType'] in ['PC', 'AD', 'GV']:
-                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y'"
+                                query_string = """
+                                SELECT count(*) 
+                                FROM public.sched_h1 
+                                WHERE cmte_id = %s 
+                                AND election_year = (select extract(year from cvg_start_date) from public.reports where report_id = %s) 
+                                AND delete_ind IS DISTINCT FROM 'Y'
+                                """
                                 if eventTypes['eventType'] == 'PC':
                                     query_string += " AND public_communications = true"
                                 elif eventTypes['eventType'] == 'AD':
@@ -364,7 +370,13 @@ def get_dynamic_forms_fields(request):
                                 else:
                                     eventTypes['hasValue'] = False
                             elif eventTypes['eventType'] in ['VR', 'VI', 'GO', 'GC', 'EA']:
-                                query_string = "SELECT count(*) FROM public.sched_h1 WHERE cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y'"
+                                query_string = """
+                                SELECT count(*) 
+                                FROM public.sched_h1 
+                                WHERE cmte_id = %s 
+                                AND election_year = (select extract(year from cvg_start_date) from public.reports where report_id = %s)
+                                AND delete_ind IS DISTINCT FROM 'Y'
+                                """
                                 with connection.cursor() as cursor:
                                     cursor.execute(query_string, [cmte_id,report_id])
                                     count = cursor.fetchone()
@@ -2411,7 +2423,7 @@ def get_all_transactions(request):
                                                 OR 
                                                 (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
                                                 OR
-                                                (transaction_table = 'sched_h2' AND name IN (
+                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
                                                 SELECT h4.activity_event_identifier FROM public.sched_h4 h4
                                                 WHERE  h4.report_id = '{0}'
                                                 AND h4.cmte_id = '{1}'
@@ -2443,9 +2455,9 @@ def get_all_transactions(request):
         output_list = []
         total_amount = 0.0
         with connection.cursor() as cursor:
-            logger.debug('query all transactions with sql:{}'.format(trans_query_string))
+            # logger.debug('query all transactions with sql:{}'.format(trans_query_string))
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
-            print(cursor.query)
+            # print(cursor.query)
             data_row = cursor.fetchone()
             if data_row and data_row[0]:
                 transaction_list = data_row[0]
@@ -2457,11 +2469,11 @@ def get_all_transactions(request):
                         c1_list = get_core_sched_c1(cmte_id, transaction.get('transaction_id'))
                         # print(c1_list)
                         for c1 in c1_list:
-                            c1['sched_type'] = 'sched_c1'
+                            c1['schedule'] = 'sched_c1'
                             c1['api_call'] = '/sc/schedC1'
                         c2_list = get_core_sched_c2(cmte_id, transaction.get('transaction_id'))
                         for c2 in c2_list:
-                            c2['sched_type'] = 'sched_c2'
+                            c2['schedule'] = 'sched_c2'
                             c2['api_call'] = '/sc/schedC2'
                         if c1_list or c2_list:
                             transaction['child'] = []
@@ -5795,7 +5807,7 @@ def get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, yr_to_dat):
             prev_cvg_year = cvg_start_date.year - 1
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
 
-            print(prev_cvg_end_dt,'prevvvvvvvvvvvvvvvvvvvvvvvv')
+            # print(prev_cvg_end_dt,'prevvvvvvvvvvvvvvvvvvvvvvvv')
             with connection.cursor() as cursor:
                 cursor.execute("SELECT COALESCE(t1.coh_cop, 0) from public.sched_l t1 where t1.cmte_id = %s AND t1.account_name = %s AND t1.cvg_end_date <= %s AND t1.delete_ind is distinct from 'Y' order by t1.cvg_end_date desc limit 1", 
                 [cmte_id, levin_accnt_name, prev_cvg_end_dt])
@@ -5825,7 +5837,7 @@ def get_sl_item_aggregate(report_id, cmte_id, prev_yr,levin_accnt_name):
     try:
         # import pdb;pdb.set_trace()
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         if not prev_yr:
             #cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
             from_date = date(cvg_start_date.year, 1,1)
@@ -5909,12 +5921,12 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
         return sl_unitem_val,levin_accnt_name
 
     if line_number == '7':
-        print(formula,'line 77777777777777777777')
+       
         if formula == '':
           val = get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, False)
         else:
           val = get_sl_cash_on_hand_cop(report_id, cmte_id, levin_accnt_name, True)
-          print(val,'77777777777777777777777777777777')
+         
        
         return val,levin_accnt_name
 
@@ -5959,7 +5971,7 @@ def get_sl_line_sum_value(line_number, levin_accnt_name, formula, sched_la_line_
                     val += val_l_changed
                 else:
                     val += get_sl_line_sum_value(cl_n,levin_accnt_name, "", sched_la_line_sum_dict, cmte_id, report_id)[0]
-                print(val,'val-add')
+                # print(val,'val-add')
                
     return val,levin_accnt_name
 

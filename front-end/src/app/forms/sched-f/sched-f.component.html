@@ -481,6 +481,20 @@
                           [resultTemplate]="rtPayeeCommitteeId"
                           [inputFormatter]="formatterPayeeCommitteeId"
                           (selectItem)="handleSelectedCandidate($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                        <input *ngIf="isFieldName(col?.name, 'beneficiary_cand_id')" class="form-control"
+                          [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
+                          [attr.name]="col?.name" [attr.value]="col?.value" [maxlength]="col?.validation?.max"
+                          [formControlName]="col?.name" [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-ben-cand-id" 
+                          [ngbTypeahead]="searchCandidateId" 
+                          [focusFirst]=false
+                          [resultTemplate]="rtCandidate" 
+                          [inputFormatter]="formatterCandidateId"
+                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />                          
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_name')" class="form-control"
                           [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
@@ -702,22 +716,54 @@
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <div class="forms__btn-container">
-                <button class="btn btn-previous btn-left" type="button" 
-                  (click)="clearFormValues(); returnToParent(editScheduleAction)">
-                  Cancel
-                </button>
-                <button *ngIf="!showPart2" class="btn btn-secondary btn-right" (click)="next()">
-                  Next
-                </button>
-                <button *ngIf="showPart2" class="btn btn-secondary btn-right" (click)="back()">
-                  Back
-                </button>              
-                <!-- <a class="btn btn-primary btn-right" (click)="saveAndReturnToParentDebt()">
-                  Return to Debt to Vendor
-                </a> -->
-                <a *ngIf="showPart2" class="btn btn-primary btn-right" (click)="saveAndReturnToParentDebt()">
-                  Save &amp; View Expenditure
-                </a>   
+                <!-- <div *ngIf="scheduleAction === editScheduleAction; else createActions">
+                  <button class="btn btn-previous btn-left" type="button" 
+                    (click)="clearFormValues(); returnToParent(editScheduleAction)">
+                    Cancel
+                  </button>
+                  <button *ngIf="!showPart2" class="btn btn-secondary btn-right" (click)="next()">
+                    Next
+                  </button>
+                  <button *ngIf="showPart2" class="btn btn-secondary btn-right" (click)="back()">
+                    Back
+                  </button>                  
+                </div> -->
+                <!-- <ng-template #createActions> -->
+                  <ng-container *ngIf="!showPart2">
+                    <button class="btn btn-previous btn-left" type="button" 
+                      (click)="clearFormValues(); returnToParent(editScheduleAction)">
+                      Cancel
+                    </button>
+                    <button class="btn btn-secondary btn-right" (click)="next()">
+                      Next
+                    </button>                                        
+                  </ng-container>
+                  <ng-container *ngIf="showPart2">
+                    <button class="btn btn-previous btn-left" (click)="back()">
+                      Previous
+                    </button>
+                    <ng-container *ngIf="scheduleAction === addSubScheduleAction">
+                      <button class="btn btn-secondary btn-right" 
+                        (click)="saveOnly()">
+                        Save &amp; Add Transaction
+                      </button>
+                      <button class="btn btn-primary btn-right"
+                        (click)="saveAndReturnToParentDebt()">
+                        Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
+                      </button>                        
+                    </ng-container>  
+                    <ng-container *ngIf="scheduleAction === editScheduleAction">
+                      <button class="btn btn-secondary btn-right" 
+                        (click)="updateOnly()">
+                        Save
+                      </button>
+                      <button class="btn btn-primary btn-right"
+                        (click)="saveAndReturnToParentDebt()">
+                        Return to {{ subTransactionInfo.transactionTypeDescription }}
+                      </button>
+                    </ng-container>
+                  </ng-container> 
+                <!-- </ng-template>               -->
               </div>
             </div>
           </div>
