@@ -29,6 +29,7 @@ import { SignComponent } from './shared/partials/sign/sign.component';
 import { SubmitComponent } from './shared/partials/submit/submit.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
+import {HelpComponent} from './help/help.component';
 
 export const AppRoutes: Routes = [
   {
@@ -124,6 +125,7 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService]
        },
+      { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
     ]
   },
   { path: '**', redirectTo: '' }
