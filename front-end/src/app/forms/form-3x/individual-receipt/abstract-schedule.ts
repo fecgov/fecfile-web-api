@@ -42,7 +42,7 @@ import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
 import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
 import { ActiveView } from '../../transactions/transactions.component';
 import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
-import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
+import { validateAmount, validateContributionAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { trigger, transition, style, animate, state } from '@angular/animations';
@@ -164,6 +164,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _cmteTypeCategory: string;
   private _completedCloning: boolean = false;
   private _coordinatedPartyExpenditureFields = coordinatedPartyExpenditureFields;
+  private _outstandingDebtBalance: number;
 
   constructor(
     private _http: HttpClient,
@@ -221,6 +222,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   // when determining action so force it here.
                   this.scheduleAction = ScheduleActions.addSubTransaction;
                   this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
+                  if (this._prePopulateFromSchedDData) {
+                    // set the max for payments to the remaining debt for validation.
+                    if (this._prePopulateFromSchedDData.incurred_amount) {
+                      this._outstandingDebtBalance = this._prePopulateFromSchedDData.incurred_amount;
+                    }
+                  }
                   this._checkForReturnToDebtSummary(message);
                 }
               }
@@ -289,6 +296,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.totalAmountReadOnly = true;
     this._completedCloning = false;
     this.returnToDebtSummary = false;
+    this._outstandingDebtBalance = 0;
 
     if (localStorage.getItem('committee_details') !== null) {
       this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
@@ -578,6 +586,22 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
       }
+    } else if (this.isFieldName(fieldName, 'expenditure_amount') ||
+        this.isFieldName(fieldName, 'total_amount')) {
+      // Debt payments need a validation to prevent exceeding the incurred debt
+      if (this.transactionType === 'OPEXP_DEBT' ||
+          this.transactionType === 'ALLOC_EXP_DEBT' ||
+          this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
+          this.transactionType === 'OTH_DISB_DEBT' ||
+          this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
+          this.transactionType === 'COEXP_PARTY_DEBT' ||
+          this.transactionType === 'IE_B4_DISSE_MEMO') {
+        if (this._outstandingDebtBalance) {
+          if (this._outstandingDebtBalance >= 0) {
+            formValidators.push(validateContributionAmount(this._outstandingDebtBalance));
+          }
+        }
+      }
     }
     // else if (this.isFieldName(fieldName, 'purpose_description')) {
     //   // Purpose description is required when prefix with In-kind #
@@ -627,6 +651,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
     return formValidators;
+  }
+
+  private _checkDebtPaymentExceeded(e: any) {
+    if (this.isFieldName(e.name, 'expenditure_amount')) {
+      if (this.transactionType === 'OPEXP_DEBT') {
+        console.log();
+        // this.form.controls['expenditure_amount'].setValidators([validateAmount(), validateContributionAmount(this.outstandingLoanBalance)]);
+        // formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
+      }
+    }
   }
 
   /**
@@ -3592,7 +3626,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           if (button === null) {
             button = document.getElementById('addSingleChildButton');
           }
-          button.scrollIntoView();
+          if (button !== null) {
+            button.scrollIntoView();
+          }
         }
       }
     });
@@ -3662,6 +3698,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               if (modelArray) {
                 if (modelArray.length > 0) {
                   this._parentTransactionModel = modelArray[0];
+                  this._setDebtPaymentValidations(trx);
                 }
               }
             }
@@ -3669,6 +3706,44 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     });
+  }
+
+  /**
+   * On an edit, now that the incurred amount from the parent is obtained, set the validation
+   * for exceeding max debt payment when editing a payment.
+   * @param trx debt/parent transaction to the payment
+   */
+  private _setDebtPaymentValidations(trx: any) {
+
+    // Payment transactions have different payment field names.
+    // OPEXP has expenditure_amount
+    // ALLOC_EXP_DEBT has total_amount
+    // ALLOC_FEA_DISB_DEBT has total_amount
+    // OTH_DISB_DEBT has expenditure_amount
+    // FEA_100PCT_DEBT_PAY has expenditure_amount
+    // COEXP_PARTY_DEBT has expenditure_amount
+    // IE_B4_DISSE_MEMO not yet developed
+
+    let amountField: string;
+    if (this.frmIndividualReceipt.get('expenditure_amount')) {
+      amountField = 'expenditure_amount';
+    } else if (this.frmIndividualReceipt.get('total_amount')) {
+      amountField = 'total_amount';
+    }
+
+    if (this.frmIndividualReceipt.get(amountField)) {
+      if (trx.hasOwnProperty('incurred_amount')) {
+        if (trx.incurred_amount) {
+          this._outstandingDebtBalance = trx.incurred_amount;
+          const expAmtformField: any = this.findFormField(amountField);
+          const validations: Array<any> = this._mapValidators(expAmtformField.validation,
+            expAmtformField.name, expAmtformField.value);
+
+          this.frmIndividualReceipt.controls[amountField].setValidators(validations);
+          this.frmIndividualReceipt.controls[amountField].updateValueAndValidity();
+        }
+      }
+    }
   }
 
   /**
@@ -3783,6 +3858,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;
+    this._outstandingDebtBalance = 0;
     this.memoCode = false;
     this.memoCodeChild = false;
     this._readOnlyMemoCode = false;

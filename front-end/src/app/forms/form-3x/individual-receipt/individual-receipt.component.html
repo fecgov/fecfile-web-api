@@ -255,6 +255,16 @@
                               coverage period only. -->
                           </div>
                         </ng-container>
+
+
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.amountExceeded">
+                            Expenditure amount exceeds outstanding loan amount
+                          </div>
+                        </ng-container>
+
+
                       </div>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'checkbox'">
