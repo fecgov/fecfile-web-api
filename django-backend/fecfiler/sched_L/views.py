@@ -62,6 +62,10 @@ LB_TRANSACTIONS = [
     "LEVIN_VOTER_REG",
 ]
 
+API_CALL_LA = {'api_call' : '/sa/schedA'}
+API_CALL_LB = {'api_call' : '/sb/schedB'}
+
+
 def get_next_transaction_id(trans_char):
     """get next transaction_id with seeding letter, like 'SA' """
     try:
