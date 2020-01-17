@@ -50,7 +50,9 @@ export class HeaderComponent implements OnInit {
         }
       });
   }
-
+  public notImplemented() {
+    alert('Page/Feature not implemented yet');
+  }
   public toggleMenu(): void {
     if(this.menuActive) {
       this.menuActive = false;

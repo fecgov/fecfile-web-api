@@ -11,9 +11,7 @@ urlpatterns = [
         name="get_h2_summary_table",
     ),
     url(
-        r"^sh2/get_h2_type_events$",
-        views.get_h2_type_events,
-        name="get_h2_type_events",
+        r"^sh2/get_h2_type_events$", views.get_h2_type_events, name="get_h2_type_events"
     ),
     url(
         r"^sh3/get_h3_total_amount$",
@@ -25,16 +23,8 @@ urlpatterns = [
         views.get_h3_aggregate_amount,
         name="get_h3_aggregate_amount",
     ),
-    url(
-        r"^sh3/get_h3_summary$",
-        views.get_h3_summary,
-        name="get_h3_summary",
-    ),
-    url(
-        r"^sh5/get_h5_summary$",
-        views.get_h5_summary,
-        name="get_h5_summary",
-    ),
+    url(r"^sh3/get_h3_summary$", views.get_h3_summary, name="get_h3_summary"),
+    url(r"^sh5/get_h5_summary$", views.get_h5_summary, name="get_h5_summary"),
     url(r"^sh3/schedH3$", views.schedH3, name="schedH3"),
     url(r"^sh4/schedH4$", views.schedH4, name="schedH4"),
     url(r"^sh5/schedH5$", views.schedH5, name="schedH5"),
@@ -49,11 +39,15 @@ urlpatterns = [
         views.get_sched_h5_breakdown,
         name="get_sched_h5_breakdown",
     ),
-    url(r"^sh1/get_h1_percentage$",
-        views.get_h1_percentage, name="get_h1_percentage"),
+    url(r"^sh1/get_h1_percentage$", views.get_h1_percentage, name="get_h1_percentage"),
     url(
         r"^sh1/get_fed_nonfed_share$",
         views.get_fed_nonfed_share,
         name="get_fed_nonfed_share",
+    ),
+    url(
+        r"^sh1/validate_h1_h2_exist$",
+        views.validate_h1_h2_exist,
+        name="validate_h1_h2_exist",
     ),
 ]
