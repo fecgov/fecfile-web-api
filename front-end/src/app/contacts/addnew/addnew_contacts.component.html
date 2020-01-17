@@ -408,7 +408,7 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button"  (click)= "(frmContact.touched || frmContact.dirty) ? cancelStepWithWarning() : cancelStep() ">
+              <button class="btn btn-previous btn-left" type="button"  (click)= "(frmContact.dirty) ? cancelStepWithWarning() : cancelStep() ">
                 Cancel
               </button>
               
