@@ -201,6 +201,29 @@ def get_transaction_categories(request):
         return Response("The get_transaction_categories API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
+def cmte_type(cmte_id):
+    """
+    to know if the cmte is PAC or PTY and determine the flag values for administrative, generic_voter_drive, public_communications
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into schedH3 table
+            cursor.execute(
+                """SELECT cmte_type_category FROM public.committee_master WHERE cmte_id=%s""",
+                [cmte_id],
+            )
+            cmte_type_tuple = cursor.fetchone()
+            if cmte_type_tuple:
+                return cmte_type_tuple[0]
+            else:
+                raise Exception(
+                    "The cmte_id: {} does not exist in committee master table.".format(
+                        cmte_id
+                    )
+                )
+    except Exception as err:
+        raise Exception(f"cmte_type function is throwing an error: {err}")
+
 """
 ********************************************************************************************************************************
 GET TRANSACTION TYPES API- CORE APP - FNE 1477, FNE1497 - BY ZOBAIR SALEEM
@@ -2419,19 +2442,58 @@ def get_all_transactions(request):
             if ctgry_type != 'other_tran':
                 param_string += " AND report_id in ('{}')".format("', '".join(report_list))
             else:
-                param_string = param_string + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
-                                                OR 
-                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
-                                                OR
-                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
-                                                SELECT h4.activity_event_identifier FROM public.sched_h4 h4
-                                                WHERE  h4.report_id = '{0}'
-                                                AND h4.cmte_id = '{1}'
-                                                UNION
-                                                SELECT h3.activity_event_name
-                                                FROM   public.sched_h3 h3
-                                                WHERE  h3.report_id = '{0}'
-                                                AND h3.cmte_id = '{1}')))""".format(request.data.get('reportid'), cmte_id)
+                if cmte_type(cmte_id) == 'PTY':
+                    logger.debug('pty cmte all_other transactions')
+                    param_string = param_string + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
+                                                    OR 
+                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
+                                                    OR
+                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
+                                                    SELECT h4.activity_event_identifier FROM public.sched_h4 h4
+                                                    WHERE  h4.report_id = '{0}'
+                                                    AND h4.cmte_id = '{1}'
+                                                    UNION
+                                                    SELECT h3.activity_event_name
+                                                    FROM   public.sched_h3 h3
+                                                    WHERE  h3.report_id = '{0}'
+                                                    AND h3.cmte_id = '{1}')))""".format(request.data.get('reportid'), cmte_id)
+                else:
+                    # for PAC, h1 and h2 will show up only when there are transactions tied to it
+                    logger.debug('pac cmte all_other transactions')
+                    param_string = param_string + """AND (((transaction_table = 'sched_h3' or transaction_table = 'sched_h4') AND report_id = '{0}')
+                                                    OR
+                                                    (transaction_table = 'sched_h1' AND report_id = '{0}' AND back_ref_transaction_id is null)
+                                                    OR
+                                                    (transaction_table = 'sched_h1' AND report_id = '{0}' AND transaction_id IN (
+                                                    with h1_set as (select  (
+                                                    case when administrative is true then 'AD'
+                                                    when public_communications is true then 'PC'
+                                                    when generic_voter_drive is true then 'GV'
+                                                    end) as event_type, transaction_id, cmte_id, report_id
+                                                    from sched_h1 where delete_ind is distinct from 'Y' and report_id = '{0}')
+                                                    select distinct t.transaction_id from h1_set t
+                                                    join sched_h4 h4 on t.event_type = h4.activity_event_type and h4.report_id = t.report_id
+                                                    where h4.delete_ind is distinct from 'Y'
+                                                    union
+                                                    select distinct t.transaction_id from h1_set t
+                                                    join sched_h3 h3 on t.event_type = h3.activity_event_type and h3.report_id = t.report_id
+                                                    where h3.delete_ind is distinct from 'Y'
+                                                    ))
+                                                    OR 
+                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
+                                                    OR
+                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
+                                                    SELECT h4.activity_event_identifier FROM public.sched_h4 h4
+                                                    WHERE  h4.report_id = '{0}'
+                                                    AND h4.cmte_id = '{1}'
+                                                    AND h4.delete_ind is distinct from 'Y'
+                                                    UNION
+                                                    SELECT h3.activity_event_name
+                                                    FROM   public.sched_h3 h3
+                                                    WHERE  h3.report_id = '{0}'
+                                                    AND h3.delete_ind is distinct from 'Y'
+                                                    AND h3.cmte_id = '{1}')))""".format(request.data.get('reportid'), cmte_id)
+
 
         # To determine if we are searching for regular or trashed transactions
         if 'trashed_flag' in request.data and str(request.data.get('trashed_flag')).lower() == 'true':
@@ -2457,8 +2519,9 @@ def get_all_transactions(request):
         with connection.cursor() as cursor:
             # logger.debug('query all transactions with sql:{}'.format(trans_query_string))
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
-            # print(cursor.query)
+            print(cursor.query)
             data_row = cursor.fetchone()
+            print(data_row)
             if data_row and data_row[0]:
                 transaction_list = data_row[0]
                 logger.debug('total transactions loaded:{}'.format(len(transaction_list)))
