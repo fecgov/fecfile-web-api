@@ -53,8 +53,10 @@ import { reportModel } from 'src/app/reports/model/report.model';
 import { entityTypes, committeeEventTypes } from './entity-types-json';
 import { ScheduleActions } from './schedule-actions.enum';
 import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
-import { coordinatedPartyExpenditureFields } from '../../sched-f-core/coordinated-party-expend-fields';
-import { coordinatedPartyExpenditureCCFields } from '../../sched-f-core/coordinated-party-expend-cc-fields';
+import { coordinatedPartyExpenditureFields } from '../../sched-f-core/coordinated-party-expenditure-fields';
+import { coordinatedExpenditureCCFields } from '../../sched-f-core/coordinated-expenditure-cc-fields';
+import { coordinatedExpenditureStaffFields } from '../../sched-f-core/coordinated-expenditure-staff-fields';
+import { coordinatedExpenditurePayrollFields } from '../../sched-f-core/coordinated-expenditure-payroll-fields';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -3066,11 +3068,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       });
     }
     this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
-      if (this.transactionType === 'COEXP_PARTY') {
-        res = this._coordinatedPartyExpenditureFields;
-      } else if (this.transactionType === 'COEXP_CC_PAY') {
-        res = coordinatedPartyExpenditureCCFields;
-      }
+      res = this._hijackFormFields(res);
       if (res) {
         if (res.hasOwnProperty('data')) {
           if (typeof res.data === 'object') {
@@ -3231,6 +3229,30 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this._prePopulateFromSchedLData = null;
       }
     });
+  }
+
+  /**
+   * For overriding form fields from API with front end version.
+   *
+   * @param res
+   */
+  private _hijackFormFields(res: any): any {
+    switch (this.transactionType) {
+      case 'COEXP_PARTY':
+        res = this._coordinatedPartyExpenditureFields;
+        break;
+      case 'COEXP_CC_PAY':
+        res = coordinatedExpenditureCCFields;
+        break;
+      case 'COEXP_STAF_REIM':
+        res = coordinatedExpenditureStaffFields;
+        break;
+      case 'COEXP_PMT_PROL':
+        res = coordinatedExpenditurePayrollFields;
+        break;
+      default:
+    }
+    return res;
   }
 
   /**
