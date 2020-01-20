@@ -1,4 +1,4 @@
-export const coordinatedPartyExpenditureFields = {
+export const coordinatedExpenditurePayrollFields = {
   data: {
     formFields: [
       {
@@ -10,7 +10,7 @@ export const coordinatedPartyExpenditureFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
@@ -381,7 +381,7 @@ export const coordinatedPartyExpenditureFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: true,
@@ -763,6 +763,51 @@ export const coordinatedPartyExpenditureFields = {
         type: 'hidden',
         name: 'api_call',
         value: '/sf/schedF'
+      },
+      {
+        type: 'hidden',
+        name: 'entity_type',
+        value: 'ORG'
+      },
+      {
+        type: 'hidden',
+        name: 'beneficiary_cand_entity_id',
+        value: null
+      },
+      {
+        type: 'hidden',
+        name: 'memo_code',
+        value: null
+      },
+      {
+        type: 'hidden',
+        name: 'line_number',
+        value: '24'
+      },
+      {
+        type: 'hidden',
+        name: 'transaction_id',
+        value: null
+      },
+      {
+        type: 'hidden',
+        name: 'back_ref_transaction_id',
+        value: null
+      },
+      {
+        type: 'hidden',
+        name: 'back_ref_sched_name',
+        value: null
+      },
+      {
+        type: 'hidden',
+        name: 'transaction_type',
+        value: '24E'
+      },
+      {
+        type: 'hidden',
+        name: 'transaction_type_identifier',
+        value: 'COEXP_PMT_PROL'
       }
     ],
     states: [
@@ -1012,7 +1057,14 @@ export const coordinatedPartyExpenditureFields = {
       }
     ],
     titles: null,
-    entityTypes: null,
+    entityTypes: [
+      {
+        entityType: 'ORG',
+        entityTypeDescription: 'Organization',
+        group: 'org-group',
+        selected: true
+      }
+    ],
     electionTypes: [
       {
         electionType: 'P',

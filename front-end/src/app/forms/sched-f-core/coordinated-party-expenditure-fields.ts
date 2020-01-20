@@ -1,6 +1,38 @@
-export const coordinatedPartyExpenditureCCFields = {
+export const coordinatedPartyExpenditureFields = {
   data: {
     formFields: [
+      {
+        childForm: false,
+        childFormTitle: null,
+        colClassName: 'col col-md-5',
+        seperator: false,
+        cols: [
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: null,
+            toggle: false,
+            inputGroup: false,
+            inputIcon: null,
+            text: 'Entity Type',
+            infoIcon: true,
+            infoText:
+              'CAN Candidate \\n\n           CCM Candidate Committee  \\n\n            COM Committee \\n\n            IND Individual (a person) \\n\n            ORG Organization (not a committee and not a person) \\n\n            PAC Political Action Committee\\n\n            PTY Party Organization',
+            name: 'entity_type',
+            type: 'select',
+            value: 'IND',
+            scroll: false,
+            height: '30px',
+            width: '450px',
+            validation: {
+              required: true,
+              max: 3,
+              alphaNumeric: true
+            }
+          }
+        ]
+      },
       {
         childForm: false,
         childFormTitle: null,
@@ -29,6 +61,129 @@ export const coordinatedPartyExpenditureCCFields = {
               max: 200,
               alphaNumeric: true
             }
+          },
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: 'ind-group',
+            toggle: true,
+            inputGroup: false,
+            inputIcon: null,
+            text: 'Last Name',
+            infoIcon: false,
+            infoText: null,
+            name: 'last_name',
+            type: 'text',
+            value: null,
+            scroll: false,
+            height: '30px',
+            width: '197px',
+            validation: {
+              required: true,
+              max: 30,
+              alphaNumeric: true
+            }
+          },
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: 'ind-group',
+            toggle: true,
+            inputGroup: false,
+            inputIcon: null,
+            text: 'First Name',
+            infoIcon: false,
+            infoText: null,
+            name: 'first_name',
+            type: 'text',
+            value: null,
+            scroll: false,
+            height: '30px',
+            width: '197px',
+            validation: {
+              required: true,
+              max: 20,
+              alphaNumeric: true
+            }
+          },
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: 'ind-group',
+            toggle: true,
+            inputGroup: false,
+            inputIcon: null,
+            text: 'Middle Name',
+            infoIcon: false,
+            infoText: null,
+            name: 'middle_name',
+            type: 'text',
+            value: null,
+            scroll: false,
+            height: '30px',
+            width: '197px',
+            validation: {
+              required: false,
+              max: 20,
+              alphaNumeric: true
+            }
+          }
+        ]
+      },
+      {
+        childForm: false,
+        childFormTitle: null,
+        colClassName: 'col col-md-4',
+        seperator: true,
+        cols: [
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: 'ind-group',
+            toggle: true,
+            inputGroup: false,
+            inputIcon: null,
+            text: 'Prefix',
+            infoIcon: false,
+            infoText: null,
+            name: 'prefix',
+            type: 'text',
+            value: null,
+            scroll: false,
+            height: '30px',
+            width: '98.35px',
+            validation: {
+              required: false,
+              max: 10,
+              alphaNumeric: true
+            }
+          },
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: 'ind-group',
+            toggle: true,
+            inputGroup: false,
+            inputIcon: null,
+            text: 'Suffix',
+            infoIcon: false,
+            infoText: null,
+            name: 'suffix',
+            type: 'text',
+            value: null,
+            scroll: false,
+            height: '30px',
+            width: '98.35px',
+            validation: {
+              required: false,
+              max: 10,
+              alphaNumeric: true
+            }
           }
         ]
       },
@@ -49,7 +204,7 @@ export const coordinatedPartyExpenditureCCFields = {
             text: 'Street 1',
             infoIcon: false,
             infoText: null,
-            name: 'payee_street_1',
+            name: 'street_1',
             type: 'text',
             value: null,
             scroll: false,
@@ -72,7 +227,7 @@ export const coordinatedPartyExpenditureCCFields = {
             text: 'Street 2',
             infoIcon: false,
             infoText: null,
-            name: 'payee_street_2',
+            name: 'street_2',
             type: 'text',
             value: null,
             scroll: false,
@@ -103,7 +258,7 @@ export const coordinatedPartyExpenditureCCFields = {
             text: 'City',
             infoIcon: false,
             infoText: null,
-            name: 'payee_city',
+            name: 'city',
             type: 'text',
             value: null,
             scroll: false,
@@ -126,7 +281,7 @@ export const coordinatedPartyExpenditureCCFields = {
             text: 'State',
             infoIcon: false,
             infoText: null,
-            name: 'payee_state',
+            name: 'state',
             type: 'select',
             value: null,
             scroll: false,
@@ -149,7 +304,7 @@ export const coordinatedPartyExpenditureCCFields = {
             text: 'Zip Code',
             infoIcon: false,
             infoText: null,
-            name: 'payee_zip',
+            name: 'zip_code',
             type: 'text',
             value: null,
             scroll: false,
@@ -158,6 +313,168 @@ export const coordinatedPartyExpenditureCCFields = {
             validation: {
               required: true,
               max: 10,
+              alphaNumeric: true
+            }
+          }
+        ]
+      },
+      {
+        childForm: false,
+        childFormTitle: null,
+        colClassName: 'col col-md-4',
+        seperator: false,
+        cols: [
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: null,
+            toggle: false,
+            inputGroup: true,
+            inputIcon: 'calendar-icon',
+            text: 'Expenditure Date',
+            infoIcon: true,
+            infoText: 'Request language from RAD',
+            name: 'expenditure_date',
+            type: 'date',
+            value: null,
+            scroll: false,
+            height: '30px',
+            width: '154px',
+            validation: {
+              required: true,
+              max: null,
+              date: true
+            }
+          }
+        ]
+      },
+      {
+        childForm: false,
+        childFormTitle: null,
+        colClassName: 'col col-md-4',
+        seperator: false,
+        cols: [
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: null,
+            toggle: false,
+            inputGroup: true,
+            inputIcon: 'dollar-sign-icon',
+            text: 'Expenditure Amount',
+            infoIcon: true,
+            infoText: 'Request language from RAD',
+            name: 'expenditure_amount',
+            type: 'text',
+            value: null,
+            scroll: false,
+            height: '30px',
+            width: '154px',
+            validation: {
+              required: true,
+              max: 12,
+              dollarAmount: true
+            }
+          },
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: true,
+            entityGroup: null,
+            toggle: false,
+            inputGroup: true,
+            inputIcon: 'dollar-sign-icon',
+            text: 'Aggregate General Election Expended',
+            infoIcon: true,
+            infoText: 'Request language from RAD',
+            name: 'aggregate_general_elec_exp',
+            type: 'text',
+            value: null,
+            scroll: false,
+            height: '30px',
+            width: '154px',
+            validation: {
+              required: true,
+              max: 12,
+              dollarAmount: true
+            }
+          },
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: null,
+            toggle: false,
+            inputGroup: false,
+            inputIcon: null,
+            text: 'Memo Code',
+            infoIcon: true,
+            infoText: 'Request language from RAD',
+            name: 'memo_code',
+            type: 'checkbox',
+            value: null,
+            scroll: false,
+            height: '24px',
+            width: '24px',
+            validation: {
+              required: false,
+              max: 1,
+              alphaNumeric: true
+            }
+          }
+        ]
+      },
+      {
+        childForm: false,
+        childFormTitle: null,
+        colClassName: 'col col-md-5',
+        seperator: true,
+        cols: [
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: null,
+            toggle: false,
+            inputGroup: false,
+            inputIcon: null,
+            text: 'Expenditure Purpose Description',
+            infoIcon: true,
+            infoText: 'Request language from RAD',
+            name: 'expenditure_purpose_description',
+            type: 'text',
+            value: null,
+            scroll: true,
+            height: '30px',
+            width: '380px',
+            validation: {
+              required: true,
+              max: 100,
+              alphaNumeric: true
+            }
+          },
+          {
+            preText: null,
+            setEntityIdTo: 'entity_id',
+            isReadonly: false,
+            entityGroup: null,
+            toggle: false,
+            inputGroup: false,
+            inputIcon: null,
+            text: 'Memo Text',
+            infoIcon: true,
+            infoText: 'Request language from RAD',
+            name: 'memo_text',
+            type: 'text',
+            value: null,
+            scroll: true,
+            height: '30px',
+            width: '380px',
+            validation: {
+              required: false,
+              max: 100,
               alphaNumeric: true
             }
           }
@@ -439,114 +756,6 @@ export const coordinatedPartyExpenditureCCFields = {
             }
           }
         ]
-      },
-      {
-        childForm: false,
-        childFormTitle: null,
-        colClassName: 'col col-md-4',
-        seperator: true,
-        cols: [
-          {
-            preText: null,
-            setEntityIdTo: 'entity_id',
-            isReadonly: false,
-            entityGroup: null,
-            toggle: false,
-            inputGroup: true,
-            inputIcon: 'calendar-icon',
-            text: 'Expenditure Date',
-            infoIcon: true,
-            infoText: 'Request language from RAD',
-            name: 'expenditure_date',
-            type: 'date',
-            value: null,
-            scroll: false,
-            height: '30px',
-            width: '154px',
-            validation: {
-              required: true,
-              max: null,
-              date: true
-            }
-          },
-          {
-            preText: null,
-            setEntityIdTo: 'entity_id',
-            isReadonly: false,
-            entityGroup: null,
-            toggle: false,
-            inputGroup: true,
-            inputIcon: 'dollar-sign-icon',
-            text: 'Expenditure Amount',
-            infoIcon: true,
-            infoText: 'Request language from RAD',
-            name: 'expenditure_amount',
-            type: 'text',
-            value: null,
-            scroll: false,
-            height: '30px',
-            width: '154px',
-            validation: {
-              required: true,
-              max: 12,
-              dollarAmount: true
-            }
-          }
-        ]
-      },
-      {
-        childForm: false,
-        childFormTitle: null,
-        colClassName: 'col col-md-5',
-        seperator: true,
-        cols: [
-          {
-            preText: null,
-            setEntityIdTo: 'entity_id',
-            isReadonly: false,
-            entityGroup: null,
-            toggle: false,
-            inputGroup: false,
-            inputIcon: null,
-            text: 'Expenditure Purpose Description',
-            infoIcon: true,
-            infoText: 'Request language from RAD',
-            name: 'expenditure_purpose_description',
-            type: 'text',
-            value: null,
-            scroll: true,
-            height: '30px',
-            width: '380px',
-            validation: {
-              required: true,
-              max: 100,
-              alphaNumeric: true
-            }
-          },
-          {
-            preText: null,
-            setEntityIdTo: 'entity_id',
-            isReadonly: false,
-            entityGroup: null,
-            toggle: false,
-            inputGroup: false,
-            inputIcon: null,
-            text: 'Memo Text',
-            infoIcon: true,
-            infoText: 'Request language from RAD',
-            name: 'memo_text',
-            type: 'text',
-            value: null,
-            scroll: true,
-            height: '30px',
-            width: '380px',
-            validation: {
-              required: false,
-              max: 100,
-              alphaNumeric: true
-            }
-          }
-        ]
       }
     ],
     hiddenFields: [
@@ -598,7 +807,7 @@ export const coordinatedPartyExpenditureCCFields = {
       {
         type: 'hidden',
         name: 'transaction_type_identifier',
-        value: 'COEXP_CC_PAY'
+        value: 'COEXP_PARTY'
       }
     ],
     states: [
@@ -984,27 +1193,7 @@ export const coordinatedPartyExpenditureCCFields = {
         ]
       }
     ],
-    subTransactions: [
-      {
-        transactionType: 'CE_CC_PAY',
-        transactionTypeDescription: 'Coordinated Expenditure Credit Card',
-        scheduleType: 'sched_f_core',
-        subTransactionType: 'CE_CC_PAY_MEMO',
-        subScheduleType: 'sched_f_core',
-        subTransactionTypeDescription: 'Coordinated Expenditure Credit Card Memo',
-        api_call: '/sf/schedF',
-        isParent: true,
-        isEarmark: false
-      }
-    ],
-    jfMemoTypes: [
-      {
-        memoType: 'CC Corresponding Memo',
-        lineNumber: '24',
-        transactionIdentifier: 'IE_CC_PAY_MEMO',
-        transactionCode: '24_M',
-        entityType: 'ORG'
-      }
-    ]
+    subTransactions: null,
+    jfMemoTypes: null
   }
 };
