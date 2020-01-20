@@ -1960,6 +1960,7 @@ def get_sla_summary_table(request):
             # adding memo child transactions
             if result:
                 for obj in result:
+                    obj.update(API_CALL_LA)
                     if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
                         memo_objs = get_la_memos(
                             cmte_id, obj.get("report_id"), obj.get(
@@ -2025,14 +2026,15 @@ def get_slb_summary_table(request):
             result = cursor.fetchone()[0]
             # print(result)
             # adding memo child transactions
-            # if result:
-            #     for obj in result:
-            #         if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
-            #             memo_objs = get_la_memos(
-            #                 cmte_id, obj.get("report_id"), obj.get("transaction_id")
-            #             )
-            #             if memo_objs:
-            #                 obj["child"] = memo_objs
+            if result:
+                for obj in result:
+                    obj.update(API_CALL_LB)
+                    # if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
+                    #     memo_objs = get_la_memos(
+                    #         cmte_id, obj.get("report_id"), obj.get("transaction_id")
+                    #     )
+                    #     if memo_objs:
+                    #         obj["child"] = memo_objs
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
