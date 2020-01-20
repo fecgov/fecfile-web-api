@@ -115,6 +115,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public totalAmountReadOnly: boolean;
   public returnToDebtSummary = false;
   public returnToDebtSummaryInfo: any;
+  public viewScheduleAction: ScheduleActions = ScheduleActions.view;
 
   protected abstractScheduleComponent: AbstractScheduleParentEnum;
   protected isInit = false;
@@ -538,6 +539,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     //     });
     //   }
     // });
+
+    if (this.scheduleAction === ScheduleActions.view) {
+      this.frmIndividualReceipt.disable();
+    }
   }
 
   /**
