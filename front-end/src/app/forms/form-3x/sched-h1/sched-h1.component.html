@@ -160,7 +160,7 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                      <input ngModel type="checkbox" name="applied_activity1" id="ad" value="administrative">
+                      <input ngModel type="checkbox" name="applied_activity1" id="ad" value="administrative" [disabled]="h1PacADDisabled">
                       <label for="ad">
                         Administrative
                       </label>
@@ -174,7 +174,7 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="checkbox" name="applied_activity2" id="gvd" value="generic_voter_drive">
+                    <input ngModel type="checkbox" name="applied_activity2" id="gvd" value="generic_voter_drive" [disabled]="h1PacGVDisabled">
                     <label for="gvd">
                       Generic Voter Drive
                     </label>
@@ -188,7 +188,7 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="checkbox" name="applied_activity3" id="pc" value="public_communication">
+                    <input ngModel type="checkbox" name="applied_activity3" id="pc" value="public_communication" [disabled]="h1PacPCDisabled">
                     <label for="pc">
                       Public Communications Referenceing Party Only
                     </label>
@@ -209,7 +209,7 @@
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <div class="forms__btn-container">
-                <button type="submit" class="btn btn-primary btn-right" [disabled]="!f.valid" (click)="saveH1(f)">
+                <button type="submit" class="btn btn-primary btn-right" [disabled]="!f.valid || (h1PacADDisabled && h1PacGVDisabled && h1PacPCDisabled)" (click)="saveH1(f)">
                     Save
                   </button>
               </div>
