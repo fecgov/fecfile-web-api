@@ -34,6 +34,15 @@ export class SchedH1Component implements OnInit {
   h1Disabled = false;
   removedH1Subscription: Subscription;
 
+  getH1PacSubscription: Subscription;
+  getH1PacADDisable = false;
+  h1PacADDisabled = false;
+  getH1PacGVDisable = false;
+  h1PacGVDisabled = false;
+  getH1PacPCDisable = false;
+  h1PacPCDisabled = false;
+  removedH1PacSubscription: Subscription;
+
   constructor(
     private _http: HttpClient,
     private _activatedRoute: ActivatedRoute,
@@ -63,6 +72,9 @@ export class SchedH1Component implements OnInit {
           message => {
             if(message.scheduleType === 'Schedule H1') {
               this.getH1Disable = false;
+
+              this.checkH1PacDisabled();
+
               this.scheduleAction = ScheduleActions.add;
               this.form.control.patchValue({ h1_election_year_options: '' }, { onlySelf: true });
             }
@@ -76,6 +88,7 @@ export class SchedH1Component implements OnInit {
     //console.log(localStorage.getItem('cmte_type_category'));
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.checkH1Disabled();
+    this.checkH1PacDisabled();
   }
 
   public ngDoCheck() {
@@ -203,6 +216,7 @@ export class SchedH1Component implements OnInit {
     this.transaction_id = item.transaction_id;
 
     this.checkH1Disabled();
+    this.checkH1PacDisabled();
 
     if (this.isPac()) {
       this.form.control.patchValue({ federal_share: item.federal_percent * 100 }, { onlySelf: true });
@@ -244,6 +258,7 @@ export class SchedH1Component implements OnInit {
 
   public previousStep(): void {
     this.checkH1Disabled();
+    this.checkH1PacDisabled();
     this.status.emit({
       form: {},
       direction: 'previous',
@@ -307,7 +322,82 @@ export class SchedH1Component implements OnInit {
   public changeH1Disable() {
     if(this._activatedRoute.snapshot.queryParams.step === 'step_2') {
         this.h1Disabled = this.getH1Disable;
+        this.h1PacADDisabled = this.getH1PacADDisable;
+        this.h1PacGVDisabled = this.getH1PacGVDisable;
+        this.h1PacPCDisabled = this.getH1PacPCDisable;
     }
+  }
+
+  public checkH1PacDisabled() {
+    if(this.scheduleAction === ScheduleActions.add) {
+      this.getH1PacSubscription = this.getH1Pac().subscribe(
+        res=>{
+          if(res && this.isPac()) {
+            if(res.administrative === 1) {
+              this.form.control.patchValue({ applied_activity1: 'administrative' }, { onlySelf: true });
+              this.getH1PacADDisable = true;
+            }else {
+              this.form.control.patchValue({ applied_activity1: '' }, { onlySelf: true });
+              this.getH1PacADDisable = false;
+            }
+
+            if(res.generic_voter_drive === 1) {
+              this.form.control.patchValue({ applied_activity2: 'generic_voter_drive' }, { onlySelf: true });
+              this.getH1PacGVDisable = true;
+            }else {
+              this.form.control.patchValue({ applied_activity2: '' }, { onlySelf: true });
+              this.getH1PacGVDisable = false;
+            }
+
+            if(res.public_communications === 1) {
+              this.form.control.patchValue({ applied_activity3: 'public_communications' }, { onlySelf: true });
+              this.getH1PacPCDisable = true;
+            }else {
+              this.form.control.patchValue({ applied_activity3: '' }, { onlySelf: true });
+              this.getH1PacPCDisable = false;
+            }
+          }else{
+            this.getH1PacADDisable = false;
+            this.getH1PacGVDisable = false;
+            this.getH1PacPCDisable = false;
+          }
+        }
+      )
+      this.h1PacADDisabled = this.getH1PacADDisable;
+      this.h1PacGVDisabled = this.getH1PacGVDisable;
+      this.h1PacPCDisabled = this.getH1PacPCDisable;
+    }else {
+      this.h1PacADDisabled = false;
+      this.h1PacGVDisabled = false;
+      this.h1PacPCDisabled = false;
+    }
+  }
+
+  public getH1Pac(): Observable<any> {
+
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/sh1/validate_pac_h1`;
+
+    let httpOptions = new HttpHeaders();
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+
+    let params = new HttpParams();
+    params = params.append('report_id', reportId);
+
+    return this._http.get(url, {
+      params,
+      headers: httpOptions
+    })
+    .pipe(map(res => {
+      if (res) {
+        console.log('Get H1 Pac res: ', res);
+        return res;
+      }
+      return false;
+      })
+    )
   }
 
 }
