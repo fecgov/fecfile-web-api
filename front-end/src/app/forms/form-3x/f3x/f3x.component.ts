@@ -513,8 +513,8 @@ export class F3xComponent implements OnInit {
           this.transactionTypeText = 'Schedule L-A Entry / Business Receipt';
         } else if (this.transactionType === 'LEVIN_PARTN_REC') {
           this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt';
-        } else if (this.transactionType === 'LEVIN_PARTN_MEMO') {
-          this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt Memo';
+        //} else if (this.transactionType === 'LEVIN_PARTN_MEMO') {
+        //  this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt Memo';
         } else if (this.transactionType === 'LEVIN_PAC_REC') {
           this.transactionTypeText = 'Schedule L-A Entry / PAC Receipt';
         } else if (this.transactionType === 'LEVIN_NON_FED_REC') {
