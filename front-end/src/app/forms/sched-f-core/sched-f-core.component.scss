@@ -1,16 +1,6 @@
 @import '../../shared/scss/global';
 
-input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type=number] {
-    -moz-appearance:textfield;
-}
-
-.sched-c1-container {
+.individual-receipt-container {
   padding-right: 10px;
   .row {
     margin-left: 0;
@@ -70,40 +60,8 @@ input[type=number] {
       @include clearfix();
     }
     section {
-      .section_b_label {
-        float: left;
-        padding-top: .4em;
-      }
-      .c1_verbiage_lg {
-        font-size: 20px;
-      }
-      .c1_verbiage_sm {
-        font-size: 16px;
-      }
-      .section_i_verbiage_container {
-        padding-left: 1.5em;
-      }
-      .section_i_list_items {
-        padding-left: 3em;
-        padding-top: 0.5em;
-      }
-      .section_i_checkbox_container {
-        padding: 0 1em 0 1.5em;
-        .section_i_checkbox {
-          -webkit-transform: scale(1.9);
-          -ms-transform: scale(1.9);
-          -moz-transform: scale(1.9);
-          -webkit-transform: scale(1.9);
-          -o-transform: scale(1.9);
-          margin: 10px;
-        }
-      }
-      .section_i_checkbox_verbiage {
-        padding-top: 0.35em;
-      }
-      padding-top: 1em;
       .coord_expenditure_text {
-        // padding-top: 3em;
+        padding-top: 3em;
         padding-bottom: 1em;
       }
       .content {
@@ -135,16 +93,9 @@ input[type=number] {
           }
           textarea {
             &.form-control {
-              resize:none;
-              // overflow: scroll;
+              overflow: scroll;
               width: 400px;
             }
-          }
-          .ng-select.forms__select ::ng-deep .ng-select-container  {            
-            height: 45px;
-          }
-          .ng-select.disable-arrow .ng-arrow-wrapper .ng-arrow {
-            display: none;
           }
           .forms__big_checkbox {
             -webkit-transform: scale(1.9);
@@ -153,14 +104,6 @@ input[type=number] {
             -webkit-transform: scale(1.9); /* Safari and Chrome */
             -o-transform: scale(1.9); /* Opera */
             margin: 10px;
-          }
-          .forms__big_radio {
-            -webkit-transform: scale(2.9);
-            -ms-transform: scale(2.9); /* IE */
-            -moz-transform: scale(2.9); /* FF */
-            -webkit-transform: scale(2.9); /* Safari and Chrome */
-            -o-transform: scale(2.9); /* Opera */
-            margin: 23px;
           }
           label {
             font-family: sans-serif;
@@ -178,9 +121,14 @@ input[type=number] {
               }
             }
             .ng-select-container {
+              // Not working
               height: 45px;
             }
           }
+          // Not working
+          // .ng-select-container {
+          //   height: 45px !important;
+          // }
           .ng-dropdown-panel {
             .ng-dropdown-panel-items {
               .ng-option {

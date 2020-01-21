@@ -108,7 +108,7 @@
                 <span class="sr-only">Click here for more information</span>
               </div>
             </label>
-            <ng-select #stateSelect [items]="states" class="forms__select" [formControlName]="'state'"
+            <ng-select #stateSelect [items]="states" class="forms__select disable-arrow" [formControlName]="'state'"
               bindValue="state_code" bindLabel="state_code" [selectOnTab]="true" [ngClass]="
                 c1Form.get('state')?.invalid &&
                 (c1Form.touched || c1Form.dirty)
