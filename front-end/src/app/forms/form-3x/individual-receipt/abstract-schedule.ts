@@ -3334,6 +3334,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         return;
       }
 
+      let hiddenFieldEntityId = null;
+      if (schedDData.hasOwnProperty('entity_id')) {
+        hiddenFieldEntityId = schedDData.entity_id;
+      }
+      this.hiddenFields.push({
+        'type': 'hidden',
+        'name': 'entity_id',
+        'value': schedDData.entity_id
+      });
+
       this._prePopulateFormFieldHelper(schedDData, 'entity_type', fieldArray);
       if (entityType === 'ORG') {
         fieldArray = this._prePopulateFormFieldHelper(schedDData, 'entity_name', fieldArray);
