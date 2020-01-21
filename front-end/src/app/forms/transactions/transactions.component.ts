@@ -107,6 +107,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   private readonly filtersLSK = 'transactions.filters';
   removeTagsSubscription: any;
 
+  private viewTransactionSubscription: Subscription;
+
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _transactionsMessageService: TransactionsMessageService,
@@ -158,6 +160,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       _activatedRoute.queryParams.subscribe(p => {
         this.transactionCategory = p.transactionCategory;
       });
+
+    this.viewTransactionSubscription = this._transactionsMessageService
+      .getViewTransactionMessage()
+      .subscribe((trx: TransactionModel) => {
+        this.transactionToEdit = trx;
+        this.showView();
+      });
+
     }
 
   private removeFilterAndTag(message: any) {
@@ -246,6 +256,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.editTransactionSubscription.unsubscribe();
     this.editDebtSummaryTransactionSubscription.unsubscribe();
     this.showTransactionsSubscription.unsubscribe();
+    this.viewTransactionSubscription.unsubscribe();
   }
 
   public goToPreviousStep(): void {
@@ -1015,5 +1026,26 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     else{
       return input !== null && input !== undefined;
     }
+  }
+
+  public showView() {
+    const emptyValidForm = this._fb.group({});
+
+    const emitObj: any = {
+      form: emptyValidForm,
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'transactions',
+      action: ScheduleActions.view,
+      transactionCategory: this.transactionCategory,
+      scheduleType: this.transactionToEdit.scheduleType,
+      transactionDetail: {
+        transactionModel: this.transactionToEdit
+      }
+    };
+
+    this.showTransaction.emit(emitObj);
+
+    this.showCategories();
   }
 }

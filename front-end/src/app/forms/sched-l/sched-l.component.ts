@@ -336,7 +336,6 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
 
     for (const row of serverData) {
       const model = new SchedLModel({});
-
       model.cmte_id = row.cmte_id;
       model.report_id = row.report_id;
       model.transaction_type_identifier = row.transaction_type_identifier;
@@ -349,16 +348,20 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
       model.expenditure_date = row.expenditure_date;
       model.contribution_amount = row.contribution_amount;
       model.expenditure_amount = row.expenditure_amount;
-													
-															
+      if (row.contribution_date !== '') {
+        model.date = row.contribution_date;
+        model.amount = row.contribution_amount;
+      } else if (row.expenditure_date !== '') {
+        model.date = row.expenditure_date;
+        model.amount = row.expenditure_amount;
+      }
+      model.aggregate = row.aggregate_amt;
       model.memo_code = row.memo_code;
       model.first_name = row.first_name;
       model.last_name = row.last_name;
       model.entity_name = row.entity_name;
       model.entity_type = row.entity_type;
-
       modelArray.push(model);
-	
     }
 
     console.log('91: ', modelArray);

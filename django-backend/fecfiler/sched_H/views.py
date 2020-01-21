@@ -710,6 +710,44 @@ def validate_h1_h2_exist(request):
     except:
         raise
 
+
+@api_view(['GET'])
+def validate_pac_h1(request):
+    """
+    api to validate h1 status
+    """
+    try:
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        event_types = [
+            "administrative", # TODO: need to fix this typo
+            "generic_voter_drive",
+            "public_communications",
+        ]
+        _result = {}
+        for _event_type in event_types:
+            with connection.cursor() as cursor:
+                _sql = """
+                select count(*) from public.sched_h1
+                where cmte_id = '{}'
+                and report_id = {}
+                and {} = true
+                and delete_ind is distinct from 'Y'
+                """.format(cmte_id, report_id, _event_type)
+                cursor.execute(_sql)
+                if not cursor.rowcount:
+                    raise Exception('Error: exceptions when query pac h1 data.')
+                _count = int(cursor.fetchone()[0])
+                _result.update({ _event_type : _count })
+        return JsonResponse(
+                _result, status = status.HTTP_200_OK
+            )
+    except:
+        raise
+    
+
+
+
 @api_view(['GET'])
 def get_fed_nonfed_share(request):
     """
@@ -840,6 +878,7 @@ def get_fed_nonfed_share(request):
                 where cmte_id = %s 
                 and activity_event_type = %s
                 and create_date between %s and %s
+                and delete_ind is distinct from 'Y'
                 order by create_date desc, last_update_date desc
             """
             with connection.cursor() as cursor:

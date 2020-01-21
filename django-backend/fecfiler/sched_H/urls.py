@@ -50,4 +50,9 @@ urlpatterns = [
         views.validate_h1_h2_exist,
         name="validate_h1_h2_exist",
     ),
+    url(
+        r"^sh1/validate_pac_h1$",
+        views.validate_pac_h1,
+        name="validate_pac_h1",
+    ),
 ]

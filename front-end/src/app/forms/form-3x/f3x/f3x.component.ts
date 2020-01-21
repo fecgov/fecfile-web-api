@@ -396,6 +396,20 @@ export class F3xComponent implements OnInit {
                 transactionTypeText = transactionModel.type;
                 transactionType = transactionModel.transactionTypeIdentifier;
               }
+            } else if (this.scheduleAction === ScheduleActions.view) {
+              let apiCall = null;
+              if (e.transactionDetail) {
+                if (e.transactionDetail.transactionModel) {
+                  if (e.transactionDetail.transactionModel.hasOwnProperty('apiCall')) {
+                    apiCall = e.transactionDetail.transactionModel.apiCall;
+                  }
+                }
+              }
+
+              this._populateFormForView(e, AbstractScheduleParentEnum.schedMainComponent);
+              const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+              transactionTypeText = transactionModel.type;
+              transactionType = transactionModel.transactionTypeIdentifier;
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
@@ -513,8 +527,8 @@ export class F3xComponent implements OnInit {
           this.transactionTypeText = 'Schedule L-A Entry / Business Receipt';
         } else if (this.transactionType === 'LEVIN_PARTN_REC') {
           this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt';
-        } else if (this.transactionType === 'LEVIN_PARTN_MEMO') {
-          this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt Memo';
+        //} else if (this.transactionType === 'LEVIN_PARTN_MEMO') {
+        //  this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt Memo';
         } else if (this.transactionType === 'LEVIN_PAC_REC') {
           this.transactionTypeText = 'Schedule L-A Entry / PAC Receipt';
         } else if (this.transactionType === 'LEVIN_NON_FED_REC') {
@@ -604,7 +618,7 @@ export class F3xComponent implements OnInit {
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'OTH_DISB_DEBT' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'FEA_100PCT_DEBT_PAY' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'COEXP_PARTY_DEBT' ||
-        e.transactionDetail.transactionModel.transactionTypeIdentifier === 'IE_B4_DISSE_MEMO' ||
+        e.transactionDetail.transactionModel.transactionTypeIdentifier === 'IE' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'OTH_REC_DEBT') &&
       e.returnToDebtSummary
     ) {
@@ -915,5 +929,16 @@ export class F3xComponent implements OnInit {
         });
       }
     }
+  }
+
+  private _populateFormForView(e: any, schedule: AbstractScheduleParentEnum) {
+    e.transactionDetail.action = this.scheduleAction;
+    const emitObject: any = {
+      key: 'fullForm',
+      abstractScheduleComponent: schedule,
+      transactionModel: e.transactionDetail
+    };
+
+    this._f3xMessageService.sendPopulateFormMessage(emitObject);
   }
 }

@@ -154,3 +154,19 @@
     }
   }
 }
+
+.ng-select.disabled.ng-select .ng-select-container{
+  background-color: #e9ecef;
+}
+
+.ng-select.disabled .ng-arrow-wrapper .ng-arrow {
+  display: none;
+}
+
+.ng-select.disabled ng-dropdown-panel {
+  display: none;
+}
+
+.ng-select.disabled .ng-clear-wrapper {
+  display: none;
+}

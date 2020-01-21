@@ -115,7 +115,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public totalAmountReadOnly: boolean;
   public returnToDebtSummary = false;
   public returnToDebtSummaryInfo: any;
-
+  public viewScheduleAction: ScheduleActions = ScheduleActions.view;
 
   protected abstractScheduleComponent: AbstractScheduleParentEnum;
   protected isInit = false;
@@ -153,7 +153,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _selectedCandidateChangeWarn: any;
   private _selectedCandidateChangeWarnChild: any;
   private _contributionAmountMax: number;
-  private _transactionToEdit: TransactionModel;
+  protected _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
   private _readOnlyMemoCode: boolean;
   private _readOnlyMemoCodeChild: boolean;
@@ -547,6 +547,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     //     });
     //   }
     // });
+
+    if (this.scheduleAction === ScheduleActions.view) {
+      this.frmIndividualReceipt.disable();
+    }
   }
 
   /**
@@ -752,7 +756,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Apply the validation rules when aggregate changes.
    */
   private _listenForAggregateChanges(): void {
-    if ( this.frmIndividualReceipt.get('contribution_aggregate') != null) {
+    if (this.frmIndividualReceipt.get('contribution_aggregate') != null) {
       this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.subscribe(val => {
         // All validators are replaced here.  Currently the only validator functions
         // for employer and occupation is the validateAggregate().  The max length is enforced
@@ -769,10 +773,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         const occupationControl = this.frmIndividualReceipt.get('occupation');
         occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
         occupationControl.updateValueAndValidity();
-
-
       });
-    } else if ( this.frmIndividualReceipt.get('expenditure_amount') != null) {
+    } else if (this.frmIndividualReceipt.get('expenditure_amount') != null) {
       this.frmIndividualReceipt.get('expenditure_amount').valueChanges.subscribe(value => {
         const expenditurePurposeDesc = this.frmIndividualReceipt.get('expenditure_purpose');
         expenditurePurposeDesc.setValidators([validateAggregate(value, true, 'expenditure_purpose')]);
@@ -1652,7 +1654,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
             console.log('child memo code val ' + receiptObj[field]);
           }
-        } else if (this.isFieldName(field, 'purpose_description') || this.isFieldName(field, 'expenditure_purpose')) {
+        }
+        // TODO: Incomplete FNE-1984
+        /*else if (this.isFieldName(field, 'purpose_description') || this.isFieldName(field, 'expenditure_purpose')) {
           const preTextHiddenField = this._findHiddenField('name', 'pretext');
           let preText = '';
           if (preTextHiddenField) {
@@ -1664,7 +1668,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
           }
-        } else if (
+        }*/
+        else if (
           field === 'last_name' ||
           field === 'first_name' ||
           field === 'cand_last_name' ||
@@ -1989,8 +1994,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               this.goH4OrH6Summary(this.transactionType);
             } else if (
               this.returnToDebtSummary &&
-              (this.transactionType === 'DEBT_TO_VENDOR' ||
-              this.transactionType === 'DEBT_BY_VENDOR')
+              (this.transactionType === 'DEBT_TO_VENDOR' || this.transactionType === 'DEBT_BY_VENDOR')
             ) {
               this._goDebtSummary();
             } else if (
@@ -2001,10 +2005,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.transactionType === 'OTH_DISB_DEBT' ||
                 this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
                 this.transactionType === 'COEXP_PARTY_DEBT' ||
-                this.transactionType === 'IE_B4_DISSE_MEMO' ||
+                this.transactionType === 'IE' ||
                 this.transactionType === 'OTH_REC_DEBT'
               )
-            ) {
+           ) {
               this.returnToParent(this.editScheduleAction);
             } else {
               this._completedCloning = true;
@@ -2225,7 +2229,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     if (
       (transactionModel.transactionTypeIdentifier === 'DEBT_TO_VENDOR' ||
-      transactionModel.transactionTypeIdentifier === 'DEBT_BY_VENDOR') &&
+        transactionModel.transactionTypeIdentifier === 'DEBT_BY_VENDOR') &&
       this.returnToDebtSummary
     ) {
       emitObj.returnToDebtSummary = true;
@@ -3150,6 +3154,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
                     if (
                       (this.transactionType === 'ALLOC_FEA_DISB' ||
+                        this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
                         this.transactionType === 'ALLOC_FEA_CC_PAY' ||
                         this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
                         this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
@@ -3914,11 +3919,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (!this.subTransactionInfo) {
       return;
     }
-    if (!this.subTransactionInfo.isEarmark && !this.subTransactionInfo.isParent
+    if (
+      !this.subTransactionInfo.isEarmark &&
+      !this.subTransactionInfo.isParent &&
       // this.transactionType !== 'EAR_REC' &&
       // this.transactionType !== 'CON_EAR_UNDEP' &&
       // this.transactionType !== 'CON_EAR_DEP_1'
-      &&
       this.transactionType !== 'ALLOC_EXP' &&
       this.transactionType !== 'ALLOC_EXP_CC_PAY' &&
       this.transactionType !== 'ALLOC_EXP_CC_PAY_MEMO' &&
@@ -3926,8 +3932,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.transactionType !== 'ALLOC_EXP_STAF_REIM_MEMO' &&
       this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL' &&
       this.transactionType !== 'ALLOC_EXP_PMT_TO_PROL_MEMO' &&
-      this.transactionType !== 'ALLOC_EXP_VOID'
-      &&
+      this.transactionType !== 'ALLOC_EXP_VOID' &&
       this.transactionType !== 'ALLOC_FEA_DISB' &&
       this.transactionType !== 'ALLOC_FEA_CC_PAY' &&
       this.transactionType !== 'ALLOC_FEA_CC_PAY_MEMO' &&
@@ -4369,9 +4374,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public cancel(): void {
     if (
       this.returnToDebtSummary &&
-      (this.transactionType === 'DEBT_TO_VENDOR' ||
-        this.transactionType === 'DEBT_BY_VENDOR'
-      )
+      (this.transactionType === 'DEBT_TO_VENDOR' || this.transactionType === 'DEBT_BY_VENDOR')
     ) {
       this._goDebtSummary();
     } else if (
@@ -4382,7 +4385,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.transactionType === 'OTH_DISB_DEBT' ||
         this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
         this.transactionType === 'COEXP_PARTY_DEBT' ||
-        this.transactionType === 'IE_B4_DISSE_MEMO' ||
+        this.transactionType === 'IE' ||
         this.transactionType === 'OTH_REC_DEBT'
       )
     ) {
