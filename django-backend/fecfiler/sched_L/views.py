@@ -30,9 +30,13 @@ from fecfiler.core.views import (
     undo_delete_entities,
 )
 
-from fecfiler.core.transaction_util import get_sched_a_transactions, get_transaction_type_descriptions
-from fecfiler.sched_A.views import get_next_transaction_id
-from fecfiler.sched_D.views import do_transaction
+from fecfiler.core.transaction_util import (
+    get_sched_a_transactions, 
+    get_transaction_type_descriptions, 
+    do_transaction,
+)
+# from fecfiler.sched_A.views import get_next_transaction_id
+# from fecfiler.sched_D.views import do_transaction
 
 
 # Create your views here.
