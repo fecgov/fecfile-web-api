@@ -9,6 +9,9 @@ export class SchedLModel {
     levin_account_name: string;
     contribution_date: string;
     expenditure_date: string;
+    date: any;
+    amount: any;
+    aggregate: any;
     contribution_amount: string;
     expenditure_amount: string;
     memo_code: string;
@@ -28,8 +31,11 @@ export class SchedLModel {
         this.levin_account_name = schedL.levin_account_name ? schedL.levin_account_name : '';
         this.contribution_date = schedL.contribution_date ? schedL.contribution_date : '';
         this.expenditure_date = schedL.expenditure_date ? schedL.expenditure_date : '';
+        this.date = schedL.date ? schedL.date : null;
         this.contribution_amount = schedL.contribution_amount ? schedL.contribution_amount : '';
         this.expenditure_amount = schedL.expenditure_amount ? schedL.expenditure_amount : '';
+        this.amount = schedL.amount ? schedL.amount : '';
+        this.aggregate = schedL.aggregate ? schedL.aggregate : '';
         this.memo_code = schedL.memo_code ? schedL.memo_code : '';
         this.first_name = schedL.first_name ? schedL.first_name : '';
         this.last_name = schedL.last_name ? schedL.last_name : '';

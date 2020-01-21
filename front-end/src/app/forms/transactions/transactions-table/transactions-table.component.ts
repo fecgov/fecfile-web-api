@@ -163,23 +163,23 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       { filterName: 'states', options: ['receipts', 'disbursements', 'loans-and-debts', 'other'] }
     ];
 
-    private _filterToTypeMap : any = [
-      { filterName: 'filterAmountMin', filterType: FilterTypes.amount },
-      { filterName: 'filterAmountMax', filterType: FilterTypes.amount },
-      { filterName: 'filterLoanAmountMin', filterType: FilterTypes.loanAmount },
-      { filterName: 'filterLoanAmountMax', filterType: FilterTypes.loanAmount },
-      { filterName: 'filterAggregateAmountMin', filterType: FilterTypes.aggregateAmount },
-      { filterName: 'filterAggregateAmountMax', filterType: FilterTypes.aggregateAmount },
-      { filterName: 'filterLoanClosingBalanceMin', filterType: FilterTypes.loanClosingBalance },
-      { filterName: 'filterLoanClosingBalanceMax', filterType: FilterTypes.loanClosingBalance },
-      { filterName: 'filterDebtBeginningBalanceMin', filterType: FilterTypes.debtBeginningBalance },
-      { filterName: 'filterDebtBeginningBalanceMax', filterType: FilterTypes.debtBeginningBalance },
-      { filterName: 'filterDateFrom', filterType: FilterTypes.date },
-      { filterName: 'filterDateTo', filterType: FilterTypes.date },
-      { filterName: 'filterElectionCode', filterType: FilterTypes.electionCodes },
-      { filterName: 'filterElectionYearFrom', filterType: FilterTypes.electionYear },
-      { filterName: 'filterElectionYearTo', filterType: FilterTypes.electionYear },
-      { filterName: 'filterSchedule', filterType: FilterTypes.schedule },
+  private _filterToTypeMap: any = [
+    { filterName: 'filterAmountMin', filterType: FilterTypes.amount },
+    { filterName: 'filterAmountMax', filterType: FilterTypes.amount },
+    { filterName: 'filterLoanAmountMin', filterType: FilterTypes.loanAmount },
+    { filterName: 'filterLoanAmountMax', filterType: FilterTypes.loanAmount },
+    { filterName: 'filterAggregateAmountMin', filterType: FilterTypes.aggregateAmount },
+    { filterName: 'filterAggregateAmountMax', filterType: FilterTypes.aggregateAmount },
+    { filterName: 'filterLoanClosingBalanceMin', filterType: FilterTypes.loanClosingBalance },
+    { filterName: 'filterLoanClosingBalanceMax', filterType: FilterTypes.loanClosingBalance },
+    { filterName: 'filterDebtBeginningBalanceMin', filterType: FilterTypes.debtBeginningBalance },
+    { filterName: 'filterDebtBeginningBalanceMax', filterType: FilterTypes.debtBeginningBalance },
+    { filterName: 'filterDateFrom', filterType: FilterTypes.date },
+    { filterName: 'filterDateTo', filterType: FilterTypes.date },
+    { filterName: 'filterElectionCode', filterType: FilterTypes.electionCodes },
+    { filterName: 'filterElectionYearFrom', filterType: FilterTypes.electionYear },
+    { filterName: 'filterElectionYearTo', filterType: FilterTypes.electionYear },
+    { filterName: 'filterSchedule', filterType: FilterTypes.schedule },
   ]
 
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
@@ -218,20 +218,20 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       });
 
     this.loadDefaultReceiptsTabSubscription = this._transactionsMessageService.getLoadDefaultTabMessage()
-    .takeUntil(this.onDestroy$)
-    .subscribe(p => {
-      this.transactionCategory = p.transactionCategory;
-      this.reportId = p.reportId;
-      this._router.navigate([`/forms/form/${this.formType}`],{
-        queryParams: {
-          step: p.step,
-          reportId: p.reportId,
-          edit: p.edit,
-          transactionCategory: p.transactionCategory,
-          allTransactions: p.allTransactions
-        }
-      });
-    })
+      .takeUntil(this.onDestroy$)
+      .subscribe(p => {
+        this.transactionCategory = p.transactionCategory;
+        this.reportId = p.reportId;
+        this._router.navigate([`/forms/form/${this.formType}`], {
+          queryParams: {
+            step: p.step,
+            reportId: p.reportId,
+            edit: p.edit,
+            transactionCategory: p.transactionCategory,
+            allTransactions: p.allTransactions
+          }
+        });
+      })
 
     this.loadTransactionsSubscription = this._transactionsMessageService
       .getLoadTransactionsMessage()
@@ -483,19 +483,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
               this.editTransaction(this.transactionsModel[transactionModelIndex]);
             }
             // loop through any children as well
-            else{
-              if(this.transactionsModel[transactionModelIndex].child && this.transactionsModel[transactionModelIndex].child.length > 0){
-                for(let childTransactionModelIndex = 0;
+            else {
+              if (this.transactionsModel[transactionModelIndex].child && this.transactionsModel[transactionModelIndex].child.length > 0) {
+                for (let childTransactionModelIndex = 0;
                   childTransactionModelIndex < this.transactionsModel[transactionModelIndex].child.length;
-                  childTransactionModelIndex++){
-                    if (this.transactionsModel[transactionModelIndex].child[childTransactionModelIndex].transactionId === this.clonedTransaction.transaction_id) {
-                      this.transactionsModel[transactionModelIndex].child[childTransactionModelIndex].cloned = true;
-                      this.editTransaction(this.transactionsModel[transactionModelIndex].child[childTransactionModelIndex]);
-                    }
+                  childTransactionModelIndex++) {
+                  if (this.transactionsModel[transactionModelIndex].child[childTransactionModelIndex].transactionId === this.clonedTransaction.transaction_id) {
+                    this.transactionsModel[transactionModelIndex].child[childTransactionModelIndex].cloned = true;
+                    this.editTransaction(this.transactionsModel[transactionModelIndex].child[childTransactionModelIndex]);
                   }
+                }
               }
             }
-          
+
           }
         }
 
@@ -535,8 +535,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
             //clear the form on the screen for that filter & remove the tag
             this.filters[filter] = null;
             let filterType = this._filterToTypeMap.filter(e => e.filterName === filter);
-            if(filterType && filterType.length > 0){
-              this._transactionsMessageService.sendRemoveTagMessage({ 'type' : filterType[0].filterType});
+            if (filterType && filterType.length > 0) {
+              this._transactionsMessageService.sendRemoveTagMessage({ 'type': filterType[0].filterType });
             }
 
           }
@@ -894,24 +894,26 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     let trxIds = '';
     // let iseditable = true;
     let unEditableTypesArray = [];
-    let parentTransactionsArray = [];
+    let linkedTransactionsArray = [];
     const selectedTransactions: Array<TransactionModel> = [];
     for (const trx of this.transactionsModel) {
       if (trx.selected) {
+
+        //this condition only applies to H1 and H2s
+        if (this.transactionCategory === 'other' && !trx.isTrashable) {
+          linkedTransactionsArray.push(trx.type);
+        }
+
         if (!trx.iseditable) {
           unEditableTypesArray.push(trx.type);
         }
-        if (this.transactionCategory === 'receipts' || this.transactionCategory === 'disbursements') {
-          if (trx.child) {
-            parentTransactionsArray.push(trx.type);
-          }
-        }
+        
         selectedTransactions.push(trx);
         trxIds += trx.transactionId + ', ';
       }
     }
 
-    if (unEditableTypesArray.length > 0 || parentTransactionsArray.length > 0) {
+    if (unEditableTypesArray.length > 0 || linkedTransactionsArray.length > 0) {
       let message = '';
       if (unEditableTypesArray.length > 0) {
         message += "You cannot delete the following selected transaction types because they are auto-generated. ";
@@ -922,13 +924,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         message += `\n\n`;
       }
 
-      if (parentTransactionsArray.length > 0) {
-        message += "You cannot delete the following selected transaction types because they are linked to child transactions. Please delete them first";
-        let parentTransactionsSet = new Set(parentTransactionsArray);
-        parentTransactionsSet.forEach(transactionType => {
+      if (linkedTransactionsArray.length > 0) {
+        message += "You cannot delete the following selected transaction types because they are linked to other transactions. Please delete them first.";
+        let linkedTransactionsSet = new Set(linkedTransactionsArray);
+        linkedTransactionsSet.forEach(transactionType => {
           message += `    \n \u2022 ${transactionType}`;
         });
-      }
+      } 
 
       this._dialogService.confirm(
         message,
@@ -1002,8 +1004,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to view
    */
-  public viewTransaction(): void {
-    alert('View transaction is not yet supported');
+  public viewTransaction(trx: TransactionModel): void {
+    //alert('View transaction is not yet supported');
+    this._transactionsMessageService.sendViewTransactionMessage(trx);
   }
 
   /**
@@ -1029,25 +1032,50 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .confirm('You are about to delete this transaction ' + trx.transactionId + '.', ConfirmModalComponent, 'Caution!')
       .then(res => {
         if (res === 'okay') {
-          this._transactionsService
-            .trashOrRestoreTransactions(this.formType, 'trash', this.reportId, [trx])
-            .subscribe((res: GetTransactionsResponse) => {
-              this.getTransactionsPage(this.config.currentPage);
-              this._dialogService.confirm(
-                'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transactionId,
-                ConfirmModalComponent,
-                'Success!',
-                false,
-                ModalHeaderClassEnum.successHeader
-              );
-            });
-
-            if(trx.scheduleType === 'Schedule H1') {
-              this._transactionsMessageService.sendRemoveH1TransactionsMessage(trx);
-            }
+          if (trx.child && trx.child.length > 0) {
+            this._dialogService
+              .confirm('WARNING: There are child transactions associated with this transaction. This action will delete all child transactions as well. Are you sure you want to continue? ', ConfirmModalComponent, 'Caution!')
+              .then(res => {
+                this.trashOrRestoreAfterConfirmation(res, trx);
+              })
+          }
+          else {
+            this.trashOrRestoreAfterConfirmation(res, trx);
+          }
         } else if (res === 'cancel') {
         }
       });
+  }
+
+  private trashOrRestoreAfterConfirmation(res: any, trx: TransactionModel) {
+    if (res === 'okay') {
+      this._transactionsService
+        .trashOrRestoreTransactions(this.formType, 'trash', this.reportId, [trx])
+        .subscribe((res: GetTransactionsResponse) => {
+          this.getTransactionsPage(this.config.currentPage);
+          this._dialogService.confirm('Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transactionId, ConfirmModalComponent, 'Success!', false, ModalHeaderClassEnum.successHeader);
+        });
+      if (trx.scheduleType === 'Schedule H1') {
+        this._transactionsMessageService.sendRemoveH1TransactionsMessage(trx);
+      }
+    }
+    else if (res === 'cancel') {
+    }
+  }
+
+  public showRow(trx: any, sched: string): boolean {
+    let childArray;
+    if (trx && trx.entityType === 'ORG' && (trx.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE')) {
+      if (trx.child && trx.child.length > 0) {
+        childArray = trx.child.filter(element => {
+          return element.scheduleType === sched
+        });
+        if (childArray.length > 0) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
@@ -1152,7 +1180,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  public checkIfEditMode(trx:any = null) {
+  public checkIfEditMode(trx: any = null) {
     this._dialogService
       .confirm(
         'This report has been filed with the FEC. If you want to change, you must Amend the report',

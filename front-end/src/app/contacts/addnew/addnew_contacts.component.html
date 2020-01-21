@@ -360,7 +360,7 @@
                   </ng-select>
                 </ng-container> -->
                 
-              <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type'">
+              <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type' && scheduleAction !== editScheduleAction">
                   <ng-select #entityTypeSelect
                     [items]="entityTypes"
                     (change)="handleTypeChange($event, col)"
@@ -368,7 +368,7 @@
                     [style.height]="col?.height"
                     [formControlName]="col?.name"
                     bindValue="code"
-                    bindLabel="name" 
+                    bindLabel="name"
                     [ngClass]="
                       frmContact.get(col?.name)?.invalid &&
                       (frmContact.touched || frmContact.dirty)
@@ -378,6 +378,25 @@
                   >
                   </ng-select>
                 </ng-container>
+              <ng-container *ngIf="col?.type === 'select' && col?.name === 'entity_type' && scheduleAction === editScheduleAction">
+                <ng-select #entityTypeSelect
+                  class="disabled" [searchable]="false" [clearable]="false"
+                  [items]="entityTypes"
+                  (change)="handleTypeChange($event, col)"
+                  [style.width]="col?.width"
+                  [style.height]="col?.height"
+                  [formControlName]="col?.name"
+                  bindValue="code"
+                  bindLabel="name"
+                  [ngClass]="
+                    frmContact.get(col?.name)?.invalid &&
+                    (frmContact.touched || frmContact.dirty)
+                      ? 'state-select-error'
+                      : ''
+                  "
+                >
+                </ng-select>
+              </ng-container>
 
              </div>
             </div>
@@ -408,7 +427,7 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button"  (click)= "(frmContact.touched || frmContact.dirty) ? cancelStepWithWarning() : cancelStep() ">
+              <button class="btn btn-previous btn-left" type="button"  (click)= "(frmContact.dirty) ? cancelStepWithWarning() : cancelStep() ">
                 Cancel
               </button>
               

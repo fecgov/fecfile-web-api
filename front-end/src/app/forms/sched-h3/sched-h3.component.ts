@@ -99,6 +99,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public aggregate_amount_edit = 0;
   public activity_event_name_edit: string;
 
+  public saveAndAddDisabled = false;
+  public getH1H2ExistSubscription: Subscription;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -171,7 +174,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
           }
         });
       }
-    })
+    });
   }
 
   public ngOnInit() {
@@ -228,7 +231,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.formType = '3X';
     this.showPart2 = false;
 
-    if(this.transactionType === 'ALLOC_H3_RATIO'){
+    if(this.transactionType === 'ALLOC_H3_RATIO' && this.scheduleAction !== ScheduleActions.edit){
       this.setH3();
     }
 
@@ -331,6 +334,23 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       }
     ]
 
+    if(this.isPac()) {
+      this.categories =  this.categories.filter(obj => obj.id !== 'EA');
+    }
+
+  }
+
+  isPac() {
+
+    let ispac = false;
+    if (localStorage.getItem('committee_details') !== null) {
+      let cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+      if (cmteDetails.cmte_type_category === 'PAC') {
+        ispac = true;
+      }
+    }
+
+    return ispac;
   }
   
   public setActivityOrEventIdentifier(category: string) {
@@ -462,6 +482,10 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.changeTotalAndAggrAmount();
 
+    if(e.target.value !== '') {
+      this._noH1H2Popup(e.target.value)
+    }
+
   }
 
   public selectActivityOrEventChange(e) {
@@ -515,13 +539,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   
   public setH3Sum() {
 
+    this.h3Sum = [];
+
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
     
     //this.h3Subscription = this._schedH3Service.getSummary(this.getReportId()).subscribe(res =>
     this.h3Subscription = this._schedH3Service.getSummary(reportId).subscribe(res =>
       {        
         if(res) {
-          this.h3Sum = [];
+          //this.h3Sum = [];
           this.h3Sum =  res;         
           this.h3TableConfig.totalItems = res.length;
         }
@@ -1114,6 +1140,57 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     }else {
       this.returnToSum();
     }
+  }
+
+  private _noH1H2Popup(category: string) {
+
+    let activityEventScheduleType = '';
+    if(category === 'DC' || category === 'DF') {
+      activityEventScheduleType = 'sched_h2'
+    }else {
+      activityEventScheduleType = 'sched_h1'
+    }
+
+    const report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+
+    this.getH1H2ExistSubscription = this._schedH3Service.getH1H2ExistStatus(report_id, category)
+    .subscribe(res =>
+      {
+        if(res) {
+          if(res.count === 0) {
+
+            this.saveAndAddDisabled = true;
+
+            const scheduleName = activityEventScheduleType === 'sched_h1' ? 'H1' : 'H2';
+            const scheduleType = activityEventScheduleType;
+
+            const message =
+              `Please add Schedule ${scheduleName} before proceeding with adding the ` +
+              `amount.  Schedule ${scheduleName} is required to correctly allocate the federal and non-federal portions of the transaction.`;
+            this._dlService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {
+              if (res === 'okay') {
+                const emitObj: any = {
+                  form: this.frmIndividualReceipt,
+                  direction: 'next',
+                  step: 'step_3',
+                  previousStep: 'step_2',
+                  scheduleType: scheduleType,
+                  action: ScheduleActions.add
+                };
+                if (scheduleType === 'sched_h2') {
+                  emitObj.transactionType = 'ALLOC_H2_RATIO';
+                  emitObj.transactionTypeText = 'Allocation Ratios';
+                }
+                this.status.emit(emitObj);
+              } else if (res === 'cancel') {
+              }
+            });
+          }else {
+            this.saveAndAddDisabled = false;
+          }
+        }
+      }
+    )
   }
 
 }
