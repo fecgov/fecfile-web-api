@@ -224,9 +224,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
                   if (this._prePopulateFromSchedDData) {
                     // set the max for payments to the remaining debt for validation.
-                    if (this._prePopulateFromSchedDData.incurred_amount) {
-                      this._outstandingDebtBalance = this._prePopulateFromSchedDData.incurred_amount;
-                    }
+                    // if (this._prePopulateFromSchedDData.incurred_amount) {
+                    const incurredAmount = this._prePopulateFromSchedDData.incurred_amount ?
+                      this._prePopulateFromSchedDData.incurred_amount : 0;
+                    const paymentAmount = this._prePopulateFromSchedDData.payment_amount ?
+                      this._prePopulateFromSchedDData.payment_amount : 0;
+                      this._outstandingDebtBalance = incurredAmount - paymentAmount;
+                    // }
                   }
                   this._checkForReturnToDebtSummary(message);
                 }
@@ -296,7 +300,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.totalAmountReadOnly = true;
     this._completedCloning = false;
     this.returnToDebtSummary = false;
-    this._outstandingDebtBalance = 0;
+    this._outstandingDebtBalance = null;
 
     if (localStorage.getItem('committee_details') !== null) {
       this._committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
@@ -600,7 +604,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
           this.transactionType === 'COEXP_PARTY_DEBT' ||
           this.transactionType === 'IE_B4_DISSE_MEMO') {
-        if (this._outstandingDebtBalance) {
+        if (this._outstandingDebtBalance !== null) {
           if (this._outstandingDebtBalance >= 0) {
             formValidators.push(validateContributionAmount(this._outstandingDebtBalance));
           }
@@ -3500,7 +3504,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               } else {
                 if (trx.hasOwnProperty('back_ref_transaction_id')) {
                   if (trx.back_ref_transaction_id) {
-                    this._getParentFromChild(reportId, trx.back_ref_transaction_id, apiCall);
+                    this._getParentFromChild(reportId, trx, apiCall);
                   }
                 }
               }
@@ -3683,27 +3687,29 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * from the parent sub-transaction table, the parent information needs to be obtained from the
    * API.  It is need for returning to the parent from the child.
    * @param reportId
-   * @param backRefTransactionId
+   * @param childTrx
    * @param apiCall
    */
-  private _getParentFromChild(reportId: string, backRefTransactionId: string, apiCall: string) {
+  private _getParentFromChild(reportId: string, childTrx: any, apiCall: string) {
     // There is a bug the apiCall value is incorrect when where a parent-child have different schedules
     // as with Sched_D.  Temporary path is to hard code the apiCall based on the trnasactionID 1st to chars.
     // TODO add back_ref_api_call to child transaction in the getSched API and pass it here.
+
+    const backRefTransactionId = childTrx.back_ref_transaction_id;
     if (backRefTransactionId.startsWith('SD')) {
       apiCall = '/sd/schedD';
     }
 
     this._receiptService.getDataSchedule(reportId, backRefTransactionId, apiCall).subscribe(res => {
       if (Array.isArray(res)) {
-        for (const trx of res) {
-          if (trx.hasOwnProperty('transaction_id')) {
-            if (trx.transaction_id === backRefTransactionId) {
-              const modelArray = this._transactionsService.mapFromServerSchedFields([trx]);
+        for (const parentTrx of res) {
+          if (parentTrx.hasOwnProperty('transaction_id')) {
+            if (parentTrx.transaction_id === backRefTransactionId) {
+              const modelArray = this._transactionsService.mapFromServerSchedFields([parentTrx]);
               if (modelArray) {
                 if (modelArray.length > 0) {
                   this._parentTransactionModel = modelArray[0];
-                  this._setDebtPaymentValidations(trx);
+                  this._setDebtPaymentValidations(parentTrx, childTrx);
                 }
               }
             }
@@ -3716,9 +3722,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   /**
    * On an edit, now that the incurred amount from the parent is obtained, set the validation
    * for exceeding max debt payment when editing a payment.
-   * @param trx debt/parent transaction to the payment
+   * @param parentTrx debt/parent transaction to the payment
+   * @param childTrx payment/child transaction on the Debt
    */
-  private _setDebtPaymentValidations(trx: any) {
+  private _setDebtPaymentValidations(parentTrx: any, childTrx: any) {
 
     // Payment transactions have different payment field names.
     // OPEXP has expenditure_amount
@@ -3737,16 +3744,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
 
     if (this.frmIndividualReceipt.get(amountField)) {
-      if (trx.hasOwnProperty('incurred_amount')) {
-        if (trx.incurred_amount) {
-          this._outstandingDebtBalance = trx.incurred_amount;
-          const expAmtformField: any = this.findFormField(amountField);
-          const validations: Array<any> = this._mapValidators(expAmtformField.validation,
-            expAmtformField.name, expAmtformField.value);
+      if (parentTrx.hasOwnProperty('incurred_amount') &&
+          parentTrx.hasOwnProperty('payment_amount')) {
+        const incurredAmount = parentTrx.incurred_amount ? parentTrx.incurred_amount : 0;
+        const paymentAmount = parentTrx.payment_amount ? parentTrx.payment_amount : 0;
+        // Because this is edit on a payment, back out the current payment amount
+        // from the sum of payment before calculating the balance.
+        this._outstandingDebtBalance = incurredAmount - (paymentAmount - childTrx[amountField]);
+        const expAmtformField: any = this.findFormField(amountField);
+        const validations: Array<any> = this._mapValidators(expAmtformField.validation,
+          expAmtformField.name, expAmtformField.value);
 
-          this.frmIndividualReceipt.controls[amountField].setValidators(validations);
-          this.frmIndividualReceipt.controls[amountField].updateValueAndValidity();
-        }
+        this.frmIndividualReceipt.controls[amountField].setValidators(validations);
+        this.frmIndividualReceipt.controls[amountField].updateValueAndValidity();
       }
     }
   }
@@ -3863,7 +3873,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;
-    this._outstandingDebtBalance = 0;
+    // this._outstandingDebtBalance = null;
     this.memoCode = false;
     this.memoCodeChild = false;
     this._readOnlyMemoCode = false;
