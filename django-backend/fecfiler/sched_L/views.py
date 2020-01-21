@@ -1242,7 +1242,7 @@ def get_sl_summary_table(request):
         coh_cop_ytd = (
             coh_bop_ytd
             + response.get("total_receipt_amount_ytd")
-            + response.get("total_disbursement_amount_ytd")
+            - response.get("total_disbursement_amount_ytd")
         )
         cash_summary = {
             "coh_bop_report": coh_bop_report,
@@ -1251,6 +1251,16 @@ def get_sl_summary_table(request):
             "coh_cop_ytd": coh_cop_ytd,
         }
         response.update(cash_summary)
+        subtotal_report = float(response.get('coh_bop_report')) + float(response.get('total_receipt_amount'))
+        subtotal_ytd = float(response.get('coh_bop_ytd')) + float(response.get('total_receipt_amount_ytd'))
+        #adding subtotal numbers
+        response.update(
+            {
+                'subtotal_report' : subtotal_report,
+                'subtotal_ytd' : subtotal_ytd,
+            }
+        )
+
 
         """
         calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
