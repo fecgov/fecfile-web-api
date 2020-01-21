@@ -29,7 +29,7 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
 )
-from fecfiler.core.transaction_util import get_sched_a_transactions
+from fecfiler.core.transaction_util import get_sched_a_transactions, get_transaction_type_descriptions
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
 
@@ -1353,6 +1353,9 @@ def get_sla_summary_table(request):
         tps_str = ",".join(transaction_tps)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
         logger.debug("transaction_types:{}".format(tps_str))
+
+        
+        tran_desc_dic = get_transaction_type_descriptions()
         with connection.cursor() as cursor:
             cursor.execute(_sql_p1 + tps_str + _sql_p2, [cmte_id, report_id])
             result = cursor.fetchone()[0]
@@ -1365,7 +1368,15 @@ def get_sla_summary_table(request):
                             cmte_id, obj.get("report_id"), obj.get(
                                 "transaction_id")
                         )
+                        print('..')
+                        print(memo_objs)
                         if memo_objs:
+                            for m_obj in memo_objs:
+                                levin_account_id, levin_account_name  = load_levin_account_data(m_obj.get('transaction_id'))
+                                m_obj['levin_account_id'] = levin_account_id
+                                m_obj['levin_account_name'] = levin_account_name
+                                m_obj['tran_desc'] = tran_desc_dic.get('LEVIN_PARTN_MEMO')
+
                             obj["child"] = memo_objs
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
@@ -1374,6 +1385,25 @@ def get_sla_summary_table(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+
+def load_levin_account_data(transaction_id):
+    """
+    helper function for loading levin_acct info
+    """
+    _sql = """
+    SELECT sa.levin_account_id, la.levin_account_name
+    FROM public.sched_a sa, public.levin_account la
+    WHERE sa.levin_account_id = la.levin_account_id
+    and sa.transaction_id = %s
+    and sa.delete_ind is distinct from 'Y'
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(_sql, [transaction_id])
+        if cursor.rowcount:
+            _levin = cursor.fetchone()
+            return _levin[0], _levin[1]
+        else:
+            raise Exception('Error loading levin account.')
 
 @api_view(["GET"])
 def get_slb_summary_table(request):
