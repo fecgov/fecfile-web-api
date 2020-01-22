@@ -904,7 +904,7 @@ def get_fed_nonfed_share(request):
                 from public.sched_h4 
                 where cmte_id = %s 
                 and activity_event_type = %s
-                and create_date between %s and %s
+                and expenditure_date between %s and %s
                 and delete_ind is distinct from 'Y'
                 order by create_date desc, last_update_date desc
             """

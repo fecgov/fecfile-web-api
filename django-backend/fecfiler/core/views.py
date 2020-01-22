@@ -5143,10 +5143,10 @@ def clone_a_transaction(request):
         # set transaction date to today's date and transaction amount to 0
         from datetime import date
         _today = date.today().strftime('%m/%d/%Y')
-        if transaction_id.startswith('SA'):
+        if transaction_id.startswith('SA') or transaction_id.startswith('LA'):
             select_str = select_str.replace('contribution_date', "'"+_today+"'")
             select_str = select_str.replace('contribution_amount', "'"+'0.00'+"'")
-        if transaction_id.startswith('SB'):
+        if transaction_id.startswith('SB') or transaction_id.startswith('LB'):
             select_str = select_str.replace('expenditure_date', "'"+_today+"'")
             select_str = select_str.replace('expenditure_amount', "'"+'0.00'+"'")
         if transaction_id.startswith('SH') and transaction_table == 'sched_h4':
@@ -5199,6 +5199,11 @@ def clone_a_transaction(request):
         logger.debug('load_sql:{}'.format(load_sql))
         cursor.execute(load_sql)
         rep_json = cursor.fetchone()[0]
+        for obj in rep_json:
+            if transaction_id.startswith('LA'):
+                obj['api_call'] = '/sa/schedA'
+            if transaction_id.startswith('LB'):
+                obj['api_call'] = '/sb/schedB'  
 
         # return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
         return Response(rep_json, status=status.HTTP_200_OK)
