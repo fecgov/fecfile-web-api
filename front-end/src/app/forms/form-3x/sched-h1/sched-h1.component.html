@@ -114,6 +114,7 @@
                             type="number"
                             name="federal_share"
                             (keyup)="handleFedShareFieldKeyup($event, f)"
+                            (blur)="handleOnFedBlurEvent($event, f)"
                           >
 
                           <div class="input-group-prepend">
@@ -135,6 +136,7 @@
                               type="number"
                               name="nonfederal_share"
                               (keyup)="handleNonFedShareFieldKeyup($event, f)"
+                              (blur)="handleOnNonFedBlurEvent($event, f)"
                               ngClass="f.get('nonfederal_share')?.invalid &&
                               (f.touched || f.dirty)
                                 ? 'input-field-error' : ''"
@@ -160,7 +162,7 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                      <input ngModel type="checkbox" name="applied_activity1" id="ad" value="administrative" [disabled]="h1PacADDisabled">
+                      <input ngModel type="checkbox" name="applied_activity1" id="ad" value="administrative" [disabled]="h1PacADDisabled" (click)="clickPacOptions($event)">
                       <label for="ad">
                         Administrative
                       </label>
@@ -174,7 +176,7 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="checkbox" name="applied_activity2" id="gvd" value="generic_voter_drive" [disabled]="h1PacGVDisabled">
+                    <input ngModel type="checkbox" name="applied_activity2" id="gvd" value="generic_voter_drive" [disabled]="h1PacGVDisabled" (click)="clickPacOptions($event)">
                     <label for="gvd">
                       Generic Voter Drive
                     </label>
@@ -188,7 +190,7 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="checkbox" name="applied_activity3" id="pc" value="public_communication" [disabled]="h1PacPCDisabled">
+                    <input ngModel type="checkbox" name="applied_activity3" id="pc" value="public_communication" [disabled]="h1PacPCDisabled" (click)="clickPacOptions($event)">
                     <label for="pc">
                       Public Communications Referenceing Party Only
                     </label>
@@ -209,7 +211,9 @@
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <div class="forms__btn-container">
-                <button type="submit" class="btn btn-primary btn-right" [disabled]="!f.valid || (h1PacADDisabled && h1PacGVDisabled && h1PacPCDisabled)" (click)="saveH1(f)">
+                <button type="submit" class="btn btn-primary btn-right" 
+                  [disabled]="!f.valid || (h1PacADDisabled && h1PacGVDisabled && h1PacPCDisabled) || pacSaveDisable"
+                  (click)="saveH1(f)">
                     Save
                   </button>
               </div>
