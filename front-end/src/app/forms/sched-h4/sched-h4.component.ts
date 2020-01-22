@@ -239,7 +239,9 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
           this.schedH4sModel = this.mapFromServerFields(res);
           this.setArrow(this.schedH4sModel);
 
-          this.schedH4sModel = this.schedH4sModel .filter(obj => obj.memo_code !== 'X');
+          //this.schedH4sModel = this.schedH4sModel .filter(obj => obj.memo_code !== 'X');
+          this.schedH4sModel = this.schedH4sModel .filter(obj => obj.back_ref_transaction_id === null);
+
           this.tableConfig.totalItems = this.schedH4sModel.length;
         }
       });        
