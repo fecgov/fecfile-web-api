@@ -184,7 +184,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
     protected _decimalPipe: DecimalPipe,
-    private _reportTypeService: ReportTypeService,
+    protected _reportTypeService: ReportTypeService,
     protected _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
     private _f3xMessageService: F3xMessageService,
