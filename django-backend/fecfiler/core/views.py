@@ -5098,7 +5098,9 @@ def clone_a_transaction(request):
 
     transaction_tables = {
         'SA': 'sched_a',
+        'LA': 'sched_a',
         'SB': 'sched_b',
+        'LB': 'sched_b',
         'SC': 'sched_c',
         'SD': 'sched_d',
     }
