@@ -1680,6 +1680,45 @@ def get_backref_id_trash(transaction_id, cmte_id):
     except Exception:
         raise
 
+def delete_H1_carry_over(transaction_id, cmte_id):
+    try:
+        _sql = """SELECT atv.transaction_table, (SELECT cm.cmte_type_category FROM public.committee_master cm WHERE cm.cmte_id = %s) 
+                FROM public.all_transactions_view atv 
+                WHERE atv.transaction_id = %s and atv.cmte_id = %s 
+               """
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id, transaction_id, cmte_id])
+            forms_obj = cursor.fetchone()
+            if forms_obj[0] == 'sched_h1':
+                if forms_obj[1] == 'PTY':
+                    _sql1 = """UPDATE public.sched_h1 
+                        SET delete_ind = 'Y' 
+                        FROM public.sched_h1 ch1
+                        WHERE sched_h1.election_year = ch1.election_year 
+                        AND ch1.cmte_id = sched_h1.cmte_id
+                        AND ch1.transaction_id = %s 
+                        AND sched_h1.cmte_id = %s
+                        AND sched_h1.delete_ind is distinct from 'Y';
+                        """
+                if forms_obj[1] == 'PAC':
+                    _sql1 = """UPDATE public.sched_h1 
+                        SET delete_ind = 'Y' 
+                        FROM public.sched_h1 ch1
+                        WHERE sched_h1.election_year = ch1.election_year 
+                        AND ch1.cmte_id = sched_h1.cmte_id
+                        AND ch1.administrative = sched_h1.administrative
+                        AND ch1.generic_voter_drive = sched_h1.generic_voter_drive
+                        AND ch1.public_communications = sched_h1.public_communications
+                        AND ch1.transaction_id = %s 
+                        AND sched_h1.cmte_id = %s
+                        AND sched_h1.delete_ind is distinct from 'Y';
+                        """
+                cursor.execute(_sql1, [transaction_id, cmte_id])
+                print(cursor.query)
+
+    except Exception:
+        raise
+        
 @api_view(['PUT'])
 def trash_restore_transactions(request):
     """api for trash and resore transactions. 
@@ -1734,10 +1773,13 @@ def trash_restore_transactions(request):
                     if _delete == 'Y' or (_delete != 'Y' and datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
                         'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']):
                         _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
-                # Handling aggregate updation for sched_B transactions
-                if transaction_id[:2] == 'SB':
-                    if _delete == 'Y':
-                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                # Handling delete of sched_B transactions
+                if transaction_id[:2] == 'SB' and _delete == 'Y':
+                    _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                # Handling delete of schedule H1 transactions
+                if transaction_id[:2] == 'SH' and _delete == 'Y':
+                    # delete_H1_carry_over(transaction_id, cmte_id)
+
             elif transaction_id[:2] in ('SC', 'SD'):
                 # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D
                 if _delete == 'Y' or (transaction_id[:2] == 'SC' and _delete != 'Y'):
