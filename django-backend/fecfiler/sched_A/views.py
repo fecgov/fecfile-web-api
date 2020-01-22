@@ -1778,6 +1778,7 @@ def trash_restore_transactions(request):
                     _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
                 # Handling delete of schedule H1 transactions
                 if transaction_id[:2] == 'SH' and _delete == 'Y':
+                    print('test')
                     # delete_H1_carry_over(transaction_id, cmte_id)
 
             elif transaction_id[:2] in ('SC', 'SD'):
