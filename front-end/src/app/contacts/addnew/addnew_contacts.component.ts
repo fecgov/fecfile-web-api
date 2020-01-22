@@ -777,6 +777,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.frmContact.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
     this.frmContact.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    // TODO: Workaround backend column-name typo. Should be removed later FNE-1974
+    this.frmContact.patchValue({ prefix: contact.preffix }, { onlySelf: true });
     this.frmContact.patchValue({ suffix: contact.suffix }, { onlySelf: true });
     this.frmContact.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
     this.frmContact.patchValue({ street_2: contact.street_2 }, { onlySelf: true });

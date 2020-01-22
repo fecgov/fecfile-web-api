@@ -2567,7 +2567,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
     let namePrefix = '';
-
     if (isChildForm) {
       this._selectedEntityChild = this._utilService.deepClone(entity);
       this._setSetEntityIdTo(this._selectedEntityChild, col);
@@ -2584,6 +2583,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('first_name');
     fieldNames.push('middle_name');
     fieldNames.push('prefix');
+    // TODO: Should be removed later FNE-1974
+    fieldNames.push('preffix');
     fieldNames.push('suffix');
     fieldNames.push('street_1');
     fieldNames.push('street_2');
@@ -2608,7 +2609,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (fieldNames) {
       for (const fieldName of fieldNames) {
         const patch = {};
-        patch[namePrefix + fieldName] = entity[fieldName];
+        // TODO: Should be removed later FNE-1974
+        if ( fieldName === 'preffix') {
+          console.warn('Fix this issue backend Column-name preffix')
+          patch[namePrefix + 'prefix'] = entity[fieldName];
+        } else {
+          patch[namePrefix + fieldName] = entity[fieldName];
+        }
         this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
       }
     }
