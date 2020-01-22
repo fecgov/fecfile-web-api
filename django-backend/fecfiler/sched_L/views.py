@@ -1995,6 +1995,7 @@ def get_sla_summary_table(request):
                                 m_obj['levin_account_id'] = levin_account_id
                                 m_obj['levin_account_name'] = levin_account_name
                                 m_obj['tran_desc'] = tran_desc_dic.get('LEVIN_PARTN_MEMO')
+                                m_obj.update(API_CALL_LA)
 
                             obj["child"] = memo_objs
         return Response(result, status=status.HTTP_200_OK)
