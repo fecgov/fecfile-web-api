@@ -1170,7 +1170,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
                 result = cursor.fetchone()
                 coh_cop = result[0]
         logger.debug('coh result:{}'.format(coh_cop))
-        return coh_cop
+        return float(coh_cop)
     except Exception as e:
         raise Exception(
             "The prev_cash_on_hand_cop function is throwing an error: " +
@@ -1837,14 +1837,16 @@ def update_sl_summary(data):
         # print(response)
         coh_cop_report = (
             coh_bop_report
-            + sl_data.get("total_receipts")
-            - sl_data.get("total_disb")
+            + float(sl_data.get("total_receipts"))
+            - float(sl_data.get("total_disb"))
         )
+        logger.debug('coh_cop_report:{}'.format(coh_cop_report))
         coh_cop_ytd = (
             coh_bop_ytd
-            + sl_data.get("total_receipts_ytd")
-            + sl_data.get("total_disb_ytd")
+            + float(sl_data.get("total_receipts_ytd"))
+            - float(sl_data.get("total_disb_ytd"))
         )
+        logger.debug('coh_cop_ytd:{}'.format(coh_cop_ytd))
         cash_summary = {
             "coh_bop": coh_bop_report,
             "coh_coy": coh_bop_ytd,
