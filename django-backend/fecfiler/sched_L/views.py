@@ -29,9 +29,15 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
 )
-from fecfiler.core.transaction_util import get_sched_a_transactions, do_transaction
-# from fecfiler.core.views import get_next_transaction_id
+
+from fecfiler.core.transaction_util import (
+    get_sched_a_transactions, 
+    get_transaction_type_descriptions, 
+    do_transaction,
+)
+# from fecfiler.sched_A.views import get_next_transaction_id
 # from fecfiler.sched_D.views import do_transaction
+
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -1164,7 +1170,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
                 result = cursor.fetchone()
                 coh_cop = result[0]
         logger.debug('coh result:{}'.format(coh_cop))
-        return coh_cop
+        return float(coh_cop)
     except Exception as e:
         raise Exception(
             "The prev_cash_on_hand_cop function is throwing an error: " +
@@ -1636,7 +1642,7 @@ def get_sl_summary_table(request):
         coh_cop_ytd = (
             coh_bop_ytd
             + response.get("total_receipt_amount_ytd")
-            + response.get("total_disbursement_amount_ytd")
+            - response.get("total_disbursement_amount_ytd")
         )
         cash_summary = {
             "coh_bop_report": coh_bop_report,
@@ -1645,6 +1651,16 @@ def get_sl_summary_table(request):
             "coh_cop_ytd": coh_cop_ytd,
         }
         response.update(cash_summary)
+        subtotal_report = float(response.get('coh_bop_report')) + float(response.get('total_receipt_amount'))
+        subtotal_ytd = float(response.get('coh_bop_ytd')) + float(response.get('total_receipt_amount_ytd'))
+        #adding subtotal numbers
+        response.update(
+            {
+                'subtotal_report' : subtotal_report,
+                'subtotal_ytd' : subtotal_ytd,
+            }
+        )
+
 
         """
         calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
@@ -1821,14 +1837,16 @@ def update_sl_summary(data):
         # print(response)
         coh_cop_report = (
             coh_bop_report
-            + sl_data.get("total_receipts")
-            - sl_data.get("total_disb")
+            + float(sl_data.get("total_receipts"))
+            - float(sl_data.get("total_disb"))
         )
+        logger.debug('coh_cop_report:{}'.format(coh_cop_report))
         coh_cop_ytd = (
             coh_bop_ytd
-            + sl_data.get("total_receipts_ytd")
-            + sl_data.get("total_disb_ytd")
+            + float(sl_data.get("total_receipts_ytd"))
+            - float(sl_data.get("total_disb_ytd"))
         )
+        logger.debug('coh_cop_ytd:{}'.format(coh_cop_ytd))
         cash_summary = {
             "coh_bop": coh_bop_report,
             "coh_coy": coh_bop_ytd,
@@ -1953,6 +1971,9 @@ def get_sla_summary_table(request):
         tps_str = ",".join(transaction_tps)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
         logger.debug("transaction_types:{}".format(tps_str))
+
+        
+        tran_desc_dic = get_transaction_type_descriptions()
         with connection.cursor() as cursor:
             cursor.execute(_sql_p1 + tps_str + _sql_p2, [cmte_id, report_id])
             result = cursor.fetchone()[0]
@@ -1960,12 +1981,21 @@ def get_sla_summary_table(request):
             # adding memo child transactions
             if result:
                 for obj in result:
+                    obj.update(API_CALL_LA)
                     if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
                         memo_objs = get_la_memos(
                             cmte_id, obj.get("report_id"), obj.get(
                                 "transaction_id")
                         )
+                        print('..')
+                        print(memo_objs)
                         if memo_objs:
+                            for m_obj in memo_objs:
+                                levin_account_id, levin_account_name  = load_levin_account_data(m_obj.get('transaction_id'))
+                                m_obj['levin_account_id'] = levin_account_id
+                                m_obj['levin_account_name'] = levin_account_name
+                                m_obj['tran_desc'] = tran_desc_dic.get('LEVIN_PARTN_MEMO')
+
                             obj["child"] = memo_objs
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
@@ -1974,6 +2004,25 @@ def get_sla_summary_table(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+
+def load_levin_account_data(transaction_id):
+    """
+    helper function for loading levin_acct info
+    """
+    _sql = """
+    SELECT sa.levin_account_id, la.levin_account_name
+    FROM public.sched_a sa, public.levin_account la
+    WHERE sa.levin_account_id = la.levin_account_id
+    and sa.transaction_id = %s
+    and sa.delete_ind is distinct from 'Y'
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(_sql, [transaction_id])
+        if cursor.rowcount:
+            _levin = cursor.fetchone()
+            return _levin[0], _levin[1]
+        else:
+            raise Exception('Error loading levin account.')
 
 @api_view(["GET"])
 def get_slb_summary_table(request):
@@ -2025,14 +2074,15 @@ def get_slb_summary_table(request):
             result = cursor.fetchone()[0]
             # print(result)
             # adding memo child transactions
-            # if result:
-            #     for obj in result:
-            #         if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
-            #             memo_objs = get_la_memos(
-            #                 cmte_id, obj.get("report_id"), obj.get("transaction_id")
-            #             )
-            #             if memo_objs:
-            #                 obj["child"] = memo_objs
+            if result:
+                for obj in result:
+                    obj.update(API_CALL_LB)
+                    # if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
+                    #     memo_objs = get_la_memos(
+                    #         cmte_id, obj.get("report_id"), obj.get("transaction_id")
+                    #     )
+                    #     if memo_objs:
+                    #         obj["child"] = memo_objs
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
