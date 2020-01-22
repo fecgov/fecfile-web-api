@@ -956,7 +956,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const reportId = this._receiptService.getReportIdFromStorage(this.formType);
 
     this._receiptService
-      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId)
+      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId, this._transactionToEdit.transactionId)
       .subscribe(
         res => {
           if (res) {
@@ -3582,7 +3582,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this.isFieldName(prop, 'activity_event_amount_ytd')
                   ) {
                     const amount = trx[prop] ? trx[prop] : 0;
-                    this._formatAmount({ target: { value: amount.toString() } }, prop, false);
+                    if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['total_amount'] && this.scheduleAction === 'edit' && this._cloned) {
+                      this.frmIndividualReceipt.patchValue({ total_amount: null }, { onlySelf: true });
+                    }else {
+                      this._formatAmount({ target: { value: amount.toString() } }, prop, false);
+                    }
                   }
                 }
               }
