@@ -998,8 +998,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     const reportId = this._receiptService.getReportIdFromStorage(this.formType);
 
+    let transactionId = '0';
+    if(this.scheduleAction === ScheduleActions.edit) {
+      transactionId = this._transactionToEdit.transactionId;
+    }
+
     this._receiptService
-      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId, this._transactionToEdit.transactionId)
+      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId, transactionId)
       .subscribe(
         res => {
           if (res) {
@@ -2377,6 +2382,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                           refresh: 1
                         }
                       });
+                      /*
                       this._router.navigateByUrl('/dashboard', { skipLocationChange: true }).then(() => {
                         this._router.navigate([`/forms/form/${this.formType}`], {
                           queryParams: {
@@ -2386,7 +2392,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                             transactionCategory: this._transactionCategory
                           }
                         });
-                      });
+                      });*/
                     }
                   });
               });
