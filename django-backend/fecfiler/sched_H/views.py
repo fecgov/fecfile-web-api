@@ -745,7 +745,23 @@ def validate_pac_h1(request):
     except:
         raise
     
-
+def get_old_amount(transaction_id):
+    """
+    helper function for loading total_amount
+    """
+    _sql = """
+    SELECT transaction_amount
+    FROM public.all_other_transactions_view
+    WHERE transaction_id = %s
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [transaction_id])
+            if cursor.rowcount:
+                return cursor.fetchone()[0]
+            return 0
+    except:
+        raise
 
 
 @api_view(['GET'])
@@ -772,6 +788,17 @@ def get_fed_nonfed_share(request):
     try:
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
+        transaction_id = request.query_params.get('transaction_id')
+
+        if 'old_amount' in request.query_params:
+            old_amount = float(request.query_params.get('old_amount'))
+        else:
+            old_amount = 0
+
+        if transaction_id:
+            old_amount = float(get_old_amount(transaction_id))
+        
+
         cmte_type_category = request.query_params.get('cmte_type_category')
         total_amount = request.query_params.get('total_amount')
         calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
@@ -890,10 +917,11 @@ def get_fed_nonfed_share(request):
         # fed_percent = float(cursor.fetchone()[0])
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
-        if transaction_type_identifier and not transaction_type_identifier.endswith('_MEMO'):
-            new_aggregate_amount = aggregate_amount + float(total_amount)
-        else:
+        if transaction_type_identifier and transaction_type_identifier.endswith('_MEMO'):
             new_aggregate_amount = aggregate_amount
+        else:
+            new_aggregate_amount = aggregate_amount + float(total_amount) - old_amount
+            # new_aggregate_amount = aggregate_amount
         return JsonResponse(
             {
                 'fed_share': '{0:.2f}'.format(fed_share), 
