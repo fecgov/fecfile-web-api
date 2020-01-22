@@ -126,6 +126,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
 
   /**
+   * For toggling between 2 screens of Sched F Debt Payment.
+   */
+  public showPart2: boolean;
+
+  /**
    * Indicates the Form Group is loaded.  Used by "hybrid" parent classes of this base class
    * having both "static" and "dynamic" form fields as found in Sched F Debt Payment.
    */
@@ -2040,6 +2045,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   }
                 }
               }
+              if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+                this.showPart2 = false;
+              }
             }
 
             let resetParentId = true;
@@ -2533,6 +2541,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('cand_office_district');
     fieldNames.push('cand_election_year');
     fieldNames.push('beneficiary_cand_id');
+    fieldNames.push('payee_cmte_id');
     this._patchFormFields(fieldNames, entity, namePrefix);
     // setting Beneficiary Candidate Entity Id to hidden variable
     const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
@@ -2655,6 +2664,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('cand_office');
     fieldNames.push('cand_office_state');
     fieldNames.push('cand_office_district');
+    fieldNames.push('payee_cmte_id');
     this._patchFormFields(fieldNames, entity, namePrefix);
     // setting Beneficiary Candidate Entity Id to hidden variable
     const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
