@@ -18,7 +18,6 @@ from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_a_transactions,
     get_sched_b_transactions,
-    get_sched_e_child_transactions,
     get_sched_f_child_transactions,
     get_sched_h4_child_transactions,
     get_sched_h6_child_transactions,
@@ -720,9 +719,6 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
     sched_b_list = get_sched_b_transactions(
         report_id, cmte_id, back_ref_transaction_id=transaction_id
     )
-    sched_e_list = get_sched_e_child_transactions(
-        report_id, cmte_id, transaction_id
-    )
     # TODO: will add all other transactions later on
     sched_f_list = get_sched_f_child_transactions(
         report_id, cmte_id, transaction_id)
@@ -730,7 +726,7 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
         report_id, cmte_id, transaction_id)
     sched_h6_list = get_sched_h6_child_transactions(
         report_id, cmte_id, transaction_id)
-    return sched_a_list + sched_b_list + sched_e_list + sched_f_list + sched_h4_list + sched_h6_list
+    return sched_a_list + sched_b_list + sched_f_list + sched_h4_list + sched_h6_list
 
     #     childA_forms_obj = get_list_child_schedA(
     #     report_id, cmte_id, transaction_id)

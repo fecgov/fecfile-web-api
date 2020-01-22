@@ -231,7 +231,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.formType = '3X';
     this.showPart2 = false;
 
-    if(this.transactionType === 'ALLOC_H3_RATIO'){
+    if(this.transactionType === 'ALLOC_H3_RATIO' && this.scheduleAction !== ScheduleActions.edit){
       this.setH3();
     }
 

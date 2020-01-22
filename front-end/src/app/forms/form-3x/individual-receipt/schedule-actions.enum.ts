@@ -3,5 +3,6 @@ export enum ScheduleActions {
   edit = 'edit',
   clone = 'clone',
   addSubTransaction = 'addSubTransaction',
-  loanSummary = 'loanSummary'
+  loanSummary = 'loanSummary',
+  view = 'view'
 }

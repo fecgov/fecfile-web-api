@@ -396,6 +396,20 @@ export class F3xComponent implements OnInit {
                 transactionTypeText = transactionModel.type;
                 transactionType = transactionModel.transactionTypeIdentifier;
               }
+            } else if (this.scheduleAction === ScheduleActions.view) {
+              let apiCall = null;
+              if (e.transactionDetail) {
+                if (e.transactionDetail.transactionModel) {
+                  if (e.transactionDetail.transactionModel.hasOwnProperty('apiCall')) {
+                    apiCall = e.transactionDetail.transactionModel.apiCall;
+                  }
+                }
+              }
+
+              this._populateFormForView(e, AbstractScheduleParentEnum.schedMainComponent);
+              const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+              transactionTypeText = transactionModel.type;
+              transactionType = transactionModel.transactionTypeIdentifier;
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
@@ -915,5 +929,16 @@ export class F3xComponent implements OnInit {
         });
       }
     }
+  }
+
+  private _populateFormForView(e: any, schedule: AbstractScheduleParentEnum) {
+    e.transactionDetail.action = this.scheduleAction;
+    const emitObject: any = {
+      key: 'fullForm',
+      abstractScheduleComponent: schedule,
+      transactionModel: e.transactionDetail
+    };
+
+    this._f3xMessageService.sendPopulateFormMessage(emitObject);
   }
 }
