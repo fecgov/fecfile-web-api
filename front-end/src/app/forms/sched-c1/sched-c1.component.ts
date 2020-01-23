@@ -83,7 +83,7 @@ export class SchedC1Component implements OnInit, OnChanges {
       this.c1Form.patchValue({ state: res.state });
       this.c1Form.patchValue({ zip: res.zip_code });
       this.c1Form.patchValue({ loan_amount: this._decimalPipe.transform(res.loan_amount_original, '.2-2') });
-      this.c1Form.patchValue({ loan_intrest_rate: res.loan_intrest_rate });
+      this.c1Form.patchValue({ loan_intrest_rate: this._decimalPipe.transform(res.loan_intrest_rate, '.2-2')});
       this.c1Form.patchValue({ loan_incurred_date: res.loan_incurred_date });
       this.c1Form.patchValue({ loan_due_date: res.loan_due_date });
 
@@ -295,6 +295,10 @@ export class SchedC1Component implements OnInit, OnChanges {
       default:
       // this.sectionType = Sections.initialSection;
     }
+  }
+
+  public cancel(){
+    this._goToLoan();
   }
 
   private _checkSectionValid(): boolean {
@@ -591,6 +595,17 @@ export class SchedC1Component implements OnInit, OnChanges {
       scheduleType: 'sched_c_ls',
     };
     this.status.emit(loanRepaymentEmitObj);
+  }
+
+  private _goToLoan() {
+    const loanEmitObj: any = {
+      form: {},
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'step_2',
+      scheduleType: 'sched_c',
+    };
+    this.status.emit(loanEmitObj);
   }
 
   private _prepareFormDataForApi(formData: any) {

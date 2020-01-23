@@ -184,8 +184,8 @@
               </div>
             </label>
             <div class="input-group">
-              <input class="form-control" id="loan_intrest_rate" type="number" max="100"
-                [formControlName]="'loan_intrest_rate'" [attr.readonly]="true" [attr.name]="'loan_intrest_rate'"
+              <input class="form-control" id="loan_intrest_rate" type="text" 
+                [formControlName]="'loan_intrest_rate'" [attr.name]="'loan_intrest_rate'" [attr.readonly]="true"
                 [style.width]="'33%'" [style.height]="'30px'" [ngClass]="
                   c1Form.get('loan_intrest_rate')?.invalid &&
                   (c1Form.touched || c1Form.dirty)
@@ -1126,9 +1126,13 @@
 
     <footer>
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
+        <div class="grid-row__col grid-row__col--12 pl-0 pb-3">
           <!--clean up these classes if not needed-->
           <div class="forms__btn-container">
+            <button *ngIf="sectionType === initialSection" class="btn btn-previous btn-left" type="button"
+              (click)="cancel()">
+              Return to Loan
+            </button>
             <button *ngIf="sectionType !== initialSection" class="btn btn-previous btn-left" type="button"
               (click)="showPreviousSection()">
               Previous
