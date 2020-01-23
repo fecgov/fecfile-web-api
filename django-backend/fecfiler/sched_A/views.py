@@ -19,12 +19,19 @@ from rest_framework.response import Response
 from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
-                                 undo_delete_entities, superceded_report_id_list)
+                                 undo_delete_entities, superceded_report_id_list, get_sched_h_transaction_table)
 
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     update_parent_purpose,
     cmte_type)
+
+from fecfiler.core.aggregation_helper import(
+    update_activity_event_amount_ytd_h4,
+    update_activity_event_amount_ytd_h6,
+    load_schedH4,
+    load_schedH6,
+)
 
 from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     get_schedB, post_schedB, put_schedB,
@@ -33,6 +40,7 @@ from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     delete_sql_schedB)
 
 from fecfiler.sched_L.views import update_sl_summary
+# from fecfiler.sched_H.views import get_list_schedH4, get_list_schedH6
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -188,8 +196,11 @@ SCHED_L_A_TRAN_TYPES = [
     "LEVIN_NON_FED_REC",
 ]
 
-SCHEDULE_TO_TABLE_DICT = { 'SA': ['sched_a'],
+SCHEDULE_TO_TABLE_DICT = { 
+    'SA': ['sched_a'],
+    'LA': ['sched_a'],
     'SB': ['sched_b'],
+    'LB': ['sched_b'],
     'SC': ['sched_c', 'sched_c1', 'sched_c2'],
     'SD': ['sched_d'],
     'SE': ['sched_e'],
@@ -1778,9 +1789,16 @@ def trash_restore_transactions(request):
                     _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
                 # Handling delete of schedule H1 transactions
                 if transaction_id[:2] == 'SH' and _delete == 'Y':
-                    print('test')
-                    # delete_H1_carry_over(transaction_id, cmte_id)
-
+                    tran_tbl = get_sched_h_transaction_table(transaction_id)
+                    if tran_tbl == 'sched_h4':
+                        data = load_schedH4(cmte_id, report_id, transaction_id)[0]
+                        logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
+                        update_activity_event_amount_ytd_h4(data)
+                    if tran_tbl == 'sched_h6':
+                        data = load_schedH6(cmte_id, report_id, transaction_id)[0]
+                        logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
+                        update_activity_event_amount_ytd_h6(data)
+    
             elif transaction_id[:2] in ('SC', 'SD'):
                 # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D
                 if _delete == 'Y' or (transaction_id[:2] == 'SC' and _delete != 'Y'):
