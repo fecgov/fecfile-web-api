@@ -1787,7 +1787,7 @@ def update_sl_summary(data):
             'account_name': get_levin_account(cmte_id, levin_account_id)[0]['levin_account_name'],
             'cvg_from_date':cvg_start_date,
             'cvg_end_date':cvg_end_date,
-            'transaction_type_identifier':'LEVIN_SUMM',
+            'transaction_type_identifier':'SCHED_L_SUM',
         }
         sl_data.update(dummy_data)
             # post_schedL(dummy_rec)
