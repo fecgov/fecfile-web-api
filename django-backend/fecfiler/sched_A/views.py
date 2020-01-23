@@ -1798,7 +1798,6 @@ def trash_restore_transactions(request):
                         data = load_schedH6(cmte_id, report_id, transaction_id)[0]
                         logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
                         update_activity_event_amount_ytd_h6(data)
-    
             elif transaction_id[:2] in ('SC', 'SD'):
                 # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D
                 if _delete == 'Y' or (transaction_id[:2] == 'SC' and _delete != 'Y'):
