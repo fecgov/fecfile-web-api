@@ -501,12 +501,12 @@
                         </td>
                         <td>
                           <div class="summary_text_amt_level_3" >
-                            {{ lSum.total_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                            {{ lSum.itemized_non_itemized_combined | currency:'USD':'symbol-narrow':'1.2-2'}}
                           </div>
                         </td>  
                         <td>
                           <div class="summary_text_amt_level_3" >
-                              {{ lSum.total_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                              {{ lSum.itemized_non_itemized_combined_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
                           </div>
                         </td>  
                       </tr>
@@ -637,12 +637,12 @@
                         </td>
                         <td>
                           <div class="summary_text_amt_level_1" >
-                            {{ lSum.total_disbursement_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                            {{ lSum.line4_subtotal | currency:'USD':'symbol-narrow':'1.2-2'}}
                           </div>
                         </td>  
                         <td>
                           <div class="summary_text_amt_level_1" >
-                              {{ lSum.total_disbursement_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                              {{ lSum.line4_subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
                           </div>
                         </td>  
                       </tr>
@@ -722,12 +722,12 @@
                         </td>
                         <td>
                           <div class="summary_text_amt_level_3" >
-                            {{ lSum.line4_subtotal | currency:'USD':'symbol-narrow':'1.2-2'}}
+                            {{ lSum.subtotal_report | currency:'USD':'symbol-narrow':'1.2-2'}}
                           </div>
                         </td>  
                         <td>
                           <div class="summary_text_amt_level_3" >
-                              {{ lSum.line4_subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                              {{ lSum.subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
                           </div>
                         </td>  
                       </tr>
