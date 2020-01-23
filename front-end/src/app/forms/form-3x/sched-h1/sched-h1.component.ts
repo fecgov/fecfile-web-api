@@ -43,6 +43,8 @@ export class SchedH1Component implements OnInit {
   h1PacPCDisabled = false;
   removedH1PacSubscription: Subscription;
 
+  pacSaveDisable = true;
+
   constructor(
     private _http: HttpClient,
     private _activatedRoute: ActivatedRoute,
@@ -248,7 +250,23 @@ export class SchedH1Component implements OnInit {
     }
   }
 
+  public handleOnFedBlurEvent(e, f: NgForm) {
+    if (e.target.value <= 100) {
+      f.controls.nonfederal_share.setValue(100 - e.target.value);
+    } else {
+      f.controls.nonfederal_share.setValue(0);
+    }
+  }
+
   public handleNonFedShareFieldKeyup(e, f: NgForm) {
+    if (e.target.value <= 100) {
+      f.controls.federal_share.setValue(100 - e.target.value);
+    } else {
+      f.controls.federal_share.setValue(0);
+    }
+  }
+
+  public handleOnNonFedBlurEvent(e, f: NgForm) {
     if (e.target.value <= 100) {
       f.controls.federal_share.setValue(100 - e.target.value);
     } else {
@@ -325,6 +343,29 @@ export class SchedH1Component implements OnInit {
         this.h1PacADDisabled = this.getH1PacADDisable;
         this.h1PacGVDisabled = this.getH1PacGVDisable;
         this.h1PacPCDisabled = this.getH1PacPCDisable;
+
+        if(this.scheduleAction  === ScheduleActions.add) {
+          this.form.control.patchValue({ federal_share: null }, { onlySelf: true });
+          this.form.control.patchValue({ nonfederal_share: null }, { onlySelf: true });
+
+          if(!this.h1PacADDisabled) {
+            this.form.control.patchValue({ applied_activity1: null }, { onlySelf: true });
+          }
+
+          if(!this.h1PacGVDisabled) {
+            this.form.control.patchValue({ applied_activity2: null }, { onlySelf: true });
+          }
+
+          if(!this.h1PacPCDisabled) {
+            this.form.control.patchValue({ applied_activity3: null }, { onlySelf: true });
+          }
+        }else if(this.scheduleAction  === ScheduleActions.edit) {
+          this.form.reset();
+          this.scheduleAction = ScheduleActions.add;
+          this.checkH1PacDisabled();
+        }
+
+        this.pacSaveDisable = true;
     }
   }
 
@@ -398,6 +439,18 @@ export class SchedH1Component implements OnInit {
       return false;
       })
     )
+  }
+
+  public clickPacOptions(e: any) {
+    if(!this.form.value.applied_activity1 && e.target.value === 'administrative'
+      || !this.form.value.applied_activity2 && e.target.value === 'generic_voter_drive'
+      || !this.form.value.applied_activity3 && e.target.value === 'public_communication') {
+        this.pacSaveDisable = false;
+    }else if(!this.form.value.applied_activity2 && !this.form.value.applied_activity3 && this.form.value.applied_activity1 && e.target.value === 'administrative'
+      || !this.form.value.applied_activity1 && !this.form.value.applied_activity3 && this.form.value.applied_activity2 && e.target.value === 'generic_voter_drive'
+      || !this.form.value.applied_activity1 && !this.form.value.applied_activity2 && this.form.value.applied_activity3 && e.target.value === 'public_communication') {
+        this.pacSaveDisable = true;
+    }
   }
 
 }

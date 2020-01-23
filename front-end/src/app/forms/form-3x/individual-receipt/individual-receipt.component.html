@@ -549,7 +549,7 @@
                   <button *ngIf="!isShedH4OrH6TransactionType(transactionType) || cloned" class="btn btn-previous btn-left" type="button" (click)="cancel()">
                     Cancel
                   </button>
-                  <button *ngIf="isShedH4OrH6TransactionType(transactionType) && !cloned" class="btn btn-previous btn-left" type="button" (click)="goH4OrH6Summary(transactionType)">
+                  <button *ngIf="isShedH4OrH6TransactionType(transactionType) && !cloned" class="btn btn-previous btn-left" type="button" (click)="clearFormValues(); goH4OrH6Summary(transactionType)">
                     Cancel
                   </button>
                   <button class="btn btn-secondary btn-right" (click)="updateOnly()">
