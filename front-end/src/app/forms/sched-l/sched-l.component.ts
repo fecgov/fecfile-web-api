@@ -23,6 +23,7 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
 import { Observable, Subscription } from 'rxjs';
 import { style, animate, transition, trigger } from '@angular/animations';
+import { ActiveView } from '../transactions/transactions.component';
 import { PaginationInstance } from 'ngx-pagination';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
@@ -58,6 +59,8 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   @Input() scheduleAction: ScheduleActions;
   @Input() scheduleType: string;
   @Output() status: EventEmitter<any>;
+  @Input() public tableType: string;
+  public transactionsView = ActiveView.transactions;
 
   public formType: string;
   public showPart2: boolean;
@@ -76,6 +79,9 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   public schedLsModel: Array<SchedLModel>;
   public schedLsModelL: Array<SchedLModel>;
   private clonedTransaction: any;
+  public bulkActionDisabled = true;
+  public bulkActionCounter = 0;
+  private allTransactionsSelected: boolean;
 
   constructor(
     _http: HttpClient,
@@ -454,6 +460,36 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
       return false;
     }
     return true;
+  }
+
+  /**
+   * Check for multiple rows checked in the table
+   * and disable/enable the bulk action button
+   * accordingly.
+   *
+   * @param the event payload from the click
+   */
+  public checkForMultiChecked(e: any): void {
+    if (e.target.checked) {
+      this.bulkActionCounter++;
+    } else {
+      this.allTransactionsSelected = false;
+      if (this.bulkActionCounter > 0) {
+        this.bulkActionCounter--;
+      }
+    }
+
+    // Transaction View shows bulk action when more than 1 checked
+    // Recycle Bin shows delete action when 1 or more checked.
+    const count = this.isTransactionViewActive() ? 1 : 0;
+    this.bulkActionDisabled = this.bulkActionCounter > count ? false : true;
+  }
+
+  /**
+   * Check if the view to show is Transactions.
+   */
+  public isTransactionViewActive() {
+    return this.tableType === this.transactionsView ? true : false;
   }
 
 }
