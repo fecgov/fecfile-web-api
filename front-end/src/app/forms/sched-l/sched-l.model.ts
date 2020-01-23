@@ -1,6 +1,7 @@
 export class SchedLModel {
     cmte_id: string;
     report_id: number;
+    transactionId: string;
     transaction_type_identifier: string;
     tran_desc: string;
     transaction_id: string;
@@ -20,10 +21,14 @@ export class SchedLModel {
     entity_name: string;
     entity_type: string;
     arrow_dir: string;
+    toggleChild: boolean;
+    api_call: string;
+    child: SchedLModel[] = [];
     constructor(schedL: any) {
         this.cmte_id = schedL.cmte_id ? schedL.cmte_id : '';
         this.report_id = schedL.report_id ? schedL.report_id : '';
         this.transaction_type_identifier = schedL.transaction_type_identifier ? schedL.transaction_type_identifier : '';
+        this.transactionId = schedL.transactionId ? schedL.transactionId : '';
         this.tran_desc = schedL.tran_desc ? schedL.tran_desc : '';
         this.transaction_id = schedL.transaction_id ? schedL.transaction_id : '';
         this.back_ref_transaction_id = schedL.back_ref_transaction_id ? schedL.back_ref_transaction_id : '';
@@ -42,5 +47,7 @@ export class SchedLModel {
         this.entity_name = schedL.entity_name ? schedL.entity_name : '';
         this.entity_type = schedL.entity_type ? schedL.entity_type : '';
         this.arrow_dir = schedL.arrow_dir ? schedL.arrow_dir : '';
+        this.api_call = schedL.api_call ? schedL.api_call : '';
+        this.toggleChild = schedL.toggleChild;
     }
 }

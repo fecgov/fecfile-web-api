@@ -126,6 +126,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
 
   /**
+   * For toggling between 2 screens of Sched F Debt Payment.
+   */
+  public showPart2: boolean;
+
+  /**
    * Indicates the Form Group is loaded.  Used by "hybrid" parent classes of this base class
    * having both "static" and "dynamic" form fields as found in Sched F Debt Payment.
    */
@@ -179,7 +184,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _messageService: MessageService,
     private _currencyPipe: CurrencyPipe,
     protected _decimalPipe: DecimalPipe,
-    private _reportTypeService: ReportTypeService,
+    protected _reportTypeService: ReportTypeService,
     protected _typeaheadService: TypeaheadService,
     private _dialogService: DialogService,
     private _f3xMessageService: F3xMessageService,
@@ -993,8 +998,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     const reportId = this._receiptService.getReportIdFromStorage(this.formType);
 
+    let transactionId = '0';
+    if(this.scheduleAction === ScheduleActions.edit) {
+      transactionId = this._transactionToEdit.transactionId;
+    }
+
     this._receiptService
-      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId)
+      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId, transactionId)
       .subscribe(
         res => {
           if (res) {
@@ -2040,6 +2050,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   }
                 }
               }
+              if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+                this.showPart2 = false;
+              }
             }
 
             let resetParentId = true;
@@ -2369,6 +2382,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                           refresh: 1
                         }
                       });
+                      /*
                       this._router.navigateByUrl('/dashboard', { skipLocationChange: true }).then(() => {
                         this._router.navigate([`/forms/form/${this.formType}`], {
                           queryParams: {
@@ -2378,7 +2392,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                             transactionCategory: this._transactionCategory
                           }
                         });
-                      });
+                      });*/
                     }
                   });
               });
@@ -2533,6 +2547,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('cand_office_district');
     fieldNames.push('cand_election_year');
     fieldNames.push('beneficiary_cand_id');
+    fieldNames.push('payee_cmte_id');
     this._patchFormFields(fieldNames, entity, namePrefix);
     // setting Beneficiary Candidate Entity Id to hidden variable
     const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
@@ -2567,7 +2582,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
     let namePrefix = '';
-
     if (isChildForm) {
       this._selectedEntityChild = this._utilService.deepClone(entity);
       this._setSetEntityIdTo(this._selectedEntityChild, col);
@@ -2584,6 +2598,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('first_name');
     fieldNames.push('middle_name');
     fieldNames.push('prefix');
+    // TODO: Should be removed later FNE-1974
+    fieldNames.push('preffix');
     fieldNames.push('suffix');
     fieldNames.push('street_1');
     fieldNames.push('street_2');
@@ -2608,7 +2624,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (fieldNames) {
       for (const fieldName of fieldNames) {
         const patch = {};
-        patch[namePrefix + fieldName] = entity[fieldName];
+        // TODO: Should be removed later FNE-1974
+        if ( fieldName === 'preffix') {
+          console.warn('Fix this issue backend Column-name preffix')
+          patch[namePrefix + 'prefix'] = entity[fieldName];
+        } else {
+          patch[namePrefix + fieldName] = entity[fieldName];
+        }
         this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
       }
     }
@@ -2655,6 +2677,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('cand_office');
     fieldNames.push('cand_office_state');
     fieldNames.push('cand_office_district');
+    fieldNames.push('payee_cmte_id');
     this._patchFormFields(fieldNames, entity, namePrefix);
     // setting Beneficiary Candidate Entity Id to hidden variable
     const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
@@ -3630,7 +3653,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this.isFieldName(prop, 'activity_event_amount_ytd')
                   ) {
                     const amount = trx[prop] ? trx[prop] : 0;
-                    this._formatAmount({ target: { value: amount.toString() } }, prop, false);
+                    if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['total_amount'] && this.scheduleAction === 'edit' && this._cloned) {
+                      this.frmIndividualReceipt.patchValue({ total_amount: null }, { onlySelf: true });
+                    }else {
+                      this._formatAmount({ target: { value: amount.toString() } }, prop, false);
+                    }
                   }
                 }
               }
