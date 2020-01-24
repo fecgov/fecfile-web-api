@@ -286,8 +286,10 @@ def get_child_identifer(identifier, form_type):
 
 
 @api_view(["POST"])
+
 def create_json_builders(request):
     try:
+        # import ipdb;ipdb.set_trace()  
         print("request",request)
         MANDATORY_INPUTS = ['report_id', 'call_from']
         error_string = ""
@@ -440,7 +442,7 @@ def create_json_builders(request):
                 cmte_id, 
                 4,
                 " create_json_builders calling data Validatior with data_obj", 
-                json.dumps(data_obj.json()), 
+                json.dumps(data_obj), 
                 '',
                 '', 
                 '' 

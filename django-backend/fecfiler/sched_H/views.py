@@ -789,7 +789,7 @@ def get_fed_nonfed_share(request):
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
         transaction_id = request.query_params.get('transaction_id')
-        if int(transaction_id) == 0:
+        if transaction_id and not transaction_id.startswith('SH') == 0:
             transaction_id = None
 
         if 'old_amount' in request.query_params:

@@ -171,6 +171,7 @@ def schedF_sql_dict(data):
     except:
         raise Exception("invalid request data.")
 
+
 def get_existing_expenditure_amount(cmte_id, transaction_id):
     """
     fetch existing expenditure amount in the db for current transaction
@@ -215,7 +216,8 @@ def put_schedF(data):
             entity_flag = False
 
         existing_expenditure = get_existing_expenditure_amount(
-            data.get("cmte_id"), data.get("transaction_id"))
+            data.get("cmte_id"), data.get("transaction_id")
+        )
         try:
             entity_id = entity_data.get("entity_id")
             data["payee_entity_id"] = entity_id
@@ -920,16 +922,17 @@ def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
         expenditure_year = (
             datetime.datetime.strptime(expenditure_date, "%m/%d/%Y").date().year
         )
-        for i, val in enumerate(election_year_list):
-            if i == len(election_year_list) - 2:
-                break
-            if (
-                election_year_list[i + 1] < expenditure_year
-                and expenditure_year <= election_year_list[i]
-            ):
-                end_date = datetime.date(election_year_list[i], 12, 31)
-                start_year = election_year_list[i] - add_year
-                start_date = datetime.date(start_year, 1, 1)
+        if len(election_year_list) >= 2:
+            for i, val in enumerate(election_year_list):
+                if i == len(election_year_list) - 2:
+                    break
+                if (
+                    election_year_list[i + 1] < expenditure_year
+                    and expenditure_year <= election_year_list[i]
+                ):
+                    end_date = datetime.date(election_year_list[i], 12, 31)
+                    start_year = election_year_list[i] - add_year
+                    start_date = datetime.date(start_year, 1, 1)
         if not end_date:
             if datetime.datetime.now().year % 2 == 1:
                 end_year = datetime.datetime.now().year + add_year

@@ -473,6 +473,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this.frmLoan.patchValue({ first_name: loan.first_name }, { onlySelf: true });
     this.frmLoan.patchValue({ middle_name: loan.middle_name }, { onlySelf: true });
     this.frmLoan.patchValue({ prefix: loan.prefix }, { onlySelf: true });
+    this.frmLoan.patchValue({ prefix: loan.preffix }, { onlySelf: true });
     this.frmLoan.patchValue({ suffix: loan.suffix }, { onlySelf: true });
     this.frmLoan.patchValue({ street_1: loan.street_1 }, { onlySelf: true });
     this.frmLoan.patchValue({ street_2: loan.street_2 }, { onlySelf: true });
