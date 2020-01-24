@@ -162,10 +162,12 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
+                    <span [title]="h1PacADDisabled ? 'H1 for Administrative already exists.': ''">
                       <input ngModel type="checkbox" name="applied_activity1" id="ad" value="administrative" [disabled]="h1PacADDisabled" (click)="clickPacOptions($event)">
                       <label for="ad">
                         Administrative
                       </label>
+                    </span>
 
                     <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                         tooltipClass="form-tooltip">
@@ -176,10 +178,12 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="checkbox" name="applied_activity2" id="gvd" value="generic_voter_drive" [disabled]="h1PacGVDisabled" (click)="clickPacOptions($event)">
-                    <label for="gvd">
-                      Generic Voter Drive
-                    </label>
+                    <span [title]="h1PacGVDisabled ? 'H1 for Generic Voter Drive already exists.': ''">
+                      <input ngModel type="checkbox" name="applied_activity2" id="gvd" value="generic_voter_drive" [disabled]="h1PacGVDisabled" (click)="clickPacOptions($event)">
+                      <label for="gvd">
+                        Generic Voter Drive
+                      </label>
+                    </span>
 
                     <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                         tooltipClass="form-tooltip">
@@ -190,10 +194,12 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="checkbox" name="applied_activity3" id="pc" value="public_communication" [disabled]="h1PacPCDisabled" (click)="clickPacOptions($event)">
-                    <label for="pc">
-                      Public Communications Referenceing Party Only
-                    </label>
+                    <span [title]="h1PacPCDisabled ? 'H1 for Public Communications Referenceing Party Only already exists.': ''">
+                      <input ngModel type="checkbox" name="applied_activity3" id="pc" value="public_communication" [disabled]="h1PacPCDisabled" (click)="clickPacOptions($event)">
+                      <label for="pc">
+                        Public Communications Referenceing Party Only
+                      </label>
+                    </span>
 
                     <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                         tooltipClass="form-tooltip">
