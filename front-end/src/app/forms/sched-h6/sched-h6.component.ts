@@ -372,6 +372,22 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     trx.report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
     trx.transactionId = trx.transaction_id;
 
+    if(this.hasChildTransaction(trx)) {
+      const msg = "There are child transactions associated with this transaction. This action will delete all child transactions as well. Are you sure you want to continue?";
+      this._dlService
+        .confirm(msg, ConfirmModalComponent, 'Warning!')
+        .then(res => {
+          if (res === 'okay') {
+            this.transhAction(trx);
+          } else if (res === 'cancel') {
+          }
+        });
+    }else {
+      this.transhAction(trx);
+    }
+  }
+
+  private transhAction(trx: any): void {
     this._dlService
       .confirm('You are about to delete this transaction ' + trx.transaction_id + '.', ConfirmModalComponent, 'Caution!')
       .then(res => {
@@ -391,14 +407,14 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
             });
         } else if (res === 'cancel') {
         }
-      });
+      })
   }
 
-  public checkIfTrashable(item: any): boolean {
+  public hasChildTransaction(item: any): boolean {
     if(this.schedH6sModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id).length !== 0) {
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
   
 }
