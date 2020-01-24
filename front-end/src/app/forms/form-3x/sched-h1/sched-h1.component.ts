@@ -359,8 +359,12 @@ export class SchedH1Component implements OnInit {
         this.h1PacPCDisabled = this.getH1PacPCDisable;
 
         if(this.scheduleAction  === ScheduleActions.add) {
-          this.form.control.patchValue({ federal_share: null }, { onlySelf: true });
-          this.form.control.patchValue({ nonfederal_share: null }, { onlySelf: true });
+          if(this.form.value.federal_share) {
+            this.form.control.patchValue({ federal_share: null }, { onlySelf: true });
+          }
+          if(this.form.value.federal_share) {
+            this.form.control.patchValue({ nonfederal_share: null }, { onlySelf: true });
+          }
 
           if(!this.h1PacADDisabled) {
             this.form.control.patchValue({ applied_activity1: null }, { onlySelf: true });
