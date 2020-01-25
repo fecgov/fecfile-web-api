@@ -49,12 +49,12 @@ def load_schedH6(cmte_id, report_id, transaction_id):
             last_update_date
             FROM public.sched_h6
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
-            AND delete_ind is distinct from 'Y') t
+            ) t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
             schedH6_list = cursor.fetchone()[0]
             if schedH6_list is None:
-                raise NoOPError(
+                raise Exception(
                     "No sched_H6 transaction found for transaction_id {}".format(
                         transaction_id
                     )
