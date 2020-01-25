@@ -217,6 +217,8 @@ export class SchedH1Component implements OnInit {
     this.scheduleAction = ScheduleActions.edit;
     this.transaction_id = item.transaction_id;
 
+    this.pacSaveDisable = false;
+
     this.checkH1Disabled();
     this.checkH1PacDisabled();
 
@@ -226,6 +228,18 @@ export class SchedH1Component implements OnInit {
       this.form.control.patchValue({ applied_activity1: item.administrative }, { onlySelf: true });
       this.form.control.patchValue({ applied_activity2: item.generic_voter_drive }, { onlySelf: true });
       this.form.control.patchValue({ applied_activity3: item.public_communications }, { onlySelf: true });
+
+      this.getH1PacSubscription = this.getH1Pac().subscribe(
+        res=>{
+          if(res && this.isPac()) {
+            if(res.administrative === 1 && !item.administrative) { this.h1PacADDisabled = true };
+
+            if(res.generic_voter_drive === 1 && !item.generic_voter_drive) { this.h1PacGVDisabled = true };
+
+            if(res.public_communications === 1 && !item.public_communications) { this.h1PacPCDisabled = true };
+          }
+        }
+      )
     } else {
       if (item.presidential_only) {
         this.form.control.patchValue({ h1_election_year_options: '1' }, { onlySelf: true });
@@ -345,8 +359,12 @@ export class SchedH1Component implements OnInit {
         this.h1PacPCDisabled = this.getH1PacPCDisable;
 
         if(this.scheduleAction  === ScheduleActions.add) {
-          this.form.control.patchValue({ federal_share: null }, { onlySelf: true });
-          this.form.control.patchValue({ nonfederal_share: null }, { onlySelf: true });
+          if(this.form.value.federal_share) {
+            this.form.control.patchValue({ federal_share: null }, { onlySelf: true });
+          }
+          if(this.form.value.federal_share) {
+            this.form.control.patchValue({ nonfederal_share: null }, { onlySelf: true });
+          }
 
           if(!this.h1PacADDisabled) {
             this.form.control.patchValue({ applied_activity1: null }, { onlySelf: true });

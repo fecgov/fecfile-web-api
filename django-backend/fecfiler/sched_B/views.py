@@ -688,6 +688,8 @@ def post_schedB(datum):
         # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
             trans_char = "LB" # for sched_l transactions
+            datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            datum.get('transaction_type_identifier'))
         else:
             trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)

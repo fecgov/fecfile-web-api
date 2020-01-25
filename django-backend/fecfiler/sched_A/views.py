@@ -850,6 +850,8 @@ def post_schedA(datum):
         # for sched_l contributions, the transaction is starts with 'SLA'
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
             trans_char = "LA"
+            datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            datum.get('transaction_type_identifier'))
         else:
             trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
@@ -920,8 +922,9 @@ def post_schedA(datum):
                 'The post_sql_schedA function is throwing an error: ' + str(e))
             
         # update line number based on aggregate amount info
-        update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
-            'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if transaction_id.startswith('SA'):
+            update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
+                'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
             update_sl_summary(datum)    
         return datum
@@ -1791,10 +1794,14 @@ def trash_restore_transactions(request):
                 if transaction_id[:2] == 'SH' and _delete == 'Y':
                     tran_tbl = get_sched_h_transaction_table(transaction_id)
                     if tran_tbl == 'sched_h4':
+                        logger.debug('sched_h4 trash: check child transaction and update ytd amount:')
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
                         data = load_schedH4(cmte_id, report_id, transaction_id)[0]
                         logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
                         update_activity_event_amount_ytd_h4(data)
                     if tran_tbl == 'sched_h6':
+                        logger.debug('sched_h6 trash: check child transaction and update ytd amount:')
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
                         data = load_schedH6(cmte_id, report_id, transaction_id)[0]
                         logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
                         update_activity_event_amount_ytd_h6(data)
