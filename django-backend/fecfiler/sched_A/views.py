@@ -1791,10 +1791,14 @@ def trash_restore_transactions(request):
                 if transaction_id[:2] == 'SH' and _delete == 'Y':
                     tran_tbl = get_sched_h_transaction_table(transaction_id)
                     if tran_tbl == 'sched_h4':
+                        logger.debug('sched_h4 trash: check child transaction and update ytd amount:')
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
                         data = load_schedH4(cmte_id, report_id, transaction_id)[0]
                         logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
                         update_activity_event_amount_ytd_h4(data)
                     if tran_tbl == 'sched_h6':
+                        logger.debug('sched_h6 trash: check child transaction and update ytd amount:')
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
                         data = load_schedH6(cmte_id, report_id, transaction_id)[0]
                         logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
                         update_activity_event_amount_ytd_h6(data)
