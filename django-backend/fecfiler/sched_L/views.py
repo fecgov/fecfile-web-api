@@ -1132,13 +1132,14 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
 
 def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
     try:
-        logger.debug('loading coh beginning data...')
+        logger.debug('****loading coh beginning data...')
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         if prev_yr:
             prev_cvg_year = cvg_start_date.year - 1
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
+            print(prev_cvg_end_dt)
         with connection.cursor() as cursor:
             if levin_account_id:
                 cursor.execute(
@@ -1156,7 +1157,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
             else:
                 cursor.execute(
                     """
-                    SELECT COALESCE(coh_cop, 0) 
+                    SELECT SUM(COALESCE(coh_cop, 0))
                     FROM public.sched_l 
                     WHERE cmte_id = %s 
                     AND cvg_end_date = %s 
@@ -1169,6 +1170,8 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
             else:
                 result = cursor.fetchone()
                 coh_cop = result[0]
+                if not coh_cop:
+                    coh_cop = 0
         logger.debug('coh result:{}'.format(coh_cop))
         return float(coh_cop)
     except Exception as e:

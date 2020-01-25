@@ -850,6 +850,8 @@ def post_schedA(datum):
         # for sched_l contributions, the transaction is starts with 'SLA'
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
             trans_char = "LA"
+            datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            datum.get('transaction_type_identifier'))
         else:
             trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
@@ -920,8 +922,9 @@ def post_schedA(datum):
                 'The post_sql_schedA function is throwing an error: ' + str(e))
             
         # update line number based on aggregate amount info
-        update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
-            'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if transaction_id.startswith('SA'):
+            update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
+                'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
             update_sl_summary(datum)    
         return datum

@@ -473,6 +473,7 @@ def get_sched_f_child_transactions(report_id, cmte_id, transaction_id):
     except:
         raise
 
+
 def get_sched_e_child_transactions(report_id, cmte_id, transaction_id):
     """
     load child transactions for sched_e
@@ -490,7 +491,6 @@ def get_sched_e_child_transactions(report_id, cmte_id, transaction_id):
             return post_process_it(cursor, cmte_id)
     except:
         raise
-
 
 
 def get_sched_h4_child_transactions(report_id, cmte_id, transaction_id):
