@@ -5103,6 +5103,7 @@ def clone_a_transaction(request):
         'LB': 'sched_b',
         'SC': 'sched_c',
         'SD': 'sched_d',
+        'SE': 'sched_e',
         'SF': 'sched_f',
     }
     # cmte_id = request.user.username
@@ -5149,6 +5150,10 @@ def clone_a_transaction(request):
             select_str = select_str.replace('contribution_amount', "'"+'0.00'+"'")
         if transaction_id.startswith('SB') or transaction_id.startswith('LB') or transaction_id.startswith('SF'):
             select_str = select_str.replace('expenditure_date', "'"+_today+"'")
+            select_str = select_str.replace('expenditure_amount', "'"+'0.00'+"'")
+        if transaction_id.startswith('SE'):
+            select_str = select_str.replace('disbursement_date', "'"+_today+"'")
+            select_str = select_str.replace('dissemination_date', "'"+_today+"'")
             select_str = select_str.replace('expenditure_amount', "'"+'0.00'+"'")
         if transaction_id.startswith('SH') and transaction_table == 'sched_h4':
             select_str = select_str.replace('expenditure_date', "'"+_today+"'")
