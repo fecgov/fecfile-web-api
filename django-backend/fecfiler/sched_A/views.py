@@ -32,6 +32,7 @@ from fecfiler.core.aggregation_helper import(
     load_schedH4,
     load_schedH6,
     update_aggregate_sf,
+    update_aggregate_se,
     load_schedF,
     load_schedE,
 )
@@ -1814,18 +1815,8 @@ def trash_restore_transactions(request):
                     )
 
                 if transaction_id[:2] == 'SE':
-                    pass
-                    # update_aggregate_se(
-                    #     tran_data["cmte_id"],
-                    #     tran_data["beneficiary_cand_id"],
-                    #     datetime.datetime.strptime(tran_data.get("expenditure_date"), "%Y-%m-%d")
-                    #     .date()
-                    #     .strftime("%m/%d/%Y"),
-                    # )
+                    update_aggregate_se(tran_data)
             
-                
-
-
                 # Handling delete of schedule H4/H6 transactions: delete child trans and update aggregate
                 if transaction_id[:2] == 'SH' and _delete == 'Y':
                     tran_tbl = get_sched_h_transaction_table(transaction_id)
