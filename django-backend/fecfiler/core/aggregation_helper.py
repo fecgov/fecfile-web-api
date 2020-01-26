@@ -20,6 +20,276 @@ def date_format(cvg_date):
         raise
 
 
+def load_schedE(cmte_id, report_id, transaction_id):
+    """
+    get one sched_e item with tran_id
+    """
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            cmte_id,
+            report_id,
+            transaction_type_identifier,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            payee_entity_id,
+            election_code,
+            election_other_desc,
+            dissemination_date,
+            expenditure_amount,
+            disbursement_date,
+            calendar_ytd_amount,
+            purpose,
+            category_code,
+            payee_cmte_id,
+            support_oppose_code,
+            so_cand_id,
+            so_cand_last_name,
+            so_cand_first_name,
+            so_cand_middle_name,
+            so_cand_prefix,
+            so_cand_suffix,
+            so_cand_office,
+            so_cand_district,
+            so_cand_state,
+            completing_entity_id,
+            date_signed,
+            memo_code,
+            memo_text,
+            line_number,
+            create_date, 
+            last_update_date
+            FROM public.sched_e
+            WHERE cmte_id = %s
+            AND report_id = %s
+            AND transaction_id = %s) t 
+            """
+            # if is_back_ref:
+            #     _sql = _sql + """ AND back_ref_transaction_id = %s) t"""
+            # else:
+            #     _sql = _sql + """ AND transaction_id = %s) t"""
+            cursor.execute(_sql, (cmte_id, report_id, transaction_id))
+            schedE_list = cursor.fetchone()[0]
+            if schedE_list is None:
+                raise Exception(
+                    "No sched_e transaction found for transaction_id {}".format(
+                        transaction_id
+                    )
+                )
+            return schedE_list
+        #     merged_list = []
+        #     if schedE_list:
+        #         for dictE in schedE_list:
+        #             merged_list.append(dictE)
+        # return merged_list
+    except Exception:
+        raise
+
+
+def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
+    try:
+        start_date = None
+        end_date = None
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (SELECT e.cand_office, e.cand_office_state, e.cand_office_district FROM public.entity e 
+                WHERE e.cmte_id in ('C00000000') 
+                AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = %s AND e.delete_ind is distinct from 'Y') as t""",
+                [beneficiary_cand_id],
+            )
+            # print(cursor.query)
+            cand = cursor.fetchone()[0]
+            logger.debug("Candidate Office Data: " + str(cand))
+        if cand:
+            cand = cand[0]
+            if cand["cand_office"] == "H":
+                add_year = 1
+                if not (cand["cand_office_state"] and cand["cand_office_district"]):
+                    raise Exception(
+                        "The candidate details for candidate Id: {} are missing: office state and district".format(
+                            beneficiary_cand_id
+                        )
+                    )
+            elif cand["cand_office"] == "S":
+                add_year = 5
+                if not cand["cand_office_state"]:
+                    raise Exception(
+                        "The candidate details for candidate Id: {} are missing: office state".format(
+                            beneficiary_cand_id
+                        )
+                    )
+                cand["cand_office_district"] = None
+            elif cand["cand_office"] == "P":
+                add_year = 3
+                cand["cand_office_state"] = None
+                cand["cand_office_district"] = None
+            else:
+                raise Exception(
+                    "The candidate id: {} does not belong to either Senate, House or Presidential office. Kindly check cand_office in entity table for details".format(
+                        beneficiary_cand_id
+                    )
+                )
+        else:
+            raise Exception(
+                "The candidate Id: {} is not present in the entity table.".format(
+                    beneficiary_cand_id
+                )
+            )
+        election_year_list = get_election_year(
+            cand["cand_office"], cand["cand_office_state"], cand["cand_office_district"]
+        )
+        logger.debug("Election years based on FEC API:" + str(election_year_list))
+        expenditure_year = (
+            datetime.datetime.strptime(expenditure_date, "%m/%d/%Y").date().year
+        )
+        if len(election_year_list) >= 2:
+            for i, val in enumerate(election_year_list):
+                if i == len(election_year_list) - 2:
+                    break
+                if (
+                    election_year_list[i + 1] < expenditure_year
+                    and expenditure_year <= election_year_list[i]
+                ):
+                    end_date = datetime.date(election_year_list[i], 12, 31)
+                    start_year = election_year_list[i] - add_year
+                    start_date = datetime.date(start_year, 1, 1)
+        if not end_date:
+            if datetime.datetime.now().year % 2 == 1:
+                end_year = datetime.datetime.now().year + add_year
+                end_date = datetime.date(end_year, 12, 31)
+                start_date = datetime.date(datetime.datetime.now().year, 1, 1)
+            else:
+                end_date = datetime.date(datetime.datetime.now().year, 12, 31)
+                start_year = datetime.datetime.now().year - add_year
+                start_date = datetime.date(start_year, 1, 1)
+        return start_date, end_date
+    except Exception as e:
+        logger.debug(e)
+        raise Exception("The agg_dates function is throwing an error: " + str(e))
+
+
+def get_SF_transactions_candidate(start_date, end_date, beneficiary_cand_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (SELECT t1.transaction_id, t1.expenditure_date, t1.expenditure_amount, 
+                t1.aggregate_general_elec_exp, t1.memo_code FROM public.sched_f t1 WHERE t1.payee_cand_id = %s AND t1.expenditure_date >= %s AND 
+                t1.expenditure_date <= %s AND t1.delete_ind is distinct FROM 'Y' 
+                AND (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id) is distinct FROM 'Y'
+                ORDER BY t1.expenditure_date ASC, t1.create_date ASC) t""",
+                [beneficiary_cand_id, start_date, end_date],
+            )
+            if cursor.rowcount == 0:
+                transaction_list = []
+            else:
+                transaction_list = cursor.fetchall()[0][0]
+        logger.debug(transaction_list)
+        return transaction_list
+    except Exception as e:
+        logger.debug(e)
+        raise Exception(
+            "The get_SF_transactions_candidate function is throwing an error: " + str(e)
+        )
+
+
+def update_aggregate_sf(cmte_id, beneficiary_cand_id, expenditure_date):
+    try:
+        aggregate_amount = 0.0
+        # expenditure_date = datetime.datetime.strptime(expenditure_date, '%Y-%m-%d').date()
+        cvg_start_date, cvg_end_date = agg_dates(
+            cmte_id, beneficiary_cand_id, expenditure_date
+        )
+        transaction_list = get_SF_transactions_candidate(
+            cvg_start_date, cvg_end_date, beneficiary_cand_id
+        )
+        for transaction in transaction_list:
+            if transaction["memo_code"] != "X":
+                aggregate_amount += float(transaction["expenditure_amount"])
+            if transaction["expenditure_date"] >= expenditure_date:
+                put_aggregate_SF(aggregate_amount, transaction["transaction_id"])
+    except Exception as e:
+        logger.debug(e)
+        raise Exception(
+            "The update_aggregate_general_elec_exp API is throwing an error: " + str(e)
+        )
+
+
+def load_schedF(cmte_id, report_id, transaction_id):
+    try:
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """SELECT json_agg(t) FROM ( SELECT
+            sf.cmte_id,
+            sf.report_id,
+            sf.transaction_type_identifier,
+            sf.transaction_id, 
+            sf.back_ref_transaction_id,
+            sf.back_ref_sched_name,
+            sf.coordinated_exp_ind,
+            sf.designating_cmte_id,
+            sf.designating_cmte_name,
+            sf.subordinate_cmte_id,
+            sf.subordinate_cmte_name,
+            sf.subordinate_cmte_street_1,
+            sf.subordinate_cmte_street_2,
+            sf.subordinate_cmte_city,
+            sf.subordinate_cmte_state,
+            sf.subordinate_cmte_zip,
+            sf.payee_entity_id as entity_id,
+            sf.expenditure_date,
+            sf.expenditure_amount,
+            sf.aggregate_general_elec_exp,
+            sf.purpose,
+            sf.category_code,
+            sf.payee_cmte_id,
+            sf.payee_cand_id as beneficiary_cand_id,
+            sf.payee_cand_last_name as cand_last_name,
+            sf.payee_cand_fist_name as cand_first_name,
+            sf.payee_cand_middle_name as cand_middle_name,
+            sf.payee_cand_prefix as cand_prefix,
+            sf.payee_cand_suffix as cand_suffix,
+            sf.payee_cand_office as cand_office,
+            sf.payee_cand_state as cand_office_state,
+            sf.payee_cand_district as cand_office_district,
+            sf.memo_code,
+            sf.memo_text,
+            sf.delete_ind,
+            sf.create_date,
+            sf.last_update_date,
+            (SELECT DISTINCT ON (e.ref_cand_cmte_id) e.entity_id 
+            FROM public.entity e WHERE e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = sf.cmte_id) 
+                        AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = sf.payee_cand_id AND e.delete_ind is distinct from 'Y'
+                        ORDER BY e.ref_cand_cmte_id DESC, e.entity_id DESC) AS beneficiary_cand_entity_id
+            FROM public.sched_f sf
+            WHERE sf.report_id = %s AND sf.cmte_id = %s AND sf.transaction_id = %s
+            ) t
+            """
+            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+            schedF_list = cursor.fetchone()[0]
+            if schedF_list is None:
+                raise Exception(
+                    "No sched_f transaction found for transaction_id {}".format(
+                        transaction_id
+                    )
+                )
+            merged_list = []
+            for dictF in schedF_list:
+                entity_id = dictF.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                entity_list = get_entities(data)
+                dictEntity = entity_list[0]
+                del dictEntity["cand_office"]
+                del dictEntity["cand_office_state"]
+                del dictEntity["cand_office_district"]
+                merged_dict = {**dictF, **dictEntity}
+                merged_list.append(merged_dict)
+        return merged_list
+    except Exception:
+        raise
+
+
 def load_schedH6(cmte_id, report_id, transaction_id):
     try:
         with connection.cursor() as cursor:
