@@ -1251,6 +1251,10 @@ def get_list_schedH2(report_id, cmte_id, transaction_id):
             transaction_type,
             transaction_id,
             activity_event_name,
+            ( CASE fundraising 
+            WHEN true THEN 'fundraising' 
+            ELSE 'direct_cand_suppot' 
+            END )  AS event_type, 
             fundraising,
             direct_cand_support,
             ratio_code,
