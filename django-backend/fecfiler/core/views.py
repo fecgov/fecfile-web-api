@@ -31,6 +31,8 @@ from fuzzywuzzy import fuzz
 import pandas
 import numpy
 
+# from fecfiler.forms.views import email
+
 from fecfiler.core.carryover_helper import (
     do_h1_carryover,
     do_h2_carryover,
@@ -885,6 +887,55 @@ def delete_reports(data):
 """
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
+
+@api_view(['PUT'])
+def submit_report(request):
+    """
+    an update api used for submitting a report
+
+    1) We need to change report status from Saved to Submitted.
+    2) Update report_seq value into fec_id column.
+    3) Append "FEC-" to fec_id in return value.
+    3) Return JSON response: "fec_id", "status","message"
+    4) use email template from "https://github.com/SalientCRGT-FEC/nxg_fec/tree/develop/django-backend/templates/email_ack.html" and replace @parameters with report values.
+    5) Send confirmation email, please refer to email function in below file.
+    https://github.com/SalientCRGT-FEC/nxg_fec/blob/develop/django-backend/fecfiler/forms/views.py
+    """
+
+    SUBMIT_STATUS = 'Submitted'
+    cmte_id = request.user.username
+    report_id = request.data.get('report_id')
+    fec_id = 'FEC-'+str(report_id)
+
+    _sql_update = """
+    UPDATE public.reports
+    SET status = %s, fec_id = %s
+    WHERE report_id = %s
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(_sql_update, [SUBMIT_STATUS, fec_id, report_id])
+        if cursor.rowcount == 0:
+            raise Exception('report {} update failed'.format(report_id))
+    
+    email_data = request.data.copy()
+    email_data['id'] = email_data['report_id']
+    # email(True, email_data)
+
+    _sql_response = """
+    SELECT json_agg(t) FROM (
+        SELECT fec_id, status, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+        FROM public.reports
+        WHERE report_id = %s)t
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(_sql_response, [report_id])
+        if cursor.rowcount == 0:
+            raise Exception('report {} update failed'.format(report_id))
+        rep_json = cursor.fetchone()[0]
+    return JsonResponse(rep_json[0], status=status.HTTP_200_OK, safe=False)
+
+
+
 @api_view(['POST','GET','DELETE','PUT'])
 def reports(request):
 
