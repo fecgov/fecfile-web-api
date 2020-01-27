@@ -905,7 +905,8 @@ def submit_report(request):
     SUBMIT_STATUS = 'Submitted'
     cmte_id = request.user.username
     report_id = request.data.get('report_id')
-    fec_id = 'FEC-'+str(report_id)
+    # fec_id = 'FEC-'+str(report_id)
+    fec_id = report_id
 
     _sql_update = """
     UPDATE public.reports
