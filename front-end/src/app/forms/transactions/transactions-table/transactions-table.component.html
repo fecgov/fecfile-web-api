@@ -175,7 +175,7 @@
                     <i class="ellipsis-icon"></i>
                   </button>
                   <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                    <button *ngIf="trx.transactionTypeIdentifier === 'LOAN_FROM_IND'" class="dropdown-item" (click)="viewTransaction(trx)">
+                    <button *ngIf="trx.transactionTypeIdentifier === 'LOAN_FROM_IND' || trx.transactionTypeIdentifier === 'LOAN_FROM_BANK'" class="dropdown-item" (click)="viewTransaction(trx)">
                       <i class="view-icon"></i> View
                     </button>
                     <span [title]="!trx.iseditable ? 'This transaction cannot be edited because it is auto generated.':''">
