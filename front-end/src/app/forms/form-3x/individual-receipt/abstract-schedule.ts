@@ -142,7 +142,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _transaction: any = {};
   private _transactionType: string = null;
   private _transactionTypePrevious: string = null;
-  private _transactionCategory = '';
+  protected _transactionCategory = '';
   private _formSubmitted = false;
   private _contributionAggregateValue = 0.0;
   private _contributionAggregateValueChild = 0.0;
@@ -701,9 +701,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       const cvgEndDate: string = this._reportType.cvgEndDate;
 
       if (this.memoCode) {
-        this.frmIndividualReceipt.controls[dateField].setValidators([Validators.required]);
-
-        this.frmIndividualReceipt.controls[dateField].updateValueAndValidity();
+        if(this.frmIndividualReceipt.controls[dateField]){
+          this.frmIndividualReceipt.controls[dateField].setValidators([Validators.required]);
+          this.frmIndividualReceipt.controls[dateField].updateValueAndValidity();
+        }
       } else {
         if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls[dateField]) {
           this.frmIndividualReceipt.controls[dateField].setValidators([
@@ -1750,6 +1751,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           field === 'non_fed_share_amount' ||
           field === 'activity_event_amount_ytd' ||
           field === 'aggregate_general_elec_exp' ||
+          
+          //for sched e YTD field
+          field === 'expenditure_aggregate' ||
+          
           // for H6 fields name
           field === 'federal_share' ||
           field === 'levin_share'
@@ -3458,7 +3463,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  private _prePopulateFormForEditOrView(transactionDetail: any) {
+  protected _prePopulateFormForEditOrView(transactionDetail: any) {
     if (transactionDetail) {
       // The action on the message is the same as the this.scheduleAction from parent.
       // using the field from the message in case there is a race condition with Input().
@@ -3665,7 +3670,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               this._calculateDebtAmountFields(trx);
             }
           }
+          //once data is set, send a message to any child components that may want to set additional specific fields
+            this._messageService.sendPopulateChildComponentMessage({populateChildForEdit: true, transactionData: trx});
         }
+
+
         // move the payment button into view if flag is set.
         if (this._transactionToEdit && this._transactionToEdit.scrollDebtPaymentButtonIntoView) {
           let button = document.getElementById('jfMemoDropdown');
