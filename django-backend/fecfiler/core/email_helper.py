@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def email(boolean, data):
     SENDER = "donotreply@fec.gov"
-    RECIPIENT = ["qqss88@gmail.com"]
+    RECIPIENT = []
 
     RECIPIENT.append("%s" % data.get("email_on_file"))
 
