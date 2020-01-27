@@ -31,7 +31,7 @@ from fuzzywuzzy import fuzz
 import pandas
 import numpy
 
-# from fecfiler.forms.views import email
+from fecfiler.core.email_helper import email
 
 from fecfiler.core.carryover_helper import (
     do_h1_carryover,
@@ -917,9 +917,12 @@ def submit_report(request):
         if cursor.rowcount == 0:
             raise Exception('report {} update failed'.format(report_id))
     
+    logger.debug('sending email with data')
     email_data = request.data.copy()
     email_data['id'] = email_data['report_id']
-    # email(True, email_data)
+    logger.debug('sending email with data {}'.format(email_data))
+    email(True, email_data)
+    logger.debug('email success.')
 
     _sql_response = """
     SELECT json_agg(t) FROM (
@@ -932,6 +935,7 @@ def submit_report(request):
         if cursor.rowcount == 0:
             raise Exception('report {} update failed'.format(report_id))
         rep_json = cursor.fetchone()[0]
+    
     return JsonResponse(rep_json[0], status=status.HTTP_200_OK, safe=False)
 
 
