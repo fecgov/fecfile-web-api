@@ -285,6 +285,19 @@ def schedC_sql_dict(data):
     except:
         raise Exception('invalid request data.')
 
+def initial_loan(transaction_id):
+    """
+    helper function for checking the loan is not a carryover loan
+    """
+    _sql = """
+    SELECT back_ref_transaction_id from public.sched_c
+    where transaction_id = %s
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(_sql, [transaction_id])
+        if not cursor.fetchone()[0]:
+            return True
+        return False
 
 def put_schedC(data):
     """
@@ -325,7 +338,8 @@ def put_schedC(data):
             logger.debug('updating loan with data:{}'.format(data))
             put_sql_schedC(data)
             data_copy = data.copy()
-            update_auto_sched_a(data_copy)
+            if initial_loan(data.get('transaction_id')):
+                update_auto_sched_a(data_copy)
 
         except Exception as e:
             # rollback entity data
@@ -432,7 +446,6 @@ def get_auto_sched_a_id(transaction_id):
     """
     try:
         with connection.cursor() as cursor:
-
             # UPDATE delete_ind flag on a single row from Sched_A table
             cursor.execute(_sql, [transaction_id])
             if (cursor.rowcount == 0):
@@ -469,6 +482,8 @@ def update_auto_sched_a(data):
     
     data['transaction_id'] = get_auto_sched_a_id(parent_id)
     # fill in purpose - hardcoded - TODO: confirm on this
+    # if not data['transaction_id']:
+    #     retru
     data['purpose_description'] = 'Loan received: {}'.format(
         data.get('transaction_type_identifier')
         )
