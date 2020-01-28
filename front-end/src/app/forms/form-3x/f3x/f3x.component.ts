@@ -387,9 +387,16 @@ export class F3xComponent implements OnInit {
               } else if (apiCall === '/sc/schedC1') {
                 alert('edit C1 not yet supported');
               } else if (apiCall === '/sf/schedF') {
-                // force change to set show first page.
-                this.forceChangeDetectionFDebtPayment = new Date();
-                this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
+                if(this.scheduleType === 'sched_f_core'){
+                  this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFCoreComponent);
+                  const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+                  transactionTypeText = transactionModel.type;
+                  transactionType = transactionModel.transactionTypeIdentifier;  
+                }else{
+                  // force change to set show first page.
+                  this.forceChangeDetectionFDebtPayment = new Date();
+                  this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
+                }
               } else if (apiCall === '/se/schedE') {
                 // force change to set show first page.
                 // this.forceChangeDetectionFDebtPayment = new Date();
@@ -596,6 +603,11 @@ export class F3xComponent implements OnInit {
         e.scheduleType = 'sched_f_core';
       }
     }
+
+    //TODO_ clean this up  
+    if(!e.scheduleType && e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.transactionTypeIdentifier === 'COEXP_PARTY'){
+      e.scheduleType = 'sched_f_core';
+    } 
 
     //default to sched_a ?
     this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
