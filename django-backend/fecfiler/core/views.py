@@ -3425,6 +3425,24 @@ def loansanddebts(report_id, cmte_id):
     except Exception as e:
         raise Exception('The loansanddebts function is throwing an error' + str(e))
 
+def getthirdnavamounts(cmte_id, report_id):
+    try:
+        amounts = []
+        _values = [cmte_id, report_id]
+        table_list = [['sched_a'], ['sched_b', 'sched_e', 'sched_f'], ['sched_c', 'sched_d']]
+        for table in table_list:
+            _sql = """
+            SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE transaction_table in ('{}')
+            AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
+            """.format("', '".join(table))
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, _values)
+                print(cursor.query)
+                amounts.append(cursor.fetchone()[0])
+        return amounts[0], amounts[1], amounts[2]
+    except Exception as e:
+        raise Exception('The getthirdnavamounts function is throwing an error' + str(e))
+
 @api_view(['GET'])
 def get_thirdNavigationTransactionTypes(request):
     try:
@@ -3438,16 +3456,25 @@ def get_thirdNavigationTransactionTypes(request):
         # period_receipt = summary_receipts(period_args)
         # period_disbursement = summary_disbursements(period_args)
 
-        period_args = [datetime.date(2019, 1, 1), datetime.date(2019, 12, 31), cmte_id, report_id]
-        period_receipt = summary_receipts_for_sumamry_table(period_args)
-        period_disbursement = summary_disbursements_for_sumamry_table(period_args)
+        # period_args = [datetime.date(2019, 1, 1), datetime.date(2019, 12, 31), cmte_id, report_id]
+        # period_receipt = summary_receipts_for_sumamry_table(period_args)
+        # period_disbursement = summary_disbursements_for_sumamry_table(period_args)
+
+        period_receipt, period_disbursement, loans_and_debts = getthirdnavamounts(cmte_id, report_id)
         loans_and_debts = loansanddebts(report_id, cmte_id)
 
         coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
-        coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
+        # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
+        coh_cop = coh_bop + period_receipt - period_disbursement + loans_and_debts
 
-        forms_obj = { 'Receipts': period_receipt[0].get('amt'),
-                        'Disbursements': period_disbursement[0].get('amt'),
+        # forms_obj = { 'Receipts': period_receipt[0].get('amt'),
+        #                 'Disbursements': period_disbursement[0].get('amt'),
+        #                 'Loans/Debts': loans_and_debts,
+        #                 'Others': 0,
+        #                 'COH': coh_cop}
+
+        forms_obj = { 'Receipts': period_receipt,
+                        'Disbursements': period_disbursement,
                         'Loans/Debts': loans_and_debts,
                         'Others': 0,
                         'COH': coh_cop}
