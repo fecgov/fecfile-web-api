@@ -350,7 +350,7 @@
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office')">
                       <ng-select #candOfficeTypeSelect 
-                        [items]="candidateOfficeTypes"
+                        [items]="candOfficeStatesByTransactionType"
                         (change)="handleOfficeSoughtChangeForSchedE($event, col)" 
                         class="forms__select" 
                         [formControlName]="col?.name"

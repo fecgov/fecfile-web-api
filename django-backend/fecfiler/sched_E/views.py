@@ -185,6 +185,10 @@ def schedE_sql_dict(data):
         # remap election code for frontend handshaking
         if 'full_election_code' in data:
             datum['election_code'] = data.get('full_election_code')
+
+        #also add entity_id as an attribute. It is being remapped to payee_entity_id but fails in core since its looking for entity_id
+        if 'payee_entity_id' in data:
+            datum['entity_id'] = data.get('payee_entity_id')
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
         return datum
@@ -947,13 +951,14 @@ def mapFieldsForUI(data):
         "so_cand_prefix",
         "so_cand_suffix",
         "so_cand_office",
-        "so_cand_district",
     ]
     for _f in cand_fields:
         if _f in data:
             data[_f.replace('so_','')] = data.pop(_f)
     data['cand_office_state'] = data['so_cand_state']
     data.pop('so_cand_state')
+    data['cand_office_district'] = data['so_cand_district']
+    data.pop('so_cand_district')
     data['full_election_code'] = data['election_code']
     data['cand_election_year'] = data['election_code'][-4:]
     data['election_code'] = data['election_code'][0:-4]
