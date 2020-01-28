@@ -21,7 +21,7 @@ import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedul
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
 import { schedFstaticFormFields } from '../sched-f/static-form-fields.json';
-import { Observable } from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 @Component({
@@ -90,6 +90,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     _activatedRoute.queryParams.subscribe(p => {
       this.cloned = p.cloned ? true : false;
     });
+
   }
 
   public ngOnInit() {
@@ -329,4 +330,11 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   }
 
   public saveForAddSubTempSchedF() {}
+  public handleOnBlurEvent($event: any, col: any) {
+    super.handleOnBlurEvent($event, col);
+    console.log('col %s %s', col,  this.frmIndividualReceipt.controls['expenditure_amount'].value);
+    const expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
+    this.frmIndividualReceipt.patchValue(
+        { aggregate_general_elec_exp: expenditureAmount}, { onlySelf: true });
+  }
 }
