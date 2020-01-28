@@ -1652,11 +1652,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       for (const field in this.frmIndividualReceipt.controls) {
         if (
           field === 'contribution_date' ||
-          field === 'expenditure_date' ||
-          field === 'disbursement_date' ||
-          field === 'dissemination_date'
+          field === 'expenditure_date'
         ) {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
+        } else if(  field === 'disbursement_date' ||
+          field === 'dissemination_date'){
+            if(this.frmIndividualReceipt.get(field).value){
+              receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
+            }
         } else if (field === this._childFieldNamePrefix + 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else if (field === 'memo_code') {
