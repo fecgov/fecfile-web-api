@@ -189,12 +189,12 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     }
 
     //TODO -- currently for some of the forms api is sending entityTypes as null. Setting it here based on transaction type until that is fixed
-    if (this.transactionType === 'IE_CC_PAY') {
+    if (this.transactionType === 'IE_CC_PAY' || this.transactionType === 'IE_PMT_TO_PROL') {
       let entityItem = { entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: true };
       this.handleEntityTypeChange(entityItem);
       this.selectedEntityType = entityItem;
     }
-    else if (this.transactionType === 'IE_STAF_REIM') {
+    else if (this.transactionType === 'IE_STAF_REIM' || this.transactionType === 'IE_PMT_TO_PROL_MEMO') {
       let entityItem = { entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: true };
       this.handleEntityTypeChange(entityItem);
       this.selectedEntityType = entityItem;
