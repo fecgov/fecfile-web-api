@@ -86,6 +86,7 @@ urlpatterns = [
     ),
     url(r"^core/print_preview_pdf$", views.print_preview_pdf, name="print_preview_pdf"),
     url(r"^core/reports$", views.reports, name="reports"),
+    url(r"^core/submit_report$", views.submit_report, name="submit_report"),
     url(r"^core/contacts$", views.contacts, name="contacts"),
     url(
         r"^core/delete_trashed_transactions$",
@@ -145,7 +146,6 @@ urlpatterns = [
         name="clone_a_transaction",
     ),
     # url(r"^core/get_filler_transaction_type$", views.get_filler_transaction_type, name="get_filler_transaction_type"),
-
     url(
         r"^core/address_validation$",
         views.address_validation,
@@ -166,11 +166,7 @@ urlpatterns = [
         views.new_report_update_date,
         name="new_report_update_date",
     ),
-    url(
-        r"^core/get_report_status$",
-        views.get_report_status,
-        name="get_report_status",
-    ),
+    url(r"^core/get_report_status$", views.get_report_status, name="get_report_status"),
     url(
         r"^core/get_sched_c_loan_dynamic_forms_fields$",
         views.get_sched_c_loan_dynamic_forms_fields,
@@ -188,7 +184,7 @@ urlpatterns = [
     ),
     url(
         r"^core/prepare_Schedl_summary_data$",
-        views. prepare_Schedl_summary_data,
+        views.prepare_Schedl_summary_data,
         name=" prepare_Schedl_summary_data",
     ),
     url(

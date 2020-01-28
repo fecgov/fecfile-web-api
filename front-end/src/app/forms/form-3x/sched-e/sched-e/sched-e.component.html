@@ -350,7 +350,7 @@
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office')">
                       <ng-select #candOfficeTypeSelect 
-                        [items]="candidateOfficeTypes"
+                        [items]="candOfficeStatesByTransactionType"
                         (change)="handleOfficeSoughtChangeForSchedE($event, col)" 
                         class="forms__select" 
                         [formControlName]="col?.name"
@@ -615,7 +615,7 @@
                   <button class="btn btn-secondary btn-right" (click)="updateOnly()">
                     Save
                   </button>
-                  <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
+                  <a *ngIf="subTransactionInfo?.isParent === false && _transactionCategory === 'loans-and-debts'" class="btn btn-primary btn-right"
                     (click)="saveAndReturnToParent()">
                     Return to {{ subTransactionInfo.transactionTypeDescription }}
                   </a>

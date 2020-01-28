@@ -185,6 +185,10 @@ def schedE_sql_dict(data):
         # remap election code for frontend handshaking
         if 'full_election_code' in data:
             datum['election_code'] = data.get('full_election_code')
+
+        #also add entity_id as an attribute. It is being remapped to payee_entity_id but fails in core since its looking for entity_id
+        if 'payee_entity_id' in data:
+            datum['entity_id'] = data.get('payee_entity_id')
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
         return datum
@@ -933,6 +937,40 @@ def get_list_all_schedE(report_id, cmte_id):
     except Exception:
         raise
 
+def mapFieldsForUI(data):
+    """
+    mapping response fields to frontend fields
+    """
+    # so_ fields remapping to work with frontend
+    # TODO: may need db fields renaming in the future
+    cand_fields = [
+        "so_cand_id",
+        "so_cand_last_name",
+        "so_cand_first_name",
+        "so_cand_middle_name",
+        "so_cand_prefix",
+        "so_cand_suffix",
+        "so_cand_office",
+    ]
+    for _f in cand_fields:
+        if _f in data:
+            data[_f.replace('so_','')] = data.pop(_f)
+    data['cand_office_state'] = data['so_cand_state']
+    data.pop('so_cand_state')
+    data['cand_office_district'] = data['so_cand_district']
+    data.pop('so_cand_district')
+    data['full_election_code'] = data['election_code']
+    data['cand_election_year'] = data['election_code'][-4:]
+    data['election_code'] = data['election_code'][0:-4]
+    data['expenditure_aggregate'] = data['calendar_ytd_amount']
+    data.pop('calendar_ytd_amount')
+    data['beneficiary_cand_id'] = data['cand_id']
+    data.pop('cand_id')
+    data['expenditure_purpose_description'] = data['purpose']
+    data.pop('purpose')
+    # data['aggregate'] = data['expenditure_aggregate'] #this should be mapped more cleanly. Right now sending a duplicate of expenditure_aggregate
+    
+    return data
 
 def get_list_schedE(report_id, cmte_id, transaction_id, is_back_ref=False):
     """
@@ -994,6 +1032,24 @@ def get_list_schedE(report_id, cmte_id, transaction_id, is_back_ref=False):
             merged_list = []
             if schedE_list:
                 for dictE in schedE_list:
+                    dictE['api_call'] = '/se/schedE'
+                    # get payee, completing entities and merge
+                    entity_ids = [
+                        'payee_entity_id',
+                        'completing_entity_id'
+                    ]
+                    for _id in entity_ids:
+                        entity_id = dictE.get(_id)
+                        data = {
+                            'entity_id': entity_id,
+                            'cmte_id': dictE['cmte_id']
+                        }
+                        entity_data = get_entities(data)[0]
+                        if _id == 'completing_entity_id':
+                            prefix = _id.split('_')[0]
+                            entity_data = {(prefix + '_' + k) : v for k,v in entity_data.items()}
+                        dictE.update(entity_data)
+                    dictE = mapFieldsForUI(dictE)
                     merged_list.append(dictE)
         return merged_list
     except Exception:

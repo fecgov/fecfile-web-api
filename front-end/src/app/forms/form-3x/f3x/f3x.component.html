@@ -98,6 +98,16 @@
             transactionType === 'L_SUM'
           "
         >
+          
+          <app-sched-e
+            [hidden]="scheduleType !== 'sched_e'"
+            [transactionTypeText]="transactionTypeText"
+            [transactionType]="transactionType"
+            [scheduleAction]="scheduleAction"
+            [scheduleType]="scheduleType"
+            (status)="onNotify($event)"
+          >
+          </app-sched-e>
           <f3x-individual-receipt
             [hidden]="
               scheduleType !== 'sched_a' &&
@@ -114,15 +124,7 @@
             (status)="onNotify($event)"
           >
           </f3x-individual-receipt>
-          <app-sched-e
-            [hidden]="scheduleType !== 'sched_e'"
-            [transactionTypeText]="transactionTypeText"
-            [transactionType]="transactionType"
-            [scheduleAction]="scheduleAction"
-            [scheduleType]="scheduleType"
-            (status)="onNotify($event)"
-          >
-          </app-sched-e>
+          
         </div>
         <!-- This is for Sched F payment on a Debt.  Not the same as sched_f_core -->
         <app-sched-f

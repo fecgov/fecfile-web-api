@@ -390,7 +390,15 @@ export class F3xComponent implements OnInit {
                 // force change to set show first page.
                 this.forceChangeDetectionFDebtPayment = new Date();
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
-              } else {
+              } else if (apiCall === '/se/schedE') {
+                // force change to set show first page.
+                // this.forceChangeDetectionFDebtPayment = new Date();
+                this._populateFormForEdit(e, AbstractScheduleParentEnum.schedEComponent);
+                const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+                transactionTypeText = transactionModel.type;
+                transactionType = transactionModel.transactionTypeIdentifier;
+              } 
+              else {
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedMainComponent);
                 const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
                 transactionTypeText = transactionModel.type;
@@ -567,10 +575,15 @@ export class F3xComponent implements OnInit {
       e.scheduleType = 'sched_c_loan_payment';
     }
 
+
     //TODO-Remove this elseif once transactions are moved to Disubursements
-    if (e.scheduleType === 'Schedule E') {
+    if (e.scheduleType === 'Schedule E' ) {
       e.scheduleType = 'sched_e';
     }
+
+     if(!e.scheduleType && e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.apiCall === '/se/schedE'){
+      e.scheduleType = 'sched_e';
+    } 
 
     if (e.scheduleType && e.transactionType) {
       if (
