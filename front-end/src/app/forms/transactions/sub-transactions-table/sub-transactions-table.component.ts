@@ -135,6 +135,9 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
 
         model.date = trx.expenditure_date ? trx.expenditure_date : trx.contribution_date;
         model.aggregate = trx.contribution_aggregate;
+        if(!model.aggregate && this.subTransactionsTableType === 'sched_e'){
+          model.aggregate = trx.expenditure_aggregate;
+        }
 
         model.activityEventType = trx.activity_event_type;
         model.activityEventIdentifier = trx.activity_event_identifier;

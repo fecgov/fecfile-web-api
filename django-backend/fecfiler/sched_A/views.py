@@ -31,6 +31,10 @@ from fecfiler.core.aggregation_helper import(
     update_activity_event_amount_ytd_h6,
     load_schedH4,
     load_schedH6,
+    update_aggregate_sf,
+    update_aggregate_se,
+    load_schedF,
+    load_schedE,
 )
 
 from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
@@ -850,6 +854,8 @@ def post_schedA(datum):
         # for sched_l contributions, the transaction is starts with 'SLA'
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
             trans_char = "LA"
+            datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            datum.get('transaction_type_identifier'))
         else:
             trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
@@ -920,8 +926,9 @@ def post_schedA(datum):
                 'The post_sql_schedA function is throwing an error: ' + str(e))
             
         # update line number based on aggregate amount info
-        update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
-            'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if transaction_id.startswith('SA'):
+            update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
+                'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
             update_sl_summary(datum)    
         return datum
@@ -1770,12 +1777,21 @@ def trash_restore_transactions(request):
                 back_ref_transaction_id, transaction_amount = get_backref_id_trash(transaction_id, cmte_id)
                 if back_ref_transaction_id and back_ref_transaction_id[:2] in ('SC', 'SD'):
                     update_parent_amounts_to_trash(transaction_amount, back_ref_transaction_id, cmte_id, _delete)
+                # load data and prepare for aggregation and take care parent-child relationship
+
+                tran_data = {}
+                if transaction_id[:2] == 'SF':
+                    tran_data = load_schedF(cmte_id, report_id, transaction_id)
+                if transaction_id[:2] == 'SE':
+                    tran_data = load_schedE(cmte_id, report_id, transaction_id)
+
                 # Deleting/Restoring the transaction
                 deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
                     report_id,
                     transaction_id, 
                     _delete))
-                # Handling aggregate updation for sched_A transactions
+
+                # Handling aggregate update for sched_A transactions
                 if transaction_id[:2] == 'SA':
                     datum = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
                     update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
@@ -1784,17 +1800,35 @@ def trash_restore_transactions(request):
                     if _delete == 'Y' or (_delete != 'Y' and datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
                         'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']):
                         _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
-                # Handling delete of sched_B transactions
-                if transaction_id[:2] == 'SB' and _delete == 'Y':
+
+                # Handling delete of sched_B, sched_E, sched_F child transactions
+                if transaction_id[:2] in ['SB', 'SE', 'SF'] and _delete == 'Y':
                     _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
-                # Handling delete of schedule H1 transactions
+
+                if transaction_id[:2] == 'SF':
+                    update_aggregate_sf(
+                        tran_data["cmte_id"],
+                        tran_data["beneficiary_cand_id"],
+                        datetime.datetime.strptime(tran_data.get("expenditure_date"), "%Y-%m-%d")
+                        .date()
+                        .strftime("%m/%d/%Y"),
+                    )
+
+                if transaction_id[:2] == 'SE':
+                    update_aggregate_se(tran_data)
+            
+                # Handling delete of schedule H4/H6 transactions: delete child trans and update aggregate
                 if transaction_id[:2] == 'SH' and _delete == 'Y':
                     tran_tbl = get_sched_h_transaction_table(transaction_id)
                     if tran_tbl == 'sched_h4':
+                        logger.debug('sched_h4 trash: check child transaction and update ytd amount:')
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
                         data = load_schedH4(cmte_id, report_id, transaction_id)[0]
                         logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
                         update_activity_event_amount_ytd_h4(data)
                     if tran_tbl == 'sched_h6':
+                        logger.debug('sched_h6 trash: check child transaction and update ytd amount:')
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
                         data = load_schedH6(cmte_id, report_id, transaction_id)[0]
                         logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
                         update_activity_event_amount_ytd_h6(data)

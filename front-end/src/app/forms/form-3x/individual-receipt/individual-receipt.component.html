@@ -562,7 +562,7 @@
                 </div>
                 <ng-template #createActions>
                   <div *ngIf="!isShedH4OrH6TransactionType(transactionType)">
-                    <button *ngIf="!subTransactionInfo || subTransactionInfo?.isParent" class="btn btn-previous btn-left" type="button"
+                    <button *ngIf="(!subTransactionInfo || subTransactionInfo?.isParent) && (scheduleAction !== viewScheduleAction)" class="btn btn-previous btn-left" type="button"
                       (click)="previousStep()">
                       Previous
                     </button>
