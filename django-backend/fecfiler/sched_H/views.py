@@ -789,14 +789,15 @@ def get_fed_nonfed_share(request):
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
         transaction_id = request.query_params.get('transaction_id')
-        if transaction_id and not transaction_id.startswith('SH') == 0:
+        if transaction_id and not transaction_id.startswith('SH'):
             transaction_id = None
-
+        print(transaction_id)
         if 'old_amount' in request.query_params:
             old_amount = float(request.query_params.get('old_amount'))
         else:
             old_amount = 0
 
+        # for editing purpose, need grab old amount
         if transaction_id:
             old_amount = float(get_old_amount(transaction_id))
         
@@ -808,6 +809,16 @@ def get_fed_nonfed_share(request):
         end_dt = datetime.date(int(calendar_year), 12, 31)
         event_name = request.query_params.get('activity_event_identifier') 
         transaction_type_identifier = request.query_params.get('transaction_type_identifier') 
+        if transaction_type_identifier.startswith('ALLOC_FEA'):
+            tran_tbl = 'public.sched_h6'
+            f_ytd = 'activity_event_total_ytd'
+            f_event = 'account_event_identifier'
+        else:
+            tran_tbl = 'public.sched_h4'
+            f_ytd = 'activity_event_amount_ytd'
+            f_event = 'activity_event_identifier'
+
+
 
         if event_name: # event-based, goes to h2
             _sql = """
@@ -827,12 +838,13 @@ def get_fed_nonfed_share(request):
                     raise Exception('Error: no h1 data found.')
                 fed_percent = float(cursor.fetchone()[0])
             
+            # for esiting, just grab the aggregation amount
             if transaction_id:
                 _sql = """
-                select activity_event_amount_ytd 
-                from public.sched_h4 
+                select {} 
+                from {}
                 where transaction_id = %s
-                """
+                """.format(f_ytd, tran_tbl)
                 with connection.cursor() as cursor:
                     cursor.execute(_sql, [transaction_id])
                     if not cursor.rowcount:
@@ -841,14 +853,14 @@ def get_fed_nonfed_share(request):
                         aggregate_amount = float(cursor.fetchone()[0])
             else:
                 _sql = """
-                select activity_event_amount_ytd 
-                from public.sched_h4 
+                select {} 
+                from {} 
                 where cmte_id = %s 
-                and activity_event_identifier = %s
+                and {} = %s
                 and create_date between %s and %s
                 and delete_ind is distinct from 'Y'
-                order by create_date desc, last_update_date desc;
-                """
+                order by expenditure_date desc, last_update_date desc;
+                """.format(f_ytd, tran_tbl, f_event)
                 with connection.cursor() as cursor:
                     cursor.execute(_sql, (cmte_id, event_name, start_dt, end_dt))
                     if not cursor.rowcount:
@@ -872,7 +884,8 @@ def get_fed_nonfed_share(request):
                 # order by create_date desc, last_update_date desc
                 # """
                 _sql = """
-                select federal_percent from public.sched_h1
+                select federal_percent 
+                from public.sched_h1
                 where election_year = %s
                 and cmte_id = %s
                 and delete_ind is distinct from 'Y'
@@ -916,10 +929,10 @@ def get_fed_nonfed_share(request):
             
             if transaction_id:
                 _sql = """
-                select activity_event_amount_ytd 
-                from public.sched_h4 
+                select {} 
+                from {} 
                 where transaction_id = %s
-                """
+                """.format(f_ytd, tran_tbl)
                 with connection.cursor() as cursor:
                     cursor.execute(_sql, [transaction_id])
                     if not cursor.rowcount:
@@ -928,14 +941,16 @@ def get_fed_nonfed_share(request):
                         aggregate_amount = float(cursor.fetchone()[0])
             else:
                 _sql = """
-                select activity_event_amount_ytd 
-                from public.sched_h4 
+                select {} 
+                from {} 
                 where cmte_id = %s 
                 and activity_event_type = %s
                 and expenditure_date between %s and %s
                 and delete_ind is distinct from 'Y'
-                order by create_date desc, last_update_date desc
-                """
+                order by expenditure_date desc, last_update_date desc
+                """.format(f_ytd, tran_tbl)
+                print('...')
+                print(_sql)
                 with connection.cursor() as cursor:
                     cursor.execute(_sql, (cmte_id, activity_event_type, start_dt, end_dt))
                 # logger.debug()
@@ -944,6 +959,7 @@ def get_fed_nonfed_share(request):
                     else:
                         aggregate_amount = float(cursor.fetchone()[0])
         # fed_percent = float(cursor.fetchone()[0])
+        print(aggregate_amount)
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
         if transaction_type_identifier and transaction_type_identifier.endswith('_MEMO'):

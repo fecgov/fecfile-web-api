@@ -955,14 +955,14 @@ def submit_report(request):
     if form_tp == 'F3X':
         _sql_response = """
         SELECT json_agg(t) FROM (
-            SELECT fec_id, status, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            SELECT 'FEC-' || fec_id as fec_id, status, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
             FROM public.reports
             WHERE report_id = %s)t
         """
     elif form_tp == 'F99':
         _sql_response = """
         SELECT json_agg(t) FROM (
-            SELECT fec_id, status, message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            SELECT 'FEC-' || fec_id as fec_id, status, message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
             FROM public.forms_committeeinfo
             WHERE id = %s)t
         """ 
@@ -3467,16 +3467,26 @@ def getthirdnavamounts(cmte_id, report_id):
     try:
         amounts = []
         _values = [cmte_id, report_id]
-        table_list = [['sched_a'], ['sched_b', 'sched_e', 'sched_f'], ['sched_c', 'sched_d']]
+        table_list = [['11A','11AI','11AII','11B','11C','12','15','16','17','18A','18B'], 
+                      ['21AI','21AII','21B','22','28A','28B','28C','29']]
         for table in table_list:
             _sql = """
-            SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE transaction_table in ('{}')
-            AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
-            """.format("', '".join(table))
+                SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE line_number in ('{}')
+                AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
+                """.format("', '".join(table))
             with connection.cursor() as cursor:
                 cursor.execute(_sql, _values)
                 print(cursor.query)
                 amounts.append(cursor.fetchone()[0])
+        loans_table = ['sched_c', 'sched_d']
+        l_sql = """
+            SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE transaction_table in ('{}')
+            AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
+            """.format("', '".join(loans_table))
+        with connection.cursor() as cursor:
+            cursor.execute(l_sql, _values)
+            print(cursor.query)
+            amounts.append(cursor.fetchone()[0])
         return amounts[0], amounts[1], amounts[2]
     except Exception as e:
         raise Exception('The getthirdnavamounts function is throwing an error' + str(e))
