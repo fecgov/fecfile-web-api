@@ -905,14 +905,41 @@ def submit_report(request):
     SUBMIT_STATUS = 'Submitted'
     cmte_id = request.user.username
     report_id = request.data.get('report_id')
-    # fec_id = 'FEC-'+str(report_id)
-    fec_id = report_id
+    form_tp = request.data.get('form_type') 
 
-    _sql_update = """
-    UPDATE public.reports
-    SET status = %s, fec_id = %s
-    WHERE report_id = %s
-    """
+    fec_id = report_id
+    if form_tp == 'F3X':
+        update_tbl = 'public.reports'
+        f_id = 'report_id'
+    elif form_tp == 'F99':
+        update_tbl = 'public.forms_committeeinfo'
+        f_id = 'id'
+    else:
+        raise Exception('Error: invalid form type.')
+
+    #     report_id = request.data.get('report_id')
+    #     fec_id = report_id
+    # else:
+    #     report_seq = request.data.get('report_seq')
+        # fec_id = report_seq
+    # fec_id = 'FEC-'+str(report_id)
+    
+
+    if form_tp == 'F3X':
+        _sql_update = """
+            UPDATE {}""".format(update_tbl) + """
+            SET status = %s, fec_id = %s""" + """
+            WHERE {} = %s
+            """.format(f_id)
+    elif form_tp == 'F99':
+        _sql_update = """
+            UPDATE {}""".format(update_tbl) + """
+            SET is_submitted = true, status = %s, fec_id = %s""" + """
+            WHERE {} = %s
+            """.format(f_id)
+    else:
+        raise Exception('Error: invalid form type.') 
+
     with connection.cursor() as cursor:
         cursor.execute(_sql_update, [SUBMIT_STATUS, fec_id, report_id])
         if cursor.rowcount == 0:
@@ -920,17 +947,28 @@ def submit_report(request):
     
     logger.debug('sending email with data')
     email_data = request.data.copy()
-    email_data['id'] = email_data['report_id']
+    email_data['id'] = 'FEC-'+email_data['report_id']
     logger.debug('sending email with data {}'.format(email_data))
     email(True, email_data)
     logger.debug('email success.')
 
-    _sql_response = """
-    SELECT json_agg(t) FROM (
-        SELECT fec_id, status, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
-        FROM public.reports
-        WHERE report_id = %s)t
-    """
+    if form_tp == 'F3X':
+        _sql_response = """
+        SELECT json_agg(t) FROM (
+            SELECT fec_id, status, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            FROM public.reports
+            WHERE report_id = %s)t
+        """
+    elif form_tp == 'F99':
+        _sql_response = """
+        SELECT json_agg(t) FROM (
+            SELECT fec_id, status, message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            FROM public.forms_committeeinfo
+            WHERE id = %s)t
+        """ 
+    else:
+        raise Exception('Error: invalid form type')
+
     with connection.cursor() as cursor:
         cursor.execute(_sql_response, [report_id])
         if cursor.rowcount == 0:
