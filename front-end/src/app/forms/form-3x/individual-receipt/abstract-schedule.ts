@@ -230,11 +230,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (this._prePopulateFromSchedDData) {
                     // set the max for payments to the remaining debt for validation.
                     // if (this._prePopulateFromSchedDData.incurred_amount) {
-                    const incurredAmount = this._prePopulateFromSchedDData.incurred_amount ?
-                      this._prePopulateFromSchedDData.incurred_amount : 0;
+                    const balanceAtClose = this._prePopulateFromSchedDData.balance_at_close ?
+                      this._prePopulateFromSchedDData.balance_at_close : 0;
                     const paymentAmount = this._prePopulateFromSchedDData.payment_amount ?
                       this._prePopulateFromSchedDData.payment_amount : 0;
-                      this._outstandingDebtBalance = incurredAmount - paymentAmount;
+                      this._outstandingDebtBalance = balanceAtClose - paymentAmount;
                     // }
                   }
                   this._checkForReturnToDebtSummary(message);
@@ -1652,11 +1652,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       for (const field in this.frmIndividualReceipt.controls) {
         if (
           field === 'contribution_date' ||
-          field === 'expenditure_date' ||
-          field === 'disbursement_date' ||
-          field === 'dissemination_date'
+          field === 'expenditure_date'
         ) {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
+        } else if(  field === 'disbursement_date' ||
+          field === 'dissemination_date'){
+            if(this.frmIndividualReceipt.get(field).value){
+              receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
+            }
         } else if (field === this._childFieldNamePrefix + 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else if (field === 'memo_code') {

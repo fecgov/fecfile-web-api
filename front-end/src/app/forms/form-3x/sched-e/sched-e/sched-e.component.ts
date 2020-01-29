@@ -52,10 +52,12 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     { 'code': 'O', 'description': 'Oppose' }
   ];
 
-  // private prepopulatedMemoText = 'Multistate independent expenditure, publicly distributed or disseminated in the following states: ';
-  private prepopulatedMemoText = 'Not actual wording: ';
+  private prepopulatedMemoText = 'Multistate independent expenditure, publicly distributed or disseminated in the following states: ';
+  // private prepopulatedMemoText = 'Not actual wording: ';
   public selectedStates: string;
   private multistateMemoTextDelimiter = ' - ';
+  _originalExpenditureAggregate: any;
+  _originalExpenditureAmount: any;
 
   constructor(_http: HttpClient,
     _fb: FormBuilder,
@@ -187,12 +189,12 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     }
 
     //TODO -- currently for some of the forms api is sending entityTypes as null. Setting it here based on transaction type until that is fixed
-    if (this.transactionType === 'IE_CC_PAY') {
+    if (this.transactionType === 'IE_CC_PAY' || this.transactionType === 'IE_PMT_TO_PROL') {
       let entityItem = { entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: true };
       this.handleEntityTypeChange(entityItem);
       this.selectedEntityType = entityItem;
     }
-    else if (this.transactionType === 'IE_STAF_REIM') {
+    else if (this.transactionType === 'IE_STAF_REIM' || this.transactionType === 'IE_PMT_TO_PROL_MEMO') {
       let entityItem = { entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: true };
       this.handleEntityTypeChange(entityItem);
       this.selectedEntityType = entityItem;
@@ -219,6 +221,9 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   populateFormForEdit(trx: any) {
     //split memoText for IE_MULTI
+    this._originalExpenditureAmount = trx.expenditure_amount;
+    this._originalExpenditureAggregate = trx.expenditure_aggregate;
+
     if (trx.transaction_type_identifier === 'IE_MULTI') {
       let memoText = trx.memo_text.substring(trx.memo_text.indexOf(this.multistateMemoTextDelimiter.trim()) + 1).trim();
       let memoTextStates = trx.memo_text.substring(0, trx.memo_text.indexOf(this.multistateMemoTextDelimiter));
@@ -286,23 +291,32 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
     console.log('YTD is being recalculated ...');
     let currentExpenditureAmount = this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    this._schedEService.getAggregate(this.frmIndividualReceipt.value).subscribe(res => {
+    if (this.scheduleAction === ScheduleActions.add) {
+      this._schedEService.getAggregate(this.frmIndividualReceipt.value).subscribe(res => {
 
-      this._currentAggregate = "0";
+        this._currentAggregate = "0";
 
-      if (res && res.ytd_amount) {
-        this._currentAggregate = res.ytd_amount;
-      }
+        if (res && res.ytd_amount) {
+          this._currentAggregate = res.ytd_amount;
+        }
+        this.frmIndividualReceipt.patchValue({
+          expenditure_aggregate:
+            this._decimalPipe.transform(currentExpenditureAmount + this._convertAmountToNumber(this._currentAggregate), '.2-2')
+        }, { onlySelf: true });
+      }, error => {
+        this.frmIndividualReceipt.patchValue({
+          expenditure_aggregate:
+            this._decimalPipe.transform(currentExpenditureAmount, '.2-2')
+        }, { onlySelf: true });
+      });
+    }
+    else {
       this.frmIndividualReceipt.patchValue({
         expenditure_aggregate:
-          this._decimalPipe.transform(currentExpenditureAmount + this._convertAmountToNumber(this._currentAggregate), '.2-2')
+          this._decimalPipe.transform(this._originalExpenditureAggregate - this._originalExpenditureAmount + 
+            this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value), '.2-2')
       }, { onlySelf: true });
-    }, error => {
-      this.frmIndividualReceipt.patchValue({
-        expenditure_aggregate:
-          this._decimalPipe.transform(currentExpenditureAmount, '.2-2')
-      }, { onlySelf: true });
-    });
+    }
   }
 
   private _convertAmountToNumber(amount: string) {
