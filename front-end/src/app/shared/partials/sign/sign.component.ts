@@ -53,6 +53,7 @@ export class SignComponent implements OnInit {
   public showAdditionalEmail2Warn = false;
   public confirm_email_1: string = '';
   public confirm_email_2: string = '';
+  public fec_id = '';
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -75,6 +76,7 @@ export class SignComponent implements OnInit {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this.committee_details = JSON.parse(localStorage.getItem('committee_details'));
+    //this.fec_id = this._activatedRoute.snapshot.queryParams.fec_id;
 
     if (this.formType === '3X') {
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
@@ -558,6 +560,7 @@ export class SignComponent implements OnInit {
                           form: this.frmSignee,
                           direction: 'next',
                           step: 'step_5',
+                          fec_id: res.fec_id,
                           previousStep: this._step
                         });
 
@@ -588,10 +591,16 @@ export class SignComponent implements OnInit {
 
                   localStorage.setItem('form_3X_saved', JSON.stringify(frmSaved));
 
-                  this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode } });
+                  this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode, 
+                                        fec_id: res.fec_id } });
 
                   this._messageService.sendMessage({
                     form_submitted: true
+                  });
+                } else {
+                  this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode } });
+                  this._messageService.sendMessage({
+                    form_submitted: false
                   });
                 }
               });
@@ -612,8 +621,10 @@ export class SignComponent implements OnInit {
                     form: this.frmSignee,
                     direction: 'next',
                     step: 'step_5',
+                    fec_id: res.fec_id,
                     previousStep: this._step
                   });
+
 
                   this._messageService.sendMessage({
                     form_submitted: true
@@ -624,6 +635,7 @@ export class SignComponent implements OnInit {
               this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
                 if (res) {
                   console.log(' response = ', res);
+                  this.fec_id = res.fec_id;
                   /*this.frmSaved = true;
           
                         let formSavedObj: any = {

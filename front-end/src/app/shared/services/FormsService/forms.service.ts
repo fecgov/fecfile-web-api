@@ -417,14 +417,23 @@ export class FormsService {
 
     if (form_type === '99') {
       let form99_details: form99 = JSON.parse(localStorage.getItem('form_99_details'));
-
-      url = '/f99/submit_comm_info';
+      //let formData: FormData = new FormData();
       data = form99_details;
-
       data['form_type'] = 'F99';
+      data['report_id'] = '' + data['id'];
+      data['status'] = 'Submitted';
+      data['amend_ind'] = 'N';
+      //url = '/f99/submit_comm_info';
+      url = '/core/submit_report';
+      
+
+      
+
+      console.log('F99 Data : ', data);
+
     }
     return this._http
-      .post(`${environment.apiUrl}${url}`, data, {
+      .put(`${environment.apiUrl}${url}`, data, {
         headers: httpOptions
       })
       .pipe(
@@ -432,7 +441,7 @@ export class FormsService {
           if (res) {
             localStorage.removeItem('form_99_details');
             localStorage.removeItem('form_99_details_res');
-            return true;
+            return res;
           }
           return false;
         })
@@ -457,8 +466,8 @@ export class FormsService {
 
       delete form99_details.file;
       url = '/f99/update_f99_info';
-      data = form99_details;
 
+      data = form99_details;
       data['form_type'] = 'F99';
 
       console.log('Signee_SaveForm form99_details', form99_details);
