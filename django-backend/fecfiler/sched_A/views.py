@@ -1786,9 +1786,9 @@ def trash_restore_transactions(request):
 
                 tran_data = {}
                 if transaction_id[:2] == 'SF':
-                    tran_data = load_schedF(cmte_id, report_id, transaction_id)
+                    tran_data = load_schedF(cmte_id, report_id, transaction_id)[0]
                 if transaction_id[:2] == 'SE':
-                    tran_data = load_schedE(cmte_id, report_id, transaction_id)
+                    tran_data = load_schedE(cmte_id, report_id, transaction_id)[0]
 
                 # Deleting/Restoring the transaction
                 deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
