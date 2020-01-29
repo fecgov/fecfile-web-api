@@ -955,14 +955,14 @@ def submit_report(request):
     if form_tp == 'F3X':
         _sql_response = """
         SELECT json_agg(t) FROM (
-            SELECT fec_id, status, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            SELECT 'FEC-' || fec_id as fec_id, status, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
             FROM public.reports
             WHERE report_id = %s)t
         """
     elif form_tp == 'F99':
         _sql_response = """
         SELECT json_agg(t) FROM (
-            SELECT fec_id, status, message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            SELECT 'FEC-' || fec_id as fec_id, status, message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
             FROM public.forms_committeeinfo
             WHERE id = %s)t
         """ 
