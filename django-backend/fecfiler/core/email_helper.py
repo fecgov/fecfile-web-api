@@ -48,7 +48,6 @@ def email(boolean, data):
     ):
         RECIPIENT.append("%s" % data.get("email_on_file_1"))
 
-    RECIPIENT = ["qqss88@gmail.com"]
     SUBJECT = "Form {} submitted successfully".format(data.get("form_type"))
 
     # The email body for recipients with non-HTML email clients.
