@@ -925,11 +925,21 @@ def submit_report(request):
     # fec_id = 'FEC-'+str(report_id)
     
 
-    _sql_update = """
-    UPDATE {}""".format(update_tbl) + """
-    SET status = %s, fec_id = %s""" + """
-    WHERE {} = %s
-    """.format(f_id)
+    if form_tp == 'F3X':
+        _sql_update = """
+            UPDATE {}""".format(update_tbl) + """
+            SET status = %s, fec_id = %s""" + """
+            WHERE {} = %s
+            """.format(f_id)
+    elif form_tp == 'F99':
+        _sql_update = """
+            UPDATE {}""".format(update_tbl) + """
+            SET is_submitted = true, status = %s, fec_id = %s""" + """
+            WHERE {} = %s
+            """.format(f_id)
+    else:
+        raise Exception('Error: invalid form type.') 
+
     with connection.cursor() as cursor:
         cursor.execute(_sql_update, [SUBMIT_STATUS, fec_id, report_id])
         if cursor.rowcount == 0:
