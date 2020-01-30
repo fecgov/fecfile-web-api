@@ -443,7 +443,7 @@ export const coordinatedExpenditureCCFields = {
             text: 'Expenditure Purpose Description',
             infoIcon: true,
             infoText: 'Request language from RAD',
-            name: 'expenditure_purpose_description',
+            name: 'purpose',
             type: 'text',
             value: null,
             scroll: true,

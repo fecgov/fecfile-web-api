@@ -154,6 +154,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.editTransactionSubscription = this._tranMessageService
       .getEditTransactionMessage()
       .subscribe((trx: TransactionModel) => {
+        console.log(trx.transactionTypeIdentifier + 'tranc iden');
         if (trx.transactionTypeIdentifier === 'ALLOC_H2_RATIO') {
           this.editH2(trx);
         }

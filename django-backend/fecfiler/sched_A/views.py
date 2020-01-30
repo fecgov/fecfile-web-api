@@ -35,6 +35,7 @@ from fecfiler.core.aggregation_helper import(
     update_aggregate_se,
     load_schedF,
     load_schedE,
+    update_aggregate_sl,
 )
 
 from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
@@ -44,6 +45,7 @@ from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     delete_sql_schedB)
 
 from fecfiler.sched_L.views import update_sl_summary
+# from fecfile.core.aggregation_helper import 
 # from fecfiler.sched_H.views import get_list_schedH4, get_list_schedH6
 
 # Create your views here.
@@ -868,6 +870,7 @@ def post_schedA(datum):
             post_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), check_decimal(datum.get(
                 'contribution_amount')), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'),
                 datum.get('levin_account_id'))
+            logger.debug('transaction saved...')
             try:
                 if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
                     logger.debug('auto generating sched_b child transaction:')
@@ -930,6 +933,8 @@ def post_schedA(datum):
             update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
                 'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            print('haha')
+            update_aggregate_sl(datum)
             update_sl_summary(datum)    
         return datum
     except:
@@ -1781,9 +1786,9 @@ def trash_restore_transactions(request):
 
                 tran_data = {}
                 if transaction_id[:2] == 'SF':
-                    tran_data = load_schedF(cmte_id, report_id, transaction_id)
+                    tran_data = load_schedF(cmte_id, report_id, transaction_id)[0]
                 if transaction_id[:2] == 'SE':
-                    tran_data = load_schedE(cmte_id, report_id, transaction_id)
+                    tran_data = load_schedE(cmte_id, report_id, transaction_id)[0]
 
                 # Deleting/Restoring the transaction
                 deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
