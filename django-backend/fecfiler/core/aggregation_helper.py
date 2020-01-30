@@ -4,6 +4,7 @@ import requests
 
 # from functools import lru_cache
 from django.db import connection
+from fecfiler.core.transaction_util import do_transaction
 
 # from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
 # import datetime
