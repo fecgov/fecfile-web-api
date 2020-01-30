@@ -124,6 +124,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _prePopulateFromSchedDData: any;
   protected _prePopulateFromSchedLData: any;
   protected _parentTransactionModel: TransactionModel;
+  protected _rollbackAfterUnsuccessfulSave = false;
 
   /**
    * For toggling between 2 screens of Sched F Debt Payment.
@@ -1844,6 +1845,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         reportId = this._activatedRoute.snapshot.queryParams.reportId;
       }
 
+      this._rollbackAfterUnsuccessfulSave = false;
       this._receiptService.saveSchedule(this.formType, this.scheduleAction, reportId).subscribe(res => {
         if (res) {
           this._transactionToEdit = null;
@@ -2084,6 +2086,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
           }
         }
+      }, error =>{
+        this._rollbackAfterUnsuccessfulSave = true;
+        this._messageService.sendRollbackChangesMessage({rollbackChanges:true});
       });
     } else {
       this.frmIndividualReceipt.markAsDirty();
