@@ -43,8 +43,8 @@ SCHED_SCHED_CODES_DICT = {
         'sched_d': 'SD',
         'sched_e': 'SE',
         'sched_f': 'SF',
-        # 'sched_h1': 'SH1',
-        # 'sched_h2': 'SH2',
+        'sched_h1': 'SH',
+        'sched_h2': 'SH',
         'sched_h3': 'SH',
         'sched_h4': 'SH',
         'sched_h5': 'SH',
@@ -91,7 +91,7 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
             sql_query = """SELECT json_agg(t) FROM ({}) t""".format(query)
             # print(sql_query)
             cursor.execute(sql_query, query_values_list)
-            #print(cursor.query.decode("utf-8"))
+            # print(cursor.query.decode("utf-8"))
             result = cursor.fetchone()[0]
             if result is None:
                 # TO Handle zero transactions in sched_a or sched_b for a specific transaction_type_identifer using this condition
