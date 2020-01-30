@@ -81,7 +81,7 @@ export class FinancialSummaryComponent implements OnInit {
     this._reportTypeService.printPreview('financial_screen', this._formType);
   }
 
-  public viewTransactions(): void {
+  public viewTransactions(transactionCategory?: string): void {
     this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
 
     if (this._form3XReportType === null || typeof this._form3XReportType === 'undefined') {
@@ -98,7 +98,7 @@ export class FinancialSummaryComponent implements OnInit {
     console.log(' FinancialSummaryComponent this.reportId = ', this.reportId);
     this._transactionsMessageService.sendLoadTransactionsMessage(this.reportId);
     this._router.navigate([`/forms/form/${this._formType}`], {
-      queryParams: { step: 'transactions', reportId: this.reportId, edit: this.editMode }
+      queryParams: { step: 'transactions', reportId: this.reportId, edit: this.editMode, transactionCategory: transactionCategory }
     });
   }
 
