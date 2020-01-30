@@ -91,11 +91,11 @@ export class SubmitComponent implements OnInit {
   }
 
   public goToDashboard(): void {
-    if (!this.checkStatus) {
+    //if (!this.checkStatus) {
       this._router.navigateByUrl('dashboard');
-    } else {
-      this._formsComponent.canDeactivate();
-    }
+    //} else {
+    //  this._formsComponent.canDeactivate();
+    //}
   }
 
   private _checkReportStatus() {
