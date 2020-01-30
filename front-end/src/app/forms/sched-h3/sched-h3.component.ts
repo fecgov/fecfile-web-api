@@ -740,6 +740,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public saveAndGetSummary(ratio: any, scheduleAction: any) {
+    this.h3Sum = [];
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
