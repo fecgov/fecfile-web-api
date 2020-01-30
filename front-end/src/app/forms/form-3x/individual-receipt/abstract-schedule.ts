@@ -155,6 +155,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _selectedChangeWarnChild: any;
   private _selectedCandidateChangeWarn: any;
   private _selectedCandidateChangeWarnChild: any;
+  private _isShowWarn: boolean;
   private _contributionAmountMax: number;
   protected _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
@@ -291,6 +292,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._selectedCandidateChangeWarn = null;
     this._selectedCandidateChild = null;
     this._selectedCandidateChangeWarnChild = null;
+    this._isShowWarn = true;
     this._readOnlyMemoCode = false;
     this._readOnlyMemoCodeChild = false;
     this._transactionToEdit = null;
@@ -1513,8 +1515,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
-    const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+    if (this._isShowWarn) {
+      this._isShowWarn = false;
+      const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
+      this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});  
+    }
 
     if (isChildForm) {
       this._selectedChangeWarnChild[name] = name;
@@ -1543,8 +1548,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
-    const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+    if (this._isShowWarn) {
+      this._isShowWarn = false;
+      const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
+      this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+    }
 
     if (isChildForm) {
       this._selectedCandidateChangeWarnChild[name] = name;
@@ -1902,6 +1910,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._selectedCandidateChangeWarn = null;
           this._selectedCandidateChild = null;
           this._selectedCandidateChangeWarnChild = null;
+          this._isShowWarn = true;
           this.activityEventNames = null;
           // Replace this with clearFormValues() if possible - END
 
@@ -2546,6 +2555,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._selectedCandidateChangeWarn = {};
     }
 
+    this._isShowWarn = true;
+
     const fieldNames = [];
     fieldNames.push('cand_last_name');
     fieldNames.push('cand_first_name');
@@ -2602,6 +2613,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._setSetEntityIdTo(this._selectedEntity, col);
       this._selectedChangeWarn = {};
     }
+
+    this._isShowWarn = true;
 
     const fieldNames = [];
     fieldNames.push('last_name');
@@ -2669,6 +2682,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._setSetEntityIdTo(this._selectedEntity, col);
       this._selectedChangeWarn = {};
     }
+
+    this._isShowWarn = true;
 
     // These field names map to the same name in the form
     const fieldNames = [];
@@ -3512,6 +3527,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         // this._selectedCandidateChild = null;
         this._selectedCandidateChangeWarnChild = {};
 
+        this._isShowWarn = true;
+
         // this.transactionType = formData.transactionTypeIdentifier;
         this._setFormDataValues(formData.transactionId, formData.apiCall, formData.reportId);
       }
@@ -3923,6 +3940,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._selectedCandidateChangeWarn = null;
     this._selectedCandidateChild = null;
     this._selectedCandidateChangeWarnChild = null;
+
+    this._isShowWarn = true;
 
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;
