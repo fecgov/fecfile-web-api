@@ -12,51 +12,48 @@ import {
   OnChanges,
   SimpleChanges
 } from '@angular/core';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import {CurrencyPipe, DecimalPipe} from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { UtilService } from '../../../shared/utils/util.service';
-import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { IndividualReceiptService } from './individual-receipt.service';
+import {FormsService} from '../../../shared/services/FormsService/forms.service';
+import {UtilService} from '../../../shared/utils/util.service';
+import {MessageService} from '../../../shared/services/MessageService/message.service';
+import {IndividualReceiptService} from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
-import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
-import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
+import {alphaNumeric} from '../../../shared/utils/forms/validation/alpha-numeric.validator';
+import {floatingPoint} from '../../../shared/utils/forms/validation/floating-point.validator';
 import { validatePurposeInKindRequired, IN_KIND } from '../../../shared/utils/forms/validation/purpose.validator';
-import { ReportTypeService } from '../report-type/report-type.service';
+import {ReportTypeService} from '../report-type/report-type.service';
 import { Observable, Subscription, interval, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
-import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
-import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import {
-  ConfirmModalComponent,
-  ModalHeaderClassEnum
-} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { TransactionModel } from '../../transactions/model/transaction.model';
-import { F3xMessageService } from '../service/f3x-message.service';
+import {TypeaheadService} from 'src/app/shared/partials/typeahead/typeahead.service';
+import {DialogService} from 'src/app/shared/services/DialogService/dialog.service';
+import {ConfirmModalComponent, ModalHeaderClassEnum} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {TransactionModel} from '../../transactions/model/transaction.model';
+import {F3xMessageService} from '../service/f3x-message.service';
 
 import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
-import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
+import {TransactionsMessageService} from '../../transactions/service/transactions-message.service';
 import { ActiveView } from '../../transactions/transactions.component';
-import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
-import { validateAmount, validateContributionAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
-import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import {validateAggregate} from 'src/app/shared/utils/forms/validation/aggregate.validator';
+import {validateAmount, validateContributionAmount} from 'src/app/shared/utils/forms/validation/amount.validator';
+import {ContributionDateValidator} from 'src/app/shared/utils/forms/validation/contribution-date.validator';
+import {ContactsService} from 'src/app/contacts/service/contacts.service';
 import { trigger, transition, style, animate, state } from '@angular/animations';
 import { heLocale } from 'ngx-bootstrap';
 import { TransactionsService, GetTransactionsResponse } from '../../transactions/service/transactions.service';
-import { ReportsService } from 'src/app/reports/service/report.service';
-import { reportModel } from 'src/app/reports/model/report.model';
+import {ReportsService} from 'src/app/reports/service/report.service';
+import {reportModel} from 'src/app/reports/model/report.model';
 import { entityTypes, committeeEventTypes } from './entity-types-json';
-import { ScheduleActions } from './schedule-actions.enum';
-import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
-import { coordinatedPartyExpenditureFields } from '../../sched-f-core/coordinated-party-expenditure-fields';
-import { coordinatedExpenditureCCFields } from '../../sched-f-core/coordinated-expenditure-cc-fields';
-import { coordinatedExpenditureStaffFields } from '../../sched-f-core/coordinated-expenditure-staff-fields';
-import { coordinatedExpenditurePayrollFields } from '../../sched-f-core/coordinated-expenditure-payroll-fields';
+import {ScheduleActions} from './schedule-actions.enum';
+import {AbstractScheduleParentEnum} from './abstract-schedule-parent.enum';
+import {coordinatedPartyExpenditureFields} from '../../sched-f-core/coordinated-party-expenditure-fields';
+import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-expenditure-cc-fields';
+import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
+import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -3055,7 +3052,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.frmIndividualReceipt.controls[fieldName].setValidators([Validators.required]);
           this.frmIndividualReceipt.controls[fieldName].updateValueAndValidity();
         }
-        if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+        if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+        this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent ) {
           if (fieldName === 'expenditure_date') {
             if (this._selectedCandidate) {
               if (this._selectedCandidate.beneficiary_cand_id) {
@@ -3311,6 +3309,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * @param res
    */
   private _hijackFormFields(res: any): any {
+    console.log('Hijack for : '  + this.transactionType);
     switch (this.transactionType) {
       case 'COEXP_PARTY':
         res = this._coordinatedPartyExpenditureFields;
@@ -4533,5 +4532,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this._doValidateReceipt(SaveActions.saveForReturnToSummary);
       }
     }
+  }
+  protected convertAmountToNumber(amount: string) {
+    if (amount) {
+      return Number(this.abstractRemoveCommas(amount));
+    }
+    return 0;
+  }
+
+  protected abstractRemoveCommas(amount: string): string {
+    return amount.toString().replace(new RegExp(',', 'g'), '');
   }
 }
