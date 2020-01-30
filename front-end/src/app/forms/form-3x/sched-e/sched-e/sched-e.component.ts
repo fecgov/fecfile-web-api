@@ -25,6 +25,7 @@ import { connectableObservableDescriptor } from 'rxjs/internal/observable/Connec
 import { AbstractSchedule } from '../../individual-receipt/abstract-schedule';
 import { AbstractScheduleParentEnum } from '../../individual-receipt/abstract-schedule-parent.enum';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { MultiStateValidator } from '../../../../shared/utils/forms/validation/multistate.validator';
 
 @Component({
   selector: 'app-sched-e',
@@ -34,9 +35,10 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
   encapsulation: ViewEncapsulation.None
 })
 export class SchedEComponent extends IndividualReceiptComponent implements OnInit {
-
+  
   private messageSubscription: Subscription;
   private populateChildComponentMessageSubscription: Subscription
+  private rollbackChangesMessageSubscription: Subscription;
 
 
   public hideCandidateState = false;
@@ -46,6 +48,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   private _reportId;
   public candOfficeStatesByTransactionType: any;
   public displayCandStateField = false;
+  private _minStateSelectionForMultistate = 6;
 
   public supportOpposeTypes = [
     { 'code': 'S', 'description': 'Support' },
@@ -79,6 +82,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
+    private _multistateValidator:MultiStateValidator,
     private _changeDetector: ChangeDetectorRef,
     private _schedEService: SchedEService) {
     super(
@@ -108,11 +112,17 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       if (message && message.parentFormPopulated) {
         this.populateChildData();
       }
-    })
+    });
 
     this.populateChildComponentMessageSubscription = _messageService.getPopulateChildComponentMessage().subscribe(message => {
       if (message && message.populateChildForEdit && message.transactionData) {
         this.populateFormForEdit(message.transactionData);
+      }
+    });
+
+    this.rollbackChangesMessageSubscription = _messageService.getRollbackChangesMessage().subscribe(message => {
+      if(message && message.rollbackChanges){
+        this.rollbackIfSaveFailed();
       }
     })
   }
@@ -174,6 +184,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     super.ngOnDestroy();
     this.messageSubscription.unsubscribe();
     this.populateChildComponentMessageSubscription.unsubscribe();
+    this.rollbackChangesMessageSubscription.unsubscribe();
   }
 
   /**Add any child specific initializations, validators here */
@@ -186,6 +197,12 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       }
       // this.frmIndividualReceipt.controls['disbursement_date'].setValidators([Validators.required]);
       this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
+    }
+
+    if (this.frmIndividualReceipt.controls['election_other_description']) {
+      this.frmIndividualReceipt.controls['election_other_description'].clearValidators();
+      // this.frmIndividualReceipt.controls['election_other_description'].setValidators[();
+      this.frmIndividualReceipt.controls['election_other_description'].updateValueAndValidity();
     }
 
     //TODO -- currently for some of the forms api is sending entityTypes as null. Setting it here based on transaction type until that is fixed
@@ -206,9 +223,16 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.frmIndividualReceipt.patchValue({ memo_text_states: this.prepopulatedMemoText }, { onlySelf: true });
       this.candOfficeStatesByTransactionType = this.candidateOfficeTypes.filter(element => element.code === 'P');
       this.displayCandStateField = true;
-      this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
-      this.frmIndividualReceipt.controls['cand_office_state'].setValidators([Validators.required, Validators.maxLength(2)]);
-      this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+      if(this.frmIndividualReceipt.controls['cand_office_state']){
+        this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
+        this.frmIndividualReceipt.controls['cand_office_state'].setValidators([Validators.required, Validators.maxLength(2)]);
+      }
+      if(this.frmIndividualReceipt.controls['cand_office_district']){
+        this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+      }
+      if(this.frmIndividualReceipt.controls['multi_state_options']){
+        this.frmIndividualReceipt.controls['multi_state_options'].setValidators([this._multistateValidator.multistateSelection(this._minStateSelectionForMultistate), Validators.required]);
+      }
       this.frmIndividualReceipt.updateValueAndValidity();
       this._changeDetector.detectChanges();
     }
@@ -457,6 +481,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   public saveOnly() {
     this.addSchedESpecificMetadata();
     super.saveOnly();
+    this.rollbackIfSaveFailed();
   }
 
   public updateOnly() {
@@ -482,7 +507,24 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   private addSchedESpecificMetadata() {
     this.hiddenFields.push({ type: "hidden", name: "full_election_code", value: this.electionCode + this.electionYear });
     if (this.transactionType === 'IE_MULTI') {
-      this.frmIndividualReceipt.patchValue({ memo_text: this.prepopulatedMemoText + ' ' + this.selectedStates + this.multistateMemoTextDelimiter +  this.frmIndividualReceipt.controls['memo_text'].value }, { onlySelf: true });
+      let currentVal = this.frmIndividualReceipt.controls['memo_text'].value;
+      if(!currentVal){
+        currentVal = '';
+      }
+      this.frmIndividualReceipt.patchValue({ memo_text: this.prepopulatedMemoText + ' ' + this.selectedStates + this.multistateMemoTextDelimiter +  currentVal }, { onlySelf: true });
+    }
+  }
+
+
+  private rollbackIfSaveFailed() {
+    if (this._rollbackAfterUnsuccessfulSave){
+      if (this.transactionType === 'IE_MULTI') {
+        let originalMemoText = (this.frmIndividualReceipt.controls['memo_text'].value).split('-');
+        if(originalMemoText && originalMemoText.length > 1){
+          originalMemoText = originalMemoText[1];
+          this.frmIndividualReceipt.patchValue({ memo_text: originalMemoText }, { onlySelf: true });
+        }
+      } 
     }
   }
 
