@@ -407,12 +407,13 @@ def get_sched_e_ytd_amount(request):
             raise Exception('election_code is required for this api.')
         if cand_office == 'P':
             _sql = """
-            SELECT calendar_ytd_amount 
+            SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
             FROM public.sched_e
             WHERE cmte_id = %s
             AND so_cand_office = %s 
             AND election_code = %s 
             AND delete_ind is distinct from 'Y'
+            ORDER BY transaction_dt DESC, create_date DESC; 
             """
             _v = (cmte_id, cand_office, election_code)
         elif cand_office == 'S':
@@ -420,13 +421,14 @@ def get_sched_e_ytd_amount(request):
             if not cand_state:
                 raise Exception('cand_state is required for cand_office S')
             _sql = """
-            SELECT calendar_ytd_amount 
+            SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
             FROM public.sched_e
             WHERE cmte_id = %s
             AND so_cand_office = %s 
             AND election_code = %s 
             AND so_cand_state = %s 
             AND delete_ind is distinct from 'Y'
+            ORDER BY transaction_dt DESC, create_date DESC; 
             """
             _v = (cmte_id, cand_office, election_code, cand_state)
         elif cand_office == 'H':
@@ -437,7 +439,7 @@ def get_sched_e_ytd_amount(request):
             if not cand_district:
                 raise Exception('cand_district is required for cand_office H')
             _sql = """
-            SELECT calendar_ytd_amount 
+            SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt
             FROM public.sched_e
             WHERE cmte_id = %s
             AND so_cand_office = %s 
@@ -445,6 +447,7 @@ def get_sched_e_ytd_amount(request):
             AND so_cand_state = %s 
             AND so_cand_district = %s 
             AND delete_ind is distinct from 'Y'
+            ORDER BY transaction_dt DESC, create_date DESC; 
             """
             _v = (cmte_id, cand_office, election_code,
                   cand_state, cand_district)

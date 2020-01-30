@@ -32,6 +32,7 @@ export class F99Component implements OnInit {
   public isLoading: boolean = true;
   public committee_details: any = {};
   public showValidateBar: boolean = false;
+  public fec_id = '';
 
   private _committeeDetails: any = {};
   private _form99Details: any = {};
@@ -165,9 +166,13 @@ export class F99Component implements OnInit {
       if (this.direction === 'next') {
         if (this.frm.valid) {
           this.step = this._step;
-
-          this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, reportId: this.reportId,
+          if (this.step === 'step_5') {
+            this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, fec_id: this.fec_id,
             edit: this.editMode, refresh: this.editMode } });
+          } else {
+            this._router.navigate(['/forms/form/99'], { queryParams: { step: this.step, reportId: this.reportId,
+            edit: this.editMode, refresh: this.editMode } });
+          }
         } else if (this.frm === 'preview') {
           this.step = this._step;
 
@@ -198,6 +203,8 @@ export class F99Component implements OnInit {
     this._step = e.step;
 
     this.currentStep = e.step;
+
+    this.fec_id = e.fec_id;
 
     if (e.refresh && e.edit !== false) {
       this.editMode = e.refresh;

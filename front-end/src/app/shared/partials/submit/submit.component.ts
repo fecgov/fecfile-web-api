@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { MessageService } from '../../services/MessageService/message.service';
@@ -17,7 +17,7 @@ import { FormsComponent } from 'src/app/forms/forms.component';
 })
 export class SubmitComponent implements OnInit {
   public form_type: string = '';
-  public FEC_Id: string = '#####';
+  @Input() public FEC_Id: string = '#####';
 
   private _reportId: number;
   private _subscription: Subscription;
@@ -34,8 +34,9 @@ export class SubmitComponent implements OnInit {
 
   ngOnInit() {
     this.form_type = this._activatedRoute.snapshot.paramMap.get('form_id');
-    if (this._router.url.indexOf('step_5') > -1) {
-      this._checkReportStatus();
+     if (this._router.url.indexOf('step_6') > -1) {
+      this.FEC_Id = this._activatedRoute.snapshot.queryParams.fec_id;
+      // this._checkReportStatus();
     }
     console.log('form submitted ...', this.form_type);
 
@@ -98,10 +99,12 @@ export class SubmitComponent implements OnInit {
   }
 
   private _checkReportStatus() {
-    if (this._router.url.indexOf('step_5') > -1) {
+    // we need to revisit to see if we really need this code
+    /*if (this._router.url.indexOf('step_5') > -1) {
       this._formsService.get_report_status(this.form_type, this._reportId).subscribe(
         res => {
-          if (res && res.fec_status === 'Accepted') {
+          // if (res && res.fec_status === 'Accepted') {
+          if (res && res.fec_status === 'Submitted') {
             this.FEC_Id = res.fec_id;
             this.checkStatus = false;
           } else {
@@ -112,6 +115,6 @@ export class SubmitComponent implements OnInit {
           console.log('error: ', error);
         }
       );
-    }
+    }*/
   }
 }

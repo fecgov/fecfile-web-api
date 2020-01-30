@@ -5,6 +5,7 @@ import maya
 from django.db import connection
 from django.template.loader import render_to_string
 import boto3
+from botocore.exceptions import ClientError
 
 # from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
 # import datetime
@@ -61,17 +62,16 @@ def email(boolean, data):
     # t = Template(email_ack1)
     # c= Context({'@REPID':123458},)
 
-    data["updated_at"] = (
-        maya.parse(data["updated_at"])
-        .datetime(to_timezone="US/Eastern", naive=True)
-        .strftime("%m-%d-%Y %T")
-    )
-    data["created_at"] = (
-        maya.parse(data["created_at"])
-        .datetime(to_timezone="US/Eastern", naive=True)
-        .strftime("%m-%d-%Y %T")
-    )
-
+    # data["updated_at"] = (
+    #     maya.parse(data["updated_at"])
+    #     .datetime(to_timezone="US/Eastern", naive=True)
+    #     .strftime("%m-%d-%Y %T")
+    # )
+    # data["created_at"] = (
+    #     maya.parse(data["created_at"])
+    #     .datetime(to_timezone="US/Eastern", naive=True)
+    #     .strftime("%m-%d-%Y %T")
+    # )
     BODY_HTML = render_to_string("email_ack.html", {"data": data})
     # data.get('committeeid')
 
