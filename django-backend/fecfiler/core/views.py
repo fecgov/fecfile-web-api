@@ -2408,7 +2408,7 @@ def superceded_report_id_list(report_id):
             else:
                 report_list.append(str(reportId[0]))
                 report_id = reportId[0]
-        print(report_list)
+        # print(report_list)
         return report_list
     except Exception as e:
         raise
