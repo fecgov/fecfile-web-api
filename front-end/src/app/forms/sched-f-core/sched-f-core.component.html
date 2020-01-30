@@ -751,7 +751,7 @@
                 (click)="previousStep()">
                 Previous
               </button>
-              <button *ngIf="scheduleAction === aditScheduleAction" 
+              <button *ngIf="scheduleAction === editScheduleAction"
                 class="btn btn-previous btn-left" type="button" (click)="cancel()">
                 Cancel
               </button>
@@ -765,13 +765,15 @@
               </button>
               <ng-container>
                 <button *ngIf="scheduleAction === addScheduleAction"
-                  class="btn btn-secondary btn-right" 
-                  (click)="saveOnly()">
+                        class="btn btn-secondary btn-right"
+                        [disabled]="!frmIndividualReceipt.valid"
+                        (click)="saveOnly()">
                   Save &amp; Add Transaction
                 </button>
                 <button *ngIf="scheduleAction === editScheduleAction"
-                  class="btn btn-secondary btn-right" 
-                  (click)="updateOnly()">
+                        class="btn btn-secondary btn-right"
+                        [disabled]="!frmIndividualReceipt.valid"
+                        (click)="updateOnly()">
                   Save
                 </button>
                 <button *ngIf="scheduleAction === addScheduleAction" 

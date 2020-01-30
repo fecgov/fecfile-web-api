@@ -141,6 +141,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       .getEditTransactionMessage()
       .subscribe((trx: TransactionModel) => {
         this.transactionToEdit = trx;
+        console.log(trx.transactionTypeIdentifier + 'identifier for edit');
         this.showEdit();
       });
 
