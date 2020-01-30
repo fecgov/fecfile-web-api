@@ -5,6 +5,7 @@ import maya
 from django.db import connection
 from django.template.loader import render_to_string
 import boto3
+from botocore.exceptions import ClientError
 
 # from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
 # import datetime

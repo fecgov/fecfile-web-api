@@ -1,5 +1,6 @@
 import logging
 import datetime
+import requests
 
 # from functools import lru_cache
 from django.db import connection
@@ -520,6 +521,56 @@ def load_schedE(cmte_id, report_id, transaction_id):
         raise
 
 
+def get_election_year(office_sought, election_state, election_district):
+    try:
+        if office_sought == "P":
+            param_string = "&office_sought={}".format(office_sought)
+            add_year = 4
+        elif office_sought == "S":
+            param_string = "&office_sought={}&election_state={}".format(
+                office_sought, election_state
+            )
+            add_year = 6
+        elif office_sought == "H":
+            param_string = "&office_sought={}&election_state={}&election_district={}".format(
+                office_sought, election_state, election_district
+            )
+            add_year = 2
+        else:
+            raise Exception("office_sought can only take P,S,H values")
+        i = 1
+        results = []
+        election_year_list = []
+        while True:
+            ab = requests.get(
+                "https://api.open.fec.gov/v1/election-dates/?sort=-election_date&api_key=50nTHLLMcu3XSSzLnB0hax2Jg5LFniladU5Yf25j&page={}&per_page=100&sort_hide_null=false&sort_nulls_last=false{}".format(
+                    i, param_string
+                )
+            )
+            results = results + ab.json()["results"]
+            if (
+                i == ab.json()["pagination"]["pages"]
+                or ab.json()["pagination"]["pages"] == 0
+            ):
+                break
+            else:
+                i += 1
+        logger.debug("count of FEC election dates API:" + str(len(results)))
+        for result in results:
+            if result["election_year"] not in election_year_list:
+                election_year_list.append(result["election_year"])
+        if election_year_list:
+            election_year_list.sort(reverse=True)
+            if election_year_list[0] + add_year >= datetime.datetime.now().year:
+                election_year_list.insert(0, election_year_list[0] + add_year)
+        return election_year_list
+    except Exception as e:
+        logger.debug(e)
+        raise Exception(
+            "The get_election_year function is throwing an error: " + str(e)
+        )
+
+
 def agg_dates(cmte_id, beneficiary_cand_id, expenditure_date):
     try:
         start_date = None
@@ -648,6 +699,24 @@ def update_aggregate_sf(cmte_id, beneficiary_cand_id, expenditure_date):
         )
 
 
+def put_aggregate_SF(aggregate_general_elec_exp, transaction_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE public.sched_f SET aggregate_general_elec_exp = %s WHERE transaction_id = %s",
+                [aggregate_general_elec_exp, transaction_id],
+            )
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "The Transaction ID: {} does not exist in schedF table".format(
+                        transaction_id
+                    )
+                )
+    except Exception as e:
+        logger.debug(e)
+        raise Exception("The put_aggregate_SF function is throwing an error: " + str(e))
+
+
 def load_schedF(cmte_id, report_id, transaction_id):
     try:
         with connection.cursor() as cursor:
@@ -706,18 +775,19 @@ def load_schedF(cmte_id, report_id, transaction_id):
                         transaction_id
                     )
                 )
-            merged_list = []
-            for dictF in schedF_list:
-                entity_id = dictF.get("entity_id")
-                data = {"entity_id": entity_id, "cmte_id": cmte_id}
-                entity_list = get_entities(data)
-                dictEntity = entity_list[0]
-                del dictEntity["cand_office"]
-                del dictEntity["cand_office_state"]
-                del dictEntity["cand_office_district"]
-                merged_dict = {**dictF, **dictEntity}
-                merged_list.append(merged_dict)
-        return merged_list
+            return schedF_list
+            # merged_list = []
+        #     for dictF in schedF_list:
+        #         entity_id = dictF.get("entity_id")
+        #         data = {"entity_id": entity_id, "cmte_id": cmte_id}
+        #         entity_list = get_entities(data)
+        #         dictEntity = entity_list[0]
+        #         del dictEntity["cand_office"]
+        #         del dictEntity["cand_office_state"]
+        #         del dictEntity["cand_office_district"]
+        #         merged_dict = {**dictF, **dictEntity}
+        #         merged_list.append(merged_dict)
+        # return merged_list
     except Exception:
         raise
 
