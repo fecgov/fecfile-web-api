@@ -886,8 +886,8 @@ def get_form99list(request):
 
             #commented by Mahendra 10052019
             #print ("[cmte_id]", cmte_id)
-            #print ("[viewtype]", viewtype)
-            #print ("[reportid]", reportid)
+            print ("[viewtype]", viewtype)
+            print ("[reportid]", reportid)
 
             forms_obj = None
             with connection.cursor() as cursor:
@@ -916,7 +916,7 @@ def get_form99list(request):
                                             ELSE 'current'
                                         END AS viewtype,
                                             deleteddate
-                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
+                                         FROM public.reports_view WHERE cmte_id = %s AND delete_ind is distinct from 'Y'
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
@@ -934,9 +934,15 @@ def get_form99list(request):
                 for row in cursor.fetchall():
                     data_row = list(row)
                     forms_obj=data_row[0]
-
+            print(forms_obj)
             if forms_obj is None:
                forms_obj = []
+
+            # for submitted report, add FEC- to fec_id
+            SUBMIT_STATUS = 'Filed'
+            for obj in forms_obj:
+                if obj['status'] == SUBMIT_STATUS:
+                    obj['fec_id'] = 'FEC-' + str(obj.get('fec_id', ''))
 
             with connection.cursor() as cursor:
 
@@ -968,7 +974,7 @@ def get_form99list(request):
                                             WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
                                             ELSE 'current'
                                         END AS viewtype, deleteddate
-                                         FROM public.reports_view WHERE cmte_id = %s  AND (delete_ind <> 'Y' OR delete_ind is NULL) AND last_update_date is not null 
+                                         FROM public.reports_view WHERE cmte_id = %s  AND (delete_ind <> 'Y' OR delete_ind is NULL) 
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
