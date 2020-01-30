@@ -125,36 +125,36 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   public next() {
     this.frmIndividualReceipt.markAsTouched();
 
-    // if (!this._checkFormFieldIsValid('coordinated_exp_ind')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('designating_cmte_id')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('designating_cmte_name')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('subordinate_cmte_id')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('subordinate_cmte_name')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('subordinate_cmte_street_1')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('subordinate_cmte_street_2')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('subordinate_cmte_city')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('subordinate_cmte_state')) {
-    //   return;
-    // }
-    // if (!this._checkFormFieldIsValid('subordinate_cmte_zip')) {
-    //   return;
-    // }
+    if (!this._checkFormFieldIsValid('coordinated_exp_ind')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('designating_cmte_id')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('designating_cmte_name')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('subordinate_cmte_id')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('subordinate_cmte_name')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('subordinate_cmte_street_1')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('subordinate_cmte_street_2')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('subordinate_cmte_city')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('subordinate_cmte_state')) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('subordinate_cmte_zip')) {
+      return;
+    }
     this.showPart2 = true;
   }
 
@@ -334,7 +334,21 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     super.handleOnBlurEvent($event, col);
     console.log('col %s %s', col,  this.frmIndividualReceipt.controls['expenditure_amount'].value);
     const expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
+    const contributionAggregateValue: string = this._decimalPipe.transform(
+        expenditureAmount,
+        '.2-2'
+    );
     this.frmIndividualReceipt.patchValue(
-        { aggregate_general_elec_exp: expenditureAmount}, { onlySelf: true });
+        { aggregate_general_elec_exp: contributionAggregateValue}, { onlySelf: true });
   }
+
+  public updateOnly() {
+    this.back();
+    super.updateOnly();
+  }
+  public saveOnly(): void {
+    this.back();
+    super.saveOnly();
+  }
+
 }

@@ -590,7 +590,7 @@ export class F3xComponent implements OnInit {
 
      if(!e.scheduleType && e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.apiCall === '/se/schedE'){
       e.scheduleType = 'sched_e';
-    } 
+    }
 
     if (e.scheduleType && e.transactionType) {
       if (
@@ -604,12 +604,18 @@ export class F3xComponent implements OnInit {
       }
     }
 
-    //TODO_ clean this up  
-    if(!e.scheduleType && e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.transactionTypeIdentifier === 'COEXP_PARTY'){
+    // extract shed_f_core based on transactionTypeIdentifier
+    if ( !e.scheduleType && e.transactionDetail && e.transactionDetail.transactionModel ) {
+      const tTypeIdentifier = e.transactionDetail.transactionModel.transactionTypeIdentifier;
+      if (tTypeIdentifier === 'COEXP_PARTY'  ||
+          tTypeIdentifier === 'COEXP_CC_PAY' ||
+          tTypeIdentifier === 'COEXP_STAF_REIM' ||
+          tTypeIdentifier === 'COEXP_PMT_PROL'
+      ) {
       e.scheduleType = 'sched_f_core';
-    } 
-
-    //default to sched_a ?
+      }
+}
+    // default to sched_a ?
     this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
 
     /*    //Schedule H's need to be remapped too
