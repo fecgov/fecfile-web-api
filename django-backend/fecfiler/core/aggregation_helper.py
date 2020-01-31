@@ -174,6 +174,8 @@ def update_aggregate_sl(datum):
             cmte_id,
             levin_account_id,
         )
+        if not transactions_list:
+            return
         aggregate_amount = 0
         for transaction in transactions_list:
             if transaction[5] != "Y":
@@ -436,6 +438,8 @@ def update_aggregate_se(data):
         transaction_list = get_transactions_election_and_office(
             aggregate_start_date, aggregate_end_date, data
         )
+        if not transaction_list:
+            return
         aggregate_amount = 0
         for transaction in transaction_list:
             # update aggregate amount for non-memo and dangled memo transactions
@@ -707,11 +711,12 @@ def update_aggregate_sf(cmte_id, beneficiary_cand_id, expenditure_date):
         transaction_list = get_SF_transactions_candidate(
             cvg_start_date, cvg_end_date, beneficiary_cand_id
         )
-        for transaction in transaction_list:
-            if transaction["memo_code"] != "X":
-                aggregate_amount += float(transaction["expenditure_amount"])
-            if transaction["expenditure_date"] >= expenditure_date:
-                put_aggregate_SF(aggregate_amount, transaction["transaction_id"])
+        if transaction_list:
+            for transaction in transaction_list:
+                if transaction["memo_code"] != "X":
+                    aggregate_amount += float(transaction["expenditure_amount"])
+                if transaction["expenditure_date"] >= expenditure_date:
+                    put_aggregate_SF(aggregate_amount, transaction["transaction_id"])
     except Exception as e:
         logger.debug(e)
         raise Exception(
