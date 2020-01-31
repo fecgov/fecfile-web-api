@@ -140,7 +140,7 @@
         </app-sched-f>
         <!-- This component is for the 'core' Schedule F, a different component handles sched F payment -->
         <app-sched-f-core
-          *ngIf="scheduleType === 'sched_f_core'"
+          [hidden]="scheduleType !== 'sched_f_core'"
           [formType]="'3X'"
           [transactionTypeText]="transactionTypeTextSchedFCore"
           [transactionType]="transactionTypeSchedFCore"

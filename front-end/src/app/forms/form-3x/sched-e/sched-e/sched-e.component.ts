@@ -25,6 +25,7 @@ import { connectableObservableDescriptor } from 'rxjs/internal/observable/Connec
 import { AbstractSchedule } from '../../individual-receipt/abstract-schedule';
 import { AbstractScheduleParentEnum } from '../../individual-receipt/abstract-schedule-parent.enum';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { MultiStateValidator } from '../../../../shared/utils/forms/validation/multistate.validator';
 
 @Component({
   selector: 'app-sched-e',
@@ -37,6 +38,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   private messageSubscription: Subscription;
   private populateChildComponentMessageSubscription: Subscription
+  private rollbackChangesMessageSubscription: Subscription;
 
 
   public hideCandidateState = false;
@@ -46,6 +48,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   private _reportId;
   public candOfficeStatesByTransactionType: any;
   public displayCandStateField = false;
+  private _minStateSelectionForMultistate = 6;
 
   public supportOpposeTypes = [
     { 'code': 'S', 'description': 'Support' },
@@ -79,6 +82,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
+    private _multistateValidator: MultiStateValidator,
     private _changeDetector: ChangeDetectorRef,
     private _schedEService: SchedEService) {
     super(
@@ -108,11 +112,17 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       if (message && message.parentFormPopulated) {
         this.populateChildData();
       }
-    })
+    });
 
     this.populateChildComponentMessageSubscription = _messageService.getPopulateChildComponentMessage().subscribe(message => {
       if (message && message.populateChildForEdit && message.transactionData) {
         this.populateFormForEdit(message.transactionData);
+      }
+    });
+
+    this.rollbackChangesMessageSubscription = _messageService.getRollbackChangesMessage().subscribe(message => {
+      if (message && message.rollbackChanges) {
+        this.rollbackIfSaveFailed();
       }
     })
   }
@@ -174,6 +184,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     super.ngOnDestroy();
     this.messageSubscription.unsubscribe();
     this.populateChildComponentMessageSubscription.unsubscribe();
+    this.rollbackChangesMessageSubscription.unsubscribe();
   }
 
   /**Add any child specific initializations, validators here */
@@ -186,6 +197,12 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       }
       // this.frmIndividualReceipt.controls['disbursement_date'].setValidators([Validators.required]);
       this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
+    }
+
+    if (this.frmIndividualReceipt.controls['election_other_description']) {
+      this.frmIndividualReceipt.controls['election_other_description'].clearValidators();
+      // this.frmIndividualReceipt.controls['election_other_description'].setValidators[();
+      this.frmIndividualReceipt.controls['election_other_description'].updateValueAndValidity();
     }
 
     //TODO -- currently for some of the forms api is sending entityTypes as null. Setting it here based on transaction type until that is fixed
@@ -206,13 +223,20 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.frmIndividualReceipt.patchValue({ memo_text_states: this.prepopulatedMemoText }, { onlySelf: true });
       this.candOfficeStatesByTransactionType = this.candidateOfficeTypes.filter(element => element.code === 'P');
       this.displayCandStateField = true;
-      this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
-      this.frmIndividualReceipt.controls['cand_office_state'].setValidators([Validators.required, Validators.maxLength(2)]);
-      this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+      if (this.frmIndividualReceipt.controls['cand_office_state']) {
+        this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
+        this.frmIndividualReceipt.controls['cand_office_state'].setValidators([Validators.required, Validators.maxLength(2)]);
+      }
+      if (this.frmIndividualReceipt.controls['cand_office_district']) {
+        this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+      }
+      if (this.frmIndividualReceipt.controls['multi_state_options']) {
+        this.frmIndividualReceipt.controls['multi_state_options'].setValidators([this._multistateValidator.multistateSelection(this._minStateSelectionForMultistate), Validators.required]);
+      }
       this.frmIndividualReceipt.updateValueAndValidity();
       this._changeDetector.detectChanges();
     }
-    else{
+    else {
       this.candOfficeStatesByTransactionType = this.candidateOfficeTypes;
       this._changeDetector.detectChanges();
     }
@@ -223,6 +247,8 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     //split memoText for IE_MULTI
     this._originalExpenditureAmount = trx.expenditure_amount;
     this._originalExpenditureAggregate = trx.expenditure_aggregate;
+
+    this.updateDateValidators();
 
     if (trx.transaction_type_identifier === 'IE_MULTI') {
       let memoText = trx.memo_text.substring(trx.memo_text.indexOf(this.multistateMemoTextDelimiter.trim()) + 1).trim();
@@ -257,7 +283,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
         return false;
       }
     } else if (colName === 'cand_office_district') {
-      if ((this.officeSought === 'P' || this.officeSought === 'S') || (this.transactionType === 'IE_MULTI')){
+      if ((this.officeSought === 'P' || this.officeSought === 'S') || (this.transactionType === 'IE_MULTI')) {
         return false;
       }
     }
@@ -291,7 +317,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
     console.log('YTD is being recalculated ...');
     let currentExpenditureAmount = this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    if (this.scheduleAction === ScheduleActions.add) {
+    if (this.scheduleAction !== ScheduleActions.edit) {
       this._schedEService.getAggregate(this.frmIndividualReceipt.value).subscribe(res => {
 
         this._currentAggregate = "0";
@@ -313,7 +339,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     else {
       this.frmIndividualReceipt.patchValue({
         expenditure_aggregate:
-          this._decimalPipe.transform(this._originalExpenditureAggregate - this._originalExpenditureAmount + 
+          this._decimalPipe.transform(this._originalExpenditureAggregate - this._originalExpenditureAmount +
             this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value), '.2-2')
       }, { onlySelf: true });
     }
@@ -361,8 +387,8 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.frmIndividualReceipt.patchValue({ 'cand_office_district': null }, { onlySelf: true });
     }
     else if (office === 'P') {
-      if(this.transactionType !== 'IE_MULTI')
-      this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
+      if (this.transactionType !== 'IE_MULTI')
+        this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
       this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
       this.frmIndividualReceipt.updateValueAndValidity();
 
@@ -432,22 +458,32 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   public dateChange(fieldName: string) {
 
     //Remove valdiations from the other date field if one is present
-    if (fieldName === 'disbursement_date' && this.frmIndividualReceipt.controls[fieldName].value) {
+    if (fieldName === 'disbursement_date' && this.frmIndividualReceipt.controls[fieldName] && this.frmIndividualReceipt.controls[fieldName].value) {
       this.frmIndividualReceipt.controls['dissemination_date'].clearValidators();
       this.frmIndividualReceipt.controls['dissemination_date'].updateValueAndValidity();
     }
-    else if (fieldName === 'dissemination_date' && this.frmIndividualReceipt.controls[fieldName].value) {
+    else if (fieldName === 'dissemination_date' && this.frmIndividualReceipt.controls[fieldName] && this.frmIndividualReceipt.controls[fieldName].value) {
       this.frmIndividualReceipt.controls['disbursement_date'].clearValidators();
       this.frmIndividualReceipt.controls['disbursement_date'].setValidators([this._contributionDateValidator.contributionDate(this.coverageStartDate, this.coverageEndDate)]);
       this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
     }
-    else if (!this.frmIndividualReceipt.controls['dissemination_date'].value && !this.frmIndividualReceipt.controls['disbursement_date'].value) {
+    else if ((this.frmIndividualReceipt.controls['dissemination_date'] && this.frmIndividualReceipt.controls['disbursement_date']) &&
+     (!this.frmIndividualReceipt.controls['dissemination_date'].value && !this.frmIndividualReceipt.controls['disbursement_date'].value)) {
       this.frmIndividualReceipt.controls['disbursement_date'].setValidators([this._contributionDateValidator.contributionDate(this.coverageStartDate, this.coverageEndDate), Validators.required]);
       this.frmIndividualReceipt.controls['dissemination_date'].setValidators([Validators.required]);
       this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
       this.frmIndividualReceipt.controls['dissemination_date'].updateValueAndValidity();
 
     }
+  }
+
+  /**
+   * This method will run through the dateChange event on both fields and based on which fields are present
+   * it will update the validators. 
+   */
+  private updateDateValidators() {
+    this.dateChange('disbursement_date');
+    this.dateChange('dissemination_date');
   }
 
   private removeCommas(amount: string): string {
@@ -457,6 +493,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   public saveOnly() {
     this.addSchedESpecificMetadata();
     super.saveOnly();
+    this.rollbackIfSaveFailed();
   }
 
   public updateOnly() {
@@ -482,7 +519,24 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   private addSchedESpecificMetadata() {
     this.hiddenFields.push({ type: "hidden", name: "full_election_code", value: this.electionCode + this.electionYear });
     if (this.transactionType === 'IE_MULTI') {
-      this.frmIndividualReceipt.patchValue({ memo_text: this.prepopulatedMemoText + ' ' + this.selectedStates + this.multistateMemoTextDelimiter +  this.frmIndividualReceipt.controls['memo_text'].value }, { onlySelf: true });
+      let currentVal = this.frmIndividualReceipt.controls['memo_text'].value;
+      if (!currentVal) {
+        currentVal = '';
+      }
+      this.frmIndividualReceipt.patchValue({ memo_text: this.prepopulatedMemoText + ' ' + this.selectedStates + this.multistateMemoTextDelimiter + currentVal }, { onlySelf: true });
+    }
+  }
+
+
+  private rollbackIfSaveFailed() {
+    if (this._rollbackAfterUnsuccessfulSave) {
+      if (this.transactionType === 'IE_MULTI') {
+        let originalMemoText = (this.frmIndividualReceipt.controls['memo_text'].value).split('-');
+        if (originalMemoText && originalMemoText.length > 1) {
+          originalMemoText = originalMemoText[1];
+          this.frmIndividualReceipt.patchValue({ memo_text: originalMemoText }, { onlySelf: true });
+        }
+      }
     }
   }
 
@@ -491,21 +545,21 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
    * Search for Candidate when first name input value changes.
    */
   searchCandLastName = (text$: Observable<string>) =>
-  text$.pipe(
-    debounceTime(500),
-    distinctUntilChanged(),
-    switchMap(searchText => {
-      if (searchText) {
-        let result = this._typeaheadService.getContacts(searchText, 'cand_last_name');
-        if(this.transactionType === 'IE_MULTI'){
-          result = result.map(contacts => contacts.filter(element => element.cand_office === 'P'))
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          let result = this._typeaheadService.getContacts(searchText, 'cand_last_name');
+          if (this.transactionType === 'IE_MULTI') {
+            result = result.map(contacts => contacts.filter(element => element.cand_office === 'P'))
+          }
+          return result;
+        } else {
+          return Observable.of([]);
         }
-        return result;
-      } else {
-        return Observable.of([]);
-      }
-    })
-  );
+      })
+    );
 
   /**
    * Search for Candidate when first name input value changes.
@@ -517,7 +571,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       switchMap(searchText => {
         if (searchText) {
           let result = this._typeaheadService.getContacts(searchText, 'cand_first_name');
-          if(this.transactionType === 'IE_MULTI'){
+          if (this.transactionType === 'IE_MULTI') {
             result = result.map(contacts => contacts.filter(element => element.cand_office === 'P'))
           }
           return result;

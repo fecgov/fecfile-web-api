@@ -1128,9 +1128,12 @@ def put_schedA(datum):
         update_date = datetime.datetime.strptime(prev_transaction_data.get('contribution_date'), '%Y-%m-%d').date()
         if update_date > datum.get('contribution_date'):
             update_date = datum.get('contribution_date')
-        update_linenumber_aggamt_transactions_SA(update_date, datum.get(
-            'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+
+        if transaction_id.startswith('SA'):
+            update_linenumber_aggamt_transactions_SA(update_date, datum.get(
+                'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            update_aggregate_sl(datum)
             update_sl_summary(datum)    
         return datum
     except:
@@ -1786,9 +1789,9 @@ def trash_restore_transactions(request):
 
                 tran_data = {}
                 if transaction_id[:2] == 'SF':
-                    tran_data = load_schedF(cmte_id, report_id, transaction_id)
+                    tran_data = load_schedF(cmte_id, report_id, transaction_id)[0]
                 if transaction_id[:2] == 'SE':
-                    tran_data = load_schedE(cmte_id, report_id, transaction_id)
+                    tran_data = load_schedE(cmte_id, report_id, transaction_id)[0]
 
                 # Deleting/Restoring the transaction
                 deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,

@@ -327,6 +327,14 @@
                               coverage period only. -->
                           </div>
                         </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt?.get(col?.name)?.errors?.minStates">
+                            You must select at least 6 states
+                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                              coverage period only. -->
+                          </div>
+                        </ng-container>
                       </div>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'checkbox'">
@@ -346,6 +354,7 @@
                     <ng-container *ngIf="col?.type === 'textarea'">
                       <textarea  class="form-control"
                          [attr.name]="col?.name"
+                         [attr.readonly]="col.isReadonly"
                         [attr.maxlength]="col?.validation?.max" [formControlName]="col?.name"></textarea>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office')">
@@ -391,7 +400,6 @@
                         [items]="states"
                         [multiple]="true" 
                         (change)="handleMultiStateChange($event, col)"
-                        [maxSelectedItems]="6"
                         class="forms__select" 
                         [formControlName]="col?.name" 
                         bindValue="code" 
@@ -410,6 +418,19 @@
                         </ng-template>
                       </ng-select>
                     </ng-container>
+                    <div class="error-text" *ngIf="
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
+                            frmIndividualReceipt.get(col?.name).invalid
+                          ">
+                      <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt?.get(col?.name)?.errors?.minStates">
+                            You must select at least 6 states
+                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                              coverage period only. -->
+                          </div>
+                        </ng-container>    
+                    </div>
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office_state') && isFieldVisible(col?.name)">
                       <ng-select #stateSelect 
                         [items]="states" 

@@ -12,51 +12,48 @@ import {
   OnChanges,
   SimpleChanges
 } from '@angular/core';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import {CurrencyPipe, DecimalPipe} from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { UtilService } from '../../../shared/utils/util.service';
-import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { IndividualReceiptService } from './individual-receipt.service';
+import {FormsService} from '../../../shared/services/FormsService/forms.service';
+import {UtilService} from '../../../shared/utils/util.service';
+import {MessageService} from '../../../shared/services/MessageService/message.service';
+import {IndividualReceiptService} from './individual-receipt.service';
 import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
-import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
-import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
+import {alphaNumeric} from '../../../shared/utils/forms/validation/alpha-numeric.validator';
+import {floatingPoint} from '../../../shared/utils/forms/validation/floating-point.validator';
 import { validatePurposeInKindRequired, IN_KIND } from '../../../shared/utils/forms/validation/purpose.validator';
-import { ReportTypeService } from '../report-type/report-type.service';
+import {ReportTypeService} from '../report-type/report-type.service';
 import { Observable, Subscription, interval, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
-import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
-import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import {
-  ConfirmModalComponent,
-  ModalHeaderClassEnum
-} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { TransactionModel } from '../../transactions/model/transaction.model';
-import { F3xMessageService } from '../service/f3x-message.service';
+import {TypeaheadService} from 'src/app/shared/partials/typeahead/typeahead.service';
+import {DialogService} from 'src/app/shared/services/DialogService/dialog.service';
+import {ConfirmModalComponent, ModalHeaderClassEnum} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {TransactionModel} from '../../transactions/model/transaction.model';
+import {F3xMessageService} from '../service/f3x-message.service';
 
 import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
-import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
+import {TransactionsMessageService} from '../../transactions/service/transactions-message.service';
 import { ActiveView } from '../../transactions/transactions.component';
-import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
-import { validateAmount, validateContributionAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
-import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import {validateAggregate} from 'src/app/shared/utils/forms/validation/aggregate.validator';
+import {validateAmount, validateContributionAmount} from 'src/app/shared/utils/forms/validation/amount.validator';
+import {ContributionDateValidator} from 'src/app/shared/utils/forms/validation/contribution-date.validator';
+import {ContactsService} from 'src/app/contacts/service/contacts.service';
 import { trigger, transition, style, animate, state } from '@angular/animations';
 import { heLocale } from 'ngx-bootstrap';
 import { TransactionsService, GetTransactionsResponse } from '../../transactions/service/transactions.service';
-import { ReportsService } from 'src/app/reports/service/report.service';
-import { reportModel } from 'src/app/reports/model/report.model';
+import {ReportsService} from 'src/app/reports/service/report.service';
+import {reportModel} from 'src/app/reports/model/report.model';
 import { entityTypes, committeeEventTypes } from './entity-types-json';
-import { ScheduleActions } from './schedule-actions.enum';
-import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
-import { coordinatedPartyExpenditureFields } from '../../sched-f-core/coordinated-party-expenditure-fields';
-import { coordinatedExpenditureCCFields } from '../../sched-f-core/coordinated-expenditure-cc-fields';
-import { coordinatedExpenditureStaffFields } from '../../sched-f-core/coordinated-expenditure-staff-fields';
-import { coordinatedExpenditurePayrollFields } from '../../sched-f-core/coordinated-expenditure-payroll-fields';
+import {ScheduleActions} from './schedule-actions.enum';
+import {AbstractScheduleParentEnum} from './abstract-schedule-parent.enum';
+import {coordinatedPartyExpenditureFields} from '../../sched-f-core/coordinated-party-expenditure-fields';
+import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-expenditure-cc-fields';
+import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
+import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -124,6 +121,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _prePopulateFromSchedDData: any;
   protected _prePopulateFromSchedLData: any;
   protected _parentTransactionModel: TransactionModel;
+  protected _rollbackAfterUnsuccessfulSave = false;
 
   /**
    * For toggling between 2 screens of Sched F Debt Payment.
@@ -157,6 +155,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _selectedChangeWarnChild: any;
   private _selectedCandidateChangeWarn: any;
   private _selectedCandidateChangeWarnChild: any;
+  private _isShowWarn: boolean;
   private _contributionAmountMax: number;
   protected _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
@@ -293,6 +292,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._selectedCandidateChangeWarn = null;
     this._selectedCandidateChild = null;
     this._selectedCandidateChangeWarnChild = null;
+    this._isShowWarn = true;
     this._readOnlyMemoCode = false;
     this._readOnlyMemoCodeChild = false;
     this._transactionToEdit = null;
@@ -1515,8 +1515,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
-    const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+    if (this._isShowWarn) {
+      this._isShowWarn = false;
+      const message = `Please note that if you update contact information it will be updated in the Contacts file. ` +
+        `Please acknowledge this change by clicking the OK button.`;
+      this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', true)
+        .then(res => {
+          if (res === 'okay') {
+          } else if (res === 'cancel') {
+            if (this._selectedEntity) {
+              if (this.frmIndividualReceipt.get(name)) {
+                const patch = {};
+                patch[name] = this._selectedEntity[name];
+                this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+              }
+            }
+          }
+        });
+    }
 
     if (isChildForm) {
       this._selectedChangeWarnChild[name] = name;
@@ -1545,8 +1561,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
-    const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+    if (this._isShowWarn) {
+      this._isShowWarn = false;
+      const message = `Please note that if you update contact information it will be updated in the Contacts file. ` +
+        `Please acknowledge this change by clicking the OK button.`;
+      this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', true)
+        .then(res => {
+          if (res === 'okay') {
+          } else if (res === 'cancel') {
+            if (this.frmIndividualReceipt.get(name)) {
+              if (this._selectedCandidate) {
+                const patch = {};
+                patch[name] = this._selectedCandidate[name];
+                this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+              }
+            }
+          }
+        });
+    }
 
     if (isChildForm) {
       this._selectedCandidateChangeWarnChild[name] = name;
@@ -1584,7 +1616,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.showWarnCandidate(col.text, col.name);
       }
     } else {
-      if (this._selectedEntity) {
+      if (this._selectedEntity && col.name !== 'cand_office_state') {
         this.showWarn(col.text, 'state');
       } else if (this._selectedCandidate) {
         this.showWarnCandidate(col.text, col.name);
@@ -1844,6 +1876,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         reportId = this._activatedRoute.snapshot.queryParams.reportId;
       }
 
+      this._rollbackAfterUnsuccessfulSave = false;
       this._receiptService.saveSchedule(this.formType, this.scheduleAction, reportId).subscribe(res => {
         if (res) {
           this._transactionToEdit = null;
@@ -1903,6 +1936,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._selectedCandidateChangeWarn = null;
           this._selectedCandidateChild = null;
           this._selectedCandidateChangeWarnChild = null;
+          this._isShowWarn = true;
           this.activityEventNames = null;
           // Replace this with clearFormValues() if possible - END
 
@@ -2084,6 +2118,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
           }
         }
+      }, error =>{
+        this._rollbackAfterUnsuccessfulSave = true;
+        this._messageService.sendRollbackChangesMessage({rollbackChanges:true});
       });
     } else {
       this.frmIndividualReceipt.markAsDirty();
@@ -2544,6 +2581,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._selectedCandidateChangeWarn = {};
     }
 
+    this._isShowWarn = true;
+
     const fieldNames = [];
     fieldNames.push('cand_last_name');
     fieldNames.push('cand_first_name');
@@ -2600,6 +2639,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._setSetEntityIdTo(this._selectedEntity, col);
       this._selectedChangeWarn = {};
     }
+
+    this._isShowWarn = true;
 
     const fieldNames = [];
     fieldNames.push('last_name');
@@ -2667,6 +2708,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._setSetEntityIdTo(this._selectedEntity, col);
       this._selectedChangeWarn = {};
     }
+
+    this._isShowWarn = true;
 
     // These field names map to the same name in the form
     const fieldNames = [];
@@ -3055,7 +3098,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.frmIndividualReceipt.controls[fieldName].setValidators([Validators.required]);
           this.frmIndividualReceipt.controls[fieldName].updateValueAndValidity();
         }
-        if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+        if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+        this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent ) {
           if (fieldName === 'expenditure_date') {
             if (this._selectedCandidate) {
               if (this._selectedCandidate.beneficiary_cand_id) {
@@ -3311,6 +3355,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * @param res
    */
   private _hijackFormFields(res: any): any {
+    console.log('Hijack for : '  + this.transactionType);
     switch (this.transactionType) {
       case 'COEXP_PARTY':
         res = this._coordinatedPartyExpenditureFields;
@@ -3508,6 +3553,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         // this._selectedCandidateChild = null;
         this._selectedCandidateChangeWarnChild = {};
 
+        this._isShowWarn = true;
+
         // this.transactionType = formData.transactionTypeIdentifier;
         this._setFormDataValues(formData.transactionId, formData.apiCall, formData.reportId);
       }
@@ -3614,10 +3661,58 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (prop === 'entity_id') {
                     this._selectedEntity = {};
                     this._selectedEntity.entity_id = trx[prop];
+                    this._selectedEntity.entity_name = null;
+                    this._selectedEntity.first_name = null;
+                    this._selectedEntity.last_name = null;
+                    this._selectedEntity.middle_name = null;
+                    // TODO: Should be removed later FNE-1974
+                    this._selectedEntity.preffix = null;
+                    // this._selectedEntity.prefix = null;
+                    this._selectedEntity.suffix = null;
+                    if (this._selectedEntity.entity_id) {
+                      if (typeof this._selectedEntity.entity_id === 'string') {
+                        if (this._selectedEntity.entity_id.startsWith('IND')) {
+                          this._selectedEntity.entity_type = 'IND';
+                          this._selectedEntity.first_name = trx.first_name;
+                          this._selectedEntity.last_name = trx.last_name;
+                          this._selectedEntity.middle_name = trx.middle_name;
+                          // TODO: Should be removed later FNE-1974
+                          this._selectedEntity.preffix = trx.preffix;
+                          // this._selectedEntity.prefix = trx.preffix;
+                          this._selectedEntity.suffix = trx.suffix;
+                        } else if (this._selectedEntity.entity_id.startsWith('ORG')) {
+                          this._selectedEntity.entity_type = 'ORG';
+                          this._selectedEntity.entity_name = trx.entity_name;
+                        }
+                      }
+                    }
+                    this._selectedEntity.city = trx.city;
+                    this._selectedEntity.employer = trx.employer;
+                    this._selectedEntity.occupation = trx.occupation;
+                    this._selectedEntity.street_1 = trx.street_1;
+                    this._selectedEntity.street_2 = trx.street_2;
+                    this._selectedEntity.state = trx.state;
+                    this._selectedEntity.zip_code = trx.zip_code;
                   }
                   if (prop === 'beneficiary_cand_entity_id') {
                     this._selectedCandidate = {};
                     this._selectedCandidate.entity_id = trx[prop];
+                    this._selectedCandidate.cand_first_name = trx.cand_first_name;
+                    this._selectedCandidate.cand_last_name = trx.cand_last_name;
+                    this._selectedCandidate.cand_middle_name = trx.cand_middle_name;
+                    this._selectedCandidate.cand_office = trx.cand_office;
+                    this._selectedCandidate.cand_office_district = trx.cand_office_district;
+                    this._selectedCandidate.cand_office_state = trx.cand_office_state;
+                    this._selectedCandidate.cand_prefix = trx.cand_prefix;
+                    this._selectedCandidate.cand_suffix = trx.cand_suffix;
+                    this._selectedCandidate.city = null;
+                    this._selectedCandidate.entity_type = 'CAN';
+                    this._selectedCandidate.payee_cmte_id = trx.payee_cmte_id;
+                    this._selectedCandidate.ref_cand_cmte_id = null;
+                    this._selectedCandidate.state = null;
+                    this._selectedCandidate.street_1 = null;
+                    this._selectedCandidate.street_2 = null;
+                    this._selectedCandidate.zip_code = null;
                   }
                   if (prop === 'entity_type') {
                     if (this.entityTypes) {
@@ -3919,6 +4014,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._selectedCandidateChangeWarn = null;
     this._selectedCandidateChild = null;
     this._selectedCandidateChangeWarnChild = null;
+
+    this._isShowWarn = true;
 
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;
@@ -4533,5 +4630,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this._doValidateReceipt(SaveActions.saveForReturnToSummary);
       }
     }
+  }
+  protected convertAmountToNumber(amount: string) {
+    if (amount) {
+      return Number(this.abstractRemoveCommas(amount));
+    }
+    return 0;
+  }
+
+  protected abstractRemoveCommas(amount: string): string {
+    return amount.toString().replace(new RegExp(',', 'g'), '');
   }
 }
