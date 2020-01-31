@@ -145,12 +145,12 @@ def update_aggregate_sl(datum):
     """
     logger.debug("update sla aggregate with data {}".format(datum))
     # TODO need to set memo transaction aggregate to parent one
-    if datum.get('transaction_id').endswith('_MEMO'):
+    if datum.get("transaction_id").endswith("_MEMO"):
         return
 
     # TODO need to set the aggregate to most recent transaction??? need confirmation on this
-    if datum.get('memo_code') == 'X':
-        return 
+    if datum.get("memo_code") == "X":
+        return
     try:
         # logger("update sla aggregate with data {}".format(datum))
         cmte_id = datum.get("cmte_id")
@@ -186,9 +186,9 @@ def update_aggregate_sl(datum):
                     transaction_id = transaction[1]
                     put_sql_agg_amount_schedA(cmte_id, transaction_id, aggregate_amount)
 
-                    child_SA_transaction_list = get_list_child_schedA(report_id, cmte_id, transaction[1])
-                    for child_SA_transaction in child_SA_transaction_list:
-                        put_sql_agg_amount_schedA(cmte_id, child_SA_transaction.get('transaction_id'), aggregate_amount)
+                    # child_SA_transaction_list = get_list_child_schedA(report_id, cmte_id, transaction[1])
+                    # for child_SA_transaction in child_SA_transaction_list:
+                    #     put_sql_agg_amount_schedA(cmte_id, child_SA_transaction.get('transaction_id'), aggregate_amount)
                 # #Updating aggregate amount to child auto generate sched B transactions
                 # if child_flag_SB:
                 #     child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
@@ -199,6 +199,7 @@ def update_aggregate_sl(datum):
         raise Exception(
             "The update_aggregate_sl function is throwing an error: " + str(e)
         )
+
 
 def superceded_report_id_list(report_id):
     try:
@@ -225,6 +226,7 @@ def superceded_report_id_list(report_id):
     except Exception as e:
         raise
 
+
 def get_list_child_schedA(report_id, cmte_id, transaction_id):
     """
     load all child sched_a items for this transaction
@@ -238,10 +240,14 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
             contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, 
             election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind
                             FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND 
-                            delete_ind is distinct from 'Y'""".format("', '".join(report_list))
+                            delete_ind is distinct from 'Y'""".format(
+                "', '".join(report_list)
+            )
 
-            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
-                           """) t""", [cmte_id, transaction_id])
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+                [cmte_id, transaction_id],
+            )
 
             for row in cursor.fetchall():
                 # forms_obj.append(data_row)
@@ -250,11 +256,8 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
             merged_list = []
             if not (schedA_list is None):
                 for dictA in schedA_list:
-                    entity_id = dictA.get('entity_id')
-                    data = {
-                        'entity_id': entity_id,
-                        'cmte_id': cmte_id
-                    }
+                    entity_id = dictA.get("entity_id")
+                    data = {"entity_id": entity_id, "cmte_id": cmte_id}
                     entity_list = get_entities(data)
                     dictEntity = entity_list[0]
                     merged_dict = {**dictA, **dictEntity}
@@ -435,7 +438,10 @@ def update_aggregate_se(data):
         )
         aggregate_amount = 0
         for transaction in transaction_list:
-            aggregate_amount += transaction[1]
+            # update aggregate amount for non-memo and dangled memo transactions
+            # TODO: need to confirm dangled memo transaction is counted or not
+            if not transaction["transaction_type_identifier"].endswith("_MEMO"):
+                aggregate_amount += transaction[1]
             logger.debug(
                 "update aggregate amount for transaction:{}".format(transaction[0])
             )

@@ -1133,6 +1133,8 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
 def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
     try:
         logger.debug('****loading coh beginning data...')
+        # if levin_account_id:
+        # levin_account_id = str(levin)
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         if prev_yr:
             prev_cvg_year = cvg_start_date.year - 1
@@ -1148,7 +1150,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
                     FROM public.sched_l 
                     WHERE cmte_id = %s 
                     AND cvg_end_date = %s 
-                    AND record_id = %s
+                    AND record_id = %s::varchar(9)
                     AND delete_ind is distinct from 'Y'
                     """,
                     [cmte_id, prev_cvg_end_dt, levin_account_id],
@@ -1706,7 +1708,7 @@ def get_sl_transaction_id(cmte_id, report_id, levin_account_id):
         FROM public.sched_l sl
         WHERE sl.cmte_id = %s
         AND sl.report_id = %s
-        AND sl.record_id = %s
+        AND sl.record_id = %s::varchar(9)
         AND sl.delete_ind is distinct from 'Y'
         """
         with connection.cursor() as cursor:
