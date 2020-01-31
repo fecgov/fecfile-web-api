@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
 import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
@@ -47,6 +47,9 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
 
   protected staticFormFields = schedFstaticFormFields;
 
+  private isDesignatedFiler: boolean;
+  private noValidationRequired = [];
+  private validateDesignatedFiler = [];
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -98,6 +101,16 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedFComponent;
     this.transactionType = 'COEXP_PARTY_DEBT';
     this.transactionTypeText = 'Coordinated Party Expenditure Debt to Vendor';
+    // set remove validators
+    this.noValidationRequired.push('subordinate_cmte_id');
+    this.noValidationRequired.push('subordinate_cmte_name');
+    this.noValidationRequired.push('subordinate_cmte_street_2');
+    this.noValidationRequired.push('subordinate_cmte_city');
+    this.noValidationRequired.push('subordinate_cmte_state');
+    this.noValidationRequired.push('subordinate_cmte_zip');
+    this.noValidationRequired.push('subordinate_cmte_street_1');
+    this.validateDesignatedFiler.push('designating_cmte_id');
+    this.validateDesignatedFiler.push('designating_cmte_name');
     super.ngOnInit();
     this.showPart2 = false;
     this._setTransactionDetail();
@@ -112,6 +125,8 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnDestroy(): void {
+    this.noValidationRequired = [];
+    this.validateDesignatedFiler = [];
     super.ngOnDestroy();
   }
 
@@ -128,34 +143,13 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   public next() {
     this.frmIndividualReceipt.markAsTouched();
 
+    if (!this._checkFormFieldIsValid('designating_cmte_id') && this.isDesignatedFiler) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('designating_cmte_name') && this.isDesignatedFiler) {
+      return;
+    }
     if (!this._checkFormFieldIsValid('coordinated_exp_ind')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('designating_cmte_id')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('designating_cmte_name')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_id')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_name')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_street_1')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_street_2')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_city')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_state')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_zip')) {
       return;
     }
     // this.frmIndividualReceipt.markAsUntouched();
@@ -346,5 +340,43 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
 
     return `${payeeCmteID}, ${candidateId}, ${lastName}, ${firstName}, ${office},
       ${officeState}, ${officeDistrict}`;
+  }
+
+  public handleOnBlurEvent($event: any, col: any) {
+    super.handleOnBlurEvent($event, col);
+    console.log('col %s %s', col,  this.frmIndividualReceipt.controls['expenditure_amount'].value);
+    const expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
+    const contributionAggregateValue: string = this._decimalPipe.transform(
+        expenditureAmount,
+        '.2-2'
+    );
+    this.frmIndividualReceipt.patchValue(
+        { aggregate_general_elec_exp: contributionAggregateValue}, { onlySelf: true });
+  }
+
+  public onFilerChange(change): void {
+
+    console.log('change %s', change);
+    if (change === 'Y') {
+      this.isDesignatedFiler = true;
+      this.addValidator(this.validateDesignatedFiler,  this.isDesignatedFiler);
+    } else {
+      this.isDesignatedFiler = false;
+      this.addValidator(this.validateDesignatedFiler,  this.isDesignatedFiler);
+    }
+    this.addValidator(this.noValidationRequired, false);
+  }
+  public addValidator( validators: Array<any>, set: boolean): void {
+    if ( set ) {
+      for (const filedName of validators) {
+        this.frmIndividualReceipt.controls[filedName].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls[filedName].updateValueAndValidity();
+      }
+    } else {
+      for (const filedName of validators) {
+        this.frmIndividualReceipt.controls[filedName].setValidators([]);
+        this.frmIndividualReceipt.controls[filedName].updateValueAndValidity();
+      }
+    }
   }
 }
