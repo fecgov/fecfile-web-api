@@ -1764,6 +1764,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           const typeAheadField = this.frmIndividualReceipt.get(field).value;
           if (typeAheadField && typeof typeAheadField !== 'string') {
             receiptObj[field] = typeAheadField['cmte_id'];
+            if (field === 'payee_cmte_id') {
+              receiptObj[field] = typeAheadField['payee_cmte_id'];
+            }
           } else {
             receiptObj[field] = typeAheadField;
           }
@@ -2490,8 +2493,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const street1 = result.street_1 ? result.street_1.trim() : '';
     const street2 = result.street_2 ? result.street_2.trim() : '';
     const name = result.cmte_id ? result.cmte_id.trim() : '';
-
-    return `${name}, ${street1}, ${street2}`;
+    const cmteName = result.cmte_name ? result.cmte_name.trim() : '';
+    return `${name},${cmteName},${street1}, ${street2}`;
   }
 
   /**
@@ -2923,7 +2926,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       })
     );
-
+  
   /**
    * format the value to display in the input field once selected from the typeahead.
    *
