@@ -386,15 +386,34 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       // also clear any district fields
       this.frmIndividualReceipt.patchValue({ 'cand_office_district': null }, { onlySelf: true });
     }
+    //TODO -- below logic is very confusing. Clean this up . 
     else if (office === 'P') {
-      if (this.transactionType !== 'IE_MULTI')
-        this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
-      this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
-      this.frmIndividualReceipt.updateValueAndValidity();
+      if(this.transactionType === 'IE_MULTI' && this.scheduleAction === ScheduleActions.edit) {
+        this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+        this.frmIndividualReceipt.updateValueAndValidity();
+        // also clear any district fields
+        this.frmIndividualReceipt.patchValue({ 'cand_office_district': null }, { onlySelf: true });
+      }
 
-      // also clear any district & state fields
-      this.frmIndividualReceipt.patchValue({ 'cand_office_state': null }, { onlySelf: true });
-      this.frmIndividualReceipt.patchValue({ 'cand_office_district': null }, { onlySelf: true });
+      else if(this.transactionType === 'IE_MULTI' && this.scheduleAction !== ScheduleActions.edit){
+        // this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
+        this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+        this.frmIndividualReceipt.updateValueAndValidity();
+        
+        // also clear any district & state fields
+        this.frmIndividualReceipt.patchValue({ 'cand_office_state': null }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ 'cand_office_district': null }, { onlySelf: true });
+      }
+      else {
+        this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
+        this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+        this.frmIndividualReceipt.updateValueAndValidity();
+        
+        // also clear any district & state fields
+        this.frmIndividualReceipt.patchValue({ 'cand_office_state': null }, { onlySelf: true });
+        this.frmIndividualReceipt.patchValue({ 'cand_office_district': null }, { onlySelf: true });
+      }
+     
     }
   }
 
@@ -518,13 +537,14 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   private addSchedESpecificMetadata() {
     this.hiddenFields.push({ type: "hidden", name: "full_election_code", value: this.electionCode + this.electionYear });
-    if (this.transactionType === 'IE_MULTI') {
-      let currentVal = this.frmIndividualReceipt.controls['memo_text'].value;
-      if (!currentVal) {
-        currentVal = '';
-      }
-      this.frmIndividualReceipt.patchValue({ memo_text: this.prepopulatedMemoText + ' ' + this.selectedStates + this.multistateMemoTextDelimiter + currentVal }, { onlySelf: true });
-    }
+    // if (this.transactionType === 'IE_MULTI') {
+    //   let currentVal = this.frmIndividualReceipt.controls['memo_text'].value;
+    //   if (!currentVal) {
+    //     currentVal = '';
+    //   }
+    //   // this.frmIndividualReceipt.patchValue({ memo_text: this.prepopulatedMemoText + ' ' + this.selectedStates + this.multistateMemoTextDelimiter + currentVal }, { onlySelf: true });
+    //   // this.hiddenFields.push({ memo_text: this.prepopulatedMemoText + ' ' + this.selectedStates + this.multistateMemoTextDelimiter + currentVal });
+    // }
   }
 
 
@@ -580,4 +600,70 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
         }
       })
     );
+
+  /**
+   * Search for Committee Payees when Committee ID input value changes.
+   */
+  searchPayeeCommitteeId = (text$: Observable<string>) =>
+  text$.pipe(
+    debounceTime(500),
+    distinctUntilChanged(),
+    switchMap(searchText => {
+      const searchTextUpper = searchText.toUpperCase();
+
+      if (
+        searchTextUpper === 'C' ||
+        searchTextUpper === 'C0' ||
+        searchTextUpper === 'C00' ||
+        searchTextUpper === 'C000'
+      ) {
+        return Observable.of([]);
+      }
+
+      if (searchText) {
+        let result = this._typeaheadService.getContacts(searchText, 'payee_cmte_id');
+          if (this.transactionType === 'IE_MULTI') {
+            result = result.map(contacts => contacts.filter(element => element.cand_office === 'P'))
+          }
+          return result;
+      } else {
+        return Observable.of([]);
+      }
+    })
+  );
+
+  formatterPayeeCommitteeId = (x: { payee_cmte_id: string }) => {
+    if (typeof x !== 'string') {
+      return x.payee_cmte_id;
+    } else {
+      return x;
+    }
+  };
+
+    /**
+   * Format a Candidate Entity to display in the Payee Committee ID type ahead.
+   *
+   * @param result formatted item in the typeahead list
+   */
+  public formatTypeaheadPayeeCommitteeId(result: any) {
+    const payeeCmteID = result.payee_cmte_id ? result.payee_cmte_id.trim() : '';
+    const candidateId = result.beneficiary_cand_id ? result.beneficiary_cand_id.trim() : '';
+    const lastName = result.cand_last_name ? result.cand_last_name.trim() : '';
+    const firstName = result.cand_first_name ? result.cand_first_name.trim() : '';
+    let office = result.cand_office ? result.cand_office.toUpperCase().trim() : '';
+    if (office) {
+      if (office === 'P') {
+        office = 'Presidential';
+      } else if (office === 'S') {
+        office = 'Senate';
+      } else if (office === 'H') {
+        office = 'House';
+      }
+    }
+    const officeState = result.cand_office_state ? result.cand_office_state.trim() : '';
+    const officeDistrict = result.cand_office_district ? result.cand_office_district.trim() : '';
+
+    return `${payeeCmteID}, ${candidateId}, ${lastName}, ${firstName}, ${office},
+      ${officeState}, ${officeDistrict}`;
+  }
 }
