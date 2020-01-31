@@ -416,6 +416,52 @@ def get_sched_a_transactions(
         raise
 
 
+def get_sched_e_child_transactions(report_id, cmte_id, transaction_id):
+    """
+    load child transactions for sched_e
+    """
+    _sql = """
+        SELECT
+            cmte_id,
+            report_id,
+            transaction_type_identifier,
+            transaction_id,
+            back_ref_transaction_id,
+            back_ref_sched_name,
+            payee_entity_id,
+            election_code,
+            election_other_desc,
+            expenditure_amount,
+            COALESCE(dissemination_date, disbursement_date) as expenditure_date,
+            calendar_ytd_amount,
+            purpose,
+            category_code,
+            payee_cmte_id,
+            support_oppose_code,
+            completing_entity_id,
+            date_signed,
+            memo_code,
+            memo_text,
+            line_number,
+            create_date, 
+            last_update_date
+            FROM public.sched_e
+            WHERE report_id = %s 
+            AND cmte_id = %s 
+            AND back_ref_transaction_id = %s 
+            AND delete_ind is distinct from 'Y'
+            """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + _sql + """) t""",
+                [report_id, cmte_id, transaction_id],
+            )
+            return post_process_it(cursor, cmte_id)
+    except:
+        raise
+
+
 def get_sched_f_child_transactions(report_id, cmte_id, transaction_id):
     """
     load child transactions for sched_f
@@ -462,25 +508,6 @@ def get_sched_f_child_transactions(report_id, cmte_id, transaction_id):
     AND cmte_id = %s 
     AND back_ref_transaction_id = %s 
     AND delete_ind is distinct from 'Y'
-    """
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + _sql + """) t""",
-                [report_id, cmte_id, transaction_id],
-            )
-            return post_process_it(cursor, cmte_id)
-    except:
-        raise
-
-
-def get_sched_e_child_transactions(report_id, cmte_id, transaction_id):
-    """
-    load child transactions for sched_e
-    """
-    _sql = """
-    SELECT cmte_id, report_id, transaction_type_identifier, transaction_id, back_ref_transaction_id, back_ref_sched_name, payee_entity_id, election_code, election_other_desc, dissemination_date, expenditure_amount, disbursement_date, calendar_ytd_amount, purpose, category_code, payee_cmte_id, support_oppose_code, so_cand_id, so_cand_last_name, so_cand_first_name, so_cand_middle_name, so_cand_prefix, so_cand_suffix, so_cand_office, so_cand_district, so_cand_state, completing_entity_id, date_signed, memo_code, memo_text, delete_ind, create_date, last_update_date, line_number
-	FROM public.sched_e where report_id = %s and cmte_id = %s and back_ref_transaction_id = %s AND delete_ind is distinct from 'Y'
     """
     try:
         with connection.cursor() as cursor:
