@@ -341,19 +341,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     return `${payeeCmteID}, ${candidateId}, ${lastName}, ${firstName}, ${office},
       ${officeState}, ${officeDistrict}`;
   }
-
-  public handleOnBlurEvent($event: any, col: any) {
-    super.handleOnBlurEvent($event, col);
-    console.log('col %s %s', col,  this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    const expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    const contributionAggregateValue: string = this._decimalPipe.transform(
-        expenditureAmount,
-        '.2-2'
-    );
-    this.frmIndividualReceipt.patchValue(
-        { aggregate_general_elec_exp: contributionAggregateValue}, { onlySelf: true });
-  }
-
+  
   public onFilerChange(change): void {
 
     console.log('change %s', change);
