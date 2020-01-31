@@ -1461,7 +1461,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.close()
 
 
-                List_SH6_similar_ALLOC_FEA_DEBT_VEN= ['ALLOC_FEC_DISB_DEBT']
+                List_SH6_similar_ALLOC_FEA_DEBT_VEN= ['ALLOC_FEA_DISB_DEBT'] 
                 ALLOC_FEA_DEBT_VEN_STRING = ""
                 for tran in List_SH6_similar_ALLOC_FEA_DEBT_VEN:
 
