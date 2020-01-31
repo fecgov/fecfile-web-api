@@ -1524,12 +1524,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           if (res === 'okay') {
           } else if (res === 'cancel') {
             if (this._selectedEntity) {
-              if (this._selectedEntity[name]) {
-                if (this.frmIndividualReceipt.get(name)) {
-                  const patch = {};
-                  patch[name] = this._selectedEntity[name];
-                  this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
-                }
+              if (this.frmIndividualReceipt.get(name)) {
+                const patch = {};
+                patch[name] = this._selectedEntity[name];
+                this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
               }
             }
           }
