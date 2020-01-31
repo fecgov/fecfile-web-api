@@ -317,7 +317,20 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
     console.log('YTD is being recalculated ...');
     let currentExpenditureAmount = this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    if (this.scheduleAction !== ScheduleActions.edit) {
+    if (this.scheduleAction === ScheduleActions.edit) {
+      this.frmIndividualReceipt.patchValue({
+        expenditure_aggregate:
+          this._decimalPipe.transform(this._originalExpenditureAggregate - this._originalExpenditureAmount +
+            this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value), '.2-2')
+      }, { onlySelf: true });
+    }
+    else if (this.transactionType.endsWith('_MEMO')){
+      this.frmIndividualReceipt.patchValue({
+        expenditure_aggregate:
+          this._decimalPipe.transform(this.frmIndividualReceipt.controls['expenditure_amount'].value, '.2-2')
+      }, { onlySelf: true });
+    }
+    else  {
       this._schedEService.getAggregate(this.frmIndividualReceipt.value).subscribe(res => {
 
         this._currentAggregate = "0";
@@ -336,13 +349,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
         }, { onlySelf: true });
       });
     }
-    else {
-      this.frmIndividualReceipt.patchValue({
-        expenditure_aggregate:
-          this._decimalPipe.transform(this._originalExpenditureAggregate - this._originalExpenditureAmount +
-            this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value), '.2-2')
-      }, { onlySelf: true });
-    }
+     
   }
 
   private _convertAmountToNumber(amount: string) {
