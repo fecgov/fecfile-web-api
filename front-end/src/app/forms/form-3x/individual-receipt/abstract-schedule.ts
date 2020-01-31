@@ -2595,7 +2595,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('cand_office');
     fieldNames.push('cand_office_state');
     fieldNames.push('cand_office_district');
-    fieldNames.push('cand_election_year');
+    // fieldNames.push('cand_election_year');  -- commenting this as per business requirements. This should not be autopopulated
     fieldNames.push('beneficiary_cand_id');
     fieldNames.push('payee_cmte_id');
     this._patchFormFields(fieldNames, entity, namePrefix);
