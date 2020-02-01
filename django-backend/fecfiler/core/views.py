@@ -955,14 +955,20 @@ def submit_report(request):
     if form_tp == 'F3X':
         _sql_response = """
         SELECT json_agg(t) FROM (
-            SELECT 'FEC-' || fec_id as fec_id, status, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            SELECT 'FEC-' || fec_id as fec_id, status, filed_date, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
             FROM public.reports
             WHERE report_id = %s)t
         """
     elif form_tp == 'F99':
         _sql_response = """
         SELECT json_agg(t) FROM (
-            SELECT 'FEC-' || fec_id as fec_id, status, message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            SELECT 'FEC-' || fec_id as fec_id, 
+            status, 
+            CASE
+            WHEN is_submitted = true THEN updated_at
+            ELSE NULL::timestamp with time zone
+            END AS filed_date,
+            message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
             FROM public.forms_committeeinfo
             WHERE id = %s)t
         """ 
@@ -2408,7 +2414,7 @@ def superceded_report_id_list(report_id):
             else:
                 report_list.append(str(reportId[0]))
                 report_id = reportId[0]
-        print(report_list)
+        # print(report_list)
         return report_list
     except Exception as e:
         raise

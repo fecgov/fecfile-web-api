@@ -155,6 +155,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _selectedChangeWarnChild: any;
   private _selectedCandidateChangeWarn: any;
   private _selectedCandidateChangeWarnChild: any;
+  private _isShowWarn: boolean;
   private _contributionAmountMax: number;
   protected _transactionToEdit: TransactionModel;
   private readonly _childFieldNamePrefix = 'child*';
@@ -291,6 +292,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._selectedCandidateChangeWarn = null;
     this._selectedCandidateChild = null;
     this._selectedCandidateChangeWarnChild = null;
+    this._isShowWarn = true;
     this._readOnlyMemoCode = false;
     this._readOnlyMemoCodeChild = false;
     this._transactionToEdit = null;
@@ -1513,8 +1515,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
-    const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+    if (this._isShowWarn) {
+      this._isShowWarn = false;
+      const message = `Please note that if you update contact information it will be updated in the Contacts file. ` +
+        `Please acknowledge this change by clicking the OK button.`;
+      this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', true)
+        .then(res => {
+          if (res === 'okay') {
+          } else if (res === 'cancel') {
+            if (this._selectedEntity) {
+              if (this.frmIndividualReceipt.get(name)) {
+                const patch = {};
+                patch[name] = this._selectedEntity[name];
+                this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+              }
+            }
+          }
+        });
+    }
 
     if (isChildForm) {
       this._selectedChangeWarnChild[name] = name;
@@ -1543,8 +1561,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
-    const message = `Please note that if you update contact information it will be updated in the Contacts file.`;
-    this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', false).then(res => {});
+    if (this._isShowWarn) {
+      this._isShowWarn = false;
+      const message = `Please note that if you update contact information it will be updated in the Contacts file. ` +
+        `Please acknowledge this change by clicking the OK button.`;
+      this._dialogService.confirm(message, ConfirmModalComponent, 'Warning!', true)
+        .then(res => {
+          if (res === 'okay') {
+          } else if (res === 'cancel') {
+            if (this.frmIndividualReceipt.get(name)) {
+              if (this._selectedCandidate) {
+                const patch = {};
+                patch[name] = this._selectedCandidate[name];
+                this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
+              }
+            }
+          }
+        });
+    }
 
     if (isChildForm) {
       this._selectedCandidateChangeWarnChild[name] = name;
@@ -1582,7 +1616,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.showWarnCandidate(col.text, col.name);
       }
     } else {
-      if (this._selectedEntity) {
+      if (this._selectedEntity && col.name !== 'cand_office_state') {
         this.showWarn(col.text, 'state');
       } else if (this._selectedCandidate) {
         this.showWarnCandidate(col.text, col.name);
@@ -1730,6 +1764,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           const typeAheadField = this.frmIndividualReceipt.get(field).value;
           if (typeAheadField && typeof typeAheadField !== 'string') {
             receiptObj[field] = typeAheadField['cmte_id'];
+            if (field === 'payee_cmte_id') {
+              receiptObj[field] = typeAheadField['payee_cmte_id'];
+            }
           } else {
             receiptObj[field] = typeAheadField;
           }
@@ -1902,6 +1939,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._selectedCandidateChangeWarn = null;
           this._selectedCandidateChild = null;
           this._selectedCandidateChangeWarnChild = null;
+          this._isShowWarn = true;
           this.activityEventNames = null;
           // Replace this with clearFormValues() if possible - END
 
@@ -2455,8 +2493,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const street1 = result.street_1 ? result.street_1.trim() : '';
     const street2 = result.street_2 ? result.street_2.trim() : '';
     const name = result.cmte_id ? result.cmte_id.trim() : '';
-
-    return `${name}, ${street1}, ${street2}`;
+    const cmteName = result.cmte_name ? result.cmte_name.trim() : '';
+    return `${name},${cmteName},${street1}, ${street2}`;
   }
 
   /**
@@ -2546,6 +2584,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._selectedCandidateChangeWarn = {};
     }
 
+    this._isShowWarn = true;
+
     const fieldNames = [];
     fieldNames.push('cand_last_name');
     fieldNames.push('cand_first_name');
@@ -2555,7 +2595,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('cand_office');
     fieldNames.push('cand_office_state');
     fieldNames.push('cand_office_district');
-    fieldNames.push('cand_election_year');
+    // fieldNames.push('cand_election_year');  -- commenting this as per business requirements. This should not be autopopulated
     fieldNames.push('beneficiary_cand_id');
     fieldNames.push('payee_cmte_id');
     this._patchFormFields(fieldNames, entity, namePrefix);
@@ -2602,6 +2642,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._setSetEntityIdTo(this._selectedEntity, col);
       this._selectedChangeWarn = {};
     }
+
+    this._isShowWarn = true;
 
     const fieldNames = [];
     fieldNames.push('last_name');
@@ -2669,6 +2711,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._setSetEntityIdTo(this._selectedEntity, col);
       this._selectedChangeWarn = {};
     }
+
+    this._isShowWarn = true;
 
     // These field names map to the same name in the form
     const fieldNames = [];
@@ -2882,7 +2926,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       })
     );
-
+  
   /**
    * format the value to display in the input field once selected from the typeahead.
    *
@@ -3512,6 +3556,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         // this._selectedCandidateChild = null;
         this._selectedCandidateChangeWarnChild = {};
 
+        this._isShowWarn = true;
+
         // this.transactionType = formData.transactionTypeIdentifier;
         this._setFormDataValues(formData.transactionId, formData.apiCall, formData.reportId);
       }
@@ -3618,10 +3664,58 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   if (prop === 'entity_id') {
                     this._selectedEntity = {};
                     this._selectedEntity.entity_id = trx[prop];
+                    this._selectedEntity.entity_name = null;
+                    this._selectedEntity.first_name = null;
+                    this._selectedEntity.last_name = null;
+                    this._selectedEntity.middle_name = null;
+                    // TODO: Should be removed later FNE-1974
+                    this._selectedEntity.preffix = null;
+                    // this._selectedEntity.prefix = null;
+                    this._selectedEntity.suffix = null;
+                    if (this._selectedEntity.entity_id) {
+                      if (typeof this._selectedEntity.entity_id === 'string') {
+                        if (this._selectedEntity.entity_id.startsWith('IND')) {
+                          this._selectedEntity.entity_type = 'IND';
+                          this._selectedEntity.first_name = trx.first_name;
+                          this._selectedEntity.last_name = trx.last_name;
+                          this._selectedEntity.middle_name = trx.middle_name;
+                          // TODO: Should be removed later FNE-1974
+                          this._selectedEntity.preffix = trx.preffix;
+                          // this._selectedEntity.prefix = trx.preffix;
+                          this._selectedEntity.suffix = trx.suffix;
+                        } else if (this._selectedEntity.entity_id.startsWith('ORG')) {
+                          this._selectedEntity.entity_type = 'ORG';
+                          this._selectedEntity.entity_name = trx.entity_name;
+                        }
+                      }
+                    }
+                    this._selectedEntity.city = trx.city;
+                    this._selectedEntity.employer = trx.employer;
+                    this._selectedEntity.occupation = trx.occupation;
+                    this._selectedEntity.street_1 = trx.street_1;
+                    this._selectedEntity.street_2 = trx.street_2;
+                    this._selectedEntity.state = trx.state;
+                    this._selectedEntity.zip_code = trx.zip_code;
                   }
                   if (prop === 'beneficiary_cand_entity_id') {
                     this._selectedCandidate = {};
                     this._selectedCandidate.entity_id = trx[prop];
+                    this._selectedCandidate.cand_first_name = trx.cand_first_name;
+                    this._selectedCandidate.cand_last_name = trx.cand_last_name;
+                    this._selectedCandidate.cand_middle_name = trx.cand_middle_name;
+                    this._selectedCandidate.cand_office = trx.cand_office;
+                    this._selectedCandidate.cand_office_district = trx.cand_office_district;
+                    this._selectedCandidate.cand_office_state = trx.cand_office_state;
+                    this._selectedCandidate.cand_prefix = trx.cand_prefix;
+                    this._selectedCandidate.cand_suffix = trx.cand_suffix;
+                    this._selectedCandidate.city = null;
+                    this._selectedCandidate.entity_type = 'CAN';
+                    this._selectedCandidate.payee_cmte_id = trx.payee_cmte_id;
+                    this._selectedCandidate.ref_cand_cmte_id = null;
+                    this._selectedCandidate.state = null;
+                    this._selectedCandidate.street_1 = null;
+                    this._selectedCandidate.street_2 = null;
+                    this._selectedCandidate.zip_code = null;
                   }
                   if (prop === 'entity_type') {
                     if (this.entityTypes) {
@@ -3923,6 +4017,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._selectedCandidateChangeWarn = null;
     this._selectedCandidateChild = null;
     this._selectedCandidateChangeWarnChild = null;
+
+    this._isShowWarn = true;
 
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;

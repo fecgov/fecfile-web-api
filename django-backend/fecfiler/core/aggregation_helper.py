@@ -144,6 +144,13 @@ def update_aggregate_sl(datum):
     3/1/2018, 100, 210 (aggregate_amount > 200, transaction becomes itemized)
     """
     logger.debug("update sla aggregate with data {}".format(datum))
+    # TODO need to set memo transaction aggregate to parent one
+    if datum.get("transaction_id").endswith("_MEMO"):
+        return
+
+    # TODO need to set the aggregate to most recent transaction??? need confirmation on this
+    if datum.get("memo_code") == "X":
+        return
     try:
         # logger("update sla aggregate with data {}".format(datum))
         cmte_id = datum.get("cmte_id")
@@ -154,23 +161,12 @@ def update_aggregate_sl(datum):
         child_flag_SB = False
         child_flag_SA = False
         itemization_value = 200
-        # itemized_transaction_list = []
-        # unitemized_transaction_list = []
         form_type = find_form_type(report_id, cmte_id)
         if isinstance(contribution_date, str):
             contribution_date = date_format(contribution_date)
         aggregate_start_date, aggregate_end_date = find_aggregate_date(
             form_type, contribution_date
         )
-        # checking for child tranaction identifer for updating auto generated SB transactions
-        # if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
-        #     child_flag_SB = True
-        #     child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
-        # checking for child tranaction identifer for updating auto generated SA transactions
-        # if transaction_type_identifier in AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT:
-        #     child_flag_SA = True
-        #     child_transaction_type_identifier = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
-        # make sure transaction list comes back sorted by contribution_date ASC
         transactions_list = list_all_transactions_entity_sl(
             aggregate_start_date,
             aggregate_end_date,
@@ -178,67 +174,23 @@ def update_aggregate_sl(datum):
             cmte_id,
             levin_account_id,
         )
-        print("transaction list:{}".format(transactions_list))
-        # put field here
-        #    for quick reference
-        #      SELECT t1.contribution_amount, 0
-        # t1.transaction_id, 1
-        # t1.report_id, 2
-        # t1.line_number, 3
-        # t1.contribution_date, 4
-        # (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 5
-        # t1.memo_code, 6
-        # t1.back_ref_transaction_id,  7
-        # t1.transaction_type_identifier  8
+        if not transactions_list:
+            return
         aggregate_amount = 0
-        # PAC_aggregate_amount = 0
-        # HQ_aggregate_amount = 0
-        # CO_aggregate_amount = 0
-        # NPRE_aggregate_amount = 0
-        # RE_aggregate_amount = 0
-        # REMAIN_aggregate_amount = 0
-        # committee_type = cmte_type(cmte_id)
         for transaction in transactions_list:
-            # checking in reports table if the delete_ind flag is false for the corresponding report
             if transaction[5] != "Y":
-                # checking if the back_ref_transaction_id is null or not.
-                # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
                 if transaction[7] != None or (
                     transaction[7] == None and transaction[6] != "X"
                 ):
                     aggregate_amount += transaction[0]
 
-                    # if (committee_type == 'PAC') and transaction[8] in PAC_AGGREGATE_TYPES_1:
-                    #     PAC_aggregate_amount += transaction[0]
-                    #     aggregate_amount = PAC_aggregate_amount
-                    # elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_HQ:
-                    #     HQ_aggregate_amount += transaction[0]
-                    #     aggregate_amount = HQ_aggregate_amount
-                    # elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_CO:
-                    #     CO_aggregate_amount += transaction[0]
-                    #     aggregate_amount = CO_aggregate_amount
-                    # elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_NPRE:
-                    #     NPRE_aggregate_amount += transaction[0]
-                    #     aggregate_amount = NPRE_aggregate_amount
-                    # elif (committee_type == 'PTY') and transaction[8] in PTY_AGGREGATE_TYPES_RE:
-                    #     RE_aggregate_amount += transaction[0]
-                    #     aggregate_amount = RE_aggregate_amount
-                    # else:
-                    #     REMAIN_aggregate_amount += transaction[0]
-                    #     aggregate_amount = REMAIN_aggregate_amount
-                # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
-                # if str(report_id) == str(transaction[2]):
                 if contribution_date <= transaction[4]:
                     transaction_id = transaction[1]
-                    # line_number,itemized_ind = get_linenumber_itemization(transaction[8], aggregate_amount, itemization_value, transaction[3])
-                    # put_sql_agg_amount_sl(cmte_id, transaction_id, aggregate_amount)
                     put_sql_agg_amount_schedA(cmte_id, transaction_id, aggregate_amount)
 
-                # Updating aggregate amount to child auto generate sched A transactions
-                # if child_flag_SA:
-                #     child_SA_transaction_list = get_list_child_schedA(report_id, cmte_id, transaction[1])
-                #     for child_SA_transaction in child_SA_transaction_list:
-                #         put_sql_agg_amount_schedA(cmte_id, child_SA_transaction.get('transaction_id'), aggregate_amount)
+                    # child_SA_transaction_list = get_list_child_schedA(report_id, cmte_id, transaction[1])
+                    # for child_SA_transaction in child_SA_transaction_list:
+                    #     put_sql_agg_amount_schedA(cmte_id, child_SA_transaction.get('transaction_id'), aggregate_amount)
                 # #Updating aggregate amount to child auto generate sched B transactions
                 # if child_flag_SB:
                 #     child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
@@ -249,6 +201,72 @@ def update_aggregate_sl(datum):
         raise Exception(
             "The update_aggregate_sl function is throwing an error: " + str(e)
         )
+
+
+def superceded_report_id_list(report_id):
+    try:
+        report_list = []
+        report_list.append(str(report_id))
+        reportId = []
+        # print(report_list)
+        while True:
+            # print('in loop')
+            with connection.cursor() as cursor:
+                query_string = """SELECT previous_report_id FROM public.reports WHERE report_id = %s AND form_type = 'F3X' AND delete_ind is distinct FROM 'Y' """
+                cursor.execute(query_string, [report_id])
+                reportId = cursor.fetchone()
+            # print(reportId)
+            if reportId is None:
+                break
+            elif reportId[0] is None:
+                break
+            else:
+                report_list.append(str(reportId[0]))
+                report_id = reportId[0]
+        # print(report_list)
+        return report_list
+    except Exception as e:
+        raise
+
+
+def get_list_child_schedA(report_id, cmte_id, transaction_id):
+    """
+    load all child sched_a items for this transaction
+    """
+    try:
+        report_list = superceded_report_id_list(report_id)
+        with connection.cursor() as cursor:
+
+            # GET child rows from schedA table
+            query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, 
+            contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, 
+            election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind
+                            FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND 
+                            delete_ind is distinct from 'Y'""".format(
+                "', '".join(report_list)
+            )
+
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+                [cmte_id, transaction_id],
+            )
+
+            for row in cursor.fetchall():
+                # forms_obj.append(data_row)
+                data_row = list(row)
+                schedA_list = data_row[0]
+            merged_list = []
+            if not (schedA_list is None):
+                for dictA in schedA_list:
+                    entity_id = dictA.get("entity_id")
+                    data = {"entity_id": entity_id, "cmte_id": cmte_id}
+                    entity_list = get_entities(data)
+                    dictEntity = entity_list[0]
+                    merged_dict = {**dictA, **dictEntity}
+                    merged_list.append(merged_dict)
+        return merged_list
+    except Exception:
+        raise
 
 
 def find_aggregate_date(form_type, contribution_date):
@@ -420,9 +438,14 @@ def update_aggregate_se(data):
         transaction_list = get_transactions_election_and_office(
             aggregate_start_date, aggregate_end_date, data
         )
+        if not transaction_list:
+            return
         aggregate_amount = 0
         for transaction in transaction_list:
-            aggregate_amount += transaction[1]
+            # update aggregate amount for non-memo and dangled memo transactions
+            # TODO: need to confirm dangled memo transaction is counted or not
+            if not transaction["transaction_type_identifier"].endswith("_MEMO"):
+                aggregate_amount += transaction[1]
             logger.debug(
                 "update aggregate amount for transaction:{}".format(transaction[0])
             )
@@ -688,11 +711,12 @@ def update_aggregate_sf(cmte_id, beneficiary_cand_id, expenditure_date):
         transaction_list = get_SF_transactions_candidate(
             cvg_start_date, cvg_end_date, beneficiary_cand_id
         )
-        for transaction in transaction_list:
-            if transaction["memo_code"] != "X":
-                aggregate_amount += float(transaction["expenditure_amount"])
-            if transaction["expenditure_date"] >= expenditure_date:
-                put_aggregate_SF(aggregate_amount, transaction["transaction_id"])
+        if transaction_list:
+            for transaction in transaction_list:
+                if transaction["memo_code"] != "X":
+                    aggregate_amount += float(transaction["expenditure_amount"])
+                if transaction["expenditure_date"] >= expenditure_date:
+                    put_aggregate_SF(aggregate_amount, transaction["transaction_id"])
     except Exception as e:
         logger.debug(e)
         raise Exception(

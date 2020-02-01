@@ -24,7 +24,9 @@ from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     update_parent_purpose,
-    cmte_type)
+    cmte_type,
+    get_sched_b_transactions,
+    )
 
 from fecfiler.core.aggregation_helper import(
     update_activity_event_amount_ytd_h4,
@@ -1128,9 +1130,12 @@ def put_schedA(datum):
         update_date = datetime.datetime.strptime(prev_transaction_data.get('contribution_date'), '%Y-%m-%d').date()
         if update_date > datum.get('contribution_date'):
             update_date = datum.get('contribution_date')
-        update_linenumber_aggamt_transactions_SA(update_date, datum.get(
-            'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+
+        if transaction_id.startswith('SA'):
+            update_linenumber_aggamt_transactions_SA(update_date, datum.get(
+                'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            update_aggregate_sl(datum)
             update_sl_summary(datum)    
         return datum
     except:
@@ -1777,7 +1782,7 @@ def trash_restore_transactions(request):
         # try:
         table_list = SCHEDULE_TO_TABLE_DICT.get(transaction_id[:2])
         if table_list:
-            if transaction_id[:2] in ('SA', 'SB', 'SE', 'SF', 'SH'):
+            if transaction_id[:2] in ('SA', 'LA', 'LB', 'SB', 'SE', 'SF', 'SH'):
                 # Handling deletion/restoration of payments for schedule C and schedule D
                 back_ref_transaction_id, transaction_amount = get_backref_id_trash(transaction_id, cmte_id)
                 if back_ref_transaction_id and back_ref_transaction_id[:2] in ('SC', 'SD'):
@@ -1805,6 +1810,18 @@ def trash_restore_transactions(request):
                     if _delete == 'Y' or (_delete != 'Y' and datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
                         'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']):
                         _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                
+                if transaction_id[:2] == 'LA':
+                    tran_data = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
+                    logger.debug('update sl aggregate with LA data {}'.format(tran_data))
+                    update_aggregate_sl(tran_data)
+                    logger.debug('update sl summary with LA data {}'.format(tran_data))
+                    update_sl_summary(tran_data)
+                
+                if transaction_id[:2] == 'LB':
+                    tran_data = get_sched_b_transactions(report_id, cmte_id, transaction_id=transaction_id)[0]
+                    logger.debug('update sl summary with LB data {}'.format(tran_data))
+                    update_sl_summary(tran_data) 
 
                 # Handling delete of sched_B, sched_E, sched_F child transactions
                 if transaction_id[:2] in ['SB', 'SE', 'SF'] and _delete == 'Y':

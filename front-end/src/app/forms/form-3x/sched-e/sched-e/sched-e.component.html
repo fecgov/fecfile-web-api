@@ -16,6 +16,9 @@
 <ng-template #rtCandidate let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
 </ng-template>
+<ng-template #rtPayeeCommitteeId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadPayeeCommitteeId(r)" [term]="t"></ngb-highlight>
+</ng-template>
 <div class="individual-receipt-container">
   <form *ngIf="frmIndividualReceipt" [formGroup]="frmIndividualReceipt">
     <header>
@@ -114,6 +117,7 @@
                                 && !isFieldName(col?.name, 'cand_office_district') 
                                 && !isFieldName(col?.name, 'election_other_description') 
                                 && !isFieldName(col?.name, 'cand_election_year')
+                                && !isFieldName(col?.name, 'payee_cmte_id')
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.readonly]="isFieldReadOnly(col)"
@@ -180,6 +184,21 @@
                           [resultTemplate]="rt" [inputFormatter]="formatterLastName"
                           (selectItem)="handleSelectedIndividual($event, col)" (keyup)="handleFormFieldKeyup($event, col)"
                           (blur)="populatePurpose(col?.name)" />
+
+                        <input *ngIf="isFieldName(col?.name, 'payee_cmte_id')" class="form-control"
+                             [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
+                             [attr.name]="col?.name" [attr.value]="col?.value" [maxlength]="col?.validation?.max"
+                             [formControlName]="col?.name" [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-payee-committee-id"
+                             [ngbTypeahead]="searchPayeeCommitteeId"
+                             [focusFirst]=false
+                             [resultTemplate]="rtPayeeCommitteeId"
+                             [inputFormatter]="formatterPayeeCommitteeId"
+                             (selectItem)="handleSelectedCandidate($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="col?.name === 'completing_last_name'" class="form-control" [style.width]="col?.width"
                           [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"

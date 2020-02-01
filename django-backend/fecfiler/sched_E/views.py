@@ -139,6 +139,7 @@ def schedE_sql_dict(data):
         "completing_entity_id",
         "date_signed",
         "memo_code",
+        "memo_text_states",
         "memo_text",
         "delete_ind",
         "create_date",
@@ -1106,6 +1107,11 @@ def schedE(request):
             datum = request.data.copy()
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
+            if datum['transaction_type_identifier'] == 'IE_MULTI':
+                if 'memo_text' in datum:
+                    datum['memo_text'] = datum['memo_text_states'] + ' - ' + datum['memo_text']
+                else:
+                    datum['memo_text'] = datum['memo_text_states'] + ' - '
             if 'beneficiary_cand_id' in request.data:
                 datum['so_cand_id'] = request.data['beneficiary_cand_id']
             if 'cand_office_state' in request.data:
@@ -1198,6 +1204,12 @@ def schedE(request):
     elif request.method == "PUT":
         try:
             datum = schedE_sql_dict(request.data)
+
+            if datum['transaction_type_identifier'] == 'IE_MULTI':
+                if 'memo_text' in datum:
+                    datum['memo_text'] = datum['memo_text_states'] + ' - ' + datum['memo_text']
+                else:
+                    datum['memo_text'] = datum['memo_text_states'] + ' - '
             if 'beneficiary_cand_id' in request.data:
                 datum['so_cand_id'] = request.data['beneficiary_cand_id']
             if 'cand_office_state' in request.data:
