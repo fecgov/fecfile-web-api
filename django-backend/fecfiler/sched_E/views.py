@@ -123,7 +123,7 @@ def schedE_sql_dict(data):
         "expenditure_amount",
         "disbursement_date",
         "calendar_ytd_amount",
-        "purpose",
+        "expenditure_purpose_description",
         "category_code",
         "payee_cmte_id",
         "support_oppose_code",
@@ -139,6 +139,7 @@ def schedE_sql_dict(data):
         "completing_entity_id",
         "date_signed",
         "memo_code",
+        "memo_text_states",
         "memo_text",
         "delete_ind",
         "create_date",
@@ -185,6 +186,10 @@ def schedE_sql_dict(data):
         # remap election code for frontend handshaking
         if 'full_election_code' in data:
             datum['election_code'] = data.get('full_election_code')
+
+        #also add entity_id as an attribute. It is being remapped to payee_entity_id but fails in core since its looking for entity_id
+        if 'payee_entity_id' in data:
+            datum['entity_id'] = data.get('payee_entity_id')
         datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
             data.get('transaction_type_identifier'))
         return datum
@@ -242,7 +247,7 @@ def put_schedE(data):
         entity_id = new_entity.get("entity_id")
         # print('post_scheda {}'.format(entity_id))
         data["payee_entity_id"] = entity_id
-        check_mandatory_fields_SE(data)
+        check_mandatory_fields_se(data)
         # check_transaction_id(data.get('transaction_id'))
         existing_expenditure = get_existing_expenditure_amount(
             data.get("cmte_id"), data.get("transaction_id")
@@ -291,7 +296,6 @@ def put_sql_schedE(data):
         dissemination_date= %s,
         expenditure_amount= %s,
         disbursement_date= %s,
-        calendar_ytd_amount= %s,
         purpose= %s,
         category_code= %s,
         payee_cmte_id= %s,
@@ -310,7 +314,7 @@ def put_sql_schedE(data):
         memo_code= %s,
         memo_text= %s,
         line_number= %s,
-        last_update_date= %s,
+        last_update_date= %s
     WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
     AND delete_ind is distinct from 'Y';
     """
@@ -324,8 +328,7 @@ def put_sql_schedE(data):
         data.get("dissemination_date"),
         data.get("expenditure_amount"),
         data.get("disbursement_date"),
-        data.get("calendar_ytd_amount"),
-        data.get("purpose"),
+        data.get("expenditure_purpose_description"),
         data.get("category_code"),
         data.get("payee_cmte_id"),
         data.get("support_oppose_code"),
@@ -370,11 +373,11 @@ def update_aggregate_on_transaction(
         _sql = """
         UPDATE public.sched_e
         SET calendar_ytd_amount= %s
-        WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+        WHERE transaction_id = %s AND cmte_id = %s 
         AND delete_ind is distinct from 'Y'
         """
         do_transaction(
-            _sql, (aggregate_amount, transaction_id, report_id, cmte_id))
+            _sql, (aggregate_amount, transaction_id, cmte_id))
     except Exception as e:
         raise Exception(
             """error on update aggregate amount
@@ -405,12 +408,13 @@ def get_sched_e_ytd_amount(request):
             raise Exception('election_code is required for this api.')
         if cand_office == 'P':
             _sql = """
-            SELECT calendar_ytd_amount 
+            SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
             FROM public.sched_e
             WHERE cmte_id = %s
             AND so_cand_office = %s 
             AND election_code = %s 
             AND delete_ind is distinct from 'Y'
+            ORDER BY transaction_dt DESC, create_date DESC; 
             """
             _v = (cmte_id, cand_office, election_code)
         elif cand_office == 'S':
@@ -418,13 +422,14 @@ def get_sched_e_ytd_amount(request):
             if not cand_state:
                 raise Exception('cand_state is required for cand_office S')
             _sql = """
-            SELECT calendar_ytd_amount 
+            SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
             FROM public.sched_e
             WHERE cmte_id = %s
             AND so_cand_office = %s 
             AND election_code = %s 
             AND so_cand_state = %s 
             AND delete_ind is distinct from 'Y'
+            ORDER BY transaction_dt DESC, create_date DESC; 
             """
             _v = (cmte_id, cand_office, election_code, cand_state)
         elif cand_office == 'H':
@@ -435,7 +440,7 @@ def get_sched_e_ytd_amount(request):
             if not cand_district:
                 raise Exception('cand_district is required for cand_office H')
             _sql = """
-            SELECT calendar_ytd_amount 
+            SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt
             FROM public.sched_e
             WHERE cmte_id = %s
             AND so_cand_office = %s 
@@ -443,6 +448,7 @@ def get_sched_e_ytd_amount(request):
             AND so_cand_state = %s 
             AND so_cand_district = %s 
             AND delete_ind is distinct from 'Y'
+            ORDER BY transaction_dt DESC, create_date DESC; 
             """
             _v = (cmte_id, cand_office, election_code,
                   cand_state, cand_district)
@@ -473,7 +479,8 @@ def get_transactions_election_and_office(start_date, end_date, data):
     """
     _sql = ''
     _params = set([])
-    if data.get("so_cand_office") == "P":
+    cand_office = data.get('so_cand_office', data.get('cand_office'))
+    if cand_office == "P":
         _sql = """
         SELECT  
                 transaction_id, 
@@ -490,12 +497,12 @@ def get_transactions_election_and_office(start_date, end_date, data):
         """
         _params = (data.get("cmte_id"), start_date,
                    end_date, data.get("election_code"))
-    elif data.get("so_cand_office") == "S":
+    elif cand_office == "S":
         _sql = """
         SELECT  
                 transaction_id, 
 				expenditure_amount as transaction_amt,
-				COALESCE(dissemination_date, disbursement_date) as transaction_dt
+                COALESCE(dissemination_date, disbursement_date) as transaction_dt
         FROM public.sched_e
         WHERE  
             cmte_id = %s
@@ -513,7 +520,7 @@ def get_transactions_election_and_office(start_date, end_date, data):
             data.get("election_code"),
             data.get("so_cand_state"),
         )
-    elif data.get("so_cand_office") == "H":
+    elif cand_office == "H":
         _sql = """
         SELECT  
                 transaction_id, 
@@ -820,7 +827,7 @@ def post_sql_schedE(data):
             data.get("expenditure_amount"),
             data.get("disbursement_date"),
             data.get("calendar_ytd_amount"),
-            data.get("purpose"),
+            data.get("expenditure_purpose_description"),
             data.get("category_code"),
             data.get("payee_cmte_id"),
             data.get("support_oppose_code"),
@@ -864,6 +871,11 @@ def get_schedE(data):
             forms_obj = get_list_schedE(report_id, cmte_id, transaction_id)
         else:
             forms_obj = get_list_all_schedE(report_id, cmte_id)
+        if forms_obj:
+            for SE in forms_obj:
+                child_SE = get_list_schedE(SE['report_id'], SE['cmte_id'], SE['transaction_id'], True)
+                if child_SE:
+                    SE['child'] = child_SE
         return forms_obj
     except:
         raise
@@ -929,8 +941,42 @@ def get_list_all_schedE(report_id, cmte_id):
     except Exception:
         raise
 
+def mapFieldsForUI(data):
+    """
+    mapping response fields to frontend fields
+    """
+    # so_ fields remapping to work with frontend
+    # TODO: may need db fields renaming in the future
+    cand_fields = [
+        "so_cand_id",
+        "so_cand_last_name",
+        "so_cand_first_name",
+        "so_cand_middle_name",
+        "so_cand_prefix",
+        "so_cand_suffix",
+        "so_cand_office",
+    ]
+    for _f in cand_fields:
+        if _f in data:
+            data[_f.replace('so_','')] = data.pop(_f)
+    data['cand_office_state'] = data['so_cand_state']
+    data.pop('so_cand_state')
+    data['cand_office_district'] = data['so_cand_district']
+    data.pop('so_cand_district')
+    data['full_election_code'] = data['election_code']
+    data['cand_election_year'] = data['election_code'][-4:]
+    data['election_code'] = data['election_code'][0:-4]
+    data['expenditure_aggregate'] = data['calendar_ytd_amount']
+    data.pop('calendar_ytd_amount')
+    data['beneficiary_cand_id'] = data['cand_id']
+    data.pop('cand_id')
+    data['expenditure_purpose_description'] = data['purpose']
+    data.pop('purpose')
+    # data['aggregate'] = data['expenditure_aggregate'] #this should be mapped more cleanly. Right now sending a duplicate of expenditure_aggregate
+    
+    return data
 
-def get_list_schedE(report_id, cmte_id, transaction_id):
+def get_list_schedE(report_id, cmte_id, transaction_id, is_back_ref=False):
     """
     get one sched_e item with tran_id
     """
@@ -972,20 +1018,43 @@ def get_list_schedE(report_id, cmte_id, transaction_id):
             create_date, 
             last_update_date
             FROM public.sched_e
-            WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
-            AND delete_ind is distinct from 'Y') t
+            WHERE report_id = %s AND cmte_id = %s 
+            AND delete_ind is distinct from 'Y'
             """
+            if is_back_ref:
+                _sql = _sql + """ AND back_ref_transaction_id = %s) t"""
+            else:
+                _sql = _sql + """ AND transaction_id = %s) t"""
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
             schedE_list = cursor.fetchone()[0]
-            if schedE_list is None:
+            if schedE_list is None and not is_back_ref:
                 raise NoOPError(
                     "No sched_e transaction found for transaction_id {}".format(
                         transaction_id
                     )
                 )
             merged_list = []
-            for dictE in schedE_list:
-                merged_list.append(dictE)
+            if schedE_list:
+                for dictE in schedE_list:
+                    dictE['api_call'] = '/se/schedE'
+                    # get payee, completing entities and merge
+                    entity_ids = [
+                        'payee_entity_id',
+                        'completing_entity_id'
+                    ]
+                    for _id in entity_ids:
+                        entity_id = dictE.get(_id)
+                        data = {
+                            'entity_id': entity_id,
+                            'cmte_id': dictE['cmte_id']
+                        }
+                        entity_data = get_entities(data)[0]
+                        if _id == 'completing_entity_id':
+                            prefix = _id.split('_')[0]
+                            entity_data = {(prefix + '_' + k) : v for k,v in entity_data.items()}
+                        dictE.update(entity_data)
+                    dictE = mapFieldsForUI(dictE)
+                    merged_list.append(dictE)
         return merged_list
     except Exception:
         raise
@@ -1038,6 +1107,17 @@ def schedE(request):
             datum = request.data.copy()
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
+            if datum['transaction_type_identifier'] == 'IE_MULTI':
+                if 'memo_text' in datum:
+                    datum['memo_text'] = datum['memo_text_states'] + ' - ' + datum['memo_text']
+                else:
+                    datum['memo_text'] = datum['memo_text_states'] + ' - '
+            if 'beneficiary_cand_id' in request.data:
+                datum['so_cand_id'] = request.data['beneficiary_cand_id']
+            if 'cand_office_state' in request.data:
+                datum['so_cand_state'] = request.data['cand_office_state']
+            if 'cand_office_district' in request.data:
+                datum['so_cand_district'] = request.data['cand_office_district']
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
@@ -1124,6 +1204,21 @@ def schedE(request):
     elif request.method == "PUT":
         try:
             datum = schedE_sql_dict(request.data)
+
+            if datum['transaction_type_identifier'] == 'IE_MULTI':
+                if 'memo_text' in datum:
+                    datum['memo_text'] = datum['memo_text_states'] + ' - ' + datum['memo_text']
+                else:
+                    datum['memo_text'] = datum['memo_text_states'] + ' - '
+            if 'beneficiary_cand_id' in request.data:
+                datum['so_cand_id'] = request.data['beneficiary_cand_id']
+            if 'cand_office_state' in request.data:
+                datum['so_cand_state'] = request.data['cand_office_state']
+            if 'cand_office_district' in request.data:
+                datum['so_cand_district'] = request.data['cand_office_district']
+            if 'cand_office' in request.data:
+                datum['so_cand_office'] = request.data['cand_office']
+
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
@@ -1142,7 +1237,8 @@ def schedE(request):
             datum["cmte_id"] = request.user.username
 
             data = put_schedE(datum)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
+            output = get_schedE(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             logger.debug(e)
             return Response(

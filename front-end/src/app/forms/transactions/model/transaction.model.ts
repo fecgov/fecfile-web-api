@@ -50,6 +50,8 @@ export class TransactionModel {
   scrollDebtPaymentButtonIntoView: boolean;
   iseditable: boolean;
   isTrashable:boolean;
+  disbursementDate:Date;
+  disseminationDate:Date;
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
@@ -69,6 +71,8 @@ export class TransactionModel {
     this.date = transaction.date ? transaction.date : null;
     this.amount = transaction.amount ? transaction.amount : null;
     this.deletedDate = transaction.deletedDate ? transaction.deletedDate : null;
+    this.disbursementDate = transaction.disbursementDate ? transaction.disbursementDate : null;
+    this.disseminationDate = transaction.disseminationDate ? transaction.disseminationDate : null;
     this.aggregate = transaction.aggregate ? transaction.aggregate : null;
     this.purposeDescription = transaction.purposeDescription ? transaction.purposeDescription : '';
     this.contributorEmployer = transaction.contributorEmployer ? transaction.contributorEmployer : '';

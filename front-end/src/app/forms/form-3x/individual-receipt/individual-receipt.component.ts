@@ -129,12 +129,12 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
     this.formType = '3X';
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedMainComponent;
     localStorage.removeItem(`form_${this.formType}_saved`);
+    super.ngOnInit();
   }
 
   // tslint:disable-next-line:use-life-cycle-interface
   public ngDoCheck() {
     if (this.frmIndividualReceipt != null) {
-      console.log(this.frmIndividualReceipt.dirty);
       if ( this.frmIndividualReceipt.dirty ) {
         localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: false }));
       }

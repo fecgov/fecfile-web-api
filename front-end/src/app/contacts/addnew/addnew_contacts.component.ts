@@ -157,15 +157,17 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     if (this.frmContact.dirty) {
       if (this.frmContact.valid) {
         const isSaved = JSON.parse(localStorage.getItem('contactsaved'));
-        console.log('isSaved' + isSaved.saved);
-        if (!isSaved.saved) {
-          this.frmContact.markAsDirty();
-          this.frmContact.markAsTouched();
-        } else {
-          this.frmContact.markAsUntouched();
-          this.frmContact.markAsPristine();
+        //console.log('isSaved' + isSaved.saved);
+        if(isSaved) {
+          if (!isSaved.saved) {
+            this.frmContact.markAsDirty();
+            this.frmContact.markAsTouched();
+          } else {
+            this.frmContact.markAsUntouched();
+            this.frmContact.markAsPristine();
+          }
         }
-        } else {
+      } else {
         this.frmContact.markAsTouched();
         localStorage.setItem('contactsaved', JSON.stringify({ saved: false }));
       }
@@ -574,6 +576,16 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     } else {
       this.loadDynamiceFormFields();
       this.frmContact.patchValue({ entity_type: entityOption.code }, { onlySelf: true });
+
+      if(this.scheduleAction === ContactActions.edit) {
+        if((this.transactionToEdit.entity_type === 'IND' || this.transactionToEdit.entity_type === 'CAN')
+          && (entityOption.code === 'COM' || entityOption.code === 'ORG')) {
+          this.frmContact.patchValue({ entity_name: '' }, { onlySelf: true });
+        }else if((this.transactionToEdit.entity_type === 'COM' || this.transactionToEdit.entity_type === 'ORG')
+          && (entityOption.code === 'IND' || entityOption.code === 'CAN')) {
+          this.frmContact.patchValue({ last_name: '' }, { onlySelf: true });
+        }
+      }
     }
   }
 
@@ -765,6 +777,8 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
     this.frmContact.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.frmContact.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
     this.frmContact.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    // TODO: Workaround backend column-name typo. Should be removed later FNE-1974
+    this.frmContact.patchValue({ prefix: contact.preffix }, { onlySelf: true });
     this.frmContact.patchValue({ suffix: contact.suffix }, { onlySelf: true });
     this.frmContact.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
     this.frmContact.patchValue({ street_2: contact.street_2 }, { onlySelf: true });

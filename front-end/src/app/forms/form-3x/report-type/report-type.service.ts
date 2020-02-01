@@ -195,7 +195,8 @@ export class ReportTypeService {
   public signandSaveSubmitReport(formType: string, access_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    let url: string = '/core/reports';
+    //let url: string = '/core/reports';
+    let url: string = '/core/submit_report';
 
     let params = new HttpParams();
     let formData: FormData = new FormData();
@@ -402,7 +403,7 @@ export class ReportTypeService {
               console.log('submit Report form 3X submitted res = ', res);
               /*localStorage.removeItem(`form_${formType}_saved_backup`);
               localStorage.removeItem(`form_${formType}_report_type_backup`);*/
-              return true;
+              return res;
             }
             return false;
           })

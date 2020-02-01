@@ -231,7 +231,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.formType = '3X';
     this.showPart2 = false;
 
-    if(this.transactionType === 'ALLOC_H3_RATIO'){
+    if(this.transactionType === 'ALLOC_H3_RATIO' && this.scheduleAction !== ScheduleActions.edit){
       this.setH3();
     }
 
@@ -740,12 +740,14 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public saveAndGetSummary(ratio: any, scheduleAction: any) {
+    //this.h3Sum = [];
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
     this._schedH3Service.saveAndGetSummary(ratio, reportId, scheduleAction).subscribe(res => {
       if (res) {
         //this.saveHRes = res;
+        this.h3Sum = [];
         this.h3Entries = [];
         this.h3Sum =  res;
         this.h3TableConfig.totalItems = res.length;

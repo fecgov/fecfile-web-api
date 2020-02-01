@@ -157,6 +157,10 @@
                             (click)="changeSortDirection('non_federal_percent')">Levin
                             <i class="fa fa-sort" aria-hidden="false"></i>
                         </th>
+                        <th [@fadeInOut]
+                            (click)="changeSortDirection('memo_code')">Memo
+                            <i class="fa fa-sort" aria-hidden="false"></i>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -187,11 +191,7 @@
                         <td>{{ item.expenditure_purpose }}</td>
                         <td>{{ item.fed_share_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
                         <td>{{ item.levin_share | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
-                        <td>
-                            <div *ngIf="item.memo_code == 'X'"><input type="checkbox" checked onclick="return false;">Memo</div>
-                            <div *ngIf="item.memo_code != 'X'"><input type="checkbox" onclick="return false;">Memo</div>                            
-                        </td>
-
+                        <td>{{ item.memo_code }}</td>
                         <td class="bulk_action" >
                             <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
         
@@ -207,7 +207,7 @@
                                         <i class="fas fa-print"></i> Print
                                     </button>
                                     <button class="dropdown-item" (click)="cloneTransaction(item)"><i class="fas fa-copy"></i> Clone</button>
-                                    <button *ngIf="checkIfTrashable(item)" class="dropdown-item" (click)="trashTransaction(item)"><i class="fas fa-trash" ></i> Trash</button>
+                                    <button class="dropdown-item" (click)="trashTransaction(item)"><i class="fas fa-trash" ></i> Trash</button>
                                 </div>
                             </div>
                         </td>
@@ -239,11 +239,7 @@
                         <td>{{ itemChild.expenditure_purpose }}</td>
                         <td>{{ itemChild.fed_share_amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
                         <td>{{ itemChild.levin_share | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
-                        <td>
-                            <div *ngIf="itemChild.memo_code == 'X'"><input type="checkbox" checked onclick="return false;">Memo</div>
-                            <div *ngIf="itemChild.memo_code != 'X'"><input type="checkbox" onclick="return false;">Memo</div>
-                        </td>
-
+                        <td>{{ itemChild.memo_code }}</td>
                         <td class="bulk_action" >
                             <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 

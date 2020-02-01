@@ -34,6 +34,17 @@ export class SchedH1Component implements OnInit {
   h1Disabled = false;
   removedH1Subscription: Subscription;
 
+  getH1PacSubscription: Subscription;
+  getH1PacADDisable = false;
+  h1PacADDisabled = false;
+  getH1PacGVDisable = false;
+  h1PacGVDisabled = false;
+  getH1PacPCDisable = false;
+  h1PacPCDisabled = false;
+  removedH1PacSubscription: Subscription;
+
+  pacSaveDisable = true;
+
   constructor(
     private _http: HttpClient,
     private _activatedRoute: ActivatedRoute,
@@ -63,6 +74,9 @@ export class SchedH1Component implements OnInit {
           message => {
             if(message.scheduleType === 'Schedule H1') {
               this.getH1Disable = false;
+
+              this.checkH1PacDisabled();
+
               this.scheduleAction = ScheduleActions.add;
               this.form.control.patchValue({ h1_election_year_options: '' }, { onlySelf: true });
             }
@@ -76,6 +90,7 @@ export class SchedH1Component implements OnInit {
     //console.log(localStorage.getItem('cmte_type_category'));
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.checkH1Disabled();
+    this.checkH1PacDisabled();
   }
 
   public ngDoCheck() {
@@ -202,7 +217,10 @@ export class SchedH1Component implements OnInit {
     this.scheduleAction = ScheduleActions.edit;
     this.transaction_id = item.transaction_id;
 
+    this.pacSaveDisable = false;
+
     this.checkH1Disabled();
+    this.checkH1PacDisabled();
 
     if (this.isPac()) {
       this.form.control.patchValue({ federal_share: item.federal_percent * 100 }, { onlySelf: true });
@@ -210,6 +228,18 @@ export class SchedH1Component implements OnInit {
       this.form.control.patchValue({ applied_activity1: item.administrative }, { onlySelf: true });
       this.form.control.patchValue({ applied_activity2: item.generic_voter_drive }, { onlySelf: true });
       this.form.control.patchValue({ applied_activity3: item.public_communications }, { onlySelf: true });
+
+      this.getH1PacSubscription = this.getH1Pac().subscribe(
+        res=>{
+          if(res && this.isPac()) {
+            if(res.administrative === 1 && !item.administrative) { this.h1PacADDisabled = true };
+
+            if(res.generic_voter_drive === 1 && !item.generic_voter_drive) { this.h1PacGVDisabled = true };
+
+            if(res.public_communications === 1 && !item.public_communications) { this.h1PacPCDisabled = true };
+          }
+        }
+      )
     } else {
       if (item.presidential_only) {
         this.form.control.patchValue({ h1_election_year_options: '1' }, { onlySelf: true });
@@ -234,7 +264,23 @@ export class SchedH1Component implements OnInit {
     }
   }
 
+  public handleOnFedBlurEvent(e, f: NgForm) {
+    if (e.target.value <= 100) {
+      f.controls.nonfederal_share.setValue(100 - e.target.value);
+    } else {
+      f.controls.nonfederal_share.setValue(0);
+    }
+  }
+
   public handleNonFedShareFieldKeyup(e, f: NgForm) {
+    if (e.target.value <= 100) {
+      f.controls.federal_share.setValue(100 - e.target.value);
+    } else {
+      f.controls.federal_share.setValue(0);
+    }
+  }
+
+  public handleOnNonFedBlurEvent(e, f: NgForm) {
     if (e.target.value <= 100) {
       f.controls.federal_share.setValue(100 - e.target.value);
     } else {
@@ -244,6 +290,7 @@ export class SchedH1Component implements OnInit {
 
   public previousStep(): void {
     this.checkH1Disabled();
+    this.checkH1PacDisabled();
     this.status.emit({
       form: {},
       direction: 'previous',
@@ -307,6 +354,120 @@ export class SchedH1Component implements OnInit {
   public changeH1Disable() {
     if(this._activatedRoute.snapshot.queryParams.step === 'step_2') {
         this.h1Disabled = this.getH1Disable;
+        this.h1PacADDisabled = this.getH1PacADDisable;
+        this.h1PacGVDisabled = this.getH1PacGVDisable;
+        this.h1PacPCDisabled = this.getH1PacPCDisable;
+
+        if(this.scheduleAction  === ScheduleActions.add) {
+          if(this.form.value.federal_share) {
+            this.form.control.patchValue({ federal_share: null }, { onlySelf: true });
+          }
+          if(this.form.value.federal_share) {
+            this.form.control.patchValue({ nonfederal_share: null }, { onlySelf: true });
+          }
+
+          if(!this.h1PacADDisabled) {
+            this.form.control.patchValue({ applied_activity1: null }, { onlySelf: true });
+          }
+
+          if(!this.h1PacGVDisabled) {
+            this.form.control.patchValue({ applied_activity2: null }, { onlySelf: true });
+          }
+
+          if(!this.h1PacPCDisabled) {
+            this.form.control.patchValue({ applied_activity3: null }, { onlySelf: true });
+          }
+        }else if(this.scheduleAction  === ScheduleActions.edit) {
+          this.form.reset();
+          this.scheduleAction = ScheduleActions.add;
+          this.checkH1PacDisabled();
+        }
+
+        this.pacSaveDisable = true;
+    }
+  }
+
+  public checkH1PacDisabled() {
+    if(this.scheduleAction === ScheduleActions.add) {
+      this.getH1PacSubscription = this.getH1Pac().subscribe(
+        res=>{
+          if(res && this.isPac()) {
+            if(res.administrative === 1) {
+              this.form.control.patchValue({ applied_activity1: 'administrative' }, { onlySelf: true });
+              this.getH1PacADDisable = true;
+            }else {
+              this.form.control.patchValue({ applied_activity1: '' }, { onlySelf: true });
+              this.getH1PacADDisable = false;
+            }
+
+            if(res.generic_voter_drive === 1) {
+              this.form.control.patchValue({ applied_activity2: 'generic_voter_drive' }, { onlySelf: true });
+              this.getH1PacGVDisable = true;
+            }else {
+              this.form.control.patchValue({ applied_activity2: '' }, { onlySelf: true });
+              this.getH1PacGVDisable = false;
+            }
+
+            if(res.public_communications === 1) {
+              this.form.control.patchValue({ applied_activity3: 'public_communications' }, { onlySelf: true });
+              this.getH1PacPCDisable = true;
+            }else {
+              this.form.control.patchValue({ applied_activity3: '' }, { onlySelf: true });
+              this.getH1PacPCDisable = false;
+            }
+          }else{
+            this.getH1PacADDisable = false;
+            this.getH1PacGVDisable = false;
+            this.getH1PacPCDisable = false;
+          }
+        }
+      )
+      this.h1PacADDisabled = this.getH1PacADDisable;
+      this.h1PacGVDisabled = this.getH1PacGVDisable;
+      this.h1PacPCDisabled = this.getH1PacPCDisable;
+    }else {
+      this.h1PacADDisabled = false;
+      this.h1PacGVDisabled = false;
+      this.h1PacPCDisabled = false;
+    }
+  }
+
+  public getH1Pac(): Observable<any> {
+
+    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = `${environment.apiUrl}/sh1/validate_pac_h1`;
+
+    let httpOptions = new HttpHeaders();
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+
+    let params = new HttpParams();
+    params = params.append('report_id', reportId);
+
+    return this._http.get(url, {
+      params,
+      headers: httpOptions
+    })
+    .pipe(map(res => {
+      if (res) {
+        console.log('Get H1 Pac res: ', res);
+        return res;
+      }
+      return false;
+      })
+    )
+  }
+
+  public clickPacOptions(e: any) {
+    if(!this.form.value.applied_activity1 && e.target.value === 'administrative'
+      || !this.form.value.applied_activity2 && e.target.value === 'generic_voter_drive'
+      || !this.form.value.applied_activity3 && e.target.value === 'public_communication') {
+        this.pacSaveDisable = false;
+    }else if(!this.form.value.applied_activity2 && !this.form.value.applied_activity3 && this.form.value.applied_activity1 && e.target.value === 'administrative'
+      || !this.form.value.applied_activity1 && !this.form.value.applied_activity3 && this.form.value.applied_activity2 && e.target.value === 'generic_voter_drive'
+      || !this.form.value.applied_activity1 && !this.form.value.applied_activity2 && this.form.value.applied_activity3 && e.target.value === 'public_communication') {
+        this.pacSaveDisable = true;
     }
   }
 

@@ -24,12 +24,12 @@ export class SchedEService {
       }
     }
     else if(formData.cand_office && formData.cand_office === 'S'){
-      if(formData.election_code && formData.cand_election_year && formData.cand_state){
+      if(formData.election_code && formData.cand_election_year && formData.cand_office_state){
         allRequiredFieldsPresent = true;
       }
     }
     else if(formData.cand_office && formData.cand_office === 'H'){
-      if(formData.election_code && formData.cand_election_year && formData.cand_state && formData.cand_office_district){
+      if(formData.election_code && formData.cand_election_year && formData.cand_office_state && formData.cand_office_district){
         allRequiredFieldsPresent = true;
       }
     }
@@ -47,7 +47,7 @@ export class SchedEService {
       params = params.append('cand_office', formData.cand_office);
 
       if ((formData.cand_office === 'S' || formData.cand_office === 'H')) {
-        params = params.append('cand_state', formData.cand_state);
+        params = params.append('cand_state', formData.cand_office_state);
       }
 
       if (formData.cand_office === 'H') {

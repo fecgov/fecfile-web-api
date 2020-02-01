@@ -128,6 +128,8 @@ export class AppLayoutComponent implements OnInit {
 
       this.sideBarClass = 'dashboard active';
       this.showFormDueDate = false;
+    } else if (route === '/reports') {
+      this.showFormDueDate = false;
     } else if (
       route.indexOf('/forms/form/3X') === 0 ||
       route.indexOf('/forms/transactions/3X') === 0 ||

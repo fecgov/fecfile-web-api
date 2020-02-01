@@ -19,12 +19,26 @@ from rest_framework.response import Response
 from fecfiler.core.views import (NoOPError, check_null_value, check_report_id,
                                  date_format, delete_entities, get_entities,
                                  post_entities, put_entities, remove_entities,
-                                 undo_delete_entities, superceded_report_id_list)
+                                 undo_delete_entities, superceded_report_id_list, get_sched_h_transaction_table)
 
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     update_parent_purpose,
-    cmte_type)
+    cmte_type,
+    get_sched_b_transactions,
+    )
+
+from fecfiler.core.aggregation_helper import(
+    update_activity_event_amount_ytd_h4,
+    update_activity_event_amount_ytd_h6,
+    load_schedH4,
+    load_schedH6,
+    update_aggregate_sf,
+    update_aggregate_se,
+    load_schedF,
+    load_schedE,
+    update_aggregate_sl,
+)
 
 from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     get_schedB, post_schedB, put_schedB,
@@ -33,6 +47,8 @@ from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     delete_sql_schedB)
 
 from fecfiler.sched_L.views import update_sl_summary
+# from fecfile.core.aggregation_helper import 
+# from fecfiler.sched_H.views import get_list_schedH4, get_list_schedH6
 
 # Create your views here.
 logger = logging.getLogger(__name__)
@@ -180,7 +196,7 @@ ELECTION_YR = {'election_year': REQ_ELECTION_YR}
 SCHED_L_A_TRAN_TYPES = [
     "LEVIN_PAC_REC",
     "LEVIN_TRIB_REC",
-    "LEVIN_PARTN_MEMO",
+    # "LEVIN_PARTN_MEMO",
     "LEVIN_PARTN_REC",
     "LEVIN_ORG_REC",
     "LEVIN_INDV_REC",
@@ -188,8 +204,11 @@ SCHED_L_A_TRAN_TYPES = [
     "LEVIN_NON_FED_REC",
 ]
 
-SCHEDULE_TO_TABLE_DICT = { 'SA': ['sched_a'],
+SCHEDULE_TO_TABLE_DICT = { 
+    'SA': ['sched_a'],
+    'LA': ['sched_a'],
     'SB': ['sched_b'],
+    'LB': ['sched_b'],
     'SC': ['sched_c', 'sched_c1', 'sched_c2'],
     'SD': ['sched_d'],
     'SE': ['sched_e'],
@@ -839,6 +858,8 @@ def post_schedA(datum):
         # for sched_l contributions, the transaction is starts with 'SLA'
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
             trans_char = "LA"
+            datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
+            datum.get('transaction_type_identifier'))
         else:
             trans_char = "SA"
         transaction_id = get_next_transaction_id(trans_char)
@@ -851,6 +872,7 @@ def post_schedA(datum):
             post_sql_schedA(datum.get('cmte_id'), datum.get('report_id'), datum.get('line_number'), datum.get('transaction_type'), transaction_id, datum.get('back_ref_transaction_id'), datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), check_decimal(datum.get(
                 'contribution_amount')), datum.get('purpose_description'), datum.get('memo_code'), datum.get('memo_text'), datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), datum.get('donor_cmte_name'), datum.get('transaction_type_identifier'),
                 datum.get('levin_account_id'))
+            logger.debug('transaction saved...')
             try:
                 if datum.get('transaction_type_identifier') in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT:
                     logger.debug('auto generating sched_b child transaction:')
@@ -909,9 +931,12 @@ def post_schedA(datum):
                 'The post_sql_schedA function is throwing an error: ' + str(e))
             
         # update line number based on aggregate amount info
-        update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
-            'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+        if transaction_id.startswith('SA'):
+            update_linenumber_aggamt_transactions_SA(datum.get('contribution_date'), datum.get(
+                'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            print('haha')
+            update_aggregate_sl(datum)
             update_sl_summary(datum)    
         return datum
     except:
@@ -1105,9 +1130,12 @@ def put_schedA(datum):
         update_date = datetime.datetime.strptime(prev_transaction_data.get('contribution_date'), '%Y-%m-%d').date()
         if update_date > datum.get('contribution_date'):
             update_date = datum.get('contribution_date')
-        update_linenumber_aggamt_transactions_SA(update_date, datum.get(
-            'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
+
+        if transaction_id.startswith('SA'):
+            update_linenumber_aggamt_transactions_SA(update_date, datum.get(
+                'transaction_type_identifier'), entity_id, datum.get('cmte_id'), datum.get('report_id'))
         if datum.get('transaction_type_identifier') in SCHED_L_A_TRAN_TYPES:
+            update_aggregate_sl(datum)
             update_sl_summary(datum)    
         return datum
     except:
@@ -1680,6 +1708,45 @@ def get_backref_id_trash(transaction_id, cmte_id):
     except Exception:
         raise
 
+def delete_H1_carry_over(transaction_id, cmte_id):
+    try:
+        _sql = """SELECT atv.transaction_table, (SELECT cm.cmte_type_category FROM public.committee_master cm WHERE cm.cmte_id = %s) 
+                FROM public.all_transactions_view atv 
+                WHERE atv.transaction_id = %s and atv.cmte_id = %s 
+               """
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id, transaction_id, cmte_id])
+            forms_obj = cursor.fetchone()
+            if forms_obj[0] == 'sched_h1':
+                if forms_obj[1] == 'PTY':
+                    _sql1 = """UPDATE public.sched_h1 
+                        SET delete_ind = 'Y' 
+                        FROM public.sched_h1 ch1
+                        WHERE sched_h1.election_year = ch1.election_year 
+                        AND ch1.cmte_id = sched_h1.cmte_id
+                        AND ch1.transaction_id = %s 
+                        AND sched_h1.cmte_id = %s
+                        AND sched_h1.delete_ind is distinct from 'Y';
+                        """
+                if forms_obj[1] == 'PAC':
+                    _sql1 = """UPDATE public.sched_h1 
+                        SET delete_ind = 'Y' 
+                        FROM public.sched_h1 ch1
+                        WHERE sched_h1.election_year = ch1.election_year 
+                        AND ch1.cmte_id = sched_h1.cmte_id
+                        AND ch1.administrative = sched_h1.administrative
+                        AND ch1.generic_voter_drive = sched_h1.generic_voter_drive
+                        AND ch1.public_communications = sched_h1.public_communications
+                        AND ch1.transaction_id = %s 
+                        AND sched_h1.cmte_id = %s
+                        AND sched_h1.delete_ind is distinct from 'Y';
+                        """
+                cursor.execute(_sql1, [transaction_id, cmte_id])
+                print(cursor.query)
+
+    except Exception:
+        raise
+        
 @api_view(['PUT'])
 def trash_restore_transactions(request):
     """api for trash and resore transactions. 
@@ -1715,17 +1782,26 @@ def trash_restore_transactions(request):
         # try:
         table_list = SCHEDULE_TO_TABLE_DICT.get(transaction_id[:2])
         if table_list:
-            if transaction_id[:2] in ('SA', 'SB', 'SE', 'SF', 'SH'):
+            if transaction_id[:2] in ('SA', 'LA', 'LB', 'SB', 'SE', 'SF', 'SH'):
                 # Handling deletion/restoration of payments for schedule C and schedule D
                 back_ref_transaction_id, transaction_amount = get_backref_id_trash(transaction_id, cmte_id)
                 if back_ref_transaction_id and back_ref_transaction_id[:2] in ('SC', 'SD'):
                     update_parent_amounts_to_trash(transaction_amount, back_ref_transaction_id, cmte_id, _delete)
+                # load data and prepare for aggregation and take care parent-child relationship
+
+                tran_data = {}
+                if transaction_id[:2] == 'SF':
+                    tran_data = load_schedF(cmte_id, report_id, transaction_id)[0]
+                if transaction_id[:2] == 'SE':
+                    tran_data = load_schedE(cmte_id, report_id, transaction_id)[0]
+
                 # Deleting/Restoring the transaction
                 deleted_transaction_ids.append(trash_restore_sql_transaction( table_list,
                     report_id,
                     transaction_id, 
                     _delete))
-                # Handling aggregate updation for sched_A transactions
+
+                # Handling aggregate update for sched_A transactions
                 if transaction_id[:2] == 'SA':
                     datum = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
                     update_linenumber_aggamt_transactions_SA(datetime.datetime.strptime(datum.get('contribution_date'), '%Y-%m-%d').date(
@@ -1734,10 +1810,50 @@ def trash_restore_transactions(request):
                     if _delete == 'Y' or (_delete != 'Y' and datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
                         'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']):
                         _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
-                # Handling aggregate updation for sched_B transactions
-                if transaction_id[:2] == 'SB':
-                    if _delete == 'Y':
+                
+                if transaction_id[:2] == 'LA':
+                    tran_data = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
+                    logger.debug('update sl aggregate with LA data {}'.format(tran_data))
+                    update_aggregate_sl(tran_data)
+                    logger.debug('update sl summary with LA data {}'.format(tran_data))
+                    update_sl_summary(tran_data)
+                
+                if transaction_id[:2] == 'LB':
+                    tran_data = get_sched_b_transactions(report_id, cmte_id, transaction_id=transaction_id)[0]
+                    logger.debug('update sl summary with LB data {}'.format(tran_data))
+                    update_sl_summary(tran_data) 
+
+                # Handling delete of sched_B, sched_E, sched_F child transactions
+                if transaction_id[:2] in ['SB', 'SE', 'SF'] and _delete == 'Y':
+                    _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+
+                if transaction_id[:2] == 'SF':
+                    update_aggregate_sf(
+                        tran_data["cmte_id"],
+                        tran_data["beneficiary_cand_id"],
+                        datetime.datetime.strptime(tran_data.get("expenditure_date"), "%Y-%m-%d")
+                        .date()
+                        .strftime("%m/%d/%Y"),
+                    )
+
+                if transaction_id[:2] == 'SE':
+                    update_aggregate_se(tran_data)
+            
+                # Handling delete of schedule H4/H6 transactions: delete child trans and update aggregate
+                if transaction_id[:2] == 'SH' and _delete == 'Y':
+                    tran_tbl = get_sched_h_transaction_table(transaction_id)
+                    if tran_tbl == 'sched_h4':
+                        logger.debug('sched_h4 trash: check child transaction and update ytd amount:')
                         _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                        data = load_schedH4(cmte_id, report_id, transaction_id)[0]
+                        logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
+                        update_activity_event_amount_ytd_h4(data)
+                    if tran_tbl == 'sched_h6':
+                        logger.debug('sched_h6 trash: check child transaction and update ytd amount:')
+                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                        data = load_schedH6(cmte_id, report_id, transaction_id)[0]
+                        logger.debug('update sched h4 aggregate amount after trashing {}'.format(data))
+                        update_activity_event_amount_ytd_h6(data)
             elif transaction_id[:2] in ('SC', 'SD'):
                 # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D
                 if _delete == 'Y' or (transaction_id[:2] == 'SC' and _delete != 'Y'):

@@ -16,6 +16,9 @@
 <ng-template #rtCandidate let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
 </ng-template>
+<ng-template #rtPayeeCommitteeId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadPayeeCommitteeId(r)" [term]="t"></ngb-highlight>
+</ng-template>
 <div class="individual-receipt-container">
   <form *ngIf="frmIndividualReceipt" [formGroup]="frmIndividualReceipt">
     <header>
@@ -114,6 +117,7 @@
                                 && !isFieldName(col?.name, 'cand_office_district') 
                                 && !isFieldName(col?.name, 'election_other_description') 
                                 && !isFieldName(col?.name, 'cand_election_year')
+                                && !isFieldName(col?.name, 'payee_cmte_id')
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.readonly]="isFieldReadOnly(col)"
@@ -180,6 +184,21 @@
                           [resultTemplate]="rt" [inputFormatter]="formatterLastName"
                           (selectItem)="handleSelectedIndividual($event, col)" (keyup)="handleFormFieldKeyup($event, col)"
                           (blur)="populatePurpose(col?.name)" />
+
+                        <input *ngIf="isFieldName(col?.name, 'payee_cmte_id')" class="form-control"
+                             [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
+                             [attr.name]="col?.name" [attr.value]="col?.value" [maxlength]="col?.validation?.max"
+                             [formControlName]="col?.name" [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-payee-committee-id"
+                             [ngbTypeahead]="searchPayeeCommitteeId"
+                             [focusFirst]=false
+                             [resultTemplate]="rtPayeeCommitteeId"
+                             [inputFormatter]="formatterPayeeCommitteeId"
+                             (selectItem)="handleSelectedCandidate($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="col?.name === 'completing_last_name'" class="form-control" [style.width]="col?.width"
                           [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
@@ -327,6 +346,14 @@
                               coverage period only. -->
                           </div>
                         </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt?.get(col?.name)?.errors?.minStates">
+                            You must select at least 6 states
+                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                              coverage period only. -->
+                          </div>
+                        </ng-container>
                       </div>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'checkbox'">
@@ -346,11 +373,12 @@
                     <ng-container *ngIf="col?.type === 'textarea'">
                       <textarea  class="form-control"
                          [attr.name]="col?.name"
+                         [attr.readonly]="col.isReadonly"
                         [attr.maxlength]="col?.validation?.max" [formControlName]="col?.name"></textarea>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office')">
                       <ng-select #candOfficeTypeSelect 
-                        [items]="candidateOfficeTypes"
+                        [items]="candOfficeStatesByTransactionType"
                         (change)="handleOfficeSoughtChangeForSchedE($event, col)" 
                         class="forms__select" 
                         [formControlName]="col?.name"
@@ -391,7 +419,6 @@
                         [items]="states"
                         [multiple]="true" 
                         (change)="handleMultiStateChange($event, col)"
-                        [maxSelectedItems]="6"
                         class="forms__select" 
                         [formControlName]="col?.name" 
                         bindValue="code" 
@@ -410,6 +437,19 @@
                         </ng-template>
                       </ng-select>
                     </ng-container>
+                    <div class="error-text" *ngIf="
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
+                            frmIndividualReceipt.get(col?.name).invalid
+                          ">
+                      <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt?.get(col?.name)?.errors?.minStates">
+                            You must select at least 6 states
+                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                              coverage period only. -->
+                          </div>
+                        </ng-container>    
+                    </div>
                     <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'cand_office_state') && isFieldVisible(col?.name)">
                       <ng-select #stateSelect 
                         [items]="states" 
@@ -615,7 +655,7 @@
                   <button class="btn btn-secondary btn-right" (click)="updateOnly()">
                     Save
                   </button>
-                  <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
+                  <a *ngIf="subTransactionInfo?.isParent === false && _transactionCategory === 'loans-and-debts'" class="btn btn-primary btn-right"
                     (click)="saveAndReturnToParent()">
                     Return to {{ subTransactionInfo.transactionTypeDescription }}
                   </a>

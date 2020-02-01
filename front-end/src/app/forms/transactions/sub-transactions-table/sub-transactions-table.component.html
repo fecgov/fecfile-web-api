@@ -24,7 +24,13 @@
         Activity or Event Identifier
         <i class="fa fa-sort" aria-hidden="false"></i>
       </th>
-      <th>Date
+      <th *ngIf="subTransactionsTableType !== 'sched_e'">Date
+          <i class="fa fa-sort" aria-hidden="false"></i>
+      </th>
+      <th *ngIf="subTransactionsTableType === 'sched_e'">Disbursment Date
+          <i class="fa fa-sort" aria-hidden="false"></i>
+      </th>
+      <th *ngIf="subTransactionsTableType === 'sched_e'">Dissemination Date
           <i class="fa fa-sort" aria-hidden="false"></i>
       </th>
       <th *ngIf="isH4OrH6() === 'H4'">
@@ -67,7 +73,9 @@
       <td *ngIf="subTransactionsTableType === 'sched_d'">{{ trx.type }}</td>
       <td *ngIf="isH4OrH6() !== 'H6'">{{ trx.name }}</td>
       <td *ngIf="isH4OrH6() === 'H6'">{{ trx.activityEventIdentifier }}</td>
-      <td>{{ trx.date | date: 'MM/dd/yyyy' }}</td>
+      <td *ngIf="subTransactionsTableType !== 'sched_e'">{{ trx.date | date: 'MM/dd/yyyy' }}</td>
+      <td *ngIf="subTransactionsTableType === 'sched_e'">{{ trx.disbursementDate | date: 'MM/dd/yyyy' }}</td>
+      <td *ngIf="subTransactionsTableType === 'sched_e'">{{ trx.disseminationDate | date: 'MM/dd/yyyy' }}</td>
       <td *ngIf="isH4OrH6() === 'H4'">
           <div *ngIf="trx.activityEventType == 'AD'">Administrative</div>
           <div *ngIf="trx.activityEventType == 'GV'">Generic Voter Drive</div>

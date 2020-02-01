@@ -69,6 +69,7 @@
                     type="radio"
                     formControlName="coordinated_exp_ind"
                     value="Y"
+                    (change)="onFilerChange('Y')"
                   />
                   Yes
                 </label>
@@ -86,6 +87,7 @@
                     type="radio"
                     formControlName="coordinated_exp_ind"
                     value="N"
+                    (change)="onFilerChange('N')"
                   />
                   No
                 </label>
@@ -113,7 +115,7 @@
                   [style.height]="'30px'"
                   [maxlength]="'9'"
                   [ngClass]="
-                    frmIndividualReceipt.get('designating_cmte_id')?.invalid &&
+                    frmIndividualReceipt.get('designating_cmte_id')?.invalid && isDesignatedFiler &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -141,7 +143,7 @@
                   [style.height]="'30px'"
                   [maxlength]="'200'"
                   [ngClass]="
-                    frmIndividualReceipt.get('designating_cmte_name')?.invalid &&
+                    frmIndividualReceipt.get('designating_cmte_name')?.invalid && isDesignatedFiler &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
@@ -170,12 +172,6 @@
                   [style.width]="'45%'" 
                   [style.height]="'30px'"
                   [maxlength]="'9'"
-                  [ngClass]="
-                    frmIndividualReceipt.get('subordinate_cmte_id')?.invalid &&
-                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'input-field-error'
-                      : ''
-                  "                            
                 />
               </div>
             </div>
@@ -198,12 +194,6 @@
                   [resultTemplate]="rtCommitteeName" 
                   [inputFormatter]="formatterCommitteeName"
                   (selectItem)="handleSelectedSFCommittee($event, 'subordinate_cmte_name')"
-                  [ngClass]="
-                    frmIndividualReceipt.get('subordinate_cmte_name')?.invalid &&
-                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'input-field-error'
-                      : ''
-                  "              
                 />
               </div>
             </div>        
@@ -222,12 +212,6 @@
                   id="subordinate_cmte_street_1"
                   [style.height]="'30px'"
                   [maxlength]="'34'"
-                  [ngClass]="
-                    frmIndividualReceipt.get('subordinate_cmte_street_1')?.invalid &&
-                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'input-field-error'
-                      : ''
-                  "                
                 />
               </div>
             </div>
@@ -244,13 +228,7 @@
                   [style.height]="'30px'"
                   id="subordinate_cmte_street_2"
                   [maxlength]="'34'"
-                  [ngClass]="
-                    frmIndividualReceipt.get('subordinate_cmte_street_2')?.invalid &&
-                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'input-field-error'
-                      : ''
-                  "                
-                />
+                       />
               </div>
             </div>        
           </div>
@@ -268,12 +246,6 @@
                   [style.width]="'66%'" 
                   [style.height]="'30px'"
                   [maxlength]="'30'"
-                  [ngClass]="
-                    frmIndividualReceipt.get('subordinate_cmte_city')?.invalid &&
-                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'input-field-error'
-                      : ''
-                  "                
                 />
               </div>
             </div>
@@ -290,12 +262,7 @@
                   bindValue="code" 
                   bindLabel="code" 
                   [selectOnTab]="true"
-                    [ngClass]="
-                    frmIndividualReceipt.get('subordinate_cmte_state')?.invalid &&
-                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'forms__select-error'
-                      : ''
-                  ">
+                   >
                   <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
                     <span>{{ item.code + ' - ' + item.name }}</span>
                   </ng-template>
@@ -315,12 +282,6 @@
                   [style.width]="'33%'" 
                   [style.height]="'30px'"
                   [maxlength]="'10'"
-                  [ngClass]="
-                    frmIndividualReceipt.get('subordinate_cmte_zip')?.invalid &&
-                    (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                      ? 'input-field-error'
-                      : ''
-                  "                
                 />
                 <div class="error-text" *ngIf="
                   (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
@@ -548,6 +509,12 @@
                             you will need to check the memo code box.
                           </div>
                         </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.amountExceeded">
+                            Expenditure amount exceeds outstanding loan amount
+                          </div>
+                        </ng-container>
                       </div>
                     </ng-container>
                     <ng-container *ngIf="col?.type === 'checkbox'">
@@ -771,4 +738,3 @@
       </footer>
     </form>
   </div>
-  

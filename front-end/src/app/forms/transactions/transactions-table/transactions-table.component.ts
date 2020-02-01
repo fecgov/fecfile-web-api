@@ -1004,8 +1004,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param trx the Transaction to view
    */
-  public viewTransaction(): void {
-    alert('View transaction is not yet supported');
+  public viewTransaction(trx: TransactionModel): void {
+    //alert('View transaction is not yet supported');
+    this._transactionsMessageService.sendViewTransactionMessage(trx);
   }
 
   /**

@@ -31,6 +31,8 @@ from fuzzywuzzy import fuzz
 import pandas
 import numpy
 
+from fecfiler.core.email_helper import email
+
 from fecfiler.core.carryover_helper import (
     do_h1_carryover,
     do_h2_carryover,
@@ -200,6 +202,29 @@ def get_transaction_categories(request):
     except Exception as e:
         return Response("The get_transaction_categories API is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+
+def cmte_type(cmte_id):
+    """
+    to know if the cmte is PAC or PTY and determine the flag values for administrative, generic_voter_drive, public_communications
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into schedH3 table
+            cursor.execute(
+                """SELECT cmte_type_category FROM public.committee_master WHERE cmte_id=%s""",
+                [cmte_id],
+            )
+            cmte_type_tuple = cursor.fetchone()
+            if cmte_type_tuple:
+                return cmte_type_tuple[0]
+            else:
+                raise Exception(
+                    "The cmte_id: {} does not exist in committee master table.".format(
+                        cmte_id
+                    )
+                )
+    except Exception as err:
+        raise Exception(f"cmte_type function is throwing an error: {err}")
 
 """
 ********************************************************************************************************************************
@@ -862,6 +887,104 @@ def delete_reports(data):
 """
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
+
+@api_view(['PUT'])
+def submit_report(request):
+    """
+    an update api used for submitting a report
+
+    1) We need to change report status from Saved to Submitted.
+    2) Update report_seq value into fec_id column.
+    3) Append "FEC-" to fec_id in return value.
+    3) Return JSON response: "fec_id", "status","message"
+    4) use email template from "https://github.com/SalientCRGT-FEC/nxg_fec/tree/develop/django-backend/templates/email_ack.html" and replace @parameters with report values.
+    5) Send confirmation email, please refer to email function in below file.
+    https://github.com/SalientCRGT-FEC/nxg_fec/blob/develop/django-backend/fecfiler/forms/views.py
+    """
+
+    SUBMIT_STATUS = 'Submitted'
+    cmte_id = request.user.username
+    report_id = request.data.get('report_id')
+    form_tp = request.data.get('form_type') 
+
+    fec_id = report_id
+    if form_tp == 'F3X':
+        update_tbl = 'public.reports'
+        f_id = 'report_id'
+    elif form_tp == 'F99':
+        update_tbl = 'public.forms_committeeinfo'
+        f_id = 'id'
+    else:
+        raise Exception('Error: invalid form type.')
+
+    #     report_id = request.data.get('report_id')
+    #     fec_id = report_id
+    # else:
+    #     report_seq = request.data.get('report_seq')
+        # fec_id = report_seq
+    # fec_id = 'FEC-'+str(report_id)
+    
+
+    if form_tp == 'F3X':
+        _sql_update = """
+            UPDATE {}""".format(update_tbl) + """
+            SET status = %s, fec_id = %s""" + """
+            WHERE {} = %s
+            """.format(f_id)
+    elif form_tp == 'F99':
+        _sql_update = """
+            UPDATE {}""".format(update_tbl) + """
+            SET is_submitted = true, status = %s, fec_id = %s""" + """
+            WHERE {} = %s
+            """.format(f_id)
+    else:
+        raise Exception('Error: invalid form type.') 
+
+    with connection.cursor() as cursor:
+        cursor.execute(_sql_update, [SUBMIT_STATUS, fec_id, report_id])
+        if cursor.rowcount == 0:
+            raise Exception('report {} update failed'.format(report_id))
+    
+    logger.debug('sending email with data')
+    email_data = request.data.copy()
+    email_data['id'] = 'FEC-'+email_data['report_id']
+    logger.debug('sending email with data {}'.format(email_data))
+    email(True, email_data)
+    logger.debug('email success.')
+
+    if form_tp == 'F3X':
+        _sql_response = """
+        SELECT json_agg(t) FROM (
+            SELECT 'FEC-' || fec_id as fec_id, status, filed_date, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            FROM public.reports
+            WHERE report_id = %s)t
+        """
+    elif form_tp == 'F99':
+        _sql_response = """
+        SELECT json_agg(t) FROM (
+            SELECT 'FEC-' || fec_id as fec_id, 
+            status, 
+            CASE
+            WHEN is_submitted = true THEN updated_at
+            ELSE NULL::timestamp with time zone
+            END AS filed_date,
+            message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+            FROM public.forms_committeeinfo
+            WHERE id = %s)t
+        """ 
+    else:
+        raise Exception('Error: invalid form type')
+
+    with connection.cursor() as cursor:
+        cursor.execute(_sql_response, [report_id])
+        if cursor.rowcount == 0:
+            raise Exception('report {} update failed'.format(report_id))
+        rep_json = cursor.fetchone()[0]
+    
+    return JsonResponse(rep_json[0], status=status.HTTP_200_OK, safe=False)
+
+
+
 @api_view(['POST','GET','DELETE','PUT'])
 def reports(request):
 
@@ -2145,10 +2268,10 @@ def get_trans_query(category_type, cmte_id, param_string):
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """
 
     elif category_type == 'other_tran':
-        query_string = """SELECT report_id, schedule, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, api_call, 
+        query_string = """SELECT report_id, schedule, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
                           name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, 
-                                election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild
+                                election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, istrashable
                             from all_other_transactions_view
                             where cmte_id='""" + cmte_id + """' """ + param_string + """ """ 
     else:
@@ -2291,7 +2414,7 @@ def superceded_report_id_list(report_id):
             else:
                 report_list.append(str(reportId[0]))
                 report_id = reportId[0]
-        print(report_list)
+        # print(report_list)
         return report_list
     except Exception as e:
         raise
@@ -2419,19 +2542,58 @@ def get_all_transactions(request):
             if ctgry_type != 'other_tran':
                 param_string += " AND report_id in ('{}')".format("', '".join(report_list))
             else:
-                param_string = param_string + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
-                                                OR 
-                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
-                                                OR
-                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
-                                                SELECT h4.activity_event_identifier FROM public.sched_h4 h4
-                                                WHERE  h4.report_id = '{0}'
-                                                AND h4.cmte_id = '{1}'
-                                                UNION
-                                                SELECT h3.activity_event_name
-                                                FROM   public.sched_h3 h3
-                                                WHERE  h3.report_id = '{0}'
-                                                AND h3.cmte_id = '{1}')))""".format(request.data.get('reportid'), cmte_id)
+                if cmte_type(cmte_id) == 'PTY':
+                    logger.debug('pty cmte all_other transactions')
+                    param_string = param_string + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
+                                                    OR 
+                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
+                                                    OR
+                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
+                                                    SELECT h4.activity_event_identifier FROM public.sched_h4 h4
+                                                    WHERE  h4.report_id = '{0}'
+                                                    AND h4.cmte_id = '{1}'
+                                                    UNION
+                                                    SELECT h3.activity_event_name
+                                                    FROM   public.sched_h3 h3
+                                                    WHERE  h3.report_id = '{0}'
+                                                    AND h3.cmte_id = '{1}')))""".format(request.data.get('reportid'), cmte_id)
+                else:
+                    # for PAC, h1 and h2 will show up only when there are transactions tied to it
+                    logger.debug('pac cmte all_other transactions')
+                    param_string = param_string + """AND (((transaction_table = 'sched_h3' or transaction_table = 'sched_h4') AND report_id = '{0}')
+                                                    OR
+                                                    (transaction_table = 'sched_h1' AND report_id = '{0}' AND back_ref_transaction_id is null)
+                                                    OR
+                                                    (transaction_table = 'sched_h1' AND report_id = '{0}' AND transaction_id IN (
+                                                    with h1_set as (select  (
+                                                    case when administrative is true then 'AD'
+                                                    when public_communications is true then 'PC'
+                                                    when generic_voter_drive is true then 'GV'
+                                                    end) as event_type, transaction_id, cmte_id, report_id
+                                                    from sched_h1 where delete_ind is distinct from 'Y' and report_id = '{0}')
+                                                    select distinct t.transaction_id from h1_set t
+                                                    join sched_h4 h4 on t.event_type = h4.activity_event_type and h4.report_id = t.report_id
+                                                    where h4.delete_ind is distinct from 'Y'
+                                                    union
+                                                    select distinct t.transaction_id from h1_set t
+                                                    join sched_h3 h3 on t.event_type = h3.activity_event_type and h3.report_id = t.report_id
+                                                    where h3.delete_ind is distinct from 'Y'
+                                                    ))
+                                                    OR 
+                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
+                                                    OR
+                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
+                                                    SELECT h4.activity_event_identifier FROM public.sched_h4 h4
+                                                    WHERE  h4.report_id = '{0}'
+                                                    AND h4.cmte_id = '{1}'
+                                                    AND h4.delete_ind is distinct from 'Y'
+                                                    UNION
+                                                    SELECT h3.activity_event_name
+                                                    FROM   public.sched_h3 h3
+                                                    WHERE  h3.report_id = '{0}'
+                                                    AND h3.delete_ind is distinct from 'Y'
+                                                    AND h3.cmte_id = '{1}')))""".format(request.data.get('reportid'), cmte_id)
+
 
         # To determine if we are searching for regular or trashed transactions
         if 'trashed_flag' in request.data and str(request.data.get('trashed_flag')).lower() == 'true':
@@ -2457,8 +2619,9 @@ def get_all_transactions(request):
         with connection.cursor() as cursor:
             # logger.debug('query all transactions with sql:{}'.format(trans_query_string))
             cursor.execute("""SELECT json_agg(t) FROM (""" + trans_query_string + """) t""")
-            # print(cursor.query)
+            print(cursor.query)
             data_row = cursor.fetchone()
+            print(data_row)
             if data_row and data_row[0]:
                 transaction_list = data_row[0]
                 logger.debug('total transactions loaded:{}'.format(len(transaction_list)))
@@ -3306,6 +3469,34 @@ def loansanddebts(report_id, cmte_id):
     except Exception as e:
         raise Exception('The loansanddebts function is throwing an error' + str(e))
 
+def getthirdnavamounts(cmte_id, report_id):
+    try:
+        amounts = []
+        _values = [cmte_id, report_id]
+        table_list = [['11A','11AI','11AII','11B','11C','12','15','16','17','18A','18B'], 
+                      ['21AI','21AII','21B','22','28A','28B','28C','29']]
+        for table in table_list:
+            _sql = """
+                SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE line_number in ('{}')
+                AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
+                """.format("', '".join(table))
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, _values)
+                print(cursor.query)
+                amounts.append(cursor.fetchone()[0])
+        loans_table = ['sched_c', 'sched_d']
+        l_sql = """
+            SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE transaction_table in ('{}')
+            AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
+            """.format("', '".join(loans_table))
+        with connection.cursor() as cursor:
+            cursor.execute(l_sql, _values)
+            print(cursor.query)
+            amounts.append(cursor.fetchone()[0])
+        return amounts[0], amounts[1], amounts[2]
+    except Exception as e:
+        raise Exception('The getthirdnavamounts function is throwing an error' + str(e))
+
 @api_view(['GET'])
 def get_thirdNavigationTransactionTypes(request):
     try:
@@ -3319,16 +3510,25 @@ def get_thirdNavigationTransactionTypes(request):
         # period_receipt = summary_receipts(period_args)
         # period_disbursement = summary_disbursements(period_args)
 
-        period_args = [datetime.date(2019, 1, 1), datetime.date(2019, 12, 31), cmte_id, report_id]
-        period_receipt = summary_receipts_for_sumamry_table(period_args)
-        period_disbursement = summary_disbursements_for_sumamry_table(period_args)
+        # period_args = [datetime.date(2019, 1, 1), datetime.date(2019, 12, 31), cmte_id, report_id]
+        # period_receipt = summary_receipts_for_sumamry_table(period_args)
+        # period_disbursement = summary_disbursements_for_sumamry_table(period_args)
+
+        period_receipt, period_disbursement, loans_and_debts = getthirdnavamounts(cmte_id, report_id)
         loans_and_debts = loansanddebts(report_id, cmte_id)
 
         coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
-        coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
+        # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
+        coh_cop = coh_bop + period_receipt - period_disbursement + loans_and_debts
 
-        forms_obj = { 'Receipts': period_receipt[0].get('amt'),
-                        'Disbursements': period_disbursement[0].get('amt'),
+        # forms_obj = { 'Receipts': period_receipt[0].get('amt'),
+        #                 'Disbursements': period_disbursement[0].get('amt'),
+        #                 'Loans/Debts': loans_and_debts,
+        #                 'Others': 0,
+        #                 'COH': coh_cop}
+
+        forms_obj = { 'Receipts': period_receipt,
+                        'Disbursements': period_disbursement,
                         'Loans/Debts': loans_and_debts,
                         'Others': 0,
                         'COH': coh_cop}
@@ -5035,9 +5235,13 @@ def clone_a_transaction(request):
 
     transaction_tables = {
         'SA': 'sched_a',
+        'LA': 'sched_a',
         'SB': 'sched_b',
+        'LB': 'sched_b',
         'SC': 'sched_c',
         'SD': 'sched_d',
+        'SE': 'sched_e',
+        'SF': 'sched_f',
     }
     # cmte_id = request.user.username
     transaction_id = request.data.get('transaction_id')
@@ -5078,11 +5282,15 @@ def clone_a_transaction(request):
         # set transaction date to today's date and transaction amount to 0
         from datetime import date
         _today = date.today().strftime('%m/%d/%Y')
-        if transaction_id.startswith('SA'):
+        if transaction_id.startswith('SA') or transaction_id.startswith('LA'):
             select_str = select_str.replace('contribution_date', "'"+_today+"'")
             select_str = select_str.replace('contribution_amount', "'"+'0.00'+"'")
-        if transaction_id.startswith('SB'):
+        if transaction_id.startswith('SB') or transaction_id.startswith('LB') or transaction_id.startswith('SF'):
             select_str = select_str.replace('expenditure_date', "'"+_today+"'")
+            select_str = select_str.replace('expenditure_amount', "'"+'0.00'+"'")
+        if transaction_id.startswith('SE'):
+            select_str = select_str.replace('disbursement_date', "'"+_today+"'")
+            select_str = select_str.replace('dissemination_date', "'"+_today+"'")
             select_str = select_str.replace('expenditure_amount', "'"+'0.00'+"'")
         if transaction_id.startswith('SH') and transaction_table == 'sched_h4':
             select_str = select_str.replace('expenditure_date', "'"+_today+"'")
@@ -5135,6 +5343,11 @@ def clone_a_transaction(request):
         logger.debug('load_sql:{}'.format(load_sql))
         cursor.execute(load_sql)
         rep_json = cursor.fetchone()[0]
+        for obj in rep_json:
+            if transaction_id.startswith('LA'):
+                obj['api_call'] = '/sa/schedA'
+            if transaction_id.startswith('LB'):
+                obj['api_call'] = '/sb/schedB'  
 
         # return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
         return Response(rep_json, status=status.HTTP_200_OK)

@@ -57,6 +57,8 @@ export class F3xComponent implements OnInit {
   public transactionType = '';
   public transactionTypeTextSchedF = '';
   public transactionTypeSchedF = '';
+  public transactionTypeTextSchedFCore = '';
+  public transactionTypeSchedFCore = '';
   public transactionTypeTextDebtSummary = '';
   public transactionTypeDebtSummary = '';
   public transactionDetailSchedC: any;
@@ -66,6 +68,7 @@ export class F3xComponent implements OnInit {
   public scheduleAction: ScheduleActions;
   public scheduleCAction: ScheduleActions;
   public scheduleFAction: ScheduleActions;
+  public scheduleFCoreAction: ScheduleActions;
   public forceChangeDetectionC1: Date;
   public forceChangeDetectionFDebtPayment: Date;
   public forceChangeDetectionDebtSummary: Date;
@@ -384,15 +387,44 @@ export class F3xComponent implements OnInit {
               } else if (apiCall === '/sc/schedC1') {
                 alert('edit C1 not yet supported');
               } else if (apiCall === '/sf/schedF') {
+                if(this.scheduleType === 'sched_f_core'){
+                  this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFCoreComponent);
+                  const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+                  transactionTypeText = transactionModel.type;
+                  transactionType = transactionModel.transactionTypeIdentifier;  
+                }else{
+                  // force change to set show first page.
+                  this.forceChangeDetectionFDebtPayment = new Date();
+                  this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
+                }
+              } else if (apiCall === '/se/schedE') {
                 // force change to set show first page.
-                this.forceChangeDetectionFDebtPayment = new Date();
-                this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
-              } else {
+                // this.forceChangeDetectionFDebtPayment = new Date();
+                this._populateFormForEdit(e, AbstractScheduleParentEnum.schedEComponent);
+                const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+                transactionTypeText = transactionModel.type;
+                transactionType = transactionModel.transactionTypeIdentifier;
+              } 
+              else {
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedMainComponent);
                 const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
                 transactionTypeText = transactionModel.type;
                 transactionType = transactionModel.transactionTypeIdentifier;
               }
+            } else if (this.scheduleAction === ScheduleActions.view) {
+              let apiCall = null;
+              if (e.transactionDetail) {
+                if (e.transactionDetail.transactionModel) {
+                  if (e.transactionDetail.transactionModel.hasOwnProperty('apiCall')) {
+                    apiCall = e.transactionDetail.transactionModel.apiCall;
+                  }
+                }
+              }
+
+              this._populateFormForView(e, AbstractScheduleParentEnum.schedMainComponent);
+              const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+              transactionTypeText = transactionModel.type;
+              transactionType = transactionModel.transactionTypeIdentifier;
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
@@ -510,8 +542,8 @@ export class F3xComponent implements OnInit {
           this.transactionTypeText = 'Schedule L-A Entry / Business Receipt';
         } else if (this.transactionType === 'LEVIN_PARTN_REC') {
           this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt';
-        } else if (this.transactionType === 'LEVIN_PARTN_MEMO') {
-          this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt Memo';
+        //} else if (this.transactionType === 'LEVIN_PARTN_MEMO') {
+        //  this.transactionTypeText = 'Schedule L-A Entry / Partnership Receipt Memo';
         } else if (this.transactionType === 'LEVIN_PAC_REC') {
           this.transactionTypeText = 'Schedule L-A Entry / PAC Receipt';
         } else if (this.transactionType === 'LEVIN_NON_FED_REC') {
@@ -550,12 +582,40 @@ export class F3xComponent implements OnInit {
       e.scheduleType = 'sched_c_loan_payment';
     }
 
+
     //TODO-Remove this elseif once transactions are moved to Disubursements
-    if (e.scheduleType === 'Schedule E') {
+    if (e.scheduleType === 'Schedule E' ) {
       e.scheduleType = 'sched_e';
     }
 
-    //default to sched_a ?
+     if(!e.scheduleType && e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.apiCall === '/se/schedE'){
+      e.scheduleType = 'sched_e';
+    }
+
+    if (e.scheduleType && e.transactionType) {
+      if (
+        e.scheduleType === 'sched_f' &&
+        (e.transactionType === 'COEXP_PARTY' ||
+          e.transactionType === 'COEXP_CC_PAY' ||
+          e.transactionType === 'COEXP_STAF_REIM' ||
+          e.transactionType === 'COEXP_PMT_PROL')
+      ) {
+        e.scheduleType = 'sched_f_core';
+      }
+    }
+
+    // extract shed_f_core based on transactionTypeIdentifier
+    if ( !e.scheduleType && e.transactionDetail && e.transactionDetail.transactionModel ) {
+      const tTypeIdentifier = e.transactionDetail.transactionModel.transactionTypeIdentifier;
+      if (tTypeIdentifier === 'COEXP_PARTY'  ||
+          tTypeIdentifier === 'COEXP_CC_PAY' ||
+          tTypeIdentifier === 'COEXP_STAF_REIM' ||
+          tTypeIdentifier === 'COEXP_PMT_PROL'
+      ) {
+      e.scheduleType = 'sched_f_core';
+      }
+}
+    // default to sched_a ?
     this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
 
     /*    //Schedule H's need to be remapped too
@@ -589,7 +649,7 @@ export class F3xComponent implements OnInit {
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'OTH_DISB_DEBT' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'FEA_100PCT_DEBT_PAY' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'COEXP_PARTY_DEBT' ||
-        e.transactionDetail.transactionModel.transactionTypeIdentifier === 'IE_B4_DISSE_MEMO' ||
+        e.transactionDetail.transactionModel.transactionTypeIdentifier === 'IE' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'OTH_REC_DEBT') &&
       e.returnToDebtSummary
     ) {
@@ -812,7 +872,11 @@ export class F3xComponent implements OnInit {
       this.transactionTypeText = transactionTypeText;
       return;
     }
-    if (scheduleType.startsWith('sched_f')) {
+    if (scheduleType === 'sched_f_core') {
+      this.transactionTypeSchedFCore = transactionType;
+      this.transactionTypeTextSchedFCore = transactionTypeText;
+      this.scheduleFCoreAction = this.scheduleAction;
+    } else if (scheduleType.startsWith('sched_f') && scheduleType !== 'sched_f_core') {
       // this.transactionTypeSchedF = transactionType;
       // this.transactionTypeTextSchedF = transactionTypeText;
       // this.scheduleFAction = this.scheduleAction;
@@ -896,5 +960,16 @@ export class F3xComponent implements OnInit {
         });
       }
     }
+  }
+
+  private _populateFormForView(e: any, schedule: AbstractScheduleParentEnum) {
+    e.transactionDetail.action = this.scheduleAction;
+    const emitObject: any = {
+      key: 'fullForm',
+      abstractScheduleComponent: schedule,
+      transactionModel: e.transactionDetail
+    };
+
+    this._f3xMessageService.sendPopulateFormMessage(emitObject);
   }
 }

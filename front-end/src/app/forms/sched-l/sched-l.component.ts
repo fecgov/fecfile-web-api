@@ -14,7 +14,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { TransactionsService } from '../transactions/service/transactions.service';
+import { TransactionsService, GetTransactionsResponse } from '../transactions/service/transactions.service';
 import { HttpClient } from '@angular/common/http';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
@@ -23,12 +23,17 @@ import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
 import { Observable, Subscription } from 'rxjs';
 import { style, animate, transition, trigger } from '@angular/animations';
+import { ActiveView } from '../transactions/transactions.component';
 import { PaginationInstance } from 'ngx-pagination';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { SchedLService } from './sched-l.service';
 import { SchedLModel } from './sched-l.model';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-sched-l',
@@ -54,6 +59,8 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   @Input() scheduleAction: ScheduleActions;
   @Input() scheduleType: string;
   @Output() status: EventEmitter<any>;
+  @Input() public tableType: string;
+  public transactionsView = ActiveView.transactions;
 
   public formType: string;
   public showPart2: boolean;
@@ -71,6 +78,10 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
 
   public schedLsModel: Array<SchedLModel>;
   public schedLsModelL: Array<SchedLModel>;
+  private clonedTransaction: any;
+  public bulkActionDisabled = true;
+  public bulkActionCounter = 0;
+  private allTransactionsSelected: boolean;
 
   constructor(
     _http: HttpClient,
@@ -93,6 +104,9 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
     _reportsService: ReportsService,
+    private _tranService: TransactionsService,
+    private _rt: Router,
+    private _dlService: DialogService,
     private _actRoute: ActivatedRoute,
     private _schedLService: SchedLService,
     private _individualReceiptService: IndividualReceiptService,
@@ -331,61 +345,152 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     if (!serverData || !Array.isArray(serverData)) {
       return;
     }
-
     const modelArray: any = [];
-
     for (const row of serverData) {
       const model = new SchedLModel({});
-
-      model.cmte_id = row.cmte_id;
-      model.report_id = row.report_id;
-      model.transaction_type_identifier = row.transaction_type_identifier;
-      model.tran_desc = row.tran_desc;
-      model.transaction_id = row.transaction_id;
-      model.back_ref_transaction_id = row.back_ref_transaction_id;
-      model.levin_account_id = row.levin_account_id;
-      model.levin_account_name = row.levin_account_name;
-      model.contribution_date = row.contribution_date;
-      model.expenditure_date = row.expenditure_date;
-      model.contribution_amount = row.contribution_amount;
-      model.expenditure_amount = row.expenditure_amount;
-													
-															
-      model.memo_code = row.memo_code;
-      model.first_name = row.first_name;
-      model.last_name = row.last_name;
-      model.entity_name = row.entity_name;
-      model.entity_type = row.entity_type;
-
+      this.mapDatabaseRowToModel(model, row);
+      if (row.child) {
+        const modelChildArray = [];
+        for (const childRow of row.child) {
+          const childModel = new SchedLModel({});
+          this.mapDatabaseRowToModel(childModel, childRow);
+          modelChildArray.push(childModel);
+        }
+        model.child = modelChildArray;
+      }
       modelArray.push(model);
-	
     }
-
     console.log('91: ', modelArray);
-
     return modelArray;
+  }
+
+  public mapDatabaseRowToModel(model: SchedLModel, row: any) {
+    model.cmte_id = row.cmte_id;
+    model.report_id = row.report_id;
+    model.transaction_type_identifier = row.transaction_type_identifier;
+    model.transaction_id = row.transaction_id;
+    model.tran_desc = row.tran_desc;
+    model.back_ref_transaction_id = row.back_ref_transaction_id;
+    model.levin_account_id = row.levin_account_id;
+    model.levin_account_name = row.levin_account_name;
+    model.contribution_date = row.contribution_date;
+    model.expenditure_date = row.expenditure_date;
+    model.contribution_amount = row.contribution_amount;
+    model.expenditure_amount = row.expenditure_amount;
+    if (row.contribution_date !== '') {
+      model.date = row.contribution_date;
+      model.amount = row.contribution_amount;
+    } else if (row.expenditure_date !== '') {
+      model.date = row.expenditure_date;
+      model.amount = row.expenditure_amount;
+    }
+    model.aggregate = row.aggregate_amt;
+    model.memo_code = row.memo_code;
+    model.first_name = row.first_name;
+    model.last_name = row.last_name;
+    model.entity_name = row.entity_name;
+    model.entity_type = row.entity_type;
+    model.api_call = row.api_call;
   }
 
   public editTransaction(trx: any): void {
     this.scheduleAction = ScheduleActions.edit;
-
-    trx.apiCall = '/sa/schedA';
-    //trx.activityEventIdentifier = trx.activity_event_identifier;
-    //trx.activityEventType = trx.activity_event_type;
+    trx.apiCall = trx.api_call;
     trx.backRefTransactionId = trx.back_ref_transaction_id;
-    //trx.entityName = trx.entity_name;
-    //trx.entityType = trx.entity_type;
-    //trx.expenditureDate = trx.expenditure_date;
-    //trx.fedShareAmount = trx.fed_share_amount;
-
     trx.transactionId = trx.transaction_id;
     trx.transactionTypeIdentifier = trx.transaction_type_identifier;
-
-    //trx.type = 'H4';
-
     this._tranMessageService.sendEditTransactionMessage(trx);
   }
 
-  
+  public printTransaction(trx: any): void {
+    this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
+  }
+
+  public trashTransaction(trx: any): void {
+
+    trx.report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    trx.transactionId = trx.transaction_id;
+
+    this._dlService
+      .confirm('You are about to delete this transaction ' + trx.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._tranService
+            .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
+            .subscribe((res: GetTransactionsResponse) => {
+              this.getTransactions(trx.report_id, this.transactionType);
+              this._dlService.confirm(
+                'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  public cloneTransaction(trx: any): void {
+
+    trx.reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    trx.report_id = trx.reportId;
+    trx.transactionId = trx.transaction_id;
+
+    this._tranService
+      .cloneTransaction(trx.transaction_id)
+      .subscribe((cloneTransactionResponse: TransactionModel) => {
+        if (cloneTransactionResponse[0] && cloneTransactionResponse[0].hasOwnProperty('transaction_id')) {
+          this.clonedTransaction = cloneTransactionResponse[0];
+
+          this.clonedTransaction.reportId = cloneTransactionResponse[0].report_id;
+
+          this.editTransaction(this.clonedTransaction);
+
+          this._rt.navigate([`/forms/form/3X`], {
+            queryParams: { step: 'step_3', reportId: trx.reportId, edit: true, cloned: true, transactionCategory: 'other'}
+          });
+        }
+      });
+  }
+
+  public checkIfTrashable(trx: any): boolean {
+    if (this.schedLsModelL.filter(obj => obj.back_ref_transaction_id === trx.transaction_id).length !== 0) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Check for multiple rows checked in the table
+   * and disable/enable the bulk action button
+   * accordingly.
+   *
+   * @param the event payload from the click
+   */
+  public checkForMultiChecked(e: any): void {
+    if (e.target.checked) {
+      this.bulkActionCounter++;
+    } else {
+      this.allTransactionsSelected = false;
+      if (this.bulkActionCounter > 0) {
+        this.bulkActionCounter--;
+      }
+    }
+
+    // Transaction View shows bulk action when more than 1 checked
+    // Recycle Bin shows delete action when 1 or more checked.
+    const count = this.isTransactionViewActive() ? 1 : 0;
+    this.bulkActionDisabled = this.bulkActionCounter > count ? false : true;
+  }
+
+  /**
+   * Check if the view to show is Transactions.
+   */
+  public isTransactionViewActive() {
+    return this.tableType === this.transactionsView ? true : false;
+  }
+
 }
 

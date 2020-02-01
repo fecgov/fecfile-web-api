@@ -427,7 +427,7 @@ export class IndividualReceiptService {
   }
 
   public getFedNonFedPercentage(amount: string, activityEvent: string, activityEventName: string,
-    transactionType: string, reportId: string): Observable<any> {
+    transactionType: string, reportId: string, transactionId: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sh1/get_fed_nonfed_share';
     let httpOptions = new HttpHeaders();
@@ -460,6 +460,10 @@ export class IndividualReceiptService {
 
     if (reportId) {
       params = params.append('report_id', reportId);
+    }
+
+    if (transactionId) {
+      params = params.append('transaction_id', transactionId);
     }
 
     return this._http.get(`${environment.apiUrl}${url}`, {
