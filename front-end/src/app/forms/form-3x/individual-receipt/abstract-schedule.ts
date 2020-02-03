@@ -2849,6 +2849,32 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       })
     );
 
+  searchPrefix = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'prefix');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  searchSuffix = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'suffix');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
   /**
    * Search for entities when organization/entity_name input value changes.
    */
@@ -2952,6 +2978,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   formatterFirstName = (x: { first_name: string }) => {
     if (typeof x !== 'string') {
       return x.first_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * TODO: Rename 'preffix' to 'prefix'. It's 'preffix' in database now.
+   */
+  formatterPrefix = (x: { preffix: string }) => {
+    if (typeof x !== 'string') {
+      return x.preffix;
+    } else {
+      return x;
+    }
+  };
+
+  formatterSuffix = (x: { suffix: string }) => {
+    if (typeof x !== 'string') {
+      return x.suffix;
     } else {
       return x;
     }
