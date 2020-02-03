@@ -5594,7 +5594,7 @@ def duplicate_address(cmte_id, data):
             input_address = " ".join(filter(None, [data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state')]))
             if 'zip_code' in data and data.get('zip_code') not in ['null', 'None', '', "", None]:
                 input_address += " " + data.get('zip_code')[0:5]
-        input_total_address_list = [" ".join([input_name, input_address, data.get('occupation'), data.get('employer')])]
+        input_total_address_list = [" ".join([input_name, input_address, data.get('occupation',""), data.get('employer',"")])]
 
         contact_list = get_list_contact(cmte_id, None, True, org_name_flag)
         compare_entity_id_list = []
@@ -5641,10 +5641,13 @@ def check_duplicate_address(request):
         address = duplicate_address(cmte_id, request.data)
         if address:
             status_code = "FAIL"
+            status_desc = "Duplicate exists"
         else:
             status_code = "SUCCESS"
+            status_desc = "Duplicate does not exist"
         output = {}
-        output['status_code'] = status_code
+        output['statusCode'] = status_code
+        output['statusDescription'] = status_desc
         output['data'] = address
         return Response(output, status=status.HTTP_200_OK)
     except requests.exceptions.HTTPError as http_err:
