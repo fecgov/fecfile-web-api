@@ -1935,14 +1935,23 @@ def autolookup_search_contacts(request):
     """
     logger.debug('autolookup with request params:{}'.format(dict(request.query_params.items())))
 
-    allowed_params = ['entity_name', 'first_name', 'last_name', 'ref_cand_cmte_id', 'principal_campaign_committee'] 
+    allowed_params = [
+        'entity_name', 
+        'first_name', 
+        'last_name', 
+        'preffix',
+        'prefix',
+        'suffix',
+        'ref_cand_cmte_id', 
+        'principal_campaign_committee'
+        ] 
     field_remapper = {
         'cmte_id': 'ref_cand_cmte_id',
         'cmte_name': 'entity_name',
         'cand_id': 'ref_cand_cmte_id',
         'cand_last_name': 'last_name',
         'cand_first_name': 'first_name',
-        'payee_cmte_id': 'principal_campaign_committee'
+        'payee_cmte_id': 'principal_campaign_committee',
     }
 
     try:
@@ -1964,9 +1973,15 @@ def autolookup_search_contacts(request):
         # rename parameters for candidate and committee
         query_params = { k:v for k,v in request.query_params.items() if k not in field_remapper }
         query_params.update({field_remapper[k]:v for k,v in request.query_params.items() if k in field_remapper})
+        if 'prefix' in query_params:
+            query_params['preffix'] = query_params.get('prefix')
+            
+
         logger.debug("autolookup with parameters {}".format(query_params))
         for key, value in query_params.items():
             if key in allowed_params:
+                if key == 'prefix':
+                    continue
                 order_string = str(key)
                 param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
                 # if cand_q:
