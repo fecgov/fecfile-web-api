@@ -3372,6 +3372,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       case 'COEXP_PMT_PROL':
         res = coordinatedExpenditurePayrollFields;
         break;
+      case 'COEXP_PARTY_VOID':
+        let coExpVoid = this._coordinatedPartyExpenditureFields;
+        coExpVoid.data.hiddenFields.map(p => {
+          if (p.name === 'transaction_type_identifier' ) {
+            p.value = 'COEXP_PARTY_VOID';
+          }
+        });
+        res = coExpVoid;
       default:
     }
     return res;
