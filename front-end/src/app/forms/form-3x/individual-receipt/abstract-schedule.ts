@@ -54,6 +54,7 @@ import {coordinatedPartyExpenditureFields} from '../../sched-f-core/coordinated-
 import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-expenditure-cc-fields';
 import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
 import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
+import {coordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -2849,6 +2850,32 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       })
     );
 
+  searchPrefix = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'prefix');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  searchSuffix = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'suffix');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
   /**
    * Search for entities when organization/entity_name input value changes.
    */
@@ -2952,6 +2979,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   formatterFirstName = (x: { first_name: string }) => {
     if (typeof x !== 'string') {
       return x.first_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * TODO: Rename 'preffix' to 'prefix'. It's 'preffix' in database now.
+   */
+  formatterPrefix = (x: { preffix: string }) => {
+    if (typeof x !== 'string') {
+      return x.preffix;
+    } else {
+      return x;
+    }
+  };
+
+  formatterSuffix = (x: { suffix: string }) => {
+    if (typeof x !== 'string') {
+      return x.suffix;
     } else {
       return x;
     }
@@ -3372,6 +3418,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       case 'COEXP_PMT_PROL':
         res = coordinatedExpenditurePayrollFields;
         break;
+      case 'COEXP_PARTY_VOID':
+        res = coordinatedPartyExpenditureVoidFields;
       default:
     }
     return res;

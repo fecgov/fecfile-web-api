@@ -1935,14 +1935,23 @@ def autolookup_search_contacts(request):
     """
     logger.debug('autolookup with request params:{}'.format(dict(request.query_params.items())))
 
-    allowed_params = ['entity_name', 'first_name', 'last_name', 'ref_cand_cmte_id', 'principal_campaign_committee'] 
+    allowed_params = [
+        'entity_name', 
+        'first_name', 
+        'last_name', 
+        'preffix',
+        'prefix',
+        'suffix',
+        'ref_cand_cmte_id', 
+        'principal_campaign_committee'
+        ] 
     field_remapper = {
         'cmte_id': 'ref_cand_cmte_id',
         'cmte_name': 'entity_name',
         'cand_id': 'ref_cand_cmte_id',
         'cand_last_name': 'last_name',
         'cand_first_name': 'first_name',
-        'payee_cmte_id': 'principal_campaign_committee'
+        'payee_cmte_id': 'principal_campaign_committee',
     }
 
     try:
@@ -1964,9 +1973,15 @@ def autolookup_search_contacts(request):
         # rename parameters for candidate and committee
         query_params = { k:v for k,v in request.query_params.items() if k not in field_remapper }
         query_params.update({field_remapper[k]:v for k,v in request.query_params.items() if k in field_remapper})
+        if 'prefix' in query_params:
+            query_params['preffix'] = query_params.get('prefix')
+            
+
         logger.debug("autolookup with parameters {}".format(query_params))
         for key, value in query_params.items():
             if key in allowed_params:
+                if key == 'prefix':
+                    continue
                 order_string = str(key)
                 param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
                 # if cand_q:
@@ -5579,7 +5594,7 @@ def duplicate_address(cmte_id, data):
             input_address = " ".join(filter(None, [data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state')]))
             if 'zip_code' in data and data.get('zip_code') not in ['null', 'None', '', "", None]:
                 input_address += " " + data.get('zip_code')[0:5]
-        input_total_address_list = [" ".join([input_name, input_address, data.get('occupation'), data.get('employer')])]
+        input_total_address_list = [" ".join([input_name, input_address, data.get('occupation',""), data.get('employer',"")])]
 
         contact_list = get_list_contact(cmte_id, None, True, org_name_flag)
         compare_entity_id_list = []
@@ -5626,10 +5641,13 @@ def check_duplicate_address(request):
         address = duplicate_address(cmte_id, request.data)
         if address:
             status_code = "FAIL"
+            status_desc = "Duplicate exists"
         else:
             status_code = "SUCCESS"
+            status_desc = "Duplicate does not exist"
         output = {}
-        output['status_code'] = status_code
+        output['statusCode'] = status_code
+        output['statusDescription'] = status_desc
         output['data'] = address
         return Response(output, status=status.HTTP_200_OK)
     except requests.exceptions.HTTPError as http_err:
