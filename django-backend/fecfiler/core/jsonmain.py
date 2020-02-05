@@ -98,8 +98,8 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
                 if empty_list_flag:
                         return []
                 else:
-                                raise NoOPError('No results are found in' + error_string +
-                                                'Table. Input received:{}'.format(','.join(query_values_list)))
+                    raise NoOPError('No results are found in ' + error_string +
+                        ' Table. Input received:{}'.format(','.join(query_values_list)))
             else:
                 # print(result)
                 return result
@@ -216,6 +216,7 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
     try:
         query_1 = """SELECT query_string FROM public.tran_query_string WHERE tran_type_identifier = %s"""
         query_values_list_1 = [identifier]
+        # print('identifier: '+ identifier)
         output = json_query(query_1, query_values_list_1,
                             "tran_query_string", False)[0]
         query = output.get('query_string')
