@@ -26,6 +26,8 @@ export class TransactionsMessageService {
   private clearAllFiltersSubject = new Subject<any>();
   private removeH1TransactionsSubject = new Subject<any>();
   private viewTransactionSubject = new Subject<any>();
+  private restoreTransactionsSubject = new Subject<any>();
+  private removeHTransactionsSubject = new Subject<any>();
 
   /**
    * A publisher uses this method to send a message to subscribers
@@ -279,4 +281,29 @@ export class TransactionsMessageService {
   public getViewTransactionMessage(): Observable<any> {
     return this.viewTransactionSubject.asObservable();
   }
+
+  public sendRestoreTransactionsMessage(message: any) {
+    this.restoreTransactionsSubject.next(message);
+  }
+
+  public clearRestoreTransactionsMessage() {
+    this.restoreTransactionsSubject.next();
+  }
+
+  public getRestoreTransactionsMessage(): Observable<any> {
+    return this.restoreTransactionsSubject.asObservable();
+  }
+
+  public sendRemoveHTransactionsMessage(message: any) {
+    this.removeHTransactionsSubject.next(message);
+  }
+
+  public clearRemoveHTransactionsMessage() {
+    this.removeHTransactionsSubject.next();
+  }
+
+  public getRemoveHTransactionsMessage(): Observable<any> {
+    return this.removeHTransactionsSubject.asObservable();
+  }
+
 }
