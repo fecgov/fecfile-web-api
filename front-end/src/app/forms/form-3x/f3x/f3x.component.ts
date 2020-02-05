@@ -602,6 +602,7 @@ export class F3xComponent implements OnInit {
           e.transactionType === 'COEXP_PARTY_VOID' ||
           e.transactionType === 'COEXP_PMT_PROL_VOID'
       ) {
+        // TODO: Workaround backend must be updated with correct transactionType for Coordinated Party Expenditure Void
         if (e.transactionType === 'COEXP_PMT_PROL_VOID') {
           e.transactionType = 'COEXP_PARTY_VOID';
         }
