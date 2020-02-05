@@ -766,11 +766,6 @@ export const coordinatedExpenditureStaffFields = {
       },
       {
         type: 'hidden',
-        name: 'entity_type',
-        value: 'ORG'
-      },
-      {
-        type: 'hidden',
         name: 'beneficiary_cand_entity_id',
         value: null
       },
@@ -1063,7 +1058,13 @@ export const coordinatedExpenditureStaffFields = {
         entityTypeDescription: 'Individual',
         group: 'ind-group',
         selected: true
-      }
+      },
+      {
+        entityType: 'ORG',
+        entityTypeDescription: 'Organization',
+        group: 'org-group',
+        selected: false
+      },
     ],
     electionTypes: [
       {
@@ -1200,7 +1201,19 @@ export const coordinatedExpenditureStaffFields = {
         ]
       }
     ],
-    subTransactions: null,
+    subTransactions: [
+      {
+        transactionType: 'COEXP_STAF_REIM',
+        transactionTypeDescription: 'Coordinated Expenditure Staff Reimbursement',
+        scheduleType: 'sched_f',
+        subTransactionType: 'COEXP_STAF_REIM_MEMO',
+        subScheduleType: 'sched_f',
+        subTransactionTypeDescription: 'CE Staff Reimburse Memo',
+        api_call: '/sf/schedF',
+        isParent: true,
+        isEarmark: false
+      }
+    ],
     jfMemoTypes: null
   }
 };
