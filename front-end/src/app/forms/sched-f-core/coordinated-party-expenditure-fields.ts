@@ -766,11 +766,6 @@ export const coordinatedPartyExpenditureFields = {
       },
       {
         type: 'hidden',
-        name: 'entity_type',
-        value: 'ORG'
-      },
-      {
-        type: 'hidden',
         name: 'beneficiary_cand_entity_id',
         value: null
       },
@@ -1057,7 +1052,20 @@ export const coordinatedPartyExpenditureFields = {
       }
     ],
     titles: null,
-    entityTypes: null,
+    entityTypes: [
+      {
+        entityType: 'ORG',
+        entityTypeDescription: 'Organization',
+        group: 'org-group',
+        selected: true
+      },
+      {
+        entityType: 'IND',
+        entityTypeDescription: 'Individual',
+        group: 'ind-group',
+        selected: false
+      },
+    ],
     electionTypes: [
       {
         electionType: 'P',

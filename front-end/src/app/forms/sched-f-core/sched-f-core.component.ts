@@ -172,6 +172,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   }
 
   private _setTransactionDetail() {
+  // TODO: Remove
     this.subTransactionInfo = {
       transactionType: 'DEBT_TO_VENDOR',
       transactionTypeDescription: 'Debt to Vendor',
