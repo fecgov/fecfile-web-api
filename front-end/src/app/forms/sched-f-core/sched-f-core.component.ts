@@ -327,12 +327,8 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
 
   public saveForAddSubTempSchedF() {}
   public handleOnBlurEvent($event: any, col: any) {
-    //super.handleOnBlurEvent($event, col);
     console.log('col %s %s', col,  this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    let expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    if (this.transactionType === 'COEXP_PARTY_VOID') {
-      expenditureAmount = - Math.abs(expenditureAmount);
-    }
+    const expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
     const contributionAggregateValue: string = this._decimalPipe.transform(
         expenditureAmount,
         '.2-2'
