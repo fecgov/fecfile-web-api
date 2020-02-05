@@ -888,6 +888,72 @@ def delete_reports(data):
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
 
+def reposit_report_data(cmte_id, report_id):
+    """
+    helper funcrtion to move current report data from efiling front db to backend db
+    """
+    # logger.debug('request for cloning a transaction:{}'.format(request.data))
+    logger.debug('reposit data with cmte_id {} and report_id {}'.format(cmte_id, report_id))
+    transaction_tables = ['sched_a']
+    # transaction_tables = ['sched_a', 'sched_b', 'sched_c', 'sched_d', 'sched_e', 'sched_f', 'sched_l']
+    import psycopg2
+    backend_connection = psycopg2.connect(
+            'dbname={} user={} host={} password={} connect_timeout=3000'.
+            format(
+                'postgres_filed',
+                os.environ.get('DB_USERNAME'),
+                os.environ.get('DB_HOST'),
+                os.environ.get('DB_PASSWORD')))
+        # conn.close()
+    back_cursor = backend_connection.cursor()
+    # cmte_id = 'C00326835'
+    # report_id = '110915'
+    for transaction_table in transaction_tables:
+        table_schema_sql = """
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = '{}'
+        """.format(transaction_table)
+        
+        with connection.cursor() as cursor:
+            logger.debug("fetching transaction table column names...")
+            # cursor.execute(table_schema_sql, (transaction_table))
+            cursor.execute(table_schema_sql)
+            rows = cursor.fetchall()  
+            columns = []
+            for row in rows:
+                columns.append(row[0])
+            logger.debug('table columns: {}'.format(list(columns)))
+
+
+
+            insert_str = ','.join(columns)
+            select_str = ','.join(columns)
+            clone_sql = """
+                SELECT {_select}
+                FROM public.{table_name}
+            """.format(table_name=transaction_table, _select=select_str)
+            clone_sql = clone_sql + """ WHERE cmte_id = %s and report_id = %s and delete_ind is distinct from 'Y';"""
+            logger.debug('clone transaction with sql:{}'.format(clone_sql))
+
+            cursor.execute(clone_sql, (cmte_id, report_id))
+
+            if not cursor.rowcount:
+                logger.debug('no transaction data found.')
+                continue
+            rows = cursor.fetchall()
+            for row in rows:
+                # print('...')
+                # print(row)
+                insert_sql = """
+                INSERT INTO public.{table_name}({_insert}) VALUES
+                """.format(table_name=transaction_table, _insert=insert_str)
+                # print(insert_sql)
+                back_cursor.execute(insert_sql+' %s', (row,))
+                backend_connection.commit()
+
+    back_cursor.close()
+    backend_connection.close()
+
 @api_view(['PUT'])
 def submit_report(request):
     """
@@ -944,6 +1010,9 @@ def submit_report(request):
         cursor.execute(_sql_update, [SUBMIT_STATUS, fec_id, report_id])
         if cursor.rowcount == 0:
             raise Exception('report {} update failed'.format(report_id))
+
+    
+    reposit_report_data(cmte_id, report_id)
     
     logger.debug('sending email with data')
     email_data = request.data.copy()
