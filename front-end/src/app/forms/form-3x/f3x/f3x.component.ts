@@ -598,8 +598,14 @@ export class F3xComponent implements OnInit , OnDestroy{
         (e.transactionType === 'COEXP_PARTY' ||
           e.transactionType === 'COEXP_CC_PAY' ||
           e.transactionType === 'COEXP_STAF_REIM' ||
-          e.transactionType === 'COEXP_PMT_PROL')
+          e.transactionType === 'COEXP_PMT_PROL') ||
+          e.transactionType === 'COEXP_PARTY_VOID' ||
+          e.transactionType === 'COEXP_PMT_PROL_VOID'
       ) {
+        // TODO: Workaround backend must be updated with correct transactionType for Coordinated Party Expenditure Void
+        if (e.transactionType === 'COEXP_PMT_PROL_VOID') {
+          e.transactionType = 'COEXP_PARTY_VOID';
+        }
         e.scheduleType = 'sched_f_core';
       }
     }
@@ -610,7 +616,9 @@ export class F3xComponent implements OnInit , OnDestroy{
       if (tTypeIdentifier === 'COEXP_PARTY'  ||
           tTypeIdentifier === 'COEXP_CC_PAY' ||
           tTypeIdentifier === 'COEXP_STAF_REIM' ||
-          tTypeIdentifier === 'COEXP_PMT_PROL'
+          tTypeIdentifier === 'COEXP_PMT_PROL' ||
+          tTypeIdentifier === 'COEXP_PARTY_VOID' ||
+          tTypeIdentifier === 'COEXP_PMT_PROL_VOID'
       ) {
       e.scheduleType = 'sched_f_core';
       }

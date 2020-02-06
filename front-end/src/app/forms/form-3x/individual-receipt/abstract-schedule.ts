@@ -1,39 +1,60 @@
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, Subject, Subscription } from 'rxjs';
-import 'rxjs/add/operator/takeUntil';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { ContactsService } from 'src/app/contacts/service/contacts.service';
-import { reportModel } from 'src/app/reports/model/report.model';
-import { ReportsService } from 'src/app/reports/service/report.service';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
-import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
-import { validateAmount, validateContributionAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
-import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
-import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
-import { UtilService } from '../../../shared/utils/util.service';
-import { coordinatedExpenditureCCFields } from '../../sched-f-core/coordinated-expenditure-cc-fields';
-import { coordinatedExpenditurePayrollFields } from '../../sched-f-core/coordinated-expenditure-payroll-fields';
-import { coordinatedExpenditureStaffFields } from '../../sched-f-core/coordinated-expenditure-staff-fields';
-import { coordinatedPartyExpenditureFields } from '../../sched-f-core/coordinated-party-expenditure-fields';
-import { TransactionModel } from '../../transactions/model/transaction.model';
-import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
-import { GetTransactionsResponse, TransactionsService } from '../../transactions/service/transactions.service';
-import { ReportTypeService } from '../report-type/report-type.service';
-import { F3xMessageService } from '../service/f3x-message.service';
-import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
-import { entityTypes } from './entity-types-json';
-import { IndividualReceiptService } from './individual-receipt.service';
-import { ScheduleActions } from './schedule-actions.enum';
+import {
+  Component,
+  EventEmitter,
+  ElementRef,
+  Input,
+  OnInit,
+  Output,
+  ViewEncapsulation,
+  ViewChild,
+  OnDestroy,
+  HostListener,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
+import {CurrencyPipe, DecimalPipe} from '@angular/common';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { FormBuilder, FormGroup, FormControl, NgForm, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
+import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { environment } from '../../../../environments/environment';
+import {FormsService} from '../../../shared/services/FormsService/forms.service';
+import {UtilService} from '../../../shared/utils/util.service';
+import {MessageService} from '../../../shared/services/MessageService/message.service';
+import {IndividualReceiptService} from './individual-receipt.service';
+import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
+import {alphaNumeric} from '../../../shared/utils/forms/validation/alpha-numeric.validator';
+import {floatingPoint} from '../../../shared/utils/forms/validation/floating-point.validator';
+import { validatePurposeInKindRequired, IN_KIND } from '../../../shared/utils/forms/validation/purpose.validator';
+import {ReportTypeService} from '../report-type/report-type.service';
+import { Observable, Subscription, interval, timer, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
+import {TypeaheadService} from 'src/app/shared/partials/typeahead/typeahead.service';
+import {DialogService} from 'src/app/shared/services/DialogService/dialog.service';
+import {ConfirmModalComponent, ModalHeaderClassEnum} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {TransactionModel} from '../../transactions/model/transaction.model';
+import {F3xMessageService} from '../service/f3x-message.service';
+
+import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
+import {TransactionsMessageService} from '../../transactions/service/transactions-message.service';
+import { ActiveView } from '../../transactions/transactions.component';
+import {validateAggregate} from 'src/app/shared/utils/forms/validation/aggregate.validator';
+import {validateAmount, validateContributionAmount} from 'src/app/shared/utils/forms/validation/amount.validator';
+import {ContributionDateValidator} from 'src/app/shared/utils/forms/validation/contribution-date.validator';
+import {ContactsService} from 'src/app/contacts/service/contacts.service';
+import { trigger, transition, style, animate, state } from '@angular/animations';
+import { heLocale } from 'ngx-bootstrap';
+import { TransactionsService, GetTransactionsResponse } from '../../transactions/service/transactions.service';
+import {ReportsService} from 'src/app/reports/service/report.service';
+import {reportModel} from 'src/app/reports/model/report.model';
+import { entityTypes, committeeEventTypes } from './entity-types-json';
+import {ScheduleActions} from './schedule-actions.enum';
+import {AbstractScheduleParentEnum} from './abstract-schedule-parent.enum';
+import {coordinatedPartyExpenditureFields} from '../../sched-f-core/coordinated-party-expenditure-fields';
+import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-expenditure-cc-fields';
+import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
+import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
+import {coordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
 
 
 export enum SaveActions {
@@ -2827,6 +2848,32 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       })
     );
 
+  searchPrefix = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'prefix');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  searchSuffix = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'suffix');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
   /**
    * Search for entities when organization/entity_name input value changes.
    */
@@ -2930,6 +2977,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   formatterFirstName = (x: { first_name: string }) => {
     if (typeof x !== 'string') {
       return x.first_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * TODO: Rename 'preffix' to 'prefix'. It's 'preffix' in database now.
+   */
+  formatterPrefix = (x: { preffix: string }) => {
+    if (typeof x !== 'string') {
+      return x.preffix;
+    } else {
+      return x;
+    }
+  };
+
+  formatterSuffix = (x: { suffix: string }) => {
+    if (typeof x !== 'string') {
+      return x.suffix;
     } else {
       return x;
     }
@@ -3351,6 +3417,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       case 'COEXP_PMT_PROL':
         res = coordinatedExpenditurePayrollFields;
         break;
+      case 'COEXP_PARTY_VOID':
+        res = coordinatedPartyExpenditureVoidFields;
       default:
     }
     return res;

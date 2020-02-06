@@ -94,7 +94,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public activity_event_name_edit: string;
 
   public saveAndAddDisabled = false;
+
   private _h3OnDestroy$ = new Subject();
+
+  public getH1H2ExistSubscription: Subscription;
+
+  public restoreSubscription: Subscription;
+  public trashSubscription: Subscription;
+
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -126,8 +134,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     private _schedHService: SchedHServiceService,
     private _tranService: TransactionsService,
     private _dlService: DialogService,
-    private _changeDet: ChangeDetectorRef
-  ) {
+    private _changeDet: ChangeDetectorRef,
+    private _tranMessageService: TransactionsMessageService,
+    ) {
     super(
       _http,
       _fb,
@@ -157,6 +166,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _decPipe;
     _tranService;
     _dlService;
+    _tranMessageService;
 
     this._schedHMessageServiceService.getpopulateHFormForEditMessage().takeUntil(this._h3OnDestroy$)
     .subscribe(p => {
@@ -168,6 +178,26 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         });
       }
     });
+
+    this.restoreSubscription = this._tranMessageService
+        .getRestoreTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H3') {
+              this.setH3Sum();
+            }
+          }
+        )
+
+    this.trashSubscription = this._tranMessageService
+        .getRemoveHTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H3') {
+              this.setH3Sum();
+            }
+          }
+        )
   }
 
   public ngOnInit() {
@@ -246,6 +276,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public ngOnDestroy(): void {
     this._h3OnDestroy$.next(true);
+    this.restoreSubscription.unsubscribe();
+    this.trashSubscription.unsubscribe();
     super.ngOnDestroy();
   }
 
