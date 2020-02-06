@@ -102,6 +102,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public saveAndAddDisabled = false;
   public getH1H2ExistSubscription: Subscription;
 
+  public restoreSubscription: Subscription;
+  public trashSubscription: Subscription;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -133,8 +136,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     private _schedHService: SchedHServiceService,
     private _tranService: TransactionsService,
     private _dlService: DialogService,
-    private _changeDet: ChangeDetectorRef
-  ) {
+    private _changeDet: ChangeDetectorRef,
+    private _tranMessageService: TransactionsMessageService,
+    ) {
     super(
       _http,
       _fb,
@@ -164,6 +168,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _decPipe;
     _tranService;
     _dlService;
+    _tranMessageService;
 
     this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
     .subscribe(p => {
@@ -175,6 +180,26 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         });
       }
     });
+
+    this.restoreSubscription = this._tranMessageService
+        .getRestoreTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H3') {
+              this.setH3Sum();
+            }
+          }
+        )
+
+    this.trashSubscription = this._tranMessageService
+        .getRemoveHTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H3') {
+              this.setH3Sum();
+            }
+          }
+        )
   }
 
   public ngOnInit() {
@@ -252,6 +277,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public ngOnDestroy(): void {
     this.populateFormForEdit.unsubscribe();
+    this.restoreSubscription.unsubscribe();
+    this.trashSubscription.unsubscribe();
     super.ngOnDestroy();
   }
 

@@ -88,6 +88,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public fedRatio: number;
   public nonfedRatio: number;
 
+  public restoreSubscription: Subscription;
+  public trashSubscription: Subscription;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -170,6 +173,26 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
         });
       }
     })
+
+    this.restoreSubscription = this._tranMessageService
+        .getRestoreTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H2') {
+              this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+            }
+          }
+        )
+
+    this.trashSubscription = this._tranMessageService
+        .getRemoveHTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H2') {
+              this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+            }
+          }
+        )
   }
 
 
@@ -226,6 +249,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public ngOnDestroy(): void {
     this.populateFormForEdit.unsubscribe();
+    this.restoreSubscription.unsubscribe();
+    this.trashSubscription.unsubscribe();
     super.ngOnDestroy();
   }
 

@@ -9,6 +9,7 @@ from fecfiler.forms.serializers import CommitteeInfoSerializer
 import json
 import datetime
 import os
+import psycopg2
 import requests
 from django.views.decorators.csrf import csrf_exempt
 import logging
@@ -888,6 +889,93 @@ def delete_reports(data):
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
 
+def reposit_f3x_data(cmte_id, report_id):
+    """
+    helper funcrtion to move current report data from efiling front db to backend db
+    """
+    # logger.debug('request for cloning a transaction:{}'.format(request.data))
+    logger.debug('reposit f3x data with cmte_id {} and report_id {}'.format(cmte_id, report_id))
+    # transaction_tables = ['sched_a']
+    transaction_tables = [
+        'reports',
+        'sched_a', 
+        'sched_b', 
+        'sched_c', 
+        'sched_c1',
+        'sched_c2',
+        'sched_d', 
+        'sched_e', 
+        'sched_f', 
+        'sched_h1',
+        'sched_h2',
+        'sched_h3',
+        'sched_h4',
+        'sched_h5',
+        'sched_h6',
+        'sched_l',
+        'form_3x',
+        ]
+    # transaction_tables = ['sched_b']
+    backend_connection = psycopg2.connect(
+            'dbname={} user={} host={} password={} connect_timeout=3000'.
+            format(
+                os.environ.get('BACKEND_DB_NAME'),
+                os.environ.get('BACKEND_DB_USER'),
+                os.environ.get('BACKEND_DB_HOST'),
+                os.environ.get('BACKEND_DB_PASSWORD')))
+        # conn.close()
+    back_cursor = backend_connection.cursor()
+    # cmte_id = 'C00326835'
+    # report_id = '110915'
+    for transaction_table in transaction_tables:
+        table_schema_sql = """
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = '{}'
+        """.format(transaction_table)
+        
+        with connection.cursor() as cursor:
+            logger.debug("fetching transaction table column names...")
+            # cursor.execute(table_schema_sql, (transaction_table))
+            cursor.execute(table_schema_sql)
+            rows = cursor.fetchall()  
+            columns = []
+            for row in rows:
+                # exclude report_seq from reports
+                if row[0] != 'report_seq':
+                    columns.append(row[0])
+            logger.debug('table columns: {}'.format(list(columns)))
+
+
+
+            insert_str = ','.join(columns)
+            select_str = ','.join(columns)
+            clone_sql = """
+                SELECT {_select}
+                FROM public.{table_name}
+            """.format(table_name=transaction_table, _select=select_str)
+            clone_sql = clone_sql + """ WHERE cmte_id = %s and report_id = %s and delete_ind is distinct from 'Y';"""
+            logger.debug('clone transaction with sql:{}'.format(clone_sql))
+
+            cursor.execute(clone_sql, (cmte_id, report_id))
+
+            if not cursor.rowcount:
+                logger.debug('no transaction data found for {}'.format(transaction_table))
+                continue
+            rows = cursor.fetchall()
+            for row in rows:
+                # print('...')
+                # print(row)
+                insert_sql = """
+                INSERT INTO public.{table_name}({_insert}) VALUES
+                """.format(table_name=transaction_table, _insert=insert_str)
+                # print(insert_sql)
+                back_cursor.execute(insert_sql+' %s', (row,))
+                backend_connection.commit()
+                logger.debug('row data {} inserted'.format(row))
+
+    back_cursor.close()
+    backend_connection.close()
+
 @api_view(['PUT'])
 def submit_report(request):
     """
@@ -944,6 +1032,10 @@ def submit_report(request):
         cursor.execute(_sql_update, [SUBMIT_STATUS, fec_id, report_id])
         if cursor.rowcount == 0:
             raise Exception('report {} update failed'.format(report_id))
+
+    
+    if form_tp == 'F3X':
+        reposit_f3x_data(cmte_id, report_id)
     
     logger.debug('sending email with data')
     email_data = request.data.copy()

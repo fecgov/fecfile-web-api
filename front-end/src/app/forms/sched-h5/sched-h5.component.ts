@@ -102,6 +102,9 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public saveAndAddDisabled = false;
   public getH1H2ExistSubscription: Subscription;
 
+  public restoreSubscription: Subscription;
+  public trashSubscription: Subscription;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -131,7 +134,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     private _tranService: TransactionsService,
     private _dlService: DialogService,
     private _schedHMessageServiceService: SchedHMessageServiceService,
-    private _schedHService:SchedHServiceService
+    private _schedHService:SchedHServiceService,
+    private _tranMessageService: TransactionsMessageService,
   ) {
     super(
       _http,
@@ -162,6 +166,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _decPipe;
     _tranService;
     _dlService;
+    _tranMessageService;
 
     this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
     .subscribe(p => {
@@ -173,6 +178,26 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         });
       }
     })
+
+    this.restoreSubscription = this._tranMessageService
+        .getRestoreTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H5') {
+              this.setH5Sum();
+            }
+          }
+        )
+
+    this.trashSubscription = this._tranMessageService
+        .getRemoveHTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H5') {
+              this.setH5Sum();
+            }
+          }
+        )
   }
 
   public ngOnInit() {
@@ -245,6 +270,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public ngOnDestroy(): void {
     this.populateFormForEdit.unsubscribe();
+    this.restoreSubscription.unsubscribe();
+    this.trashSubscription.unsubscribe();
     super.ngOnDestroy();
   }
 
