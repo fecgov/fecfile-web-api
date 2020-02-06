@@ -93,6 +93,11 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     _activatedRoute.queryParams.subscribe(p => {
       this.cloned = p.cloned ? true : false;
     });
+     _messageService.getMessage().subscribe(message => {
+      if (message && message.parentFormPopulated) {
+        console.log('Message from sub' + message);
+      }
+    });
 
   }
 

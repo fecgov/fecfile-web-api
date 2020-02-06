@@ -55,6 +55,7 @@ import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-exp
 import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
 import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
 import {coordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
+import {coordinatedExpenditureCCMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-cc-memo-fields';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -3420,6 +3421,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         break;
       case 'COEXP_PARTY_VOID':
         res = coordinatedPartyExpenditureVoidFields;
+      case 'COEXP_CC_PAY_MEMO':
+        res = coordinatedExpenditureCCMemoFields;
       default:
     }
     return res;
