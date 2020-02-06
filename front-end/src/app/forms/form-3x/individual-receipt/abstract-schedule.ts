@@ -1,59 +1,40 @@
-import {
-  Component,
-  EventEmitter,
-  ElementRef,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-  ViewChild,
-  OnDestroy,
-  HostListener,
-  OnChanges,
-  SimpleChanges
-} from '@angular/core';
-import {CurrencyPipe, DecimalPipe} from '@angular/common';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
-import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { environment } from '../../../../environments/environment';
-import {FormsService} from '../../../shared/services/FormsService/forms.service';
-import {UtilService} from '../../../shared/utils/util.service';
-import {MessageService} from '../../../shared/services/MessageService/message.service';
-import {IndividualReceiptService} from './individual-receipt.service';
-import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
-import {alphaNumeric} from '../../../shared/utils/forms/validation/alpha-numeric.validator';
-import {floatingPoint} from '../../../shared/utils/forms/validation/floating-point.validator';
-import { validatePurposeInKindRequired, IN_KIND } from '../../../shared/utils/forms/validation/purpose.validator';
-import {ReportTypeService} from '../report-type/report-type.service';
-import { Observable, Subscription, interval, timer } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
-import {TypeaheadService} from 'src/app/shared/partials/typeahead/typeahead.service';
-import {DialogService} from 'src/app/shared/services/DialogService/dialog.service';
-import {ConfirmModalComponent, ModalHeaderClassEnum} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import {TransactionModel} from '../../transactions/model/transaction.model';
-import {F3xMessageService} from '../service/f3x-message.service';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, Subject, Subscription } from 'rxjs';
+import 'rxjs/add/operator/takeUntil';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { reportModel } from 'src/app/reports/model/report.model';
+import { ReportsService } from 'src/app/reports/service/report.service';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
+import { validateAmount, validateContributionAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
+import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
+import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
+import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
+import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
+import { UtilService } from '../../../shared/utils/util.service';
+import { coordinatedExpenditureCCFields } from '../../sched-f-core/coordinated-expenditure-cc-fields';
+import { coordinatedExpenditurePayrollFields } from '../../sched-f-core/coordinated-expenditure-payroll-fields';
+import { coordinatedExpenditureStaffFields } from '../../sched-f-core/coordinated-expenditure-staff-fields';
+import { coordinatedPartyExpenditureFields } from '../../sched-f-core/coordinated-party-expenditure-fields';
+import { TransactionModel } from '../../transactions/model/transaction.model';
+import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
+import { GetTransactionsResponse, TransactionsService } from '../../transactions/service/transactions.service';
+import { ReportTypeService } from '../report-type/report-type.service';
+import { F3xMessageService } from '../service/f3x-message.service';
+import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
+import { entityTypes } from './entity-types-json';
+import { IndividualReceiptService } from './individual-receipt.service';
+import { ScheduleActions } from './schedule-actions.enum';
 
-import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
-import {TransactionsMessageService} from '../../transactions/service/transactions-message.service';
-import { ActiveView } from '../../transactions/transactions.component';
-import {validateAggregate} from 'src/app/shared/utils/forms/validation/aggregate.validator';
-import {validateAmount, validateContributionAmount} from 'src/app/shared/utils/forms/validation/amount.validator';
-import {ContributionDateValidator} from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import {ContactsService} from 'src/app/contacts/service/contacts.service';
-import { trigger, transition, style, animate, state } from '@angular/animations';
-import { heLocale } from 'ngx-bootstrap';
-import { TransactionsService, GetTransactionsResponse } from '../../transactions/service/transactions.service';
-import {ReportsService} from 'src/app/reports/service/report.service';
-import {reportModel} from 'src/app/reports/model/report.model';
-import { entityTypes, committeeEventTypes } from './entity-types-json';
-import {ScheduleActions} from './schedule-actions.enum';
-import {AbstractScheduleParentEnum} from './abstract-schedule-parent.enum';
-import {coordinatedPartyExpenditureFields} from '../../sched-f-core/coordinated-party-expenditure-fields';
-import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-expenditure-cc-fields';
-import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
-import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -73,13 +54,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   forceChangeSwitch = 0;
   status: EventEmitter<any> = new EventEmitter<any>();
 
-  /**
-   * Subscription for pre-populating the form for view or edit.
-   */
-  private _populateFormSubscription: Subscription;
-  private _clearFormSubscription: Subscription;
-  private _loadFormFieldsSubscription: Subscription;
-  private _storeParentModelSubscription: Subscription;
 
   public editMode = true;
   public checkBoxVal = false;
@@ -170,6 +144,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _coordinatedPartyExpenditureFields = coordinatedPartyExpenditureFields;
   private _outstandingDebtBalance: number;
 
+  //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
+  //there is no unsubscribe() for activateRoute . 
+  private onDestroy$ = new Subject();
+
   constructor(
     private _http: HttpClient,
     protected _fb: FormBuilder,
@@ -190,12 +168,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _transactionsMessageService: TransactionsMessageService,
     protected _contributionDateValidator: ContributionDateValidator,
     private _transactionsService: TransactionsService,
-    protected _reportsService: ReportsService
+    protected _reportsService: ReportsService, 
+    
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
+    this._f3xMessageService.getPopulateFormMessage().takeUntil(this.onDestroy$).subscribe(message => {
       if (message.hasOwnProperty('key')) {
         // See message sender for mesage properties
         switch (message.key) {
@@ -262,22 +241,22 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     });
 
-    this._storeParentModelSubscription = this._f3xMessageService.getParentModelMessage().subscribe(message => {
+    this._f3xMessageService.getParentModelMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this._parentTransactionModel = message;
     });
 
-    this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
+    this._f3xMessageService.getInitFormMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this.clearFormValues();
     });
 
-    this._loadFormFieldsSubscription = this._f3xMessageService.getLoadFormFieldsMessage().subscribe(message => {
+    this._f3xMessageService.getLoadFormFieldsMessage().takeUntil(this.onDestroy$).subscribe(message => {
       if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
         this._getFormFields();
         this._validateTransactionDate();
       }
     });
 
-    _activatedRoute.queryParams.subscribe(p => {
+    _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this._transactionCategory = p.transactionCategory;
       this._cloned = p.cloned || p.cloned === 'true' ? true : false;
     });
@@ -383,11 +362,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
-    this._populateFormSubscription.unsubscribe();
-    this._clearFormSubscription.unsubscribe();
-    this._loadFormFieldsSubscription.unsubscribe();
-    this._storeParentModelSubscription.unsubscribe();
     localStorage.removeItem('form_3X_saved');
+    this.onDestroy$.next(true);
   }
 
   private _prepareForm() {
@@ -608,7 +584,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.transactionType === 'OTH_DISB_DEBT' ||
           this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
           this.transactionType === 'COEXP_PARTY_DEBT' ||
-          this.transactionType === 'IE_B4_DISSE_MEMO') {
+          this.transactionType === 'IE_B4_DISSE') {
         if (this._outstandingDebtBalance !== null) {
           if (this._outstandingDebtBalance >= 0) {
             formValidators.push(validateContributionAmount(this._outstandingDebtBalance));
@@ -767,7 +743,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   private _listenForAggregateChanges(): void {
     if (this.frmIndividualReceipt.get('contribution_aggregate') != null) {
-      this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.subscribe(val => {
+      this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.takeUntil(this.onDestroy$)
+      .subscribe(val => {
         // All validators are replaced here.  Currently the only validator functions
         // for employer and occupation is the validateAggregate().  The max length is enforced
         // in the template as an element attribute max.
@@ -785,7 +762,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         occupationControl.updateValueAndValidity();
       });
     } else if (this.frmIndividualReceipt.get('expenditure_amount') != null) {
-      this.frmIndividualReceipt.get('expenditure_amount').valueChanges.subscribe(value => {
+      this.frmIndividualReceipt.get('expenditure_amount').valueChanges.takeUntil(this.onDestroy$)
+      .subscribe(value => {
         const expenditurePurposeDesc = this.frmIndividualReceipt.get('expenditure_purpose');
         expenditurePurposeDesc.setValidators([validateAggregate(value, true, 'expenditure_purpose')]);
         expenditurePurposeDesc.updateValueAndValidity();
@@ -3187,7 +3165,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       });
     }
-    this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
+    this._receiptService.getDynamicFormFields(this.formType, this.transactionType).takeUntil(this.onDestroy$)
+    .subscribe(res => {
       res = this._hijackFormFields(res);
       if (res) {
         if (res.hasOwnProperty('data')) {
@@ -3574,7 +3553,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       reportId = this._receiptService.getReportIdFromStorage(this.formType);
     }
     this.subTransactions = [];
-    this._receiptService.getDataSchedule(reportId, transactionId, apiCall).subscribe(res => {
+    this._receiptService.getDataSchedule(reportId, transactionId, apiCall).takeUntil(this.onDestroy$)
+    .subscribe(res => {
       if (Array.isArray(res)) {
         for (const trx of res) {
           if (trx.hasOwnProperty('transaction_id')) {
