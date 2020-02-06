@@ -9,6 +9,7 @@ from fecfiler.forms.serializers import CommitteeInfoSerializer
 import json
 import datetime
 import os
+import psycopg2
 import requests
 from django.views.decorators.csrf import csrf_exempt
 import logging
@@ -888,22 +889,40 @@ def delete_reports(data):
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
 
-def reposit_report_data(cmte_id, report_id):
+def reposit_f3x_data(cmte_id, report_id):
     """
     helper funcrtion to move current report data from efiling front db to backend db
     """
     # logger.debug('request for cloning a transaction:{}'.format(request.data))
-    logger.debug('reposit data with cmte_id {} and report_id {}'.format(cmte_id, report_id))
-    transaction_tables = ['sched_a']
-    # transaction_tables = ['sched_a', 'sched_b', 'sched_c', 'sched_d', 'sched_e', 'sched_f', 'sched_l']
-    import psycopg2
+    logger.debug('reposit f3x data with cmte_id {} and report_id {}'.format(cmte_id, report_id))
+    # transaction_tables = ['sched_a']
+    transaction_tables = [
+        'reports',
+        'sched_a', 
+        'sched_b', 
+        'sched_c', 
+        'sched_c1',
+        'sched_c2',
+        'sched_d', 
+        'sched_e', 
+        'sched_f', 
+        'sched_h1',
+        'sched_h2',
+        'sched_h3',
+        'sched_h4',
+        'sched_h5',
+        'sched_h6',
+        'sched_l',
+        'form_3x',
+        ]
+    # transaction_tables = ['sched_b']
     backend_connection = psycopg2.connect(
             'dbname={} user={} host={} password={} connect_timeout=3000'.
             format(
-                'postgres_filed',
-                os.environ.get('DB_USERNAME'),
-                os.environ.get('DB_HOST'),
-                os.environ.get('DB_PASSWORD')))
+                os.environ.get('BACKEND_DB_NAME'),
+                os.environ.get('BACKEND_DB_USER'),
+                os.environ.get('BACKEND_DB_HOST'),
+                os.environ.get('BACKEND_DB_PASSWORD')))
         # conn.close()
     back_cursor = backend_connection.cursor()
     # cmte_id = 'C00326835'
@@ -921,7 +940,9 @@ def reposit_report_data(cmte_id, report_id):
             rows = cursor.fetchall()  
             columns = []
             for row in rows:
-                columns.append(row[0])
+                # exclude report_seq from reports
+                if row[0] != 'report_seq':
+                    columns.append(row[0])
             logger.debug('table columns: {}'.format(list(columns)))
 
 
@@ -938,7 +959,7 @@ def reposit_report_data(cmte_id, report_id):
             cursor.execute(clone_sql, (cmte_id, report_id))
 
             if not cursor.rowcount:
-                logger.debug('no transaction data found.')
+                logger.debug('no transaction data found for {}'.format(transaction_table))
                 continue
             rows = cursor.fetchall()
             for row in rows:
@@ -950,6 +971,7 @@ def reposit_report_data(cmte_id, report_id):
                 # print(insert_sql)
                 back_cursor.execute(insert_sql+' %s', (row,))
                 backend_connection.commit()
+                logger.debug('row data {} inserted'.format(row))
 
     back_cursor.close()
     backend_connection.close()
@@ -1012,7 +1034,8 @@ def submit_report(request):
             raise Exception('report {} update failed'.format(report_id))
 
     
-    reposit_report_data(cmte_id, report_id)
+    if form_tp == 'F3X':
+        reposit_f3x_data(cmte_id, report_id)
     
     logger.debug('sending email with data')
     email_data = request.data.copy()
