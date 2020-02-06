@@ -1,18 +1,12 @@
-// import { Http } from '@angular/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { CookieService } from 'ngx-cookie-service';
+import { Observable, Subject } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { environment } from '../../environments/environment';
-import { CookieService } from 'ngx-cookie-service';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { SessionService } from '../shared/services/SessionService/session.service';
 import { ApiService } from '../shared/services/APIService/api.service';
-import { MessageService } from '../shared/services/MessageService/message.service';
-import { HeaderComponent } from '../shared/partials/header/header.component';
-import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
-import { FormsComponent } from '../forms/forms.component';
-import { DOCUMENT } from '@angular/common';
+import { SessionService } from '../shared/services/SessionService/session.service';
 import { IAccount } from './account';
 import { AccountService } from './account.service';
 
@@ -23,26 +17,12 @@ import { AccountService } from './account.service';
   providers: [AccountService]
 })
 
-export class AccountComponent implements OnInit {
+export class AccountComponent implements OnInit, OnDestroy {
   accounts: IAccount;
   public showSideBar: boolean = true;
   public showLegalDisclaimer: boolean = false;
   public levin_accounts: any[] = [];
-  // = [
-  //   {
-
-  //     "levin_account_id": 777,
-  //     "levin_account_name": "levin_acct2"
-  //   },
-  //   {
-  //     "levin_account_id": 2,
-  //     "levin_account_name": "qqss_tst1"
-  //   },
-  //   {
-  //     "levin_account_id": 3,
-  //     "levin_account_name": "qqss_tst22"
-  //   }
-  // ];
+  private onDestroy$ = new Subject();
 
   constructor(
     private _accountService: AccountService,
@@ -51,15 +31,8 @@ export class AccountComponent implements OnInit {
     private _modalService: NgbModal,
     private _http: HttpClient,
     private _cookieService: CookieService,
-    // private _http: Http,
-    //private document: Document
   ) {
-    // this.levin_accounts = this.getLevinAccounts().subscribe(
-    //   response => {
-
-    //   }
-    // );
-    this.getLevinAccounts().subscribe(res => {
+    this.getLevinAccounts().takeUntil(this.onDestroy$).subscribe(res => {
       console.log(res);
       if (res) {
         this.levin_accounts = res;
@@ -80,15 +53,16 @@ export class AccountComponent implements OnInit {
   }
 
   ngOnInit() {
-    // console.log("accessing service call...");
-    this._accountService.getAccounts()
+    this._accountService.getAccounts().takeUntil(this.onDestroy$)
       .subscribe(res => this.accounts = <IAccount>res);
-    // this.getLevinAccounts().subscribe(res => this.levin_accounts = res.json());
-    // console.log(this.accounts)
   }
 
   goToForms1() {
     window.open('https://webforms.fec.gov/webforms/form1/index.htm', '_blank');
+  }
+
+  ngOnDestroy(){
+    this.onDestroy$.next(true);
   }
 
 
