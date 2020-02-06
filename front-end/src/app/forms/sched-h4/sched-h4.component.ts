@@ -77,6 +77,9 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
 
   private clonedTransaction: any;
 
+  public restoreSubscription: Subscription;
+  public trashSubscription: Subscription;
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -134,6 +137,26 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     _tranService;
     _rt;
     _dlService;
+
+    this.restoreSubscription = this._tranMessageService
+        .getRestoreTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H4') {
+              this.getH4Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+            }
+          }
+        )
+
+    this.trashSubscription = this._tranMessageService
+        .getRemoveHTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H4') {
+              this.getH4Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+            }
+          }
+        )
   }
 
 
@@ -191,6 +214,8 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnDestroy(): void {
+    this.restoreSubscription.unsubscribe();
+    this.trashSubscription.unsubscribe();
     super.ngOnDestroy();
   }
 
