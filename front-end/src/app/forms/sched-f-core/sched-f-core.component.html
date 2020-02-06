@@ -706,9 +706,7 @@
       <app-sub-transactions-table [hidden]="!isShowChildTransactions()" 
         [subTransactions]="subTransactions"
         [formType]="formType"
-        [subTransactionsTableType]="subTransactionsTableType"
-        [returnToDebtSummary]="returnToDebtSummary"
-        [returnToDebtSummaryInfo]="returnToDebtSummaryInfo">
+        [subTransactionsTableType]="subTransactionsTableType">
       </app-sub-transactions-table>
       <div class="forms__btn-container">
         <button id="addSingleChildButton" *ngIf="!subTransactionInfo?.isEarmark &&
@@ -743,6 +741,10 @@
                 Previous
               </button>
               <ng-container>
+                <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
+                   (click)="saveAndReturnToParent()">
+                  Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
+                </a>
                 <button *ngIf="scheduleAction === addScheduleAction"
                         class="btn btn-secondary btn-right"
                         [disabled]="!frmIndividualReceipt.valid"

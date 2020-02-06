@@ -600,8 +600,10 @@ export class F3xComponent implements OnInit {
           e.transactionType === 'COEXP_STAF_REIM' ||
           e.transactionType === 'COEXP_PMT_PROL') ||
           e.transactionType === 'COEXP_PARTY_VOID' ||
-          e.transactionType === 'COEXP_PMT_PROL_VOID'
-      ) {
+          e.transactionType === 'COEXP_PMT_PROL_VOID' ||
+          e.transactionType === 'COEXP_CC_PAY_MEMO' ||
+          e.transactionType === 'COEXP_STAF_REIM_MEMO' ||
+          e.transactionType === 'COEXP_PMT_PROL_MEMO' ) {
         // TODO: Workaround backend must be updated with correct transactionType for Coordinated Party Expenditure Void
         if (e.transactionType === 'COEXP_PMT_PROL_VOID') {
           e.transactionType = 'COEXP_PARTY_VOID';
@@ -618,7 +620,10 @@ export class F3xComponent implements OnInit {
           tTypeIdentifier === 'COEXP_STAF_REIM' ||
           tTypeIdentifier === 'COEXP_PMT_PROL' ||
           tTypeIdentifier === 'COEXP_PARTY_VOID' ||
-          tTypeIdentifier === 'COEXP_PMT_PROL_VOID'
+          tTypeIdentifier === 'COEXP_PMT_PROL_VOID' ||
+          tTypeIdentifier === 'COEXP_CC_PAY_MEMO' ||
+          tTypeIdentifier === 'COEXP_STAF_REIM_MEMO' ||
+          tTypeIdentifier === 'COEXP_PMT_PROL_MEMO'
       ) {
       e.scheduleType = 'sched_f_core';
       }
