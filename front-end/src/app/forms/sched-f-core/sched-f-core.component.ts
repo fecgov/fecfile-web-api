@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input, SimpleChanges, OnDestroy, OnChanges } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import {FormBuilder, Validators} from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
 import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
@@ -43,6 +43,9 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
 
   protected staticFormFields = schedFstaticFormFields;
 
+  private isDesignatedFiler: boolean;
+  private noValidationRequired = [];
+  private validateDesignatedFiler = [];
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -98,6 +101,16 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     this.formFieldsPrePopulated = true;
     this.formType = '3X';
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedFCoreComponent;
+    // set remove validators
+    this.noValidationRequired.push('subordinate_cmte_id');
+    this.noValidationRequired.push('subordinate_cmte_name');
+    this.noValidationRequired.push('subordinate_cmte_street_2');
+    this.noValidationRequired.push('subordinate_cmte_city');
+    this.noValidationRequired.push('subordinate_cmte_state');
+    this.noValidationRequired.push('subordinate_cmte_zip');
+    this.noValidationRequired.push('subordinate_cmte_street_1');
+    this.validateDesignatedFiler.push('designating_cmte_id');
+    this.validateDesignatedFiler.push('designating_cmte_name');
     super.ngOnInit();
   }
 
@@ -109,6 +122,8 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   }
 
   public ngOnDestroy(): void {
+    this.noValidationRequired = [];
+    this.validateDesignatedFiler = [];
     super.ngOnDestroy();
   }
 
@@ -124,37 +139,17 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
    */
   public next() {
     this.frmIndividualReceipt.markAsTouched();
-
+    if (!this._checkFormFieldIsValid('designating_cmte_id') && this.isDesignatedFiler) {
+      return;
+    }
+    if (!this._checkFormFieldIsValid('designating_cmte_name') && this.isDesignatedFiler) {
+      return;
+    }
     if (!this._checkFormFieldIsValid('coordinated_exp_ind')) {
       return;
     }
-    if (!this._checkFormFieldIsValid('designating_cmte_id')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('designating_cmte_name')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_id')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_name')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_street_1')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_street_2')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_city')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_state')) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('subordinate_cmte_zip')) {
-      return;
-    }
+
+
     this.showPart2 = true;
   }
 
@@ -177,6 +172,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   }
 
   private _setTransactionDetail() {
+  // TODO: Remove
     this.subTransactionInfo = {
       transactionType: 'DEBT_TO_VENDOR',
       transactionTypeDescription: 'Debt to Vendor',
@@ -331,7 +327,6 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
 
   public saveForAddSubTempSchedF() {}
   public handleOnBlurEvent($event: any, col: any) {
-    super.handleOnBlurEvent($event, col);
     console.log('col %s %s', col,  this.frmIndividualReceipt.controls['expenditure_amount'].value);
     const expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
     const contributionAggregateValue: string = this._decimalPipe.transform(
@@ -340,6 +335,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     );
     this.frmIndividualReceipt.patchValue(
         { aggregate_general_elec_exp: contributionAggregateValue}, { onlySelf: true });
+    super.handleOnBlurEvent($event, col);
   }
 
   public updateOnly() {
@@ -350,5 +346,29 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     this.back();
     super.saveOnly();
   }
+  public onFilerChange(change): void {
 
+    console.log('change %s', change);
+    if (change === 'Y') {
+      this.isDesignatedFiler = true;
+      this.addValidator(this.validateDesignatedFiler,  this.isDesignatedFiler);
+    } else {
+      this.isDesignatedFiler = false;
+      this.addValidator(this.validateDesignatedFiler,  this.isDesignatedFiler);
+    }
+    this.addValidator(this.noValidationRequired, false);
+}
+public addValidator( validators: Array<any>, set: boolean): void {
+    if ( set ) {
+      for (const filedName of validators) {
+        this.frmIndividualReceipt.controls[filedName].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls[filedName].updateValueAndValidity();
+      }
+    } else {
+      for (const filedName of validators) {
+        this.frmIndividualReceipt.controls[filedName].setValidators([]);
+        this.frmIndividualReceipt.controls[filedName].updateValueAndValidity();
+      }
+    }
+}
 }

@@ -264,7 +264,7 @@
       </ng-container>
       <div class="row">
         <div class="col" *ngIf="frmLoan.get('entity_type').value === 'ORG'">Please provide your paper Loan agreement by
-          filling form 99 in the C1 Agrrement</div>
+          filing form 99 in the C1 Agrrement</div>
       </div>
     </section>
 
@@ -288,7 +288,7 @@
                   Previous
                 </button>
                 <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan()">
-                  Save
+                  {{frmLoan?.get('entity_type')?.value === 'ORG' ? 'Next' : 'Save'}}
                 </button>
                 <button *ngIf="frmLoan?.get('entity_type')?.value === 'ORG'" class="btn btn-secondary btn-right" type="button"
                 (click)="onSaveLoan('endorser')"
@@ -310,7 +310,7 @@
                   Cancel
                 </button>
                 <button class="btn btn-secondary btn-right" type="button" (click)="onSaveLoan()">
-                  Save
+                  {{frmLoan?.get('entity_type')?.value === 'ORG' ? 'Next' : 'Save'}}
                 </button>
                 <button *ngIf="frmLoan?.get('entity_type')?.value === 'ORG'" class="btn btn-secondary btn-right" type="button"
                 (click)="onSaveLoan('endorser')">

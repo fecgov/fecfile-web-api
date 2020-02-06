@@ -54,6 +54,7 @@ import {coordinatedPartyExpenditureFields} from '../../sched-f-core/coordinated-
 import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-expenditure-cc-fields';
 import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
 import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
+import {coordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -1764,6 +1765,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           const typeAheadField = this.frmIndividualReceipt.get(field).value;
           if (typeAheadField && typeof typeAheadField !== 'string') {
             receiptObj[field] = typeAheadField['cmte_id'];
+            if (field === 'payee_cmte_id') {
+              receiptObj[field] = typeAheadField['payee_cmte_id'];
+            }
           } else {
             receiptObj[field] = typeAheadField;
           }
@@ -2490,8 +2494,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const street1 = result.street_1 ? result.street_1.trim() : '';
     const street2 = result.street_2 ? result.street_2.trim() : '';
     const name = result.cmte_id ? result.cmte_id.trim() : '';
-
-    return `${name}, ${street1}, ${street2}`;
+    const cmteName = result.cmte_name ? result.cmte_name.trim() : '';
+    return `${name},${cmteName},${street1}, ${street2}`;
   }
 
   /**
@@ -2592,7 +2596,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('cand_office');
     fieldNames.push('cand_office_state');
     fieldNames.push('cand_office_district');
-    fieldNames.push('cand_election_year');
+    // fieldNames.push('cand_election_year');  -- commenting this as per business requirements. This should not be autopopulated
     fieldNames.push('beneficiary_cand_id');
     fieldNames.push('payee_cmte_id');
     this._patchFormFields(fieldNames, entity, namePrefix);
@@ -2846,6 +2850,32 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       })
     );
 
+  searchPrefix = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'prefix');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  searchSuffix = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._typeaheadService.getContacts(searchText, 'suffix');
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
   /**
    * Search for entities when organization/entity_name input value changes.
    */
@@ -2923,7 +2953,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       })
     );
-
+  
   /**
    * format the value to display in the input field once selected from the typeahead.
    *
@@ -2949,6 +2979,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   formatterFirstName = (x: { first_name: string }) => {
     if (typeof x !== 'string') {
       return x.first_name;
+    } else {
+      return x;
+    }
+  };
+
+  /**
+   * TODO: Rename 'preffix' to 'prefix'. It's 'preffix' in database now.
+   */
+  formatterPrefix = (x: { preffix: string }) => {
+    if (typeof x !== 'string') {
+      return x.preffix;
+    } else {
+      return x;
+    }
+  };
+
+  formatterSuffix = (x: { suffix: string }) => {
+    if (typeof x !== 'string') {
+      return x.suffix;
     } else {
       return x;
     }
@@ -3369,6 +3418,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       case 'COEXP_PMT_PROL':
         res = coordinatedExpenditurePayrollFields;
         break;
+      case 'COEXP_PARTY_VOID':
+        res = coordinatedPartyExpenditureVoidFields;
       default:
     }
     return res;

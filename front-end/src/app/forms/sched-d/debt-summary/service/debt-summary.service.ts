@@ -67,31 +67,36 @@ export class DebtSummaryService {
   public deleteDebt(debt: DebtSummaryModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    const url = '/sd/schedD';
+    const url = '/core/trash_restore_transactions';
     const reportId: string = this._reportTypeService.getReportIdFromStorage('3X').toString();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     let params = new HttpParams();
-    params = params.append('transaction_id', debt.transactionId);
-    params = params.append('report_id', reportId);
+    const request: any = {};
+    const actions = [];
+    actions.push({
+      action: 'trash',
+      report_id: debt.reportId && debt.reportId !== 'undefined'? debt.reportId :reportId, 
+      transaction_id: debt.transactionId
+    });
+    request.actions = actions;
 
     return this._http
-      .delete(`${environment.apiUrl}${url}`, {
-        params,
-        headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            console.log('get_outstanding_loans API res: ', res);
+    .put(`${environment.apiUrl}${url}`, request, {
+      headers: httpOptions
+    })
+    .pipe(
+      map(res => {
+        if (res) {
+          console.log('get_outstanding_loans API res: ', res);
 
-            return res;
-          }
-          return false;
-        })
-      );
+          return res;
+        }
+        return false;
+      })
+    );
   }
 
   /**
