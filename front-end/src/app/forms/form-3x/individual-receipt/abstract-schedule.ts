@@ -27,7 +27,7 @@ import {alphaNumeric} from '../../../shared/utils/forms/validation/alpha-numeric
 import {floatingPoint} from '../../../shared/utils/forms/validation/floating-point.validator';
 import { validatePurposeInKindRequired, IN_KIND } from '../../../shared/utils/forms/validation/purpose.validator';
 import {ReportTypeService} from '../report-type/report-type.service';
-import { Observable, Subscription, interval, timer } from 'rxjs';
+import { Observable, Subscription, interval, timer, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
 import {TypeaheadService} from 'src/app/shared/partials/typeahead/typeahead.service';
 import {DialogService} from 'src/app/shared/services/DialogService/dialog.service';
@@ -56,6 +56,7 @@ import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-
 import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
 import {coordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
 
+
 export enum SaveActions {
   saveOnly = 'saveOnly',
   saveForReturnToParent = 'saveForReturnToParent',
@@ -74,13 +75,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   forceChangeSwitch = 0;
   status: EventEmitter<any> = new EventEmitter<any>();
 
-  /**
-   * Subscription for pre-populating the form for view or edit.
-   */
-  private _populateFormSubscription: Subscription;
-  private _clearFormSubscription: Subscription;
-  private _loadFormFieldsSubscription: Subscription;
-  private _storeParentModelSubscription: Subscription;
 
   public editMode = true;
   public checkBoxVal = false;
@@ -171,6 +165,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _coordinatedPartyExpenditureFields = coordinatedPartyExpenditureFields;
   private _outstandingDebtBalance: number;
 
+  //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
+  //there is no unsubscribe() for activateRoute . 
+  private onDestroy$ = new Subject();
+
   constructor(
     private _http: HttpClient,
     protected _fb: FormBuilder,
@@ -191,12 +189,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _transactionsMessageService: TransactionsMessageService,
     protected _contributionDateValidator: ContributionDateValidator,
     private _transactionsService: TransactionsService,
-    protected _reportsService: ReportsService
+    protected _reportsService: ReportsService, 
+    
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    this._populateFormSubscription = this._f3xMessageService.getPopulateFormMessage().subscribe(message => {
+    this._f3xMessageService.getPopulateFormMessage().takeUntil(this.onDestroy$).subscribe(message => {
       if (message.hasOwnProperty('key')) {
         // See message sender for mesage properties
         switch (message.key) {
@@ -263,22 +262,22 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     });
 
-    this._storeParentModelSubscription = this._f3xMessageService.getParentModelMessage().subscribe(message => {
+    this._f3xMessageService.getParentModelMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this._parentTransactionModel = message;
     });
 
-    this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
+    this._f3xMessageService.getInitFormMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this.clearFormValues();
     });
 
-    this._loadFormFieldsSubscription = this._f3xMessageService.getLoadFormFieldsMessage().subscribe(message => {
+    this._f3xMessageService.getLoadFormFieldsMessage().takeUntil(this.onDestroy$).subscribe(message => {
       if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
         this._getFormFields();
         this._validateTransactionDate();
       }
     });
 
-    _activatedRoute.queryParams.subscribe(p => {
+    _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this._transactionCategory = p.transactionCategory;
       this._cloned = p.cloned || p.cloned === 'true' ? true : false;
     });
@@ -384,11 +383,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
-    this._populateFormSubscription.unsubscribe();
-    this._clearFormSubscription.unsubscribe();
-    this._loadFormFieldsSubscription.unsubscribe();
-    this._storeParentModelSubscription.unsubscribe();
     localStorage.removeItem('form_3X_saved');
+    this.onDestroy$.next(true);
   }
 
   private _prepareForm() {
@@ -609,7 +605,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.transactionType === 'OTH_DISB_DEBT' ||
           this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
           this.transactionType === 'COEXP_PARTY_DEBT' ||
-          this.transactionType === 'IE_B4_DISSE_MEMO') {
+          this.transactionType === 'IE_B4_DISSE') {
         if (this._outstandingDebtBalance !== null) {
           if (this._outstandingDebtBalance >= 0) {
             formValidators.push(validateContributionAmount(this._outstandingDebtBalance));
@@ -768,7 +764,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   private _listenForAggregateChanges(): void {
     if (this.frmIndividualReceipt.get('contribution_aggregate') != null) {
-      this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.subscribe(val => {
+      this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.takeUntil(this.onDestroy$)
+      .subscribe(val => {
         // All validators are replaced here.  Currently the only validator functions
         // for employer and occupation is the validateAggregate().  The max length is enforced
         // in the template as an element attribute max.
@@ -786,7 +783,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         occupationControl.updateValueAndValidity();
       });
     } else if (this.frmIndividualReceipt.get('expenditure_amount') != null) {
-      this.frmIndividualReceipt.get('expenditure_amount').valueChanges.subscribe(value => {
+      this.frmIndividualReceipt.get('expenditure_amount').valueChanges.takeUntil(this.onDestroy$)
+      .subscribe(value => {
         const expenditurePurposeDesc = this.frmIndividualReceipt.get('expenditure_purpose');
         expenditurePurposeDesc.setValidators([validateAggregate(value, true, 'expenditure_purpose')]);
         expenditurePurposeDesc.updateValueAndValidity();
@@ -3233,7 +3231,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       });
     }
-    this._receiptService.getDynamicFormFields(this.formType, this.transactionType).subscribe(res => {
+    this._receiptService.getDynamicFormFields(this.formType, this.transactionType).takeUntil(this.onDestroy$)
+    .subscribe(res => {
       res = this._hijackFormFields(res);
       if (res) {
         if (res.hasOwnProperty('data')) {
@@ -3622,7 +3621,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       reportId = this._receiptService.getReportIdFromStorage(this.formType);
     }
     this.subTransactions = [];
-    this._receiptService.getDataSchedule(reportId, transactionId, apiCall).subscribe(res => {
+    this._receiptService.getDataSchedule(reportId, transactionId, apiCall).takeUntil(this.onDestroy$)
+    .subscribe(res => {
       if (Array.isArray(res)) {
         for (const trx of res) {
           if (trx.hasOwnProperty('transaction_id')) {

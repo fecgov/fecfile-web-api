@@ -1,10 +1,11 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
 import { FormsService } from '../../services/FormsService/forms.service';
 import { MessageService } from '../../services/MessageService/message.service';
 import { Icommittee_forms } from '../../interfaces/FormsService/FormsService';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,7 +14,8 @@ import { Icommittee_forms } from '../../interfaces/FormsService/FormsService';
   encapsulation: ViewEncapsulation.None,
   providers: [NgbTooltipConfig]
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, OnDestroy {
+  
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
@@ -31,6 +33,8 @@ export class SidebarComponent implements OnInit {
 
   private _toggleNavClicked: boolean = false;
 
+  private onDestroy$ = new Subject();
+
   constructor(
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
@@ -41,7 +45,7 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {
     const route: string = this._router.url;
 
-    this._formService.get_filed_form_types()
+    this._formService.get_filed_form_types().takeUntil(this.onDestroy$)
      .subscribe(res => this.committee_forms = <Icommittee_forms[]> res);
 
     this._router
@@ -80,6 +84,11 @@ export class SidebarComponent implements OnInit {
       this.tooltipLeft = 'auto';
     }
   }
+
+  ngOnDestroy(): void {
+    this.onDestroy$.next(true);
+  }
+  
 
   ngDoCheck(): void {
     const route: string = this._router.url;
