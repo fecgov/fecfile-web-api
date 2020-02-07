@@ -3426,8 +3426,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         break;
       case 'COEXP_PARTY_VOID':
         res = coordinatedPartyExpenditureVoidFields;
+        break;
       case 'COEXP_CC_PAY_MEMO':
         res = coordinatedExpenditureCCMemoFields;
+        break;
       default:
     }
     return res;

@@ -79,6 +79,7 @@ export class F3xComponent implements OnInit {
   private _cloned: boolean = false;
   private _reportId: any;
   public loanPaymentScheduleAction: ScheduleActions;
+  private showPart2: boolean;
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -323,6 +324,14 @@ export class F3xComponent implements OnInit {
               this._cloned = true;
             } else {
               this._cloned = false;
+            }
+
+            if (
+                e.showPart2 === false || e.showPart2 === 'false'
+            ) {
+              this.showPart2 = false;
+            } else {
+              this.showPart2 = null;
             }
 
             this.extractScheduleType(e);
@@ -945,7 +954,7 @@ export class F3xComponent implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
           queryParamsObj.step = this.step;
-
+          queryParamsObj.showPart2 = this.showPart2;
           if (this._cloned) {
             queryParamsObj.cloned = this._cloned;
             this._router.navigate([`/forms/form/${this.formType}`], {

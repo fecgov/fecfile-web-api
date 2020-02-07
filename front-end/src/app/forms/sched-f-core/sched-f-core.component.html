@@ -98,7 +98,7 @@
           <div class="col col-md-5">
             <div class="form-group">
               <label for="designating_cmte_id">
-                Designating Committee ID Number
+                Designating Committee ID Number {{isDesignatedFiler?'':optional}}
               </label>
               <input class="form-control" 
                 type="text" 
@@ -126,7 +126,7 @@
           <div class="col col-md-5">
             <div class="form-group">
               <label for="designating_cmte_name">
-                Designating Committee Name
+                Designating Committee Name {{isDesignatedFiler?'':optional}}
               </label>
               <input class="form-control" 
                 type="text" 
@@ -156,7 +156,7 @@
           <div class="col col-md-5">
             <div class="form-group">
               <label for="subordinate_cmte_id">
-                Subordinate Committee ID Number
+                Subordinate Committee ID Number {{optional}}
               </label>
               <input class="form-control" 
                 type="text"
@@ -178,7 +178,7 @@
           <div class="col col-md-5">
             <div class="form-group">
               <label for="">
-                  Subordinate Committee Name
+                  Subordinate Committee Name {{optional}}
               </label>
               <input class="form-control"
                 type="text"
@@ -202,7 +202,7 @@
           <div class="col col-md-5">
             <div class="form-group">
               <label for="subordinate_cmte_street_1">
-                Street 1
+                Street 1 {{optional}}
               </label>
               <input class="form-control" 
                 type="text" 
@@ -236,7 +236,7 @@
           <div class="col col-md-4">
             <div class="form-group">
               <label for="subordinate_cmte_city">
-                City
+                City {{optional}}
               </label>
               <input class="form-control" 
                 type="text" 
@@ -252,7 +252,7 @@
           <div class="col col-md-4">
             <div class="form-group" [style.width]="'235px'">
               <label for="subordinate_cmte_state">
-                  State
+                  State {{optional}}
               </label>
               <ng-select #stateSelect 
                 [items]="states"                   
@@ -272,7 +272,7 @@
           <div class="col col-md-4">
             <div class="form-group">
               <label for="subordinate_cmte_zip">
-                  Zip
+                  Zip {{optional}}
               </label>
               <input class="form-control" 
                 type="text" 

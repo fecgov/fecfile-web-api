@@ -44,6 +44,8 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   private isDesignatedFiler: boolean;
   private noValidationRequired = [];
   private validateDesignatedFiler = [];
+  readonly optional  = '(Optional)'
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -90,6 +92,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     );
     _activatedRoute.queryParams.subscribe(p => {
       this.cloned = p.cloned ? true : false;
+      this.showPart2 = false;
     });
      _messageService.getMessage().subscribe(message => {
       if (message && message.parentFormPopulated) {
