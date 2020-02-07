@@ -37,6 +37,7 @@ from fecfiler.core.transaction_util import (
     update_parent_purpose,
     update_sched_d_parent,
     update_sched_c_parent,
+    get_transaction_type_descriptions,
 )
 
 logger = logging.getLogger(__name__)
@@ -783,6 +784,7 @@ def get_schedB(data):
     try:
         cmte_id = data.get("cmte_id")
         report_id = data.get("report_id")
+        tran_desc_dic = get_transaction_type_descriptions()
         flag = False
         if "transaction_id" in data:
             try:
@@ -802,6 +804,8 @@ def get_schedB(data):
             for obj in child_forms_obj:
                 obj.update({"api_call": "/sb/schedB"})
                 obj.update({"election_year": REQT_ELECTION_YR})
+                tran_id = obj.get('transaction_type_identifier')
+                obj.update({"transaction_type_description": tran_desc_dic.get(tran_id, "")})
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:

@@ -1,39 +1,32 @@
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
-import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
-import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
-import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
-import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { UtilService } from 'src/app/shared/utils/util.service';
-import { CurrencyPipe, DecimalPipe, DatePipe } from '@angular/common';
-import { ReportTypeService } from '../form-3x/report-type/report-type.service';
+import { Subscription, Subject } from 'rxjs';
+import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { ReportsService } from 'src/app/reports/service/report.service';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { F3xMessageService } from '../form-3x/service/f3x-message.service';
-import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
-import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { TransactionsService, GetTransactionsResponse } from '../transactions/service/transactions.service';
-import { HttpClient } from '@angular/common/http';
+import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
-import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
+import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
+import { UtilService } from 'src/app/shared/utils/util.service';
 import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedule';
-import { ReportsService } from 'src/app/reports/service/report.service';
-import { TransactionModel } from '../transactions/model/transaction.model';
-import { Observable, Subscription } from 'rxjs';
-import { style, animate, transition, trigger } from '@angular/animations';
-import { PaginationInstance } from 'ngx-pagination';
-import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
-import { TableService } from 'src/app/shared/services/TableService/table.service';
-import { SchedH2Service } from './sched-h2.service';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
+import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
+import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
+import { ReportTypeService } from '../form-3x/report-type/report-type.service';
+import { F3xMessageService } from '../form-3x/service/f3x-message.service';
 import { SchedHMessageServiceService } from '../sched-h-service/sched-h-message-service.service';
 import { SchedHServiceService } from '../sched-h-service/sched-h-service.service';
-import {
-  ConfirmModalComponent,
-  ModalHeaderClassEnum
-} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { TransactionModel } from '../transactions/model/transaction.model';
+import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
+import { GetTransactionsResponse, TransactionsService } from '../transactions/service/transactions.service';
+import { SchedH2Service } from './sched-h2.service';
 
 
 @Component({
@@ -80,13 +73,16 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public transaction_id: string;
 
-  private editTransactionSubscription: Subscription;
 
   public cloned = false;
   populateFormForEdit: Subscription;
 
   public fedRatio: number;
   public nonfedRatio: number;
+  private _H2onDestroy$ = new Subject();
+
+  public restoreSubscription: Subscription;
+  public trashSubscription: Subscription;
 
   constructor(
     _http: HttpClient,
@@ -151,8 +147,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _tranService;
     _dlService;
 
-    this.editTransactionSubscription = this._tranMessageService
+    this._tranMessageService
       .getEditTransactionMessage()
+      .takeUntil(this._H2onDestroy$)
       .subscribe((trx: TransactionModel) => {
         console.log(trx.transactionTypeIdentifier + 'tranc iden');
         if (trx.transactionTypeIdentifier === 'ALLOC_H2_RATIO') {
@@ -160,7 +157,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
         }
       });
 
-    this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
+    this._schedHMessageServiceService.getpopulateHFormForEditMessage()
+    .takeUntil(this._H2onDestroy$)
     .subscribe(p => {
       if(p.scheduleType === 'Schedule H2'){
         let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
@@ -170,6 +168,26 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
         });
       }
     })
+
+    this.restoreSubscription = this._tranMessageService
+        .getRestoreTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H2') {
+              this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+            }
+          }
+        )
+
+    this.trashSubscription = this._tranMessageService
+        .getRemoveHTransactionsMessage()
+        .subscribe(
+          message => {
+            if(message.scheduleType === 'Schedule H2') {
+              this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
+            }
+          }
+        )
   }
 
 
@@ -216,6 +234,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   ngDoCheck() {
+    //TODO -- memory consumption, need to contain in an if statement or not do it in ngDoCheck
     this.status.emit({
       otherSchedHTransactionType: this.transactionType
     });
@@ -225,7 +244,10 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnDestroy(): void {
-    this.populateFormForEdit.unsubscribe();
+
+    this._H2onDestroy$.next(true);
+    this.restoreSubscription.unsubscribe();
+    this.trashSubscription.unsubscribe();
     super.ngOnDestroy();
   }
 

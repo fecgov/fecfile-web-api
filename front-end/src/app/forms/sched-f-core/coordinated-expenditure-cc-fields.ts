@@ -766,11 +766,6 @@ export const coordinatedExpenditureCCFields = {
       },
       {
         type: 'hidden',
-        name: 'entity_type',
-        value: 'ORG'
-      },
-      {
-        type: 'hidden',
         name: 'beneficiary_cand_entity_id',
         value: null
       },
@@ -1063,7 +1058,13 @@ export const coordinatedExpenditureCCFields = {
         entityTypeDescription: 'Organization',
         group: 'org-group',
         selected: true
-      }
+      },
+      {
+        entityType: 'IND',
+        entityTypeDescription: 'Individual',
+        group: 'ind-group',
+        selected: false
+      },
     ],
     electionTypes: [
       {
@@ -1200,7 +1201,19 @@ export const coordinatedExpenditureCCFields = {
         ]
       }
     ],
-    subTransactions: null,
+    subTransactions: [
+      {
+        transactionType: 'COEXP_CC_PAY',
+        transactionTypeDescription: 'Coordinated Expenditure Credit Card',
+        scheduleType: 'sched_f',
+        subTransactionType: 'COEXP_CC_PAY_MEMO',
+        subScheduleType: 'sched_f',
+        subTransactionTypeDescription: 'Coordinated Expenditure CC Memo',
+        api_call: '/sf/schedF',
+        isParent: true,
+        isEarmark: false
+      }
+    ],
     jfMemoTypes: null
   }
 };

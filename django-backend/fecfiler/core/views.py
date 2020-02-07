@@ -9,6 +9,7 @@ from fecfiler.forms.serializers import CommitteeInfoSerializer
 import json
 import datetime
 import os
+import psycopg2
 import requests
 from django.views.decorators.csrf import csrf_exempt
 import logging
@@ -888,6 +889,165 @@ def delete_reports(data):
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
 
+def reposit_f3x_data(cmte_id, report_id):
+    """
+    helper funcrtion to move current F3X report data from efiling front db to backend db
+    """
+    # logger.debug('request for cloning a transaction:{}'.format(request.data))
+    logger.debug('reposit f3x data with cmte_id {} and report_id {}'.format(cmte_id, report_id))
+    # transaction_tables = ['sched_a']
+    transaction_tables = [
+        'reports',
+        'sched_a', 
+        'sched_b', 
+        'sched_c', 
+        'sched_c1',
+        'sched_c2',
+        'sched_d', 
+        'sched_e', 
+        'sched_f', 
+        'sched_h1',
+        'sched_h2',
+        'sched_h3',
+        'sched_h4',
+        'sched_h5',
+        'sched_h6',
+        'sched_l',
+        'form_3x',
+        ]
+    # transaction_tables = ['sched_b']
+    backend_connection = psycopg2.connect(
+            'dbname={} user={} host={} password={} connect_timeout=3000'.
+            format(
+                os.environ.get('BACKEND_DB_NAME'),
+                os.environ.get('BACKEND_DB_USER'),
+                os.environ.get('BACKEND_DB_HOST'),
+                os.environ.get('BACKEND_DB_PASSWORD')))
+        # conn.close()
+    back_cursor = backend_connection.cursor()
+    # cmte_id = 'C00326835'
+    # report_id = '110915'
+    for transaction_table in transaction_tables:
+        table_schema_sql = """
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = '{}'
+        """.format(transaction_table)
+        
+        with connection.cursor() as cursor:
+            logger.debug("fetching transaction table column names...")
+            # cursor.execute(table_schema_sql, (transaction_table))
+            cursor.execute(table_schema_sql)
+            rows = cursor.fetchall()  
+            columns = []
+            for row in rows:
+                # exclude report_seq from reports
+                if row[0] != 'report_seq':
+                    columns.append(row[0])
+            logger.debug('table columns: {}'.format(list(columns)))
+
+
+
+            insert_str = ','.join(columns)
+            select_str = ','.join(columns)
+            clone_sql = """
+                SELECT {_select}
+                FROM public.{table_name}
+            """.format(table_name=transaction_table, _select=select_str)
+            clone_sql = clone_sql + """ WHERE cmte_id = %s and report_id = %s and delete_ind is distinct from 'Y';"""
+            logger.debug('clone transaction with sql:{}'.format(clone_sql))
+
+            cursor.execute(clone_sql, (cmte_id, report_id))
+
+            if not cursor.rowcount:
+                logger.debug('no transaction data found for {}'.format(transaction_table))
+                continue
+            rows = cursor.fetchall()
+            for row in rows:
+                # print('...')
+                # print(row)
+                insert_sql = """
+                INSERT INTO public.{table_name}({_insert}) VALUES
+                """.format(table_name=transaction_table, _insert=insert_str)
+                # print(insert_sql)
+                back_cursor.execute(insert_sql+' %s', (row,))
+                backend_connection.commit()
+                logger.debug('row data {} inserted'.format(row))
+
+    back_cursor.close()
+    backend_connection.close()
+
+def reposit_f99_data(cmte_id, report_id):
+    """
+    helper funcrtion to move current F99 report data from efiling front db to backend db
+    """
+    # logger.debug('request for cloning a transaction:{}'.format(request.data))
+    logger.debug('reposit f99 data with cmte_id {} and report_id {}'.format(cmte_id, report_id))
+    # transaction_tables = ['sched_a']
+    transaction_tables = [
+        'forms_committeeinfo',
+        # 'forms_f99attachment',
+        ]
+    # transaction_tables = ['sched_b']
+    backend_connection = psycopg2.connect(
+            'dbname={} user={} host={} password={} connect_timeout=3000'.
+            format(
+                os.environ.get('BACKEND_DB_NAME'),
+                os.environ.get('BACKEND_DB_USER'),
+                os.environ.get('BACKEND_DB_HOST'),
+                os.environ.get('BACKEND_DB_PASSWORD')))
+        # conn.close()
+    back_cursor = backend_connection.cursor()
+    # cmte_id = 'C00326835'
+    # report_id = '110915'
+    for transaction_table in transaction_tables:
+        table_schema_sql = """
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = '{}'
+        """.format(transaction_table)
+        
+        with connection.cursor() as cursor:
+            logger.debug("fetching transaction table column names...")
+            # cursor.execute(table_schema_sql, (transaction_table))
+            cursor.execute(table_schema_sql)
+            rows = cursor.fetchall()  
+            columns = []
+            for row in rows:
+                # exclude report_seq from reports
+                # if row[0] != 'report_seq':
+                columns.append(row[0])
+            logger.debug('table columns: {}'.format(list(columns)))
+
+
+
+            insert_str = ','.join(columns)
+            select_str = ','.join(columns)
+            clone_sql = """
+                SELECT {_select}
+                FROM public.{table_name}
+            """.format(table_name=transaction_table, _select=select_str)
+            clone_sql = clone_sql + """ WHERE committeeid = %s and id = %s;"""
+            logger.debug('clone transaction with sql:{}'.format(clone_sql))
+
+            cursor.execute(clone_sql, (cmte_id, report_id))
+
+            if not cursor.rowcount:
+                logger.debug('no transaction data found for {}'.format(transaction_table))
+                continue
+            rows = cursor.fetchall()
+            for row in rows:
+                # print('...')
+                # print(row)
+                insert_sql = """
+                INSERT INTO public.{table_name}({_insert}) VALUES
+                """.format(table_name=transaction_table, _insert=insert_str)
+                # print(insert_sql)
+                back_cursor.execute(insert_sql+' %s', (row,))
+                backend_connection.commit()
+                logger.debug('row data {} inserted'.format(row))
+
+    back_cursor.close()
+    backend_connection.close()
+
 @api_view(['PUT'])
 def submit_report(request):
     """
@@ -944,6 +1104,14 @@ def submit_report(request):
         cursor.execute(_sql_update, [SUBMIT_STATUS, fec_id, report_id])
         if cursor.rowcount == 0:
             raise Exception('report {} update failed'.format(report_id))
+
+    
+    if form_tp == 'F3X':
+        reposit_f3x_data(cmte_id, report_id)
+    elif form_tp == 'F99':
+        reposit_f99_data(cmte_id, report_id)
+    else:
+        raise Exception('Error: invalid form type.')
     
     logger.debug('sending email with data')
     email_data = request.data.copy()
@@ -1935,14 +2103,23 @@ def autolookup_search_contacts(request):
     """
     logger.debug('autolookup with request params:{}'.format(dict(request.query_params.items())))
 
-    allowed_params = ['entity_name', 'first_name', 'last_name', 'ref_cand_cmte_id', 'principal_campaign_committee'] 
+    allowed_params = [
+        'entity_name', 
+        'first_name', 
+        'last_name', 
+        'preffix',
+        'prefix',
+        'suffix',
+        'ref_cand_cmte_id', 
+        'principal_campaign_committee'
+        ] 
     field_remapper = {
         'cmte_id': 'ref_cand_cmte_id',
         'cmte_name': 'entity_name',
         'cand_id': 'ref_cand_cmte_id',
         'cand_last_name': 'last_name',
         'cand_first_name': 'first_name',
-        'payee_cmte_id': 'principal_campaign_committee'
+        'payee_cmte_id': 'principal_campaign_committee',
     }
 
     try:
@@ -1964,9 +2141,15 @@ def autolookup_search_contacts(request):
         # rename parameters for candidate and committee
         query_params = { k:v for k,v in request.query_params.items() if k not in field_remapper }
         query_params.update({field_remapper[k]:v for k,v in request.query_params.items() if k in field_remapper})
+        if 'prefix' in query_params:
+            query_params['preffix'] = query_params.get('prefix')
+            
+
         logger.debug("autolookup with parameters {}".format(query_params))
         for key, value in query_params.items():
             if key in allowed_params:
+                if key == 'prefix':
+                    continue
                 order_string = str(key)
                 param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
                 # if cand_q:
@@ -5584,7 +5767,7 @@ def duplicate_address(cmte_id, data):
             input_address = " ".join(filter(None, [data.get('street_1'), data.get('street_2'), data.get('city'), data.get('state')]))
             if 'zip_code' in data and data.get('zip_code') not in ['null', 'None', '', "", None]:
                 input_address += " " + data.get('zip_code')[0:5]
-        input_total_address_list = [" ".join([input_name, input_address, data.get('occupation'), data.get('employer')])]
+        input_total_address_list = [" ".join([input_name, input_address, data.get('occupation',""), data.get('employer',"")])]
 
         contact_list = get_list_contact(cmte_id, None, True, org_name_flag)
         compare_entity_id_list = []
@@ -5631,10 +5814,13 @@ def check_duplicate_address(request):
         address = duplicate_address(cmte_id, request.data)
         if address:
             status_code = "FAIL"
+            status_desc = "Duplicate exists"
         else:
             status_code = "SUCCESS"
+            status_desc = "Duplicate does not exist"
         output = {}
-        output['status_code'] = status_code
+        output['statusCode'] = status_code
+        output['statusDescription'] = status_desc
         output['data'] = address
         return Response(output, status=status.HTTP_200_OK)
     except requests.exceptions.HTTPError as http_err:

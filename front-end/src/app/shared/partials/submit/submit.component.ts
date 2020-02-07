@@ -47,7 +47,8 @@ export class SubmitComponent implements OnInit {
         if (this.form_type === '99') {
           localStorage.removeItem(`form_${this.form_type}_details`);
         } else if (this.form_type === '3X') {
-          console.log('Accessing SubmitComponent F3x submit Data Receiver API ');
+          // Below code has been temporarily commented to not generate json files while submitting report - 02/06
+          /*console.log('Accessing SubmitComponent F3x submit Data Receiver API ');
           this._reportTypeService.submitForm('3X', 'Submit').subscribe(
             res => {
               if (res) {
@@ -65,7 +66,7 @@ export class SubmitComponent implements OnInit {
             error => {
               console.log('error: ', error);
             }
-          ); /*  */
+          );*/ /*  */
         }
       }
     });

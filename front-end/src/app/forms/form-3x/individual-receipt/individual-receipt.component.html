@@ -108,6 +108,8 @@
                                 && !isFieldName(col?.name, 'beneficiary_cmte_id')
                                 && !isFieldName(col?.name, 'beneficiary_cmte_name') 
                                 && !isFieldName(col?.name, 'beneficiary_cand_id') 
+                                && !isFieldName(col?.name, 'prefix')
+                                && !isFieldName(col?.name, 'suffix')
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.readonly]="isFieldReadOnly(col)"
@@ -147,6 +149,32 @@
                                 : ''
                             " id="typeahead-template-first-name" [ngbTypeahead]="searchFirstName" [focusFirst]=false
                           [resultTemplate]="rt" [inputFormatter]="formatterFirstName"
+                          (selectItem)="handleSelectedIndividual($event, col)" (keyup)="handleFormFieldKeyup($event, col)"
+                          (blur)="populatePurpose(col?.name)" />
+                        <input *ngIf="col?.name === 'prefix'" class="form-control" [style.width]="col?.width"
+                          [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-prefix" [ngbTypeahead]="searchPrefix" [focusFirst]=false
+                          [resultTemplate]="rt" [inputFormatter]="formatterPrefix"
+                          (selectItem)="handleSelectedIndividual($event, col)" (keyup)="handleFormFieldKeyup($event, col)"
+                          (blur)="populatePurpose(col?.name)" />
+                        <input *ngIf="col?.name === 'suffix'" class="form-control" [style.width]="col?.width"
+                          [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-suffix" [ngbTypeahead]="searchSuffix" [focusFirst]=false
+                          [resultTemplate]="rt" [inputFormatter]="formatterSuffix"
                           (selectItem)="handleSelectedIndividual($event, col)" (keyup)="handleFormFieldKeyup($event, col)"
                           (blur)="populatePurpose(col?.name)" />
                         <input *ngIf="isFieldName(col?.name, 'cand_last_name')" class="form-control"
@@ -259,7 +287,7 @@
                         <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
                           <div class="text-error text-left"
                             *ngIf="frmIndividualReceipt.get(col?.name).errors?.amountExceeded">
-                            Expenditure amount exceeds outstanding loan amount
+                            Expenditure amount exceeds outstanding debt amount
                           </div>
                         </ng-container>
                       </div>

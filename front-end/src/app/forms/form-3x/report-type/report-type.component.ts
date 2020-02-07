@@ -29,6 +29,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'f3x-report-type',
@@ -70,6 +71,7 @@ export class ReportTypeComponent implements OnInit {
   private _fromDateUserModified: string = null;
   private _toDateUserModified: string = null;
   private _dateChangeSubscription: Subscription;
+  private onDestroy$ = new Subject();
 
   constructor(
     private _fb: FormBuilder,
@@ -152,7 +154,7 @@ export class ReportTypeComponent implements OnInit {
       }
     }
 
-    this._messageService.getMessage().subscribe(res => {
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(res => {
       if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
         if (res.type === this._formType) {
           if (res.reportType === 'S') {
@@ -194,6 +196,10 @@ export class ReportTypeComponent implements OnInit {
     });
 
     this._setReportTypes();
+  }
+
+  ngOnDestroy(){
+    this.onDestroy$.next(true);
   }
 
   @HostListener('window:resize', ['$event'])

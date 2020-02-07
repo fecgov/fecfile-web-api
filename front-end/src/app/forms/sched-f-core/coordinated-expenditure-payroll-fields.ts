@@ -10,7 +10,7 @@ export const coordinatedExpenditurePayrollFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: true,
+            isReadonly: false,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
@@ -764,11 +764,12 @@ export const coordinatedExpenditurePayrollFields = {
         name: 'api_call',
         value: '/sf/schedF'
       },
-      {
-        type: 'hidden',
-        name: 'entity_type',
-        value: 'ORG'
-      },
+        // Removed Spec F3x Schedule F 8.8.19
+      // {
+      //   type: 'hidden',
+      //   name: 'entity_type',
+      //   value: 'ORG'
+      // },
       {
         type: 'hidden',
         name: 'beneficiary_cand_entity_id',
@@ -1063,7 +1064,13 @@ export const coordinatedExpenditurePayrollFields = {
         entityTypeDescription: 'Organization',
         group: 'org-group',
         selected: true
-      }
+      },
+      {
+        entityType: 'IND',
+        entityTypeDescription: 'Individual',
+        group: 'ind-group',
+        selected: false
+      },
     ],
     electionTypes: [
       {
@@ -1200,7 +1207,19 @@ export const coordinatedExpenditurePayrollFields = {
         ]
       }
     ],
-    subTransactions: null,
+    subTransactions: [
+      {
+        transactionType: 'COEXP_PMT_PROL',
+        transactionTypeDescription: 'Coordinated Expenditure Payroll',
+        scheduleType: 'sched_f',
+        subTransactionType: 'COEXP_PMT_PROL_MEMO',
+        subScheduleType: 'sched_f',
+        subTransactionTypeDescription: 'CE Payroll Memo',
+        api_call: '/sf/schedF',
+        isParent: true,
+        isEarmark: false
+      }
+    ],
     jfMemoTypes: null
   }
 };

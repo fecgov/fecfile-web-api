@@ -968,6 +968,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
                   ModalHeaderClassEnum.successHeader
                 );
               });
+
+            for(const trx of selectedTransactions) {
+              if(trx.scheduleType === 'Schedule H2' ||
+                trx.scheduleType === 'Schedule H3' || trx.scheduleType === 'Schedule H4' ||
+                trx.scheduleType === 'Schedule H5' || trx.scheduleType === 'Schedule H6') {
+                  this._transactionsMessageService.sendRemoveHTransactionsMessage(trx)
+                }
+            }
           } else if (res === 'cancel') {
           }
         });
@@ -1057,6 +1065,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         });
       if (trx.scheduleType === 'Schedule H1') {
         this._transactionsMessageService.sendRemoveH1TransactionsMessage(trx);
+      }else if(trx.scheduleType === 'Schedule H2' ||
+          trx.scheduleType === 'Schedule H3' || trx.scheduleType === 'Schedule H4' ||
+          trx.scheduleType === 'Schedule H5' || trx.scheduleType === 'Schedule H6') {
+        this._transactionsMessageService.sendRemoveHTransactionsMessage(trx)
       }
     }
     else if (res === 'cancel') {
@@ -1102,6 +1114,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
                 ModalHeaderClassEnum.successHeader
               );
             });
+
+          if (trx.scheduleType === 'Schedule H2' ||
+              trx.scheduleType === 'Schedule H3' || trx.scheduleType === 'Schedule H4' ||
+              trx.scheduleType === 'Schedule H5' || trx.scheduleType === 'Schedule H6') {
+            this._transactionsMessageService.sendRestoreTransactionsMessage(trx);
+          }
         } else if (res === 'cancel') {
         }
       });

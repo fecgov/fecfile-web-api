@@ -1,6 +1,6 @@
-import { Component, HostListener, OnInit, NgZone, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnInit, NgZone, ViewChild, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../environments/environment';
 import { FormsService } from '../shared/services/FormsService/forms.service';
@@ -15,12 +15,14 @@ import { ConfirmModalComponent, ModalHeaderClassEnum } from '../shared/partials/
   styleUrls: ['./forms.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class FormsComponent implements OnInit {
+export class FormsComponent implements OnInit, OnDestroy {
   public formType: string = '';
   public closeResult: string = '';
   public canContinue: boolean = false;
   public showValidateBar: boolean = false;
   public confirmModal: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
+  private onDestroy$ = new Subject();
 
   private _openModal: any = null;
   private _step: string;
@@ -35,7 +37,8 @@ export class FormsComponent implements OnInit {
     private _dialogService: DialogService,
     private _formsService: FormsService
   ) {
-    _activeRoute.queryParams.subscribe(p => {
+
+    _activeRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       if (p.step) {
         this._step = p.step;
       }
@@ -47,13 +50,12 @@ export class FormsComponent implements OnInit {
     this._activeRoute.params.subscribe(params => {
       this.formType = params.form_id;
     });
-
-    this._messageService.getMessage().subscribe(res => {
-      if (res.validateMessage) {
-        //this.showValidateBar = res.validateMessage.showValidateBar;
-      }
-    });
   }
+
+  ngOnDestroy(): void {
+    this.onDestroy$.next(true);
+  }
+
 
   /**
    * Determines ability for a person to leave a page with a form on it.

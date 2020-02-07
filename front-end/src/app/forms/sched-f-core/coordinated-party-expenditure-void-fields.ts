@@ -1,4 +1,4 @@
-export const coordinatedPartyExpenditureFields = {
+export const coordinatedPartyExpenditureVoidFields = {
   data: {
     formFields: [
       {
@@ -375,7 +375,7 @@ export const coordinatedPartyExpenditureFields = {
             validation: {
               required: true,
               max: 12,
-              dollarAmount: true
+              dollarAmountNegative: true
             }
           },
           {
@@ -802,7 +802,7 @@ export const coordinatedPartyExpenditureFields = {
       {
         type: 'hidden',
         name: 'transaction_type_identifier',
-        value: 'COEXP_PARTY'
+        value: 'COEXP_PARTY_VOID'
       }
     ],
     states: [

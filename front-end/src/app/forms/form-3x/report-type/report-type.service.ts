@@ -195,9 +195,8 @@ export class ReportTypeService {
   public signandSaveSubmitReport(formType: string, access_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    //let url: string = '/core/reports';
-    let url: string = '/core/submit_report';
-
+    let url = '/core/reports';
+    
     let params = new HttpParams();
     let formData: FormData = new FormData();
     console.log('signandSaveSubmitReport called');
@@ -393,6 +392,7 @@ export class ReportTypeService {
     } else if (access_type === 'Submitted') {
       console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
       console.log('submit Report form 3X submitted...');
+      url = '/core/submit_report';
       return this._http
         .put(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions

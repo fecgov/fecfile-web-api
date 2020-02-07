@@ -1,31 +1,29 @@
-import { ScheduleActions } from './../../individual-receipt/schedule-actions.enum';
-import { Subscription, Observable } from 'rxjs';
-import { ReportsService } from 'src/app/reports/service/report.service';
-import { ContributionDateValidator } from './../../../../shared/utils/forms/validation/contribution-date.validator';
-import { DialogService } from './../../../../shared/services/DialogService/dialog.service';
-import { TypeaheadService } from './../../../../shared/partials/typeahead/typeahead.service';
-import { ContactsService } from 'src/app/contacts/service/contacts.service';
-import { IndividualReceiptComponent } from './../../individual-receipt/individual-receipt.component';
-import { Component, OnInit, SimpleChanges, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { ChangeDetectorRef, Component, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { FormsService } from '../../../../shared/services/FormsService/forms.service';
-import { IndividualReceiptService } from '../../individual-receipt/individual-receipt.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { UtilService } from '../../../../shared/utils/util.service';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { ReportsService } from 'src/app/reports/service/report.service';
+import { FormsService } from '../../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../../shared/services/MessageService/message.service';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { ReportTypeService } from '../../report-type/report-type.service';
-import { F3xMessageService } from '../../service/f3x-message.service';
+import { MultiStateValidator } from '../../../../shared/utils/forms/validation/multistate.validator';
+import { UtilService } from '../../../../shared/utils/util.service';
 import { TransactionsMessageService } from '../../../transactions/service/transactions-message.service';
 import { TransactionsService } from '../../../transactions/service/transactions.service';
-import { SchedEService } from '../sched-e.service';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
-import { AbstractSchedule } from '../../individual-receipt/abstract-schedule';
 import { AbstractScheduleParentEnum } from '../../individual-receipt/abstract-schedule-parent.enum';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { MultiStateValidator } from '../../../../shared/utils/forms/validation/multistate.validator';
+import { IndividualReceiptService } from '../../individual-receipt/individual-receipt.service';
+import { ReportTypeService } from '../../report-type/report-type.service';
+import { F3xMessageService } from '../../service/f3x-message.service';
+import { SchedEService } from '../sched-e.service';
+import { TypeaheadService } from './../../../../shared/partials/typeahead/typeahead.service';
+import { DialogService } from './../../../../shared/services/DialogService/dialog.service';
+import { ContributionDateValidator } from './../../../../shared/utils/forms/validation/contribution-date.validator';
+import { IndividualReceiptComponent } from './../../individual-receipt/individual-receipt.component';
+import { ScheduleActions } from './../../individual-receipt/schedule-actions.enum';
 
 @Component({
   selector: 'app-sched-e',
@@ -36,9 +34,6 @@ import { MultiStateValidator } from '../../../../shared/utils/forms/validation/m
 })
 export class SchedEComponent extends IndividualReceiptComponent implements OnInit {
 
-  private messageSubscription: Subscription;
-  private populateChildComponentMessageSubscription: Subscription
-  private rollbackChangesMessageSubscription: Subscription;
 
 
   public hideCandidateState = false;
@@ -56,9 +51,10 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   ];
 
   private prepopulatedMemoText = 'Multistate independent expenditure, publicly distributed or disseminated in the following states: ';
-  // private prepopulatedMemoText = 'Not actual wording: ';
   public selectedStates: string;
   private multistateMemoTextDelimiter = ' - ';
+
+  private _schedEonDestroy$ = new Subject();
   _originalExpenditureAggregate: any;
   _originalExpenditureAmount: any;
 
@@ -108,19 +104,19 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       _reportsService
     );
 
-    this.messageSubscription = _messageService.getMessage().subscribe(message => {
+    _messageService.getMessage().takeUntil(this._schedEonDestroy$).subscribe(message => {
       if (message && message.parentFormPopulated) {
         this.populateChildData();
       }
     });
 
-    this.populateChildComponentMessageSubscription = _messageService.getPopulateChildComponentMessage().subscribe(message => {
+    _messageService.getPopulateChildComponentMessage().takeUntil(this._schedEonDestroy$).subscribe(message => {
       if (message && message.populateChildForEdit && message.transactionData) {
         this.populateFormForEdit(message.transactionData);
       }
     });
 
-    this.rollbackChangesMessageSubscription = _messageService.getRollbackChangesMessage().subscribe(message => {
+    _messageService.getRollbackChangesMessage().takeUntil(this._schedEonDestroy$).subscribe(message => {
       if (message && message.rollbackChanges) {
         this.rollbackIfSaveFailed();
       }
@@ -150,16 +146,12 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
 
   public ngOnChanges(changes: SimpleChanges) {
-    // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
-
     super.ngOnChanges(changes);
   }
 
 
   public ngOnInit() {
-    /*     this.formType = '3X';
-        this.abstractScheduleComponent = AbstractScheduleParentEnum.schedMainComponent; */
     this.loaded = false;
     this.formFieldsPrePopulated = true;
     this.formType = '3X';
@@ -175,16 +167,11 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   }
 
-  /* public ngOnChanges(changes: SimpleChanges) {
-    this.formType = '3X';
-    super.ngOnChanges(changes);
-  } */
+  
 
   public ngOnDestroy(): void {
+    this._schedEonDestroy$.next(true);
     super.ngOnDestroy();
-    this.messageSubscription.unsubscribe();
-    this.populateChildComponentMessageSubscription.unsubscribe();
-    this.rollbackChangesMessageSubscription.unsubscribe();
   }
 
   /**Add any child specific initializations, validators here */
@@ -240,7 +227,35 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.candOfficeStatesByTransactionType = this.candidateOfficeTypes;
       this._changeDetector.detectChanges();
     }
+    
+    //if memo transaction, populate candidate information 
+    if(this.transactionType.endsWith('_MEMO')){
+      this.populateCandidateInfoFromParent();
+    }
+  }
+  populateCandidateInfoFromParent() {
+    if(this._parentTransactionModel && this.frmIndividualReceipt){
+      this.frmIndividualReceipt.patchValue({cand_last_name:this._parentTransactionModel.candLastName},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({cand_first_name:this._parentTransactionModel.candFirstName},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({cand_middle_name:this._parentTransactionModel.candMiddleName},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({cand_prefix:this._parentTransactionModel.candPrefix},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({cand_suffix:this._parentTransactionModel.candSuffix},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({cand_last_name:this._parentTransactionModel.candLastName},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({payee_cmte_id:this._parentTransactionModel.candFECId},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({beneficiary_cand_id:this._parentTransactionModel.benificiaryCandId},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({cand_office:this._parentTransactionModel.candOffice},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({cand_office_state:this._parentTransactionModel.candOfficeState},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({cand_office_district:this._parentTransactionModel.candOfficeDistrict},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({cand_election_year:this._parentTransactionModel.candElectionYear},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({support_oppose_code:this._parentTransactionModel.candSupportOpposeFlag},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({election_other_description:this._parentTransactionModel.candElectionOtherDesc},{onlySelf:true});
+      this.frmIndividualReceipt.patchValue({election_code:this._parentTransactionModel.candElectionCode},{onlySelf:true});
+      
+      if(!this.frmIndividualReceipt.value.election_code){
+        console.log(this.electionTypes);
+      }
 
+    }
   }
 
   populateFormForEdit(trx: any) {
@@ -544,14 +559,6 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   private addSchedESpecificMetadata() {
     this.hiddenFields.push({ type: "hidden", name: "full_election_code", value: this.electionCode + this.electionYear });
-    // if (this.transactionType === 'IE_MULTI') {
-    //   let currentVal = this.frmIndividualReceipt.controls['memo_text'].value;
-    //   if (!currentVal) {
-    //     currentVal = '';
-    //   }
-    //   // this.frmIndividualReceipt.patchValue({ memo_text: this.prepopulatedMemoText + ' ' + this.selectedStates + this.multistateMemoTextDelimiter + currentVal }, { onlySelf: true });
-    //   // this.hiddenFields.push({ memo_text: this.prepopulatedMemoText + ' ' + this.selectedStates + this.multistateMemoTextDelimiter + currentVal });
-    // }
   }
 
 

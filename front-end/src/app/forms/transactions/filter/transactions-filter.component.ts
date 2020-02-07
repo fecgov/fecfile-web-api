@@ -1,29 +1,19 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-  ElementRef,
-  ViewChildren,
-  QueryList,
-  OnDestroy
-} from '@angular/core';
-import { style, animate, transition, trigger, state } from '@angular/animations';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { Component, Input, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { TransactionsMessageService } from '../service/transactions-message.service';
+import { Subject } from 'rxjs';
+import 'rxjs/add/operator/takeUntil';
+import { Subscription } from 'rxjs/Subscription';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
-import { filter } from 'rxjs/operators';
+import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
+import { FilterTypes } from "../enums/filterTypes.enum";
 import { TransactionFilterModel } from '../model/transaction-filter.model';
 import { ValidationErrorModel } from '../model/validation-error.model';
+import { TransactionsMessageService } from '../service/transactions-message.service';
 import { TransactionsService } from '../service/transactions.service';
-import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
-import { Subscription } from 'rxjs/Subscription';
 import { ActiveView } from '../transactions.component';
-import { FilterTypes } from "../enums/filterTypes.enum";
-import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
-import { ActivatedRoute } from '@angular/router';
+import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
 
 /**
  * A component for filtering transactions located in the sidebar.
@@ -156,7 +146,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public debtBeginningBalanceFilterValidation: ValidationErrorModel;
   public transactionCategory: string = '';
   public editMode: boolean = false;
-
+  
+  private onDestroy$ = new Subject();
 
   /**
    * Subscription for removing selected filters.
@@ -182,8 +173,9 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     private _transactionTypeService: TransactionTypeService,
     private _activatedRoute: ActivatedRoute
   ) {
-    this.removeFilterSubscription = this._transactionsMessageService
+    this._transactionsMessageService
       .getRemoveFilterMessage()
+      .takeUntil(this.onDestroy$)
       .subscribe((message: any) => {
         if (message) {
           if (message.removeAll) {
@@ -194,8 +186,9 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.switchFilterViewSubscription = this._transactionsMessageService
+    this._transactionsMessageService
       .getSwitchFilterViewMessage()
+      .takeUntil(this.onDestroy$)
       .subscribe((message: ActiveView) => {
         switch (message) {
           case ActiveView.transactions:
@@ -210,13 +203,14 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.clearAllFiltersSubscription = this._transactionsMessageService
+    this._transactionsMessageService
     .getClearAllFiltersMessage()
+    .takeUntil(this.onDestroy$)
     .subscribe(message => {
       this.clearAndApplyFilters();
     })
 
-    _activatedRoute.queryParams.subscribe(p => {
+    _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       if (p.edit === 'true' || p.edit === true) {
         this.editMode = true;
@@ -278,9 +272,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * A method to run when component is destroyed.
    */
   public ngOnDestroy(): void {
-    this.removeFilterSubscription.unsubscribe();
-    this.switchFilterViewSubscription.unsubscribe();
-    this.clearAllFiltersSubscription.unsubscribe();
+    this.onDestroy$.next(true);
   }
 
   /**
