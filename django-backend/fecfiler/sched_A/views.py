@@ -26,6 +26,7 @@ from fecfiler.core.transaction_util import (
     update_parent_purpose,
     cmte_type,
     get_sched_b_transactions,
+    get_transaction_type_descriptions,
     )
 
 from fecfiler.core.aggregation_helper import(
@@ -946,6 +947,7 @@ def post_schedA(datum):
 def get_schedA(data):
     """load sched_a and the child sched_a and sched_b transactions."""
     try:
+        tran_desc_dic = get_transaction_type_descriptions()
         cmte_id = data.get('cmte_id')
         report_id = data.get('report_id')
         if 'transaction_id' in data:
@@ -959,12 +961,28 @@ def get_schedA(data):
                 report_id, cmte_id, transaction_id)
             for obj in childA_forms_obj:
                 obj.update(API_CALL_SA)
+                tran_id = obj.get("transaction_type_identifier")
+                obj.update(
+                    {
+                        "transaction_type_description": tran_desc_dic.get(
+                            tran_id, ""
+                        )
+                    }
+                )
                 obj.update({'election_year':REQ_ELECTION_YR})
                 # obj.update(ELECTION_YR)
 
             childB_forms_obj = get_list_child_schedB(
                 report_id, cmte_id, transaction_id)
             for obj in childB_forms_obj:
+                tran_id = obj.get("transaction_type_identifier")
+                obj.update(
+                            {
+                                "transaction_type_description": tran_desc_dic.get(
+                                    tran_id, ""
+                                )
+                            }
+                        )
                 obj.update(API_CALL_SB)
                 obj.update({'election_year':REQ_ELECTION_YR})
                 # obj.update(ELECTION_YR)
