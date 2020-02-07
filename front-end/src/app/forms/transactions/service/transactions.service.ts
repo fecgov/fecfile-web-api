@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
-import { CookieService } from 'ngx-cookie-service';
-import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
-import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { environment } from '../../../../environments/environment';
-import { TransactionModel } from '../model/transaction.model';
-import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
-import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.pipe';
-import { TransactionFilterModel } from '../model/transaction-filter.model';
-import { DatePipe } from '@angular/common';
-import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
 import { map } from 'rxjs/operators';
+import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.pipe';
+import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
+import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
+import { environment } from '../../../../environments/environment';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
+import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
+import { TransactionFilterModel } from '../model/transaction-filter.model';
+import { TransactionModel } from '../model/transaction.model';
 
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
@@ -380,6 +380,20 @@ export class TransactionsService {
     model.aggregate = row.contribution_aggregate;
     model.entityId = row.entity_id;
     model.reportType = row.report_type;
+    model.candLastName = row.cand_last_name;
+    model.candFirstName = row.cand_first_name;
+    model.candMiddleName = row.cand_middle_name;
+    model.candPrefix = row.cand_prefix;
+    model.candSuffix = row.cand_suffix;
+    model.candFECId = row.payee_cmte_id;
+    model.benificiaryCandId = row.beneficiary_cand_id;
+    model.candOffice = row.cand_office;
+    model.candOfficeState = row.cand_office_state;
+    model.candOfficeDistrict = row.cand_office_district;
+    model.candElectionCode = row.election_code;
+    model.candElectionYear = row.cand_election_year;
+    model.candElectionOtherDesc = row.election_other_desc;
+    model.candSupportOpposeFlag = row.support_oppose_code;
   }
 
   /**

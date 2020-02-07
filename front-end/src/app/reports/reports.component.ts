@@ -1,15 +1,13 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ApiService } from '../shared/services/APIService/api.service';
+import { FormsService } from '../shared/services/FormsService/forms.service';
+import { MessageService } from '../shared/services/MessageService/message.service';
+import { SessionService } from '../shared/services/SessionService/session.service';
 import { IReport } from './report';
 import { ReportService } from './reports.service';
+import { Subject } from 'rxjs';
 
-import { SessionService } from '../shared/services/SessionService/session.service';
-import { ApiService } from '../shared/services/APIService/api.service';
-import { MessageService } from '../shared/services/MessageService/message.service';
-import { HeaderComponent } from '../shared/partials/header/header.component';
-import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
-import { FormsComponent } from '../forms/forms.component';
-import { FormsService } from '../shared/services/FormsService/forms.service';
 
 @Component({
   selector: 'app-reports',
@@ -19,10 +17,13 @@ import { FormsService } from '../shared/services/FormsService/forms.service';
   providers:[ReportService,MessageService]
 })
 
-export class ReportsComponent implements OnInit {
+export class ReportsComponent implements OnInit , OnDestroy{
+
   reports: IReport[];
   public showSideBar: boolean = true;
   public showLegalDisclaimer: boolean = false;
+
+  private onDestroy$ = new Subject();
 
   constructor(
     private _reportService:ReportService,
@@ -52,12 +53,17 @@ export class ReportsComponent implements OnInit {
     }
 
     this._reportService.getReports()
+    .takeUntil(this.onDestroy$)
       .subscribe(res => this.reports = <IReport[]> res);
     console.log(this.reports)
   }
 
   public open(): void{
     this.showLegalDisclaimer = !this.showLegalDisclaimer;
+  }
+
+  ngOnDestroy(): void {
+    this.onDestroy$.next(true);
   }
 
 }

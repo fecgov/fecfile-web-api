@@ -1,56 +1,27 @@
-import {
-  Component,
-  EventEmitter,
-  ElementRef,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-  ViewChild,
-  OnDestroy,
-  HostListener,
-  OnChanges,
-  SimpleChanges
-} from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
-import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { environment } from '../../../../environments/environment';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { UtilService } from '../../../shared/utils/util.service';
-import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { IndividualReceiptService } from './individual-receipt.service';
-import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
-import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
-import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
-import { validatePurposeInKindRequired, IN_KIND } from '../../../shared/utils/forms/validation/purpose.validator';
-import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
-import { Observable, Subscription, interval, timer } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs';
+import 'rxjs/add/operator/takeUntil';
+import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { ReportsService } from 'src/app/reports/service/report.service';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import {
-  ConfirmModalComponent,
-  ModalHeaderClassEnum
-} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { TransactionModel } from '../../transactions/model/transaction.model';
-import { F3xMessageService } from '../service/f3x-message.service';
-import { ScheduleActions } from './schedule-actions.enum';
-import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
-import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
-import { ActiveView } from '../../transactions/transactions.component';
-import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
-import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
 import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { ContactsService } from 'src/app/contacts/service/contacts.service';
-import { trigger, transition, style, animate, state } from '@angular/animations';
-import { heLocale } from 'ngx-bootstrap';
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
+import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
+import { UtilService } from '../../../shared/utils/util.service';
+import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
 import { TransactionsService } from '../../transactions/service/transactions.service';
+import { F3xMessageService } from '../service/f3x-message.service';
 import { AbstractSchedule } from './abstract-schedule';
-import { ReportsService } from 'src/app/reports/service/report.service';
 import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
+import { IndividualReceiptService } from './individual-receipt.service';
+import { ScheduleActions } from './schedule-actions.enum';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -73,6 +44,8 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
   @Output() status: EventEmitter<any>;
+
+  private _onDestroy$ = new Subject();
 
   public formType: string;
   public cloned: boolean;
@@ -120,7 +93,8 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
       _transactionsService,
       _reportsService
     );
-    _activatedRoute.queryParams.subscribe(p => {
+
+    _activatedRoute.queryParams.takeUntil(this._onDestroy$).subscribe(p => {
       this.cloned = p.cloned ? true : false;
     });
   }
@@ -150,6 +124,7 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
 
   public ngOnDestroy(): void {
     localStorage.removeItem(`form_${this.formType}_saved`);
+    this._onDestroy$.next(true);
     super.ngOnDestroy();
   }
 }
