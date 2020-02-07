@@ -648,8 +648,9 @@ export class SignComponent implements OnInit {
                           step: 'step_5',
                           previousStep: this._step
                         });*/
-
-                  this._router.navigate(['/submitform/3X']);
+                  this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode,
+                  fec_id: res.fec_id } });
+                  //this._router.navigate(['/submitform/3X']);
 
                   this._messageService.sendMessage({
                     form_submitted: true
