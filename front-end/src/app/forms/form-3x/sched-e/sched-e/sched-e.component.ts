@@ -145,10 +145,10 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   }
 
 
-  public ngOnChanges(changes: SimpleChanges) {
+/*   public ngOnChanges(changes: SimpleChanges) {
     this.formType = '3X';
     super.ngOnChanges(changes);
-  }
+  } */
 
 
   public ngOnInit() {
