@@ -299,7 +299,7 @@
         </div>                     
       </div>
     </section>
-    <section *ngIf="showPart2" class="paragraph">
+    <section [hidden]="!showPart2" class="paragraph">
       <ng-container *ngFor="let hiddenField of hiddenFields">
         <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
       </ng-container>

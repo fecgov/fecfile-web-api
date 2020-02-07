@@ -39,8 +39,6 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   @Output() status: EventEmitter<any>;
 
   public cloned: boolean;
-  public showPart2: boolean;
-
   protected staticFormFields = schedFstaticFormFields;
 
   private isDesignatedFiler: boolean;
@@ -153,8 +151,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     if (!this._checkFormFieldIsValid('coordinated_exp_ind')) {
       return;
     }
-
-
+    this._setDesignatedValidators();
     this.showPart2 = true;
   }
 
@@ -176,19 +173,15 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     // return true;
   }
 
+  private _setDesignatedValidators() {
+     if ( this.frmIndividualReceipt.contains('coordinated_exp_ind') &&
+         this.frmIndividualReceipt.get('coordinated_exp_ind').value === 'Y' ) {
+       this.onFilerChange('Y');
+     } else {
+       this.onFilerChange('N');
+     }
+  }
   private _setTransactionDetail() {
-  // TODO: Remove
-    this.subTransactionInfo = {
-      transactionType: 'DEBT_TO_VENDOR',
-      transactionTypeDescription: 'Debt to Vendor',
-      scheduleType: 'sched_d',
-      subTransactionType: 'COEXP_PARTY_DEBT',
-      subScheduleType: 'sched_f',
-      subTransactionTypeDescription: 'Coordinated Party Expenditure (SF)',
-      api_call: '/sd/schedD',
-      isParent: false,
-      isEarmark: false
-    };
 
     if (this.scheduleAction === ScheduleActions.addSubTransaction) {
       this.clearFormValues();

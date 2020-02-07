@@ -2037,6 +2037,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 }
               }
             }
+
+            if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
+              this.showPart2 = false;
+            }
             this.status.emit(addSubTransEmitObj);
           } else if (saveAction === SaveActions.saveForEditSub) {
             this._progressToChild(ScheduleActions.edit, res);
@@ -2097,7 +2101,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   }
                 }
               }
-              if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+              if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+                  this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
                 this.showPart2 = false;
               }
             }
@@ -3609,6 +3614,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         this._isShowWarn = true;
 
+        // set the flag for sched f core components to hide second page
+        if ( this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent ) {
+          this.showPart2 = false;
+        }
         // this.transactionType = formData.transactionTypeIdentifier;
         this._setFormDataValues(formData.transactionId, formData.apiCall, formData.reportId);
       }
