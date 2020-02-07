@@ -205,11 +205,12 @@ export class ReportTypeService {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+    
 
     if (form3xReportType === null) {
       console.log('get backup object');
-      form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+      form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
       console.log('backup object form3xReportType = ', form3xReportType);
     }
 
