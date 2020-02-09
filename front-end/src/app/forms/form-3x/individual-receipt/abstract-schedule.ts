@@ -55,6 +55,9 @@ import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-exp
 import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
 import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
 import {coordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
+import {coordinatedExpenditureCCMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-cc-memo-fields';
+import {coordinatedExpenditureStaffMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-staff-memo-fields';
+import {coordinatedExpenditurePayrollMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-Payroll-memo-fields';
 
 
 export enum SaveActions {
@@ -2034,6 +2037,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 }
               }
             }
+
+            if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
+              this.showPart2 = false;
+            }
             this.status.emit(addSubTransEmitObj);
           } else if (saveAction === SaveActions.saveForEditSub) {
             this._progressToChild(ScheduleActions.edit, res);
@@ -2094,7 +2101,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   }
                 }
               }
-              if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+              if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+                  this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
                 this.showPart2 = false;
               }
             }
@@ -3419,6 +3427,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         break;
       case 'COEXP_PARTY_VOID':
         res = coordinatedPartyExpenditureVoidFields;
+        break;
+      case 'COEXP_CC_PAY_MEMO':
+        res = coordinatedExpenditureCCMemoFields;
+        break;
+      case 'COEXP_STAF_REIM_MEMO':
+        res = coordinatedExpenditureStaffMemoFields;
+        break;
+      case 'COEXP_PMT_PROL_MEMO':
+        res = coordinatedExpenditurePayrollMemoFields;
       default:
     }
     return res;
@@ -3605,6 +3622,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         this._isShowWarn = true;
 
+        // set the flag for sched f core components to hide second page
+        if ( this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent ) {
+          this.showPart2 = false;
+        }
         // this.transactionType = formData.transactionTypeIdentifier;
         this._setFormDataValues(formData.transactionId, formData.apiCall, formData.reportId);
       }

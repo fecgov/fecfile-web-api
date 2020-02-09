@@ -1,4 +1,4 @@
-export const coordinatedExpenditureCCFields = {
+export const coordinatedExpenditureStaffMemoFields = {
   data: {
     formFields: [
       {
@@ -404,7 +404,7 @@ export const coordinatedExpenditureCCFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
@@ -414,7 +414,7 @@ export const coordinatedExpenditureCCFields = {
             infoText: 'Request language from RAD',
             name: 'memo_code',
             type: 'checkbox',
-            value: null,
+            value: 'X',
             scroll: false,
             height: '24px',
             width: '24px',
@@ -435,7 +435,7 @@ export const coordinatedExpenditureCCFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
@@ -445,7 +445,7 @@ export const coordinatedExpenditureCCFields = {
             infoText: 'Request language from RAD',
             name: 'purpose',
             type: 'text',
-            value: null,
+            value: 'Staff Reimbursement Memo ',
             scroll: true,
             height: '30px',
             width: '380px',
@@ -771,11 +771,6 @@ export const coordinatedExpenditureCCFields = {
       },
       {
         type: 'hidden',
-        name: 'memo_code',
-        value: null
-      },
-      {
-        type: 'hidden',
         name: 'line_number',
         value: '24'
       },
@@ -802,7 +797,7 @@ export const coordinatedExpenditureCCFields = {
       {
         type: 'hidden',
         name: 'transaction_type_identifier',
-        value: 'COEXP_CC_PAY'
+        value: 'COEXP_CC_PAY_MEMO'
       }
     ],
     states: [
@@ -1203,14 +1198,14 @@ export const coordinatedExpenditureCCFields = {
     ],
     subTransactions: [
       {
-        transactionType: 'COEXP_CC_PAY',
-        transactionTypeDescription: 'Coordinated Expenditure Credit Card',
+        transactionType: 'COEXP_STAF_REIM',
+        transactionTypeDescription: 'CE Staff Reimbursement',
         scheduleType: 'sched_f_core',
-        subTransactionType: 'COEXP_CC_PAY_MEMO',
+        subTransactionType: 'COEXP_STAF_REIM_MEMO',
         subScheduleType: 'sched_f_core',
-        subTransactionTypeDescription: 'Coordinated Expenditure CC Memo',
+        subTransactionTypeDescription: 'CE Staff Reimbursement Memo',
         api_call: '/sf/schedF',
-        isParent: true,
+        isParent: false,
         isEarmark: false
       }
     ],
