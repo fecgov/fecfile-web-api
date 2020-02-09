@@ -1200,9 +1200,9 @@ export const coordinatedExpenditureCCMemoFields = {
       {
         transactionType: 'COEXP_CC_PAY',
         transactionTypeDescription: 'Coordinated Expenditure Credit Card',
-        scheduleType: 'sched_f',
+        scheduleType: 'sched_f_core',
         subTransactionType: 'COEXP_CC_PAY_MEMO',
-        subScheduleType: 'sched_f',
+        subScheduleType: 'sched_f_core',
         subTransactionTypeDescription: 'Coordinated Expenditure CC Memo',
         api_call: '/sf/schedF',
         isParent: false,

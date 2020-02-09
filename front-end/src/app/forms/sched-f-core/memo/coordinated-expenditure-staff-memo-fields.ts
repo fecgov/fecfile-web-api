@@ -1,4 +1,4 @@
-export const coordinatedExpenditureStaffFields = {
+export const coordinatedExpenditureStaffMemoFields = {
   data: {
     formFields: [
       {
@@ -404,7 +404,7 @@ export const coordinatedExpenditureStaffFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
@@ -414,7 +414,7 @@ export const coordinatedExpenditureStaffFields = {
             infoText: 'Request language from RAD',
             name: 'memo_code',
             type: 'checkbox',
-            value: null,
+            value: 'X',
             scroll: false,
             height: '24px',
             width: '24px',
@@ -435,7 +435,7 @@ export const coordinatedExpenditureStaffFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
@@ -445,7 +445,7 @@ export const coordinatedExpenditureStaffFields = {
             infoText: 'Request language from RAD',
             name: 'purpose',
             type: 'text',
-            value: null,
+            value: 'Staff Reimbursement Memo ',
             scroll: true,
             height: '30px',
             width: '380px',
@@ -771,11 +771,6 @@ export const coordinatedExpenditureStaffFields = {
       },
       {
         type: 'hidden',
-        name: 'memo_code',
-        value: null
-      },
-      {
-        type: 'hidden',
         name: 'line_number',
         value: '24'
       },
@@ -802,7 +797,7 @@ export const coordinatedExpenditureStaffFields = {
       {
         type: 'hidden',
         name: 'transaction_type_identifier',
-        value: 'COEXP_STAF_REIM'
+        value: 'COEXP_CC_PAY_MEMO'
       }
     ],
     states: [
@@ -1054,15 +1049,15 @@ export const coordinatedExpenditureStaffFields = {
     titles: null,
     entityTypes: [
       {
-        entityType: 'IND',
-        entityTypeDescription: 'Individual',
-        group: 'ind-group',
-        selected: true
-      },
-      {
         entityType: 'ORG',
         entityTypeDescription: 'Organization',
         group: 'org-group',
+        selected: true
+      },
+      {
+        entityType: 'IND',
+        entityTypeDescription: 'Individual',
+        group: 'ind-group',
         selected: false
       },
     ],
@@ -1204,13 +1199,13 @@ export const coordinatedExpenditureStaffFields = {
     subTransactions: [
       {
         transactionType: 'COEXP_STAF_REIM',
-        transactionTypeDescription: 'Coordinated Expenditure Staff Reimbursement',
+        transactionTypeDescription: 'CE Staff Reimbursement',
         scheduleType: 'sched_f_core',
         subTransactionType: 'COEXP_STAF_REIM_MEMO',
         subScheduleType: 'sched_f_core',
-        subTransactionTypeDescription: 'CE Staff Reimburse Memo',
+        subTransactionTypeDescription: 'CE Staff Reimbursement Memo',
         api_call: '/sf/schedF',
-        isParent: true,
+        isParent: false,
         isEarmark: false
       }
     ],
