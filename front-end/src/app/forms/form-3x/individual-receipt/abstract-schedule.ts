@@ -2891,7 +2891,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       distinctUntilChanged(),
       switchMap(searchText => {
         if (searchText.length === 0) {
-          this.clearFormValues();
+          this.clearOrgData();
         }
         if (searchText) {
           return this._typeaheadService.getContacts(searchText, 'entity_name');
@@ -4105,6 +4105,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     this.memoDropdownSize = null;
     this.activityEventNames = null;
+
+    this.showPart2 = false;
   }
 
   private toggleValidationIndOrg(entityType: string) {
@@ -4724,5 +4726,23 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   protected abstractRemoveCommas(amount: string): string {
     return amount.toString().replace(new RegExp(',', 'g'), '');
+  }
+
+
+  private clearOrgData() {
+    // These field names map to the same name in the form
+    const fieldNames = [];
+    fieldNames.push('street_1');
+    fieldNames.push('street_2');
+    fieldNames.push('city');
+    fieldNames.push('state');
+    fieldNames.push('zip_code');
+
+    for (const orgField of fieldNames) {
+      const orgPv = {};
+      orgPv[orgField] = null;
+      this.frmIndividualReceipt.patchValue(orgPv , { onlySelf: true });
+    }
+
   }
 }
