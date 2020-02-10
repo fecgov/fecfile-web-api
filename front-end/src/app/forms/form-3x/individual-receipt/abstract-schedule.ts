@@ -167,6 +167,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _completedCloning: boolean = false;
   private _coordinatedPartyExpenditureFields = coordinatedPartyExpenditureFields;
   private _outstandingDebtBalance: number;
+  private _scheduleHBackRefTransactionId: string;
 
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
   //there is no unsubscribe() for activateRoute . 
@@ -1006,8 +1007,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       transactionId = this._transactionToEdit.transactionId;
     }
 
+    let scheduleHBackRefTransactionId = '';
+
+    if(this._transactionToEdit && this._transactionToEdit.hasOwnProperty('backRefTransactionId')) {
+      scheduleHBackRefTransactionId = this._transactionToEdit.backRefTransactionId;
+    }else {
+      scheduleHBackRefTransactionId = '';
+    }
+
+    if(this._scheduleHBackRefTransactionId) {
+      scheduleHBackRefTransactionId = this._scheduleHBackRefTransactionId;
+    }
+
+
     this._receiptService
-      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId, transactionId)
+      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId, transactionId, scheduleHBackRefTransactionId)
       .subscribe(
         res => {
           if (res) {
@@ -2006,6 +2020,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               scheduleType: this.subTransactionInfo.subScheduleType,
               action: ScheduleActions.addSubTransaction
             };
+
+            this._scheduleHBackRefTransactionId = transactionId;
 
             // If going to a payment for a debt accessed from the Summary, user must be returned to
             // Summary on cancel/save of Debt.  Therefore, summary details must be passed to payment.
