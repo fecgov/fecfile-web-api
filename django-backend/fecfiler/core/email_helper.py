@@ -18,6 +18,15 @@ def email(boolean, data):
     RECIPIENT = []
 
     # print(data.get('email_on_file_1'))
+    if "email_on_file" in data and (
+        not (
+            data.get("email_on_file") == "-"
+            or data.get("email_on_file") is None
+            or data.get("email_on_file") == "null"
+        )
+    ):
+        RECIPIENT.append("%s" % data.get("email_on_file"))
+
     if "email_on_file_1" in data and (
         not (
             data.get("email_on_file_1") == "-"
