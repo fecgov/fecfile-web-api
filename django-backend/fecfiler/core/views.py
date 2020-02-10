@@ -1123,6 +1123,8 @@ def submit_report(request):
         email_data['coverage_start_date'] = email_data.get('cvg_start_dt')
     if 'cvg_end_dt' in email_data:
         email_data['coverage_end_date'] = email_data.get('cvg_end_dt')
+    if 'cmte_name' in email_data:
+        email_data['committeename'] = email.get('cmte_name')
 
     logger.debug('sending email with data {}'.format(email_data))
     email(True, email_data)
