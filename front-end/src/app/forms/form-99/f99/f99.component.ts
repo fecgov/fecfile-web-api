@@ -1,16 +1,11 @@
-import { Component, Input, NgZone, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd,  Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { environment } from '../../../../environments/environment';
-import { form99 } from '../../../shared/interfaces/FormsService/FormsService';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import 'rxjs/add/operator/takeUntil';
 import { ApiService } from '../../../shared/services/APIService/api.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { TypeComponent } from '../type/type.component';
-import { ReasonComponent } from '../reason/reason.component';
-import { SignComponent } from '../../../shared/partials/sign/sign.component';
-import { SubmitComponent } from '../../../shared/partials/submit/submit.component';
 
 @Component({
   selector: 'app-form-99',
@@ -18,8 +13,9 @@ import { SubmitComponent } from '../../../shared/partials/submit/submit.componen
   styleUrls: ['./f99.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class F99Component implements OnInit {
-
+export class F99Component implements OnInit , OnDestroy{
+  
+  
   @Input() status: any;
 
   public frm: any;
@@ -39,6 +35,9 @@ export class F99Component implements OnInit {
   private _step: string = '';
   private _formType: string = '';
   private _form_submitted: boolean = false;
+
+  private onDestroy$ = new Subject();
+  
 
   constructor(
     private _fb: FormBuilder,
@@ -87,9 +86,8 @@ export class F99Component implements OnInit {
       }
     }
 
-    this._router
-      .events
-      .subscribe(val => {
+
+    this._router.events.takeUntil(this.onDestroy$).subscribe(val => {
         if(val) {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/99') === -1) {
@@ -108,10 +106,9 @@ export class F99Component implements OnInit {
       });
 
     this._messageService
-      .getMessage()
+      .getMessage().takeUntil(this.onDestroy$)
       .subscribe(res => {
         if(res.validateMessage) {
-          //this.showValidateBar = res.validateMessage.showValidateBar;
         } else if (res.form_submitted) {
           this._form_submitted = true;
 
@@ -119,6 +116,11 @@ export class F99Component implements OnInit {
         }
       });
   }
+
+  ngOnDestroy(): void {
+    this.onDestroy$.next(true);
+  }
+
 
   ngDoCheck(): void {
     if(this.currentStep !== this._activatedRoute.snapshot.queryParams.step) {

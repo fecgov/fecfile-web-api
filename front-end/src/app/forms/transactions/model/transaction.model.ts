@@ -52,6 +52,22 @@ export class TransactionModel {
   isTrashable:boolean;
   disbursementDate:Date;
   disseminationDate:Date;
+  candLastName: string;
+  candFirstName: string;
+  candMiddleName: string;
+  candPrefix: string;
+  candSuffix: string;
+  candFECId: string;
+  benificiaryCandId: string;
+  candOffice:string;
+  candOfficeState:string;
+  candOfficeDistrict:string;
+  candElectionCode:string;
+  candElectionYear:string;
+  candSupportOpposeFlag:string;
+  candElectionOtherDesc: string;
+
+
 
   constructor(transaction: any) {
     this.type = transaction.type ? transaction.type : '';
@@ -104,5 +120,20 @@ export class TransactionModel {
     this.purpose = transaction.purpose;
     this.scrollDebtPaymentButtonIntoView = transaction.scrollDebtPaymentButtonIntoView ? transaction.scrollDebtPaymentButtonIntoView : false;
     this.reportId = transaction.reportId;
+    this.candLastName = transaction.candLastName;
+    this.candFirstName = transaction.candFirstName;
+    this.candMiddleName = transaction.candMiddleName;
+    this.candPrefix = transaction.candPrefix;
+    this.candSuffix = transaction.candSuffix;
+    this.candFECId = transaction.candFECId;
+    this.benificiaryCandId = transaction.benificiaryCandId;
+    this.candOffice = transaction.candOffice;
+    this.candOfficeState = transaction.candOfficeState;
+    this.candOfficeDistrict = transaction.candOfficeDistrict;
+    this.candElectionCode = transaction.candElectionCode;
+    this.candElectionYear = transaction.candElectionYear;
+    this.candElectionOtherDesc = transaction.candElectionOtherDesc;
+    this.candSupportOpposeFlag = transaction.candSupportOpposeFlag;
+
   }
 }

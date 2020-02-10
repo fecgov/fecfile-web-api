@@ -1,23 +1,19 @@
-import { state } from '@angular/animations';
-import { TransactionsMessageService } from './../../transactions/service/transactions-message.service';
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { DialogService } from '../../../shared/services/DialogService/dialog.service';
-import {
-  ConfirmModalComponent,
-  ModalHeaderClassEnum
-} from '../../../shared/partials/confirm-modal/confirm-modal.component';
-import { TransactionTypeService } from '../../../forms/form-3x/transaction-type/transaction-type.service';
-import { CashOnHandModel } from '../../transactions/model/cashOnHand.model';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbTooltipConfig, NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, Subject } from 'rxjs';
+import 'rxjs/add/operator/takeUntil';
 import { debounceTime, distinctUntilChanged, filter, map, merge } from 'rxjs/operators';
-import { NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
+import { TransactionTypeService } from '../../../forms/form-3x/transaction-type/transaction-type.service';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../../shared/partials/confirm-modal/confirm-modal.component';
+import { DialogService } from '../../../shared/services/DialogService/dialog.service';
+import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
+import { CashOnHandModel } from '../../transactions/model/cashOnHand.model';
+import { TransactionsMessageService } from './../../transactions/service/transactions-message.service';
 
 const transactionCategoryOptions = [];
 
@@ -57,6 +53,8 @@ export class TransactionSidebarComponent implements OnInit {
 
   public cashOnHand: CashOnHandModel;
 
+  private onDestroy$ = new Subject();
+
   constructor(
     private _config: NgbTooltipConfig,
     private _http: HttpClient,
@@ -71,7 +69,8 @@ export class TransactionSidebarComponent implements OnInit {
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
-    _activatedRoute.queryParams.subscribe(p => {
+
+    _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       if (p.transactionCategory) {
         this.itemSelected = p.transactionCategory;
       }
@@ -127,6 +126,7 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   ngDoCheck(): void {
+    //Could this be causing memory leak, memory bloating ? TODO - Investigate. 
     this._messageService.getMessage().subscribe(res => {
       if (res) {
         if (res.hasOwnProperty('formType')) {
@@ -228,6 +228,7 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
+    this.onDestroy$.next(true);
     this._messageService.clearMessage();
   }
 

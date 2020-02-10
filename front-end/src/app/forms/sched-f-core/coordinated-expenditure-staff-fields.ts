@@ -10,7 +10,7 @@ export const coordinatedExpenditureStaffFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: true,
+            isReadonly: false,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
@@ -1205,9 +1205,9 @@ export const coordinatedExpenditureStaffFields = {
       {
         transactionType: 'COEXP_STAF_REIM',
         transactionTypeDescription: 'Coordinated Expenditure Staff Reimbursement',
-        scheduleType: 'sched_f',
+        scheduleType: 'sched_f_core',
         subTransactionType: 'COEXP_STAF_REIM_MEMO',
-        subScheduleType: 'sched_f',
+        subScheduleType: 'sched_f_core',
         subTransactionTypeDescription: 'CE Staff Reimburse Memo',
         api_call: '/sf/schedF',
         isParent: true,

@@ -1,4 +1,4 @@
-export const coordinatedExpenditureCCFields = {
+export const coordinatedExpenditureCCMemoFields = {
   data: {
     formFields: [
       {
@@ -404,7 +404,7 @@ export const coordinatedExpenditureCCFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
@@ -414,7 +414,7 @@ export const coordinatedExpenditureCCFields = {
             infoText: 'Request language from RAD',
             name: 'memo_code',
             type: 'checkbox',
-            value: null,
+            value: 'X',
             scroll: false,
             height: '24px',
             width: '24px',
@@ -435,7 +435,7 @@ export const coordinatedExpenditureCCFields = {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
@@ -445,7 +445,7 @@ export const coordinatedExpenditureCCFields = {
             infoText: 'Request language from RAD',
             name: 'purpose',
             type: 'text',
-            value: null,
+            value: 'Credit Card Memo',
             scroll: true,
             height: '30px',
             width: '380px',
@@ -771,11 +771,6 @@ export const coordinatedExpenditureCCFields = {
       },
       {
         type: 'hidden',
-        name: 'memo_code',
-        value: null
-      },
-      {
-        type: 'hidden',
         name: 'line_number',
         value: '24'
       },
@@ -802,7 +797,7 @@ export const coordinatedExpenditureCCFields = {
       {
         type: 'hidden',
         name: 'transaction_type_identifier',
-        value: 'COEXP_CC_PAY'
+        value: 'COEXP_CC_PAY_MEMO'
       }
     ],
     states: [
@@ -1210,7 +1205,7 @@ export const coordinatedExpenditureCCFields = {
         subScheduleType: 'sched_f_core',
         subTransactionTypeDescription: 'Coordinated Expenditure CC Memo',
         api_call: '/sf/schedF',
-        isParent: true,
+        isParent: false,
         isEarmark: false
       }
     ],

@@ -1,30 +1,17 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { NgbPanelChangeEvent, NgbAccordion } from '@ng-bootstrap/ng-bootstrap';
-import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { form3x_data } from '../../../shared/interfaces/FormsService/FormsService';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbAccordion, NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs';
+import 'rxjs/add/operator/takeUntil';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { TransactionTypeService } from './transaction-type.service';
-import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
-import { F3xMessageService } from '../service/f3x-message.service';
 import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
-import {
-  ConfirmModalComponent,
-  ModalHeaderClassEnum
-} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { F3xMessageService } from '../service/f3x-message.service';
+import { TransactionTypeService } from './transaction-type.service';
 
 @Component({
   selector: 'f3x-transaction-type',
@@ -33,7 +20,8 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
   providers: [NgbTooltipConfig],
   encapsulation: ViewEncapsulation.None
 })
-export class TransactionTypeComponent implements OnInit {
+export class TransactionTypeComponent implements OnInit, OnDestroy {
+
   @ViewChild('acc') accordion: NgbAccordion;
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() selectedOptions: any = {};
@@ -59,6 +47,8 @@ export class TransactionTypeComponent implements OnInit {
   private _transactionCategory: string = '';
   private _transactionCategories: any = [];
 
+  private onDestroy$ = new Subject();
+
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
@@ -73,22 +63,10 @@ export class TransactionTypeComponent implements OnInit {
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
-    // _activatedRoute.queryParams.subscribe(p => {
-    //   const setTargetVal = { target: { value: null, placeholder: null } };
-    //   this.frmOption = this._fb.group({
-    //     secondaryOption: ['', Validators.required]
-    //   });
-    //   if (this._activatedRoute.snapshot.queryParams.transactionSubCategory) {
-    //     setTargetVal.target.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
-    //     setTargetVal.target.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategoryText;
-    //     this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
-    //     // this.updateTypeSelected(setTargetVal);
-    //     // this.childOptionsListClick(setTargetVal.target.value);
-    //     // this.doValidateOption();
-    //   }
-    // });
 
-    _activatedRoute.queryParams.subscribe(p => {
+    let routeSubscription = _activatedRoute.queryParams;
+    routeSubscription.takeUntil(this.onDestroy$).subscribe(p => {
+	
       const setTargetVal = { value: null, placeholder: null, text: null };
       this.frmOption = this._fb.group({
         secondaryOption: ['', Validators.required]
@@ -114,7 +92,12 @@ export class TransactionTypeComponent implements OnInit {
       secondaryOption: ['', Validators.required]
     });
   }
+  
+  ngOnDestroy(): void {
+    this.onDestroy$.next(true);
+  }
 
+  
   ngDoCheck(): void {
     if (this.transactionCategory) {
       this.transactionCategorySelected = false;
@@ -213,7 +196,8 @@ export class TransactionTypeComponent implements OnInit {
         transactionTypeText: this.transactionTypeText,
         transactionType: this.transactionType,
         transactionCategory: this._transactionCategory,
-        scheduleType: this.scheduleType
+        scheduleType: this.scheduleType,
+        showPart2: false
       });
 
       return 1;

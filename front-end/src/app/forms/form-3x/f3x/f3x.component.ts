@@ -1,29 +1,20 @@
-import { LoanMessageService } from './../../sched-c/service/loan-message.service';
-import { TransactionModel } from './../../transactions/model/transaction.model';
-import { Component, OnInit, Output, ViewEncapsulation } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { ReportTypeService } from '../report-type/report-type.service';
-import { TransactionTypeService } from '../transaction-type/transaction-type.service';
+import { Subject } from 'rxjs';
+import 'rxjs/add/operator/takeUntil';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import {
-  form3x_data,
-  form3XReport,
-  form3xReportTypeDetails
-} from '../../../shared/interfaces/FormsService/FormsService';
-import {
-  selectedElectionState,
-  selectedElectionDate,
-  selectedReportType
-} from '../../../shared/interfaces/FormsService/FormsService';
-import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { F3xMessageService } from '../service/f3x-message.service';
-import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
-import { AbstractScheduleParentEnum } from '../individual-receipt/abstract-schedule-parent.enum';
 import { SchedHMessageServiceService } from '../../sched-h-service/sched-h-message-service.service';
 import { SchedHServiceService } from '../../sched-h-service/sched-h-service.service';
+import { AbstractScheduleParentEnum } from '../individual-receipt/abstract-schedule-parent.enum';
+import { ScheduleActions } from '../individual-receipt/schedule-actions.enum';
+import { ReportTypeService } from '../report-type/report-type.service';
+import { F3xMessageService } from '../service/f3x-message.service';
+import { TransactionTypeService } from '../transaction-type/transaction-type.service';
+import { LoanMessageService } from './../../sched-c/service/loan-message.service';
+import { TransactionModel } from './../../transactions/model/transaction.model';
 
 @Component({
   selector: 'app-f3x',
@@ -32,7 +23,8 @@ import { SchedHServiceService } from '../../sched-h-service/sched-h-service.serv
   providers: [NgbTooltipConfig],
   encapsulation: ViewEncapsulation.None
 })
-export class F3xComponent implements OnInit {
+export class F3xComponent implements OnInit , OnDestroy{
+
   public loadingData = false;
   public currentStep: string = 'step_1';
   public editMode: boolean = true;
@@ -79,6 +71,9 @@ export class F3xComponent implements OnInit {
   private _cloned: boolean = false;
   private _reportId: any;
   public loanPaymentScheduleAction: ScheduleActions;
+  private showPart2: boolean;
+
+  private onDestroy$ = new Subject();
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -96,7 +91,8 @@ export class F3xComponent implements OnInit {
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
-    _activatedRoute.queryParams.subscribe(p => {
+
+    _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       if (p.edit === 'true' || p.edit === true) {
         this.editMode = true;
@@ -139,7 +135,7 @@ export class F3xComponent implements OnInit {
       }
     });
 
-    this._router.events.subscribe(val => {
+    this._router.events.takeUntil(this.onDestroy$).subscribe(val => {
       if (val) {
         if (val instanceof NavigationEnd) {
           if (
@@ -173,6 +169,10 @@ export class F3xComponent implements OnInit {
         }
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    this.onDestroy$.next(true);
   }
 
   ngDoCheck(): void {
@@ -325,6 +325,14 @@ export class F3xComponent implements OnInit {
               this._cloned = false;
             }
 
+            if (
+                e.showPart2 === false || e.showPart2 === 'false'
+            ) {
+              this.showPart2 = false;
+            } else {
+              this.showPart2 = null;
+            }
+
             this.extractScheduleType(e);
 
             // Do this before setting scheduleAction to prevent change detection
@@ -436,9 +444,10 @@ export class F3xComponent implements OnInit {
                     fieldArray: e.prePopulateFieldArray
                   });
                 } else if (e.hasOwnProperty('prePopulateFromSchedD')) {
+                  const component = e.scheduleType === 'sched_e' ? AbstractScheduleParentEnum.schedEComponent : AbstractScheduleParentEnum.schedMainComponent;
                   const emitObject: any = {
                     key: 'prePopulateFromSchedD',
-                    abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+                    abstractScheduleComponent: component,
                     prePopulateFromSchedD: e.prePopulateFromSchedD
                   };
                   if (
@@ -600,8 +609,10 @@ export class F3xComponent implements OnInit {
           e.transactionType === 'COEXP_STAF_REIM' ||
           e.transactionType === 'COEXP_PMT_PROL') ||
           e.transactionType === 'COEXP_PARTY_VOID' ||
-          e.transactionType === 'COEXP_PMT_PROL_VOID'
-      ) {
+          e.transactionType === 'COEXP_PMT_PROL_VOID' ||
+          e.transactionType === 'COEXP_CC_PAY_MEMO' ||
+          e.transactionType === 'COEXP_STAF_REIM_MEMO' ||
+          e.transactionType === 'COEXP_PMT_PROL_MEMO' ) {
         // TODO: Workaround backend must be updated with correct transactionType for Coordinated Party Expenditure Void
         if (e.transactionType === 'COEXP_PMT_PROL_VOID') {
           e.transactionType = 'COEXP_PARTY_VOID';
@@ -618,7 +629,10 @@ export class F3xComponent implements OnInit {
           tTypeIdentifier === 'COEXP_STAF_REIM' ||
           tTypeIdentifier === 'COEXP_PMT_PROL' ||
           tTypeIdentifier === 'COEXP_PARTY_VOID' ||
-          tTypeIdentifier === 'COEXP_PMT_PROL_VOID'
+          tTypeIdentifier === 'COEXP_PMT_PROL_VOID' ||
+          tTypeIdentifier === 'COEXP_CC_PAY_MEMO' ||
+          tTypeIdentifier === 'COEXP_STAF_REIM_MEMO' ||
+          tTypeIdentifier === 'COEXP_PMT_PROL_MEMO'
       ) {
       e.scheduleType = 'sched_f_core';
       }
@@ -940,7 +954,7 @@ export class F3xComponent implements OnInit {
         if (this.frm.valid) {
           this.step = this._step;
           queryParamsObj.step = this.step;
-
+          queryParamsObj.showPart2 = this.showPart2;
           if (this._cloned) {
             queryParamsObj.cloned = this._cloned;
             this._router.navigate([`/forms/form/${this.formType}`], {

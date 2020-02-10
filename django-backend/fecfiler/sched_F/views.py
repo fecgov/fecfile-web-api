@@ -489,6 +489,11 @@ def get_schedF(data):
             forms_obj = get_list_schedF(report_id, cmte_id, transaction_id)
         else:
             forms_obj = get_list_all_schedF(report_id, cmte_id)
+        if forms_obj:
+            for obj in forms_obj:
+                child_sf = get_list_schedF(obj['report_id'], obj['cmte_id'], obj['transaction_id'], True)
+                if child_sf:
+                    obj['child'] = child_sf
         return forms_obj
     except:
         raise
@@ -562,7 +567,7 @@ def get_list_all_schedF(report_id, cmte_id):
         raise
 
 
-def get_list_schedF(report_id, cmte_id, transaction_id):
+def get_list_schedF(report_id, cmte_id, transaction_id, is_back_ref=False):
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -609,17 +614,24 @@ def get_list_schedF(report_id, cmte_id, transaction_id):
                         AND substr(e.ref_cand_cmte_id,1,1) != 'C' AND e.ref_cand_cmte_id = sf.payee_cand_id AND e.delete_ind is distinct from 'Y'
                         ORDER BY e.ref_cand_cmte_id DESC, e.entity_id DESC) AS beneficiary_cand_entity_id
             FROM public.sched_f sf
-            WHERE sf.report_id = %s AND sf.cmte_id = %s AND sf.transaction_id = %s
-            AND sf.delete_ind is distinct from 'Y') t
+            WHERE sf.report_id = %s AND sf.cmte_id = %s
+            AND sf.delete_ind is distinct from 'Y'
             """
+            if is_back_ref:
+                _sql = _sql + """ AND sf.back_ref_transaction_id = %s) t"""
+            else:
+                _sql = _sql + """ AND sf.transaction_id = %s) t"""
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
             schedF_list = cursor.fetchone()[0]
             if schedF_list is None:
-                raise NoOPError(
-                    "No sched_f transaction found for transaction_id {}".format(
-                        transaction_id
+                if not is_back_ref:
+                    raise NoOPError(
+                        "No sched_f transaction found for transaction_id {}".format(
+                            transaction_id
+                        )
                     )
-                )
+                else:
+                    return schedF_list 
             merged_list = []
             for dictF in schedF_list:
                 entity_id = dictF.get("entity_id")
