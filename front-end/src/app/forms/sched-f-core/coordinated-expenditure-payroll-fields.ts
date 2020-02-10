@@ -1211,9 +1211,9 @@ export const coordinatedExpenditurePayrollFields = {
       {
         transactionType: 'COEXP_PMT_PROL',
         transactionTypeDescription: 'Coordinated Expenditure Payroll',
-        scheduleType: 'sched_f',
+        scheduleType: 'sched_f_core',
         subTransactionType: 'COEXP_PMT_PROL_MEMO',
-        subScheduleType: 'sched_f',
+        subScheduleType: 'sched_f_core',
         subTransactionTypeDescription: 'CE Payroll Memo',
         api_call: '/sf/schedF',
         isParent: true,

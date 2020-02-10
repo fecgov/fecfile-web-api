@@ -624,11 +624,14 @@ def get_list_schedF(report_id, cmte_id, transaction_id, is_back_ref=False):
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
             schedF_list = cursor.fetchone()[0]
             if schedF_list is None:
-                raise NoOPError(
-                    "No sched_f transaction found for transaction_id {}".format(
-                        transaction_id
+                if not is_back_ref:
+                    raise NoOPError(
+                        "No sched_f transaction found for transaction_id {}".format(
+                            transaction_id
+                        )
                     )
-                )
+                else:
+                    return schedF_list 
             merged_list = []
             for dictF in schedF_list:
                 entity_id = dictF.get("entity_id")

@@ -55,6 +55,9 @@ import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-exp
 import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
 import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
 import {coordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
+import {coordinatedExpenditureCCMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-cc-memo-fields';
+import {coordinatedExpenditureStaffMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-staff-memo-fields';
+import {coordinatedExpenditurePayrollMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-Payroll-memo-fields';
 
 
 export enum SaveActions {
@@ -2014,7 +2017,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               };
             }
 
-            const prePopulateFieldArray = this._checkForEarmarkPurposePrePopulate(res);
+            const prePopulateFieldArray = this._checkForPurposePrePopulate(res);
             if (prePopulateFieldArray) {
               addSubTransEmitObj.prePopulateFieldArray = prePopulateFieldArray;
             } else if (this.subTransactionInfo) {
@@ -2033,6 +2036,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   }
                 }
               }
+            }
+
+            if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
+              this.showPart2 = false;
             }
             this.status.emit(addSubTransEmitObj);
           } else if (saveAction === SaveActions.saveForEditSub) {
@@ -2094,7 +2101,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   }
                 }
               }
-              if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+              if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+                  this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
                 this.showPart2 = false;
               }
             }
@@ -3419,6 +3427,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         break;
       case 'COEXP_PARTY_VOID':
         res = coordinatedPartyExpenditureVoidFields;
+        break;
+      case 'COEXP_CC_PAY_MEMO':
+        res = coordinatedExpenditureCCMemoFields;
+        break;
+      case 'COEXP_STAF_REIM_MEMO':
+        res = coordinatedExpenditureStaffMemoFields;
+        break;
+      case 'COEXP_PMT_PROL_MEMO':
+        res = coordinatedExpenditurePayrollMemoFields;
       default:
     }
     return res;
@@ -3605,6 +3622,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         this._isShowWarn = true;
 
+        // set the flag for sched f core components to hide second page
+        if ( this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent ) {
+          this.showPart2 = false;
+        }
         // this.transactionType = formData.transactionTypeIdentifier;
         this._setFormDataValues(formData.transactionId, formData.apiCall, formData.reportId);
       }
@@ -4481,12 +4502,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   // }
 
   /**
-   * populate the purpose description for child with parent.
+   * Populate the purpose description for child with parent entity.
    */
-  private _checkForEarmarkPurposePrePopulate(res: any): Array<any> {
+  private _checkForPurposePrePopulate(res: any): Array<any> {
     let prePopulateFieldArray = null;
     if (this.subTransactionInfo) {
-      if (this.subTransactionInfo.isEarmark && this.subTransactionInfo.isParent) {
+      // TODO the parent of memo child transaction could have a property added to subTransactionInfo
+      // to indicate it is a memo, similar to isEarMark.  For now using transaction_type
+      // until API is provide transfer memo indicator.
+      if ((this.subTransactionInfo.isEarmark && this.subTransactionInfo.isParent) ||
+            (res.transaction_type_identifier === 'JF_TRAN' ||
+            res.transaction_type_identifier === 'JF_TRAN_NP_RECNT_ACC' ||
+            res.transaction_type_identifier === 'JF_TRAN_NP_CONVEN_ACC' ||
+            res.transaction_type_identifier === 'JF_TRAN_NP_HQ_ACC')) {
         let earmarkMemoPurpose = null;
 
         if (res.hasOwnProperty('entity_type')) {
@@ -4504,14 +4532,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           }
         }
         prePopulateFieldArray = [];
-        if (res.hasOwnProperty('contribution_amount')) {
-          const amountValue: string = this._decimalPipe.transform(parseFloat(res.contribution_amount), '.2-2');
-          prePopulateFieldArray.push({ name: 'contribution_amount', value: amountValue });
-          prePopulateFieldArray.push({ name: 'expenditure_amount', value: amountValue });
-        } else if (res.hasOwnProperty('expenditure_amount')) {
-          const amountValue: string = this._decimalPipe.transform(parseFloat(res.expenditure_amount), '.2-2');
-          prePopulateFieldArray.push({ name: 'contribution_amount', value: amountValue });
-          prePopulateFieldArray.push({ name: 'expenditure_amount', value: amountValue });
+        if (res.transaction_type_identifier !== 'JF_TRAN' &&
+            res.transaction_type_identifier !== 'JF_TRAN_NP_RECNT_ACC' &&
+            res.transaction_type_identifier !== 'JF_TRAN_NP_CONVEN_ACC' &&
+            res.transaction_type_identifier !== 'JF_TRAN_NP_HQ_ACC') {
+          if (res.hasOwnProperty('contribution_amount')) {
+            const amountValue: string = this._decimalPipe.transform(parseFloat(res.contribution_amount), '.2-2');
+            prePopulateFieldArray.push({ name: 'contribution_amount', value: amountValue });
+            prePopulateFieldArray.push({ name: 'expenditure_amount', value: amountValue });
+          } else if (res.hasOwnProperty('expenditure_amount')) {
+            const amountValue: string = this._decimalPipe.transform(parseFloat(res.expenditure_amount), '.2-2');
+            prePopulateFieldArray.push({ name: 'contribution_amount', value: amountValue });
+            prePopulateFieldArray.push({ name: 'expenditure_amount', value: amountValue });
+          }
         }
         prePopulateFieldArray.push({ name: 'purpose_description', value: earmarkMemoPurpose });
         prePopulateFieldArray.push({ name: 'expenditure_purpose', value: earmarkMemoPurpose });

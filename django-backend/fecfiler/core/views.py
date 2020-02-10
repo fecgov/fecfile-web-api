@@ -891,7 +891,7 @@ def delete_reports(data):
 
 def reposit_f3x_data(cmte_id, report_id):
     """
-    helper funcrtion to move current report data from efiling front db to backend db
+    helper funcrtion to move current F3X report data from efiling front db to backend db
     """
     # logger.debug('request for cloning a transaction:{}'.format(request.data))
     logger.debug('reposit f3x data with cmte_id {} and report_id {}'.format(cmte_id, report_id))
@@ -976,6 +976,78 @@ def reposit_f3x_data(cmte_id, report_id):
     back_cursor.close()
     backend_connection.close()
 
+def reposit_f99_data(cmte_id, report_id):
+    """
+    helper funcrtion to move current F99 report data from efiling front db to backend db
+    """
+    # logger.debug('request for cloning a transaction:{}'.format(request.data))
+    logger.debug('reposit f99 data with cmte_id {} and report_id {}'.format(cmte_id, report_id))
+    # transaction_tables = ['sched_a']
+    transaction_tables = [
+        'forms_committeeinfo',
+        # 'forms_f99attachment',
+        ]
+    # transaction_tables = ['sched_b']
+    backend_connection = psycopg2.connect(
+            'dbname={} user={} host={} password={} connect_timeout=3000'.
+            format(
+                os.environ.get('BACKEND_DB_NAME'),
+                os.environ.get('BACKEND_DB_USER'),
+                os.environ.get('BACKEND_DB_HOST'),
+                os.environ.get('BACKEND_DB_PASSWORD')))
+        # conn.close()
+    back_cursor = backend_connection.cursor()
+    # cmte_id = 'C00326835'
+    # report_id = '110915'
+    for transaction_table in transaction_tables:
+        table_schema_sql = """
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = '{}'
+        """.format(transaction_table)
+        
+        with connection.cursor() as cursor:
+            logger.debug("fetching transaction table column names...")
+            # cursor.execute(table_schema_sql, (transaction_table))
+            cursor.execute(table_schema_sql)
+            rows = cursor.fetchall()  
+            columns = []
+            for row in rows:
+                # exclude report_seq from reports
+                # if row[0] != 'report_seq':
+                columns.append(row[0])
+            logger.debug('table columns: {}'.format(list(columns)))
+
+
+
+            insert_str = ','.join(columns)
+            select_str = ','.join(columns)
+            clone_sql = """
+                SELECT {_select}
+                FROM public.{table_name}
+            """.format(table_name=transaction_table, _select=select_str)
+            clone_sql = clone_sql + """ WHERE committeeid = %s and id = %s;"""
+            logger.debug('clone transaction with sql:{}'.format(clone_sql))
+
+            cursor.execute(clone_sql, (cmte_id, report_id))
+
+            if not cursor.rowcount:
+                logger.debug('no transaction data found for {}'.format(transaction_table))
+                continue
+            rows = cursor.fetchall()
+            for row in rows:
+                # print('...')
+                # print(row)
+                insert_sql = """
+                INSERT INTO public.{table_name}({_insert}) VALUES
+                """.format(table_name=transaction_table, _insert=insert_str)
+                # print(insert_sql)
+                back_cursor.execute(insert_sql+' %s', (row,))
+                backend_connection.commit()
+                logger.debug('row data {} inserted'.format(row))
+
+    back_cursor.close()
+    backend_connection.close()
+
 @api_view(['PUT'])
 def submit_report(request):
     """
@@ -1036,6 +1108,10 @@ def submit_report(request):
     
     if form_tp == 'F3X':
         reposit_f3x_data(cmte_id, report_id)
+    elif form_tp == 'F99':
+        reposit_f99_data(cmte_id, report_id)
+    else:
+        raise Exception('Error: invalid form type.')
     
     logger.debug('sending email with data')
     email_data = request.data.copy()

@@ -195,9 +195,8 @@ export class ReportTypeService {
   public signandSaveSubmitReport(formType: string, access_type: string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    //let url: string = '/core/reports';
-    let url: string = '/core/submit_report';
-
+    let url = '/core/reports';
+    
     let params = new HttpParams();
     let formData: FormData = new FormData();
     console.log('signandSaveSubmitReport called');
@@ -206,11 +205,12 @@ export class ReportTypeService {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+    
 
     if (form3xReportType === null) {
       console.log('get backup object');
-      form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+      form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
       console.log('backup object form3xReportType = ', form3xReportType);
     }
 
@@ -393,6 +393,7 @@ export class ReportTypeService {
     } else if (access_type === 'Submitted') {
       console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
       console.log('submit Report form 3X submitted...');
+      url = '/core/submit_report';
       return this._http
         .put(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions
