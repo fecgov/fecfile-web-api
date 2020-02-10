@@ -1061,12 +1061,18 @@ def submit_report(request):
     5) Send confirmation email, please refer to email function in below file.
     https://github.com/SalientCRGT-FEC/nxg_fec/blob/develop/django-backend/fecfiler/forms/views.py
     """
-
+    # print(request.data)
+    # print(request.query_params)
     SUBMIT_STATUS = 'Submitted'
     cmte_id = request.user.username
-    report_id = request.data.get('report_id')
-    form_tp = request.data.get('form_type') 
-
+    if 'report_id' in request.query_params:
+        report_id = request.query_params.get('report_id')
+        form_tp = request.query_params.get('form_type') 
+    else:
+        report_id = request.data.get('report_id')
+        form_tp = request.data.get('form_type') 
+    if not report_id:
+        raise Exception()
     fec_id = report_id
     if form_tp == 'F3X':
         update_tbl = 'public.reports'
@@ -1077,13 +1083,6 @@ def submit_report(request):
     else:
         raise Exception('Error: invalid form type.')
 
-    #     report_id = request.data.get('report_id')
-    #     fec_id = report_id
-    # else:
-    #     report_seq = request.data.get('report_seq')
-        # fec_id = report_seq
-    # fec_id = 'FEC-'+str(report_id)
-    
 
     if form_tp == 'F3X':
         _sql_update = """
@@ -1115,7 +1114,16 @@ def submit_report(request):
     
     logger.debug('sending email with data')
     email_data = request.data.copy()
+    email_data.update(request.query_params.copy())
     email_data['id'] = 'FEC-'+email_data['report_id']
+    email_data['committeeid'] = cmte_id
+    if 'report_type' in email_data:
+        email_data['report_desc'] = email_data.get('report_type')
+    if 'cvg_start_dt' in email_data:
+        email_data['coverage_start_date'] = email_data.get('cvg_start_dt')
+    if 'cvg_end_dt' in email_data:
+        email_data['coverage_end_date'] = email_data.get('cvg_end_dt')
+
     logger.debug('sending email with data {}'.format(email_data))
     email(True, email_data)
     logger.debug('email success.')

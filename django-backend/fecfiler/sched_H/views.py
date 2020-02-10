@@ -835,7 +835,7 @@ def get_fed_nonfed_share(request):
                 logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
                 cursor.execute(_sql, (cmte_id, report_id, event_name))
                 if not cursor.rowcount:
-                    raise Exception('Error: no h1 data found.')
+                    raise Exception('Error: no h2 data found.')
                 fed_percent = float(cursor.fetchone()[0])
             
             # for esiting, just grab the aggregation amount
