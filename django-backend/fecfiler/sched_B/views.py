@@ -39,6 +39,7 @@ from fecfiler.core.transaction_util import (
     update_sched_c_parent,
     get_transaction_type_descriptions,
 )
+from fecfiler.core.report_helper import new_report_date
 
 logger = logging.getLogger(__name__)
 
@@ -81,14 +82,14 @@ CHILD_PARENT_SB_SB_TRANSACTIONS = {
 }
 
 CHILD_SCHEDB_AUTO_UPDATE_PARENT_SCHEDA_DICT = {
-    "IK_OUT": "IK_REC" ,
+    "IK_OUT": "IK_REC",
     "IK_BC_OUT": "IK_BC_REC",
     "PARTY_IK_OUT": "PARTY_IK_REC",
     "PARTY_IK_BC_OUT": "PARTY_IK_BC_REC",
     "PAC_IK_OUT": "PAC_IK_REC",
     "PAC_IK_BC_OUT": "PAC_IK_BC_REC",
     "IK_TRAN_OUT": "IK_TRAN",
-    "IK_TRAN_FEA_OUT": "IK_TRAN_FEA"
+    "IK_TRAN_FEA_OUT": "IK_TRAN_FEA",
 }
 EARMARK_SB_CHILD_LIST = [
     "CON_EAR_DEP_MEMO",
@@ -106,16 +107,33 @@ SCHED_L_B_TRAN_TYPES = [
     "LEVIN_VOTER_REG",
 ]
 
-SCHED_D_CHILD_LIST = ['OTH_DISB_DEBT', 'OPEXP_DEBT']
-SCHED_C_CHILD_LIST = ['LOAN_REPAY_MADE']
+SCHED_D_CHILD_LIST = ["OTH_DISB_DEBT", "OPEXP_DEBT"]
+SCHED_C_CHILD_LIST = ["LOAN_REPAY_MADE"]
 
 # adding election_year field needed by front end
 REQT_ELECTION_YR = ""
 
 # To avoid circular reference adding sched_a function
-def put_sql_schedA_from_schedB(cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, 
-    contribution_date, contribution_amount, purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, 
-    transaction_type_identifier):
+def put_sql_schedA_from_schedB(
+    cmte_id,
+    report_id,
+    line_number,
+    transaction_type,
+    transaction_id,
+    back_ref_transaction_id,
+    back_ref_sched_name,
+    entity_id,
+    contribution_date,
+    contribution_amount,
+    purpose_description,
+    memo_code,
+    memo_text,
+    election_code,
+    election_other_description,
+    donor_cmte_id,
+    donor_cmte_name,
+    transaction_type_identifier,
+):
     """
     update a schedule_a item
     """
@@ -123,16 +141,41 @@ def put_sql_schedA_from_schedB(cmte_id, report_id, line_number, transaction_type
         report_list = superceded_report_id_list(report_id)
         with connection.cursor() as cursor:
             # Insert data into schedA table
-            cursor.execute("""UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, 
+            cursor.execute(
+                """UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, 
                 entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, 
                 election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, transaction_type_identifier = %s, last_update_date = %s 
-                WHERE transaction_id = %s AND report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list)),
-                           [line_number, transaction_type, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, 
-                           purpose_description, memo_code, memo_text, election_code, election_other_description, donor_cmte_id, donor_cmte_name, 
-                           transaction_type_identifier, datetime.datetime.now(), transaction_id, report_id, cmte_id])
-            if (cursor.rowcount == 0):
+                WHERE transaction_id = %s AND report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(
+                    "', '".join(report_list)
+                ),
+                [
+                    line_number,
+                    transaction_type,
+                    back_ref_transaction_id,
+                    back_ref_sched_name,
+                    entity_id,
+                    contribution_date,
+                    contribution_amount,
+                    purpose_description,
+                    memo_code,
+                    memo_text,
+                    election_code,
+                    election_other_description,
+                    donor_cmte_id,
+                    donor_cmte_name,
+                    transaction_type_identifier,
+                    datetime.datetime.now(),
+                    transaction_id,
+                    report_id,
+                    cmte_id,
+                ],
+            )
+            if cursor.rowcount == 0:
                 raise Exception(
-                    'The Transaction ID: {} does not exist in schedA table'.format(transaction_id))
+                    "The Transaction ID: {} does not exist in schedA table".format(
+                        transaction_id
+                    )
+                )
     except Exception:
         raise
 
@@ -270,7 +313,7 @@ def post_sql_schedB(
     beneficiary_cand_suffix,
     aggregate_amt,
     beneficiary_cand_entity_id,
-    levin_account_id
+    levin_account_id,
 ):
     """
     db transaction for post a db transaction
@@ -366,7 +409,7 @@ def post_sql_schedB(
                     beneficiary_cand_entity_id,
                     levin_account_id,
                     datetime.datetime.now(),
-                    datetime.datetime.now()
+                    datetime.datetime.now(),
                 ],
             )
     except Exception:
@@ -531,7 +574,9 @@ def put_sql_schedB(
                     AND report_id in ('{}') 
                     AND cmte_id = %s 
                     AND delete_ind is distinct from 'Y'
-                """.format("', '".join(report_list)),
+                """.format(
+                    "', '".join(report_list)
+                ),
                 [
                     line_number,
                     transaction_type,
@@ -602,7 +647,9 @@ def delete_sql_schedB(transaction_id, report_id, cmte_id):
                 AND report_id in ('{}')
                 AND cmte_id = %s 
                 AND delete_ind is distinct from 'Y'
-                """.format("', '".join(report_list)),
+                """.format(
+                    "', '".join(report_list)
+                ),
                 [datetime.datetime.now(), transaction_id, cmte_id],
             )
             if cursor.rowcount == 0:
@@ -647,12 +694,13 @@ def put_cand_entity(data):
     return save_cand_entity(data)
 
 
+@new_report_date
 def post_schedB(datum):
     """
     create and save current sched_b item
     """
     try:
-        cmte_id = datum.get('cmte_id')
+        cmte_id = datum.get("cmte_id")
         entity_flag = False
         check_mandatory_fields_SB(datum, list_mandatory_fields_schedB)
         logger.debug("...mandatory check done.")
@@ -688,17 +736,25 @@ def post_schedB(datum):
         datum["entity_id"] = entity_id
         # datum["beneficiary_cand_entity_id"] = cand_data.get("entity_id")
         if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
-            trans_char = "LB" # for sched_l transactions
-            datum['line_number'], datum['transaction_type'] = get_line_number_trans_type(
-            datum.get('transaction_type_identifier'))
+            trans_char = "LB"  # for sched_l transactions
+            datum["line_number"], datum[
+                "transaction_type"
+            ] = get_line_number_trans_type(datum.get("transaction_type_identifier"))
         else:
             trans_char = "SB"
         transaction_id = get_next_transaction_id(trans_char)
         datum["transaction_id"] = transaction_id
 
-        #checking if beneficiary cmte id exists then copying entity name to beneficiary committee name as they both are the same
-        if 'beneficiary_cmte_id' in datum and datum.get('beneficiary_cmte_id') not in ['', ' ', None, 'none', 'null', 'None']:
-          datum['beneficiary_cmte_name'] = datum.get('entity_name')
+        # checking if beneficiary cmte id exists then copying entity name to beneficiary committee name as they both are the same
+        if "beneficiary_cmte_id" in datum and datum.get("beneficiary_cmte_id") not in [
+            "",
+            " ",
+            None,
+            "none",
+            "null",
+            "None",
+        ]:
+            datum["beneficiary_cmte_name"] = datum.get("entity_name")
         try:
             post_sql_schedB(
                 datum.get("cmte_id"),
@@ -741,18 +797,18 @@ def post_schedB(datum):
                 datum.get("beneficiary_cand_entity_id"),
                 datum.get("levin_account_id"),
             )
-            logger.debug('payment transaction saved.')
-            if datum.get('transaction_type_identifier') in SCHED_D_CHILD_LIST:
+            logger.debug("payment transaction saved.")
+            if datum.get("transaction_type_identifier") in SCHED_D_CHILD_LIST:
                 update_sched_d_parent(
-                    datum.get('cmte_id'),
-                    datum.get('back_ref_transaction_id'),
-                    datum.get('expenditure_amount')
-                    )
-            if datum.get('transaction_type_identifier') in SCHED_C_CHILD_LIST:
+                    datum.get("cmte_id"),
+                    datum.get("back_ref_transaction_id"),
+                    datum.get("expenditure_amount"),
+                )
+            if datum.get("transaction_type_identifier") in SCHED_C_CHILD_LIST:
                 update_sched_c_parent(
-                    datum.get('cmte_id'),
-                    datum.get('back_ref_transaction_id'),
-                    datum.get('expenditure_amount')
+                    datum.get("cmte_id"),
+                    datum.get("back_ref_transaction_id"),
+                    datum.get("expenditure_amount"),
                 )
         except Exception as e:
             if entity_flag:
@@ -764,11 +820,11 @@ def post_schedB(datum):
                 "The post_sql_schedB function is throwing an error: " + str(e)
             )
         logger.debug("sched_b transaction saved successfully.")
-        if datum.get('transaction_type_identifier') in SCHED_L_B_TRAN_TYPES:
-            update_sl_summary(datum) 
+        if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
+            update_sl_summary(datum)
         return datum
     except Exception as e:
-        raise Exception ("post_schedB function is throwing error: " + str(e))
+        raise Exception("post_schedB function is throwing error: " + str(e))
 
 
 def get_schedB(data):
@@ -798,8 +854,10 @@ def get_schedB(data):
             for obj in child_forms_obj:
                 obj.update({"api_call": "/sb/schedB"})
                 obj.update({"election_year": REQT_ELECTION_YR})
-                tran_id = obj.get('transaction_type_identifier')
-                obj.update({"transaction_type_description": tran_desc_dic.get(tran_id, "")})
+                tran_id = obj.get("transaction_type_identifier")
+                obj.update(
+                    {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
+                )
             if len(child_forms_obj) > 0:
                 forms_obj[0]["child"] = child_forms_obj
         else:
@@ -814,6 +872,7 @@ def get_schedB(data):
 
 
 # TODO: need to add beneficiary fields
+
 
 def get_existing_expenditure(cmte_id, transaction_id):
     """
@@ -832,8 +891,6 @@ def get_existing_expenditure(cmte_id, transaction_id):
             return cursor.fetchone()[0]
     except:
         raise
-    
-
 
 
 def put_schedB(datum):
@@ -873,14 +930,22 @@ def put_schedB(datum):
         # entity_id = entity_data.get("entity_id")
         # datum["entity_id"] = entity_id
 
-        #checking if beneficiary cmte id exists then copying entity name to beneficiary committee name as they both are the same
-        if 'beneficiary_cmte_id' in datum and datum.get('beneficiary_cmte_id') not in ['', ' ', None, 'none', 'null', 'None']:
-          datum['beneficiary_cmte_name'] = datum.get('entity_name')
+        # checking if beneficiary cmte id exists then copying entity name to beneficiary committee name as they both are the same
+        if "beneficiary_cmte_id" in datum and datum.get("beneficiary_cmte_id") not in [
+            "",
+            " ",
+            None,
+            "none",
+            "null",
+            "None",
+        ]:
+            datum["beneficiary_cmte_name"] = datum.get("entity_name")
         try:
-            if datum.get('transaction_type_identifier') in (SCHED_D_CHILD_LIST + SCHED_C_CHILD_LIST):
+            if datum.get("transaction_type_identifier") in (
+                SCHED_D_CHILD_LIST + SCHED_C_CHILD_LIST
+            ):
                 existing_exp = get_existing_expenditure(
-                    datum.get('cmte_id'),
-                    datum.get('transaction_id')
+                    datum.get("cmte_id"), datum.get("transaction_id")
                 )
             put_sql_schedB(
                 datum.get("cmte_id"),
@@ -923,40 +988,69 @@ def put_schedB(datum):
                 datum.get("beneficiary_cand_entity_id"),
                 datum.get("levin_account_id"),
             )
-            logger.debug('sched_b data saved.')
-            
+            logger.debug("sched_b data saved.")
+
             # need to update parent sched_d data if sched_d payment made
-            if datum.get('transaction_type_identifier') in SCHED_D_CHILD_LIST:
-                logger.debug('existing exp:{}'.format(existing_exp))
-                if float(existing_exp) != float(datum.get('expenditure_amount')):
+            if datum.get("transaction_type_identifier") in SCHED_D_CHILD_LIST:
+                logger.debug("existing exp:{}".format(existing_exp))
+                if float(existing_exp) != float(datum.get("expenditure_amount")):
                     update_sched_d_parent(
-                        datum.get('cmte_id'),
-                        datum.get('back_ref_transaction_id'),
-                        datum.get('expenditure_amount'),
-                        existing_exp
-                    )            
-                
-            if datum.get('transaction_type_identifier') in SCHED_C_CHILD_LIST:
-                logger.debug('existing exp:{}'.format(existing_exp))
-                if float(existing_exp) != float(datum.get('expenditure_amount')):
-                    update_sched_c_parent(
-                        datum.get('cmte_id'),
-                        datum.get('back_ref_transaction_id'),
-                        datum.get('expenditure_amount'),
-                        existing_exp
+                        datum.get("cmte_id"),
+                        datum.get("back_ref_transaction_id"),
+                        datum.get("expenditure_amount"),
+                        existing_exp,
                     )
-            
-            if datum.get('transaction_type_identifier') in CHILD_SCHEDB_AUTO_UPDATE_PARENT_SCHEDA_DICT.keys():
-                transaction_data = get_list_schedA_from_schedB(datum.get("report_id"), datum.get("cmte_id"), datum.get("back_ref_transaction_id"))[0]
-                transaction_data['entity_id'] = entity_id 
-                transaction_data['contribution_date'] = datum.get('expenditure_date') 
-                transaction_data['contribution_amount'] = datum.get('expenditure_amount')
-                transaction_data['election_code'] = datum.get('election_code')
-                transaction_data['election_other_description'] = datum.get('election_other_description')
-                transaction_data['donor_cmte_id'] = datum.get('beneficiary_cmte_id')
-                transaction_data['donor_cmte_name'] = datum.get('beneficiary_cmte_name')
-                put_sql_schedA_from_schedB(transaction_data.get('cmte_id'), transaction_data.get('report_id'), transaction_data.get('line_number'), transaction_data.get('transaction_type'), transaction_data.get('transaction_id'), transaction_data.get('back_ref_transaction_id'), transaction_data.get('back_ref_sched_name'), entity_id, transaction_data.get('contribution_date'), transaction_data.get(
-                'contribution_amount'), transaction_data.get('purpose_description'), transaction_data.get('memo_code'), transaction_data.get('memo_text'), transaction_data.get('election_code'), transaction_data.get('election_other_description'), transaction_data.get('donor_cmte_id'), transaction_data.get('donor_cmte_name'), transaction_data.get('transaction_type_identifier'))
+
+            if datum.get("transaction_type_identifier") in SCHED_C_CHILD_LIST:
+                logger.debug("existing exp:{}".format(existing_exp))
+                if float(existing_exp) != float(datum.get("expenditure_amount")):
+                    update_sched_c_parent(
+                        datum.get("cmte_id"),
+                        datum.get("back_ref_transaction_id"),
+                        datum.get("expenditure_amount"),
+                        existing_exp,
+                    )
+
+            if (
+                datum.get("transaction_type_identifier")
+                in CHILD_SCHEDB_AUTO_UPDATE_PARENT_SCHEDA_DICT.keys()
+            ):
+                transaction_data = get_list_schedA_from_schedB(
+                    datum.get("report_id"),
+                    datum.get("cmte_id"),
+                    datum.get("back_ref_transaction_id"),
+                )[0]
+                transaction_data["entity_id"] = entity_id
+                transaction_data["contribution_date"] = datum.get("expenditure_date")
+                transaction_data["contribution_amount"] = datum.get(
+                    "expenditure_amount"
+                )
+                transaction_data["election_code"] = datum.get("election_code")
+                transaction_data["election_other_description"] = datum.get(
+                    "election_other_description"
+                )
+                transaction_data["donor_cmte_id"] = datum.get("beneficiary_cmte_id")
+                transaction_data["donor_cmte_name"] = datum.get("beneficiary_cmte_name")
+                put_sql_schedA_from_schedB(
+                    transaction_data.get("cmte_id"),
+                    transaction_data.get("report_id"),
+                    transaction_data.get("line_number"),
+                    transaction_data.get("transaction_type"),
+                    transaction_data.get("transaction_id"),
+                    transaction_data.get("back_ref_transaction_id"),
+                    transaction_data.get("back_ref_sched_name"),
+                    entity_id,
+                    transaction_data.get("contribution_date"),
+                    transaction_data.get("contribution_amount"),
+                    transaction_data.get("purpose_description"),
+                    transaction_data.get("memo_code"),
+                    transaction_data.get("memo_text"),
+                    transaction_data.get("election_code"),
+                    transaction_data.get("election_other_description"),
+                    transaction_data.get("donor_cmte_id"),
+                    transaction_data.get("donor_cmte_name"),
+                    transaction_data.get("transaction_type_identifier"),
+                )
         except Exception as e:
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -966,8 +1060,8 @@ def put_schedB(datum):
             raise Exception(
                 "The put_sql_schedB function is throwing an error: " + str(e)
             )
-        if datum.get('transaction_type_identifier') in SCHED_L_B_TRAN_TYPES:
-            update_sl_summary(datum) 
+        if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
+            update_sl_summary(datum)
         return datum
     except:
         raise
@@ -1135,7 +1229,7 @@ def schedB(request):
             cmte_id = request.user.username
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
-            if not('transaction_type_identifier' in request.data):
+            if not ("transaction_type_identifier" in request.data):
                 raise Exception("Missing Input: transaction_type_identifier")
             # handling null,none value of report_id
             # TODO: can report_id be 0? what does it mean?
@@ -1188,7 +1282,7 @@ def schedB(request):
                             child_data = post_schedB(child_datum)
             output = get_schedB(data)
             # for earmark child transaction: update parent transction  purpose_description
-            if datum.get('transaction_type_identifier') in EARMARK_SB_CHILD_LIST:
+            if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:
                 update_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
@@ -1278,7 +1372,7 @@ def schedB(request):
             data = put_schedB(datum)
             output = get_schedB(data)
             # for earmark child transaction: update parent transction  purpose_description
-            if datum.get('transaction_type_identifier') in EARMARK_SB_CHILD_LIST:
+            if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:
                 update_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
 
@@ -1324,7 +1418,10 @@ def schedB(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-def get_list_schedA_from_schedB(report_id, cmte_id, transaction_id = None, include_deleted_trans_flag = False):
+
+def get_list_schedA_from_schedB(
+    report_id, cmte_id, transaction_id=None, include_deleted_trans_flag=False
+):
 
     try:
         report_list = superceded_report_id_list(report_id)
@@ -1336,44 +1433,56 @@ def get_list_schedA_from_schedB(report_id, cmte_id, transaction_id = None, inclu
                     entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, 
                     election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                     FROM public.sched_a 
-                    WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format("', '".join(report_list))
+                    WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format(
+                        "', '".join(report_list)
+                    )
                 else:
                     query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, 
                     entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, 
                     election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                     FROM public.sched_a 
-                    WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format("', '".join(report_list))
+                    WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format(
+                        "', '".join(report_list)
+                    )
 
-                cursor.execute("""SELECT json_agg(t) FROM (""" + query_string +
-                            """) t""", [report_id, cmte_id, transaction_id])
+                cursor.execute(
+                    """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+                    [report_id, cmte_id, transaction_id],
+                )
             else:
                 if not include_deleted_trans_flag:
                     query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
                     back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, 
                     memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                     FROM public.sched_a 
-                    WHERE report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC""".format("', '".join(report_list))
+                    WHERE report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC""".format(
+                        "', '".join(report_list)
+                    )
                 else:
                     query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
                     back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, 
                     memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier
                     FROM public.sched_a 
-                    WHERE report_id in ('{}') AND cmte_id = %s ORDER BY transaction_id DESC""".format("', '".join(report_list))
+                    WHERE report_id in ('{}') AND cmte_id = %s ORDER BY transaction_id DESC""".format(
+                        "', '".join(report_list)
+                    )
 
-                cursor.execute("""SELECT json_agg(t) FROM (""" +
-                           query_string + """) t""", [cmte_id])
+                cursor.execute(
+                    """SELECT json_agg(t) FROM (""" + query_string + """) t""",
+                    [cmte_id],
+                )
             print(cursor.query)
             schedA_list = cursor.fetchone()[0]
             if not schedA_list:
                 raise NoOPError(
-                    'No transaction found for cmte_id {} and report_id {}'.format(cmte_id, report_id))
+                    "No transaction found for cmte_id {} and report_id {}".format(
+                        cmte_id, report_id
+                    )
+                )
             merged_list = []
             for dictA in schedA_list:
-                entity_id = dictA.get('entity_id')
-                data = {
-                    'entity_id': entity_id,
-                    'cmte_id': cmte_id
-                }
+                entity_id = dictA.get("entity_id")
+                data = {"entity_id": entity_id, "cmte_id": cmte_id}
                 entity_list = get_entities(data)
                 dictEntity = entity_list[0]
                 merged_dict = {**dictA, **dictEntity}
