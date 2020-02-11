@@ -789,15 +789,22 @@ def get_fed_nonfed_share(request):
         cmte_id = request.user.username
         report_id = request.query_params.get('report_id')
         transaction_id = request.query_params.get('transaction_id')
+
         if transaction_id and not transaction_id.startswith('SH'):
             transaction_id = None
-        print(transaction_id)
-        if 'old_amount' in request.query_params:
-            old_amount = float(request.query_params.get('old_amount'))
-        else:
-            old_amount = 0
+
+        # for Memo tranasctions, we query parent aggregate amount instead
+        back_ref_transaction_id = request.query_params.get('back_ref_transaction_id')
+        if transaction_id and not transaction_id.startswith('SH'):
+            back_ref_transaction_id = None
+        # print(transaction_id)
+        # if 'old_amount' in request.query_params:
+        #     old_amount = float(request.query_params.get('old_amount'))
+        # else:
+        #     old_amount = 0
 
         # for editing purpose, need grab old amount
+        old_amount = 0
         if transaction_id:
             old_amount = float(get_old_amount(transaction_id))
         
@@ -835,7 +842,7 @@ def get_fed_nonfed_share(request):
                 logger.debug('query with {}, {}, {}, {}'.format(cmte_id, event_name, start_dt, end_dt))
                 cursor.execute(_sql, (cmte_id, report_id, event_name))
                 if not cursor.rowcount:
-                    raise Exception('Error: no h1 data found.')
+                    raise Exception('Error: no h2 data found.')
                 fed_percent = float(cursor.fetchone()[0])
             
             # for esiting, just grab the aggregation amount
@@ -847,6 +854,18 @@ def get_fed_nonfed_share(request):
                 """.format(f_ytd, tran_tbl)
                 with connection.cursor() as cursor:
                     cursor.execute(_sql, [transaction_id])
+                    if not cursor.rowcount:
+                        aggregate_amount = 0 
+                    else:
+                        aggregate_amount = float(cursor.fetchone()[0])
+            elif back_ref_transaction_id:
+                _sql = """
+                select {} 
+                from {}
+                where transaction_id = %s
+                """.format(f_ytd, tran_tbl)
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, [back_ref_transaction_id])
                     if not cursor.rowcount:
                         aggregate_amount = 0 
                     else:
@@ -939,6 +958,18 @@ def get_fed_nonfed_share(request):
                         aggregate_amount = 0
                     else:
                         aggregate_amount = float(cursor.fetchone()[0])
+            elif back_ref_transaction_id:
+                _sql = """
+                select {} 
+                from {} 
+                where transaction_id = %s
+                """.format(f_ytd, tran_tbl)
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, [back_ref_transaction_id])
+                    if not cursor.rowcount:
+                        aggregate_amount = 0
+                    else:
+                        aggregate_amount = float(cursor.fetchone()[0])
             else:
                 _sql = """
                 select {} 
@@ -959,7 +990,8 @@ def get_fed_nonfed_share(request):
                     else:
                         aggregate_amount = float(cursor.fetchone()[0])
         # fed_percent = float(cursor.fetchone()[0])
-        print(aggregate_amount)
+        # print(aggregate_amount)
+        logger.debug('aggregate_amount loaded:{}'.format(aggregate_amount))
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
         if transaction_type_identifier and transaction_type_identifier.endswith('_MEMO'):

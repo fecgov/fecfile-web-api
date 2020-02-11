@@ -167,6 +167,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _completedCloning: boolean = false;
   private _coordinatedPartyExpenditureFields = coordinatedPartyExpenditureFields;
   private _outstandingDebtBalance: number;
+  private _scheduleHBackRefTransactionId: string;
 
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
   //there is no unsubscribe() for activateRoute . 
@@ -1006,8 +1007,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       transactionId = this._transactionToEdit.transactionId;
     }
 
+    let scheduleHBackRefTransactionId = '';
+
+    if(this._transactionToEdit && this._transactionToEdit.hasOwnProperty('backRefTransactionId')) {
+      scheduleHBackRefTransactionId = this._transactionToEdit.backRefTransactionId;
+    }else {
+      scheduleHBackRefTransactionId = '';
+    }
+
+    if(this._scheduleHBackRefTransactionId) {
+      scheduleHBackRefTransactionId = this._scheduleHBackRefTransactionId;
+    }
+
+
     this._receiptService
-      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId, transactionId)
+      .getFedNonFedPercentage(totalAmount, activityEvent, activityEventName, this.transactionType, reportId, transactionId, scheduleHBackRefTransactionId)
       .subscribe(
         res => {
           if (res) {
@@ -2007,6 +2021,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               action: ScheduleActions.addSubTransaction
             };
 
+            this._scheduleHBackRefTransactionId = transactionId;
+
             // If going to a payment for a debt accessed from the Summary, user must be returned to
             // Summary on cancel/save of Debt.  Therefore, summary details must be passed to payment.
             if (this.transactionType === 'DEBT_TO_VENDOR' || this.transactionType === 'DEBT_BY_VENDOR') {
@@ -2891,7 +2907,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       distinctUntilChanged(),
       switchMap(searchText => {
         if (searchText.length === 0) {
-          this.clearFormValues();
+          this.clearOrgData();
         }
         if (searchText) {
           return this._typeaheadService.getContacts(searchText, 'entity_name');
@@ -4105,6 +4121,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     this.memoDropdownSize = null;
     this.activityEventNames = null;
+
+    this.showPart2 = false;
   }
 
   private toggleValidationIndOrg(entityType: string) {
@@ -4724,5 +4742,23 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   protected abstractRemoveCommas(amount: string): string {
     return amount.toString().replace(new RegExp(',', 'g'), '');
+  }
+
+
+  private clearOrgData() {
+    // These field names map to the same name in the form
+    const fieldNames = [];
+    fieldNames.push('street_1');
+    fieldNames.push('street_2');
+    fieldNames.push('city');
+    fieldNames.push('state');
+    fieldNames.push('zip_code');
+
+    for (const orgField of fieldNames) {
+      const orgPv = {};
+      orgPv[orgField] = null;
+      this.frmIndividualReceipt.patchValue(orgPv , { onlySelf: true });
+    }
+
   }
 }

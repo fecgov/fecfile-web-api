@@ -17,9 +17,53 @@ def email(boolean, data):
     SENDER = "donotreply@fec.gov"
     RECIPIENT = []
 
-    RECIPIENT.append("%s" % data.get("email_on_file"))
+    # print(data.get('email_on_file_1'))
+    if "email_on_file" in data and (
+        not (
+            data.get("email_on_file") == "-"
+            or data.get("email_on_file") is None
+            or data.get("email_on_file") == "null"
+        )
+    ):
+        RECIPIENT.append("%s" % data.get("email_on_file"))
 
-    # print(data.get('additional_email_1'))
+    if "email_on_file_1" in data and (
+        not (
+            data.get("email_on_file_1") == "-"
+            or data.get("email_on_file_1") is None
+            or data.get("email_on_file_1") == "null"
+        )
+    ):
+        RECIPIENT.append("%s" % data.get("email_on_file_1"))
+
+    if "email_on_file_2" in data and (
+        not (
+            data.get("email_on_file_2") == "-"
+            or data.get("email_on_file_2") is None
+            or data.get("email_on_file_2") == "null"
+        )
+    ):
+        RECIPIENT.append("%s" % data.get("email_on_file_2"))
+
+    if "email_1" in data and (
+        not (
+            data.get("email_1") == "-"
+            or data.get("email_1") is None
+            or data.get("email_1") == "null"
+        )
+    ):
+        RECIPIENT.append("%s" % data.get("email_1"))
+
+    if "email_2" in data and (
+        not (
+            data.get("email_2") == "-"
+            or data.get("email_2") is None
+            or data.get("email_2") == "null"
+        )
+    ):
+        RECIPIENT.append("%s" % data.get("email_2"))
+
+            # print(data.get('additional_email_1'))
     if "additional_email_1" in data and (
         not (
             data.get("additional_email_1") == "-"
@@ -39,16 +83,7 @@ def email(boolean, data):
     ):
         RECIPIENT.append("%s" % data.get("additional_email_2"))
 
-    # print(data.get('email_on_file_1'))
-    if "email_on_file_1" in data and (
-        not (
-            data.get("email_on_file_1") == "-"
-            or data.get("email_on_file_1") is None
-            or data.get("email_on_file_1") == "null"
-        )
-    ):
-        RECIPIENT.append("%s" % data.get("email_on_file_1"))
-
+    logger.debug('***here is a list of email recipients:{}'.format(RECIPIENT))
     SUBJECT = "Form {} submitted successfully".format(data.get("form_type"))
 
     # The email body for recipients with non-HTML email clients.

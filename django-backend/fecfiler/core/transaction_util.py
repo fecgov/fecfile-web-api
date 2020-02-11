@@ -589,6 +589,14 @@ def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
             expenditure_purpose,
             category_code,
             activity_event_type,
+            (
+                CASE
+                WHEN activity_event_type = 'VR' THEN 'Voter Registration'
+                WHEN activity_event_type = 'GO' THEN 'GOTV'
+                WHEN activity_event_type = 'VI' THEN 'Voter ID'
+                WHEN activity_event_type = 'GC' THEN 'Generic Campaign' 
+                ELSE ''::text
+                END) AS activity_event_identifier, 
             memo_code,
             memo_text, 
             create_date

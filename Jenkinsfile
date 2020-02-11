@@ -26,9 +26,9 @@ pipeline {
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
             }
-            stage("Functions") {
-              steps { build_functions("${VERSION}")}
-            }
+            //stage("Functions") {
+            //  steps { build_functions("${VERSION}")}
+            //}
           }
         }
        
@@ -37,7 +37,7 @@ pipeline {
             //Deploy flyway
             sh("bash data/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev ")
             //Deploy functions
-            sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev")
+            //sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev")
             //deployToK8s(String version, String environment, String deployment, String repo)
             //Deploy backend
             deployToK8s("${VERSION}", "dev","fecfile-backend-api","fecnxg-django-backend")
@@ -67,9 +67,9 @@ pipeline {
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
             }
-            stage("Functions") {
-              steps { build_functions("${VERSION}")}
-            }
+            //stage("Functions") {
+            //  steps { build_functions("${VERSION}")}
+            // }
           }
         }
        
@@ -78,7 +78,7 @@ pipeline {
             //Deploy flyway
             sh("bash data/deploy.sh ${VERSION} fecfile-frontend-qa-db.casvptvnuxni.us-east-1.rds.amazonaws.com qa ")
             //Deploy functions
-            sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-qa-db.casvptvnuxni.us-east-1.rds.amazonaws.com qa ")
+            //sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-qa-db.casvptvnuxni.us-east-1.rds.amazonaws.com qa ")
             //Deploy backend
             deployToK8s("${VERSION}", "qa","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
@@ -102,9 +102,9 @@ pipeline {
             stage("Flyway") {
               steps { build_flyway("${VERSION}") }
             }
-            stage("Functions") {
-              steps { build_functions("${VERSION}")}
-            }
+            //stage("Functions") {
+            //  steps { build_functions("${VERSION}")}
+            // }
           }
         }
        
@@ -113,7 +113,7 @@ pipeline {
             //Deploy flyway
             sh("bash data/deploy.sh ${VERSION} fecfile-frontend-uat-db.casvptvnuxni.us-east-1.rds.amazonaws.com uat")
             //Deploy functions
-            sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-uat-db.casvptvnuxni.us-east-1.rds.amazonaws.com uat")
+            // sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-uat-db.casvptvnuxni.us-east-1.rds.amazonaws.com uat")
             //Deploy backend
             deployToK8s("${VERSION}", "uat","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
