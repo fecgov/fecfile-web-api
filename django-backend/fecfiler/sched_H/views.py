@@ -2232,7 +2232,45 @@ def load_h3_aggregate_amount(cmte_id, report_id, back_ref_transaction_id):
         raise
             
 
-
+@api_view(['GET'])
+def get_h3_account_names(request):
+    """
+    get existing h3 account names so people can choose one for use 
+    """
+    try:
+        logger.debug('get_h3_account_names...')
+        cmte_id = request.user.username
+        report_id = request.query_params.get('report_id')
+        # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
+        logger.debug('cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+        with connection.cursor() as cursor:
+            # GET single row from schedA table
+            _sql = """
+            SELECT json_agg(t) FROM ( 
+            SELECT distinct account_name
+            FROM public.sched_h3
+            WHERE report_id = %s AND cmte_id = %s
+            AND back_ref_transaction_id is not null
+            AND delete_ind is distinct from 'Y'
+            ) t
+            """
+            cursor.execute(_sql, (report_id, cmte_id))
+            # print(_sql)
+            # cursor.execute(_sql)
+            _sum = cursor.fetchone()[0]
+            # if _sum: 
+            #     for _rec in _sum:
+            #         if _rec['activity_event_name']:
+            #             aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id, _rec.get('back_ref_transaction_id'))
+            #             _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_name'], 0)
+            #         # elif _rec['activity_event_type']:
+            #         #     _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
+            #         else:
+            #             _rec['aggregate_amount'] = 0
+            #             # pass
+            return Response(_sum, status = status.HTTP_200_OK )
+    except:
+        raise 
 
 @api_view(['GET'])
 def get_h3_summary(request):
