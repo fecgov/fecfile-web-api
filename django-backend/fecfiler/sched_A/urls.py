@@ -12,6 +12,6 @@ urlpatterns = [
         views.trash_restore_transactions,
         name="trash_restore_transactions",
     ),
-    # url(r'^sa/create_transaction$',
-    # views.create_transaction, name='create_transaction'),
+    url(r'^sa/get_report_id_from_date$',
+    views.get_report_id_from_date, name='get_report_id_from_date'),
 ]
