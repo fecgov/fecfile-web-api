@@ -41,6 +41,8 @@ from fecfiler.core.aggregation_helper import(
     update_aggregate_sl,
 )
 
+from fecfiler.core.report_helper import renew_report_update_date
+
 from fecfiler.sched_B.views import (delete_schedB, get_list_child_schedB,
                                     get_schedB, post_schedB, put_schedB,
                                     schedB_sql_dict, put_sql_schedB, post_sql_schedB,
@@ -1947,6 +1949,10 @@ def trash_restore_transactions(request):
                     _delete))
         else:
             raise Exception('The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT. Deleted transactions are: {}'.format(transaction_id, ','.join(deleted_transaction_ids)))
+        
+        # update report last_update_date
+        renew_report_update_date(report_id)
+
         # except Exception as e:
         #     return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
         #         status=status.HTTP_400_BAD_REQUEST)
