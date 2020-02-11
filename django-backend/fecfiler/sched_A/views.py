@@ -1408,6 +1408,50 @@ def get_child_transaction_schedA(cmte_id, report_id, back_ref_transaction_id):
                 return cursor.fetchone()[0]
     except:
         raise
+
+def reattribution_auto_generate_transactions(cmte_id, report_id, transaction_id, contribution_date, contribution_amount):
+    """ This function auto generates 2 copies of the transaction_id in the report_id. One will be an exact copy 
+    of the transaction_id and other will have modifications to contribution date and amount. Kindly check FNE-1878
+    ticket for the business rules that apply to reattribution"""
+    try:
+        query_string_1 = """INSERT INTO public.sched_a(
+        cmte_id, report_id, line_number, transaction_type, 
+        back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, 
+        contribution_amount, purpose_description, memo_code, memo_text, 
+        election_code, election_other_description, delete_ind, create_date, 
+        last_update_date, donor_cmte_id, donor_cmte_name, 
+        transaction_type_identifier, election_year, itemized_ind, levin_account_id)
+            SELECT cmte_id, %s, line_number, transaction_type, 
+               null, null, entity_id, contribution_date, 
+               contribution_amount, purpose_description, 'X', 
+               concat('MEMO: Originally reported ',to_char(contribution_date, 'MM/DD/YYYY'),'. $', %s::text, ' reattributed below'), 
+               election_code, election_other_description, delete_ind, create_date, 
+               last_update_date, donor_cmte_id, donor_cmte_name, 
+               transaction_type_identifier, election_year, itemized_ind, levin_account_id
+          FROM public.sched_a WHERE transaction_id= %s and cmte_id= %s;"""
+
+        query_string_2 = """INSERT INTO public.sched_a(
+        cmte_id, report_id, line_number, transaction_type, 
+        back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, 
+        contribution_amount, purpose_description, memo_code, memo_text, 
+        election_code, election_other_description, delete_ind, create_date, 
+        last_update_date, donor_cmte_id, donor_cmte_name, 
+        transaction_type_identifier, election_year, itemized_ind, levin_account_id)
+            SELECT cmte_id, %s, line_number, transaction_type, 
+               null, null, entity_id, %s, 
+               %s, purpose_description, 'X', 'MEMO: Reattribution Below', 
+               election_code, election_other_description, delete_ind, create_date, 
+               last_update_date, donor_cmte_id, donor_cmte_name, 
+               transaction_type_identifier, election_year, itemized_ind, levin_account_id
+          FROM public.sched_a WHERE transaction_id= %s and cmte_id= %s;"""
+
+        with connection.cursor() as cursor:
+            cursor.execute(query_string_1, [report_id, contribution_amount, transaction_id, cmte_id])
+            if cursor.rowcount == 0:
+                raise Exception('The transaction ID: {} does not exist in sched_a for committee ID: {}'.format(transaction_id, cmte_id))
+            cursor.execute(query_string_2, [report_id, contribution_date, -1*Decimal(contribution_amount), transaction_id, cmte_id])
+    except Exception as e:
+        raise Exception('The reattribution_auto_generate_transactions function is throwing an error: ' + str(e))
 """
 ***************************************************** SCHED A - POST API CALL STARTS HERE **********************************************************
 """
@@ -1425,6 +1469,11 @@ def schedA(request):
         if 'election_year' in request.query_params:
             REQ_ELECTION_YR = request.query_params.get('election_year')
         try:
+            # checking if reattribution is triggered for a transaction
+            reattribution_flag = False
+            if 'reattribution_id' in request.data and request.data['reattribution_id'] not in ['',"", None, 'null']:
+                reattribution_flag = True
+
             validate_sa_data(request.data)
             cmte_id = request.user.username
             report_id = check_report_id(request.data.get('report_id'))
@@ -1433,7 +1482,16 @@ def schedA(request):
             datum = schedA_sql_dict(request.data)
             datum['report_id'] = report_id
             datum['cmte_id'] = cmte_id
+            # Adding memo_code and memo_text values for reattribution flags
+            if reattribution_flag:
+                datum['memo_code'] = 'X'
+                datum['memo_text'] = 'MEMO: Reattribution'
+            # posting data into schedA
             data = post_schedA(datum)
+            # Auto generation of reattribution transactions
+            if reattribution_flag:
+                reattribution_auto_generate_transactions(cmte_id, report_id, request.data['reattribution_id'], 
+                    datum['contribution_date'], datum['contribution_amount'])
             output = get_schedA(data)
             # for earmark child transaction: update parent transction  purpose_description
             if datum.get('transaction_type_identifier') in EARMARK_SA_CHILD_LIST:
@@ -1896,5 +1954,36 @@ def trash_restore_transactions(request):
 """
 ******************************************************************************************************************************
 END - TRASH RESTORE TRANSACTIONS API - SCHED_A APP (MOVED FROM CORE APP)
+******************************************************************************************************************************
+"""
+"""
+******************************************************************************************************************************
+API TO GET LATEST OR MOST RECENT AMENDED REPORT ID AND ITS STATUS BASED ON TRANSACTION DATE INPUT
+USED IN REATTRIBUTION REPORT ID GENERATION
+******************************************************************************************************************************
+""" 
+@api_view(['GET'])
+def get_report_id_from_date(request):
+    try:
+        transaction_date = date_format(request.query_params.get('transaction_date'))
+        cmte_id = request.user.username
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT json_agg(t) FROM (SELECT report_id AS "reportId", CASE WHEN(status IS NULL 
+                    OR status::text = 'Saved'::text) THEN 'Saved'
+                    ELSE 'Filed' END AS status FROM public.reports WHERE cmte_id=%s AND %s>=cvg_start_date
+                    AND %s<=cvg_end_date AND delete_ind IS DISTINCT FROM 'Y' ORDER BY amend_ind ASC, amend_number DESC
+                    LIMIT 1) t""", 
+                    [cmte_id, transaction_date, transaction_date])
+            result = cursor.fetchone()
+        if result and result[0]:
+            return Response(result[0][0], status=status.HTTP_200_OK)
+        else:
+            return Response({'reportId': None, 'status': None}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response('The get_report_id_from_date API is throwing the following error: ' + str(e))
+"""
+******************************************************************************************************************************
+END - get_report_id_from_date API - SCHED_A APP (MOVED FROM CORE APP)
 ******************************************************************************************************************************
 """
