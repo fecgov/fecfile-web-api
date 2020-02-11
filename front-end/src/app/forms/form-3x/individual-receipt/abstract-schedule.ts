@@ -4222,7 +4222,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         suffix = suffix && typeof suffix === 'string' ? suffix.trim() : '';
       }
 
-      const purposePre = 'Earmarked for';
+      //const purposePre = 'Earmarked for';
+      const purposePre = '';
       let purpose = purposePre;
       const nameArray = [];
       if (prefix) {
@@ -4292,7 +4293,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         suffix = suffix && typeof suffix === 'string' ? suffix.trim() : '';
       }
 
-      const purposePre = 'Earmarked for';
+      //const purposePre = 'Earmarked for';
+      const purposePre = '';
       let purpose = purposePre;
       const nameArray = [];
       if (prefix) {
@@ -4315,7 +4317,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
 
       console.log('purpose is: ' + purpose);
-      if (purpose !== purposePre) {
+      if (purpose !== purposePre && !this.subTransactionInfo.isParent) {
         this.frmIndividualReceipt.patchValue({ purpose_description: purpose }, { onlySelf: true });
       }
     }
