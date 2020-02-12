@@ -1,5 +1,5 @@
 <ng-template #rt let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+  <ngb-highlight [result]="formatterAccountName(r)" [term]="t"></ngb-highlight>
 </ng-template>
 <ng-template #rtOrg let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
@@ -81,6 +81,9 @@
                     ? 'input-field-error'
                     : ''
                 "
+                [ngbTypeahead]="searchAccountName"
+                [resultTemplate]="rt"
+                [inputFormatter]="formatterAccountName"
               />
             </div>
           </div>
