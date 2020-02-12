@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, Input, SimpleChanges, OnDestroy, OnChanges } from '@angular/core';
-import {FormBuilder, Validators} from '@angular/forms';
+import {FormBuilder, ValidationErrors, Validators} from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
 import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
@@ -94,12 +94,9 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
       this.cloned = p.cloned ? true : false;
       this.showPart2 = false;
     });
-     _messageService.getMessage().subscribe(message => {
-      if (message && message.parentFormPopulated) {
-        console.log('Message from sub' + message);
-      }
+    _f3xMessageService.getInitFormMessage().subscribe(message => {
+      this.resetForm();
     });
-
   }
 
   public ngOnInit() {
@@ -115,6 +112,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     this.noValidationRequired.push('subordinate_cmte_state');
     this.noValidationRequired.push('subordinate_cmte_zip');
     this.noValidationRequired.push('subordinate_cmte_street_1');
+
     this.validateDesignatedFiler.push('designating_cmte_id');
     this.validateDesignatedFiler.push('designating_cmte_name');
     super.ngOnInit();
@@ -144,20 +142,23 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
    * Proceed to 2nd part of the payment.
    */
   public next() {
-    this.frmIndividualReceipt.markAsTouched();
-    if (!this._checkFormFieldIsValid('designating_cmte_id') && this.isDesignatedFiler) {
-      return;
+    const radioName = 'coordinated_exp_ind';
+
+    if (this._checkFormFieldIsValid(radioName) &&
+        this.frmIndividualReceipt.get(radioName).value === 'Y' ) {
+      if (!this._checkFormFieldIsValid('designating_cmte_id') && this.isDesignatedFiler) {
+        return;
+      }
+      if (!this._checkFormFieldIsValid('designating_cmte_name') && this.isDesignatedFiler) {
+        return;
+      }
     }
-    if (!this._checkFormFieldIsValid('designating_cmte_name') && this.isDesignatedFiler) {
-      return;
-    }
-    if (!this._checkFormFieldIsValid('coordinated_exp_ind')) {
-      return;
-    }
+
     this._setDesignatedValidators();
+
+    if ( this.frmIndividualReceipt.get(radioName).value === null ) { this.removeValidation(radioName); }
     this.showPart2 = true;
   }
-
   /**
    * Return to the first part of the payment.
    */
@@ -173,7 +174,6 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     if (this.frmIndividualReceipt.contains(fieldName)) {
       return this.frmIndividualReceipt.get(fieldName).valid;
     }
-    // return true;
   }
 
   private _setDesignatedValidators() {
@@ -326,19 +326,6 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
       ${officeState}, ${officeDistrict}`;
   }
 
-  public saveForAddSubTempSchedF() {}
-  public handleOnBlurEvent($event: any, col: any) {
-    // console.log('col %s %s', col,  this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    // const expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    // const contributionAggregateValue: string = this._decimalPipe.transform(
-    //     expenditureAmount,
-    //     '.2-2'
-    // );
-    // this.frmIndividualReceipt.patchValue(
-    //     { aggregate_general_elec_exp: contributionAggregateValue}, { onlySelf: true });
-    super.handleOnBlurEvent($event, col);
-  }
-
   public updateOnly() {
     this.back();
     super.updateOnly();
@@ -353,11 +340,16 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     if (change === 'Y') {
       this.isDesignatedFiler = true;
       this.addValidator(this.validateDesignatedFiler,  this.isDesignatedFiler);
+      this.addValidator(this.noValidationRequired, false);
+      this.disableFields(this.noValidationRequired, true);
+      this.disableFields(this.validateDesignatedFiler, false);
     } else {
-      this.isDesignatedFiler = false;
-      this.addValidator(this.validateDesignatedFiler,  this.isDesignatedFiler);
+      this.addValidator(this.validateDesignatedFiler, false);
+      this.addValidator(this.noValidationRequired, false);
+      this.disableFields(this.validateDesignatedFiler, false);
+      this.disableFields(this.noValidationRequired, false);
     }
-    this.addValidator(this.noValidationRequired, false);
+
 }
 public addValidator( validators: Array<any>, set: boolean): void {
     if ( set ) {
@@ -367,9 +359,38 @@ public addValidator( validators: Array<any>, set: boolean): void {
       }
     } else {
       for (const filedName of validators) {
-        this.frmIndividualReceipt.controls[filedName].setValidators([]);
-        this.frmIndividualReceipt.controls[filedName].updateValueAndValidity();
+        this.removeValidation(filedName);
       }
     }
 }
+
+  private removeValidation(filedName) {
+    this.frmIndividualReceipt.controls[filedName].setValidators([]);
+    this.frmIndividualReceipt.controls[filedName].updateValueAndValidity();
+  }
+
+  public disableFields( fields: Array<any>, isDisable: boolean): void {
+    if ( isDisable ) {
+      for (const fieldName of fields) {
+        const field = {};
+        field[fieldName] = '';
+        this.frmIndividualReceipt.get(fieldName).reset();
+        this.frmIndividualReceipt.get(fieldName).disable();
+        this.frmIndividualReceipt.controls[fieldName].updateValueAndValidity();
+      }
+    } else {
+      for (const fieldName of fields ) {
+        this.frmIndividualReceipt.get(fieldName).enable();
+        this.frmIndividualReceipt.controls[fieldName].updateValueAndValidity();
+      }
+    }
+  }
+
+  private resetForm() {
+   if ( Object.keys(this.frmIndividualReceipt.controls).length !== 0) {
+    this.disableFields(this.noValidationRequired, false);
+    this.disableFields(this.validateDesignatedFiler, false);
+   }
+    super.clearFormValues();
+  }
 }

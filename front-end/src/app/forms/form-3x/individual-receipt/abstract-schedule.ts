@@ -2,7 +2,7 @@ import {EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angula
 import {CurrencyPipe, DecimalPipe} from '@angular/common';
 import {HttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
-import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
 import {ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import {FormsService} from '../../../shared/services/FormsService/forms.service';
 import {UtilService} from '../../../shared/utils/util.service';
@@ -4110,10 +4110,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.activityEventNames = null;
 
     this.showPart2 = false;
-
-    if ( this.hiddenFields && this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
-      this.hiddenFields = null;
-    }
   }
 
   private toggleValidationIndOrg(entityType: string) {
@@ -4753,5 +4749,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.patchValue(orgPv , { onlySelf: true });
     }
 
+  }
+
+  protected getFormValidationErrors() {
+    Object.keys(this.frmIndividualReceipt.controls).forEach(key => {
+      const controlErrors: ValidationErrors = this.frmIndividualReceipt.get(key).errors;
+      if (controlErrors != null) {
+        Object.keys(controlErrors).forEach(keyError => {
+          console.error('Key control: ' + key + ', keyError: ' + keyError + ', err value: ', controlErrors[keyError]);
+        });
+      }
+    });
   }
 }
