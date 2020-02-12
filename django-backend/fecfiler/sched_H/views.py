@@ -194,6 +194,7 @@ def put_sql_schedH1(data):
     do_transaction(_sql, _v)
 
 
+@new_report_date
 def put_schedH1(data):
     """
     save/update a sched_h1 item
@@ -1242,6 +1243,7 @@ def put_sql_schedH2(data):
     do_transaction(_sql, _v)
 
 
+@new_report_date
 def put_schedH2(data):
     """
     save/update a sched_h2 item
@@ -1985,6 +1987,7 @@ def update_h3_total_amount(data):
     do_transaction(_sql, _v)
 
 
+@new_report_date
 def put_schedH3(data):
     """
     update sched_H3 item
@@ -2942,6 +2945,7 @@ def get_existing_h4_total(cmte_id, transaction_id):
         raise
 
 
+@new_report_date
 def put_schedH4(data):
     """
     update sched_H4 item
@@ -3739,6 +3743,7 @@ def update_h5_total_amount(data):
     do_transaction(_sql, _v)
 
 
+@new_report_date
 def put_schedH5(data):
     """
     update sched_H5 item
@@ -4468,6 +4473,7 @@ def get_existing_h6_total(cmte_id, transaction_id):
         raise
 
 
+@new_report_date
 def put_schedH6(data):
     """
     update sched_H6 item

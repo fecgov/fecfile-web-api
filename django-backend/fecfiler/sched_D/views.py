@@ -351,6 +351,7 @@ def valid_transaction_amounts(data):
     ) == float(balance_at_close)
 
 
+@new_report_date
 def put_schedD(datum):
     """update sched_d item
     here we are assuming creditor_entoty_id are always referencing something already in our DB

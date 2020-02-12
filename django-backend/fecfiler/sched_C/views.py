@@ -314,6 +314,7 @@ def initial_loan(transaction_id):
         return False
 
 
+@new_report_date
 def put_schedC(data):
     """
     update sched_c item
@@ -1615,6 +1616,7 @@ def check_mandatory_fields_SC1(data):
         raise
 
 
+@new_report_date
 def put_schedC1(data):
     """
     update sched_c1 item
@@ -2390,6 +2392,7 @@ def check_mandatory_fields_SC2(data):
         raise
 
 
+@new_report_date
 def put_schedC2(data):
     """update sched_c2 item
     here we are assuming guarantor_entoty_id are always referencing something already in our DB
