@@ -222,6 +222,7 @@ def get_existing_expenditure_amount(cmte_id, transaction_id):
         raise
 
 
+@new_report_date
 def put_schedE(data):
     """
     update sched_E item

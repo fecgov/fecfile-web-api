@@ -1341,6 +1341,7 @@ def get_schedA(data):
         raise
 
 
+@new_report_date
 def put_schedA(datum):
     """update sched_a item
     """

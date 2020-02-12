@@ -893,6 +893,7 @@ def get_existing_expenditure(cmte_id, transaction_id):
         raise
 
 
+@new_report_date
 def put_schedB(datum):
     """
     save and update a sched_b item
