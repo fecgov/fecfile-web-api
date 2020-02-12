@@ -1,4 +1,5 @@
 import logging
+from functools import wraps
 
 # from functools import lru_cache
 from django.db import connection
@@ -28,3 +29,16 @@ def renew_report_update_date(report_id):
                 raise Exception("Error: updating report update date failed.")
     except:
         raise
+
+
+def new_report_date(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        res = func(*args, **kwargs)
+        logger.debug("update report last_update_date after {}".format(func.__name__))
+        report_id = res.get("report_id")
+        renew_report_update_date(report_id)
+        logger.debug("report date updated")
+        return res
+
+    return wrapper

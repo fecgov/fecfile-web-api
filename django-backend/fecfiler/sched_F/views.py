@@ -30,7 +30,7 @@ from fecfiler.core.views import (
 from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
-
+from fecfiler.core.report_helper import new_report_date
 
 # TODO: still need to add line_number and transaction_code to sched_f
 
@@ -336,6 +336,7 @@ def validate_sF_data(data):
     check_mandatory_fields_SF(data)
 
 
+@new_report_date
 def post_schedF(data):
     """
     function for handling POST request for sF, need to:
@@ -491,9 +492,11 @@ def get_schedF(data):
             forms_obj = get_list_all_schedF(report_id, cmte_id)
         if forms_obj:
             for obj in forms_obj:
-                child_sf = get_list_schedF(obj['report_id'], obj['cmte_id'], obj['transaction_id'], True)
+                child_sf = get_list_schedF(
+                    obj["report_id"], obj["cmte_id"], obj["transaction_id"], True
+                )
                 if child_sf:
-                    obj['child'] = child_sf
+                    obj["child"] = child_sf
         return forms_obj
     except:
         raise
@@ -631,7 +634,7 @@ def get_list_schedF(report_id, cmte_id, transaction_id, is_back_ref=False):
                         )
                     )
                 else:
-                    return schedF_list 
+                    return schedF_list
             merged_list = []
             for dictF in schedF_list:
                 entity_id = dictF.get("entity_id")

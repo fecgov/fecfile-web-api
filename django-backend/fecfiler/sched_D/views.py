@@ -39,6 +39,7 @@ from fecfiler.core.views import (
     undo_delete_entities,
 )
 from fecfiler.sched_A.views import get_next_transaction_id
+from fecfiler.core.report_helper import new_report_date
 
 # from fecfiler.sched_B.views import (delete_parent_child_link_sql_schedB,
 #                                     delete_schedB, get_list_child_schedB,
@@ -553,6 +554,7 @@ def validate_sd_data(data):
     # validate_transaction_type(data)
 
 
+@new_report_date
 def post_schedD(datum):
     """save sched_d item and the associated entities."""
     try:
