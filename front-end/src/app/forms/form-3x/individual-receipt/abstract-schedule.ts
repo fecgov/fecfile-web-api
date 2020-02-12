@@ -50,6 +50,8 @@ export enum SaveActions {
 }
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+
+
   transactionTypeText = '';
   transactionType = '';
   scheduleAction: ScheduleActions = null;
@@ -144,7 +146,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _committeeDetails: any;
   private _cmteTypeCategory: string;
   private _completedCloning: boolean = false;
-  private _coordinatedPartyExpenditureFields = coordinatedPartyExpenditureFields;
   private _outstandingDebtBalance: number;
   private _scheduleHBackRefTransactionId: string;
 
@@ -1299,7 +1300,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (isChildForm) {
       this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': aggregateValue }, { onlySelf: true });
     } else {
-      if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+      if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+          this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
         this.frmIndividualReceipt.patchValue({ aggregate_general_elec_exp: aggregateValue }, { onlySelf: true });
       } else {
         this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
@@ -2607,7 +2609,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       beneficiaryCandEntityIdHiddenField.value = entity.beneficiary_cand_entity_id;
     }
 
-    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+        this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
       if (this.frmIndividualReceipt.contains('expenditure_date')) {
         if (this._selectedCandidate) {
           if (this._selectedCandidate.beneficiary_cand_id) {
@@ -3409,28 +3412,29 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     console.log('Hijack for : '  + this.transactionType);
     switch (this.transactionType) {
       case 'COEXP_PARTY':
-        res = this._coordinatedPartyExpenditureFields;
+        res = new CoordinatedPartyExpenditureFields().coordinatedPartyExpenditureFields;
         break;
       case 'COEXP_CC_PAY':
-        res = coordinatedExpenditureCCFields;
+        res = new CoordinatedExpenditureCCFields().coordinatedExpenditureCCFields;
         break;
       case 'COEXP_STAF_REIM':
-        res = coordinatedExpenditureStaffFields;
+        res = new CoordinatedExpenditureStaffFields().coordinatedExpenditureStaffFields;
         break;
       case 'COEXP_PMT_PROL':
-        res = coordinatedExpenditurePayrollFields;
+        res = new CoordinatedExpenditurePayrollFields().coordinatedExpenditurePayrollFields;
         break;
       case 'COEXP_PARTY_VOID':
-        res = coordinatedPartyExpenditureVoidFields;
+        res = new CoordinatedPartyExpenditureVoidFields().coordinatedPartyExpenditureVoidFields;
         break;
       case 'COEXP_CC_PAY_MEMO':
-        res = coordinatedExpenditureCCMemoFields;
+        res = new CoordinatedExpenditureCcMemoFields().coordinatedExpenditureCCMemoFields;
         break;
       case 'COEXP_STAF_REIM_MEMO':
-        res = coordinatedExpenditureStaffMemoFields;
+        res = new CoordinatedExpenditureStaffMemoFields().coordinatedExpenditureStaffMemoFields;
         break;
       case 'COEXP_PMT_PROL_MEMO':
-        res = coordinatedExpenditurePayrollMemoFields;
+        res = new CoordinatedExpenditurePayrollMemoFields().coordinatedExpenditurePayrollMemoFields;
+        break;
       default:
     }
     return res;
@@ -3676,6 +3680,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       if (this.frmIndividualReceipt.get(prop)) {
                         if (this.isFieldName(prop, 'contribution_aggregate')) {
                           this._contributionAggregateValue = trx[prop];
+                        } else if (this.isFieldName(prop, 'aggregate_general_elec_exp')) {
+                          this._contributionAggregateValue = trx[prop];
                         }
                         if (this.isFieldName(prop, 'activity_event_type')) {
                           if (trx[prop] !== null || trx[prop] !== 'Select') {
@@ -3780,6 +3786,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this._selectedCandidate.street_1 = null;
                     this._selectedCandidate.street_2 = null;
                     this._selectedCandidate.zip_code = null;
+                   this._selectedCandidate.beneficiary_cand_id = trx.beneficiary_cand_id;
                   }
                   if (prop === 'entity_type') {
                     if (this.entityTypes) {
@@ -3820,7 +3827,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this.isFieldName(prop, 'balance_at_close') ||
                     this.isFieldName(prop, 'fed_share_amount') ||
                     this.isFieldName(prop, 'non_fed_share_amount') ||
-                    this.isFieldName(prop, 'activity_event_amount_ytd')
+                    this.isFieldName(prop, 'activity_event_amount_ytd') ||
+                      this.isFieldName(prop, 'aggregate_general_elec_exp')
                   ) {
                     const amount = trx[prop] ? trx[prop] : 0;
                     if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['total_amount'] && this.scheduleAction === 'edit' && this._cloned) {

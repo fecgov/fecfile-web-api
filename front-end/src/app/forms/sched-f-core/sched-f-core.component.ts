@@ -328,14 +328,14 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
 
   public saveForAddSubTempSchedF() {}
   public handleOnBlurEvent($event: any, col: any) {
-    console.log('col %s %s', col,  this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    const expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
-    const contributionAggregateValue: string = this._decimalPipe.transform(
-        expenditureAmount,
-        '.2-2'
-    );
-    this.frmIndividualReceipt.patchValue(
-        { aggregate_general_elec_exp: contributionAggregateValue}, { onlySelf: true });
+    // console.log('col %s %s', col,  this.frmIndividualReceipt.controls['expenditure_amount'].value);
+    // const expenditureAmount = this.convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
+    // const contributionAggregateValue: string = this._decimalPipe.transform(
+    //     expenditureAmount,
+    //     '.2-2'
+    // );
+    // this.frmIndividualReceipt.patchValue(
+    //     { aggregate_general_elec_exp: contributionAggregateValue}, { onlySelf: true });
     super.handleOnBlurEvent($event, col);
   }
 
