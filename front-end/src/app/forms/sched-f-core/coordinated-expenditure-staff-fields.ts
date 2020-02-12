@@ -1,4 +1,5 @@
-export const coordinatedExpenditureStaffFields = {
+export class CoordinatedExpenditureStaffFields {
+  public readonly coordinatedExpenditureStaffFields = {
   data: {
     formFields: [
       {
@@ -18,7 +19,7 @@ export const coordinatedExpenditureStaffFields = {
             text: 'Entity Type',
             infoIcon: true,
             infoText:
-              'CAN Candidate \\n\n           CCM Candidate Committee  \\n\n            COM Committee \\n\n            IND Individual (a person) \\n\n            ORG Organization (not a committee and not a person) \\n\n            PAC Political Action Committee\\n\n            PTY Party Organization',
+                'CAN Candidate \\n\n           CCM Candidate Committee  \\n\n            COM Committee \\n\n            IND Individual (a person) \\n\n            ORG Organization (not a committee and not a person) \\n\n            PAC Political Action Committee\\n\n            PTY Party Organization',
             name: 'entity_type',
             type: 'select',
             value: 'IND',
@@ -1217,3 +1218,5 @@ export const coordinatedExpenditureStaffFields = {
     jfMemoTypes: null
   }
 };
+}
+

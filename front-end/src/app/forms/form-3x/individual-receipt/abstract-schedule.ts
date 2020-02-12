@@ -1,63 +1,42 @@
-import {
-  Component,
-  EventEmitter,
-  ElementRef,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-  ViewChild,
-  OnDestroy,
-  HostListener,
-  OnChanges,
-  SimpleChanges
-} from '@angular/core';
+import {EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {CurrencyPipe, DecimalPipe} from '@angular/common';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
-import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { environment } from '../../../../environments/environment';
+import {HttpClient} from '@angular/common/http';
+import {ActivatedRoute, Router} from '@angular/router';
+import {FormBuilder, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
+import {ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
 import {FormsService} from '../../../shared/services/FormsService/forms.service';
 import {UtilService} from '../../../shared/utils/util.service';
 import {MessageService} from '../../../shared/services/MessageService/message.service';
 import {IndividualReceiptService} from './individual-receipt.service';
-import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
 import {alphaNumeric} from '../../../shared/utils/forms/validation/alpha-numeric.validator';
 import {floatingPoint} from '../../../shared/utils/forms/validation/floating-point.validator';
-import { validatePurposeInKindRequired, IN_KIND } from '../../../shared/utils/forms/validation/purpose.validator';
 import {ReportTypeService} from '../report-type/report-type.service';
-import { Observable, Subscription, interval, timer, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
+import {Observable, Subject} from 'rxjs';
+import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
 import {TypeaheadService} from 'src/app/shared/partials/typeahead/typeahead.service';
 import {DialogService} from 'src/app/shared/services/DialogService/dialog.service';
 import {ConfirmModalComponent, ModalHeaderClassEnum} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import {TransactionModel} from '../../transactions/model/transaction.model';
 import {F3xMessageService} from '../service/f3x-message.service';
-
-import { hasOwnProp } from 'ngx-bootstrap/chronos/utils/type-checks';
 import {TransactionsMessageService} from '../../transactions/service/transactions-message.service';
-import { ActiveView } from '../../transactions/transactions.component';
 import {validateAggregate} from 'src/app/shared/utils/forms/validation/aggregate.validator';
 import {validateAmount, validateContributionAmount} from 'src/app/shared/utils/forms/validation/amount.validator';
 import {ContributionDateValidator} from 'src/app/shared/utils/forms/validation/contribution-date.validator';
 import {ContactsService} from 'src/app/contacts/service/contacts.service';
-import { trigger, transition, style, animate, state } from '@angular/animations';
-import { heLocale } from 'ngx-bootstrap';
-import { TransactionsService, GetTransactionsResponse } from '../../transactions/service/transactions.service';
+import {GetTransactionsResponse, TransactionsService} from '../../transactions/service/transactions.service';
 import {ReportsService} from 'src/app/reports/service/report.service';
 import {reportModel} from 'src/app/reports/model/report.model';
-import { entityTypes, committeeEventTypes } from './entity-types-json';
+import {entityTypes} from './entity-types-json';
 import {ScheduleActions} from './schedule-actions.enum';
 import {AbstractScheduleParentEnum} from './abstract-schedule-parent.enum';
-import {coordinatedPartyExpenditureFields} from '../../sched-f-core/coordinated-party-expenditure-fields';
-import {coordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-expenditure-cc-fields';
-import {coordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
-import {coordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
-import {coordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
-import {coordinatedExpenditureCCMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-cc-memo-fields';
-import {coordinatedExpenditureStaffMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-staff-memo-fields';
-import {coordinatedExpenditurePayrollMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-Payroll-memo-fields';
+import {CoordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-expenditure-cc-fields';
+import {CoordinatedPartyExpenditureFields} from '../../sched-f-core/coordinated-party-expenditure-fields';
+import {CoordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
+import {CoordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
+import {CoordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
+import {CoordinatedExpenditureCcMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-cc-memo-fields';
+import {CoordinatedExpenditureStaffMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-staff-memo-fields';
+import {CoordinatedExpenditurePayrollMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-Payroll-memo-fields';
 
 
 export enum SaveActions {
@@ -71,6 +50,8 @@ export enum SaveActions {
 }
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+
+
   transactionTypeText = '';
   transactionType = '';
   scheduleAction: ScheduleActions = null;
@@ -165,7 +146,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _committeeDetails: any;
   private _cmteTypeCategory: string;
   private _completedCloning: boolean = false;
-  private _coordinatedPartyExpenditureFields = coordinatedPartyExpenditureFields;
   private _outstandingDebtBalance: number;
   private _scheduleHBackRefTransactionId: string;
 
@@ -1320,7 +1300,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (isChildForm) {
       this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': aggregateValue }, { onlySelf: true });
     } else {
-      if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+      if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+          this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
         this.frmIndividualReceipt.patchValue({ aggregate_general_elec_exp: aggregateValue }, { onlySelf: true });
       } else {
         this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
@@ -2628,7 +2609,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       beneficiaryCandEntityIdHiddenField.value = entity.beneficiary_cand_entity_id;
     }
 
-    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent) {
+    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+        this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
       if (this.frmIndividualReceipt.contains('expenditure_date')) {
         if (this._selectedCandidate) {
           if (this._selectedCandidate.beneficiary_cand_id) {
@@ -3430,28 +3412,29 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     console.log('Hijack for : '  + this.transactionType);
     switch (this.transactionType) {
       case 'COEXP_PARTY':
-        res = this._coordinatedPartyExpenditureFields;
+        res = new CoordinatedPartyExpenditureFields().coordinatedPartyExpenditureFields;
         break;
       case 'COEXP_CC_PAY':
-        res = coordinatedExpenditureCCFields;
+        res = new CoordinatedExpenditureCCFields().coordinatedExpenditureCCFields;
         break;
       case 'COEXP_STAF_REIM':
-        res = coordinatedExpenditureStaffFields;
+        res = new CoordinatedExpenditureStaffFields().coordinatedExpenditureStaffFields;
         break;
       case 'COEXP_PMT_PROL':
-        res = coordinatedExpenditurePayrollFields;
+        res = new CoordinatedExpenditurePayrollFields().coordinatedExpenditurePayrollFields;
         break;
       case 'COEXP_PARTY_VOID':
-        res = coordinatedPartyExpenditureVoidFields;
+        res = new CoordinatedPartyExpenditureVoidFields().coordinatedPartyExpenditureVoidFields;
         break;
       case 'COEXP_CC_PAY_MEMO':
-        res = coordinatedExpenditureCCMemoFields;
+        res = new CoordinatedExpenditureCcMemoFields().coordinatedExpenditureCCMemoFields;
         break;
       case 'COEXP_STAF_REIM_MEMO':
-        res = coordinatedExpenditureStaffMemoFields;
+        res = new CoordinatedExpenditureStaffMemoFields().coordinatedExpenditureStaffMemoFields;
         break;
       case 'COEXP_PMT_PROL_MEMO':
-        res = coordinatedExpenditurePayrollMemoFields;
+        res = new CoordinatedExpenditurePayrollMemoFields().coordinatedExpenditurePayrollMemoFields;
+        break;
       default:
     }
     return res;
@@ -3697,6 +3680,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       if (this.frmIndividualReceipt.get(prop)) {
                         if (this.isFieldName(prop, 'contribution_aggregate')) {
                           this._contributionAggregateValue = trx[prop];
+                        } else if (this.isFieldName(prop, 'aggregate_general_elec_exp')) {
+                          this._contributionAggregateValue = trx[prop];
                         }
                         if (this.isFieldName(prop, 'activity_event_type')) {
                           if (trx[prop] !== null || trx[prop] !== 'Select') {
@@ -3801,6 +3786,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this._selectedCandidate.street_1 = null;
                     this._selectedCandidate.street_2 = null;
                     this._selectedCandidate.zip_code = null;
+                   this._selectedCandidate.beneficiary_cand_id = trx.beneficiary_cand_id;
                   }
                   if (prop === 'entity_type') {
                     if (this.entityTypes) {
@@ -3841,7 +3827,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this.isFieldName(prop, 'balance_at_close') ||
                     this.isFieldName(prop, 'fed_share_amount') ||
                     this.isFieldName(prop, 'non_fed_share_amount') ||
-                    this.isFieldName(prop, 'activity_event_amount_ytd')
+                    this.isFieldName(prop, 'activity_event_amount_ytd') ||
+                      this.isFieldName(prop, 'aggregate_general_elec_exp')
                   ) {
                     const amount = trx[prop] ? trx[prop] : 0;
                     if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['total_amount'] && this.scheduleAction === 'edit' && this._cloned) {
@@ -4762,5 +4749,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.patchValue(orgPv , { onlySelf: true });
     }
 
+  }
+
+  protected getFormValidationErrors() {
+    Object.keys(this.frmIndividualReceipt.controls).forEach(key => {
+      const controlErrors: ValidationErrors = this.frmIndividualReceipt.get(key).errors;
+      if (controlErrors != null) {
+        Object.keys(controlErrors).forEach(keyError => {
+          console.error('Key control: ' + key + ', keyError: ' + keyError + ', err value: ', controlErrors[keyError]);
+        });
+      }
+    });
   }
 }
