@@ -1,42 +1,43 @@
-import {EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
-import {CurrencyPipe, DecimalPipe} from '@angular/common';
-import {HttpClient} from '@angular/common/http';
-import {ActivatedRoute, Router} from '@angular/router';
-import {FormBuilder, FormControl, FormGroup, ValidationErrors, Validators} from '@angular/forms';
-import {ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
-import {FormsService} from '../../../shared/services/FormsService/forms.service';
-import {UtilService} from '../../../shared/utils/util.service';
-import {MessageService} from '../../../shared/services/MessageService/message.service';
-import {IndividualReceiptService} from './individual-receipt.service';
-import {alphaNumeric} from '../../../shared/utils/forms/validation/alpha-numeric.validator';
-import {floatingPoint} from '../../../shared/utils/forms/validation/floating-point.validator';
-import {ReportTypeService} from '../report-type/report-type.service';
-import {Observable, Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs/operators';
-import {TypeaheadService} from 'src/app/shared/partials/typeahead/typeahead.service';
-import {DialogService} from 'src/app/shared/services/DialogService/dialog.service';
-import {ConfirmModalComponent, ModalHeaderClassEnum} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import {TransactionModel} from '../../transactions/model/transaction.model';
-import {F3xMessageService} from '../service/f3x-message.service';
-import {TransactionsMessageService} from '../../transactions/service/transactions-message.service';
-import {validateAggregate} from 'src/app/shared/utils/forms/validation/aggregate.validator';
-import {validateAmount, validateContributionAmount} from 'src/app/shared/utils/forms/validation/amount.validator';
-import {ContributionDateValidator} from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import {ContactsService} from 'src/app/contacts/service/contacts.service';
-import {GetTransactionsResponse, TransactionsService} from '../../transactions/service/transactions.service';
-import {ReportsService} from 'src/app/reports/service/report.service';
-import {reportModel} from 'src/app/reports/model/report.model';
-import {entityTypes} from './entity-types-json';
-import {ScheduleActions} from './schedule-actions.enum';
-import {AbstractScheduleParentEnum} from './abstract-schedule-parent.enum';
-import {CoordinatedExpenditureCCFields} from '../../sched-f-core/coordinated-expenditure-cc-fields';
-import {CoordinatedPartyExpenditureFields} from '../../sched-f-core/coordinated-party-expenditure-fields';
-import {CoordinatedExpenditureStaffFields} from '../../sched-f-core/coordinated-expenditure-staff-fields';
-import {CoordinatedExpenditurePayrollFields} from '../../sched-f-core/coordinated-expenditure-payroll-fields';
-import {CoordinatedPartyExpenditureVoidFields} from '../../sched-f-core/coordinated-party-expenditure-void-fields';
-import {CoordinatedExpenditureCcMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-cc-memo-fields';
-import {CoordinatedExpenditureStaffMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-staff-memo-fields';
-import {CoordinatedExpenditurePayrollMemoFields} from '../../sched-f-core/memo/coordinated-expenditure-Payroll-memo-fields';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { reportModel } from 'src/app/reports/model/report.model';
+import { ReportsService } from 'src/app/reports/service/report.service';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { validateAggregate } from 'src/app/shared/utils/forms/validation/aggregate.validator';
+import { validateAmount, validateContributionAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
+import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
+import { FormsService } from '../../../shared/services/FormsService/forms.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
+import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
+import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
+import { UtilService } from '../../../shared/utils/util.service';
+import { CoordinatedExpenditureCCFields } from '../../sched-f-core/coordinated-expenditure-cc-fields';
+import { CoordinatedExpenditurePayrollFields } from '../../sched-f-core/coordinated-expenditure-payroll-fields';
+import { CoordinatedExpenditureStaffFields } from '../../sched-f-core/coordinated-expenditure-staff-fields';
+import { CoordinatedPartyExpenditureFields } from '../../sched-f-core/coordinated-party-expenditure-fields';
+import { CoordinatedPartyExpenditureVoidFields } from '../../sched-f-core/coordinated-party-expenditure-void-fields';
+import { CoordinatedExpenditureCcMemoFields } from '../../sched-f-core/memo/coordinated-expenditure-cc-memo-fields';
+import { CoordinatedExpenditurePayrollMemoFields } from '../../sched-f-core/memo/coordinated-expenditure-Payroll-memo-fields';
+import { CoordinatedExpenditureStaffMemoFields } from '../../sched-f-core/memo/coordinated-expenditure-staff-memo-fields';
+import { TransactionModel } from '../../transactions/model/transaction.model';
+import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
+import { GetTransactionsResponse, TransactionsService } from '../../transactions/service/transactions.service';
+import { ReportTypeService } from '../report-type/report-type.service';
+import { F3xMessageService } from '../service/f3x-message.service';
+import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
+import { entityTypes } from './entity-types-json';
+import { IndividualReceiptService } from './individual-receipt.service';
+import { ScheduleActions } from './schedule-actions.enum';
+
 
 
 export enum SaveActions {
@@ -50,7 +51,7 @@ export enum SaveActions {
 }
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
-
+  
 
   transactionTypeText = '';
   transactionType = '';
@@ -92,6 +93,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public returnToDebtSummary = false;
   public returnToDebtSummaryInfo: any;
   public viewScheduleAction: ScheduleActions = ScheduleActions.view;
+  public reattributionTransactionId: string;
 
   protected abstractScheduleComponent: AbstractScheduleParentEnum;
   protected isInit = false;
@@ -173,8 +175,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _transactionsMessageService: TransactionsMessageService,
     protected _contributionDateValidator: ContributionDateValidator,
     private _transactionsService: TransactionsService,
-    protected _reportsService: ReportsService, 
-    
+    protected _reportsService: ReportsService,
+
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -217,7 +219,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       this._prePopulateFromSchedDData.balance_at_close : 0;
                     const paymentAmount = this._prePopulateFromSchedDData.payment_amount ?
                       this._prePopulateFromSchedDData.payment_amount : 0;
-                      this._outstandingDebtBalance = balanceAtClose - paymentAmount;
+                    this._outstandingDebtBalance = balanceAtClose - paymentAmount;
                     // }
                   }
                   this._checkForReturnToDebtSummary(message);
@@ -242,6 +244,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             break;
           default:
             console.log('message key not supported: ' + message.key);
+        }
+      }
+    });
+
+    this._f3xMessageService.getPopulateHiddenFieldsMessage().takeUntil(this.onDestroy$).subscribe(message => {
+      if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+        if(message.reattributionTransactionId){
+          this.clearFormValues();
+          this.reattributionTransactionId = message.reattributionTransactionId;
         }
       }
     });
@@ -577,19 +588,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (this._reportType !== null) {
         const cvgStartDate: string = this._reportType.cvgStartDate;
         const cvgEndDate: string = this._reportType.cvgEndDate;
-
-        formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
+        if(!this.reattributionTransactionId){
+          formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
+        }
       }
     } else if (this.isFieldName(fieldName, 'expenditure_amount') ||
-        this.isFieldName(fieldName, 'total_amount')) {
+      this.isFieldName(fieldName, 'total_amount')) {
       // Debt payments need a validation to prevent exceeding the incurred debt
       if (this.transactionType === 'OPEXP_DEBT' ||
-          this.transactionType === 'ALLOC_EXP_DEBT' ||
-          this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
-          this.transactionType === 'OTH_DISB_DEBT' ||
-          this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
-          this.transactionType === 'COEXP_PARTY_DEBT' ||
-          this.transactionType === 'IE_B4_DISSE') {
+        this.transactionType === 'ALLOC_EXP_DEBT' ||
+        this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
+        this.transactionType === 'OTH_DISB_DEBT' ||
+        this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
+        this.transactionType === 'COEXP_PARTY_DEBT' ||
+        this.transactionType === 'IE_B4_DISSE') {
         if (this._outstandingDebtBalance !== null) {
           if (this._outstandingDebtBalance >= 0) {
             formValidators.push(validateContributionAmount(this._outstandingDebtBalance));
@@ -749,30 +761,30 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _listenForAggregateChanges(): void {
     if (this.frmIndividualReceipt.get('contribution_aggregate') != null) {
       this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.takeUntil(this.onDestroy$)
-      .subscribe(val => {
-        // All validators are replaced here.  Currently the only validator functions
-        // for employer and occupation is the validateAggregate().  The max length is enforced
-        // in the template as an element attribute max.
-        // If additoanl validators need to be added here, there is no replace function in ng,
-        // they must be cleared and all set in an array again. Onc solution is to
-        // store the validators in a class variable array, add this function to the array, and set the
-        // controls's setValidator() using the full array.  Or just get the validations from the
-        // dynamic form fields again in this.formFields[].
-        const employerControl = this.frmIndividualReceipt.get('employer');
-        employerControl.setValidators([validateAggregate(val, true, 'employer')]);
-        employerControl.updateValueAndValidity();
+        .subscribe(val => {
+          // All validators are replaced here.  Currently the only validator functions
+          // for employer and occupation is the validateAggregate().  The max length is enforced
+          // in the template as an element attribute max.
+          // If additoanl validators need to be added here, there is no replace function in ng,
+          // they must be cleared and all set in an array again. Onc solution is to
+          // store the validators in a class variable array, add this function to the array, and set the
+          // controls's setValidator() using the full array.  Or just get the validations from the
+          // dynamic form fields again in this.formFields[].
+          const employerControl = this.frmIndividualReceipt.get('employer');
+          employerControl.setValidators([validateAggregate(val, true, 'employer')]);
+          employerControl.updateValueAndValidity();
 
-        const occupationControl = this.frmIndividualReceipt.get('occupation');
-        occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
-        occupationControl.updateValueAndValidity();
-      });
+          const occupationControl = this.frmIndividualReceipt.get('occupation');
+          occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
+          occupationControl.updateValueAndValidity();
+        });
     } else if (this.frmIndividualReceipt.get('expenditure_amount') != null) {
       this.frmIndividualReceipt.get('expenditure_amount').valueChanges.takeUntil(this.onDestroy$)
-      .subscribe(value => {
-        const expenditurePurposeDesc = this.frmIndividualReceipt.get('expenditure_purpose');
-        expenditurePurposeDesc.setValidators([validateAggregate(value, true, 'expenditure_purpose')]);
-        expenditurePurposeDesc.updateValueAndValidity();
-      });
+        .subscribe(value => {
+          const expenditurePurposeDesc = this.frmIndividualReceipt.get('expenditure_purpose');
+          expenditurePurposeDesc.setValidators([validateAggregate(value, true, 'expenditure_purpose')]);
+          expenditurePurposeDesc.updateValueAndValidity();
+        });
     }
   }
 
@@ -1686,9 +1698,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else if(  field === 'disbursement_date' ||
           field === 'dissemination_date'){
-            if(this.frmIndividualReceipt.get(field).value){
-              receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
-            }
+          if(this.frmIndividualReceipt.get(field).value){
+            receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
+          }
         } else if (field === this._childFieldNamePrefix + 'contribution_date') {
           receiptObj[field] = this._utilService.formatDate(this.frmIndividualReceipt.get(field).value);
         } else if (field === 'memo_code') {
@@ -1786,10 +1798,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           field === 'non_fed_share_amount' ||
           field === 'activity_event_amount_ytd' ||
           field === 'aggregate_general_elec_exp' ||
-          
+
           //for sched e YTD field
           field === 'expenditure_aggregate' ||
-          
+
           // for H6 fields name
           field === 'federal_share' ||
           field === 'levin_share'
@@ -1860,6 +1872,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.scheduleAction === ScheduleActions.addSubTransaction
       ) {
         receiptObj.back_ref_transaction_id = this._parentTransactionModel.transactionId;
+      }
+
+      if(this.reattributionTransactionId){
+        receiptObj['reattribution_id'] = this.reattributionTransactionId;
+        receiptObj['isReattribution'] = "true";
+
+        let reattributionField = this.hiddenFields.find(element => element.name === "reattribution_report_id");
+        if(this.scheduleAction === ScheduleActions.edit && !reattributionField){
+          receiptObj.reattribution_report_id = this._transactionToEdit.reportId.toString();
+        }
       }
 
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
@@ -2046,7 +2068,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             //it was initially only set for saveAction === SaveActions.updateOnly. But it should most likely be set to true for all
             //save actions if the save is successful, so the "cloning" process can be cleared. However, since its risky to change in all
             //places, changing it in the only other place that can possibly be triggered so far in the application.
-            this._completedCloning = true; 
+            this._completedCloning = true;
 
             this.returnToParent(ScheduleActions.edit);
           } else if (saveAction === SaveActions.saveForReturnToNewParent) {
@@ -2070,7 +2092,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.transactionType === 'IE' ||
                 this.transactionType === 'OTH_REC_DEBT'
               )
-           ) {
+            ) {
               this.returnToParent(this.editScheduleAction);
             } else {
               this._completedCloning = true;
@@ -2412,7 +2434,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this._dialogService
                   .confirm(
                     'Transaction has been successfully deleted and sent to the recycle bin. ' +
-                      this._transactionToEdit.transactionId,
+                    this._transactionToEdit.transactionId,
                     ConfirmModalComponent,
                     'Success!',
                     false,
@@ -2957,7 +2979,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       })
     );
-  
+
   /**
    * format the value to display in the input field once selected from the typeahead.
    *
@@ -3113,69 +3135,116 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public dateChange(fieldName: string) {
     console.log('date has changed!');
-    const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
-    if (isChildForm) {
-      if (this.frmIndividualReceipt.contains(this._childFieldNamePrefix + fieldName)) {
-        const dateValue = this.frmIndividualReceipt.get(this._childFieldNamePrefix + fieldName).value;
-        if (!dateValue) {
-          return;
-        }
-        /*
-          Memo transactions should not validate for transaction date
-        */
-        if (this.memoCode) {
-          this.frmIndividualReceipt.controls[this._childFieldNamePrefix + fieldName].setValidators([
-            Validators.required
-          ]);
-          this.frmIndividualReceipt.controls[this._childFieldNamePrefix + fieldName].updateValueAndValidity();
-        }
-        if (this._selectedEntityChild) {
-          const entityId = this._selectedEntityChild.entity_id ? this._selectedEntityChild.entity_id : null;
-          const cmteId = this._selectedEntityChild.cmte_id ? this._selectedEntityChild.cmte_id : null;
-          const contribDate = this._utilService.formatDate(dateValue);
-          if (fieldName === 'contribution_date') {
-            this._getContributionAggregate(contribDate, entityId, cmteId);
+
+    if (this.reattributionTransactionId) {
+      this.handleDateChangeForReattribution(fieldName);
+    }
+    else {
+
+      const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
+      if (isChildForm) {
+        if (this.frmIndividualReceipt.contains(this._childFieldNamePrefix + fieldName)) {
+          const dateValue = this.frmIndividualReceipt.get(this._childFieldNamePrefix + fieldName).value;
+          if (!dateValue) {
+            return;
           }
-        }
-      }
-    } else {
-      if (this.frmIndividualReceipt.contains(fieldName)) {
-        const dateValue = this.frmIndividualReceipt.get(fieldName).value;
-        if (!dateValue) {
-          return;
-        }
-        /*
-          Memo transactions should not validate for transaction date
-        */
-        if (this.memoCode) {
-          this.frmIndividualReceipt.controls[fieldName].setValidators([Validators.required]);
-          this.frmIndividualReceipt.controls[fieldName].updateValueAndValidity();
-        }
-        if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
-        this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent ) {
-          if (fieldName === 'expenditure_date') {
-            if (this._selectedCandidate) {
-              if (this._selectedCandidate.beneficiary_cand_id) {
-                const expenditureDate = this._utilService.formatDate(dateValue);
-                this._getSchedFDebtPaymentAggregate(
-                  this._selectedCandidate.beneficiary_cand_id,
-                  expenditureDate,
-                  this._selectedCandidate.beneficiary_cand_entity_id
-                );
-              }
-            }
+          /*
+            Memo transactions should not validate for transaction date
+          */
+          if (this.memoCode) {
+            this.frmIndividualReceipt.controls[this._childFieldNamePrefix + fieldName].setValidators([
+              Validators.required
+            ]);
+            this.frmIndividualReceipt.controls[this._childFieldNamePrefix + fieldName].updateValueAndValidity();
           }
-        } else {
-          if (this._selectedEntity) {
-            if (this._selectedEntity.entity_id) {
-              const contribDate = this._utilService.formatDate(dateValue);
-              if (fieldName === 'contribution_date') {
-                this._getContributionAggregate(contribDate, this._selectedEntity.entity_id, null);
-              }
+          if (this._selectedEntityChild) {
+            const entityId = this._selectedEntityChild.entity_id ? this._selectedEntityChild.entity_id : null;
+            const cmteId = this._selectedEntityChild.cmte_id ? this._selectedEntityChild.cmte_id : null;
+            const contribDate = this._utilService.formatDate(dateValue);
+            if (fieldName === 'contribution_date') {
+              this._getContributionAggregate(contribDate, entityId, cmteId);
             }
           }
         }
+      } else {
+        if (this.frmIndividualReceipt.contains(fieldName)) {
+          const dateValue = this.frmIndividualReceipt.get(fieldName).value;
+          if (!dateValue) {
+            return;
+          }
+          /*
+            Memo transactions should not validate for transaction date
+          */
+          if (this.memoCode) {
+            this.frmIndividualReceipt.controls[fieldName].setValidators([Validators.required]);
+            this.frmIndividualReceipt.controls[fieldName].updateValueAndValidity();
+          }
+          if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
+            this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
+            if (fieldName === 'expenditure_date') {
+              if (this._selectedCandidate) {
+                if (this._selectedCandidate.beneficiary_cand_id) {
+                  const expenditureDate = this._utilService.formatDate(dateValue);
+                  this._getSchedFDebtPaymentAggregate(
+                    this._selectedCandidate.beneficiary_cand_id,
+                    expenditureDate,
+                    this._selectedCandidate.beneficiary_cand_entity_id
+                  );
+                }
+              }
+            }
+          } else {
+            if (this._selectedEntity) {
+              if (this._selectedEntity.entity_id) {
+                const contribDate = this._utilService.formatDate(dateValue);
+                if (fieldName === 'contribution_date') {
+                  this._getContributionAggregate(contribDate, this._selectedEntity.entity_id, null);
+                }
+              }
+            }
+          }
+        }
       }
+    }
+  }
+
+
+  /**
+   * This method handles date change logic for reattributions.
+   * @param fieldName 
+   */
+  protected handleDateChangeForReattribution(fieldName: string) {
+    // clear current validators for the dateField and add reattribtionValdiator
+    this.frmIndividualReceipt.controls[fieldName].clearValidators();
+    this.frmIndividualReceipt.controls[fieldName].setValidators([Validators.required]);
+    if (this.frmIndividualReceipt.contains(fieldName)) {
+      const dateValue = this.frmIndividualReceipt.get(fieldName).value;
+      if (!dateValue) {
+        return;
+      }
+      this.frmIndividualReceipt.controls[fieldName].setErrors(null);
+      this._receiptService.getReportIdByTransactionDate(this._utilService.formatDate(dateValue)).subscribe(res => {
+        if (res) {
+          if (res.reportId) {
+            if (res.status && res.status !== 'Filed') {
+              let field = this.hiddenFields.find(element => element.name === 'reattribution_report_id');
+              if(field){
+                field.value = res.reportId.toString();
+              }
+              else{
+                this.hiddenFields.push({type:'hidden',name:'reattribution_report_id',value: res.reportId.toString()});
+              }
+            }
+            else if (res.status && res.status === 'Filed') {
+              this.frmIndividualReceipt.controls[fieldName].setErrors({ reportFiled: true });
+            }
+          }
+          else {
+            this.frmIndividualReceipt.controls[fieldName].setErrors({ reportNotFound: true });
+          }
+        }
+      })
+
     }
   }
 
@@ -3238,169 +3307,169 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       });
     }
     this._receiptService.getDynamicFormFields(this.formType, this.transactionType).takeUntil(this.onDestroy$)
-    .subscribe(res => {
-      res = this._hijackFormFields(res);
-      if (res) {
-        if (res.hasOwnProperty('data')) {
-          if (typeof res.data === 'object') {
-            if (res.data.hasOwnProperty('formFields')) {
-              if (Array.isArray(res.data.formFields)) {
-                // If fields are pre-populated for "static" forms, append any additional fields
-                // from the API as with SF.
-                if (this.formFieldsPrePopulated) {
-                  if (this.staticFormFields) {
-                    if (this.staticFormFields.length > 0) {
-                      for (const field of this.staticFormFields) {
-                        res.data.formFields.push(field);
+      .subscribe(res => {
+        res = this._hijackFormFields(res);
+        if (res) {
+          if (res.hasOwnProperty('data')) {
+            if (typeof res.data === 'object') {
+              if (res.data.hasOwnProperty('formFields')) {
+                if (Array.isArray(res.data.formFields)) {
+                  // If fields are pre-populated for "static" forms, append any additional fields
+                  // from the API as with SF.
+                  if (this.formFieldsPrePopulated) {
+                    if (this.staticFormFields) {
+                      if (this.staticFormFields.length > 0) {
+                        for (const field of this.staticFormFields) {
+                          res.data.formFields.push(field);
+                        }
+                      }
+                    }
+                  }
+                  this.formFields = res.data.formFields;
+                  this._setForm(this.formFields);
+                }
+              }
+              if (res.data.hasOwnProperty('hiddenFields')) {
+                if (Array.isArray(res.data.hiddenFields)) {
+                  this.hiddenFields = res.data.hiddenFields;
+                }
+              }
+              if (res.data.hasOwnProperty('states')) {
+                if (Array.isArray(res.data.states)) {
+                  this.states = res.data.states;
+                }
+              }
+              if (res.data.hasOwnProperty('electionTypes')) {
+                if (Array.isArray(res.data.electionTypes)) {
+                  this.electionTypes = res.data.electionTypes;
+                }
+              }
+
+              if (res.data.hasOwnProperty('committeeTypeEvents')) {
+                if (Array.isArray(res.data.committeeTypeEvents)) {
+                  const committeeTypeEvents = res.data.committeeTypeEvents;
+                  if (this._cmteTypeCategory) {
+                    for (const committeeTypeEvent of committeeTypeEvents) {
+                      if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
+                        this.activityEventTypes = committeeTypeEvent.eventTypes;
+                      }
+
+                      if (
+                        (this.transactionType === 'ALLOC_FEA_DISB' ||
+                          this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
+                          this.transactionType === 'ALLOC_FEA_CC_PAY' ||
+                          this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+                          this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
+                          this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+                          this.transactionType == 'ALLOC_FEA_VOID') &&
+                        'H6' === committeeTypeEvent.committeeTypeCategory
+                      ) {
+                        this.activityEventTypes = committeeTypeEvent.eventTypes;
                       }
                     }
                   }
                 }
-                this.formFields = res.data.formFields;
-                this._setForm(this.formFields);
               }
-            }
-            if (res.data.hasOwnProperty('hiddenFields')) {
-              if (Array.isArray(res.data.hiddenFields)) {
-                this.hiddenFields = res.data.hiddenFields;
-              }
-            }
-            if (res.data.hasOwnProperty('states')) {
-              if (Array.isArray(res.data.states)) {
-                this.states = res.data.states;
-              }
-            }
-            if (res.data.hasOwnProperty('electionTypes')) {
-              if (Array.isArray(res.data.electionTypes)) {
-                this.electionTypes = res.data.electionTypes;
-              }
-            }
 
-            if (res.data.hasOwnProperty('committeeTypeEvents')) {
-              if (Array.isArray(res.data.committeeTypeEvents)) {
-                const committeeTypeEvents = res.data.committeeTypeEvents;
-                if (this._cmteTypeCategory) {
-                  for (const committeeTypeEvent of committeeTypeEvents) {
-                    if (this._cmteTypeCategory === committeeTypeEvent.committeeTypeCategory) {
-                      this.activityEventTypes = committeeTypeEvent.eventTypes;
-                    }
-
-                    if (
-                      (this.transactionType === 'ALLOC_FEA_DISB' ||
-                        this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
-                        this.transactionType === 'ALLOC_FEA_CC_PAY' ||
-                        this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
-                        this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
-                        this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
-                        this.transactionType == 'ALLOC_FEA_VOID') &&
-                      'H6' === committeeTypeEvent.committeeTypeCategory
-                    ) {
-                      this.activityEventTypes = committeeTypeEvent.eventTypes;
-                    }
-                  }
+              if (res.data.hasOwnProperty('titles')) {
+                if (Array.isArray(res.data.titles)) {
+                  this.titles = res.data.titles;
                 }
               }
-            }
-
-            if (res.data.hasOwnProperty('titles')) {
-              if (Array.isArray(res.data.titles)) {
-                this.titles = res.data.titles;
-              }
-            }
-            if (res.data.hasOwnProperty('entityTypes')) {
-              // TODO entityTypes are not returned by dynamic forms API for some.
-              // If propery exists but is null use hard coded default until API returns.
-              if (!res.data.entityTypes) {
-                res.data.entityTypes = entityTypes;
-              }
-              if (Array.isArray(res.data.entityTypes)) {
-                this.entityTypes = res.data.entityTypes;
-                if (this.entityTypes) {
-                  for (const field of this.entityTypes) {
-                    // If API sets selected to true it can be used to set the default.
-                    // If none are set, use the first.
-                    // If none are set, default to first.
-                    if (field.selected) {
-                      this.selectedEntityType = field;
-                    }
-                  }
-                  if (!this.selectedEntityType) {
-                    if (this.entityTypes.length > 0) {
-                      this.selectedEntityType = this.entityTypes[0];
-                    }
-                  }
+              if (res.data.hasOwnProperty('entityTypes')) {
+                // TODO entityTypes are not returned by dynamic forms API for some.
+                // If propery exists but is null use hard coded default until API returns.
+                if (!res.data.entityTypes) {
+                  res.data.entityTypes = entityTypes;
                 }
-                // expecting default entity type to be IND
-                this.toggleValidationIndOrg(this.selectedEntityType.entityType);
-                this._entityTypeDefault = this.selectedEntityType;
-                this.frmIndividualReceipt.patchValue(
-                  { entity_type: this.selectedEntityType.entityType },
-                  { onlySelf: true }
-                );
+                if (Array.isArray(res.data.entityTypes)) {
+                  this.entityTypes = res.data.entityTypes;
+                  if (this.entityTypes) {
+                    for (const field of this.entityTypes) {
+                      // If API sets selected to true it can be used to set the default.
+                      // If none are set, use the first.
+                      // If none are set, default to first.
+                      if (field.selected) {
+                        this.selectedEntityType = field;
+                      }
+                    }
+                    if (!this.selectedEntityType) {
+                      if (this.entityTypes.length > 0) {
+                        this.selectedEntityType = this.entityTypes[0];
+                      }
+                    }
+                  }
+                  // expecting default entity type to be IND
+                  this.toggleValidationIndOrg(this.selectedEntityType.entityType);
+                  this._entityTypeDefault = this.selectedEntityType;
+                  this.frmIndividualReceipt.patchValue(
+                    { entity_type: this.selectedEntityType.entityType },
+                    { onlySelf: true }
+                  );
+                }
               }
-            }
-            if (res.data.hasOwnProperty('subTransactions')) {
-              if (Array.isArray(res.data.subTransactions)) {
-                if (res.data.subTransactions.length > 0) {
-                  this.subTransactionInfo = res.data.subTransactions[0];
-                  if (res.data.subTransactions.length > 1) {
-                    // Fix an issue where previous transaction type is passed.
-                    for (const hiddenField of this.hiddenFields) {
-                      if ('transaction_type_identifier' === hiddenField.name) {
-                        if ((hiddenField.value = this.transactionType)) {
-                          this.multipleSubTransactionInfo = res.data.subTransactions;
+              if (res.data.hasOwnProperty('subTransactions')) {
+                if (Array.isArray(res.data.subTransactions)) {
+                  if (res.data.subTransactions.length > 0) {
+                    this.subTransactionInfo = res.data.subTransactions[0];
+                    if (res.data.subTransactions.length > 1) {
+                      // Fix an issue where previous transaction type is passed.
+                      for (const hiddenField of this.hiddenFields) {
+                        if ('transaction_type_identifier' === hiddenField.name) {
+                          if ((hiddenField.value = this.transactionType)) {
+                            this.multipleSubTransactionInfo = res.data.subTransactions;
+                          }
                         }
                       }
                     }
                   }
                 }
               }
+            } // typeof res.data
+          } // res.hasOwnProperty('data')
+        } // res
+        this._prePopulateFormField(this._prePopulateFieldArray);
+        this._prePopulateFieldArray = null;
+
+        let apiCall: string = this._findHiddenField('name', 'api_call');
+        apiCall = apiCall ? apiCall : '';
+
+        let schedDSubTran = false;
+        let schedLSubTran = false;
+        if (this.subTransactionInfo) {
+          if (this.subTransactionInfo.scheduleType === 'sched_d' && this.subTransactionInfo.isParent === false) {
+            schedDSubTran = true;
+          } else if (this.subTransactionInfo.scheduleType === 'sched_a' && this.subTransactionInfo.isParent === false) {
+            if (this.subTransactionInfo.subTransactionType === 'LEVIN_PARTN_MEMO') {
+              schedLSubTran = true;
+              /*if (res.hasOwnProperty('levin_account_id')) {
+                prePopulateFieldArray.push({ name: 'levin_account_id', value: res.levin_account_id });
+              }*/
             }
-          } // typeof res.data
-        } // res.hasOwnProperty('data')
-      } // res
-      this._prePopulateFormField(this._prePopulateFieldArray);
-      this._prePopulateFieldArray = null;
-
-      let apiCall: string = this._findHiddenField('name', 'api_call');
-      apiCall = apiCall ? apiCall : '';
-
-      let schedDSubTran = false;
-      let schedLSubTran = false;
-      if (this.subTransactionInfo) {
-        if (this.subTransactionInfo.scheduleType === 'sched_d' && this.subTransactionInfo.isParent === false) {
-          schedDSubTran = true;
-        } else if (this.subTransactionInfo.scheduleType === 'sched_a' && this.subTransactionInfo.isParent === false) {
-          if (this.subTransactionInfo.subTransactionType === 'LEVIN_PARTN_MEMO') {
-            schedLSubTran = true;
-            /*if (res.hasOwnProperty('levin_account_id')) {
-              prePopulateFieldArray.push({ name: 'levin_account_id', value: res.levin_account_id });
-            }*/
           }
         }
-      }
 
-      // If Data for sched D sub-tran has been received by the message service,
-      // pre-populate the formGroup now that the dynamic form API call is complete.
-      if (
-        this._prePopulateFromSchedDData &&
-        schedDSubTran &&
-        this.scheduleAction === ScheduleActions.addSubTransaction
-      ) {
-        this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
-        this._prePopulateFromSchedDData = null;
-      }
-      // If Data for sched L sub-tran has been received by the message service,
-      // pre-populate the formGroup now that the dynamic form API call is complete.
-      if (
-        this._prePopulateFromSchedLData &&
-        schedLSubTran &&
-        this.scheduleAction === ScheduleActions.addSubTransaction
-      ) {
-        this._prePopulateFromSchedL(this._prePopulateFromSchedLData);
-        this._prePopulateFromSchedLData = null;
-      }
-    });
+        // If Data for sched D sub-tran has been received by the message service,
+        // pre-populate the formGroup now that the dynamic form API call is complete.
+        if (
+          this._prePopulateFromSchedDData &&
+          schedDSubTran &&
+          this.scheduleAction === ScheduleActions.addSubTransaction
+        ) {
+          this._prePopulateFromSchedD(this._prePopulateFromSchedDData);
+          this._prePopulateFromSchedDData = null;
+        }
+        // If Data for sched L sub-tran has been received by the message service,
+        // pre-populate the formGroup now that the dynamic form API call is complete.
+        if (
+          this._prePopulateFromSchedLData &&
+          schedLSubTran &&
+          this.scheduleAction === ScheduleActions.addSubTransaction
+        ) {
+          this._prePopulateFromSchedL(this._prePopulateFromSchedLData);
+          this._prePopulateFromSchedLData = null;
+        }
+      });
   }
 
   /**
@@ -3642,42 +3711,42 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     this.subTransactions = [];
     this._receiptService.getDataSchedule(reportId, transactionId, apiCall).takeUntil(this.onDestroy$)
-    .subscribe(res => {
-      if (Array.isArray(res)) {
-        for (const trx of res) {
-          if (trx.hasOwnProperty('transaction_id')) {
-            if (trx.transaction_id === transactionId) {
-              if (trx.hasOwnProperty('child')) {
-                if (Array.isArray(trx.child)) {
-                  if (trx.child.length > 0) {
-                    this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([trx])[0];
-                    this.subTransactions = trx.child;
-                    if (this.subTransactionInfo) {
-                      this.subTransactionsTableType = this.subTransactionInfo.scheduleType;
+      .subscribe(res => {
+        if (Array.isArray(res)) {
+          for (const trx of res) {
+            if (trx.hasOwnProperty('transaction_id')) {
+              if (trx.transaction_id === transactionId) {
+                if (trx.hasOwnProperty('child')) {
+                  if (Array.isArray(trx.child)) {
+                    if (trx.child.length > 0) {
+                      this._parentTransactionModel = this._transactionsService.mapFromServerSchedFields([trx])[0];
+                      this.subTransactions = trx.child;
+                      if (this.subTransactionInfo) {
+                        this.subTransactionsTableType = this.subTransactionInfo.scheduleType;
+                      }
+                      for (const subTrx of this.subTransactions) {
+                        console.log('sub tran id ' + subTrx.transaction_id);
+                      }
                     }
-                    for (const subTrx of this.subTransactions) {
-                      console.log('sub tran id ' + subTrx.transaction_id);
+                  }
+                } else {
+                  if (trx.hasOwnProperty('back_ref_transaction_id')) {
+                    if (trx.back_ref_transaction_id) {
+                      this._getParentFromChild(reportId, trx, apiCall);
                     }
                   }
                 }
-              } else {
-                if (trx.hasOwnProperty('back_ref_transaction_id')) {
-                  if (trx.back_ref_transaction_id) {
-                    this._getParentFromChild(reportId, trx, apiCall);
-                  }
-                }
-              }
-              for (const prop in trx) {
-                if (trx.hasOwnProperty(prop)) {
-                  // add to hidden fields
-                  for (const hiddenField of this.hiddenFields) {
-                    if (prop === hiddenField.name) {
-                      hiddenField.value = trx[prop];
+                for (const prop in trx) {
+                  if (trx.hasOwnProperty(prop)) {
+                    // add to hidden fields
+                    for (const hiddenField of this.hiddenFields) {
+                      if (prop === hiddenField.name) {
+                        hiddenField.value = trx[prop];
+                      }
                     }
-                  }
-                  if (this.frmIndividualReceipt) {
-                    if (this.frmIndividualReceipt.get(prop)) {
+                    if (this.frmIndividualReceipt) {
                       if (this.frmIndividualReceipt.get(prop)) {
+                        if (this.frmIndividualReceipt.get(prop)) {
                         if (this.isFieldName(prop, 'contribution_aggregate')) {
                           this._contributionAggregateValue = trx[prop];
                         } else if (this.isFieldName(prop, 'aggregate_general_elec_exp')) {
@@ -3697,76 +3766,76 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                             }
                           }
                         }
-                        if (this.isFieldName(prop, 'memo_code')) {
-                          const memoCodeValue = trx[prop];
-                          if (memoCodeValue === this._memoCodeValue) {
-                            const isChildField = prop.startsWith(this._childFieldNamePrefix) ? true : false;
-                            if (isChildField) {
-                              this.memoCodeChild = true;
-                            } else {
-                              this.memoCode = true;
+                          if (this.isFieldName(prop, 'memo_code')) {
+                            const memoCodeValue = trx[prop];
+                            if (memoCodeValue === this._memoCodeValue) {
+                              const isChildField = prop.startsWith(this._childFieldNamePrefix) ? true : false;
+                              if (isChildField) {
+                                this.memoCodeChild = true;
+                              } else {
+                                this.memoCode = true;
+                              }
                             }
                           }
-                        }
-                        if (this.isFieldName(prop, 'purpose_description')) {
-                          const preTextHiddenField = this._findHiddenField('name', 'pretext');
-                          let preText = '';
-                          if (preTextHiddenField) {
-                            preText = preTextHiddenField.value ? preTextHiddenField.value : '';
-                          }
-                          if (preText) {
-                            // remove it from the input field.  It will be readded on save.
-                            if (trx[prop]) {
-                              if (typeof trx[prop] === 'string') {
-                                if (trx[prop].startsWith(preText)) {
-                                  trx[prop] = trx[prop].replace(preText, '');
+                          if (this.isFieldName(prop, 'purpose_description')) {
+                            const preTextHiddenField = this._findHiddenField('name', 'pretext');
+                            let preText = '';
+                            if (preTextHiddenField) {
+                              preText = preTextHiddenField.value ? preTextHiddenField.value : '';
+                            }
+                            if (preText) {
+                              // remove it from the input field.  It will be readded on save.
+                              if (trx[prop]) {
+                                if (typeof trx[prop] === 'string') {
+                                  if (trx[prop].startsWith(preText)) {
+                                    trx[prop] = trx[prop].replace(preText, '');
+                                  }
                                 }
                               }
                             }
                           }
-                        }
-                        const patch = {};
-                        patch[prop] = trx[prop];
-                        this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
-                      }
-                    }
-                  }
-                  if (prop === 'entity_id') {
-                    this._selectedEntity = {};
-                    this._selectedEntity.entity_id = trx[prop];
-                    this._selectedEntity.entity_name = null;
-                    this._selectedEntity.first_name = null;
-                    this._selectedEntity.last_name = null;
-                    this._selectedEntity.middle_name = null;
-                    // TODO: Should be removed later FNE-1974
-                    this._selectedEntity.preffix = null;
-                    // this._selectedEntity.prefix = null;
-                    this._selectedEntity.suffix = null;
-                    if (this._selectedEntity.entity_id) {
-                      if (typeof this._selectedEntity.entity_id === 'string') {
-                        if (this._selectedEntity.entity_id.startsWith('IND')) {
-                          this._selectedEntity.entity_type = 'IND';
-                          this._selectedEntity.first_name = trx.first_name;
-                          this._selectedEntity.last_name = trx.last_name;
-                          this._selectedEntity.middle_name = trx.middle_name;
-                          // TODO: Should be removed later FNE-1974
-                          this._selectedEntity.preffix = trx.preffix;
-                          // this._selectedEntity.prefix = trx.preffix;
-                          this._selectedEntity.suffix = trx.suffix;
-                        } else if (this._selectedEntity.entity_id.startsWith('ORG')) {
-                          this._selectedEntity.entity_type = 'ORG';
-                          this._selectedEntity.entity_name = trx.entity_name;
+                          const patch = {};
+                          patch[prop] = trx[prop];
+                          this.frmIndividualReceipt.patchValue(patch, { onlySelf: true });
                         }
                       }
                     }
-                    this._selectedEntity.city = trx.city;
-                    this._selectedEntity.employer = trx.employer;
-                    this._selectedEntity.occupation = trx.occupation;
-                    this._selectedEntity.street_1 = trx.street_1;
-                    this._selectedEntity.street_2 = trx.street_2;
-                    this._selectedEntity.state = trx.state;
-                    this._selectedEntity.zip_code = trx.zip_code;
-                  }
+                    if (prop === 'entity_id') {
+                      this._selectedEntity = {};
+                      this._selectedEntity.entity_id = trx[prop];
+                      this._selectedEntity.entity_name = null;
+                      this._selectedEntity.first_name = null;
+                      this._selectedEntity.last_name = null;
+                      this._selectedEntity.middle_name = null;
+                      // TODO: Should be removed later FNE-1974
+                      this._selectedEntity.preffix = null;
+                      // this._selectedEntity.prefix = null;
+                      this._selectedEntity.suffix = null;
+                      if (this._selectedEntity.entity_id) {
+                        if (typeof this._selectedEntity.entity_id === 'string') {
+                          if (this._selectedEntity.entity_id.startsWith('IND')) {
+                            this._selectedEntity.entity_type = 'IND';
+                            this._selectedEntity.first_name = trx.first_name;
+                            this._selectedEntity.last_name = trx.last_name;
+                            this._selectedEntity.middle_name = trx.middle_name;
+                            // TODO: Should be removed later FNE-1974
+                            this._selectedEntity.preffix = trx.preffix;
+                            // this._selectedEntity.prefix = trx.preffix;
+                            this._selectedEntity.suffix = trx.suffix;
+                          } else if (this._selectedEntity.entity_id.startsWith('ORG')) {
+                            this._selectedEntity.entity_type = 'ORG';
+                            this._selectedEntity.entity_name = trx.entity_name;
+                          }
+                        }
+                      }
+                      this._selectedEntity.city = trx.city;
+                      this._selectedEntity.employer = trx.employer;
+                      this._selectedEntity.occupation = trx.occupation;
+                      this._selectedEntity.street_1 = trx.street_1;
+                      this._selectedEntity.street_2 = trx.street_2;
+                      this._selectedEntity.state = trx.state;
+                      this._selectedEntity.zip_code = trx.zip_code;
+                    }
                   if (prop === 'beneficiary_cand_entity_id') {
                     this._selectedCandidate = {};
                     this._selectedCandidate.entity_id = trx[prop];
@@ -3805,13 +3874,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       }
                     }
                   }
-                  if (prop === this._childFieldNamePrefix + 'entity_id') {
-                    this._selectedEntityChild = {};
-                    this._selectedEntityChild.entity_id = trx[prop];
+                    if (prop === this._childFieldNamePrefix + 'entity_id') {
+                      this._selectedEntityChild = {};
+                      this._selectedEntityChild.entity_id = trx[prop];
+                    }
+                    // TODO add for _selectedCandidate
                   }
-                  // TODO add for _selectedCandidate
                 }
-              }
               // loop through props again now that aggregate should be set
               // and apply contributionAmountChange() formatting, setting, etc.
               for (const prop in trx) {
@@ -3839,27 +3908,27 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   }
                 }
               }
-              this._validateTransactionDate();
-              this._calculateDebtAmountFields(trx);
+                this._validateTransactionDate();
+                this._calculateDebtAmountFields(trx);
+              }
+            }
+            //once data is set, send a message to any child components that may want to set additional specific fields
+            this._messageService.sendPopulateChildComponentMessage({populateChildForEdit: true, transactionData: trx});
+          }
+
+
+          // move the payment button into view if flag is set.
+          if (this._transactionToEdit && this._transactionToEdit.scrollDebtPaymentButtonIntoView) {
+            let button = document.getElementById('jfMemoDropdown');
+            if (button === null) {
+              button = document.getElementById('addSingleChildButton');
+            }
+            if (button !== null) {
+              button.scrollIntoView();
             }
           }
-          //once data is set, send a message to any child components that may want to set additional specific fields
-            this._messageService.sendPopulateChildComponentMessage({populateChildForEdit: true, transactionData: trx});
         }
-
-
-        // move the payment button into view if flag is set.
-        if (this._transactionToEdit && this._transactionToEdit.scrollDebtPaymentButtonIntoView) {
-          let button = document.getElementById('jfMemoDropdown');
-          if (button === null) {
-            button = document.getElementById('addSingleChildButton');
-          }
-          if (button !== null) {
-            button.scrollIntoView();
-          }
-        }
-      }
-    });
+      });
   }
 
   private _calculateDebtAmountFields(trx: any) {
@@ -3964,7 +4033,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     if (this.frmIndividualReceipt.get(amountField)) {
       if (parentTrx.hasOwnProperty('incurred_amount') &&
-          parentTrx.hasOwnProperty('payment_amount')) {
+        parentTrx.hasOwnProperty('payment_amount')) {
         const incurredAmount = parentTrx.incurred_amount ? parentTrx.incurred_amount : 0;
         const paymentAmount = parentTrx.payment_amount ? parentTrx.payment_amount : 0;
         // Because this is edit on a payment, back out the current payment amount
@@ -4094,6 +4163,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;
+    this.reattributionTransactionId = null;
     // this._outstandingDebtBalance = null;
     this.memoCode = false;
     this.memoCodeChild = false;
@@ -4518,10 +4588,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       // to indicate it is a memo, similar to isEarMark.  For now using transaction_type
       // until API is provide transfer memo indicator.
       if ((this.subTransactionInfo.isEarmark && this.subTransactionInfo.isParent) ||
-            (res.transaction_type_identifier === 'JF_TRAN' ||
-            res.transaction_type_identifier === 'JF_TRAN_NP_RECNT_ACC' ||
-            res.transaction_type_identifier === 'JF_TRAN_NP_CONVEN_ACC' ||
-            res.transaction_type_identifier === 'JF_TRAN_NP_HQ_ACC')) {
+        (res.transaction_type_identifier === 'JF_TRAN' ||
+          res.transaction_type_identifier === 'JF_TRAN_NP_RECNT_ACC' ||
+          res.transaction_type_identifier === 'JF_TRAN_NP_CONVEN_ACC' ||
+          res.transaction_type_identifier === 'JF_TRAN_NP_HQ_ACC')) {
         let earmarkMemoPurpose = null;
 
         if (res.hasOwnProperty('entity_type')) {
@@ -4540,9 +4610,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
         prePopulateFieldArray = [];
         if (res.transaction_type_identifier !== 'JF_TRAN' &&
-            res.transaction_type_identifier !== 'JF_TRAN_NP_RECNT_ACC' &&
-            res.transaction_type_identifier !== 'JF_TRAN_NP_CONVEN_ACC' &&
-            res.transaction_type_identifier !== 'JF_TRAN_NP_HQ_ACC') {
+          res.transaction_type_identifier !== 'JF_TRAN_NP_RECNT_ACC' &&
+          res.transaction_type_identifier !== 'JF_TRAN_NP_CONVEN_ACC' &&
+          res.transaction_type_identifier !== 'JF_TRAN_NP_HQ_ACC') {
           if (res.hasOwnProperty('contribution_amount')) {
             const amountValue: string = this._decimalPipe.transform(parseFloat(res.contribution_amount), '.2-2');
             prePopulateFieldArray.push({ name: 'contribution_amount', value: amountValue });

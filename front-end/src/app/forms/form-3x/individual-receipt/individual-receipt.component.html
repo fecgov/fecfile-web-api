@@ -286,6 +286,20 @@
                         </ng-container>
                         <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
                           <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.reportFiled">
+                            The report corresponding to this date is already filed. You must amend the report first.
+                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                              coverage period only. -->
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.reportNotFound">
+                            No report corresponding to this date found.
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
                             *ngIf="frmIndividualReceipt.get(col?.name).errors?.amountExceeded">
                             Expenditure amount exceeds outstanding debt amount
                           </div>

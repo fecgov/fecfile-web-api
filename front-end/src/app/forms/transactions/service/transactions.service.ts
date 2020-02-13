@@ -979,5 +979,7 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.loanPaymentToDate = row.loan_payment_to_date;
   model.iseditable = row.iseditable;
   model.isTrashable = row.istrashable;
+  model.isReattribution = row.isReattribution;
+  model.isreattributable = row.isreattributable;
   
 }

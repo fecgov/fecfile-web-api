@@ -108,6 +108,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   removeTagsSubscription: any;
 
   private viewTransactionSubscription: Subscription;
+  private getReattributeTransactionSubscription: Subscription;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -144,6 +145,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         console.log(trx.transactionTypeIdentifier + 'identifier for edit');
         this.showEdit();
       });
+
+    this.getReattributeTransactionSubscription = this._transactionsMessageService
+    .getReattributeTransactionMessage()
+    .subscribe((trx: TransactionModel) => {
+      this.transactionToEdit = trx;
+      console.log(trx.transactionTypeIdentifier + 'identifier for edit');
+      this.showReattribute();
+    });
 
     this.editDebtSummaryTransactionSubscription = this._transactionsMessageService
       .getEditDebtSummaryTransactionMessage()
@@ -891,6 +900,37 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
     // Inform the filter component of the view change
     this._transactionsMessageService.sendSwitchFilterViewMessage(ActiveView.transactions);
+  }
+
+  /**
+   * Show reattribute for a single transaction.
+   */
+  public showReattribute(debtSummary?: any) {
+    const emptyValidForm = this._fb.group({});
+
+    this.transactionToEdit.isReattribution = true;
+    this.transactionToEdit.reattribution_id = this.transactionToEdit.transactionId;
+    const emitObj: any = {
+      form: emptyValidForm,
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'transactions',
+      action: ScheduleActions.add,
+      transactionCategory: this.transactionCategory,
+      scheduleType: this.transactionToEdit.scheduleType,
+      transactionDetail: {
+        transactionModel: this.transactionToEdit
+      }
+    };
+    if (debtSummary) {
+      if (debtSummary.returnToDebtSummary) {
+        emitObj.returnToDebtSummary = debtSummary.returnToDebtSummary;
+        emitObj.returnToDebtSummaryInfo = debtSummary.returnToDebtSummaryInfo;
+      }
+    }
+    this.showTransaction.emit(emitObj);
+
+    this.showCategories();
   }
 
   /**

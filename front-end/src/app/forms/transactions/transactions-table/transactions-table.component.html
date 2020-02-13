@@ -183,6 +183,9 @@
                         <i class="edit-icon"></i> Edit
                       </button>
                     </span>
+                    <button *ngIf="true" class="dropdown-item" (click)="reattributeTransaction(trx)">
+                        <i class="edit-icon"></i> Reattribute
+                    </button>
                     <button class="dropdown-item" (click)="printTransaction(trx)">
                       <i class="fas fa-print"></i> Print
                     </button>
@@ -246,18 +249,25 @@
                     <i class="ellipsis-icon"></i>
                   </button>
                   <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                    <button class="dropdown-item" (click)="editTransaction(trxChild)">
-                      <i class="edit-icon"></i> Edit
-                    </button>
+                    <span [title]="!trxChild.iseditable ? 'This transaction cannot be edited because it is auto generated.':''">
+                      <button [disabled]="!trxChild.iseditable" class="dropdown-item" (click)="editTransaction(trxChild)">
+                        <i class="edit-icon"></i> Edit
+                      </button>
+                    </span>
                     <button class="dropdown-item" (click)="printTransaction(trxChild)">
                       <i class="fas fa-print"></i> Print
                     </button>
-                    <button class="dropdown-item" (click)="cloneTransaction(trxChild)">
-                      <i class="far fa-copy"></i> Clone
-                    </button>
-                    <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
-                      <i class="trash-icon"></i> Trash
-                    </button>
+                    <span [title]="!trxChild.iseditable ? 'This transaction cannot be cloned because it is auto generated.':''">
+                      <button [disabled]="!trxChild.iseditable" class="dropdown-item" (click)="cloneTransaction(trxChild)">
+                        <i class="far fa-copy"></i> Clone
+                      </button>
+                    </span>
+                    <span [title]="!trxChild.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
+                      <button [disabled]="!trxChild.iseditable" *ngIf="checkIfTrashable()" class="dropdown-item"
+                        (click)="trashTransaction(trxChild)">
+                        <i class="trash-icon"></i> Trash
+                      </button>
+                    </span>
                   </div>
                 </div>
               </div>
