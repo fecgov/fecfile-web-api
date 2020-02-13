@@ -2103,6 +2103,7 @@ def schedA(request):
                     request.data["reattribution_id"],
                     datum["contribution_date"],
                     datum["contribution_amount"],
+                    data['transaction_id']
                 )
             output = get_schedA(data)
             # for earmark child transaction: update parent transction  purpose_description
