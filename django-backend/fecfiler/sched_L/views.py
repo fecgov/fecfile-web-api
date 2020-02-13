@@ -115,7 +115,7 @@ def schedL_sql_dict(data):
     filter out valid fileds for sched_L
 
     """
-    print(data)
+    # print(data)
     valid_fields = [
         "cmte_id",
         "report_id",
@@ -163,7 +163,7 @@ def schedL_sql_dict(data):
     try:
         valid_data = {k: v for k, v in data.items() if k in valid_fields}
 
-        print(valid_data)
+        # print(valid_data)
         # if 'levin_account_id' in data:
         #     valid_data['record_id'] = data.get('levin_account_id')
         #     levin_account = get_levin_account(data.get)
@@ -184,7 +184,7 @@ def put_schedL(data):
             logger.debug("update sl record with {}".format(data))
             put_sql_schedL(data)
         except Exception as e:
-            print(e)
+            # print(e)
             raise Exception(
                 "The put_sql_schedL function is throwing an error: " + str(e)
             )
@@ -1131,7 +1131,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-            print(prev_cvg_end_dt)
+            # print(prev_cvg_end_dt)
         with connection.cursor() as cursor:
             if levin_account_id:
                 cursor.execute(
@@ -1990,8 +1990,8 @@ def get_sla_summary_table(request):
                         memo_objs = get_la_memos(
                             cmte_id, obj.get("report_id"), obj.get("transaction_id")
                         )
-                        print("..")
-                        print(memo_objs)
+                        # print("..")
+                        # print(memo_objs)
                         if memo_objs:
                             for m_obj in memo_objs:
                                 levin_account_id, levin_account_name = load_levin_account_data(

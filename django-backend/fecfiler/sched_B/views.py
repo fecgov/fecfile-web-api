@@ -34,7 +34,7 @@ from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_b_transactions,
     transaction_exists,
-    update_parent_purpose,
+    update_earmark_parent_purpose,
     update_sched_d_parent,
     update_sched_c_parent,
     get_transaction_type_descriptions,
@@ -1284,7 +1284,7 @@ def schedB(request):
             output = get_schedB(data)
             # for earmark child transaction: update parent transction  purpose_description
             if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:
-                update_parent_purpose(datum)
+                update_earmark_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response(
@@ -1374,7 +1374,7 @@ def schedB(request):
             output = get_schedB(data)
             # for earmark child transaction: update parent transction  purpose_description
             if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:
-                update_parent_purpose(datum)
+                update_earmark_parent_purpose(datum)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
 
         except Exception as e:

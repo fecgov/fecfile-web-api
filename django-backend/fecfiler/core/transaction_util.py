@@ -206,11 +206,11 @@ def do_transaction(sql, values):
         raise
 
 
-def update_parent_purpose(data):
+def update_earmark_parent_purpose(data):
     """
     for earmark transaction only:
-    when a earmark child transactions is added or updated,
-    the child entity_name should be update in parents 
+    when an earmark child transaction is added or updated,
+    the child entity_name should be updated in parent transaction 
     'purpose_description' field
     """
     desc_start = {
