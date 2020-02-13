@@ -2099,7 +2099,7 @@ def schedA(request):
             if reattribution_flag:
                 reattribution_auto_generate_transactions(
                     cmte_id,
-                    report_id,
+                    datum['report_id'],
                     request.data["reattribution_id"],
                     datum["contribution_date"],
                     datum["contribution_amount"],

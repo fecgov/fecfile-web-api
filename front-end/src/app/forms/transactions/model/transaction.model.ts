@@ -39,6 +39,9 @@ export class TransactionModel {
   loanIncurredDate: any;
   loanPaymentAmt: any;
   loanPaymentToDate: any;
+  isReattribution = false;
+  reattribution_id:string;
+  isreattributable = false;
   reportType: any;
   activityEventType: any;
   activityEventIdentifier: any;
@@ -66,6 +69,7 @@ export class TransactionModel {
   candElectionYear:string;
   candSupportOpposeFlag:string;
   candElectionOtherDesc: string;
+
 
 
 
@@ -134,6 +138,7 @@ export class TransactionModel {
     this.candElectionYear = transaction.candElectionYear;
     this.candElectionOtherDesc = transaction.candElectionOtherDesc;
     this.candSupportOpposeFlag = transaction.candSupportOpposeFlag;
-
+    this.isReattribution = transaction.isReattribution;
+    this.isreattributable = transaction.isreattributable;
   }
 }

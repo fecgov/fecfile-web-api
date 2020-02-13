@@ -619,4 +619,21 @@ export class IndividualReceiptService {
     }
     return aggregate;
   }
+
+  public getReportIdByTransactionDate(transactionDate: string) : Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = '/sa/get_report_id_from_date';
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+
+    params = params.append('transaction_date', transactionDate);
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions, 
+      params
+    });
+  }
 }
