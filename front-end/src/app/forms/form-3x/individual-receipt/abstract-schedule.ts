@@ -4553,7 +4553,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             prePopulateFieldArray.push({ name: 'expenditure_amount', value: amountValue });
           }
         }
-        prePopulateFieldArray.push({ name: 'purpose_description', value: earmarkMemoPurpose });
+
+        if(this.subTransactionInfo.subTransactionType === 'EAR_MEMO' ||
+          this.subTransactionInfo.subTransactionType === 'EAR_REC_RECNT_ACC_MEMO' ||
+          this.subTransactionInfo.subTransactionType === 'EAR_REC_CONVEN_ACC_MEMO' ||
+          this.subTransactionInfo.subTransactionType === 'EAR_REC_HQ_ACC_MEMO' ||
+          this.subTransactionInfo.subTransactionType === 'PAC_EAR_MEMO') {
+          prePopulateFieldArray.push({ name: 'purpose_description', value: 'Total earmarked through conduit.' });
+        }else {
+          prePopulateFieldArray.push({ name: 'purpose_description', value: earmarkMemoPurpose });
+        }
+
         prePopulateFieldArray.push({ name: 'expenditure_purpose', value: earmarkMemoPurpose });
       } /* else if (this.subTransactionInfo.subTransactionType === 'LEVIN_PARTN_MEMO') {
           if (res.hasOwnProperty('levin_account_id')) {
