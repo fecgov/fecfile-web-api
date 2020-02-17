@@ -502,12 +502,12 @@ def get_list_schedA(
             # GET single row from schedA table
             if transaction_id:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
                                     FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format(
                         "', '".join(report_list)
                     )
                 else:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
                                     FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format(
                         "', '".join(report_list)
                     )
@@ -518,12 +518,12 @@ def get_list_schedA(
                 )
             else:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
                                 FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC""".format(
                         "', '".join(report_list)
                     )
                 else:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
                                 FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s ORDER BY transaction_id DESC""".format(
                         "', '".join(report_list)
                     )
@@ -563,7 +563,7 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
             # GET child rows from schedA table
             query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, 
             contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, 
-            election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind
+            election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
                             FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND 
                             delete_ind is distinct from 'Y'""".format(
                 "', '".join(report_list)
@@ -1982,74 +1982,82 @@ def get_child_transaction_schedA(cmte_id, report_id, back_ref_transaction_id):
     except:
         raise
 
-def reattribution_auto_generate_transactions(cmte_id, report_id, transaction_id, contribution_date, contribution_amount, back_ref_transaction_id):
+def reattribution_auto_generate_transactions(cmte_id, report_id, org_transaction_id, contribution_date, contribution_amount, reattributed_id):
 
     """ This function auto generates 2 copies of the transaction_id in the report_id. One will be an exact copy 
     of the transaction_id and other will have modifications to contribution date and amount. Kindly check FNE-1878
     ticket for the business rules that apply to reattribution"""
     try:
-        query_string_1 = """INSERT INTO public.sched_a(
+        query_string_original = """UPDATE public.sched_a SET reattribution_id=%s, reattribution_ind='O' WHERE transaction_id=%s AND cmte_id=%s"""
+        query_string_reattribution = """UPDATE public.sched_a SET reattribution_id=%s, reattribution_ind='R' WHERE transaction_id=%s AND cmte_id=%s"""
+        query_string_auto_1 = """INSERT INTO public.sched_a(
         cmte_id, report_id, line_number, transaction_type, 
         back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, 
         contribution_amount, purpose_description, memo_code, memo_text, 
         election_code, election_other_description, delete_ind, create_date, 
         last_update_date, donor_cmte_id, donor_cmte_name, 
-        transaction_type_identifier, election_year, itemized_ind, levin_account_id)
+        transaction_type_identifier, election_year, itemized_ind, levin_account_id,
+        reattribution_ind, reattribution_id)
             SELECT cmte_id, %s, line_number, transaction_type, 
-               %s, null, entity_id, contribution_date, 
+               null, null, entity_id, contribution_date, 
                contribution_amount, purpose_description, 'X', 
                concat('MEMO: Originally reported ',to_char(contribution_date, 'MM/DD/YYYY'),'. $', %s::text, ' reattributed below'), 
                election_code, election_other_description, delete_ind, create_date, 
                last_update_date, donor_cmte_id, donor_cmte_name, 
-               transaction_type_identifier, election_year, itemized_ind, levin_account_id
+               transaction_type_identifier, election_year, itemized_ind, levin_account_id,
+               'A',%s
           FROM public.sched_a WHERE transaction_id= %s and cmte_id= %s;"""
 
-        query_string_2 = """INSERT INTO public.sched_a(
+        query_string_auto_2 = """INSERT INTO public.sched_a(
         cmte_id, report_id, line_number, transaction_type, 
         back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, 
         contribution_amount, purpose_description, memo_code, memo_text, 
         election_code, election_other_description, delete_ind, create_date, 
         last_update_date, donor_cmte_id, donor_cmte_name, 
-        transaction_type_identifier, election_year, itemized_ind, levin_account_id)
+        transaction_type_identifier, election_year, itemized_ind, levin_account_id,
+        reattribution_ind, reattribution_id)
             SELECT cmte_id, %s, line_number, transaction_type, 
-               %s, null, entity_id, %s, 
+               null, null, entity_id, %s, 
                %s, purpose_description, 'X', 'MEMO: Reattribution Below', 
                election_code, election_other_description, delete_ind, create_date, 
                last_update_date, donor_cmte_id, donor_cmte_name, 
-               transaction_type_identifier, election_year, itemized_ind, levin_account_id
+               transaction_type_identifier, election_year, itemized_ind, levin_account_id,
+               'A',%s
           FROM public.sched_a WHERE transaction_id= %s and cmte_id= %s;"""
 
         with connection.cursor() as cursor:
-            cursor.execute(query_string_1, [report_id, back_ref_transaction_id, contribution_amount, transaction_id, cmte_id])
+            cursor.execute(query_string_auto_1, [report_id, contribution_amount, reattributed_id, org_transaction_id, cmte_id])
             if cursor.rowcount == 0:
-                raise Exception('The transaction ID: {} does not exist in sched_a for committee ID: {}'.format(transaction_id, cmte_id))
-            cursor.execute(query_string_2, [report_id, back_ref_transaction_id, contribution_date, -1*Decimal(contribution_amount), transaction_id, cmte_id])
+                raise Exception('The transaction ID: {} does not exist in sched_a for committee ID: {}'.format(org_transaction_id, cmte_id))
+            cursor.execute(query_string_auto_2, [report_id, contribution_date, -1*Decimal(contribution_amount), reattributed_id, org_transaction_id, cmte_id])
+            cursor.execute(query_string_original, [reattributed_id, org_transaction_id, cmte_id])
+            cursor.execute(query_string_reattribution, [org_transaction_id, reattributed_id, cmte_id])
     except Exception as e:
         raise Exception('The reattribution_auto_generate_transactions function is throwing an error: ' + str(e))
 
-def reattribution_auto_update_transactions(cmte_id, report_id, contribution_date, contribution_amount, back_ref_transaction_id):
+def reattribution_auto_update_transactions(cmte_id, report_id, contribution_date, contribution_amount, reattributed_id):
     try:
         query_string = """UPDATE public.sched_a SET report_id = %s
-        WHERE transaction_id = %s AND cmte_id = %s;"""
+        WHERE transaction_id = %s AND cmte_id = %s AND delete_ind IS DISTINCT FROM 'Y'"""
 
         query_string_s1 = """UPDATE public.sched_a SET report_id = %s, memo_text = %s
-        WHERE back_ref_transaction_id = %s AND cmte_id = %s AND memo_text LIKE %s"""
+        WHERE reattribution_id = %s AND cmte_id = %s AND contribution_amount > 0 AND reattribution_ind='A'"""
 
         query_string_s2 = """UPDATE public.sched_a SET report_id = %s, contribution_date = %s, contribution_amount = %s
-        WHERE back_ref_transaction_id = %s AND cmte_id = %s AND memo_text NOT LIKE %s"""
+        WHERE reattribution_id = %s AND cmte_id = %s AND contribution_amount < 0 AND reattribution_ind='A'"""
 
         with connection.cursor() as cursor:
-            cursor.execute(query_string, [report_id, back_ref_transaction_id, cmte_id])
+            cursor.execute(query_string, [report_id, reattributed_id, cmte_id])
             if cursor.rowcount == 0:
-                raise Exception('The transaction ID: {} does not exist in sched_a for committee ID: {}'.format(back_ref_transaction_id, cmte_id))
+                raise Exception('The transaction ID: {} does not exist in sched_a for committee ID: {}'.format(reattributed_id, cmte_id))
         with connection.cursor() as cursor:
             memo_text = 'MEMO: Originally reported ' + contribution_date.strftime("%m/%d/%Y") + '. $' + contribution_amount + ' reattributed below'
-            cursor.execute(query_string_s1, [report_id, memo_text, back_ref_transaction_id, cmte_id, '%Originally%'])
+            cursor.execute(query_string_s1, [report_id, memo_text, reattributed_id, cmte_id])
             if cursor.rowcount == 0:
-                raise Exception('The back ref transaction ID: {} does not exist in sched_a for committee ID: {}'.format(back_ref_transaction_id, cmte_id))
+                raise Exception('The reattribution ID: {} does not exist in sched_a for committee ID: {}'.format(reattributed_id, cmte_id))
         with connection.cursor() as cursor:
             cursor.execute(query_string_s2, [report_id, contribution_date, -1*Decimal(contribution_amount), 
-                back_ref_transaction_id, cmte_id, '%Originally%'])
+                reattributed_id, cmte_id])
     except Exception as e:
         raise Exception('The reattribution_auto_update_transactions function is throwing an error: ' + str(e))
 
@@ -2528,14 +2536,23 @@ def delete_H1_carry_over(transaction_id, cmte_id):
     except Exception:
         raise
 
-def get_auto_generated_reattribution_transactions(action, transaction_id, transaction_type_identifier):
+def get_auto_generated_reattribution_transactions(action, transaction_id, reattribution_ind, cmte_id):
     try:
         _sql = """SELECT report_id, transaction_id, '{}' AS action
-                FROM public.all_transactions_view
-                WHERE back_ref_transaction_id = %s AND transaction_type_identifier = %s""".format(action)
+                FROM public.sched_a
+                WHERE reattribution_id = %s AND reattribution_ind = %s AND cmte_id = %s""".format(action)
+        if reattribution_ind == 'O':
+            reatt_ind = 'R'
+        else:
+            reatt_ind = 'A'
+        if action == 'trash':
+            param_string = " AND delete_ind IS DISTINCT FROM 'Y'"
+        else:
+            param_string = " AND delete_ind = 'Y'"
+
         with connection.cursor() as cursor:
-            _query = """SELECT json_agg(t) FROM ({}) as t""".format(_sql)
-            cursor.execute(_query, [transaction_id, transaction_type_identifier])
+            _query = """SELECT json_agg(t) FROM ({}) as t""".format(_sql+param_string)
+            cursor.execute(_query, [transaction_id, reatt_ind, cmte_id])
             logger.debug(cursor.query)
             forms_obj = cursor.fetchone()
         if forms_obj and forms_obj[0]:
@@ -2544,7 +2561,31 @@ def get_auto_generated_reattribution_transactions(action, transaction_id, transa
             return []
     except Exception as e:
         raise Exception('The get_auto_generated_reattribution_transactions function is throwing an error: ' + str(e))
-        
+
+def check_reattribution_original_delete(transaction_id, cmte_id):
+    try:
+        with connection.cursor() as cursor:
+            _sql = """SELECT delete_ind FROM public.sched_a WHERE transaction_id=%s AND cmte_id=%s AND delete_ind IS 
+                    DISTINCT FROM 'Y' AND reattribution_ind IS NULL"""
+            cursor.execute(_sql, [transaction_id, cmte_id])
+            logger.debug(cursor.query)
+            if cursor.rowcount == 0:
+                raise Exception('The reattribution_id: {} is either deleted or does not exist in schedA for cmte_id {}.'.format(transaction_id, cmte_id))
+    except Exception as e:
+        raise Exception('The check_reattribution_original_delete function is throwing an error: ' + str(e))
+
+def update_reatt_original_trans(transaction_id, cmte_id, reattribution_id=None, reattribution_ind=None):
+    try:
+        with connection.cursor() as cursor:
+            _sql = """UPDATE public.sched_a SET reattribution_ind=%s, reattribution_id=%s 
+                    WHERE transaction_id=%s AND cmte_id=%s"""
+            cursor.execute(_sql, [reattribution_ind, reattribution_id, transaction_id, cmte_id])
+            logger.debug(cursor.query)
+            if cursor.rowcount == 0:
+                    raise Exception('The transaction_id: {} is either deleted or does not exist in schedA for cmte_id {}.'.format(transaction_id, cmte_id))
+    except Exception as e:
+        raise Exception('The update_reatt_original_trans function is throwing an error: ' + str(e))
+
 @api_view(['PUT'])
 def trash_restore_transactions(request):
     """api for trash and resore transactions. 
@@ -2623,15 +2664,15 @@ def trash_restore_transactions(request):
                     if _delete == 'Y' or (_delete != 'Y' and datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
                         'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']):
                         _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
-                    # Handling Reattribution auto generated transactions
-                    if _delete != 'Y' and datum['transaction_type_identifier'] in ['IND_REC_NON_CONT_ACC', 'IND_NP_CONVEN_ACC', 
-                        'IND_NP_HQ_ACC', 'IND_NP_RECNT_ACC', 'IND_RECNT_REC', 'INDV_REC', 'JF_TRAN_PAC_MEMO', 
-                        'JF_TRAN_IND_MEMO', 'JF_TRAN_PARTY_MEMO', 'JF_TRAN_TRIB_MEMO', 'JF_TRAN_NP_RECNT_IND_MEMO', 
-                        'JF_TRAN_NP_RECNT_PAC_MEMO', 'JF_TRAN_NP_RECNT_TRIB_MEMO', 'JF_TRAN_NP_CONVEN_IND_MEMO', 
-                        'JF_TRAN_NP_CONVEN_PAC_MEMO', 'JF_TRAN_NP_CONVEN_TRIB_MEMO''JF_TRAN_NP_HQ_IND_MEMO', 
-                        'JF_TRAN_NP_HQ_PAC_MEMO', 'JF_TRAN_NP_HQ_TRIB_MEMO']:
-                        _actions.extend(get_auto_generated_reattribution_transactions(action, transaction_id, datum['transaction_type_identifier']))
-                
+                    # Handling Reattribution auto generated transactions: reattribution_id
+                    if _delete == 'Y' and datum['reattribution_ind'] in ['R','O']:
+                        _actions.extend(get_auto_generated_reattribution_transactions(action, transaction_id, datum['reattribution_ind'], cmte_id))
+                    elif _delete != 'Y' and datum['reattribution_ind'] == 'R':
+                        check_reattribution_original_delete(datum['reattribution_id'], cmte_id)
+                        update_reatt_original_trans(datum['reattribution_id'], cmte_id, transaction_id, 'O')
+                        _actions.extend(get_auto_generated_reattribution_transactions(action, transaction_id, datum['reattribution_ind'], cmte_id))
+                    elif _delete != 'Y' and datum['reattribution_ind'] == 'O':
+                        update_reatt_original_trans(transaction_id, cmte_id)
                 if transaction_id[:2] == 'LA':
                     tran_data = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
                     logger.debug('update sl aggregate with LA data {}'.format(tran_data))
