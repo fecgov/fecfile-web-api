@@ -42,8 +42,8 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   protected staticFormFields = schedFstaticFormFields;
 
   private isDesignatedFiler: boolean;
-  private noValidationRequired = [];
-  private validateDesignatedFiler = [];
+  private subordinateFields = [];
+  private designatedFields = [];
   readonly optional  = '(Optional)'
 
   constructor(
@@ -105,16 +105,16 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     this.formType = '3X';
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedFCoreComponent;
     // set remove validators
-    this.noValidationRequired.push('subordinate_cmte_id');
-    this.noValidationRequired.push('subordinate_cmte_name');
-    this.noValidationRequired.push('subordinate_cmte_street_2');
-    this.noValidationRequired.push('subordinate_cmte_city');
-    this.noValidationRequired.push('subordinate_cmte_state');
-    this.noValidationRequired.push('subordinate_cmte_zip');
-    this.noValidationRequired.push('subordinate_cmte_street_1');
+    this.subordinateFields.push('subordinate_cmte_id');
+    this.subordinateFields.push('subordinate_cmte_name');
+    this.subordinateFields.push('subordinate_cmte_street_2');
+    this.subordinateFields.push('subordinate_cmte_city');
+    this.subordinateFields.push('subordinate_cmte_state');
+    this.subordinateFields.push('subordinate_cmte_zip');
+    this.subordinateFields.push('subordinate_cmte_street_1');
 
-    this.validateDesignatedFiler.push('designating_cmte_id');
-    this.validateDesignatedFiler.push('designating_cmte_name');
+    this.designatedFields.push('designating_cmte_id');
+    this.designatedFields.push('designating_cmte_name');
     super.ngOnInit();
   }
 
@@ -126,8 +126,8 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   }
 
   public ngOnDestroy(): void {
-    this.noValidationRequired = [];
-    this.validateDesignatedFiler = [];
+    this.subordinateFields = [];
+    this.designatedFields = [];
     super.ngOnDestroy();
   }
 
@@ -163,7 +163,12 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
    * Return to the first part of the payment.
    */
   public back() {
-    this.showPart2 = false;
+    if ( this.subTransactionInfo && this.subTransactionInfo.isParent === false) {
+      this.clearFormValues();
+      this.returnToParent(ScheduleActions.edit);
+    } else {
+      this.showPart2 = false;
+    }
   }
 
   /**
@@ -335,19 +340,19 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     super.saveOnly();
   }
   public onFilerChange(change): void {
-
     console.log('change %s', change);
     if (change === 'Y') {
       this.isDesignatedFiler = true;
-      this.addValidator(this.validateDesignatedFiler,  this.isDesignatedFiler);
-      this.addValidator(this.noValidationRequired, false);
-      this.disableFields(this.noValidationRequired, true);
-      this.disableFields(this.validateDesignatedFiler, false);
+      this.addValidator(this.designatedFields,  this.isDesignatedFiler);
+      this.addValidator(this.subordinateFields, false);
+      this.disableFields(this.subordinateFields, true);
+      this.disableFields(this.designatedFields, false);
     } else {
-      this.addValidator(this.validateDesignatedFiler, false);
-      this.addValidator(this.noValidationRequired, false);
-      this.disableFields(this.validateDesignatedFiler, false);
-      this.disableFields(this.noValidationRequired, false);
+      this.isDesignatedFiler = false;
+      this.addValidator(this.designatedFields, false);
+      this.addValidator(this.subordinateFields, false);
+      this.disableFields(this.designatedFields, true);
+      this.disableFields(this.subordinateFields, false);
     }
 
 }
@@ -388,9 +393,49 @@ public addValidator( validators: Array<any>, set: boolean): void {
 
   private resetForm() {
    if ( Object.keys(this.frmIndividualReceipt.controls).length !== 0) {
-    this.disableFields(this.noValidationRequired, false);
-    this.disableFields(this.validateDesignatedFiler, false);
+    this.disableFields(this.subordinateFields, false);
+    this.disableFields(this.designatedFields, false);
    }
+   this.isDesignatedFiler = false;
     super.clearFormValues();
+  }
+
+  private toggleInputFields() {
+    // If yes or no radio button is valid do not alternate fields
+     if (this._checkFormFieldIsValid('coordinated_exp_ind') ) { return; }
+
+    let allFieldsEmpty = true;
+    allFieldsEmpty = this.isFieldsEmpty(this.designatedFields);
+    if (allFieldsEmpty) {
+      allFieldsEmpty = this.isFieldsEmpty(this.subordinateFields);
+    }
+    if (allFieldsEmpty) {
+      this.disableFields(this.subordinateFields, false);
+      this.disableFields(this.designatedFields, false);
+    } else if (this.isFieldsEmpty(this.designatedFields)) {
+      this.disableFields(this.subordinateFields, false);
+      this.disableFields(this.designatedFields, true);
+    } else {
+      this.disableFields(this.subordinateFields, true);
+      this.disableFields(this.designatedFields, false);
+    }
+    }
+
+  private isFieldsEmpty(designatedFields: any[]) {
+   for (const fieldName of designatedFields ) {
+     if ( this.frmIndividualReceipt.get(fieldName) &&
+          this.frmIndividualReceipt.get(fieldName).value &&
+          this.frmIndividualReceipt.get(fieldName).value.length) {
+       return false;
+     }
+  }
+   return true;
+}
+  public saveAndReturnToParent(): void {
+    // remove validators for child form
+    this.removeValidation('coordinated_exp_ind');
+    this._setDesignatedValidators();
+    // actual save operation
+    super.saveAndReturnToParent();
   }
 }
