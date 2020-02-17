@@ -163,7 +163,12 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
    * Return to the first part of the payment.
    */
   public back() {
-    this.showPart2 = false;
+    if ( this.subTransactionInfo && this.subTransactionInfo.isParent === false) {
+      this.clearFormValues();
+      this.returnToParent(ScheduleActions.edit);
+    } else {
+      this.showPart2 = false;
+    }
   }
 
   /**
@@ -426,4 +431,11 @@ public addValidator( validators: Array<any>, set: boolean): void {
   }
    return true;
 }
+  public saveAndReturnToParent(): void {
+    // remove validators for child form
+    this.removeValidation('coordinated_exp_ind');
+    this._setDesignatedValidators();
+    // actual save operation
+    super.saveAndReturnToParent();
+  }
 }
