@@ -477,11 +477,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this.frmIndividualReceipt = new FormGroup(formGroup);
 
-    //once the parent is initialized, send message to any child subscriptions to perform any applicable actions
-    if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls) {
-      this._messageService.sendMessage({ parentFormPopulated: true });
-    }
-
     if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
       this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
       this.loaded = true;
@@ -551,6 +546,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     if (this.scheduleAction === ScheduleActions.view) {
       this.frmIndividualReceipt.disable();
+    }
+
+    //once the parent is initialized, send message to any child subscriptions to perform any applicable actions
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls) {
+      this._messageService.sendMessage({ parentFormPopulated: true , component:this.abstractScheduleComponent});
     }
   }
 
@@ -3919,7 +3919,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               }
             }
             //once data is set, send a message to any child components that may want to set additional specific fields
-            this._messageService.sendPopulateChildComponentMessage({populateChildForEdit: true, transactionData: trx});
+            this._messageService.sendPopulateChildComponentMessage({populateChildForEdit: true, transactionData: trx, component: this.abstractScheduleComponent});
           }
 
 
