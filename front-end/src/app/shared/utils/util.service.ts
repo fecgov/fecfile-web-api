@@ -148,4 +148,14 @@ export class UtilService {
     }
     return typeAheadField;
   }
+
+  public addOrEditObjectValueInArray(array: any, type: string, name: string, value: string) {
+    let field = array.find(element => element.name === name);
+    if (field) {
+      field.value = value.toString();
+    }
+    else {
+      array.push({ type: type, name: name, value: value.toString() });
+    }
+  }
 }
