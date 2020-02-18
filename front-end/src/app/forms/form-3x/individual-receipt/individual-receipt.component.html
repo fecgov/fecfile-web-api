@@ -110,6 +110,7 @@
                                 && !isFieldName(col?.name, 'beneficiary_cand_id') 
                                 && !isFieldName(col?.name, 'prefix')
                                 && !isFieldName(col?.name, 'suffix')
+                                && !isFieldName(col?.name, 'election_other_description')
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.readonly]="isFieldReadOnly(col)"
@@ -242,6 +243,18 @@
                           [focusFirst]=false [resultTemplate]="rtCommitteeName" [inputFormatter]="formatterCommitteeName"
                           (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                       </div>
+                      <input *ngIf="isFieldName(col?.name, 'election_other_description') && frmIndividualReceipt?.get('election_code')?.value  === 'O'"
+                                class="form-control" [style.width]="col?.width" [style.height]="col?.height"
+                          [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value"
+                          [maxlength]="col?.validation?.max"
+                          [formControlName]="col?.name"
+                          [attr.disabled]="isSelectFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''" />
                       <div class="error-text" *ngIf="
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
                             frmIndividualReceipt.get(col?.name).invalid
