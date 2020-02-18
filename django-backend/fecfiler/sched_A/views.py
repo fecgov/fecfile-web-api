@@ -52,7 +52,10 @@ from fecfiler.core.aggregation_helper import (
 )
 
 from fecfiler.core.report_helper import renew_report_update_date
-from fecfiler.core.sched_a_helper import new_memo_contribution_amount
+from fecfiler.core.sched_a_helper import (
+    new_memo_contribution_amount,
+    new_earmarkout_expenditure_amount,
+)
 
 from fecfiler.sched_B.views import (
     delete_schedB,
@@ -1342,6 +1345,7 @@ def get_schedA(data):
         raise
 
 
+@new_earmarkout_expenditure_amount
 @new_memo_contribution_amount
 @new_report_date
 def put_schedA(datum):
