@@ -2666,13 +2666,15 @@ def trash_restore_transactions(request):
                         _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
                     # Handling Reattribution auto generated transactions: reattribution_id
                     if _delete == 'Y' and datum['reattribution_ind'] in ['R','O']:
+                        if datum['reattribution_ind'] == 'O':
+                            update_reatt_original_trans(transaction_id, cmte_id)
+
                         _actions.extend(get_auto_generated_reattribution_transactions(action, transaction_id, datum['reattribution_ind'], cmte_id))
                     elif _delete != 'Y' and datum['reattribution_ind'] == 'R':
                         check_reattribution_original_delete(datum['reattribution_id'], cmte_id)
                         update_reatt_original_trans(datum['reattribution_id'], cmte_id, transaction_id, 'O')
                         _actions.extend(get_auto_generated_reattribution_transactions(action, transaction_id, datum['reattribution_ind'], cmte_id))
-                    elif _delete != 'Y' and datum['reattribution_ind'] == 'O':
-                        update_reatt_original_trans(transaction_id, cmte_id)
+
                 if transaction_id[:2] == 'LA':
                     tran_data = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
                     logger.debug('update sl aggregate with LA data {}'.format(tran_data))
