@@ -52,6 +52,7 @@ from fecfiler.core.aggregation_helper import (
 )
 
 from fecfiler.core.report_helper import renew_report_update_date
+from fecfiler.core.sched_a_helper import new_memo_contribution_amount
 
 from fecfiler.sched_B.views import (
     delete_schedB,
@@ -1341,6 +1342,7 @@ def get_schedA(data):
         raise
 
 
+@new_memo_contribution_amount
 @new_report_date
 def put_schedA(datum):
     """update sched_a item
@@ -1982,7 +1984,15 @@ def get_child_transaction_schedA(cmte_id, report_id, back_ref_transaction_id):
     except:
         raise
 
-def reattribution_auto_generate_transactions(cmte_id, report_id, org_transaction_id, contribution_date, contribution_amount, reattributed_id):
+
+def reattribution_auto_generate_transactions(
+    cmte_id,
+    report_id,
+    org_transaction_id,
+    contribution_date,
+    contribution_amount,
+    reattributed_id,
+):
 
     """ This function auto generates 2 copies of the transaction_id in the report_id. One will be an exact copy 
     of the transaction_id and other will have modifications to contribution date and amount. Kindly check FNE-1878
@@ -2026,16 +2036,50 @@ def reattribution_auto_generate_transactions(cmte_id, report_id, org_transaction
           FROM public.sched_a WHERE transaction_id= %s and cmte_id= %s;"""
 
         with connection.cursor() as cursor:
-            cursor.execute(query_string_auto_1, [report_id, contribution_amount, reattributed_id, org_transaction_id, cmte_id])
+            cursor.execute(
+                query_string_auto_1,
+                [
+                    report_id,
+                    contribution_amount,
+                    reattributed_id,
+                    org_transaction_id,
+                    cmte_id,
+                ],
+            )
             if cursor.rowcount == 0:
-                raise Exception('The transaction ID: {} does not exist in sched_a for committee ID: {}'.format(org_transaction_id, cmte_id))
-            cursor.execute(query_string_auto_2, [report_id, contribution_date, -1*Decimal(contribution_amount), reattributed_id, org_transaction_id, cmte_id])
-            cursor.execute(query_string_original, [reattributed_id, org_transaction_id, cmte_id])
-            cursor.execute(query_string_reattribution, [org_transaction_id, reattributed_id, cmte_id])
+                raise Exception(
+                    "The transaction ID: {} does not exist in sched_a for committee ID: {}".format(
+                        org_transaction_id, cmte_id
+                    )
+                )
+            cursor.execute(
+                query_string_auto_2,
+                [
+                    report_id,
+                    contribution_date,
+                    -1 * Decimal(contribution_amount),
+                    reattributed_id,
+                    org_transaction_id,
+                    cmte_id,
+                ],
+            )
+            cursor.execute(
+                query_string_original, [reattributed_id, org_transaction_id, cmte_id]
+            )
+            cursor.execute(
+                query_string_reattribution,
+                [org_transaction_id, reattributed_id, cmte_id],
+            )
     except Exception as e:
-        raise Exception('The reattribution_auto_generate_transactions function is throwing an error: ' + str(e))
+        raise Exception(
+            "The reattribution_auto_generate_transactions function is throwing an error: "
+            + str(e)
+        )
 
-def reattribution_auto_update_transactions(cmte_id, report_id, contribution_date, contribution_amount, reattributed_id):
+
+def reattribution_auto_update_transactions(
+    cmte_id, report_id, contribution_date, contribution_amount, reattributed_id
+):
     try:
         query_string = """UPDATE public.sched_a SET report_id = %s
         WHERE transaction_id = %s AND cmte_id = %s AND delete_ind IS DISTINCT FROM 'Y'"""
@@ -2049,17 +2093,45 @@ def reattribution_auto_update_transactions(cmte_id, report_id, contribution_date
         with connection.cursor() as cursor:
             cursor.execute(query_string, [report_id, reattributed_id, cmte_id])
             if cursor.rowcount == 0:
-                raise Exception('The transaction ID: {} does not exist in sched_a for committee ID: {}'.format(reattributed_id, cmte_id))
+                raise Exception(
+                    "The transaction ID: {} does not exist in sched_a for committee ID: {}".format(
+                        reattributed_id, cmte_id
+                    )
+                )
         with connection.cursor() as cursor:
-            memo_text = 'MEMO: Originally reported ' + contribution_date.strftime("%m/%d/%Y") + '. $' + contribution_amount + ' reattributed below'
-            cursor.execute(query_string_s1, [report_id, memo_text, reattributed_id, cmte_id])
+            memo_text = (
+                "MEMO: Originally reported "
+                + contribution_date.strftime("%m/%d/%Y")
+                + ". $"
+                + contribution_amount
+                + " reattributed below"
+            )
+            cursor.execute(
+                query_string_s1, [report_id, memo_text, reattributed_id, cmte_id]
+            )
             if cursor.rowcount == 0:
-                raise Exception('The reattribution ID: {} does not exist in sched_a for committee ID: {}'.format(reattributed_id, cmte_id))
+                raise Exception(
+                    "The reattribution ID: {} does not exist in sched_a for committee ID: {}".format(
+                        reattributed_id, cmte_id
+                    )
+                )
         with connection.cursor() as cursor:
-            cursor.execute(query_string_s2, [report_id, contribution_date, -1*Decimal(contribution_amount), 
-                reattributed_id, cmte_id])
+            cursor.execute(
+                query_string_s2,
+                [
+                    report_id,
+                    contribution_date,
+                    -1 * Decimal(contribution_amount),
+                    reattributed_id,
+                    cmte_id,
+                ],
+            )
     except Exception as e:
-        raise Exception('The reattribution_auto_update_transactions function is throwing an error: ' + str(e))
+        raise Exception(
+            "The reattribution_auto_update_transactions function is throwing an error: "
+            + str(e)
+        )
+
 
 """
 ***************************************************** SCHED A - POST API CALL STARTS HERE **********************************************************
@@ -2086,8 +2158,10 @@ def schedA(request):
                 "reattribution_id"
             ] not in ["", "", None, "null"]:
                 reattribution_flag = True
-                if 'reattribution_report_id' not in request.data:
-                    raise Exception('reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution')
+                if "reattribution_report_id" not in request.data:
+                    raise Exception(
+                        "reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution"
+                    )
             validate_sa_data(request.data)
             cmte_id = request.user.username
             report_id = check_report_id(request.data.get("report_id"))
@@ -2098,20 +2172,22 @@ def schedA(request):
             datum["cmte_id"] = cmte_id
             # Adding memo_code and memo_text values for reattribution flags
             if reattribution_flag:
-                datum['memo_code'] = 'X'
-                datum['memo_text'] = 'MEMO: Reattribution'
-                datum['report_id'] = check_report_id(request.data['reattribution_report_id'])
+                datum["memo_code"] = "X"
+                datum["memo_text"] = "MEMO: Reattribution"
+                datum["report_id"] = check_report_id(
+                    request.data["reattribution_report_id"]
+                )
             # posting data into schedA
             data = post_schedA(datum)
             # Auto generation of reattribution transactions
             if reattribution_flag:
                 reattribution_auto_generate_transactions(
                     cmte_id,
-                    datum['report_id'],
+                    datum["report_id"],
                     request.data["reattribution_id"],
                     datum["contribution_date"],
                     datum["contribution_amount"],
-                    data['transaction_id']
+                    data["transaction_id"],
                 )
             output = get_schedA(data)
             # for earmark child transaction: update parent transction  purpose_description
@@ -2175,13 +2251,19 @@ def schedA(request):
         try:
             # checking if reattribution is triggered for a transaction
             reattribution_flag = False
-            if 'isReattribution' in request.data and request.data['isReattribution'] not in ['None', 'null', '', ""]:
-                if request.data['isReattribution'] in ['True', 'true', 't', 'T', True]:
+            if "isReattribution" in request.data and request.data[
+                "isReattribution"
+            ] not in ["None", "null", "", ""]:
+                if request.data["isReattribution"] in ["True", "true", "t", "T", True]:
                     reattribution_flag = True
-                    if 'reattribution_report_id' not in request.data:
-                        raise Exception('reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution')
+                    if "reattribution_report_id" not in request.data:
+                        raise Exception(
+                            "reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution"
+                        )
                     else:
-                        reattribution_report_id = check_report_id(request.data['reattribution_report_id'])
+                        reattribution_report_id = check_report_id(
+                            request.data["reattribution_report_id"]
+                        )
             validate_sa_data(request.data)
             datum = schedA_sql_dict(request.data)
             if "transaction_id" in request.data and check_null_value(
@@ -2199,18 +2281,22 @@ def schedA(request):
             datum["report_id"] = report_id
             datum["cmte_id"] = request.user.username
             # To check if the report id exists in reports table
-            form_type = find_form_type(report_id, datum.get('cmte_id'))
+            form_type = find_form_type(report_id, datum.get("cmte_id"))
             # updating data for reattribution fields
             if reattribution_flag:
-                datum['memo_code'] = 'X'
-                datum['memo_text'] = 'MEMO: Reattribution'
+                datum["memo_code"] = "X"
+                datum["memo_text"] = "MEMO: Reattribution"
             data = put_schedA(datum)
             # Updating auto generated transactions for reattribution transactions
             if reattribution_flag:
-                reattribution_auto_update_transactions(datum['cmte_id'], 
+                reattribution_auto_update_transactions(
+                    datum["cmte_id"],
                     reattribution_report_id,
-                    datum['contribution_date'], datum['contribution_amount'], datum['transaction_id'])
-                data['report_id'] = reattribution_report_id
+                    datum["contribution_date"],
+                    datum["contribution_amount"],
+                    datum["transaction_id"],
+                )
+                data["report_id"] = reattribution_report_id
             output = get_schedA(data)
 
             # for earmark child transaction: update parent transction  purpose_description
@@ -2536,22 +2622,27 @@ def delete_H1_carry_over(transaction_id, cmte_id):
     except Exception:
         raise
 
-def get_auto_generated_reattribution_transactions(action, transaction_id, reattribution_ind, cmte_id):
+
+def get_auto_generated_reattribution_transactions(
+    action, transaction_id, reattribution_ind, cmte_id
+):
     try:
         _sql = """SELECT report_id, transaction_id, '{}' AS action
                 FROM public.sched_a
-                WHERE reattribution_id = %s AND reattribution_ind = %s AND cmte_id = %s""".format(action)
-        if reattribution_ind == 'O':
-            reatt_ind = 'R'
+                WHERE reattribution_id = %s AND reattribution_ind = %s AND cmte_id = %s""".format(
+            action
+        )
+        if reattribution_ind == "O":
+            reatt_ind = "R"
         else:
-            reatt_ind = 'A'
-        if action == 'trash':
+            reatt_ind = "A"
+        if action == "trash":
             param_string = " AND delete_ind IS DISTINCT FROM 'Y'"
         else:
             param_string = " AND delete_ind = 'Y'"
 
         with connection.cursor() as cursor:
-            _query = """SELECT json_agg(t) FROM ({}) as t""".format(_sql+param_string)
+            _query = """SELECT json_agg(t) FROM ({}) as t""".format(_sql + param_string)
             cursor.execute(_query, [transaction_id, reatt_ind, cmte_id])
             logger.debug(cursor.query)
             forms_obj = cursor.fetchone()
@@ -2560,7 +2651,11 @@ def get_auto_generated_reattribution_transactions(action, transaction_id, reattr
         else:
             return []
     except Exception as e:
-        raise Exception('The get_auto_generated_reattribution_transactions function is throwing an error: ' + str(e))
+        raise Exception(
+            "The get_auto_generated_reattribution_transactions function is throwing an error: "
+            + str(e)
+        )
+
 
 def check_reattribution_original_delete(transaction_id, cmte_id):
     try:
@@ -2570,23 +2665,42 @@ def check_reattribution_original_delete(transaction_id, cmte_id):
             cursor.execute(_sql, [transaction_id, cmte_id])
             logger.debug(cursor.query)
             if cursor.rowcount == 0:
-                raise Exception('The reattribution_id: {} is either deleted or does not exist in schedA for cmte_id {}.'.format(transaction_id, cmte_id))
+                raise Exception(
+                    "The reattribution_id: {} is either deleted or does not exist in schedA for cmte_id {}.".format(
+                        transaction_id, cmte_id
+                    )
+                )
     except Exception as e:
-        raise Exception('The check_reattribution_original_delete function is throwing an error: ' + str(e))
+        raise Exception(
+            "The check_reattribution_original_delete function is throwing an error: "
+            + str(e)
+        )
 
-def update_reatt_original_trans(transaction_id, cmte_id, reattribution_id=None, reattribution_ind=None):
+
+def update_reatt_original_trans(
+    transaction_id, cmte_id, reattribution_id=None, reattribution_ind=None
+):
     try:
         with connection.cursor() as cursor:
             _sql = """UPDATE public.sched_a SET reattribution_ind=%s, reattribution_id=%s 
                     WHERE transaction_id=%s AND cmte_id=%s"""
-            cursor.execute(_sql, [reattribution_ind, reattribution_id, transaction_id, cmte_id])
+            cursor.execute(
+                _sql, [reattribution_ind, reattribution_id, transaction_id, cmte_id]
+            )
             logger.debug(cursor.query)
             if cursor.rowcount == 0:
-                    raise Exception('The transaction_id: {} is either deleted or does not exist in schedA for cmte_id {}.'.format(transaction_id, cmte_id))
+                raise Exception(
+                    "The transaction_id: {} is either deleted or does not exist in schedA for cmte_id {}.".format(
+                        transaction_id, cmte_id
+                    )
+                )
     except Exception as e:
-        raise Exception('The update_reatt_original_trans function is throwing an error: ' + str(e))
+        raise Exception(
+            "The update_reatt_original_trans function is throwing an error: " + str(e)
+        )
 
-@api_view(['PUT'])
+
+@api_view(["PUT"])
 def trash_restore_transactions(request):
     """api for trash and resore transactions. 
        we are doing soft-delete only, mark delete_ind to 'Y'
@@ -2661,23 +2775,59 @@ def trash_restore_transactions(request):
                         datum.get("report_id"),
                     )
                     # Deleting/Restoring auto generated transactions for Schedule A
-                    if _delete == 'Y' or (_delete != 'Y' and datum.get('transaction_type_identifier') in ['IK_REC','IK_BC_REC','PARTY_IK_REC','PARTY_IK_BC_REC','PAC_IK_REC',
-                        'PAC_IK_BC_REC','IK_TRAN','IK_TRAN_FEA']):
-                        _actions.extend(get_child_transactions_to_trash(transaction_id, _delete))
+                    if _delete == "Y" or (
+                        _delete != "Y"
+                        and datum.get("transaction_type_identifier")
+                        in [
+                            "IK_REC",
+                            "IK_BC_REC",
+                            "PARTY_IK_REC",
+                            "PARTY_IK_BC_REC",
+                            "PAC_IK_REC",
+                            "PAC_IK_BC_REC",
+                            "IK_TRAN",
+                            "IK_TRAN_FEA",
+                        ]
+                    ):
+                        _actions.extend(
+                            get_child_transactions_to_trash(transaction_id, _delete)
+                        )
                     # Handling Reattribution auto generated transactions: reattribution_id
-                    if _delete == 'Y' and datum['reattribution_ind'] in ['R','O']:
-                        if datum['reattribution_ind'] == 'O':
+                    if _delete == "Y" and datum["reattribution_ind"] in ["R", "O"]:
+                        if datum["reattribution_ind"] == "O":
                             update_reatt_original_trans(transaction_id, cmte_id)
 
-                        _actions.extend(get_auto_generated_reattribution_transactions(action, transaction_id, datum['reattribution_ind'], cmte_id))
-                    elif _delete != 'Y' and datum['reattribution_ind'] == 'R':
-                        check_reattribution_original_delete(datum['reattribution_id'], cmte_id)
-                        update_reatt_original_trans(datum['reattribution_id'], cmte_id, transaction_id, 'O')
-                        _actions.extend(get_auto_generated_reattribution_transactions(action, transaction_id, datum['reattribution_ind'], cmte_id))
+                        _actions.extend(
+                            get_auto_generated_reattribution_transactions(
+                                action,
+                                transaction_id,
+                                datum["reattribution_ind"],
+                                cmte_id,
+                            )
+                        )
+                    elif _delete != "Y" and datum["reattribution_ind"] == "R":
+                        check_reattribution_original_delete(
+                            datum["reattribution_id"], cmte_id
+                        )
+                        update_reatt_original_trans(
+                            datum["reattribution_id"], cmte_id, transaction_id, "O"
+                        )
+                        _actions.extend(
+                            get_auto_generated_reattribution_transactions(
+                                action,
+                                transaction_id,
+                                datum["reattribution_ind"],
+                                cmte_id,
+                            )
+                        )
 
-                if transaction_id[:2] == 'LA':
-                    tran_data = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
-                    logger.debug('update sl aggregate with LA data {}'.format(tran_data))
+                if transaction_id[:2] == "LA":
+                    tran_data = get_list_schedA(
+                        report_id, cmte_id, transaction_id, True
+                    )[0]
+                    logger.debug(
+                        "update sl aggregate with LA data {}".format(tran_data)
+                    )
                     update_aggregate_sl(tran_data)
                     logger.debug("update sl summary with LA data {}".format(tran_data))
                     update_sl_summary(tran_data)
