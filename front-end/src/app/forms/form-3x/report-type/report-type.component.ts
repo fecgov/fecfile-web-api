@@ -162,6 +162,7 @@ export class ReportTypeComponent implements OnInit {
               if (typeof res.electionDates[0] === 'object') {
                 this._fromDateSelected = res.electionDates[0].cvg_start_date;
                 this._toDateSelected = res.electionDates[0].cvg_end_date;
+                this._dueDate = res.electionDates[0].due_date;
 
                 if (this._fromDateSelected !== null && this._toDateSelected !== null) {
                   if (this._fromDateSelected.length >= 1 && this._toDateSelected.length >= 1) {
