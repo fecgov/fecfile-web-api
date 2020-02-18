@@ -855,20 +855,28 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     let trxIds = '';
     const selectedTransactions: Array<TransactionModel> = [];
+    let unItemizedCount = 0;
+    let selectedCount = 0;
     for (const trx of this.transactionsModel) {
       if (trx.selected) {
+        selectedCount++;
         // remove un-itemized  trxIds here when printing multiple
         if (trx.itemized && trx.itemized === 'U') {
+          unItemizedCount++;
           continue;
         }
         selectedTransactions.push(trx);
         trxIds += trx.transactionId + ', ';
       }
     }
+    if ( selectedCount === unItemizedCount ) {
+      this.showUnItemizedWarn();
+    } else {
 
-    trxIds = trxIds.substr(0, trxIds.length - 2);
-    //this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved' );
-    this._reportTypeService.printPreview('transaction_table_screen', '3X', trxIds);
+      trxIds = trxIds.substr(0, trxIds.length - 2);
+      //this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved' );
+      this._reportTypeService.printPreview('transaction_table_screen', '3X', trxIds);
+    }
   }
 
   public printPreview(): void {
