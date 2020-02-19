@@ -185,8 +185,11 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
      if ( this.frmIndividualReceipt.contains('coordinated_exp_ind') &&
          this.frmIndividualReceipt.get('coordinated_exp_ind').value === 'Y' ) {
        this.onFilerChange('Y');
-     } else {
+     } else if ( this.frmIndividualReceipt.contains('coordinated_exp_ind') &&
+         this.frmIndividualReceipt.get('coordinated_exp_ind').value === 'N') {
        this.onFilerChange('N');
+     } else {
+       this.onFilerChange(null);
      }
   }
   private _setTransactionDetail() {
@@ -347,12 +350,20 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
       this.addValidator(this.subordinateFields, false);
       this.disableFields(this.subordinateFields, true);
       this.disableFields(this.designatedFields, false);
-    } else {
+    } else if ('N' === change) {
       this.isDesignatedFiler = false;
       this.addValidator(this.designatedFields, false);
       this.addValidator(this.subordinateFields, false);
       this.disableFields(this.designatedFields, true);
       this.disableFields(this.subordinateFields, false);
+    } else if (null === change) {
+      this.addValidator(this.designatedFields, false);
+      this.addValidator(this.subordinateFields, false);
+      this.disableFields(this.designatedFields, false);
+      this.disableFields(this.subordinateFields, false);
+      if (!this._checkFormFieldIsValid('coordinated_exp_ind') ) {
+        this.removeValidation('coordinated_exp_ind');
+      }
     }
 
 }
