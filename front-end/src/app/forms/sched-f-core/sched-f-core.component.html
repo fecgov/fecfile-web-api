@@ -355,6 +355,7 @@
                               && !isFieldName(col?.name, 'beneficiary_cmte_name') 
                               && !isFieldName(col?.name, 'beneficiary_cand_id')
                               && !isFieldName(col?.name, 'payee_cmte_id')
+                              && !isFieldName(col?.name, 'aggregate_general_elec_exp')
                               " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                         [attr.type]="col?.type" [attr.name]="col?.name"
                         [attr.readonly]="isFieldReadOnly(col)"
@@ -370,6 +371,10 @@
                               : ''
                           " (keyup)="handleFormFieldKeyup($event, col)" (change)="(isFieldName(col?.name, 'contribution_date') || isFieldName(col?.name, 'expenditure_date')) 
                                     ? dateChange(col?.name) : null;" />
+                      <input *ngIf="col?.name === 'aggregate_general_elec_exp'" class="form-control" [style.width]="col?.width"
+                             [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                             [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                             [attr.readonly]="isFieldReadOnly(col)"/>
                       <input *ngIf="col?.name === 'last_name'" class="form-control" [style.width]="col?.width"
                         [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                         [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
@@ -747,7 +752,6 @@
                 </button>
                 <button *ngIf="scheduleAction === editScheduleAction"
                         class="btn btn-secondary btn-right"
-                        [disabled]="!frmIndividualReceipt.valid"
                         (click)="updateOnly()">
                   Save
                 </button>
