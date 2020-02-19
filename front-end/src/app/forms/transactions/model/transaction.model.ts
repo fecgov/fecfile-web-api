@@ -42,6 +42,9 @@ export class TransactionModel {
   isReattribution = false;
   reattribution_id:string;
   isreattributable = false;
+  isRedesignation = false;
+  redesignation_id:string;
+  isredesignatable = false;
   reportType: any;
   activityEventType: any;
   activityEventIdentifier: any;
@@ -140,5 +143,10 @@ export class TransactionModel {
     this.candSupportOpposeFlag = transaction.candSupportOpposeFlag;
     this.isReattribution = transaction.isReattribution;
     this.isreattributable = transaction.isreattributable;
+    this.reattribution_id = transaction.reattribution_id;
+    this.isredesignatable = transaction.isredesignatable;
+    this.isRedesignation = transaction.isRedesignation;
+    this.redesignation_id = transaction.redesignation_id;
+
   }
 }
