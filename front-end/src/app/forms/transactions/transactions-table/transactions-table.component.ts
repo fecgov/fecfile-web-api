@@ -1047,6 +1047,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsMessageService.sendReattributeTransactionMessage(trx);
   }
 
+  /**
+   * Redesignate the transaction selected by the user.
+   *
+   * @param trx the Transaction to edit
+   */
+  public redesignateTransaction(trx: TransactionModel): void {
+    this._transactionsMessageService.sendRedesignateTransactionMessage(trx);
+  }
+
   public printTransaction(trx: TransactionModel): void {
     if (trx.itemized && (trx.itemized === 'U' || trx.itemized === 'u' )) {
     this.showUnItemizedWarn();

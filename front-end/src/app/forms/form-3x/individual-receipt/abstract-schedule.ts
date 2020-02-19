@@ -51,7 +51,6 @@ export enum SaveActions {
 }
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
-  
 
   transactionTypeText = '';
   transactionType = '';
@@ -94,6 +93,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public returnToDebtSummaryInfo: any;
   public viewScheduleAction: ScheduleActions = ScheduleActions.view;
   public reattributionTransactionId: string;
+  public redesignationTransactionId: string;
 
   protected abstractScheduleComponent: AbstractScheduleParentEnum;
   protected isInit = false;
@@ -254,8 +254,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.clearFormValues();
           this.reattributionTransactionId = message.reattributionTransactionId;
         }
+        if(message.redesignationTransactionId){
+          // this.clearFormValuesForRedesignation();
+          this.redesignationTransactionId = message.redesignationTransactionId;
+        }
       }
     });
+
+    this._f3xMessageService.getClearFormValuesForRedesignationMessage().takeUntil(this.onDestroy$).subscribe(message => {
+      if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+      this.clearFormValuesForRedesignation();
+      }
+    })
 
     this._f3xMessageService.getParentModelMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this._parentTransactionModel = message;
@@ -588,7 +598,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (this._reportType !== null) {
         const cvgStartDate: string = this._reportType.cvgStartDate;
         const cvgEndDate: string = this._reportType.cvgEndDate;
-        if(!this.reattributionTransactionId){
+        if(!this.reattributionTransactionId && !this.redesignationTransactionId){
           formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
         }
       }
@@ -1883,6 +1893,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           receiptObj.reattribution_report_id = this._transactionToEdit.reportId.toString();
         }
       }
+      if(this.redesignationTransactionId){
+        receiptObj['redesignation_id'] = this.redesignationTransactionId;
+        receiptObj['isRedesignation'] = "true";
+
+        let redesignationField = this.hiddenFields.find(element => element.name === "redesignation_report_id");
+        if(this.scheduleAction === ScheduleActions.edit && !redesignationField){
+          receiptObj.redesignation_report_id = this._transactionToEdit.reportId.toString();
+        }
+      }
 
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
 
@@ -3136,8 +3155,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public dateChange(fieldName: string) {
     console.log('date has changed!');
 
-    if (this.reattributionTransactionId) {
-      this.handleDateChangeForReattribution(fieldName);
+    if (this.reattributionTransactionId || this.redesignationTransactionId) {
+      this.handleDateChangeForReattributionOrRedesignation(fieldName);
     }
     else {
 
@@ -3213,7 +3232,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * This method handles date change logic for reattributions.
    * @param fieldName 
    */
-  protected handleDateChangeForReattribution(fieldName: string) {
+  protected handleDateChangeForReattributionOrRedesignation(fieldName: string) {
     // clear current validators for the dateField and add reattribtionValdiator
     this.frmIndividualReceipt.controls[fieldName].clearValidators();
     this.frmIndividualReceipt.controls[fieldName].setValidators([Validators.required]);
@@ -3227,12 +3246,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (res) {
           if (res.reportId) {
             if (res.status && res.status !== 'Filed') {
-              let field = this.hiddenFields.find(element => element.name === 'reattribution_report_id');
-              if(field){
-                field.value = res.reportId.toString();
+              let elementName = null;
+              if(this.reattributionTransactionId){
+                elementName = 'reattribution_report_id'
               }
-              else{
-                this.hiddenFields.push({type:'hidden',name:'reattribution_report_id',value: res.reportId.toString()});
+              else if(this.redesignationTransactionId){
+                elementName = 'redesignation_report_id'
+              }
+              if(elementName){
+                let field = this.hiddenFields.find(element => element.name === elementName);
+                if(field){
+                  field.value = res.reportId.toString();
+                }
+                else{
+                  this.hiddenFields.push({type:'hidden',name:elementName,value: res.reportId.toString()});
+                }
               }
             }
             else if (res.status && res.status === 'Filed') {
@@ -4170,6 +4198,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._contributionAggregateValue = 0.0;
     this._contributionAggregateValueChild = 0.0;
     this.reattributionTransactionId = null;
+    this.redesignationTransactionId = null;
     // this._outstandingDebtBalance = null;
     this.memoCode = false;
     this.memoCodeChild = false;
@@ -4846,5 +4875,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         });
       }
     });
+  }
+
+  protected clearFormValuesForRedesignation() {
+    if(this.frmIndividualReceipt){
+      if(this.frmIndividualReceipt.controls['expenditure_date']){
+        this.frmIndividualReceipt.controls['expenditure_date'].reset();
+      }
+    }
   }
 }

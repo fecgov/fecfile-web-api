@@ -109,6 +109,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   private viewTransactionSubscription: Subscription;
   private getReattributeTransactionSubscription: Subscription;
+  private getRedesignateTransactionSubscription: Subscription;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -152,6 +153,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       this.transactionToEdit = trx;
       console.log(trx.transactionTypeIdentifier + 'identifier for edit');
       this.showReattribute();
+    });
+
+    this.getRedesignateTransactionSubscription = this._transactionsMessageService
+    .getRedesignateTransactionMessage()
+    .subscribe((trx: TransactionModel) => {
+      this.transactionToEdit = trx;
+      console.log(trx.transactionTypeIdentifier + 'identifier for edit');
+      this.showRedesignate();
     });
 
     this.editDebtSummaryTransactionSubscription = this._transactionsMessageService
@@ -267,6 +276,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.editDebtSummaryTransactionSubscription.unsubscribe();
     this.showTransactionsSubscription.unsubscribe();
     this.viewTransactionSubscription.unsubscribe();
+    this.getRedesignateTransactionSubscription.unsubscribe();
+    this.getReattributeTransactionSubscription.unsubscribe();
   }
 
   public goToPreviousStep(): void {
@@ -930,6 +941,30 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     }
     this.showTransaction.emit(emitObj);
 
+    this.showCategories();
+  }
+
+    /**
+   * Show redesignate for a single transaction.
+   */
+  public showRedesignate(debtSummary?: any) {
+    const emptyValidForm = this._fb.group({});
+
+    this.transactionToEdit.isRedesignation = true;
+    this.transactionToEdit.redesignation_id = this.transactionToEdit.transactionId;
+    const emitObj: any = {
+      form: emptyValidForm,
+      direction: 'next',
+      step: 'step_3',
+      previousStep: 'transactions',
+      action: ScheduleActions.add,
+      transactionCategory: this.transactionCategory,
+      scheduleType: this.transactionToEdit.scheduleType,
+      transactionDetail: {
+        transactionModel: this.transactionToEdit
+      }
+    };
+    this.showTransaction.emit(emitObj);
     this.showCategories();
   }
 

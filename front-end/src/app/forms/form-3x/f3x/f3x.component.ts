@@ -374,7 +374,8 @@ export class F3xComponent implements OnInit , OnDestroy{
             let transactionTypeText = '';
             let transactionType = '';
 
-            this.handleReattribution(e);
+            this.handleReattributionOrRedesignation(e);
+            
 
             if (this.scheduleAction === ScheduleActions.edit) {
               // Sched C uses change detection for populating form for edit.
@@ -438,7 +439,10 @@ export class F3xComponent implements OnInit , OnDestroy{
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
-
+              if(e && e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.isRedesignation){
+                this._populateFormForEdit(e, AbstractScheduleParentEnum.schedMainComponent);
+                this._f3xMessageService.sendClearFormValuesForRedesignationMessage({abstractScheduleComponent:AbstractScheduleParentEnum.schedMainComponent});
+              }
               if (this.scheduleAction === ScheduleActions.addSubTransaction) {
                 if (e.hasOwnProperty('prePopulateFieldArray') && Array.isArray(e.prePopulateFieldArray)) {
                   this._f3xMessageService.sendPopulateFormMessage({
@@ -578,24 +582,39 @@ export class F3xComponent implements OnInit , OnDestroy{
     }
   }
 
-  private handleReattribution(e: any) {
-    if (e && e.transactionDetail && e.transactionDetail.transactionModel &&
-      e.transactionDetail.transactionModel.isReattribution) {
+  private handleReattributionOrRedesignation(e: any) {
+    if (e && e.transactionDetail && e.transactionDetail.transactionModel) {
       const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
-      
       e.transactionTypeText = transactionModel.type;
       e.transactionType = transactionModel.transactionTypeIdentifier;
+      
       let reattributionId:string = null;
-      if(this.scheduleAction === ScheduleActions.add){
-        reattributionId = transactionModel.reattribution_id;
+      let redesignationId:string = null;
+      if(transactionModel.isReattribution){
+        if(this.scheduleAction === ScheduleActions.add){
+          reattributionId = transactionModel.reattribution_id;
+        }
+        else if(this.scheduleAction === ScheduleActions.edit){
+          reattributionId = transactionModel.transactionId
+        }
+        this._f3xMessageService.sendPopulateHiddenFieldsMessage({
+          abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+          reattributionTransactionId: reattributionId
+        });
       }
-      else if(this.scheduleAction === ScheduleActions.edit){
-        reattributionId = transactionModel.transactionId
+      else if(transactionModel.isRedesignation){
+        if(this.scheduleAction === ScheduleActions.add){
+          redesignationId = transactionModel.redesignation_id;
+        }
+        else if(this.scheduleAction === ScheduleActions.edit){
+          redesignationId = transactionModel.transactionId
+        }
+        this._f3xMessageService.sendPopulateHiddenFieldsMessage({
+          abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+          redesignationTransactionId: redesignationId
+        });
       }
-      this._f3xMessageService.sendPopulateHiddenFieldsMessage({
-        abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
-        reattributionTransactionId: reattributionId
-      });
+      
     }
   }
 
