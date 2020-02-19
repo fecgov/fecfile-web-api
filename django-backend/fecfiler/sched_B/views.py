@@ -755,6 +755,18 @@ def post_schedB(datum):
             "None",
         ]:
             datum["beneficiary_cmte_name"] = datum.get("entity_name")
+
+        if "election_code" in datum and datum.get("election_code") not in [
+            "",
+            " ",
+            None,
+            "none",
+            "null",
+            "None",
+        ]:
+            datum["election_code"] = datum.get("election_code") + str(
+                datum.get("election_year", "")
+            )
         try:
             post_sql_schedB(
                 datum.get("cmte_id"),
@@ -849,11 +861,15 @@ def get_schedB(data):
             # adding hard-coded api call info to get object details
             for obj in forms_obj:
                 obj.update({"api_call": "/sb/schedB"})
-                obj.update({"election_year": REQT_ELECTION_YR})
+                if obj.get("election_code"):
+                    obj.update({"election_year": obj.get("election_code")[1:]})
+                # obj.update({"election_year": REQT_ELECTION_YR})
             child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
             for obj in child_forms_obj:
                 obj.update({"api_call": "/sb/schedB"})
-                obj.update({"election_year": REQT_ELECTION_YR})
+                if obj.get("election_code"):
+                    obj.update({"election_year": obj.get("election_code")[1:]})
+                # obj.update({"election_year": REQT_ELECTION_YR})
                 tran_id = obj.get("transaction_type_identifier")
                 obj.update(
                     {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
@@ -864,7 +880,9 @@ def get_schedB(data):
             forms_obj = get_list_all_schedB(report_id, cmte_id)
             for obj in forms_obj:
                 obj.update({"api_call": "/sb/schedB"})
-                obj.update({"election_year": REQT_ELECTION_YR})
+                if obj.get("election_code"):
+                    obj.update({"election_year": obj.get("election_code")[1:]})
+                # obj.update({"election_year": REQT_ELECTION_YR})
         return forms_obj
 
     except:
@@ -941,6 +959,18 @@ def put_schedB(datum):
             "None",
         ]:
             datum["beneficiary_cmte_name"] = datum.get("entity_name")
+
+        if "election_code" in datum and datum.get("election_code") not in [
+            "",
+            " ",
+            None,
+            "none",
+            "null",
+            "None",
+        ]:
+            datum["election_code"] = datum.get("election_code") + str(
+                datum.get("election_year", "")
+            )
         try:
             if datum.get("transaction_type_identifier") in (
                 SCHED_D_CHILD_LIST + SCHED_C_CHILD_LIST
