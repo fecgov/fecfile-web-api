@@ -64,7 +64,29 @@
               <ng-container *ngFor="let col of row.cols">
                 <div [class]="row.colClassName" *ngIf="isToggleShow(col)">
                   <div class="form-group" [style.width]="setSelectTypeWidth(col)">
-                    <label [for]="col?.name">
+                    <label [for]="col?.name"
+                    *ngIf="col?.name !== 'election_other_description'"
+                    >
+                      {{ col?.text }}
+                      <!-- replace button with div below to resolve tab issue into button -->
+                      <!-- <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </button> -->
+                      <div type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </div>
+                      <ng-container *ngIf="!col?.validation?.required
+                        && !col?.isReadonly && col?.name !== 'activity_event_identifier'">
+                        (Optional)
+                      </ng-container>
+                    </label>
+                    <label
+                    *ngIf="col?.name === 'election_other_description' && frmIndividualReceipt?.get('election_code')?.value  === 'O'"
+                    >
                       {{ col?.text }}
                       <!-- replace button with div below to resolve tab issue into button -->
                       <!-- <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
