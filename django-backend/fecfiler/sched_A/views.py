@@ -2798,8 +2798,8 @@ def trash_restore_transactions(request):
                         )
                     # Handling Reattribution auto generated transactions: reattribution_id
                     if _delete == "Y" and datum["reattribution_ind"] in ["R", "O"]:
-                        if datum["reattribution_ind"] == "O":
-                            update_reatt_original_trans(transaction_id, cmte_id)
+                        if datum["reattribution_ind"] == "R":
+                            update_reatt_original_trans(datum["reattribution_id"], cmte_id)
 
                         _actions.extend(
                             get_auto_generated_reattribution_transactions(
