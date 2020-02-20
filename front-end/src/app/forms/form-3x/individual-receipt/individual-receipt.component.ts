@@ -40,6 +40,7 @@ export enum SaveActions {
   // encapsulation: ViewEncapsulation.None
 })
 export class IndividualReceiptComponent extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+  @Input() mainTransactionTypeText: string;
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;

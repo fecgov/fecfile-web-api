@@ -46,6 +46,7 @@ export class F3xComponent implements OnInit , OnDestroy{
   public transactionCategories: any = [];
   public transactionCategory: string = '';
   public transactionTypeText = '';
+  public mainTransactionTypeText = '';
   public transactionType = '';
   public transactionTypeTextSchedF = '';
   public transactionTypeSchedF = '';
@@ -373,6 +374,7 @@ export class F3xComponent implements OnInit , OnDestroy{
             // with an action to allow for view or edit.
             let transactionTypeText = '';
             let transactionType = '';
+            let mainTransactionTypeText = '';
 
             this.handleReattributionOrRedesignation(e);
             
@@ -439,6 +441,7 @@ export class F3xComponent implements OnInit , OnDestroy{
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
+              mainTransactionTypeText = e.mainTransactionTypeText ? e.mainTransactionTypeText : '';
               if(e && e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.isRedesignation){
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedMainComponent);
                 this._f3xMessageService.sendClearFormValuesForRedesignationMessage({abstractScheduleComponent:AbstractScheduleParentEnum.schedMainComponent});
@@ -474,7 +477,8 @@ export class F3xComponent implements OnInit , OnDestroy{
                 }
               }
             }
-            this._setTransactionTypeBySchedule(transactionTypeText, transactionType, this.scheduleType);
+            this._setTransactionTypeBySchedule(transactionTypeText, transactionType, mainTransactionTypeText,
+              this.scheduleType);
           }
 
           //transactionModel is being passed in so to leverage the reportId if present instead of getting from localStorage
@@ -925,7 +929,8 @@ export class F3xComponent implements OnInit , OnDestroy{
    * @param transactionType
    * @param scheduleType
    */
-  private _setTransactionTypeBySchedule(transactionTypeText: string, transactionType: string, scheduleType: string) {
+  private _setTransactionTypeBySchedule(transactionTypeText: string, transactionType: string,
+    mainTransactionTypeText: string, scheduleType: string) {
     if (!scheduleType) {
       this.transactionType = transactionType;
       this.transactionTypeText = transactionTypeText;
@@ -948,6 +953,7 @@ export class F3xComponent implements OnInit , OnDestroy{
     } else {
       this.transactionType = transactionType;
       this.transactionTypeText = transactionTypeText;
+      this.mainTransactionTypeText = mainTransactionTypeText;
     }
   }
 

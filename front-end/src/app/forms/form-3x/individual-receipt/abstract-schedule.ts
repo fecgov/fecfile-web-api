@@ -52,6 +52,7 @@ export enum SaveActions {
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
+  mainTransactionTypeText = '';
   transactionTypeText = '';
   transactionType = '';
   scheduleAction: ScheduleActions = null;
