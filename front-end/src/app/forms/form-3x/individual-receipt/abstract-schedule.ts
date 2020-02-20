@@ -1681,13 +1681,40 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (this.frmIndividualReceipt.contains(description)) {
         this.frmIndividualReceipt.controls[description].setValidators([Validators.required]);
         this.frmIndividualReceipt.controls[description].updateValueAndValidity();
+        const patch = {};
+        patch[description] = null;
+        this.frmIndividualReceipt.patchValue(patch,{onlySelf:true});
       }
     } else {
       if (this.frmIndividualReceipt.contains(description)) {
         this.frmIndividualReceipt.controls[description].setValidators([Validators.nullValidator]);
         this.frmIndividualReceipt.controls[description].updateValueAndValidity();
+        const patch = {};
+        patch[description] = this.getElectionTypeDescription(item.electionType);
+        this.frmIndividualReceipt.patchValue(patch,{onlySelf:true});
       }
     }
+  }
+
+
+  private getElectionTypeDescription(electionCode:string) : string{
+    if(this.electionTypes){
+      const electionType = this.electionTypes.find(element=> element.electionType === electionCode);
+      if(electionType){
+        return electionType.electionTypeDescription;
+      }
+    }
+    return null;
+  }
+
+  private getElectionTypeCode(electionTypeDescription:string) : string{
+    if(this.electionTypes){
+      const electionType = this.electionTypes.find(element=> element.electionTypeDescription === electionTypeDescription);
+      if(electionType){
+        return electionType.electionType;
+      }
+    }
+    return null;
   }
 
   /**
@@ -1832,7 +1859,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           receiptObj[field] = amountVal;
         } else if (field === 'levin_account_id') {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value.toString();
-        } else {
+        } else if(field === 'election_code'){
+          receiptObj[field] = this.frmIndividualReceipt.get(field).value[0];
+        } 
+        else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
       }
@@ -3781,25 +3811,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     if (this.frmIndividualReceipt) {
                       if (this.frmIndividualReceipt.get(prop)) {
                         if (this.frmIndividualReceipt.get(prop)) {
-                        if (this.isFieldName(prop, 'contribution_aggregate')) {
-                          this._contributionAggregateValue = trx[prop];
-                        } else if (this.isFieldName(prop, 'aggregate_general_elec_exp')) {
-                          this._contributionAggregateValue = trx[prop];
-                        }
-                        if (this.isFieldName(prop, 'activity_event_type')) {
-                          if (trx[prop] !== null || trx[prop] !== 'Select') {
-                            this.totalAmountReadOnly = false;
-                            if (this.activityEventTypes) {
-                              for (const activityEvent of this.activityEventTypes) {
-                                if (trx[prop] === activityEvent.eventType) {
-                                  if (activityEvent.scheduleType === 'sched_h2' && activityEvent.hasValue === true) {
-                                    this.activityEventNames = activityEvent.activityEventTypes;
+                          if (this.isFieldName(prop, 'contribution_aggregate')) {
+                            this._contributionAggregateValue = trx[prop];
+                          } else if (this.isFieldName(prop, 'aggregate_general_elec_exp')) {
+                            this._contributionAggregateValue = trx[prop];
+                          }
+                          if (this.isFieldName(prop, 'activity_event_type')) {
+                            if (trx[prop] !== null || trx[prop] !== 'Select') {
+                              this.totalAmountReadOnly = false;
+                              if (this.activityEventTypes) {
+                                for (const activityEvent of this.activityEventTypes) {
+                                  if (trx[prop] === activityEvent.eventType) {
+                                    if (activityEvent.scheduleType === 'sched_h2' && activityEvent.hasValue === true) {
+                                      this.activityEventNames = activityEvent.activityEventTypes;
+                                    }
                                   }
                                 }
                               }
                             }
                           }
-                        }
                           if (this.isFieldName(prop, 'memo_code')) {
                             const memoCodeValue = trx[prop];
                             if (memoCodeValue === this._memoCodeValue) {
@@ -3826,6 +3856,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                                   }
                                 }
                               }
+                            }
+                          }
+                          if (this.isFieldName(prop,'election_code')){
+                            if(trx.election_code !== 'O'){
+                              trx[prop] = this.getElectionTypeCode(trx.election_other_description);
                             }
                           }
                           const patch = {};

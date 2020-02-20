@@ -408,7 +408,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       // also clear any district fields
       this.frmIndividualReceipt.patchValue({ 'cand_office_district': null }, { onlySelf: true });
     }
-    //TODO -- below logic is very confusing. Clean this up . 
+    //TODO -- below logic is very confusing. try to clean this up . 
     else if (office === 'P') {
       if(this.transactionType === 'IE_MULTI' && this.scheduleAction === ScheduleActions.edit) {
         this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
@@ -558,7 +558,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   }
 
   private addSchedESpecificMetadata() {
-    this._utilService.addOrEditObjectValueInArray(this.hiddenFields, 'hidden','full_election_code', this.electionCode + this.electionYear);
+    this._utilService.addOrEditObjectValueInArray(this.hiddenFields, 'hidden','full_election_code', this.electionCode[0] + this.electionYear);
   }
 
 
