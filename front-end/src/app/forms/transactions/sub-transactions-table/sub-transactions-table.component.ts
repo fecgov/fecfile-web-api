@@ -235,6 +235,8 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
       trx.apiCall = '/sh4/schedH4';
     } else if (this.isH4OrH6() === 'H6') {
       trx.apiCall = '/sh6/schedH6';
+    } else if (this.isSchedF(trx)) {
+      trx.apiCall = '/sf/schedF';
     }
     if (this.returnToDebtSummary) {
       const debtSummary = {
@@ -267,5 +269,16 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
         }
       }
     }
+  }
+
+  private isSchedF(trx: TransactionModel) {
+    if (trx) {
+      if ( trx.transactionTypeIdentifier === 'COEXP_CC_PAY_MEMO' ||
+          trx.transactionTypeIdentifier === 'COEXP_STAF_REIM_MEMO' ||
+          trx.transactionTypeIdentifier === 'COEXP_PMT_PROL_MEMO' ) {
+        return true;
+      }
+    }
+    return false;
   }
 }
