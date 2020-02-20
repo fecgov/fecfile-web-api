@@ -295,6 +295,7 @@ def do_h2_carryover(cmte_id, report_id):
                 select distinct h2.back_ref_transaction_id from public.sched_h2 h2
                 where h2.cmte_id = %s
                 and h2.back_ref_transaction_id is not null
+                and h2.delete_ind is distinct from 'Y'
             )
             AND h.delete_ind is distinct from 'Y'
     """
