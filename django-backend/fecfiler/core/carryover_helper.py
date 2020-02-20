@@ -1,6 +1,8 @@
 import logging
+
 # from functools import lru_cache
 from django.db import connection
+
 # from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
 # import datetime
 
@@ -17,7 +19,7 @@ def is_pac(cmte_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [cmte_id])
             if cursor.rowcount > 0:
-                return cursor.fetchone()[0] == 'PAC'
+                return cursor.fetchone()[0] == "PAC"
         return False
     except:
         raise
@@ -33,7 +35,7 @@ def is_pty(cmte_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [cmte_id])
             if cursor.rowcount > 0:
-                return cursor.fetchone()[0] == 'PTY'
+                return cursor.fetchone()[0] == "PTY"
         return False
     except:
         raise
@@ -108,11 +110,11 @@ def do_pty_h1_carryover(cmte_id, report_id):
             print(cursor.fetchone())
             print(cursor.rowcount)
             if not cursor.rowcount:
-                logger.debug('no h1 found in current report. need carryover:')
+                logger.debug("no h1 found in current report. need carryover:")
                 cursor.execute(carryover_sql, (report_id, cmte_id))
                 if cursor.rowcount != 1:
-                    logger.debug('no valid h1 found for carryover.')
-            logger.debug('pty h1 carryover done.')
+                    logger.debug("no valid h1 found for carryover.")
+            logger.debug("pty h1 carryover done.")
     except:
         raise
 
@@ -184,6 +186,7 @@ def do_pac_h1_carryover(cmte_id, report_id):
                 select distinct t.back_ref_transaction_id from public.sched_h1 t
                 where t.cmte_id = %s
                 and t.back_ref_transaction_id is not null
+                and t.delete_ind is distinct from 'Y'
             )
             AND h.delete_ind is distinct from 'Y'
     """
@@ -191,10 +194,10 @@ def do_pac_h1_carryover(cmte_id, report_id):
         with connection.cursor() as cursor:
             # cursor.execute(count_sql, (report_id, cmte_id, report_id, cmte_id))
             # if cursor.rowcount == 0:
-            cursor.execute(carryover_sql, (report_id,
-                                           cmte_id, report_id, cmte_id))
+            cursor.execute(carryover_sql, (report_id, cmte_id, report_id, cmte_id))
             logger.debug(
-                'pac h1 carryover done, carryover items:{}'.format(cursor.rowcount))
+                "pac h1 carryover done, carryover items:{}".format(cursor.rowcount)
+            )
 
             # if cursor.rowcount != 1:
             #         raise Exception('error on h1 carryover.')
@@ -206,8 +209,9 @@ def do_h1_carryover(cmte_id, report_id):
     """
     doing h1 carryover
     """
-    logger.debug('doing h1 caryover with cmte_id {} and report_id {}'.format(
-        cmte_id, report_id))
+    logger.debug(
+        "doing h1 caryover with cmte_id {} and report_id {}".format(cmte_id, report_id)
+    )
 
     _sql = """
     SELECT extract(day from cvg_start_date) as d, 
@@ -222,14 +226,14 @@ def do_h1_carryover(cmte_id, report_id):
         if cursor.rowcount:
             _res = cursor.fetchone()
             if int(_res[0]) == 1 and int(_res[1] == 1):
-                logger.debug('new year report, no h1 carryover needed.')
+                logger.debug("new year report, no h1 carryover needed.")
                 return
 
     # if is_pty(cmte_id):
     #     logger.debug('party h1 carryover...')
     #     do_pty_h1_carryover(cmte_id, report_id)
     if is_pac(cmte_id):
-        logger.debug('pac h1 carryover...')
+        logger.debug("pac h1 carryover...")
         do_pac_h1_carryover(cmte_id, report_id)
     else:
         pass
@@ -291,19 +295,18 @@ def do_h2_carryover(cmte_id, report_id):
                 select distinct h2.back_ref_transaction_id from public.sched_h2 h2
                 where h2.cmte_id = %s
                 and h2.back_ref_transaction_id is not null
+                and h2.delete_ind is distinct from 'Y'
             )
             AND h.delete_ind is distinct from 'Y'
     """
     try:
-        logger.debug('doing h2 carryover...')
+        logger.debug("doing h2 carryover...")
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (report_id, cmte_id,
-                                  report_id, report_id, cmte_id))
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
             if cursor.rowcount == 0:
-                logger.debug('No valid h2 items found.')
-            logger.debug(
-                'h2 carryover done with report_id {}'.format(report_id))
-            logger.debug('total carryover h2 items:{}'.format(cursor.rowcount))
+                logger.debug("No valid h2 items found.")
+            logger.debug("h2 carryover done with report_id {}".format(report_id))
+            logger.debug("total carryover h2 items:{}".format(cursor.rowcount))
     except:
         raise
 
@@ -406,18 +409,15 @@ def do_loan_carryover(cmte_id, report_id):
     # query_back_sql = """
     # select d.back_ref_transaction_id
     # """
-    logger.debug('doing loan carryover...')
+    logger.debug("doing loan carryover...")
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (report_id, cmte_id,
-                                  report_id, report_id, cmte_id))
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
             if cursor.rowcount == 0:
                 logger.debug("No carryover happens.")
             else:
-                logger.debug(
-                    "loan carryover done with report_id {}".format(report_id))
-                logger.debug(
-                    "total carryover loans:{}".format(cursor.rowcount))
+                logger.debug("loan carryover done with report_id {}".format(report_id))
+                logger.debug("total carryover loans:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
         logger.debug("carryover done.")
     except:
@@ -487,18 +487,15 @@ def do_debt_carryover(cmte_id, report_id):
     # query_back_sql = """
     # select d.back_ref_transaction_id
     # """
-    logger.debug('doing debt carryover...')
+    logger.debug("doing debt carryover...")
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, (report_id, cmte_id,
-                                  report_id, report_id, cmte_id))
+            cursor.execute(_sql, (report_id, cmte_id, report_id, report_id, cmte_id))
             if cursor.rowcount == 0:
                 logger.debug("No carryover happens.")
             else:
-                logger.debug(
-                    "debt carryover done with report_id {}".format(report_id))
-                logger.debug(
-                    "total carryover debts:{}".format(cursor.rowcount))
+                logger.debug("debt carryover done with report_id {}".format(report_id))
+                logger.debug("total carryover debts:{}".format(cursor.rowcount))
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
                 logger.debug("carryover done.")
     except:
@@ -577,8 +574,7 @@ def do_carryover_sc_payments(cmte_id, report_id, rowcount):
             for i in range(rowcount):
                 parent_id = cursor.fetchone()[0]
                 current_id = cursor.fetchone()[1]
-                carryover_sched_b_payments(
-                    cmte_id, report_id, parent_id, current_id)
+                carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id)
                 # carryover_sched_e_payments(cmte_id, report_id, parent_id, current_id)
                 # carryover_sched_f_payments(cmte_id, report_id, parent_id, current_id)
                 # carryover_sched_h4_payments(cmte_id, report_id, parent_id, current_id)
