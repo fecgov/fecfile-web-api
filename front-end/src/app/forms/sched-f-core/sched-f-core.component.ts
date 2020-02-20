@@ -335,11 +335,15 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   }
 
   public updateOnly() {
-    this.back();
+    if (this.frmIndividualReceipt.valid) {
+      this.back();
+    }
     super.updateOnly();
   }
   public saveOnly(): void {
-    this.back();
+    if (this.frmIndividualReceipt.valid) {
+      this.back();
+    }
     super.saveOnly();
   }
   public onFilerChange(change): void {
