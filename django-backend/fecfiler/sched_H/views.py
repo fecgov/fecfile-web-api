@@ -3733,7 +3733,11 @@ def schedH5_sql_dict(data):
         "memo_text",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        valid_data["line_number"], valid_data["transaction_type"] = get_line_number_trans_type(
+            data["transaction_type_identifier"]
+            )
+        return valid_data
     except:
         raise Exception("invalid request data.")
 
@@ -3783,7 +3787,7 @@ def put_schedH5(data):
             )
         return get_list_schedH5(
             data.get("report_id"), data.get("cmte_id"), data.get("transaction_id")
-        )
+        )[0]
     except:
         raise
 
@@ -3804,6 +3808,8 @@ def put_sql_schedH5(data):
                   generic_campaign_amount= %s,
                   memo_code= %s,
                   memo_text = %s,
+                  line_number = %s,
+                  transaction_type = %s,
                   back_ref_transaction_id = %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
@@ -3820,6 +3826,8 @@ def put_sql_schedH5(data):
         data.get("generic_campaign_amount"),
         data.get("memo_code"),
         data.get("memo_text"),
+        data.get("line_number"),
+        data.get("transaction_type"),
         data.get("back_ref_transaction_id"),
         datetime.datetime.now(),
         data.get("transaction_id"),
@@ -3876,12 +3884,14 @@ def post_sql_schedH5(data):
             gotv_amount,
             generic_campaign_amount,
             memo_code,
-            memo_text ,
+            memo_text,
+            line_number,
+            transaction_type,
             back_ref_transaction_id,
             create_date,
             last_update_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get("cmte_id"),
@@ -3897,6 +3907,8 @@ def post_sql_schedH5(data):
             data.get("generic_campaign_amount"),
             data.get("memo_code"),
             data.get("memo_text"),
+            data.get("line_number"),
+            data.get("transaction_type"),
             data.get("back_ref_transaction_id"),
             datetime.datetime.now(),
             datetime.datetime.now(),
@@ -3958,6 +3970,8 @@ def get_child_schedH5(transaction_id, report_id, cmte_id):
             generic_campaign_amount,
             memo_code,
             memo_text,
+            line_number,
+            transaction_type,
             back_ref_transaction_id,
             create_date,
             last_update_date
@@ -3993,6 +4007,8 @@ def get_list_all_schedH5(report_id, cmte_id):
             generic_campaign_amount,
             memo_code,
             memo_text,
+            line_number,
+            transaction_type,
             create_date,
             last_update_date,
             coalesce(
@@ -4046,6 +4062,8 @@ def get_list_schedH5(report_id, cmte_id, transaction_id):
             generic_campaign_amount,
             memo_code,
             memo_text,
+            line_number,
+            transaction_type,
             back_ref_transaction_id,
             create_date,
             last_update_date,
@@ -4360,8 +4378,8 @@ def schedH5(request):
             #     data = put_schedB(datum)
             #     output = get_schedB(data)
             # else:
-            data = put_schedH5(datum)[0]
-            # output = get_schedA(data)
+            data = put_schedH5(datum)
+            # output = get_schedH5(data)
             return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
         except Exception as e:
             logger.debug(e)
