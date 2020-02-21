@@ -2433,7 +2433,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       // if form is valid check if transactionId exists
       // if exists do not check/show warning for child trx required
       // else check for the warning flag and show popup, on ok save and view transaction else return to the page
-      // show the warning only for parent
           if (this.isShowChildRequiredWarn()) {
             this._dialogService.confirm(this.childNeededWarnText, ConfirmModalComponent, 'Warning !!!', false).then(
                 res => {
@@ -4960,9 +4959,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if ( transactionId && transactionId.length > 0 ) {
       return false;
     }
-    if (this.subTransactionInfo && !this.subTransactionInfo.isParent) {
-     return false;
-    }
+
     if ( this._findHiddenField('name', 'show_memo_warning') &&
         this._findHiddenField('name', 'show_memo_warning').value ) {
       return true;
