@@ -384,6 +384,9 @@ export class F3xComponent implements OnInit, OnDestroy {
                   mainTransactionTypeText = el.text;
                 }
               });
+              if (!mainTransactionTypeText) {
+                mainTransactionTypeText = e.mainTransactionTypeText ? e.mainTransactionTypeText : '';
+              }
 
               let apiCall = null;
               if (e.transactionDetail) {
@@ -443,6 +446,9 @@ export class F3xComponent implements OnInit, OnDestroy {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
               mainTransactionTypeText = e.mainTransactionTypeText ? e.mainTransactionTypeText : '';
+              // if (!mainTransactionTypeText) {
+              //   mainTransactionTypeText = this._findMainTransactionTypeText(transactionType);
+              // }
               if (
                 e &&
                 e.transactionDetail &&
@@ -910,6 +916,7 @@ export class F3xComponent implements OnInit, OnDestroy {
     if (this.scheduleType === 'sched_f') {
       if (e.action === ScheduleActions.addSubTransaction) {
         this.scheduleFAction = e.action;
+        this.mainTransactionTypeText = e.mainTransactionTypeText ? e.mainTransactionTypeText : '';
         this.transactionTypeSchedF = e.transactionType ? e.transactionType : '';
         this.transactionTypeTextSchedF = e.transactionTypeText ? e.transactionTypeText : '';
         this.forceChangeDetectionFDebtPayment = new Date();
@@ -1062,5 +1069,19 @@ export class F3xComponent implements OnInit, OnDestroy {
     };
 
     this._f3xMessageService.sendPopulateFormMessage(emitObject);
+  }
+
+  private _findMainTransactionTypeText(transactionType: string): string {
+    this.transactionCategories.forEach(cat => {
+      cat.options.forEach(subCat => {
+        // subCat.forEach(type)
+        subCat.options.forEach(type => {
+          if (type.value === transactionType) {
+            return cat.text;
+          }
+        });
+      });
+    });
+    return '';
   }
 }

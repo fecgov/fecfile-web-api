@@ -315,7 +315,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
     if (payment) {
       transactionModel.scrollDebtPaymentButtonIntoView = true;
     }
-
+    
     this.status.emit({
       form: emptyValidForm,
       direction: 'next',
@@ -323,6 +323,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       previousStep: 'step_2',
       action: DebtSumarysActions.edit,
       scheduleType: 'sched_d',
+      mainTransactionTypeText: 'Loans and Debts',
       returnToDebtSummary: true,
       returnToDebtSummaryInfo: {
         transactionType: this.transactionType,
@@ -343,6 +344,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       previousStep: 'step_2',
       action: DebtSumarysActions.edit,
       scheduleType: debtPayment.scheduleType,
+      mainTransactionTypeText: 'Loans and Debts',
       returnToDebtSummary: true,
       returnToDebtSummaryInfo: {
         transactionType: this.transactionType,

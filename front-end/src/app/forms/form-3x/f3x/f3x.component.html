@@ -101,6 +101,7 @@
           
           <app-sched-e
             [hidden]="scheduleType !== 'sched_e'"
+            [mainTransactionTypeText]="mainTransactionTypeText"
             [transactionTypeText]="transactionTypeText"
             [transactionType]="transactionType"
             [scheduleAction]="scheduleAction"
@@ -132,6 +133,7 @@
           [hidden]="scheduleType !== 'sched_f'"
           [formType]="'3X'"
           [forceChangeDetection]="forceChangeDetectionFDebtPayment"
+          [mainTransactionTypeText]="mainTransactionTypeText"
           [transactionTypeText]="transactionTypeTextSchedF"
           [transactionType]="transactionTypeSchedF"
           [scheduleAction]="scheduleFAction"

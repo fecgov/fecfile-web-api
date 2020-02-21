@@ -23,7 +23,7 @@
         <div class="float-left">
           <h2>
             Form 3X
-            <ng-container *ngIf="transactionTypeText && !mainTransactionTypeText"> {{ transactionTypeText }} </ng-container>
+            <ng-container *ngIf="transactionTypeText && !mainTransactionTypeText"> / {{ transactionTypeText }} </ng-container>
             <ng-container *ngIf="transactionTypeText && mainTransactionTypeText"> / 
               {{ mainTransactionTypeText }} / {{ transactionTypeText }}
             </ng-container>
