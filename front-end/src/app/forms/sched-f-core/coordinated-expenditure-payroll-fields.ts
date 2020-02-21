@@ -810,6 +810,11 @@ export class CoordinatedExpenditurePayrollFields {
           type: 'hidden',
           name: 'transaction_type_identifier',
           value: 'COEXP_PMT_PROL'
+        },
+        {
+          type: 'hidden',
+          name: 'show_memo_warning',
+          value: true
         }
       ],
       states: [

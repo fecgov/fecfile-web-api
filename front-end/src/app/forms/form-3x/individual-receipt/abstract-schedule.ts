@@ -2274,7 +2274,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public saveOnly(): void {
-    this._doValidateReceipt(SaveActions.saveOnly);
+    if ( this._findHiddenField('name', 'show_memo_warning') &&
+        this._findHiddenField('name', 'show_memo_warning').value) {
+      if (!this.frmIndividualReceipt.valid) {
+        return;
+      }
+    this._dialogService.confirm('Please note that this transaction usually includes memo transactions that support the parent' +
+        ' transaction. You can add the memo transactions at a later date. ',
+        ConfirmModalComponent, 'Warning !!!', false).then(res => {
+      if (res === 'okay') {
+        this._doValidateReceipt(SaveActions.saveOnly);
+      } else {
+        //used by sched f
+        this.showPart2 = true;
+        return;
+      }
+    });
+    } else {
+      this._doValidateReceipt(SaveActions.saveOnly);
+    }
   }
 
   public updateOnly(): void {
