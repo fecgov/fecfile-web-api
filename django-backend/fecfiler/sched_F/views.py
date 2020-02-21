@@ -27,7 +27,7 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
 )
-from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent
+from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent, get_line_number_trans_type
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.sched_D.views import do_transaction
 from fecfiler.core.report_helper import new_report_date
@@ -167,6 +167,9 @@ def schedF_sql_dict(data):
         output["payee_cand_office"] = data.get("cand_office")
         output["payee_cand_state"] = data.get("cand_office_state")
         output["payee_cand_district"] = data.get("cand_office_district")
+        output["line_number"], output["transaction_type"] = get_line_number_trans_type(
+            data.get("transaction_type_identifier")
+        )
         return output
     except:
         raise Exception("invalid request data.")
@@ -271,6 +274,8 @@ def put_sql_schedF(data):
                   expenditure_date = %s,
                   expenditure_amount = %s,
                   aggregate_general_elec_exp = %s,
+                  line_number = %s,
+                  transaction_type = %s,
                   purpose = %s,
                   category_code = %s,
                   payee_cmte_id = %s,
@@ -307,6 +312,8 @@ def put_sql_schedF(data):
         data.get("expenditure_date"),
         data.get("expenditure_amount"),
         data.get("aggregate_general_elec_exp"),
+        data.get("line_number"),
+        data.get("transaction_type"),
         data.get("purpose"),
         data.get("category_code"),
         data.get("payee_cmte_id"),
@@ -415,6 +422,8 @@ def post_sql_schedF(data):
             expenditure_date,
             expenditure_amount,
             aggregate_general_elec_exp,
+            line_number, 
+            transaction_type,
             purpose,
             category_code,
             payee_cmte_id,
@@ -432,7 +441,7 @@ def post_sql_schedF(data):
             create_date,
             last_update_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get("cmte_id"),
@@ -455,6 +464,8 @@ def post_sql_schedF(data):
             data.get("expenditure_date"),
             data.get("expenditure_amount"),
             data.get("aggregate_general_elec_exp"),
+            data.get("line_number"),
+            data.get("transaction_type"),
             data.get("purpose"),
             data.get("category_code"),
             data.get("payee_cmte_id"),
@@ -529,6 +540,8 @@ def get_list_all_schedF(report_id, cmte_id):
             expenditure_date,
             expenditure_amount,
             aggregate_general_elec_exp,
+            line_number,
+            transaction_type,
             purpose,
             category_code,
             payee_cmte_id,
@@ -596,6 +609,8 @@ def get_list_schedF(report_id, cmte_id, transaction_id, is_back_ref=False):
             sf.expenditure_date,
             sf.expenditure_amount,
             sf.aggregate_general_elec_exp,
+            sf.line_number,
+            sf.transaction_type,
             sf.purpose,
             sf.category_code,
             sf.payee_cmte_id,
