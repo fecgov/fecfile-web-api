@@ -191,6 +191,9 @@ def schedE_sql_dict(data):
         # remap election code for frontend handshaking
         if "full_election_code" in data:
             datum["election_code"] = data.get("full_election_code")
+        if "election_other_description" in data:
+            datum["election_other_desc"] = data.get("election_other_description")
+            
 
         # also add entity_id as an attribute. It is being remapped to payee_entity_id but fails in core since its looking for entity_id
         if "payee_entity_id" in data:
@@ -894,6 +897,7 @@ def get_schedE(data):
             forms_obj = get_list_all_schedE(report_id, cmte_id)
         if forms_obj:
             for SE in forms_obj:
+                SE['election_other_description'] = SE.get('election_other_desc')
                 child_SE = get_list_schedE(
                     SE["report_id"], SE["cmte_id"], SE["transaction_id"], True
                 )
