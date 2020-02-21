@@ -1170,6 +1170,7 @@ def schedB_sql_dict(data):
             "memo_code": data.get("memo_code"),
             "memo_text": data.get("memo_text"),
             "election_code": data.get("election_code"),
+            "election_year": data.get("election_year"),
             "election_other_description": data.get("election_other_description"),
             "beneficiary_cmte_id": data.get("beneficiary_cmte_id"),
             "beneficiary_cand_id": data.get("beneficiary_cand_id"),
