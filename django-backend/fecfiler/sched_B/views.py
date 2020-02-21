@@ -863,12 +863,14 @@ def get_schedB(data):
                 obj.update({"api_call": "/sb/schedB"})
                 if obj.get("election_code"):
                     obj.update({"election_year": obj.get("election_code")[1:]})
+                    obj['election_code'] = obj.get("election_code")[0]
                 # obj.update({"election_year": REQT_ELECTION_YR})
             child_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
             for obj in child_forms_obj:
                 obj.update({"api_call": "/sb/schedB"})
                 if obj.get("election_code"):
                     obj.update({"election_year": obj.get("election_code")[1:]})
+                    obj['election_code'] = obj.get("election_code")[0]
                 # obj.update({"election_year": REQT_ELECTION_YR})
                 tran_id = obj.get("transaction_type_identifier")
                 obj.update(
@@ -882,6 +884,7 @@ def get_schedB(data):
                 obj.update({"api_call": "/sb/schedB"})
                 if obj.get("election_code"):
                     obj.update({"election_year": obj.get("election_code")[1:]})
+                    obj['election_code'] = obj.get("election_code")[0]
                 # obj.update({"election_year": REQT_ELECTION_YR})
         return forms_obj
 
