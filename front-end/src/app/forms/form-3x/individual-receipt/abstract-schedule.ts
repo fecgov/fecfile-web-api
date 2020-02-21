@@ -150,6 +150,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _completedCloning: boolean = false;
   private _outstandingDebtBalance: number;
   private _scheduleHBackRefTransactionId: string;
+  
+  private candidateAssociatedWithPayeeTransactionTypes = [
+    "IE_VOID",
+    "IE_CC_PAY",
+    "IE_STAF_REIM",
+    "IE_PMT_TO_PROL",
+    "IE_MULTI",
+    "IE",
+    "IE_B4_DISSE",
+    "IE_CC_PAY_MEMO",
+    "IE_STAF_REIM_MEMO",
+    "IE_PMT_TO_PROL_MEMO",
+    "COEXP_PARTY",
+    "COEXP_CC_PAY",
+    "COEXP_STAF_REIM",
+    "COEXP_PMT_PROL",
+    "COEXP_PARTY_VOID",
+    "COEXP_CC_PAY_MEMO",
+    "COEXP_STAF_REIM_MEMO",
+    "COEXP_PMT_PROL_MEMO",
+    "COEXP_PARTY_DEBT"
+  ];
 
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
   //there is no unsubscribe() for activateRoute . 
@@ -2799,15 +2821,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('zip_code');
     fieldNames.push('occupation');
     fieldNames.push('employer');
-    fieldNames.push('cand_last_name');
-    fieldNames.push('cand_first_name');
-    fieldNames.push('cand_middle_name');
-    fieldNames.push('cand_suffix');
-    fieldNames.push('cand_prefix');
-    fieldNames.push('cand_office');
-    fieldNames.push('cand_office_state');
-    fieldNames.push('cand_office_district');
-    fieldNames.push('payee_cmte_id');
+    if(this.isCandidateAssociatedWithPayee()){
+      fieldNames.push('cand_last_name');
+      fieldNames.push('cand_first_name');
+      fieldNames.push('cand_middle_name');
+      fieldNames.push('cand_suffix');
+      fieldNames.push('cand_prefix');
+      fieldNames.push('cand_office');
+      fieldNames.push('cand_office_state');
+      fieldNames.push('cand_office_district');
+      fieldNames.push('payee_cmte_id');
+    }
     this._patchFormFields(fieldNames, entity, namePrefix);
     // setting Beneficiary Candidate Entity Id to hidden variable
     const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
@@ -2859,6 +2883,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
+  }
+  isCandidateAssociatedWithPayee() : boolean {
+    if(this.candidateAssociatedWithPayeeTransactionTypes.includes(this.transactionType)){
+      return false;
+    }
+    return true;
   }
 
   /**
