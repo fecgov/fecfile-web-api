@@ -1963,7 +1963,11 @@ def schedH3_sql_dict(data):
         "memo_text",
     ]
     try:
-        return {k: v for k, v in data.items() if k in valid_fields}
+        valid_data = {k: v for k, v in data.items() if k in valid_fields}
+        valid_data["line_number"], valid_data[
+            "transaction_type"
+        ] = get_line_number_trans_type(data["transaction_type_identifier"])
+        return valid_data
     except:
         raise Exception("invalid request data.")
 
@@ -2004,7 +2008,8 @@ def put_schedH3(data):
             raise Exception(
                 "The put_sql_schedH3 function is throwing an error: " + str(e)
             )
-        return get_schedH3(data)
+        # return get_schedH3(data)
+        return data
     except:
         raise
 
@@ -2026,6 +2031,8 @@ def put_sql_schedH3(data):
                   transferred_amount = %s,
                   memo_code = %s,
                   memo_text = %s,
+                  line_number = %s,
+                  transaction_type = %s,
                   last_update_date = %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
@@ -2042,6 +2049,8 @@ def put_sql_schedH3(data):
         data.get("transferred_amount"),
         data.get("memo_code"),
         data.get("memo_text"),
+        data.get("line_number"),
+        data.get("transaction_type"),
         datetime.datetime.now(),
         data.get("transaction_id"),
         data.get("report_id"),
@@ -2103,10 +2112,12 @@ def post_sql_schedH3(data):
             transferred_amount,
             memo_code,
             memo_text,
+            line_number,
+            transaction_type,
             create_date ,
             last_update_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get("cmte_id"),
@@ -2123,6 +2134,8 @@ def post_sql_schedH3(data):
             data.get("transferred_amount"),
             data.get("memo_code"),
             data.get("memo_text"),
+            data.get("line_number"),
+            data.get("transaction_type"),
             datetime.datetime.now(),
             datetime.datetime.now(),
         )
@@ -2184,6 +2197,8 @@ def get_child_schedH3(transaction_id, report_id, cmte_id):
             transferred_amount,
             memo_code,
             memo_text,
+            line_number,
+            transaction_type,
             delete_ind,
             create_date ,
             last_update_date
@@ -2226,6 +2241,8 @@ def get_list_all_schedH3(report_id, cmte_id):
             transferred_amount,
             memo_code,
             memo_text,
+            line_number,
+            transaction_type,
             delete_ind,
             create_date ,
             last_update_date
@@ -2270,6 +2287,8 @@ def get_list_schedH3(report_id, cmte_id, transaction_id):
             transferred_amount,
             memo_code,
             memo_text,
+            line_number,
+            transaction_type,
             delete_ind,
             create_date ,
             last_update_date
@@ -2814,8 +2833,8 @@ def schedH3(request):
             #     output = get_schedB(data)
             # else:
             data = put_schedH3(datum)
-            # output = get_schedA(data)
-            return JsonResponse(data[0], status=status.HTTP_201_CREATED, safe=False)
+            output = get_schedH3(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED, safe=False)
         except Exception as e:
             logger.debug(e)
             return Response(
