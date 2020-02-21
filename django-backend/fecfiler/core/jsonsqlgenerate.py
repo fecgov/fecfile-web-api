@@ -303,7 +303,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                         to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", t1.expenditure_amount AS "expenditureAmount",
                         COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription", COALESCE(t1.category_code, '''') AS "categoryCode",
                         COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
-                        COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "payeeOrgName",
+                        COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
                         COALESCE(t2.street_1, '''') AS "payeeStreet1", COALESCE(t2.street_2, '''') AS "payeeStreet2", COALESCE(t2.city, '''') AS "payeeCity",
                         COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZipCode"
                         FROM public.sched_b t1
@@ -338,7 +338,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                         COALESCE(t3.cand_office_state, '''') AS "beneficiaryCandidateState",
                         COALESCE(t3.cand_office_district, '''') AS "beneficiaryCandidateDistrict",
                         COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
-                        COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "payeeOrgName",
+                        COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
                         COALESCE(t2.street_1, '''') AS "payeeStreet1", COALESCE(t2.street_2, '''') AS "payeeStreet2", COALESCE(t2.city, '''') AS "payeeCity",
                         COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZipCode"
                         FROM public.sched_b t1
@@ -364,7 +364,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                         COALESCE(t1.expenditure_purpose, '''') AS "expenditurePurposeDescription", COALESCE(t1.category_code, '''') AS "categoryCode",
                         COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId", COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
                         COALESCE(t1.memo_code, '''') AS "memoCode", COALESCE(t1.memo_text, '''') AS "memoDescription",
-                        COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "payeeOrgName",
+                        COALESCE(t2.entity_type, '''') AS "entityType", COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
                         COALESCE(t2.street_1, '''') AS "payeeStreet1", COALESCE(t2.street_2, '''') AS "payeeStreet2", COALESCE(t2.city, '''') AS "payeeCity",
                         COALESCE(t2.state, '''') AS "payeeState", COALESCE(t2.zip_code, '''') AS "payeeZipCode"
                         FROM public.sched_b t1
@@ -2386,7 +2386,7 @@ COALESCE(t1.category_code, '''') AS "categoryCode",
 COALESCE(t1.memo_code, '''') AS "memoCode", 
 COALESCE(t1.memo_text, '''') AS "memoDescription",
 COALESCE(t2.entity_type, '''') AS "entityType", 
-COALESCE(t2.entity_name, '''') AS "payeeOrgName",
+COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
 COALESCE(t2.last_name, '''') AS "payeeLastName", 
 COALESCE(t2.first_name, '''') AS "payeeFirstName",
 COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 

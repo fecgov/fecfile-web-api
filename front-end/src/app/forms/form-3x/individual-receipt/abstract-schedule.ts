@@ -151,6 +151,29 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _completedCloning: boolean = false;
   private _outstandingDebtBalance: number;
   private _scheduleHBackRefTransactionId: string;
+  private readonly childNeededWarnText = 'Please note that this transaction usually includes memo transactions that support the' +
+      ' parent transaction. You can add the memo transactions at a later date.';
+  private candidateAssociatedWithPayeeTransactionTypes = [
+    "IE_VOID",
+    "IE_CC_PAY",
+    "IE_STAF_REIM",
+    "IE_PMT_TO_PROL",
+    "IE_MULTI",
+    "IE",
+    "IE_B4_DISSE",
+    "IE_CC_PAY_MEMO",
+    "IE_STAF_REIM_MEMO",
+    "IE_PMT_TO_PROL_MEMO",
+    "COEXP_PARTY",
+    "COEXP_CC_PAY",
+    "COEXP_STAF_REIM",
+    "COEXP_PMT_PROL",
+    "COEXP_PARTY_VOID",
+    "COEXP_CC_PAY_MEMO",
+    "COEXP_STAF_REIM_MEMO",
+    "COEXP_PMT_PROL_MEMO",
+    "COEXP_PARTY_DEBT"
+  ];
 
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
   //there is no unsubscribe() for activateRoute . 
@@ -1682,13 +1705,40 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (this.frmIndividualReceipt.contains(description)) {
         this.frmIndividualReceipt.controls[description].setValidators([Validators.required]);
         this.frmIndividualReceipt.controls[description].updateValueAndValidity();
+        const patch = {};
+        patch[description] = null;
+        this.frmIndividualReceipt.patchValue(patch,{onlySelf:true});
       }
     } else {
       if (this.frmIndividualReceipt.contains(description)) {
         this.frmIndividualReceipt.controls[description].setValidators([Validators.nullValidator]);
         this.frmIndividualReceipt.controls[description].updateValueAndValidity();
+        const patch = {};
+        patch[description] = this.getElectionTypeDescription(item.electionType);
+        this.frmIndividualReceipt.patchValue(patch,{onlySelf:true});
       }
     }
+  }
+
+
+  private getElectionTypeDescription(electionCode:string) : string{
+    if(this.electionTypes){
+      const electionType = this.electionTypes.find(element=> element.electionType === electionCode);
+      if(electionType){
+        return electionType.electionTypeDescription;
+      }
+    }
+    return null;
+  }
+
+  private getElectionTypeCode(electionTypeDescription:string) : string{
+    if(this.electionTypes){
+      const electionType = this.electionTypes.find(element=> element.electionTypeDescription === electionTypeDescription);
+      if(electionType){
+        return electionType.electionType;
+      }
+    }
+    return null;
   }
 
   /**
@@ -1833,7 +1883,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           receiptObj[field] = amountVal;
         } else if (field === 'levin_account_id') {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value.toString();
-        } else {
+        } else if(field === 'election_code'){
+          receiptObj[field] = this.frmIndividualReceipt.get(field).value[0];
+        } 
+        else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
       }
@@ -2246,7 +2299,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public saveOnly(): void {
-    this._doValidateReceipt(SaveActions.saveOnly);
+    if ( this._findHiddenField('name', 'show_memo_warning') &&
+        this._findHiddenField('name', 'show_memo_warning').value) {
+      if (!this.frmIndividualReceipt.valid) {
+        return;
+      }
+    this._dialogService.confirm(this.childNeededWarnText, ConfirmModalComponent, 'Warning !!!', false).then(
+        res => {
+      if (res === 'okay') {
+        this._doValidateReceipt(SaveActions.saveOnly);
+      } else {
+        //used by sched f
+        this.showPart2 = true;
+        return;
+      }
+    });
+    } else {
+      this._doValidateReceipt(SaveActions.saveOnly);
+    }
   }
 
   public updateOnly(): void {
@@ -2385,8 +2455,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public saveOrWarn(): void {
     if (this.frmIndividualReceipt.valid) {
-      this.saveOnly();
-      this.viewTransactions();
+      // if form is valid check if transactionId exists
+      // if exists do not check/show warning for child trx required
+      // else check for the warning flag and show popup, on ok save and view transaction else return to the page
+          if (this.isShowChildRequiredWarn()) {
+            this._dialogService.confirm(this.childNeededWarnText, ConfirmModalComponent, 'Warning !!!', false).then(
+                res => {
+                  if (res === 'okay') {
+                    this._doValidateReceipt(SaveActions.saveOnly);
+                    this.viewTransactions();
+                  } else {
+                    this.showPart2 = true;
+                    return;
+                  }
+                });
+          } else {
+            this._doValidateReceipt(SaveActions.saveOnly);
+            this.viewTransactions();
+          }
     } else {
       this._dialogService.confirm('', ConfirmModalComponent, '', true).then(res => {
         if (res === 'okay' ? true : false) {
@@ -2772,15 +2858,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fieldNames.push('zip_code');
     fieldNames.push('occupation');
     fieldNames.push('employer');
-    fieldNames.push('cand_last_name');
-    fieldNames.push('cand_first_name');
-    fieldNames.push('cand_middle_name');
-    fieldNames.push('cand_suffix');
-    fieldNames.push('cand_prefix');
-    fieldNames.push('cand_office');
-    fieldNames.push('cand_office_state');
-    fieldNames.push('cand_office_district');
-    fieldNames.push('payee_cmte_id');
+    if(this.isCandidateAssociatedWithPayee()){
+      fieldNames.push('cand_last_name');
+      fieldNames.push('cand_first_name');
+      fieldNames.push('cand_middle_name');
+      fieldNames.push('cand_suffix');
+      fieldNames.push('cand_prefix');
+      fieldNames.push('cand_office');
+      fieldNames.push('cand_office_state');
+      fieldNames.push('cand_office_district');
+      fieldNames.push('payee_cmte_id');
+    }
     this._patchFormFields(fieldNames, entity, namePrefix);
     // setting Beneficiary Candidate Entity Id to hidden variable
     const beneficiaryCandEntityIdHiddenField = this._findHiddenField('name', 'beneficiary_cand_entity_id');
@@ -2832,6 +2920,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
+  }
+  isCandidateAssociatedWithPayee() : boolean {
+    if(this.candidateAssociatedWithPayeeTransactionTypes.includes(this.transactionType)){
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -3784,25 +3878,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     if (this.frmIndividualReceipt) {
                       if (this.frmIndividualReceipt.get(prop)) {
                         if (this.frmIndividualReceipt.get(prop)) {
-                        if (this.isFieldName(prop, 'contribution_aggregate')) {
-                          this._contributionAggregateValue = trx[prop];
-                        } else if (this.isFieldName(prop, 'aggregate_general_elec_exp')) {
-                          this._contributionAggregateValue = trx[prop];
-                        }
-                        if (this.isFieldName(prop, 'activity_event_type')) {
-                          if (trx[prop] !== null || trx[prop] !== 'Select') {
-                            this.totalAmountReadOnly = false;
-                            if (this.activityEventTypes) {
-                              for (const activityEvent of this.activityEventTypes) {
-                                if (trx[prop] === activityEvent.eventType) {
-                                  if (activityEvent.scheduleType === 'sched_h2' && activityEvent.hasValue === true) {
-                                    this.activityEventNames = activityEvent.activityEventTypes;
+                          if (this.isFieldName(prop, 'contribution_aggregate')) {
+                            this._contributionAggregateValue = trx[prop];
+                          } else if (this.isFieldName(prop, 'aggregate_general_elec_exp')) {
+                            this._contributionAggregateValue = trx[prop];
+                          }
+                          if (this.isFieldName(prop, 'activity_event_type')) {
+                            if (trx[prop] !== null || trx[prop] !== 'Select') {
+                              this.totalAmountReadOnly = false;
+                              if (this.activityEventTypes) {
+                                for (const activityEvent of this.activityEventTypes) {
+                                  if (trx[prop] === activityEvent.eventType) {
+                                    if (activityEvent.scheduleType === 'sched_h2' && activityEvent.hasValue === true) {
+                                      this.activityEventNames = activityEvent.activityEventTypes;
+                                    }
                                   }
                                 }
                               }
                             }
                           }
-                        }
                           if (this.isFieldName(prop, 'memo_code')) {
                             const memoCodeValue = trx[prop];
                             if (memoCodeValue === this._memoCodeValue) {
@@ -3829,6 +3923,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                                   }
                                 }
                               }
+                            }
+                          }
+                          if (this.isFieldName(prop,'election_code')){
+                            if(trx.election_code !== 'O'){
+                              trx[prop] = this.getElectionTypeCode(trx.election_other_description);
                             }
                           }
                           const patch = {};
@@ -4886,5 +4985,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.frmIndividualReceipt.controls['expenditure_date'].reset();
       }
     }
+  }
+
+  private isShowChildRequiredWarn() {
+    const transactionId = this._findHiddenField('name', 'transaction_id');
+    if ( transactionId && transactionId.length > 0 ) {
+      return false;
+    }
+
+    if ( this._findHiddenField('name', 'show_memo_warning') &&
+        this._findHiddenField('name', 'show_memo_warning').value ) {
+      return true;
+    }
+    return false;
   }
 }
