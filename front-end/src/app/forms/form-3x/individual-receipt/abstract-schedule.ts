@@ -51,6 +51,8 @@ export enum SaveActions {
 }
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+
+  mainTransactionTypeText = '';
   transactionTypeText = '';
   transactionType = '';
   scheduleAction: ScheduleActions = null;
@@ -2088,6 +2090,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               direction: 'next',
               step: 'step_3',
               previousStep: 'step_2',
+              mainTransactionTypeText: this.mainTransactionTypeText,
               transactionTypeText: this.subTransactionInfo.subTransactionTypeDescription,
               transactionType: this.subTransactionInfo.subTransactionType,
               apiCall: this.subTransactionInfo.api_call,
@@ -2398,6 +2401,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
+      mainTransactionTypeText: this.mainTransactionTypeText,
       transactionTypeText: this.subTransactionInfo.transactionTypeDescription,
       transactionType: this.subTransactionInfo.transactionType,
       action: scheduleAction,

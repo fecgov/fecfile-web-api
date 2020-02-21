@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
 import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
@@ -37,6 +37,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 })
 export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() formType: string;
+  @Input() mainTransactionTypeText: string;
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
@@ -341,21 +342,20 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     return `${payeeCmteID}, ${candidateId}, ${lastName}, ${firstName}, ${office},
       ${officeState}, ${officeDistrict}`;
   }
-  
-  public onFilerChange(change): void {
 
+  public onFilerChange(change): void {
     console.log('change %s', change);
     if (change === 'Y') {
       this.isDesignatedFiler = true;
-      this.addValidator(this.validateDesignatedFiler,  this.isDesignatedFiler);
+      this.addValidator(this.validateDesignatedFiler, this.isDesignatedFiler);
     } else {
       this.isDesignatedFiler = false;
-      this.addValidator(this.validateDesignatedFiler,  this.isDesignatedFiler);
+      this.addValidator(this.validateDesignatedFiler, this.isDesignatedFiler);
     }
     this.addValidator(this.noValidationRequired, false);
   }
-  public addValidator( validators: Array<any>, set: boolean): void {
-    if ( set ) {
+  public addValidator(validators: Array<any>, set: boolean): void {
+    if (set) {
       for (const filedName of validators) {
         this.frmIndividualReceipt.controls[filedName].setValidators([Validators.required]);
         this.frmIndividualReceipt.controls[filedName].updateValueAndValidity();
