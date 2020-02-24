@@ -772,11 +772,6 @@ export class CoordinatedExpenditureStaffFields {
       },
       {
         type: 'hidden',
-        name: 'memo_code',
-        value: null
-      },
-      {
-        type: 'hidden',
         name: 'line_number',
         value: '24'
       },
