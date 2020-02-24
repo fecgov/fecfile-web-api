@@ -990,6 +990,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       if (debtSummary.returnToDebtSummary) {
         emitObj.returnToDebtSummary = debtSummary.returnToDebtSummary;
         emitObj.returnToDebtSummaryInfo = debtSummary.returnToDebtSummaryInfo;
+        emitObj.mainTransactionTypeText = 'Loans and Debts';
       }
     }
     this.showTransaction.emit(emitObj);

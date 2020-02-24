@@ -804,6 +804,11 @@ export class CoordinatedExpenditureStaffFields {
         type: 'hidden',
         name: 'transaction_type_identifier',
         value: 'COEXP_STAF_REIM'
+      },
+      {
+        type: 'hidden',
+        name: 'show_memo_warning',
+        value: true
       }
     ],
     states: [

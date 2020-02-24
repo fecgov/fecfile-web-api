@@ -804,6 +804,11 @@ export class CoordinatedExpenditureCCFields  {
           type: 'hidden',
           name: 'transaction_type_identifier',
           value: 'COEXP_CC_PAY'
+        },
+        {
+          type: 'hidden',
+          name: 'show_memo_warning',
+          value: true
         }
       ],
       states: [

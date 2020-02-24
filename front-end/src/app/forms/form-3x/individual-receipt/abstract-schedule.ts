@@ -52,6 +52,7 @@ export enum SaveActions {
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
+  mainTransactionTypeText = '';
   transactionTypeText = '';
   transactionType = '';
   scheduleAction: ScheduleActions = null;
@@ -150,7 +151,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _completedCloning: boolean = false;
   private _outstandingDebtBalance: number;
   private _scheduleHBackRefTransactionId: string;
-  
+  private readonly childNeededWarnText = 'Please note that this transaction usually includes memo transactions that support the' +
+      ' parent transaction. You can add the memo transactions at a later date.';
   private candidateAssociatedWithPayeeTransactionTypes = [
     "IE_VOID",
     "IE_CC_PAY",
@@ -2093,6 +2095,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               direction: 'next',
               step: 'step_3',
               previousStep: 'step_2',
+              mainTransactionTypeText: this.mainTransactionTypeText,
               transactionTypeText: this.subTransactionInfo.subTransactionTypeDescription,
               transactionType: this.subTransactionInfo.subTransactionType,
               apiCall: this.subTransactionInfo.api_call,
@@ -2309,7 +2312,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public saveOnly(): void {
-    this._doValidateReceipt(SaveActions.saveOnly);
+    if ( this._findHiddenField('name', 'show_memo_warning') &&
+        this._findHiddenField('name', 'show_memo_warning').value) {
+      if (!this.frmIndividualReceipt.valid) {
+        return;
+      }
+    this._dialogService.confirm(this.childNeededWarnText, ConfirmModalComponent, 'Warning !!!', false).then(
+        res => {
+      if (res === 'okay') {
+        this._doValidateReceipt(SaveActions.saveOnly);
+      } else {
+        //used by sched f
+        this.showPart2 = true;
+        return;
+      }
+    });
+    } else {
+      this._doValidateReceipt(SaveActions.saveOnly);
+    }
   }
 
   public updateOnly(): void {
@@ -2394,6 +2414,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       direction: 'next',
       step: 'step_3',
       previousStep: 'step_2',
+      mainTransactionTypeText: this.mainTransactionTypeText,
       transactionTypeText: this.subTransactionInfo.transactionTypeDescription,
       transactionType: this.subTransactionInfo.transactionType,
       action: scheduleAction,
@@ -2447,8 +2468,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public saveOrWarn(): void {
     if (this.frmIndividualReceipt.valid) {
-      this.saveOnly();
-      this.viewTransactions();
+      // if form is valid check if transactionId exists
+      // if exists do not check/show warning for child trx required
+      // else check for the warning flag and show popup, on ok save and view transaction else return to the page
+          if (this.isShowChildRequiredWarn()) {
+            this._dialogService.confirm(this.childNeededWarnText, ConfirmModalComponent, 'Warning !!!', false).then(
+                res => {
+                  if (res === 'okay') {
+                    this._doValidateReceipt(SaveActions.saveOnly);
+                    this.viewTransactions();
+                  } else {
+                    this.showPart2 = true;
+                    return;
+                  }
+                });
+          } else {
+            this._doValidateReceipt(SaveActions.saveOnly);
+            this.viewTransactions();
+          }
     } else {
       this._dialogService.confirm('', ConfirmModalComponent, '', true).then(res => {
         if (res === 'okay' ? true : false) {
@@ -4994,5 +5031,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.frmIndividualReceipt.controls['cand_office_district'].reset();
       }
     }
+  }
+
+  private isShowChildRequiredWarn() {
+    const transactionId = this._findHiddenField('name', 'transaction_id');
+    if ( transactionId && transactionId.length > 0 ) {
+      return false;
+    }
+
+    if ( this._findHiddenField('name', 'show_memo_warning') &&
+        this._findHiddenField('name', 'show_memo_warning').value ) {
+      return true;
+    }
+    return false;
   }
 }
