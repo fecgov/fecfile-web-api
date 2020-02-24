@@ -256,6 +256,7 @@
         </app-sched-h5>
         <app-sched-h4
           [hidden]="transactionType !== 'ALLOC_H4_TYPES' && transactionType !== 'ALLOC_H4_SUM'"
+          [mainTransactionTypeText]="mainTransactionTypeText"
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"
@@ -265,6 +266,7 @@
         </app-sched-h4>
         <app-sched-h6
           [hidden]="transactionType !== 'ALLOC_H6_TYPES' && transactionType !== 'ALLOC_H6_SUM'"
+          [mainTransactionTypeText]="mainTransactionTypeText"
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"
@@ -280,6 +282,7 @@
             transactionType !== 'LB_SUM' &&
             transactionType !== 'L_SUM'
           "
+          [mainTransactionTypeText]="mainTransactionTypeText"
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"
