@@ -693,7 +693,7 @@
                       (click)="saveAndReturnToParent()">
                       Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
                     </a>
-                    <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="viewTransactions()">
+                    <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="(frmIndividualReceipt.dirty) ? saveOrWarn() : viewTransactions()">
                       View Transactions
                     </a>
                   </div>
