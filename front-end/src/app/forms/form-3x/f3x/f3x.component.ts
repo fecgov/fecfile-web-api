@@ -441,7 +441,7 @@ export class F3xComponent implements OnInit , OnDestroy{
               transactionType = e.transactionType ? e.transactionType : '';
               if(e && e.transactionDetail && e.transactionDetail.transactionModel && e.transactionDetail.transactionModel.isRedesignation){
                 this._populateFormForEdit(e, AbstractScheduleParentEnum.schedMainComponent);
-                this._f3xMessageService.sendClearFormValuesForRedesignationMessage({abstractScheduleComponent:AbstractScheduleParentEnum.schedMainComponent});
+                // this._f3xMessageService.sendClearFormValuesForRedesignationMessage({abstractScheduleComponent:AbstractScheduleParentEnum.schedMainComponent});
               }
               if (this.scheduleAction === ScheduleActions.addSubTransaction) {
                 if (e.hasOwnProperty('prePopulateFieldArray') && Array.isArray(e.prePopulateFieldArray)) {
