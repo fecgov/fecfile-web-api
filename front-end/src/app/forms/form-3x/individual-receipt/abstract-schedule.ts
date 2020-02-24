@@ -2383,6 +2383,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         direction: 'next',
         step: 'step_3',
         previousStep: 'step_2',
+        mainTransactionTypeText: this.mainTransactionTypeText,
         transactionTypeText: this.subTransactionInfo.subTransactionTypeDescription,
         transactionType: this.subTransactionInfo.subTransactionType,
         action: scheduleAction,
