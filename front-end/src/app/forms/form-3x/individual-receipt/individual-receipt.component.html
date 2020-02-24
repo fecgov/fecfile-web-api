@@ -625,7 +625,7 @@
               </div>
 
               <ng-template #allOtherTrx>
-                <div *ngIf="scheduleAction === editScheduleAction; else createActions">
+                <div *ngIf="scheduleAction === editScheduleAction || reattributionTransactionId || redesignationTransactionId; else createActions">
                   <button *ngIf="!isShedH4OrH6TransactionType(transactionType) || cloned" class="btn btn-previous btn-left" type="button" (click)="cancel()">
                     Cancel
                   </button>

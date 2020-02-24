@@ -1472,7 +1472,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.showWarn(col.text, col.name);
       }
     } else if (this._isCandidateField(col)) {
-      this.handleFormFieldKeyupCandidate($event, col);
+      if(!this.redesignationTransactionId){
+        this.handleFormFieldKeyupCandidate($event, col);
+      }
     } else if (this.isFieldName(col.name, 'contribution_amount')) {
       this.contributionAmountKeyup($event);
     } else {
@@ -1661,7 +1663,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     } else {
       if (this._selectedEntity && col.name !== 'cand_office_state') {
         this.showWarn(col.text, 'state');
-      } else if (this._selectedCandidate) {
+      } else if (this._selectedCandidate && !this.redesignationTransactionId) {
         this.showWarnCandidate(col.text, col.name);
       }
     }
@@ -1679,7 +1681,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.showWarnCandidate(col.text, col.name);
       }
     } else {
-      if (this._selectedCandidate) {
+      if (this._selectedCandidate && !this.redesignationTransactionId) {
         this.showWarnCandidate(col.text, col.name);
       }
     }
@@ -1897,8 +1899,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.hiddenFields.forEach((el: any) => {
           if (el.name === 'transaction_id') {
             el.value = this._transactionToEdit.transactionId;
-            // If Transaction Id is present, setting Action to Edit
-            this.scheduleAction = ScheduleActions.edit;
+            // If Transaction Id is present, setting Action to Edit, unless its a redesignation
+            if(!this.redesignationTransactionId){
+              this.scheduleAction = ScheduleActions.edit;
+            }
           } else if (el.name === 'api_call') {
             el.value = this._transactionToEdit.apiCall;
           }
@@ -2022,6 +2026,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.memoCode = false;
           this.memoCodeChild = false;
           this.frmIndividualReceipt.reset();
+          this._prepopulateDefaultPurposeText();
           this._setMemoCodeForForm();
           this._selectedEntity = null;
           this._selectedChangeWarn = null;
@@ -2240,6 +2245,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       });
 
       return Observable.of('invalid');
+    }
+  }
+  _prepopulateDefaultPurposeText() {
+    const purposeFormField = this.findFormFieldEndingWith('purpose_description');
+    if(purposeFormField && purposeFormField.preText && purposeFormField.value && purposeFormField.preText === purposeFormField.value){
+      const patch = {};
+      patch[purposeFormField.name] = purposeFormField.preText;
+      this.frmIndividualReceipt.patchValue(patch,{onlySelf:true});
     }
   }
 
@@ -4051,6 +4064,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
             //once data is set, send a message to any child components that may want to set additional specific fields
             this._messageService.sendPopulateChildComponentMessage({populateChildForEdit: true, transactionData: trx, component: this.abstractScheduleComponent});
+
+            if(this.redesignationTransactionId){
+              this._f3xMessageService.sendClearFormValuesForRedesignationMessage({abstractScheduleComponent:AbstractScheduleParentEnum.schedMainComponent});
+            }
           }
 
 
@@ -4802,6 +4819,23 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     return null;
   }
 
+  public findFormFieldEndingWith(name: string): any {
+    if (!name || !this.formFields) {
+      return null;
+    }
+    const fields = this.formFields;
+    for (const el of fields) {
+      if (el.hasOwnProperty('cols') && el.cols) {
+        for (const e of el.cols) {
+          if (e.name.endsWith(name)) {
+            return e;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   public isShedH4OrH6TransactionType(transactionType: string): boolean {
     if (
       transactionType === 'ALLOC_EXP' ||
@@ -4984,6 +5018,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if(this.frmIndividualReceipt){
       if(this.frmIndividualReceipt.controls['expenditure_date']){
         this.frmIndividualReceipt.controls['expenditure_date'].reset();
+      }
+      if(this.frmIndividualReceipt.controls['expenditure_amount']){
+        this.frmIndividualReceipt.controls['expenditure_amount'].reset();
+      }
+      if(this.frmIndividualReceipt.controls['cand_office']){
+        this.frmIndividualReceipt.controls['cand_office'].reset();
+      }
+      if(this.frmIndividualReceipt.controls['cand_office_state']){
+        this.frmIndividualReceipt.controls['cand_office_state'].reset();
+      }
+      if(this.frmIndividualReceipt.controls['cand_office_district']){
+        this.frmIndividualReceipt.controls['cand_office_district'].reset();
       }
     }
   }
