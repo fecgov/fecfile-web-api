@@ -3567,10 +3567,14 @@ def schedH4(request):
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
-                datum["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
-                )
-                data = put_schedH4(datum)
+                try:
+                    datum["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                    data = put_schedH4(datum)
+                except: 
+                    datum['transaction_id'] = None
+                    data = post_schedH4(datum)
             else:
                 # print(datum)
                 data = post_schedH4(datum)
