@@ -4180,14 +4180,41 @@ def period_receipts_for_summary_table_sql(
     """
     return line number, contribution_amount of each transaction and calendar_year sum of all contribution_amount
     """
+    logger.debug('loading period_receipts for calendar start {}, end {}, report_id {}'.format(calendar_start_dt, calendar_end_dt, report_id))
+    rep_sql = """
+        SELECT line_number, COALESCE(contribution_amount,0) 
+        FROM public.sched_a t1 
+        WHERE t1.memo_code IS NULL 
+        AND t1.cmte_id = %s 
+        AND t1.report_id = %s 
+        AND t1.delete_ind is distinct from 'Y';
+    """
+    ytd_sql = """
+        select line_number, COALESCE(sum(contribution_amount),0) as contribution_amount_ytd 
+        FROM public.sched_a t2 
+        WHERE t2.memo_code IS NULL 
+        AND t2.delete_ind is distinct from 'Y' 
+        AND T2.cmte_id = %s
+        AND t2.contribution_date BETWEEN %s AND %s
+        group by line_number;
+    """
     try:
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            print('rep_sql query:')
             cursor.execute(
-                "SELECT line_number, COALESCE(contribution_amount,0), ( select COALESCE(sum(contribution_amount),0) as contribution_amount_ytd FROM public.sched_a t2 WHERE t2.memo_code IS NULL AND t2.delete_ind is distinct from 'Y' AND t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.contribution_date BETWEEN %s AND %s )  FROM public.sched_a t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'",
-                [calendar_start_dt, calendar_end_dt, cmte_id, report_id],
+                rep_sql,
+                [cmte_id, report_id],
             )
-            return cursor.fetchall()
+            report_transactions = cursor.fetchall()
+            logger.debug('transactions for current report:{}'.format(cursor.rowcount))
+            cursor.execute(
+                ytd_sql,
+                [cmte_id, calendar_start_dt, calendar_end_dt],
+            )
+            ytd_transactions = cursor.fetchall()
+            logger.debug('transaction_linenumber for ytd:{}'.format(cursor.rowcount))
+            return report_transactions, ytd_transactions
     except Exception as e:
         raise Exception(
             "The period_receipts_for_summary_table_sql function is throwing an error: "
@@ -4202,7 +4229,7 @@ def period_disbursements_for_summary_table_sql(
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             cursor.execute(
-                "SELECT line_number, COALESCE(expenditure_amount,0), ( select COALESCE(sum(expenditure_amount),0) as expenditure_amount_ytd FROM public.sched_b t2 WHERE t2.memo_code IS NULL AND t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'",
+                "SELECT line_number, COALESCE(expenditure_amount,0), ( select COALESCE(sum(expenditure_amount),0) as expenditure_amount_ytd FROM public.sched_b t2 WHERE t2.memo_code IS NULL AND t2.delete_ind is distinct from 'Y' AND t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'",
                 [calendar_start_dt, calendar_end_dt, cmte_id, report_id],
             )
             return cursor.fetchall()
@@ -4578,47 +4605,87 @@ def summary_receipts_for_sumamry_table(args):
         cmte_id = args[2]
         report_id = args[3]
 
-        sql_output = period_receipts_for_summary_table_sql(
+        rep_trans, ytd_trans = period_receipts_for_summary_table_sql(
             calendar_start_dt, calendar_end_dt, cmte_id, report_id
         )
-        for row in sql_output:
+        for row in rep_trans:
             data_row = list(row)
             if data_row[0] in ["11AI", "11A"]:
                 XIAI_amount = XIAI_amount + data_row[1]
-                XIAI_amount_ytd = data_row[2]
+                # XIAI_amount_ytd = data_row[2]
             if data_row[0] == "11AII":
                 XIAII_amount = XIAII_amount + data_row[1]
-                XIAII_amount_ytd = data_row[2]
+                # XIAII_amount_ytd = data_row[2]
             if data_row[0] == "11B":
                 XIB_amount = XIB_amount + data_row[1]
-                XIB_amount_ytd = data_row[2]
+                # XIB_amount_ytd = data_row[2]
             if data_row[0] == "11C":
                 XIC_amount = XIC_amount + data_row[1]
-                XIC_amount_ytd = data_row[2]
+                # XIC_amount_ytd = data_row[2]
             if data_row[0] == "12":
                 XII_amount = XII_amount + data_row[1]
-                XII_amount_ytd = data_row[2]
+                # XII_amount_ytd = data_row[2]
             if data_row[0] == "13":
                 XIII_amount = XIII_amount + data_row[1]
-                XIII_amount_ytd = data_row[2]
+                # XIII_amount_ytd = data_row[2]
             if data_row[0] == "14":
                 XIV_amount = XIV_amount + data_row[1]
-                XIV_amount_ytd = data_row[2]
+                # XIV_amount_ytd = data_row[2]
             if data_row[0] == "15":
                 XV_amount = XV_amount + data_row[1]
-                XV_amount_ytd = data_row[2]
+                # XV_amount_ytd = data_row[2]
             if data_row[0] == "16":
                 XVI_amount = XVI_amount + data_row[1]
-                XVI_amount_ytd = data_row[2]
+                # XVI_amount_ytd = data_row[2]
             if data_row[0] == "17":
                 XVII_amount = XVII_amount + data_row[1]
-                XVII_amount_ytd = data_row[2]
+                # XVII_amount_ytd = data_row[2]
             if data_row[0] == "18A":
                 XVIIIA_amount = XVIIIA_amount + data_row[1]
-                XVIIIA_amount_ytd = data_row[2]
+                # XVIIIA_amount_ytd = data_row[2]
             if data_row[0] == "18B":
                 XVIIIB_amount = XVIIIB_amount + data_row[1]
-                XVIIIB_amount_ytd = data_row[2]
+                # XVIIIB_amount_ytd = data_row[2]
+
+        for row in ytd_trans:
+            data_row = list(row)
+            if data_row[0] in ["11AI", "11A"]:
+                # XIAI_amount = XIAI_amount + data_row[1]
+                XIAI_amount_ytd = data_row[1]
+            if data_row[0] == "11AII":
+                # XIAII_amount = XIAII_amount + data_row[1]
+                XIAII_amount_ytd = data_row[1]
+            if data_row[0] == "11B":
+                # XIB_amount = XIB_amount + data_row[1]
+                XIB_amount_ytd = data_row[1]
+            if data_row[0] == "11C":
+                # XIC_amount = XIC_amount + data_row[1]
+                XIC_amount_ytd = data_row[1]
+            if data_row[0] == "12":
+                # XII_amount = XII_amount + data_row[1]
+                XII_amount_ytd = data_row[1]
+            if data_row[0] == "13":
+                # XIII_amount = XIII_amount + data_row[1]
+                XIII_amount_ytd = data_row[1]
+            if data_row[0] == "14":
+                # XIV_amount = XIV_amount + data_row[1]
+                XIV_amount_ytd = data_row[1]
+            if data_row[0] == "15":
+                # XV_amount = XV_amount + data_row[1]
+                XV_amount_ytd = data_row[1]
+            if data_row[0] == "16":
+                # XVI_amount = XVI_amount + data_row[1]
+                XVI_amount_ytd = data_row[1]
+            if data_row[0] == "17":
+                # XVII_amount = XVII_amount + data_row[1]
+                XVII_amount_ytd = data_row[1]
+            if data_row[0] == "18A":
+                # XVIIIA_amount = XVIIIA_amount + data_row[1]
+                XVIIIA_amount_ytd = data_row[1]
+            if data_row[0] == "18B":
+                # XVIIIB_amount = XVIIIB_amount + data_row[1]
+                XVIIIB_amount_ytd = data_row[1]
+
 
         XIA_amount = XIA_amount + XIAI_amount + XIAII_amount
         XIA_amount_ytd = XIA_amount_ytd + XIAI_amount_ytd + XIAII_amount_ytd
@@ -4895,7 +4962,7 @@ def get_summary_table(request):
         ]
         logger.debug("period_args:{}".format(period_args))
 
-        logger.debug("load receipts and dsibursements...")
+        logger.debug("load receipts and disbursements...")
         period_receipt = summary_receipts_for_sumamry_table(period_args)
         period_disbursement = summary_disbursements_for_sumamry_table(period_args)
 
