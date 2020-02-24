@@ -54,6 +54,7 @@ import {
   ]
 })
 export class SchedH6Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+  @Input() mainTransactionTypeText: string;
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
