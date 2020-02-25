@@ -495,9 +495,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols') && el.cols) {
         el.cols.forEach(e => {
-          if((this.reattributionTransactionId || this.redesignationTransactionId) && this._maxReattributableOrRedesignatableAmount){
-            e.validation.max = this._maxReattributableOrRedesignatableAmount;
-          }
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name, e.value));
           if (
             this.isFieldName(e.name, 'contribution_amount') ||
@@ -647,6 +644,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     } else if (this.isFieldName(fieldName, 'expenditure_amount') ||
+      this.isFieldName(fieldName,'contribution_amount') ||
       this.isFieldName(fieldName, 'total_amount')) {
       // Debt payments need a validation to prevent exceeding the incurred debt
       if (this.transactionType === 'OPEXP_DEBT' ||
@@ -661,6 +659,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             formValidators.push(validateContributionAmount(this._outstandingDebtBalance));
           }
         }
+      }
+
+      // if redesignation or reattribution, validate to prevent exceeding the original amount
+      if((this.reattributionTransactionId || this.redesignationTransactionId) && this._maxReattributableOrRedesignatableAmount){
+        formValidators.push(validateContributionAmount(Number(this._maxReattributableOrRedesignatableAmount)));
       }
     }
     // else if (this.isFieldName(fieldName, 'purpose_description')) {
@@ -2058,6 +2061,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._selectedCandidateChangeWarnChild = null;
           this._isShowWarn = true;
           this.activityEventNames = null;
+          this.reattributionTransactionId = null;
+          this.redesignationTransactionId = null;
           // Replace this with clearFormValues() if possible - END
 
           localStorage.removeItem(`form_${this.formType}_receipt`);
