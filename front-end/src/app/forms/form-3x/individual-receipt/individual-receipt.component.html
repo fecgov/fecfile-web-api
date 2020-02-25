@@ -447,6 +447,7 @@
                         bindValue="eventType"
                         bindLabel="eventTypeDescription" 
                         [selectOnTab]="true"
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -469,6 +470,7 @@
                         bindValue="activityEventDescription"
                         bindLabel="activityEventDescription" 
                         [selectOnTab]="true"
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
