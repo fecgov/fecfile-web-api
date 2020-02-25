@@ -798,7 +798,7 @@ export class CoordinatedExpenditureStaffMemoFields {
         {
           type: 'hidden',
           name: 'transaction_type_identifier',
-          value: 'COEXP_CC_PAY_MEMO'
+          value: 'COEXP_STAF_REIM_MEMO'
         }
       ],
       states: [

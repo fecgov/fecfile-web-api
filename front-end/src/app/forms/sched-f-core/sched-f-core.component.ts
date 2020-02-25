@@ -457,4 +457,14 @@ public addValidator( validators: Array<any>, set: boolean): void {
     // actual save operation
     super.saveAndReturnToParent();
   }
+
+  public isChild(): boolean {
+    if ( this.subTransactionInfo &&
+        this.subTransactionInfo.subTransactionTypeDescription &&
+    ! this.subTransactionInfo.isParent) {
+      this.transactionTypeText = this.subTransactionInfo.subTransactionTypeDescription;
+      return true;
+    }
+    return  false;
+  }
 }
