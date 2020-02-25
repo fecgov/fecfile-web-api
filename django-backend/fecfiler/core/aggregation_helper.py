@@ -316,6 +316,7 @@ def get_transactions_election_and_office(start_date, end_date, data):
             AND COALESCE(dissemination_date, disbursement_date) <= %s
             AND election_code = %s
             AND delete_ind is distinct FROM 'Y' 
+            AND memo_code is null
             ORDER BY transaction_dt ASC, create_date ASC;
         """
         _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"))
@@ -324,7 +325,8 @@ def get_transactions_election_and_office(start_date, end_date, data):
         SELECT  
                 transaction_id, 
 				expenditure_amount as transaction_amt,
-                COALESCE(dissemination_date, disbursement_date) as transaction_dt
+                COALESCE(dissemination_date, disbursement_date) as transaction_dt,
+                memo_code,
         FROM public.sched_e
         WHERE  
             cmte_id = %s
@@ -332,7 +334,8 @@ def get_transactions_election_and_office(start_date, end_date, data):
             AND COALESCE(dissemination_date, disbursement_date) <= %s
             AND election_code = %s
             AND so_cand_state = %s
-            AND delete_ind is distinct FROM 'Y' 
+            AND delete_ind is distinct FROM 'Y'
+            AND memo_code is null 
             ORDER BY transaction_dt ASC, create_date ASC; 
         """
         _params = (
@@ -347,7 +350,8 @@ def get_transactions_election_and_office(start_date, end_date, data):
         SELECT  
                 transaction_id, 
 				expenditure_amount as transaction_amt,
-				COALESCE(dissemination_date, disbursement_date) as transaction_dt
+				COALESCE(dissemination_date, disbursement_date) as transaction_dt,
+                memo_code
         FROM public.sched_e
         WHERE  
             cmte_id = %s
@@ -357,6 +361,7 @@ def get_transactions_election_and_office(start_date, end_date, data):
             AND so_cand_state = %s
             AND so_cand_district = %s
             AND delete_ind is distinct FROM 'Y' 
+            AND memo_code is null
             ORDER BY transaction_dt ASC, create_date ASC;  
         """
         _params = (
@@ -442,13 +447,14 @@ def update_aggregate_se(data):
             aggregate_start_date, aggregate_end_date, data
         )
         if not transaction_list:
+            logger.debug("no SE transctions found.")
             return
         aggregate_amount = 0
         for transaction in transaction_list:
             # update aggregate amount for non-memo and dangled memo transactions
             # TODO: need to confirm dangled memo transaction is counted or not
-            if not transaction["transaction_type_identifier"].endswith("_MEMO"):
-                aggregate_amount += transaction[1]
+            # if transaction["transaction_type_identifier"].endswith("_MEMO"):
+            aggregate_amount += transaction[1]
             logger.debug(
                 "update aggregate amount for transaction:{}".format(transaction[0])
             )
