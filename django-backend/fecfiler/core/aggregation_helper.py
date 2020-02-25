@@ -179,10 +179,13 @@ def update_aggregate_sl(datum):
         aggregate_amount = 0
         for transaction in transactions_list:
             if transaction[5] != "Y":
-                if transaction[7] != None or (
-                    transaction[7] == None and transaction[6] != "X"
-                ):
+                if not transactio[6]:
                     aggregate_amount += transaction[0]
+
+                # if transaction[7] != None or (
+                #     transaction[7] == None and transaction[6] != "X"
+                # ):
+                # aggregate_amount += transaction[0]
 
                 if contribution_date <= transaction[4]:
                     transaction_id = transaction[1]
