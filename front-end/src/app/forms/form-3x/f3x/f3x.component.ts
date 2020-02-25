@@ -620,17 +620,21 @@ export class F3xComponent implements OnInit, OnDestroy {
         }
         this._f3xMessageService.sendPopulateHiddenFieldsMessage({
           abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
-          reattributionTransactionId: reattributionId
+          reattributionTransactionId: reattributionId,
+          maxAmount: transactionModel.amount
         });
       } else if (transactionModel.isRedesignation) {
         if (this.scheduleAction === ScheduleActions.add) {
           redesignationId = transactionModel.redesignation_id;
         } else if (this.scheduleAction === ScheduleActions.edit) {
           redesignationId = transactionModel.transactionId;
+          
         }
         this._f3xMessageService.sendPopulateHiddenFieldsMessage({
           abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
-          redesignationTransactionId: redesignationId
+          redesignationTransactionId: redesignationId,
+          maxAmount: transactionModel.amount
+
         });
       }
     }

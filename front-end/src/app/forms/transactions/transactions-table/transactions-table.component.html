@@ -212,7 +212,7 @@
           </tr>
           <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
             <td style="padding-left: 1.5rem;">
-              <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+              <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
             </td>
             <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
             <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
@@ -254,6 +254,9 @@
                         <i class="edit-icon"></i> Edit
                       </button>
                     </span>
+                    <button *ngIf="trxChild.isreattributable" class="dropdown-item" (click)="reattributeTransaction(trxChild)">
+                        <i class="clipboard-icon"></i> Reattribute
+                    </button>
                     <button class="dropdown-item" (click)="printTransaction(trxChild)">
                       <i class="fas fa-print"></i> Print
                     </button>
@@ -498,7 +501,7 @@
             </tr>
             <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
               <td style="padding-left: 1.5rem;">
-                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
               </td>
               <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
               <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
@@ -1016,7 +1019,7 @@
             </tr>
             <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
               <td style="padding-left: 1.5rem;">
-                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
               </td>
               <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
               <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trxChild.scheduleType}}</td>
