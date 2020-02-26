@@ -338,6 +338,10 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     if (this.frmIndividualReceipt.valid) {
       this.back();
     }
+    if ( this.subTransactionInfo &&
+        this.subTransactionInfo.isParent === false ) {
+      this.onFilerChange(null);
+    }
     super.updateOnly();
   }
   public saveOnly(): void {
@@ -452,5 +456,15 @@ public addValidator( validators: Array<any>, set: boolean): void {
     this._setDesignatedValidators();
     // actual save operation
     super.saveAndReturnToParent();
+  }
+
+  public isChild(): boolean {
+    if ( this.subTransactionInfo &&
+        this.subTransactionInfo.subTransactionTypeDescription &&
+    ! this.subTransactionInfo.isParent) {
+      this.transactionTypeText = this.subTransactionInfo.subTransactionTypeDescription;
+      return true;
+    }
+    return  false;
   }
 }

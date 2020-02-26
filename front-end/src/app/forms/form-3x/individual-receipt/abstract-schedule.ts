@@ -105,6 +105,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _prePopulateFromSchedLData: any;
   protected _parentTransactionModel: TransactionModel;
   protected _rollbackAfterUnsuccessfulSave = false;
+  protected _prePopulateFromSchedHData: any;
 
   /**
    * For toggling between 2 screens of Sched F Debt Payment.
@@ -263,6 +264,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   // when determining action so force it here.
                   this.scheduleAction = ScheduleActions.addSubTransaction;
                   this._prePopulateFromSchedLData = message.prePopulateFromSchedL;
+                }
+              }
+            }
+            break;
+          case 'prePopulateFromSchedH':
+            // set class variable '_prePopulateFromSchedHData' to be referenced once the formGroup
+            // has been loaded by the get dynamic fields API call.
+            if (message) {
+              if (message.prePopulateFromSchedH) {
+                // only load form for the AbstractSchudule parent in the view
+                if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+                  this.scheduleAction = ScheduleActions.addSubTransaction;
+                  this._prePopulateFromSchedHData = message.prePopulateFromSchedH;
                 }
               }
             }
@@ -1064,6 +1078,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
     }
 
+    if (
+      this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+      this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+      this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+      this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+      this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_STAF_REIM_MEMO'
+    ) {
+      activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
+
+      if(activityEvent === 'DC' || activityEvent === 'DF') {
+        activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
+      }
+    }
+
     if (!activityEvent) {
       return;
     }
@@ -1465,11 +1493,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.transactionType) {
       // Not sure if this is needed for preventing excessive calls.
       // Removed for now to get working for sched_h.
-      // if (this.transactionType !== this._transactionTypePrevious) {
+      if (this.transactionType !== this._transactionTypePrevious) {
       this._transactionTypePrevious = this.transactionType;
       // reload dynamic form fields
       this._getFormFields();
-      // }
+      }
     }
   }
 
@@ -2182,6 +2210,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       );*/
                   }
                 }
+              }else if(
+                (this.subTransactionInfo.scheduleType === 'sched_h4' ||
+                 this.subTransactionInfo.scheduleType === 'sched_h6') &&
+                this.subTransactionInfo.isParent === true
+              ){
+                addSubTransEmitObj.prePopulateFromSchedH = res;
               }
             }
 
@@ -2246,6 +2280,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this._prePopulateFromSchedLData = res;
                     this._prePopulateFromSchedL(this._prePopulateFromSchedLData);
                   }
+                }else if (
+                    this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+                    this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+                    this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+                    this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+                    this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_STAF_REIM_MEMO') {
+                  this._prePopulateFromSchedHData = res;
+                  this._prePopulateFromSchedH(this._prePopulateFromSchedHData);
                 }
               }
               if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
@@ -3627,6 +3669,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         let schedDSubTran = false;
         let schedLSubTran = false;
+        let schedHSubTran = false;
         if (this.subTransactionInfo) {
           if (this.subTransactionInfo.scheduleType === 'sched_d' && this.subTransactionInfo.isParent === false) {
             schedDSubTran = true;
@@ -3637,6 +3680,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 prePopulateFieldArray.push({ name: 'levin_account_id', value: res.levin_account_id });
               }*/
             }
+          }else if(
+              this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+              this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+              this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+              this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+              this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_STAF_REIM_MEMO'
+            ) {
+              schedHSubTran = true;
           }
         }
 
@@ -3659,6 +3710,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         ) {
           this._prePopulateFromSchedL(this._prePopulateFromSchedLData);
           this._prePopulateFromSchedLData = null;
+        }
+
+        if (
+          this._prePopulateFromSchedHData &&
+          schedHSubTran &&
+          this.scheduleAction === ScheduleActions.addSubTransaction
+        ) {
+          this._prePopulateFromSchedH(this._prePopulateFromSchedHData);
+          this._prePopulateFromSchedHData = null;
         }
       });
   }
@@ -3797,6 +3857,31 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (schedLData.hasOwnProperty('levin_account_id')) {
       this._prePopulateFormFieldHelper(schedLData, 'levin_account_id', fieldArray);
     }
+    this._prePopulateFormField(fieldArray);
+  }
+
+  protected _prePopulateFromSchedH(schedHData: any) {
+    let fieldArray = [];
+    if (schedHData.hasOwnProperty('activity_event_type')) {
+      const activityEventType = schedHData.activity_event_type;
+      if (!activityEventType) {
+        return;
+      }
+      if (typeof activityEventType !== 'string') {
+        return;
+      }
+
+      this._prePopulateFormFieldHelper(schedHData, 'activity_event_type', fieldArray);
+
+      if (schedHData.hasOwnProperty('activity_event_identifier')) {
+        const entityEventIdentifier = schedHData.activity_event_identifier;
+        if(activityEventType === 'DF' || activityEventType === 'DC') {
+          this.activityEventNames = entityEventIdentifier;
+          this._prePopulateFormFieldHelper(schedHData, 'activity_event_identifier', fieldArray);
+        }
+      }
+    }
+    this.totalAmountReadOnly = false;
     this._prePopulateFormField(fieldArray);
   }
 

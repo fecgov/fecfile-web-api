@@ -798,7 +798,7 @@ export class CoordinatedExpenditurePayrollMemoFields {
         {
           type: 'hidden',
           name: 'transaction_type_identifier',
-          value: 'COEXP_CC_PAY_MEMO'
+          value: 'COEXP_PMT_PROL_MEMO'
         }
       ],
       states: [
