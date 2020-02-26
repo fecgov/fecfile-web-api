@@ -1248,6 +1248,167 @@ def schedB_sql_dict(data):
     except:
         raise
 
+def redesignation_auto_generate_transactions(
+    cmte_id,
+    report_id,
+    org_transaction_id,
+    contribution_date,
+    contribution_amount,
+    redesignated_id,
+):
+
+    """ This function auto generates 2 copies of the transaction_id in the report_id. One will be an exact copy 
+    of the transaction_id and other will have modifications to contribution date and amount. Kindly check FNE-1878
+    ticket for the business rules that apply to reattribution"""
+    try:
+        query_string_original = """UPDATE public.sched_b SET redesignation_id=%s, redesignation_ind='O' WHERE transaction_id=%s AND cmte_id=%s"""
+        query_string_redesignation = """UPDATE public.sched_b SET redesignation_id=%s, redesignation_ind='R' WHERE transaction_id=%s AND cmte_id=%s"""
+        query_string_auto_1 = """INSERT INTO public.sched_b(
+            cmte_id, report_id, line_number, transaction_type, 
+            back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, 
+            expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, 
+            category_code, memo_code, memo_text, election_code, election_other_description, 
+            beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, 
+            other_street_2, other_city, other_state, other_zip, nc_soft_account, 
+            delete_ind, beneficiary_cand_office, 
+            beneficiary_cand_state, beneficiary_cand_district, aggregate_amt, 
+            transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
+            beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
+            beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
+            itemized_ind, levin_account_id, redesignation_id, redesignation_ind)
+            SELECT cmte_id, %s, line_number, transaction_type, 
+               null, null, entity_id, expenditure_date, 
+               expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose,
+               category_code, 'X', 
+               concat('MEMO: See ', (SELECT rrt.rpt_type_desc FROM public.ref_rpt_types rrt WHERE rrt.rpt_type = 
+               (SELECT r.report_type FROM public.reports r WHERE r.report_id = report_id)), ' report. Redesignation below'), 
+               election_code, election_other_description, 
+               beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, 
+               other_street_2, other_city, other_state, other_zip, nc_soft_account,
+               delete_ind, beneficiary_cand_office, 
+               beneficiary_cand_state, beneficiary_cand_district, aggregate_amt, 
+               transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
+               beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
+               beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
+               itemized_ind, levin_account_id, 'A', %s
+            FROM public.sched_b WHERE transaction_id= %s and cmte_id= %s;"""
+
+        query_string_auto_2 = """INSERT INTO public.sched_b(
+            cmte_id, report_id, line_number, transaction_type, 
+            back_ref_transaction_id, back_ref_sched_name, entity_id, expenditure_date, 
+            expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose, 
+            category_code, memo_code, memo_text, election_code, election_other_description, 
+            beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, 
+            other_street_2, other_city, other_state, other_zip, nc_soft_account, 
+            delete_ind, beneficiary_cand_office, 
+            beneficiary_cand_state, beneficiary_cand_district, aggregate_amt, 
+            transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
+            beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
+            beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
+            itemized_ind, levin_account_id, redesignation_id, redesignation_ind)
+            SELECT cmte_id, %s, line_number, transaction_type, 
+               null, null, entity_id, %s, 
+               %s, semi_annual_refund_bundled_amount, expenditure_purpose,
+               category_code, 'X', 'MEMO: Redesignated Below', election_code, election_other_description, 
+               beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, 
+               other_street_2, other_city, other_state, other_zip, nc_soft_account, 
+               delete_ind, beneficiary_cand_office, 
+               beneficiary_cand_state, beneficiary_cand_district, aggregate_amt, 
+               transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
+               beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
+               beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
+               itemized_ind, levin_account_id, 'A', %s
+          FROM public.sched_b WHERE transaction_id= %s and cmte_id= %s;"""
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                query_string_auto_1,
+                [
+                    report_id,
+                    redesignated_id,
+                    org_transaction_id,
+                    cmte_id,
+                ],
+            )
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "The transaction ID: {} does not exist in sched_b for committee ID: {}".format(
+                        org_transaction_id, cmte_id
+                    )
+                )
+            cursor.execute(
+                query_string_auto_2,
+                [
+                    report_id,
+                    contribution_date,
+                    -1 * Decimal(contribution_amount),
+                    redesignated_id,
+                    org_transaction_id,
+                    cmte_id,
+                ],
+            )
+            cursor.execute(
+                query_string_original, [redesignated_id, org_transaction_id, cmte_id]
+            )
+            cursor.execute(
+                query_string_redesignation,
+                [org_transaction_id, redesignated_id, cmte_id],
+            )
+    except Exception as e:
+        raise Exception(
+            "The redesignation_auto_generate_transactions function is throwing an error: "
+            + str(e)
+        )
+
+
+def redesignation_auto_update_transactions(
+    cmte_id, report_id, expenditure_date, expenditure_amount, redesignated_id
+):
+    try:
+        query_string = """UPDATE public.sched_b SET report_id = %s
+        WHERE transaction_id = %s AND cmte_id = %s AND delete_ind IS DISTINCT FROM 'Y'"""
+
+        query_string_s1 = """UPDATE public.sched_b SET report_id = %s
+        WHERE redesignation_id = %s AND cmte_id = %s AND expenditure_amount > 0 AND redesignation_ind='A'"""
+
+        query_string_s2 = """UPDATE public.sched_b SET report_id = %s, expenditure_date = %s, expenditure_amount = %s
+        WHERE redesignation_id = %s AND cmte_id = %s AND expenditure_amount < 0 AND redesignation_ind='A'"""
+
+        with connection.cursor() as cursor:
+            cursor.execute(query_string, [report_id, redesignated_id, cmte_id])
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "The transaction ID: {} does not exist in sched_b for committee ID: {}".format(
+                        redesignated_id, cmte_id
+                    )
+                )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                query_string_s1, [report_id, redesignated_id, cmte_id]
+            )
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "The Redesignated ID: {} does not exist in sched_b for committee ID: {}".format(
+                        redesignated_id, cmte_id
+                    )
+                )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                query_string_s2,
+                [
+                    report_id,
+                    expenditure_date,
+                    -1 * Decimal(expenditure_amount),
+                    redesignated_id,
+                    cmte_id,
+                ],
+            )
+    except Exception as e:
+        raise Exception(
+            "The redesignation_auto_update_transactions function is throwing an error: "
+            + str(e)
+        )
+
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedB(request):
@@ -1261,6 +1422,16 @@ def schedB(request):
         if "election_year" in request.query_params:
             REQT_ELECTION_YR = request.query_params.get("election_year")
         try:
+            # checking if redesignation is triggered for a transaction
+            redesignation_flag = False
+            if "redesignation_id" in request.data and request.data[
+                "redesignation_id"
+            ] not in ["", "", None, "null"]:
+                redesignation_flag = True
+                if "redesignation_report_id" not in request.data:
+                    raise Exception(
+                        "redesignation_report_id parameter is missing. Kindly provide this id to continue redesignation"
+                    )
             cmte_id = request.user.username
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
@@ -1276,6 +1447,13 @@ def schedB(request):
             datum = schedB_sql_dict(request.data)
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
+            # Adding memo_code and memo_text values for redesignation flags
+            if redesignation_flag:
+                datum["memo_code"] = "X"
+                datum["memo_text"] = "MEMO: Redesignated"
+                datum["report_id"] = check_report_id(
+                    request.data["redesignation_report_id"]
+                )
             if "entity_id" in request.data and check_null_value(
                 request.data.get("entity_id")
             ):
@@ -1289,6 +1467,16 @@ def schedB(request):
                 data = put_schedB(datum)
             else:
                 data = post_schedB(datum)
+            # Auto generation of redesignation transactions
+            if redesignation_flag:
+                redesignation_auto_generate_transactions(
+                    cmte_id,
+                    datum["report_id"],
+                    request.data["redesignation_id"],
+                    datum["expenditure_date"],
+                    datum["expenditure_amount"],
+                    data["transaction_id"],
+                )
 
             # Associating child transactions to parent and storing them to DB
             if "child" in request.data:
@@ -1374,6 +1562,21 @@ def schedB(request):
             REQT_ELECTION_YR = request.query_params.get("election_year")
 
         try:
+            # checking if redesignation is triggered for a transaction
+            redesignation_flag = False
+            if "isRedesignation" in request.data and request.data[
+                "isRedesignation"
+            ] not in ["None", "null", "", ""]:
+                if request.data["isRedesignation"] in ["True", "true", "t", "T", True]:
+                    redesignation_flag = True
+                    if "redesignation_report_id" not in request.data:
+                        raise Exception(
+                            "redesignation_report_id parameter is missing. Kindly provide this id to continue reattribution"
+                        )
+                    else:
+                        redesignation_report_id = check_report_id(
+                            request.data["redesignation_report_id"]
+                        )
             datum = schedB_sql_dict(request.data)
 
             if "transaction_id" in request.data and check_null_value(
@@ -1403,8 +1606,21 @@ def schedB(request):
                 request.data.get("entity_id")
             ):
                 datum["entity_id"] = request.data.get("entity_id")
-
+            # updating data for redesignation fields
+            if redesignation_flag:
+                datum["memo_code"] = "X"
+                datum["memo_text"] = "MEMO: Redesignated"
             data = put_schedB(datum)
+            # Updating auto generated transactions for redesignated transactions
+            if redesignation_flag:
+                redesignation_auto_update_transactions(
+                    datum["cmte_id"],
+                    redesignation_report_id,
+                    datum["expenditure_date"],
+                    datum["expenditure_amount"],
+                    datum["transaction_id"],
+                )
+                data["report_id"] = redesignation_report_id
             output = get_schedB(data)
             # for earmark child transaction: update parent transction  purpose_description
             if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:

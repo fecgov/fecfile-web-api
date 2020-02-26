@@ -434,19 +434,19 @@ export class CoordinatedExpenditureStaffFields {
         seperator: true,
         cols: [
           {
-            preText: null,
+            preText: 'Staff Reimbursement',
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
             inputIcon: null,
-            text: 'Expenditure Purpose Description',
+            text: 'Purpose of Disbursement',
             infoIcon: true,
             infoText: 'Request language from RAD',
             name: 'purpose',
             type: 'text',
-            value: null,
+            value: 'Staff Reimbursement',
             scroll: true,
             height: '30px',
             width: '380px',
@@ -768,11 +768,6 @@ export class CoordinatedExpenditureStaffFields {
       {
         type: 'hidden',
         name: 'beneficiary_cand_entity_id',
-        value: null
-      },
-      {
-        type: 'hidden',
-        name: 'memo_code',
         value: null
       },
       {

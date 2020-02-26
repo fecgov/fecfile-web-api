@@ -488,6 +488,12 @@ export class F3xComponent implements OnInit, OnDestroy {
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
                     prePopulateFromSchedL: e.prePopulateFromSchedL
                   });
+                }else if (e.hasOwnProperty('prePopulateFromSchedH')) {
+                  this._f3xMessageService.sendPopulateFormMessage({
+                    key: 'prePopulateFromSchedH',
+                    abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+                    prePopulateFromSchedH: e.prePopulateFromSchedH
+                  });
                 }
               }
             }
@@ -620,7 +626,8 @@ export class F3xComponent implements OnInit, OnDestroy {
         }
         this._f3xMessageService.sendPopulateHiddenFieldsMessage({
           abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
-          reattributionTransactionId: reattributionId
+          reattributionTransactionId: reattributionId,
+          maxAmount: transactionModel.amount
         });
       } else if (transactionModel.isRedesignation) {
         if (this.scheduleAction === ScheduleActions.add) {
@@ -630,7 +637,9 @@ export class F3xComponent implements OnInit, OnDestroy {
         }
         this._f3xMessageService.sendPopulateHiddenFieldsMessage({
           abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
-          redesignationTransactionId: redesignationId
+          redesignationTransactionId: redesignationId,
+          maxAmount: transactionModel.amount
+
         });
       }
     }

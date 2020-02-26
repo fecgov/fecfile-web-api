@@ -1252,4 +1252,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       }
     };
 
+  public printTransaction(trx: any): void {
+    this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
+  }
+
 }

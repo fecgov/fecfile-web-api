@@ -441,12 +441,12 @@ export class CoordinatedExpenditureStaffMemoFields {
               toggle: false,
               inputGroup: false,
               inputIcon: null,
-              text: 'Expenditure Purpose Description',
+              text: 'Purpose of Disbursement',
               infoIcon: true,
               infoText: 'Request language from RAD',
               name: 'purpose',
               type: 'text',
-              value: 'Staff Reimbursement Memo ',
+              value: 'Staff Reimbursement Memo',
               scroll: true,
               height: '30px',
               width: '380px',
@@ -798,7 +798,7 @@ export class CoordinatedExpenditureStaffMemoFields {
         {
           type: 'hidden',
           name: 'transaction_type_identifier',
-          value: 'COEXP_CC_PAY_MEMO'
+          value: 'COEXP_STAF_REIM_MEMO'
         }
       ],
       states: [

@@ -434,19 +434,19 @@ export class CoordinatedExpenditurePayrollFields {
           seperator: true,
           cols: [
             {
-              preText: null,
+              preText: 'Payroll Payment',
               setEntityIdTo: 'entity_id',
-              isReadonly: false,
+              isReadonly: true,
               entityGroup: null,
               toggle: false,
               inputGroup: false,
               inputIcon: null,
-              text: 'Expenditure Purpose Description',
+              text: 'Purpose of Disbursement',
               infoIcon: true,
               infoText: 'Request language from RAD',
               name: 'purpose',
               type: 'text',
-              value: null,
+              value: 'Payroll Payment',
               scroll: true,
               height: '30px',
               width: '380px',
@@ -774,11 +774,6 @@ export class CoordinatedExpenditurePayrollFields {
         {
           type: 'hidden',
           name: 'beneficiary_cand_entity_id',
-          value: null
-        },
-        {
-          type: 'hidden',
-          name: 'memo_code',
           value: null
         },
         {
