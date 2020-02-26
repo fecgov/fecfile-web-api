@@ -1934,7 +1934,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         } else if (field === 'levin_account_id') {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value.toString();
         } else if (field === 'election_code') {
-          receiptObj[field] = this.frmIndividualReceipt.get(field).value[0];
+          if (this.frmIndividualReceipt.get(field).value && this.frmIndividualReceipt.get(field).value[0]) {
+            receiptObj[field] = this.frmIndividualReceipt.get(field).value[0];
+          }
         }
         else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
