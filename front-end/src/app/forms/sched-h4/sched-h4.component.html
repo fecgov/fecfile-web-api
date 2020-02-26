@@ -222,7 +222,7 @@
                                     <button class="dropdown-item" (click)="editTransaction(item)">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
-                                    <button class="dropdown-item">
+                                    <button class="dropdown-item" (click)="printTransaction(item)">
                                         <i class="fas fa-print"></i> Print
                                     </button>
                                     <button class="dropdown-item" (click)="cloneTransaction(item)"><i class="fas fa-copy"></i> Clone</button>
@@ -274,7 +274,7 @@
                                         <button class="dropdown-item" (click)="editTransaction(itemChild)">
                                             <i class="fas fa-edit"></i> Edit
                                         </button>
-                                        <button class="dropdown-item">
+                                        <button class="dropdown-item" (click)="printTransaction(itemChild)">
                                             <i class="fas fa-print"></i> Print
                                         </button>
                                         <button class="dropdown-item" (click)="cloneTransaction(itemChild)"><i class="fas fa-copy"></i> Clone</button>
