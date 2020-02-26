@@ -434,7 +434,7 @@ export class CoordinatedExpenditureCCFields  {
           seperator: true,
           cols: [
             {
-              preText: null,
+              preText: 'Credit Card Payment',
               setEntityIdTo: 'entity_id',
               isReadonly: true,
               entityGroup: null,

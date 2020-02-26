@@ -434,7 +434,7 @@ export class CoordinatedExpenditureStaffFields {
         seperator: true,
         cols: [
           {
-            preText: null,
+            preText: 'Staff Reimbursement',
             setEntityIdTo: 'entity_id',
             isReadonly: true,
             entityGroup: null,
