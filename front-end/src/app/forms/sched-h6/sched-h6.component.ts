@@ -241,7 +241,6 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
 
   public selectTypeChange(e) {    
     this.transactionType = e.currentTarget.value;
-    console.log('99: ', this.transactionType);
   }
  
   public getH6Sum(reportId: string) {
@@ -441,6 +440,10 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
       return true;
     }
     return false;
+  }
+
+  public printTransaction(trx: any): void {
+    this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
   }
   
 }
