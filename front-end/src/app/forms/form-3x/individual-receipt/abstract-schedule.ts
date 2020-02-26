@@ -237,14 +237,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   this.scheduleAction = ScheduleActions.addSubTransaction;
                   this._prePopulateFromSchedDData = message.prePopulateFromSchedD;
                   if (this._prePopulateFromSchedDData) {
-                    // set the max for payments to the remaining debt for validation.
-                    // if (this._prePopulateFromSchedDData.incurred_amount) {
-                    const balanceAtClose = this._prePopulateFromSchedDData.balance_at_close ?
-                      this._prePopulateFromSchedDData.balance_at_close : 0;
+                    // set the max paymen allowed on a debt.
+                    const balanceAtBegin = this._prePopulateFromSchedDData.beginning_balance ?
+                      this._prePopulateFromSchedDData.beginning_balance : 0;
+                    const incurredAmount = this._prePopulateFromSchedDData.incurred_amount ?
+                      this._prePopulateFromSchedDData.incurred_amount : 0;
                     const paymentAmount = this._prePopulateFromSchedDData.payment_amount ?
                       this._prePopulateFromSchedDData.payment_amount : 0;
-                    this._outstandingDebtBalance = balanceAtClose - paymentAmount;
-                    // }
+                    this._outstandingDebtBalance = (balanceAtBegin + incurredAmount) - paymentAmount;
                   }
                   this._checkForReturnToDebtSummary(message);
                 }
