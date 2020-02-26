@@ -601,5 +601,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
         this.schedH2.patchValue({ratio_code:'s'}, { onlySelf: true });
     }
   }
+
+  public printTransaction(trx: any): void {
+    this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
+  }
 }
 
