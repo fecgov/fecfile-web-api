@@ -291,12 +291,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
         if (message.reattributionTransactionId) {
           this.clearFormValues();
-          this.reattributionTransactionId = message.reattributionTransactionId;
-          this._maxReattributableOrRedesignatableAmount = message.maxAmount;
+          this.populateDataForReattribution(message);
         }
         if (message.redesignationTransactionId) {
-          this.redesignationTransactionId = message.redesignationTransactionId;
-          this._maxReattributableOrRedesignatableAmount = message.maxAmount;
+          
+          this.populateDataForRedesignation(message);
         }
       }
     });
@@ -326,6 +325,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._transactionCategory = p.transactionCategory;
       this._cloned = p.cloned || p.cloned === 'true' ? true : false;
     });
+  }
+
+  private populateDataForRedesignation(message: any) {
+    this.redesignationTransactionId = message.redesignationTransactionId;
+    this._maxReattributableOrRedesignatableAmount = message.maxAmount;
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['expenditure_amount']){
+      this.frmIndividualReceipt.controls['expenditure_amount'].setValidators([Validators.required,validateContributionAmount(Number(this._maxReattributableOrRedesignatableAmount))]);
+      this.frmIndividualReceipt.controls['expenditure_amount'].updateValueAndValidity();
+    }
+  }
+
+  private populateDataForReattribution(message: any) {
+    this.reattributionTransactionId = message.reattributionTransactionId;
+    this._maxReattributableOrRedesignatableAmount = message.maxAmount;
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_amount']){
+      this.frmIndividualReceipt.controls['contribution_amount'].setValidators([Validators.required,validateContributionAmount(Number(this._maxReattributableOrRedesignatableAmount))]);
+      this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
+    }
   }
 
   public ngOnInit(): void {
@@ -396,33 +413,39 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges) {
-    if (this.editMode) {
-      this._prepareForm();
-      // added check to avoid script error
-      if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
-        this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-          this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
-          Validators.required
-        ]);
-      }
-    } else {
-      this._dialogService
-        .confirm(
-          'This report has been filed with the FEC. If you want to change, you must Amend the report',
-          ConfirmModalComponent,
-          'Warning',
-          true,
-          ModalHeaderClassEnum.warningHeader,
-          null,
-          'Return to Reports'
-        )
-        .then(res => {
-          if (res === 'okay') {
-            this.ngOnInit();
-          } else if (res === 'cancel') {
-            this._router.navigate(['/reports']);
+    if (this.checkComponent(changes)) {
+      if (this.editMode) {
+        this._reportsService.getCoverageDates(this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
+          this.cvgStartDate = this._utilService.formatDate(res.cvg_start_date);
+          this.cvgEndDate = this._utilService.formatDate(res.cvg_end_date);
+          this._prepareForm();
+          // added check to avoid script error
+          if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
+            this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+              this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+              Validators.required
+            ]);
           }
         });
+      } else {
+        this._dialogService
+          .confirm(
+            'This report has been filed with the FEC. If you want to change, you must Amend the report',
+            ConfirmModalComponent,
+            'Warning',
+            true,
+            ModalHeaderClassEnum.warningHeader,
+            null,
+            'Return to Reports'
+          )
+          .then(res => {
+            if (res === 'okay') {
+              this.ngOnInit();
+            } else if (res === 'cancel') {
+              this._router.navigate(['/reports']);
+            }
+          });
+      }
     }
   }
   checkComponent(changes: SimpleChanges): boolean {
@@ -509,9 +532,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     fields.forEach(el => {
       if (el.hasOwnProperty('cols') && el.cols) {
         el.cols.forEach(e => {
-          if((this.reattributionTransactionId || this.redesignationTransactionId) && this._maxReattributableOrRedesignatableAmount){
-            e.validation.max = this._maxReattributableOrRedesignatableAmount;
-          }
           formGroup[e.name] = new FormControl(e.value || null, this._mapValidators(e.validation, e.name, e.value));
           if (
             this.isFieldName(e.name, 'contribution_amount') ||
@@ -661,6 +681,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     } else if (this.isFieldName(fieldName, 'expenditure_amount') ||
+      this.isFieldName(fieldName,'contribution_amount') ||
       this.isFieldName(fieldName, 'total_amount')) {
       // Debt payments need a validation to prevent exceeding the incurred debt
       if (this.transactionType === 'OPEXP_DEBT' ||
@@ -675,6 +696,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             formValidators.push(validateContributionAmount(this._outstandingDebtBalance));
           }
         }
+      }
+
+      // if redesignation or reattribution, validate to prevent exceeding the original amount
+      if((this.reattributionTransactionId || this.redesignationTransactionId) && this._maxReattributableOrRedesignatableAmount){
+        formValidators.push(validateContributionAmount(Number(this._maxReattributableOrRedesignatableAmount)));
       }
     }
     // else if (this.isFieldName(fieldName, 'purpose_description')) {
@@ -691,7 +717,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (validation === 'required') {
           if (validators[validation]) {
             // occuaption and employer will be required dpending on aggregate
-            if (fieldName !== 'employer' && fieldName !== 'occupation' && fieldName !== 'expenditure_purpose') {
+            if (fieldName !== 'employer' && fieldName !== 'occupation') {
               if (fieldName === 'incurred_amount' && this.scheduleAction === ScheduleActions.edit) {
                 // not required but not optinal when editing
               } else {
@@ -1933,10 +1959,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           receiptObj[field] = amountVal;
         } else if (field === 'levin_account_id') {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value.toString();
-        } else if (field === 'election_code') {
-          if (this.frmIndividualReceipt.get(field).value && this.frmIndividualReceipt.get(field).value[0]) {
-            receiptObj[field] = this.frmIndividualReceipt.get(field).value[0];
-          }
+        } else if (field === 'election_code' && this.frmIndividualReceipt 
+                    && this.frmIndividualReceipt.get(field) && this.frmIndividualReceipt.get(field).value) {
+          receiptObj[field] = this.frmIndividualReceipt.get(field).value[0];
         }
         else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
@@ -2088,6 +2113,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._selectedCandidateChangeWarnChild = null;
           this._isShowWarn = true;
           this.activityEventNames = null;
+          this.reattributionTransactionId = null;
+          this.redesignationTransactionId = null;
           // Replace this with clearFormValues() if possible - END
 
           localStorage.removeItem(`form_${this.formType}_receipt`);
@@ -2315,7 +2342,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
   _prepopulateDefaultPurposeText() {
-    const purposeFormField = this.findFormFieldEndingWith('purpose_description');
+    const purposeFormField = this.findFormFieldContaining('purpose');
     if (purposeFormField && purposeFormField.preText && purposeFormField.value && purposeFormField.preText === purposeFormField.value) {
       const patch = {};
       patch[purposeFormField.name] = purposeFormField.preText;
@@ -4436,6 +4463,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._readOnlyMemoCodeChild = false;
     if (this.frmIndividualReceipt) {
       this.frmIndividualReceipt.reset();
+      this._prepopulateDefaultPurposeText();
     }
     if (this.frmIndividualReceipt && this.frmIndividualReceipt.contains('entity_type')) {
       this.selectedEntityType = this._entityTypeDefault;
@@ -4929,7 +4957,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     return null;
   }
 
-  public findFormFieldEndingWith(name: string): any {
+  public findFormFieldContaining(name: string): any {
     if (!name || !this.formFields) {
       return null;
     }
@@ -4937,7 +4965,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     for (const el of fields) {
       if (el.hasOwnProperty('cols') && el.cols) {
         for (const e of el.cols) {
-          if (e.name.endsWith(name)) {
+          if (e.name.includes(name)) {
             return e;
           }
         }
@@ -5131,6 +5159,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
       if (this.frmIndividualReceipt.controls['expenditure_amount']) {
         this.frmIndividualReceipt.controls['expenditure_amount'].reset();
+        this.frmIndividualReceipt.controls['expenditure_amount'].setValidators([Validators.required,floatingPoint(),validateAmount(),validateContributionAmount(Number(this._maxReattributableOrRedesignatableAmount))]);
+        this.frmIndividualReceipt.controls['expenditure_amount'].updateValueAndValidity();
       }
       if (this.frmIndividualReceipt.controls['cand_office']) {
         this.frmIndividualReceipt.controls['cand_office'].reset();

@@ -634,7 +634,6 @@ export class F3xComponent implements OnInit, OnDestroy {
           redesignationId = transactionModel.redesignation_id;
         } else if (this.scheduleAction === ScheduleActions.edit) {
           redesignationId = transactionModel.transactionId;
-          
         }
         this._f3xMessageService.sendPopulateHiddenFieldsMessage({
           abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,

@@ -339,7 +339,8 @@
                         <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
                           <div class="text-error text-left"
                             *ngIf="frmIndividualReceipt.get(col?.name).errors?.amountExceeded">
-                            Expenditure amount exceeds outstanding debt amount
+                            <ng-container *ngIf="!reattributionTransactionId && !redesignationTransactionId">Expenditure amount exceeds outstanding debt amount</ng-container>
+                            <ng-container *ngIf="reattributionTransactionId || redesignationTransactionId">Amount must be less than the total amount on original transaction</ng-container>
                           </div>
                         </ng-container>
                       </div>
