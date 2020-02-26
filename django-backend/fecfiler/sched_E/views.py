@@ -193,7 +193,6 @@ def schedE_sql_dict(data):
             datum["election_code"] = data.get("full_election_code")
         if "election_other_description" in data:
             datum["election_other_desc"] = data.get("election_other_description")
-            
 
         # also add entity_id as an attribute. It is being remapped to payee_entity_id but fails in core since its looking for entity_id
         if "payee_entity_id" in data:
@@ -501,7 +500,8 @@ def get_transactions_election_and_office(start_date, end_date, data):
             AND COALESCE(dissemination_date, disbursement_date) >= %s
             AND COALESCE(dissemination_date, disbursement_date) <= %s
             AND election_code = %s
-            AND delete_ind is distinct FROM 'Y' 
+            AND delete_ind is distinct FROM 'Y'
+            AND memo_code is null 
             ORDER BY transaction_dt ASC, create_date ASC;
         """
         _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"))
@@ -519,6 +519,7 @@ def get_transactions_election_and_office(start_date, end_date, data):
             AND election_code = %s
             AND so_cand_state = %s
             AND delete_ind is distinct FROM 'Y' 
+            AND memo_code is null
             ORDER BY transaction_dt ASC, create_date ASC; 
         """
         _params = (
@@ -543,6 +544,7 @@ def get_transactions_election_and_office(start_date, end_date, data):
             AND so_cand_state = %s
             AND so_cand_district = %s
             AND delete_ind is distinct FROM 'Y' 
+            AND memo_code is null
             ORDER BY transaction_dt ASC, create_date ASC;  
         """
         _params = (
@@ -897,7 +899,7 @@ def get_schedE(data):
             forms_obj = get_list_all_schedE(report_id, cmte_id)
         if forms_obj:
             for SE in forms_obj:
-                SE['election_other_description'] = SE.get('election_other_desc')
+                SE["election_other_description"] = SE.get("election_other_desc")
                 child_SE = get_list_schedE(
                     SE["report_id"], SE["cmte_id"], SE["transaction_id"], True
                 )
