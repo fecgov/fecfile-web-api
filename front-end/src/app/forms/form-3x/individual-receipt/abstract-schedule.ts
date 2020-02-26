@@ -717,7 +717,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (validation === 'required') {
           if (validators[validation]) {
             // occuaption and employer will be required dpending on aggregate
-            if (fieldName !== 'employer' && fieldName !== 'occupation') {
+            if (fieldName !== 'employer' && fieldName !== 'occupation' && fieldName !== 'expenditure_purpose') {
               if (fieldName === 'incurred_amount' && this.scheduleAction === ScheduleActions.edit) {
                 // not required but not optinal when editing
               } else {
