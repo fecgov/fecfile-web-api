@@ -434,7 +434,7 @@ export class CoordinatedExpenditurePayrollFields {
           seperator: true,
           cols: [
             {
-              preText: null,
+              preText: 'Payroll Payment',
               setEntityIdTo: 'entity_id',
               isReadonly: true,
               entityGroup: null,
