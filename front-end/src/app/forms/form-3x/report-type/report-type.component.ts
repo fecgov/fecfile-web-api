@@ -31,6 +31,7 @@ import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/part
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { Subject } from 'rxjs';
 import {ReportsService} from '../../../reports/service/report.service';
+import {TransactionsMessageService} from '../../transactions/service/transactions-message.service';
 
 @Component({
   selector: 'f3x-report-type',
@@ -83,7 +84,8 @@ export class ReportTypeComponent implements OnInit {
     private _activatedRoute: ActivatedRoute,
     private _dialogService: DialogService,
     private _datePipe: DatePipe,
-    private  _reportService: ReportsService
+    private  _reportService: ReportsService,
+    private  _transactionsMessageService: TransactionsMessageService
   ) {}
 
   ngOnInit(): void {
@@ -336,6 +338,7 @@ export class ReportTypeComponent implements OnInit {
       this._form3xReportTypeDetails.additionalEmail1 = '';
       this._form3xReportTypeDetails.additionalEmail2 = '';
       this._form3xReportTypeDetails.formType = '3X';
+      this._form3xReportTypeDetails.reportId = '';
 
       const today: any = new Date();
       const formattedToday: any = this._datePipe.transform(today, 'MM/dd/yyyy');
@@ -354,6 +357,8 @@ export class ReportTypeComponent implements OnInit {
           let reportId = 0;
           if (Array.isArray(res) && !res[0].hasOwnProperty('create_date')) {
             reportId = res[0].report_id;
+            this._form3xReportTypeDetails.reportId = reportId;
+            window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
             const cvgStartDate: any = res[0].cvg_start_date;
             let datearray: any = cvgStartDate.split('-');
 
@@ -388,12 +393,16 @@ export class ReportTypeComponent implements OnInit {
 
                         return 0;
                       } else if (userRes === 'ReportExist') {
-                        // TODO: Remove the following assignment when navigation is ready
-                        reportStatus = 'oldNavigation';
-                        if (reportStatus === 'saved') {
-                          // navigate to alltransaction screen
+                        this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
+                        if (reportStatus.toLowerCase() === 'saved') {
+                          this._router.navigate([`/forms/form/${this._formType}`], {
+                            queryParams: { step: 'transactions', reportId: reportId, edit: true, transactionCategory: 'receipts' }
+                          });
                         } else if ( reportStatus.toLowerCase() === 'filed' ) {
                           // navigate to summary page of the filed report
+                          this._router.navigate([`/forms/form/${this._formType}`], {
+                            queryParams: { step: 'financial_summary', reportId: reportId, edit: false, transactionCategory: '' }
+                          });
                         } else {
                           // navigate away to the reports view
                           // this should not happen as a report with report id should be either saved or filed
