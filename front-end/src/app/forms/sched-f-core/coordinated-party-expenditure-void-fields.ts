@@ -441,7 +441,7 @@ export class CoordinatedPartyExpenditureVoidFields {
               toggle: false,
               inputGroup: false,
               inputIcon: null,
-              text: 'Expenditure Purpose Description',
+              text: 'Purpose of Disbursement',
               infoIcon: true,
               infoText: 'Request language from RAD',
               name: 'purpose',
