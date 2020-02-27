@@ -153,8 +153,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _completedCloning: boolean = false;
   private _outstandingDebtBalance: number;
   private _scheduleHBackRefTransactionId: string;
+  private reattrbutionTransaction: any;
   private readonly childNeededWarnText = 'Please note that this transaction usually includes memo transactions that support the' +
-    ' parent transaction. You can add the memo transactions at a later date.';
+  ' parent transaction. You can add the memo transactions at a later date.';
   private candidateAssociatedWithPayeeTransactionTypes = [
     "IE_VOID",
     "IE_CC_PAY",
@@ -300,6 +301,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     });
 
+    this._f3xMessageService.getPopulateFieldsMessage().takeUntil(this.onDestroy$).subscribe(message => {
+      if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+        if(message.fieldArray){
+          this._prePopulateFormField(message.fieldArray);
+        }
+      }
+    })
+
     this._f3xMessageService.getClearFormValuesForRedesignationMessage().takeUntil(this.onDestroy$).subscribe(message => {
       if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
         this.clearFormValuesForRedesignation();
@@ -339,10 +348,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private populateDataForReattribution(message: any) {
     this.reattributionTransactionId = message.reattributionTransactionId;
     this._maxReattributableOrRedesignatableAmount = message.maxAmount;
+    this.reattrbutionTransaction = message.reattributionTransaction;
     if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_amount']){
       this.frmIndividualReceipt.controls['contribution_amount'].setValidators([Validators.required,validateContributionAmount(Number(this._maxReattributableOrRedesignatableAmount))]);
       this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
     }
+    this._prePopulateFieldArray = [{name:'purpose_description', value:this.reattrbutionTransaction.purposeDescription}];
+      // this.frmIndividualReceipt.patchValue({'expenditure_purpose':this.reattrbutionTransaction.purpose_description},{onlySelf:true});
   }
 
   public ngOnInit(): void {
@@ -4205,6 +4217,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             if (this.redesignationTransactionId) {
               this._f3xMessageService.sendClearFormValuesForRedesignationMessage({ abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent });
             }
+            
           }
 
 
@@ -5154,24 +5167,34 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   protected clearFormValuesForRedesignation() {
     if (this.frmIndividualReceipt) {
-      if (this.frmIndividualReceipt.controls['expenditure_date']) {
-        this.frmIndividualReceipt.controls['expenditure_date'].reset();
+      if(this.scheduleAction === ScheduleActions.add){
+        if (this.frmIndividualReceipt.controls['expenditure_date']) {
+          this.frmIndividualReceipt.controls['expenditure_date'].reset();
+        }
+        if (this.frmIndividualReceipt.controls['expenditure_amount']) {
+          this.frmIndividualReceipt.controls['expenditure_amount'].reset();
+        }
+        if (this.frmIndividualReceipt.controls['cand_office']) {
+          this.frmIndividualReceipt.controls['cand_office'].reset();
+        }
+        if (this.frmIndividualReceipt.controls['cand_office_state']) {
+          this.frmIndividualReceipt.controls['cand_office_state'].reset();
+        }
+        if (this.frmIndividualReceipt.controls['cand_office_district']) {
+          this.frmIndividualReceipt.controls['cand_office_district'].reset();
+        }
+
+        if(this._transactionToEdit){
+          this._transactionToEdit.transactionId = null;
+        }
+
       }
       if (this.frmIndividualReceipt.controls['expenditure_amount']) {
-        this.frmIndividualReceipt.controls['expenditure_amount'].reset();
         this.frmIndividualReceipt.controls['expenditure_amount'].setValidators([Validators.required,floatingPoint(),validateAmount(),validateContributionAmount(Number(this._maxReattributableOrRedesignatableAmount))]);
         this.frmIndividualReceipt.controls['expenditure_amount'].updateValueAndValidity();
       }
-      if (this.frmIndividualReceipt.controls['cand_office']) {
-        this.frmIndividualReceipt.controls['cand_office'].reset();
-      }
-      if (this.frmIndividualReceipt.controls['cand_office_state']) {
-        this.frmIndividualReceipt.controls['cand_office_state'].reset();
-      }
-      if (this.frmIndividualReceipt.controls['cand_office_district']) {
-        this.frmIndividualReceipt.controls['cand_office_district'].reset();
-      }
     }
+    
   }
 
   private isShowChildRequiredWarn() {

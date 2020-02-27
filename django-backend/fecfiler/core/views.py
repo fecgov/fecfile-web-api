@@ -3095,7 +3095,7 @@ def get_trans_query(category_type, cmte_id, param_string):
             """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
-                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild from all_disbursements_transactions_view
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, isredesignatable, "isRedesignation" from all_disbursements_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """

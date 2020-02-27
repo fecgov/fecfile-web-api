@@ -18,6 +18,7 @@ export class F3xMessageService {
   private storeParentModelSubject = new Subject<any>();
   private populateHiddenFieldsSubject = new Subject<any>();
   private clearFormFieldsForRedesignationSubject = new Subject<any>();
+  private populateFieldsSubject = new Subject<any>();
 
 
   /**
@@ -44,6 +45,32 @@ export class F3xMessageService {
    */
   public getPopulateFormMessage(): Observable<any> {
     return this.populateFormSubject.asObservable();
+  }
+
+  /**
+   * Used by the F3X parent component to inform the child component
+   * to pre-populate the form with the given data.
+   *
+   * @param message
+   */
+  public sendPopulateFieldsMessage(message: any) {
+    this.populateFieldsSubject.next(message);
+  }
+
+
+  /**
+   * Clear the Populate Form message.
+   */
+  public clearPopulateFieldsMessage() {
+    this.populateFieldsSubject.next();
+  }
+
+
+  /**
+   * A method for subscribers of the Populate Form message.
+   */
+  public getPopulateFieldsMessage(): Observable<any> {
+    return this.populateFieldsSubject.asObservable();
   }
 
    /**

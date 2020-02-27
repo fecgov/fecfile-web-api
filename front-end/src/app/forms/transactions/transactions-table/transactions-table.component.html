@@ -471,7 +471,7 @@
                           <i class="edit-icon"></i> Edit
                         </button>
                       </span>
-                      <button *ngIf="true" class="dropdown-item" (click)="redesignateTransaction(trx)">
+                      <button *ngIf="trx.isredesignatable" class="dropdown-item" (click)="redesignateTransaction(trx)">
                         <i class="clipboard-icon"></i> Redesignate
                       </button>
                       <button class="dropdown-item" (click)="printTransaction(trx)">
