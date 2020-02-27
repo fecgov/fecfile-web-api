@@ -3548,6 +3548,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._receiptService.getLevinAccounts().subscribe(res => {
         if (res) {
           this.levinAccounts = res;
+        }else {
+          this._dialogService
+          .confirm(
+            'You must first create the Levin account in the Profile Account screen.',
+            ConfirmModalComponent,
+            'Warning!',
+            false
+            )
+          .then(res => {
+            if (res === 'okay') {
+              this._router.navigate(['/account']);
+            } else if (res === 'cancel') {
+            }
+          });
         }
       });
     }
