@@ -331,6 +331,7 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   public goToAllTransactions(){
+    // go to different tab
     const transactionCategory: 'receipts' = this._activatedRoute.snapshot.queryParams.transactionCategory;
 
     this._transactionMessageService.sendLoadDefaultTabMessage(
