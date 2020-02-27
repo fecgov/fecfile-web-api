@@ -321,6 +321,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this._f3xMessageService.getInitFormMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this.clearFormValues();
+      this.removeAllValidators();
     });
 
     this._f3xMessageService.getLoadFormFieldsMessage().takeUntil(this.onDestroy$).subscribe(message => {
@@ -1749,7 +1750,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     } else {
       if (this._selectedEntity && col.name !== 'cand_office_state') {
         this.showWarn(col.text, 'state');
-      } else if (this._selectedCandidate && !this.redesignationTransactionId) {
+      } else if (this._selectedCandidate ) {
         this.showWarnCandidate(col.text, col.name);
       }
     }
@@ -1767,7 +1768,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.showWarnCandidate(col.text, col.name);
       }
     } else {
-      if (this._selectedCandidate && !this.redesignationTransactionId) {
+      if (this._selectedCandidate ) {
         this.showWarnCandidate(col.text, col.name);
       }
     }
@@ -5174,14 +5175,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (this.frmIndividualReceipt.controls['expenditure_amount']) {
           this.frmIndividualReceipt.controls['expenditure_amount'].reset();
         }
-        if (this.frmIndividualReceipt.controls['cand_office']) {
-          this.frmIndividualReceipt.controls['cand_office'].reset();
+        if (this.frmIndividualReceipt.controls['election_code']) {
+          this.frmIndividualReceipt.controls['election_code'].reset();
         }
-        if (this.frmIndividualReceipt.controls['cand_office_state']) {
-          this.frmIndividualReceipt.controls['cand_office_state'].reset();
+        if (this.frmIndividualReceipt.controls['election_year']) {
+          this.frmIndividualReceipt.controls['election_year'].reset();
         }
-        if (this.frmIndividualReceipt.controls['cand_office_district']) {
-          this.frmIndividualReceipt.controls['cand_office_district'].reset();
+        if (this.frmIndividualReceipt.controls['election_other_description']) {
+          this.frmIndividualReceipt.controls['election_other_description'].reset();
         }
 
         if(this._transactionToEdit){
@@ -5209,4 +5210,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     return false;
   }
+
+  protected removeAllValidators() {
+    for (const key in this.frmIndividualReceipt.controls) {
+      this.frmIndividualReceipt.get(key).clearValidators();
+      this.frmIndividualReceipt.get(key).updateValueAndValidity();
+    }
+}
 }
