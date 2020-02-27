@@ -1275,13 +1275,13 @@ def redesignation_auto_generate_transactions(
             transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
             beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
             beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
-            itemized_ind, levin_account_id, redesignation_id, redesignation_ind)
+            itemized_ind, levin_account_id, redesignation_ind,redesignation_id)
             SELECT cmte_id, %s, line_number, transaction_type, 
                null, null, entity_id, expenditure_date, 
                expenditure_amount, semi_annual_refund_bundled_amount, expenditure_purpose,
                category_code, 'X', 
                concat('MEMO: See ', (SELECT rrt.rpt_type_desc FROM public.ref_rpt_types rrt WHERE rrt.rpt_type = 
-               (SELECT r.report_type FROM public.reports r WHERE r.report_id = report_id)), ' report. Redesignation below'), 
+               (SELECT r.report_type FROM public.reports r WHERE r.report_id = %s)), ' report. Redesignation below'), 
                election_code, election_other_description, 
                beneficiary_cmte_id, beneficiary_cand_id, other_name, other_street_1, 
                other_street_2, other_city, other_state, other_zip, nc_soft_account,
@@ -1305,7 +1305,7 @@ def redesignation_auto_generate_transactions(
             transaction_type_identifier, beneficiary_cmte_name, beneficiary_cand_last_name, 
             beneficiary_cand_first_name, beneficiary_cand_middle_name, beneficiary_cand_prefix, 
             beneficiary_cand_suffix, election_year, beneficiary_cand_entity_id, 
-            itemized_ind, levin_account_id, redesignation_id, redesignation_ind)
+            itemized_ind, levin_account_id, redesignation_ind,redesignation_id)
             SELECT cmte_id, %s, line_number, transaction_type, 
                null, null, entity_id, %s, 
                %s, semi_annual_refund_bundled_amount, expenditure_purpose,
@@ -1324,6 +1324,7 @@ def redesignation_auto_generate_transactions(
             cursor.execute(
                 query_string_auto_1,
                 [
+                    report_id,
                     report_id,
                     redesignated_id,
                     org_transaction_id,

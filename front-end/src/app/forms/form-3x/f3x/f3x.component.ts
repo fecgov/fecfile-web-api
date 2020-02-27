@@ -618,17 +618,25 @@ export class F3xComponent implements OnInit, OnDestroy {
 
       let reattributionId: string = null;
       let redesignationId: string = null;
+      let maxAmount = transactionModel.amount;
+      if(this.scheduleAction === ScheduleActions.edit){
+        // maxAmount = transactionModel.originalAmount;
+      }
       if (transactionModel.isReattribution) {
         if (this.scheduleAction === ScheduleActions.add) {
           reattributionId = transactionModel.reattribution_id;
         } else if (this.scheduleAction === ScheduleActions.edit) {
           reattributionId = transactionModel.transactionId;
         }
+
         this._f3xMessageService.sendPopulateHiddenFieldsMessage({
           abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
           reattributionTransactionId: reattributionId,
-          maxAmount: transactionModel.amount
+          maxAmount: maxAmount, 
+          reattributionTransaction: transactionModel
         });
+        const fieldArray = [{name:'purpose_description', value:transactionModel.purposeDescription}];
+        this._f3xMessageService.sendPopulateFieldsMessage({abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent, fieldArray});
       } else if (transactionModel.isRedesignation) {
         if (this.scheduleAction === ScheduleActions.add) {
           redesignationId = transactionModel.redesignation_id;
@@ -638,7 +646,7 @@ export class F3xComponent implements OnInit, OnDestroy {
         this._f3xMessageService.sendPopulateHiddenFieldsMessage({
           abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
           redesignationTransactionId: redesignationId,
-          maxAmount: transactionModel.amount
+          maxAmount: maxAmount
 
         });
       }

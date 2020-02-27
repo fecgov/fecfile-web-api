@@ -982,5 +982,7 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.isTrashable = row.istrashable;
   model.isReattribution = row.isReattribution;
   model.isreattributable = row.isreattributable;
-  
+  model.isRedesignation = row.isRedesignation;
+  model.isredesignatable = row.isredesignatable;
+
 }
