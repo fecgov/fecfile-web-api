@@ -69,6 +69,7 @@ from fecfiler.sched_B.views import (
     put_sql_agg_amount_schedB,
     get_list_child_transactionId_schedB,
     delete_sql_schedB,
+    get_list_schedB
 )
 
 from fecfiler.sched_L.views import update_sl_summary
@@ -2965,6 +2966,7 @@ def trash_restore_transactions(request):
                     )
                 if transaction_id[:2] == 'SB':
                     # Handling redesignation_id auto generated transactions: redesignation_id
+                    datum = get_list_schedB(report_id, cmte_id, transaction_id, True)[0]
                     if _delete == "Y" and datum["redesignation_ind"] in ["R", "O"]:
                         if datum["redesignation_ind"] == "R":
                             update_redes_original_trans(datum["redesignation_id"], cmte_id)
