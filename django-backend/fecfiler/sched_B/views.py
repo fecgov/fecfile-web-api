@@ -427,7 +427,7 @@ def get_list_schedB(report_id, cmte_id, transaction_id, include_deleted_trans_fl
     """
     get sched_b item for this transaction_id
     """
-    return get_sched_b_transactions(report_id, cmte_id, include_deleted_trans_flag, transaction_id=transaction_id)
+    return get_sched_b_transactions(report_id, cmte_id, include_deleted_trans_flag=include_deleted_trans_flag, transaction_id=transaction_id)
 
 
 def get_list_child_schedB(report_id, cmte_id, transaction_id):
