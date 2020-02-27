@@ -3718,6 +3718,12 @@ def get_all_transactions(request):
                     output_list = transaction_list
                     logger.debug("loans_transactions:")
                 else:
+                    if ctgry_type == "disbursements_tran":
+                        for transaction in transaction_list:
+                            if transaction['isRedesignation'] is True:
+                                original_amount = get_original_amount_by_redesignation_id(transaction['transaction_id']);
+                                transaction['original_amount'] = original_amount[0]
+                                logger.debug('')
                     transaction_dict = {
                         trans.get("transaction_id"): trans for trans in transaction_list
                     }
@@ -9336,3 +9342,22 @@ def prepare_Schedl_summary_data(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+def get_original_amount_by_redesignation_id(
+    transaction_id
+    ):
+
+    try:
+        with connection.cursor() as cursor:
+            if transaction_id:
+                query_string = """SELECT expenditure_amount
+                FROM public.sched_b 
+                WHERE  redesignation_id = %s AND redesignation_ind = 'O'"""
+
+                cursor.execute(query_string ,[transaction_id],)
+                print(cursor.query)
+                original_amount = cursor.fetchone()
+                return original_amount
+            else: 
+                raise Exception("No transaction id found");
+    except Exception:
+        raise

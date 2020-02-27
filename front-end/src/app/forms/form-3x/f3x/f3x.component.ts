@@ -620,7 +620,7 @@ export class F3xComponent implements OnInit, OnDestroy {
       let redesignationId: string = null;
       let maxAmount = transactionModel.amount;
       if(this.scheduleAction === ScheduleActions.edit){
-        // maxAmount = transactionModel.originalAmount;
+        maxAmount = transactionModel.originalAmount;
       }
       if (transactionModel.isReattribution) {
         if (this.scheduleAction === ScheduleActions.add) {
