@@ -4405,7 +4405,7 @@ def summary_disbursements_for_sumamry_table(args):
             if data_row[0] == "22":
                 # XXII_amount = XXII_amount + data_row[1]
                 XXII_amount_ytd = data_row[1]
-                
+
                 # TODO: need to confirm on 23/24 and see if the BR is correct
             if data_row[0] == "23":
                 # XXIII_amount = XXIII_amount + data_row[1]
@@ -8495,6 +8495,26 @@ def delete_levin_account(cmte_id, levin_account_id):
     except Exception as e:
         raise Exception("Error deleting levin account.")
 
+def levin_deletable(cmte_id, levin_account_id):
+    """
+    check and see if a levin_acct is deletable: if there are transactions associated with levin account,
+    it is NOT deletable
+    """
+    _sql = """
+    SELECT count(*) FROM sched_l
+    WHERE cmte_id = %s 
+    AND record_id = %s
+    and delete_ind is dsitinct from 'Y'
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (cmte_id, levin_account_id))
+            if cursor.fetchone()[0]:
+                return False
+            return True
+    except Exception as e:
+        raise Exception("Error deleting levin account.")
+
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def levin_accounts(request):
@@ -8567,6 +8587,8 @@ def levin_accounts(request):
             levin_account_id = request.query_params.get("levin_account_id")
             if not levin_account_id:
                 raise Exception("a valid levin account id is required.")
+            if not levin_deletable(cmte_id, levin_account_id):
+                raise Exception('levin account has transactions and not deletable.')
             delete_levin_account(cmte_id, levin_account_id)
             return Response(
                 "The account: {} has been successfully deleted".format(
