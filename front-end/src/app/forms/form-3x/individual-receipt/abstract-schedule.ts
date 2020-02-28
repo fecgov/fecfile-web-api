@@ -355,7 +355,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
     }
     this._prePopulateFieldArray = [{name:'purpose_description', value:this.reattrbutionTransaction.purposeDescription}];
-      // this.frmIndividualReceipt.patchValue({'expenditure_purpose':this.reattrbutionTransaction.purpose_description},{onlySelf:true});
+
+
   }
 
   public ngOnInit(): void {
@@ -570,6 +571,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               this._readOnlyMemoCodeChild = e.isReadonly;
             } else {
               this._readOnlyMemoCode = e.isReadonly;
+            }
+            if(this.redesignationTransactionId || this.reattributionTransactionId){
+              if(isChildForm){
+                this.memoCodeChild = true;
+                this._readOnlyMemoCodeChild = true;
+              }
+              else{
+                this.memoCode = true;
+                this._readOnlyMemoCode = true;
+              }
             }
           }
         });

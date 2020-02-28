@@ -250,11 +250,19 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.frmIndividualReceipt.patchValue({support_oppose_code:this._parentTransactionModel.candSupportOpposeFlag},{onlySelf:true});
       this.frmIndividualReceipt.patchValue({election_other_description:this._parentTransactionModel.candElectionOtherDesc},{onlySelf:true});
       this.frmIndividualReceipt.patchValue({election_code:this._parentTransactionModel.candElectionCode},{onlySelf:true});
-      
-      if(!this.frmIndividualReceipt.value.election_code){
-        console.log(this.electionTypes);
-      }
 
+      if(this._parentTransactionModel.candOffice){
+        if(this._parentTransactionModel.candOffice === 'P'){
+          this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
+          this.frmIndividualReceipt.controls['cand_office_state'].updateValueAndValidity();
+          this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+          this.frmIndividualReceipt.controls['cand_office_district'].updateValueAndValidity();
+        }
+        else if(this._parentTransactionModel.candOffice === 'S'){
+          this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+          this.frmIndividualReceipt.controls['cand_office_district'].updateValueAndValidity();
+        }
+      }
     }
   }
 
