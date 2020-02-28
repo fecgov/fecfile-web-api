@@ -1414,7 +1414,9 @@ def put_schedA(datum):
                     in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT
                 ):
                     child_datum = AUTO_parent_SA_to_child_SB_dict(datum)
-                    child_datum["expenditure_purpose"] = "In-Kind #" + transaction_id
+                    child_datum["expenditure_purpose"] = "In-Kind " + datum.get(
+                        "purpose_description", " "
+                    )
                     if datum.get("transaction_type_identifier") in [
                         "IK_TRAN",
                         "IK_TRAN_FEA",
@@ -1497,7 +1499,9 @@ def put_schedA(datum):
                         child_datum.get("transaction_type_identifier")
                     )
                     child_datum["back_ref_transaction_id"] = transaction_id
-                    child_datum["purpose_description"] = "In-Kind #" + transaction_id
+                    child_datum["purpose_description"] = "In-Kind " + datum.get(
+                        "purpose_description", " "
+                    )
                     child_transaction_id = get_child_transaction_schedA(
                         datum.get("cmte_id"), datum.get("report_id"), transaction_id
                     )
