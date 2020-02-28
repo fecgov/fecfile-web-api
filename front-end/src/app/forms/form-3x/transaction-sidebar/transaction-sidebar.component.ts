@@ -332,7 +332,21 @@ export class TransactionSidebarComponent implements OnInit {
 
   public goToAllTransactions(){
     // go to different tab
-    const transactionCategory: 'receipts' = this._activatedRoute.snapshot.queryParams.transactionCategory;
+    let transactionCategory = this._activatedRoute.snapshot.queryParams.transactionCategory;
+
+    if(!transactionCategory) {
+      if (localStorage.getItem('form_3X_temp_transaction_type') !== null) {
+        const form3xTransactionType = JSON.parse(localStorage.getItem('form_3X_temp_transaction_type'));
+        if (form3xTransactionType !== null) {
+          transactionCategory = form3xTransactionType.mainTransactionTypeValue;
+        }
+      }else if (localStorage.getItem('form_3X_transaction_type') !== null) {
+        const form3xTransactionType = JSON.parse(localStorage.getItem('form_3X_transaction_type'));
+        if (form3xTransactionType !== null) {
+          transactionCategory = form3xTransactionType.mainTransactionTypeValue;
+        }
+      }
+    }
 
     this._transactionMessageService.sendLoadDefaultTabMessage(
       {
