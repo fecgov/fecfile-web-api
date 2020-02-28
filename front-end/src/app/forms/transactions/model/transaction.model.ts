@@ -74,6 +74,17 @@ export class TransactionModel {
   candElectionOtherDesc: string;
   originalAmount: any;
 
+  //used by sched f core child trx
+  coordinatedExpInd: string;
+  designatingCmteId: string;
+  designatingCmteName: string;
+  subordinateCmteId: string;
+  subordinateCmteName: string;
+  subordinateCmteStreet_1: string;
+  subordinateCmteStreet_2: string;
+  subordinateCmteCity: string;
+  subordinateCmteState: string;
+  subordinateCmteZip: string;
 
 
 

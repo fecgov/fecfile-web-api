@@ -92,7 +92,9 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     );
     _activatedRoute.queryParams.subscribe(p => {
       this.cloned = p.cloned ? true : false;
-      this.showPart2 = false;
+      if (p.showPart2) {
+        this.showPart2 = p.showPart2;
+      }
     });
     _f3xMessageService.getInitFormMessage().subscribe(message => {
       this.resetForm();
@@ -121,7 +123,13 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';
-
+  if ( changes && changes.transactionType && changes.transactionType.currentValue) {
+    const transactionTypeIdentifier = changes.transactionType.currentValue;
+    if (transactionTypeIdentifier.startsWith('COEXP') && transactionTypeIdentifier.endsWith('MEMO')) {
+      this.loaded = false;
+      this.showPart2 = true;
+    }
+  }
     super.ngOnChanges(changes);
   }
 
@@ -165,6 +173,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   public back() {
     if ( this.subTransactionInfo && this.subTransactionInfo.isParent === false) {
       this.clearFormValues();
+      this.showPart2 = true;
       this.returnToParent(ScheduleActions.edit);
     } else {
       this.showPart2 = false;
@@ -336,7 +345,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
 
   public updateOnly() {
     if (this.frmIndividualReceipt.valid) {
-      this.back();
+      this.showPart2 = false;
     }
     if ( this.subTransactionInfo &&
         this.subTransactionInfo.isParent === false ) {
@@ -346,7 +355,7 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
   }
   public saveOnly(): void {
     if (this.frmIndividualReceipt.valid) {
-      this.back();
+      this.showPart2 = false;
     }
     super.saveOnly();
   }

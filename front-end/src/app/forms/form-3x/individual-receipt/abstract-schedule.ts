@@ -1975,10 +1975,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         } else if (field === 'election_code' && this.frmIndividualReceipt 
                     && this.frmIndividualReceipt.get(field) && this.frmIndividualReceipt.get(field).value) {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value[0];
-        }
-        else {
+        } else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
+
+        this.populateSchedFChildData(field, receiptObj);
+
       }
 
       // for each entity ID comes from the dynamic form fields as setEntityIdTo.
@@ -5225,10 +5227,53 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     return false;
   }
 
+
+  private populateSchedFChildData(field: string, receiptObj: any) {
+      // Possible issue : Populating data from parent when  sched f child is created can cause in consistensis
+      // data from child and parent can be out of sync whent the parent is edited
+      // backend should take care of the updates if parent is modified
+    if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent && !this.subTransactionInfo.isParent) {
+      switch (field) {
+        case 'coordinated_exp_ind' :
+          receiptObj[field] = this._parentTransactionModel.coordinatedExpInd;
+          break;
+        case 'designating_cmte_id':
+          receiptObj[field] = this._parentTransactionModel.designatingCmteId;
+          break;
+        case 'designating_cmte_name':
+          receiptObj[field] = this._parentTransactionModel.designatingCmteName;
+          break;
+        case 'subordinate_cmte_id':
+          receiptObj[field] = this._parentTransactionModel.subordinateCmteId;
+          break;
+        case 'subordinate_cmte_name':
+          receiptObj[field] = this._parentTransactionModel.subordinateCmteName;
+          break;
+        case 'subordinate_cmte_street_1':
+          receiptObj[field] = this._parentTransactionModel.subordinateCmteStreet_1;
+          break;
+        case 'subordinate_cmte_street_2':
+          receiptObj[field] = this._parentTransactionModel.subordinateCmteStreet_2;
+          break;
+        case 'subordinate_cmte_city':
+          receiptObj[field] = this._parentTransactionModel.subordinateCmteCity;
+          break;
+        case 'subordinate_cmte_state':
+          receiptObj[field] = this._parentTransactionModel.subordinateCmteState;
+          break;
+        case 'subordinate_cmte_zip':
+          receiptObj[field] = this._parentTransactionModel.subordinateCmteZip;
+          break;
+        default:
+      }
+    }
+  }
+  
   protected removeAllValidators() {
     for (const key in this.frmIndividualReceipt.controls) {
       this.frmIndividualReceipt.get(key).clearValidators();
       this.frmIndividualReceipt.get(key).updateValueAndValidity();
     }
 }
+
 }
