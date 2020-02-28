@@ -3718,6 +3718,12 @@ def get_all_transactions(request):
                     output_list = transaction_list
                     logger.debug("loans_transactions:")
                 else:
+                    if ctgry_type == "disbursements_tran":
+                        for transaction in transaction_list:
+                            if transaction['isRedesignation'] is True:
+                                original_amount = get_original_amount_by_redesignation_id(transaction['transaction_id']);
+                                transaction['original_amount'] = original_amount[0]
+                                logger.debug('')
                     transaction_dict = {
                         trans.get("transaction_id"): trans for trans in transaction_list
                     }
@@ -4194,14 +4200,14 @@ def period_receipts_for_summary_table_sql(
         FROM public.sched_a t2 
         WHERE t2.memo_code IS NULL 
         AND t2.delete_ind is distinct from 'Y' 
-        AND T2.cmte_id = %s
+        AND t2.cmte_id = %s
         AND t2.contribution_date BETWEEN %s AND %s
         group by line_number;
     """
     try:
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
-            print('rep_sql query:')
+            # print('rep_sql query:')
             cursor.execute(
                 rep_sql,
                 [cmte_id, report_id],
@@ -4222,17 +4228,49 @@ def period_receipts_for_summary_table_sql(
         )
 
 
-def period_disbursements_for_summary_table_sql(
-    calendar_start_dt, calendar_end_dt, cmte_id, report_id
-):
+def period_disbursements_for_summary_table_sql( calendar_start_dt, calendar_end_dt, cmte_id, report_id):
+    """
+    helper function on querying report-wise and ytd total amount for sched_b
+    """
+    logger.debug('loading period_dsibursements for calendar start {}, end {}, report_id {}'.format(calendar_start_dt, calendar_end_dt, report_id))
+    rep_sql = """
+        SELECT line_number, COALESCE(expenditure_amount,0) 
+        FROM public.sched_b t1 
+        WHERE t1.memo_code IS NULL 
+        AND t1.cmte_id = %s 
+        AND t1.report_id = %s 
+        AND t1.delete_ind is distinct from 'Y';
+    """
+    ytd_sql = """
+        select line_number, COALESCE(sum(expenditure_amount),0) as expenditure_amount_ytd 
+        FROM public.sched_b t2 
+        WHERE t2.memo_code IS NULL 
+        AND t2.delete_ind is distinct from 'Y' 
+        AND t2.cmte_id = %s
+        AND t2.expenditure_date BETWEEN %s AND %s
+        group by line_number;
+    """
     try:
         with connection.cursor() as cursor:
-            # cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             cursor.execute(
-                "SELECT line_number, COALESCE(expenditure_amount,0), ( select COALESCE(sum(expenditure_amount),0) as expenditure_amount_ytd FROM public.sched_b t2 WHERE t2.memo_code IS NULL AND t2.delete_ind is distinct from 'Y' AND t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'",
-                [calendar_start_dt, calendar_end_dt, cmte_id, report_id],
+                rep_sql,
+                [cmte_id, report_id],
             )
-            return cursor.fetchall()
+            report_transactions = cursor.fetchall()
+            logger.debug('transactions for current report:{}'.format(cursor.rowcount))
+            cursor.execute(
+                ytd_sql,
+                [cmte_id, calendar_start_dt, calendar_end_dt],
+            )
+            ytd_transactions = cursor.fetchall()
+            logger.debug('transaction_linenumber for ytd:{}'.format(cursor.rowcount))
+            return report_transactions, ytd_transactions
+            # cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
+            # cursor.execute(
+            #     "SELECT line_number, COALESCE(expenditure_amount,0), ( select COALESCE(sum(expenditure_amount),0) as expenditure_amount_ytd FROM public.sched_b t2 WHERE t2.memo_code IS NULL AND t2.delete_ind is distinct from 'Y' AND t2.line_number = t1.line_number AND T2.cmte_id = T1.cmte_id AND t2.expenditure_date BETWEEN %s AND %s ) FROM public.sched_b t1 WHERE t1.memo_code IS NULL AND t1.cmte_id = %s AND t1.report_id = %s AND t1.delete_ind is distinct from 'Y'",
+            #     [calendar_start_dt, calendar_end_dt, cmte_id, report_id],
+            # )
+            # return cursor.fetchall()
     except Exception as e:
         raise Exception(
             "The period_disbursements_for_summary_table_sql function is throwing an error: "
@@ -4303,59 +4341,114 @@ def summary_disbursements_for_sumamry_table(args):
         cmte_id = args[2]
         report_id = args[3]
 
-        sql_output = period_disbursements_for_summary_table_sql(
+        rep_trans, ytd_trans = period_disbursements_for_summary_table_sql(
             calendar_start_dt, calendar_end_dt, cmte_id, report_id
         )
-        for row in sql_output:
+        logger.debug('summarizing report sched_b...')
+        for row in rep_trans:
             data_row = list(row)
             if data_row[0] in ["21AI", "21A"]:
                 XXIAI_amount = XXIAI_amount + data_row[1]
-                XXIAI_amount_ytd = data_row[2]
+                # XXIAI_amount_ytd = data_row[2]
             if data_row[0] == "21AII":
                 XXIAII_amount = XXIAII_amount + data_row[1]
-                XXIAII_amount_ytd = data_row[2]
+                # XXIAII_amount_ytd = data_row[2]
             if data_row[0] == "21B":
                 XXIB_amount = XXIB_amount + data_row[1]
-                XXIB_amount_ytd = data_row[2]
+                # XXIB_amount_ytd = data_row[2]
             if data_row[0] == "22":
                 XXII_amount = XXII_amount + data_row[1]
-                XXII_amount_ytd = data_row[2]
+                # XXII_amount_ytd = data_row[2]
             if data_row[0] == "23":
                 XXIII_amount = XXIII_amount + data_row[1]
-                XXIII_amount_ytd = XXIV_amount
+                # XXIII_amount_ytd = XXIV_amount
             if data_row[0] == "24":
                 XXIV_amount = XXIV_amount + data_row[1]
-                XXIV_amount_ytd = XXIV_amount
+                # XXIV_amount_ytd = XXIV_amount
             if data_row[0] == "25":
                 XXV_amount = XXV_amount + data_row[1]
-                XXV_amount_ytd = data_row[2]
+                # XXV_amount_ytd = data_row[2]
             if data_row[0] == "26":
                 XXVI_amount = XXVI_amount + data_row[1]
-                XXVI_amount_ytd = data_row[2]
+                # XXVI_amount_ytd = data_row[2]
             if data_row[0] == "27":
                 XXVII_amount = XXVII_amount + data_row[1]
-                XXVII_amount_ytd = data_row[2]
+                # XXVII_amount_ytd = data_row[2]
             if data_row[0] == "28A":
                 XXVIIIA_amount = XXVIIIA_amount + data_row[1]
-                XXVIIIA_amount_ytd = data_row[2]
+                # XXVIIIA_amount_ytd = data_row[2]
             if data_row[0] == "28B":
                 XXVIIIB_amount = XXVIIIB_amount + data_row[1]
-                XXVIIIB_amount_ytd = data_row[2]
+                # XXVIIIB_amount_ytd = data_row[2]
             if data_row[0] == "28C":
                 XXVIIIC_amount = XXVIIIC_amount + data_row[1]
-                XXVIIIC_amount_ytd = data_row[2]
+                # XXVIIIC_amount_ytd = data_row[2]
             if data_row[0] == "29":
                 XXIX_amount = XXIX_amount + data_row[1]
-                XXIX_amount_ytd = data_row[2]
+                # XXIX_amount_ytd = data_row[2]
             if data_row[0] == "30AI":
                 XXXAI_amount = XXXAI_amount + data_row[1]
-                XXXAI_amount_ytd = data_row[2]
+                # XXXAI_amount_ytd = data_row[2]
             if data_row[0] == "30AII":
                 XXXAII_amount = XXXAII_amount + data_row[1]
-                XXXAII_amount_ytd = data_row[2]
+                # XXXAII_amount_ytd = data_row[2]
             if data_row[0] == "30B":
                 XXXB_amount = XXXB_amount + data_row[1]
-                XXXB_amount_ytd = data_row[2]
+                # XXXB_amount_ytd = data_row[2]
+
+        logger.debug('summarizing ytd sched_b...')
+        for row in ytd_trans:
+            data_row = list(row)
+            if data_row[0] in ["21AI", "21A"]:
+                # XXIAI_amount = XXIAI_amount + data_row[1]
+                XXIAI_amount_ytd = data_row[1]
+            if data_row[0] == "21AII":
+                # XXIAII_amount = XXIAII_amount + data_row[1]
+                XXIAII_amount_ytd = data_row[1]
+            if data_row[0] == "21B":
+                # XXIB_amount = XXIB_amount + data_row[1]
+                XXIB_amount_ytd = data_row[1]
+            if data_row[0] == "22":
+                # XXII_amount = XXII_amount + data_row[1]
+                XXII_amount_ytd = data_row[1]
+                
+                # TODO: need to confirm on 23/24 and see if the BR is correct
+            if data_row[0] == "23":
+                # XXIII_amount = XXIII_amount + data_row[1]
+                XXIII_amount_ytd = XXIV_amount
+            if data_row[0] == "24":
+                # XXIV_amount = XXIV_amount + data_row[1]
+                XXIV_amount_ytd = XXIV_amount
+            if data_row[0] == "25":
+                # XXV_amount = XXV_amount + data_row[1]
+                XXV_amount_ytd = data_row[1]
+            if data_row[0] == "26":
+                # XXVI_amount = XXVI_amount + data_row[1]
+                XXVI_amount_ytd = data_row[1]
+            if data_row[0] == "27":
+                # XXVII_amount = XXVII_amount + data_row[1]
+                XXVII_amount_ytd = data_row[1]
+            if data_row[0] == "28A":
+                # XXVIIIA_amount = XXVIIIA_amount + data_row[1]
+                XXVIIIA_amount_ytd = data_row[1]
+            if data_row[0] == "28B":
+                # XXVIIIB_amount = XXVIIIB_amount + data_row[1]
+                XXVIIIB_amount_ytd = data_row[1]
+            if data_row[0] == "28C":
+                # XXVIIIC_amount = XXVIIIC_amount + data_row[1]
+                XXVIIIC_amount_ytd = data_row[1]
+            if data_row[0] == "29":
+                # XXIX_amount = XXIX_amount + data_row[1]
+                XXIX_amount_ytd = data_row[1]
+            if data_row[0] == "30AI":
+                # XXXAI_amount = XXXAI_amount + data_row[1]
+                XXXAI_amount_ytd = data_row[1]
+            if data_row[0] == "30AII":
+                # XXXAII_amount = XXXAII_amount + data_row[1]
+                XXXAII_amount_ytd = data_row[1]
+            if data_row[0] == "30B":
+                # XXXB_amount = XXXB_amount + data_row[1]
+                XXXB_amount_ytd = data_row[1]
 
         XXI_amount = XXIAI_amount + XXIAII_amount + XXIB_amount
         XXI_amount_ytd = XXIAI_amount_ytd + XXIAII_amount_ytd + XXIB_amount_ytd
@@ -4608,83 +4701,84 @@ def summary_receipts_for_sumamry_table(args):
         rep_trans, ytd_trans = period_receipts_for_summary_table_sql(
             calendar_start_dt, calendar_end_dt, cmte_id, report_id
         )
-        for row in rep_trans:
-            data_row = list(row)
-            if data_row[0] in ["11AI", "11A"]:
-                XIAI_amount = XIAI_amount + data_row[1]
-                # XIAI_amount_ytd = data_row[2]
-            if data_row[0] == "11AII":
-                XIAII_amount = XIAII_amount + data_row[1]
-                # XIAII_amount_ytd = data_row[2]
-            if data_row[0] == "11B":
-                XIB_amount = XIB_amount + data_row[1]
-                # XIB_amount_ytd = data_row[2]
-            if data_row[0] == "11C":
-                XIC_amount = XIC_amount + data_row[1]
-                # XIC_amount_ytd = data_row[2]
-            if data_row[0] == "12":
-                XII_amount = XII_amount + data_row[1]
-                # XII_amount_ytd = data_row[2]
-            if data_row[0] == "13":
-                XIII_amount = XIII_amount + data_row[1]
-                # XIII_amount_ytd = data_row[2]
-            if data_row[0] == "14":
-                XIV_amount = XIV_amount + data_row[1]
-                # XIV_amount_ytd = data_row[2]
-            if data_row[0] == "15":
-                XV_amount = XV_amount + data_row[1]
-                # XV_amount_ytd = data_row[2]
-            if data_row[0] == "16":
-                XVI_amount = XVI_amount + data_row[1]
-                # XVI_amount_ytd = data_row[2]
-            if data_row[0] == "17":
-                XVII_amount = XVII_amount + data_row[1]
-                # XVII_amount_ytd = data_row[2]
-            if data_row[0] == "18A":
-                XVIIIA_amount = XVIIIA_amount + data_row[1]
-                # XVIIIA_amount_ytd = data_row[2]
-            if data_row[0] == "18B":
-                XVIIIB_amount = XVIIIB_amount + data_row[1]
-                # XVIIIB_amount_ytd = data_row[2]
-
-        for row in ytd_trans:
-            data_row = list(row)
-            if data_row[0] in ["11AI", "11A"]:
-                # XIAI_amount = XIAI_amount + data_row[1]
-                XIAI_amount_ytd = data_row[1]
-            if data_row[0] == "11AII":
-                # XIAII_amount = XIAII_amount + data_row[1]
-                XIAII_amount_ytd = data_row[1]
-            if data_row[0] == "11B":
-                # XIB_amount = XIB_amount + data_row[1]
-                XIB_amount_ytd = data_row[1]
-            if data_row[0] == "11C":
-                # XIC_amount = XIC_amount + data_row[1]
-                XIC_amount_ytd = data_row[1]
-            if data_row[0] == "12":
-                # XII_amount = XII_amount + data_row[1]
-                XII_amount_ytd = data_row[1]
-            if data_row[0] == "13":
-                # XIII_amount = XIII_amount + data_row[1]
-                XIII_amount_ytd = data_row[1]
-            if data_row[0] == "14":
-                # XIV_amount = XIV_amount + data_row[1]
-                XIV_amount_ytd = data_row[1]
-            if data_row[0] == "15":
-                # XV_amount = XV_amount + data_row[1]
-                XV_amount_ytd = data_row[1]
-            if data_row[0] == "16":
-                # XVI_amount = XVI_amount + data_row[1]
-                XVI_amount_ytd = data_row[1]
-            if data_row[0] == "17":
-                # XVII_amount = XVII_amount + data_row[1]
-                XVII_amount_ytd = data_row[1]
-            if data_row[0] == "18A":
-                # XVIIIA_amount = XVIIIA_amount + data_row[1]
-                XVIIIA_amount_ytd = data_row[1]
-            if data_row[0] == "18B":
-                # XVIIIB_amount = XVIIIB_amount + data_row[1]
-                XVIIIB_amount_ytd = data_row[1]
+        if rep_trans:
+            for row in rep_trans:
+                data_row = list(row)
+                if data_row[0] in ["11AI", "11A"]:
+                    XIAI_amount = XIAI_amount + data_row[1]
+                    # XIAI_amount_ytd = data_row[2]
+                if data_row[0] == "11AII":
+                    XIAII_amount = XIAII_amount + data_row[1]
+                    # XIAII_amount_ytd = data_row[2]
+                if data_row[0] == "11B":
+                    XIB_amount = XIB_amount + data_row[1]
+                    # XIB_amount_ytd = data_row[2]
+                if data_row[0] == "11C":
+                    XIC_amount = XIC_amount + data_row[1]
+                    # XIC_amount_ytd = data_row[2]
+                if data_row[0] == "12":
+                    XII_amount = XII_amount + data_row[1]
+                    # XII_amount_ytd = data_row[2]
+                if data_row[0] == "13":
+                    XIII_amount = XIII_amount + data_row[1]
+                    # XIII_amount_ytd = data_row[2]
+                if data_row[0] == "14":
+                    XIV_amount = XIV_amount + data_row[1]
+                    # XIV_amount_ytd = data_row[2]
+                if data_row[0] == "15":
+                    XV_amount = XV_amount + data_row[1]
+                    # XV_amount_ytd = data_row[2]
+                if data_row[0] == "16":
+                    XVI_amount = XVI_amount + data_row[1]
+                    # XVI_amount_ytd = data_row[2]
+                if data_row[0] == "17":
+                    XVII_amount = XVII_amount + data_row[1]
+                    # XVII_amount_ytd = data_row[2]
+                if data_row[0] == "18A":
+                    XVIIIA_amount = XVIIIA_amount + data_row[1]
+                    # XVIIIA_amount_ytd = data_row[2]
+                if data_row[0] == "18B":
+                    XVIIIB_amount = XVIIIB_amount + data_row[1]
+                    # XVIIIB_amount_ytd = data_row[2]
+        if ytd_trans:
+            for row in ytd_trans:
+                data_row = list(row)
+                if data_row[0] in ["11AI", "11A"]:
+                    # XIAI_amount = XIAI_amount + data_row[1]
+                    XIAI_amount_ytd = data_row[1]
+                if data_row[0] == "11AII":
+                    # XIAII_amount = XIAII_amount + data_row[1]
+                    XIAII_amount_ytd = data_row[1]
+                if data_row[0] == "11B":
+                    # XIB_amount = XIB_amount + data_row[1]
+                    XIB_amount_ytd = data_row[1]
+                if data_row[0] == "11C":
+                    # XIC_amount = XIC_amount + data_row[1]
+                    XIC_amount_ytd = data_row[1]
+                if data_row[0] == "12":
+                    # XII_amount = XII_amount + data_row[1]
+                    XII_amount_ytd = data_row[1]
+                if data_row[0] == "13":
+                    # XIII_amount = XIII_amount + data_row[1]
+                    XIII_amount_ytd = data_row[1]
+                if data_row[0] == "14":
+                    # XIV_amount = XIV_amount + data_row[1]
+                    XIV_amount_ytd = data_row[1]
+                if data_row[0] == "15":
+                    # XV_amount = XV_amount + data_row[1]
+                    XV_amount_ytd = data_row[1]
+                if data_row[0] == "16":
+                    # XVI_amount = XVI_amount + data_row[1]
+                    XVI_amount_ytd = data_row[1]
+                if data_row[0] == "17":
+                    # XVII_amount = XVII_amount + data_row[1]
+                    XVII_amount_ytd = data_row[1]
+                if data_row[0] == "18A":
+                    # XVIIIA_amount = XVIIIA_amount + data_row[1]
+                    XVIIIA_amount_ytd = data_row[1]
+                if data_row[0] == "18B":
+                    # XVIIIB_amount = XVIIIB_amount + data_row[1]
+                    XVIIIB_amount_ytd = data_row[1]
 
 
         XIA_amount = XIA_amount + XIAI_amount + XIAII_amount
@@ -9248,3 +9342,22 @@ def prepare_Schedl_summary_data(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+def get_original_amount_by_redesignation_id(
+    transaction_id
+    ):
+
+    try:
+        with connection.cursor() as cursor:
+            if transaction_id:
+                query_string = """SELECT expenditure_amount
+                FROM public.sched_b 
+                WHERE  redesignation_id = %s AND redesignation_ind = 'O'"""
+
+                cursor.execute(query_string ,[transaction_id],)
+                print(cursor.query)
+                original_amount = cursor.fetchone()
+                return original_amount
+            else: 
+                raise Exception("No transaction id found");
+    except Exception:
+        raise

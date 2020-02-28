@@ -392,22 +392,26 @@ def create_json_builders(request):
                     DB_table = "public." + schedule_name.get('sched_type')
                     list_identifier = get_transaction_type_identifier(
                         DB_table, report_id, cmte_id, transaction_id_list)
+                    print('****')
                     print(list_identifier)
                     for identifier in list_identifier:
                         identifier = identifier.get('transaction_type_identifier')
                         # print(identifier)
                         # Handling transaction id list: Having no child transactions printed if transaction id list is specified
-                        if transaction_id_list:
-                            child_identifier_list = []
-                        else:
-                            child_identifier_list = get_child_identifer(
+                        # *******************************************
+                        # if transaction_id_list:
+                        #     child_identifier_list = []
+                        # else:
+                        child_identifier_list = get_child_identifer(
                                 identifier, form_type)
+                                # ********************************************
                         # SQL QUERY to get all transactions of the specific identifier
                         if identifier not in ALL_CHILD_TRANSACTION_TYPES_LIST:
-                            # print('parent')
+                            print('*****')
+                            print('parent')
                             parent_transactions = get_transactions(
                                 identifier, report_id, cmte_id, None, transaction_id_list)
-                            # print(parent_transactions)
+                            print(parent_transactions)
                         else:
                             # print('here')
                             # Handling transaction id list: getting data for child transactions mentioned in transaction list
