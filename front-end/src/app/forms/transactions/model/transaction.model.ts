@@ -73,6 +73,17 @@ export class TransactionModel {
   candSupportOpposeFlag:string;
   candElectionOtherDesc: string;
 
+  //used by sched f core child trx
+  coordinatedExpInd: string;
+  designatingCmteId: string;
+  designatingCmteName: string;
+  subordinateCmteId: string;
+  subordinateCmteName: string;
+  subordinateCmteStreet_1: string;
+  subordinateCmteStreet_2: string;
+  subordinateCmteCity: string;
+  subordinateCmteState: string;
+  subordinateCmteZip: string;
 
 
 

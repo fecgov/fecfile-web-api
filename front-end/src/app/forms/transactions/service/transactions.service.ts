@@ -395,6 +395,18 @@ export class TransactionsService {
     model.candElectionYear = row.cand_election_year;
     model.candElectionOtherDesc = row.election_other_desc;
     model.candSupportOpposeFlag = row.support_oppose_code;
+
+    // sched f core child
+    model.coordinatedExpInd = row.coordinated_exp_ind;
+    model.designatingCmteId = row.designating_cmte_id;
+    model.designatingCmteName = row.designating_cmte_name;
+    model.subordinateCmteId = row.subordinate_cmte_id;
+    model.subordinateCmteName = row.subordinate_cmte_name;
+    model.subordinateCmteStreet_1 = row. subordinate_cmte_street_1;
+    model.subordinateCmteStreet_2 = row.subordinate_cmte_street_2;
+    model.subordinateCmteCity = row.subordinate_cmte_city;
+    model.subordinateCmteState = row.subordinate_cmte_state;
+    model.subordinateCmteZip = row.subordinate_cmte_zip;
   }
 
   /**
