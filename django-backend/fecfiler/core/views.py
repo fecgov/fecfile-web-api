@@ -3721,9 +3721,9 @@ def get_all_transactions(request):
                     if ctgry_type == "disbursements_tran":
                         for transaction in transaction_list:
                             if transaction['isRedesignation'] is True:
-                                original_amount = get_original_amount_by_redesignation_id(transaction['transaction_id']);
-                                transaction['original_amount'] = original_amount[0]
-                                logger.debug('')
+                                original_amount = get_original_amount_by_redesignation_id(transaction['transaction_id'])
+                                if original_amount is not None:
+                                    transaction['original_amount'] = original_amount[0]
                     transaction_dict = {
                         trans.get("transaction_id"): trans for trans in transaction_list
                     }
