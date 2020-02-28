@@ -1,3 +1,4 @@
+import { ReportTypeService } from './../../form-3x/report-type/report-type.service';
 import { TransactionsService } from './../../transactions/service/transactions.service';
 import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
@@ -143,7 +144,8 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
-    private _transactionService: TransactionsService
+    private _transactionService: TransactionsService, 
+    private _reportTypeService: ReportTypeService
   ) {
     this.showPinColumnsSubscription = this._LoanMessageService.getShowPinColumnMessage()
       .subscribe(
@@ -601,6 +603,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     }
     // otherwise, no show.
     return false;
+  }
+
+  public printLoan(loan){
+    this._reportTypeService.printPreview('transaction_table_screen', '3X', loan.transaction_id);
   }
 
 
