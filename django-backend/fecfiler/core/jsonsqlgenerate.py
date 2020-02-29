@@ -141,7 +141,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 list_SA_similar_OFFSET = ["OFFSET_TO_OPEX", "LOAN_REPAY_RCVD"]
                 list_SA_similar_REF_FED_CAN = ["REF_TO_FED_CAN"]
-                list_SA_similar_OTH_REC = ["OTH_REC"]
+                list_SA_similar_OTH_REC = ["OTH_REC", "OTH_REC_DEBT"]
                 list_SA_similar_REF_NFED_CAN = ["REF_TO_OTH_CMTE"]
 
                 SA_OTHER_STRING = ""
@@ -1419,7 +1419,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(CORD_REIM_STRING)
                 file.close()
 
-                List_SD_similar_DEBT= ['DEBT_TO_VENDOR']
+                List_SD_similar_DEBT= ['DEBT_TO_VENDOR', 'DEBT_BY_VENDOR']
                 DEBT_STRING = ""
                 for tran in List_SD_similar_DEBT:
 
@@ -1446,7 +1446,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     COALESCE(t1.payment_amount, 0.0) AS "paymentAmount",
                     COALESCE(t1.balance_at_close, 0.0) AS "balanceAtClose"
                     FROM public.sched_d t1
-                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.creditor_entity_id
+                    LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
