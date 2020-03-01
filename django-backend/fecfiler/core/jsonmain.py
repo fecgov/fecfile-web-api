@@ -77,6 +77,8 @@ list_of_SL_SA_transaction_types = ['LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_O
 list_of_SL_SB_transaction_types = ['LEVIN_VOTER_ID', 'LEVIN_GOTV', 'LEVIN_GEN', 'LEVIN_OTH_DISB', 'LEVIN_VOTER_REG']
 
 
+logger = logging.getLogger(__name__)
+
 def get_header_details():
     return {
         "version": "8.3",
@@ -217,6 +219,7 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
     try:
         query_1 = """SELECT query_string FROM public.tran_query_string WHERE tran_type_identifier = %s"""
         query_values_list_1 = [identifier]
+        # print('get_transactions...')
         # print('identifier: '+ identifier)
         output = json_query(query_1, query_values_list_1,
                             "tran_query_string", False)[0]
@@ -231,6 +234,8 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
             query_values_list = [report_id, cmte_id,
                 back_ref_transaction_id, back_ref_transaction_id]
         error_string = identifier + ". Get all transactions"
+        # print(query)
+        # print(query_values_list)
         return json_query(query, query_values_list, error_string, True)
     except Exception:
         raise
@@ -319,6 +324,7 @@ def create_json_builders(request):
     try:
         # import ipdb;ipdb.set_trace()
         # print("request",request)
+        logger.debug('create json builder with {}'.format(request))
         MANDATORY_INPUTS = ['report_id', 'call_from'] 
         error_string = ""
         output = {}
@@ -360,6 +366,8 @@ def create_json_builders(request):
                 'transaction_id').replace(" ", "")
             transaction_id_list = transaction_id_string.split(',')
         # Populating output json with header and data values
+        # print('*** transaction id list***')
+        logger.debug('transaction is list:{}'.format(transaction_id_list))
         output['header'] = get_header_details()
         output['data'] = get_data_details(report_id, cmte_id)
         # Figuring out the form type
@@ -392,8 +400,8 @@ def create_json_builders(request):
                     DB_table = "public." + schedule_name.get('sched_type')
                     list_identifier = get_transaction_type_identifier(
                         DB_table, report_id, cmte_id, transaction_id_list)
-                    print('****')
-                    print(list_identifier)
+                    # print('****')
+                    # print(list_identifier)
                     for identifier in list_identifier:
                         identifier = identifier.get('transaction_type_identifier')
                         # print(identifier)
@@ -404,14 +412,16 @@ def create_json_builders(request):
                         # else:
                         child_identifier_list = get_child_identifer(
                                 identifier, form_type)
+                        # print('**********child identifer list')
+                        # print(child_identifier_list)
                                 # ********************************************
                         # SQL QUERY to get all transactions of the specific identifier
                         if identifier not in ALL_CHILD_TRANSACTION_TYPES_LIST:
-                            print('*****')
-                            print('parent')
+                            # print('*****')
+                            # print('parent')
                             parent_transactions = get_transactions(
                                 identifier, report_id, cmte_id, None, transaction_id_list)
-                            print(parent_transactions)
+                            # print(parent_transactions)
                         else:
                             # print('here')
                             # Handling transaction id list: getting data for child transactions mentioned in transaction list
@@ -464,8 +474,8 @@ def create_json_builders(request):
             file_obj = {'json_file': ('data.json', open(
                 tmp_path, 'rb'), 'application/json')}
 
-            print("data_obj = ", data_obj)
-            print("file_obj = ", file_obj)
+            # print("data_obj = ", data_obj)
+            # print("file_obj = ", file_obj)
             resp = requests.post(settings.NXG_FEC_PRINT_API_URL +
                                  settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
 
@@ -488,8 +498,8 @@ def create_json_builders(request):
                         }
             file_obj = {'fecDataFile': ('data.json', open(
                 tmp_path, 'rb'), 'application/json')}
-            print("data_obj = ", data_obj)
-            print("file_obj = ", file_obj)
+            # print("data_obj = ", data_obj)
+            # print("file_obj = ", file_obj)
 
             add_log(report_id,
                 cmte_id, 
