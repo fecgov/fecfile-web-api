@@ -101,6 +101,7 @@
           
           <app-sched-e
             [hidden]="scheduleType !== 'sched_e'"
+            [mainTransactionTypeText]="mainTransactionTypeText"
             [transactionTypeText]="transactionTypeText"
             [transactionType]="transactionType"
             [scheduleAction]="scheduleAction"
@@ -117,6 +118,7 @@
               scheduleType !== 'sched_h6' &&
               scheduleType !== 'sched_L'
             "
+            [mainTransactionTypeText]="mainTransactionTypeText"
             [transactionTypeText]="transactionTypeText"
             [transactionType]="transactionType"
             [scheduleAction]="scheduleAction"
@@ -131,6 +133,7 @@
           [hidden]="scheduleType !== 'sched_f'"
           [formType]="'3X'"
           [forceChangeDetection]="forceChangeDetectionFDebtPayment"
+          [mainTransactionTypeText]="mainTransactionTypeText"
           [transactionTypeText]="transactionTypeTextSchedF"
           [transactionType]="transactionTypeSchedF"
           [scheduleAction]="scheduleFAction"
@@ -253,6 +256,7 @@
         </app-sched-h5>
         <app-sched-h4
           [hidden]="transactionType !== 'ALLOC_H4_TYPES' && transactionType !== 'ALLOC_H4_SUM'"
+          [mainTransactionTypeText]="mainTransactionTypeText"
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"
@@ -262,6 +266,7 @@
         </app-sched-h4>
         <app-sched-h6
           [hidden]="transactionType !== 'ALLOC_H6_TYPES' && transactionType !== 'ALLOC_H6_SUM'"
+          [mainTransactionTypeText]="mainTransactionTypeText"
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"
@@ -277,6 +282,7 @@
             transactionType !== 'LB_SUM' &&
             transactionType !== 'L_SUM'
           "
+          [mainTransactionTypeText]="mainTransactionTypeText"
           [transactionTypeText]="transactionTypeText"
           [transactionType]="transactionType"
           [scheduleAction]="scheduleAction"

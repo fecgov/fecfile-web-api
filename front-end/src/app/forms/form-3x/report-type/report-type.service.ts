@@ -196,20 +196,26 @@ export class ReportTypeService {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url = '/core/reports';
-    
+
     let params = new HttpParams();
     let formData: FormData = new FormData();
     console.log('signandSaveSubmitReport called');
     console.log('signandSaveSubmitReport formType = ', formType);
     console.log('signandSaveSubmitReport access_type = ', access_type);
 
+    // Adding CommitteeId and CommitteeName details to payload while submitting a report
+    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    formData.append('committeeid', committeeDetails.committeeid);
+    formData.append('committeename', committeeDetails.committeename);
+
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+
 
     if (form3xReportType === null) {
       console.log('get backup object');
-      form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
+      form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
       console.log('backup object form3xReportType = ', form3xReportType);
     }
 

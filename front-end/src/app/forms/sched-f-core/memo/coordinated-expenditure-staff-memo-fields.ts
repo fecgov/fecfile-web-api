@@ -1,5 +1,5 @@
-export class CoordinatedExpenditurePayrollFields {
-  public readonly coordinatedExpenditurePayrollFields = {
+export class CoordinatedExpenditureStaffMemoFields {
+  public readonly coordinatedExpenditureStaffMemoFields = {
     data: {
       formFields: [
         {
@@ -405,7 +405,7 @@ export class CoordinatedExpenditurePayrollFields {
             {
               preText: null,
               setEntityIdTo: 'entity_id',
-              isReadonly: false,
+              isReadonly: true,
               entityGroup: null,
               toggle: false,
               inputGroup: false,
@@ -415,7 +415,7 @@ export class CoordinatedExpenditurePayrollFields {
               infoText: 'Request language from RAD',
               name: 'memo_code',
               type: 'checkbox',
-              value: null,
+              value: 'X',
               scroll: false,
               height: '24px',
               width: '24px',
@@ -434,7 +434,7 @@ export class CoordinatedExpenditurePayrollFields {
           seperator: true,
           cols: [
             {
-              preText: 'Payroll Payment',
+              preText: null,
               setEntityIdTo: 'entity_id',
               isReadonly: true,
               entityGroup: null,
@@ -446,7 +446,7 @@ export class CoordinatedExpenditurePayrollFields {
               infoText: 'Request language from RAD',
               name: 'purpose',
               type: 'text',
-              value: 'Payroll Payment',
+              value: 'Staff Reimbursement Memo',
               scroll: true,
               height: '30px',
               width: '380px',
@@ -765,12 +765,6 @@ export class CoordinatedExpenditurePayrollFields {
           name: 'api_call',
           value: '/sf/schedF'
         },
-        // Removed Spec F3x Schedule F 8.8.19
-        // {
-        //   type: 'hidden',
-        //   name: 'entity_type',
-        //   value: 'ORG'
-        // },
         {
           type: 'hidden',
           name: 'beneficiary_cand_entity_id',
@@ -804,12 +798,7 @@ export class CoordinatedExpenditurePayrollFields {
         {
           type: 'hidden',
           name: 'transaction_type_identifier',
-          value: 'COEXP_PMT_PROL'
-        },
-        {
-          type: 'hidden',
-          name: 'show_memo_warning',
-          value: true
+          value: 'COEXP_STAF_REIM_MEMO'
         }
       ],
       states: [
@@ -1210,19 +1199,20 @@ export class CoordinatedExpenditurePayrollFields {
       ],
       subTransactions: [
         {
-          transactionType: 'COEXP_PMT_PROL',
-          transactionTypeDescription: 'Coordinated Expenditure Payroll',
+          transactionType: 'COEXP_STAF_REIM',
+          transactionTypeDescription: 'CE Staff Reimbursement',
           scheduleType: 'sched_f_core',
-          subTransactionType: 'COEXP_PMT_PROL_MEMO',
+          subTransactionType: 'COEXP_STAF_REIM_MEMO',
           subScheduleType: 'sched_f_core',
-          subTransactionTypeDescription: 'CE Payroll Memo',
+          subTransactionTypeDescription: 'CE Staff Reimbursement Memo',
           api_call: '/sf/schedF',
-          isParent: true,
+          isParent: false,
           isEarmark: false
         }
       ],
       jfMemoTypes: null
     }
   };
-}
 
+
+}

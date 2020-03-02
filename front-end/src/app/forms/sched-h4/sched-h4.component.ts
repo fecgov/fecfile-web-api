@@ -53,6 +53,7 @@ import {
   ]
 })
 export class SchedH4Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
+  @Input() mainTransactionTypeText: string;
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
@@ -453,6 +454,10 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
       return true;
     }
     return false;
+  }
+
+  public printTransaction(trx: any): void {
+    this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
   }
   
 }

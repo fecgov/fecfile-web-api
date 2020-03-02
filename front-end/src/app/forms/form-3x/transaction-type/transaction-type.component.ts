@@ -44,6 +44,7 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
 
   private _formType: string = '';
   private _mainTransactionCategory: any = [];
+  private _mainTransactionTypeText: string;
   private _transactionCategory: string = '';
   private _transactionCategories: any = [];
 
@@ -193,10 +194,12 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
         step: 'step_3',
         previousStep: 'step_2',
         action: ScheduleActions.add,
+        mainTransactionTypeText: this._mainTransactionTypeText,
         transactionTypeText: this.transactionTypeText,
         transactionType: this.transactionType,
         transactionCategory: this._transactionCategory,
-        scheduleType: this.scheduleType
+        scheduleType: this.scheduleType,
+        showPart2: false
       });
 
       return 1;
@@ -268,6 +271,7 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
     if(this._mainTransactionCategory && this._mainTransactionCategory.length > 0){
       const mainTransactionTypeText: string = this._mainTransactionCategory[0].text;
       const mainTransactionTypeValue: string = this._mainTransactionCategory[0].value;
+      this._mainTransactionTypeText = mainTransactionTypeText;
       const transactionObj: any = {
         mainTransactionTypeText,
         mainTransactionTypeValue,

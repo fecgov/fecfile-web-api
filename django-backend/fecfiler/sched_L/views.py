@@ -31,10 +31,11 @@ from fecfiler.core.views import (
 )
 
 from fecfiler.core.transaction_util import (
-    get_sched_a_transactions, 
-    get_transaction_type_descriptions, 
+    get_sched_a_transactions,
+    get_transaction_type_descriptions,
     do_transaction,
 )
+
 # from fecfiler.sched_A.views import get_next_transaction_id
 # from fecfiler.sched_D.views import do_transaction
 
@@ -42,12 +43,7 @@ from fecfiler.core.transaction_util import (
 # Create your views here.
 logger = logging.getLogger(__name__)
 
-MANDATORY_FIELDS_SCHED_L = [
-    "cmte_id",
-    "report_id", 
-    "transaction_id", 
-    "record_id",
-]
+MANDATORY_FIELDS_SCHED_L = ["cmte_id", "report_id", "transaction_id", "record_id"]
 
 LA_TRANSACTIONS = [
     "LEVIN_OTH_REC",
@@ -68,8 +64,8 @@ LB_TRANSACTIONS = [
     "LEVIN_VOTER_REG",
 ]
 
-API_CALL_LA = {'api_call' : '/sa/schedA'}
-API_CALL_LB = {'api_call' : '/sb/schedB'}
+API_CALL_LA = {"api_call": "/sa/schedA"}
+API_CALL_LB = {"api_call": "/sb/schedB"}
 
 
 def get_next_transaction_id(trans_char):
@@ -77,7 +73,8 @@ def get_next_transaction_id(trans_char):
     try:
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT public.get_next_transaction_id(%s)""", [trans_char])
+                """SELECT public.get_next_transaction_id(%s)""", [trans_char]
+            )
             transaction_id = cursor.fetchone()[0]
             # transaction_id = transaction_ids[0]
         return transaction_id
@@ -118,7 +115,7 @@ def schedL_sql_dict(data):
     filter out valid fileds for sched_L
 
     """
-    print(data)
+    # print(data)
     valid_fields = [
         "cmte_id",
         "report_id",
@@ -166,7 +163,7 @@ def schedL_sql_dict(data):
     try:
         valid_data = {k: v for k, v in data.items() if k in valid_fields}
 
-        print(valid_data)
+        # print(valid_data)
         # if 'levin_account_id' in data:
         #     valid_data['record_id'] = data.get('levin_account_id')
         #     levin_account = get_levin_account(data.get)
@@ -184,10 +181,10 @@ def put_schedL(data):
         check_mandatory_fields_SL(data)
         # check_transaction_id(data.get('transaction_id'))
         try:
-            logger.debug('update sl record with {}'.format(data))
+            logger.debug("update sl record with {}".format(data))
             put_sql_schedL(data)
         except Exception as e:
-            print(e)
+            # print(e)
             raise Exception(
                 "The put_sql_schedL function is throwing an error: " + str(e)
             )
@@ -605,8 +602,7 @@ def delete_schedL(data):
     try:
 
         delete_sql_schedL(
-            data.get("cmte_id"), data.get(
-                "report_id"), data.get("transaction_id")
+            data.get("cmte_id"), data.get("report_id"), data.get("transaction_id")
         )
     except Exception as e:
         raise
@@ -638,8 +634,7 @@ def schedL(request):
                 datum["record_id"] = levin_acct_id
                 levin_account = get_levin_account(cmte_id, levin_acct_id)
                 if levin_account:
-                    datum["account_name"] = levin_account[0].get(
-                        "levin_account_name")
+                    datum["account_name"] = levin_account[0].get("levin_account_name")
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
             ):
@@ -698,8 +693,7 @@ def schedL(request):
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
-                data["report_id"] = check_report_id(
-                    request.data.get("report_id"))
+                data["report_id"] = check_report_id(request.data.get("report_id"))
             else:
                 raise Exception("Missing Input: report_id is mandatory")
             if "transaction_id" in request.data and check_null_value(
@@ -748,8 +742,7 @@ def schedL(request):
                 datum["record_id"] = levin_acct_id
                 levin_account = get_levin_account(cmte_id, levin_acct_id)
                 if levin_account:
-                    datum["account_name"] = levin_account[0].get(
-                        "levin_account_name")
+                    datum["account_name"] = levin_account[0].get("levin_account_name")
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
             # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
@@ -804,12 +797,11 @@ def load_ytd_disbursements_summary(cmte_id, start_dt, end_dt, levin_account_id=N
             GROUP BY t1.transaction_type_identifier 
         """
     try:
-        logger.debug('loading LB ytd...')
+        logger.debug("loading LB ytd...")
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             if levin_account_id:
-                cursor.execute(
-                    _sql, (cmte_id, start_dt, end_dt, levin_account_id))
+                cursor.execute(_sql, (cmte_id, start_dt, end_dt, levin_account_id))
             else:
                 cursor.execute(_sql, (cmte_id, start_dt, end_dt))
             # rows = cursor.fetchall()
@@ -833,15 +825,15 @@ def load_ytd_disbursements_summary(cmte_id, start_dt, end_dt, levin_account_id=N
                 + float(result["gotv_disb_amount_ytd"])
                 + float(result["generic_campaign_disb_amount_ytd"])
             )
-            result["total_disb_ytd"] = float(
-                result["other_disb_ytd"]
-            ) + float(result["total_disb_sub_ytd"])
+            result["total_disb_ytd"] = float(result["other_disb_ytd"]) + float(
+                result["total_disb_sub_ytd"]
+            )
     except Exception as e:
         raise Exception(
             "Error happens when query and calcualte dsibursements:" + str(e)
         )
     # print('dsibursement ytd:{}'.format(result))
-    logger.debug('LB ytd data:{}'.format(result))
+    logger.debug("LB ytd data:{}".format(result))
     return result
 
 
@@ -903,12 +895,11 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
         """
 
     try:
-        logger.debug('loading LA ytd...')
+        logger.debug("loading LA ytd...")
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             if levin_account_id:
-                cursor.execute(_sql1, (cmte_id, start_dt,
-                                       end_dt, levin_account_id))
+                cursor.execute(_sql1, (cmte_id, start_dt, end_dt, levin_account_id))
             else:
                 cursor.execute(_sql1, (cmte_id, start_dt, end_dt))
             # print(cursor.rowcount)
@@ -921,13 +912,12 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
                         result["unitem_receipts_ytd"] = row[1]
                     else:
                         pass
-            result["total_c_receipts_ytd"] = float(
-                result["item_receipts_ytd"]
-            ) + float(result["unitem_receipts_ytd"])
+            result["total_c_receipts_ytd"] = float(result["item_receipts_ytd"]) + float(
+                result["unitem_receipts_ytd"]
+            )
 
             if levin_account_id:
-                cursor.execute(_sql2, (cmte_id, start_dt,
-                                       end_dt, levin_account_id))
+                cursor.execute(_sql2, (cmte_id, start_dt, end_dt, levin_account_id))
             else:
                 cursor.execute(_sql2, (cmte_id, start_dt, end_dt))
             # print(cursor.rowcount)
@@ -939,10 +929,9 @@ def load_ytd_receipts_summary(cmte_id, start_dt, end_dt, levin_account_id=None):
             ) + float(result["other_receipts_ytd"])
 
     except Exception as e:
-        raise Exception(
-            "Error happens when query ytd receipts amount:" + str(e))
+        raise Exception("Error happens when query ytd receipts amount:" + str(e))
     # print(result)
-    logger.debug('LA ytd data:{}'.format(result))
+    logger.debug("LA ytd data:{}".format(result))
     return result
 
 
@@ -981,7 +970,7 @@ def load_report_disbursements_sumamry(cmte_id, report_id, levin_account_id=None)
         """
 
     try:
-        logger.debug('loading LB data...')
+        logger.debug("loading LB data...")
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             if levin_account_id:
@@ -1011,15 +1000,15 @@ def load_report_disbursements_sumamry(cmte_id, report_id, levin_account_id=None)
                 + float(result["gotv_disb_amount"])
                 + float(result["generic_campaign_disb_amount"])
             )
-            result["total_disb"] = float(
-                result["other_disb"]
-            ) + float(result["total_disb_sub"])
+            result["total_disb"] = float(result["other_disb"]) + float(
+                result["total_disb_sub"]
+            )
     except Exception as e:
         raise Exception(
             "Error happens when query and calcualte disbursements:" + str(e)
         )
     # print(result)
-    logger.debug('LB result:{}'.format(result))
+    logger.debug("LB result:{}".format(result))
     return result
 
 
@@ -1078,7 +1067,8 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
         """
 
     logger.debug(
-        'loading receipts summary: cmte_id {}, report_id {}'.format(cmte_id, report_id))
+        "loading receipts summary: cmte_id {}, report_id {}".format(cmte_id, report_id)
+    )
     result = {}
     result["item_receipts"] = 0
     result["unitem_receipts"] = 0
@@ -1089,7 +1079,7 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
                 cursor.execute(_sql1, (cmte_id, report_id, levin_account_id))
             else:
                 cursor.execute(_sql1, (cmte_id, report_id))
-            logger.debug('rows retrieved:{}'.format(cursor.rowcount))
+            logger.debug("rows retrieved:{}".format(cursor.rowcount))
             if cursor.rowcount:
 
                 rows = cursor.fetchall()
@@ -1105,11 +1095,11 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
                 #     result["itemized_receipt_amount"] = 0
                 #     result["non-itemized_receipt_amount"] = 0
 
-            result["total_c_receipts"] = float(
-                result["item_receipts"]
-            ) + float(result["unitem_receipts"])
+            result["total_c_receipts"] = float(result["item_receipts"]) + float(
+                result["unitem_receipts"]
+            )
 
-            logger.debug('loading other la transactions:')
+            logger.debug("loading other la transactions:")
             if levin_account_id:
                 cursor.execute(_sql2, (cmte_id, report_id, levin_account_id))
             else:
@@ -1119,10 +1109,10 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
                 result["other_receipts"] = cursor.fetchone()[0]
             else:
                 result["other_receipts"] = 0
-            result["total_receipts"] = float(
-                result["total_c_receipts"]
-            ) + float(result["other_receipts"])
-            logger.debug('receipts summary:{}'.format(result))
+            result["total_receipts"] = float(result["total_c_receipts"]) + float(
+                result["other_receipts"]
+            )
+            logger.debug("receipts summary:{}".format(result))
     except Exception as e:
         raise Exception(
             "Error happens when query and calcualte receipts amount:" + str(e)
@@ -1132,7 +1122,7 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
 
 def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
     try:
-        logger.debug('****loading coh beginning data...')
+        logger.debug("****loading coh beginning data...")
         # if levin_account_id:
         # levin_account_id = str(levin)
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
@@ -1141,7 +1131,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-            print(prev_cvg_end_dt)
+            # print(prev_cvg_end_dt)
         with connection.cursor() as cursor:
             if levin_account_id:
                 cursor.execute(
@@ -1174,18 +1164,20 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
                 coh_cop = result[0]
                 if not coh_cop:
                     coh_cop = 0
-        logger.debug('coh result:{}'.format(coh_cop))
+        logger.debug("coh result:{}".format(coh_cop))
         return float(coh_cop)
     except Exception as e:
         raise Exception(
-            "The prev_cash_on_hand_cop function is throwing an error: " +
-            str(e)
+            "The prev_cash_on_hand_cop function is throwing an error: " + str(e)
         )
 
 
 #############
 
-def load_ytd_disbursements_summary_api(cmte_id, start_dt, end_dt, levin_account_id=None):
+
+def load_ytd_disbursements_summary_api(
+    cmte_id, start_dt, end_dt, levin_account_id=None
+):
     """
     load year_to_date disbursement amount
     """
@@ -1222,8 +1214,7 @@ def load_ytd_disbursements_summary_api(cmte_id, start_dt, end_dt, levin_account_
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             if levin_account_id:
-                cursor.execute(
-                    _sql, (cmte_id, start_dt, end_dt, levin_account_id))
+                cursor.execute(_sql, (cmte_id, start_dt, end_dt, levin_account_id))
             else:
                 cursor.execute(_sql, (cmte_id, start_dt, end_dt))
             # rows = cursor.fetchall()
@@ -1319,8 +1310,7 @@ def load_ytd_receipts_summary_api(cmte_id, start_dt, end_dt, levin_account_id=No
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             if levin_account_id:
-                cursor.execute(_sql1, (cmte_id, start_dt,
-                                       end_dt, levin_account_id))
+                cursor.execute(_sql1, (cmte_id, start_dt, end_dt, levin_account_id))
             else:
                 cursor.execute(_sql1, (cmte_id, start_dt, end_dt))
             # print(cursor.rowcount)
@@ -1338,8 +1328,7 @@ def load_ytd_receipts_summary_api(cmte_id, start_dt, end_dt, levin_account_id=No
             ) + float(result["non_itemized_receipt_amount_ytd"])
 
             if levin_account_id:
-                cursor.execute(_sql2, (cmte_id, start_dt,
-                                       end_dt, levin_account_id))
+                cursor.execute(_sql2, (cmte_id, start_dt, end_dt, levin_account_id))
             else:
                 cursor.execute(_sql2, (cmte_id, start_dt, end_dt))
             # print(cursor.rowcount)
@@ -1351,8 +1340,7 @@ def load_ytd_receipts_summary_api(cmte_id, start_dt, end_dt, levin_account_id=No
             ) + float(result["other_sl_receipt_amount_ytd"])
 
     except Exception as e:
-        raise Exception(
-            "Error happens when query ytd receipts amount:" + str(e))
+        raise Exception("Error happens when query ytd receipts amount:" + str(e))
     # print(result)
     return result
 
@@ -1486,7 +1474,8 @@ def load_report_receipts_summary_api(cmte_id, report_id, levin_account_id=None):
         """
 
     logger.debug(
-        'loading receipts summary: cmte_id {}, report_id {}'.format(cmte_id, report_id))
+        "loading receipts summary: cmte_id {}, report_id {}".format(cmte_id, report_id)
+    )
     result = {}
     result["itemized_receipt_amount"] = 0
     result["non_itemized_receipt_amount"] = 0
@@ -1497,7 +1486,7 @@ def load_report_receipts_summary_api(cmte_id, report_id, levin_account_id=None):
                 cursor.execute(_sql1, (cmte_id, report_id, levin_account_id))
             else:
                 cursor.execute(_sql1, (cmte_id, report_id))
-            logger.debug('rows retrieved:{}'.format(cursor.rowcount))
+            logger.debug("rows retrieved:{}".format(cursor.rowcount))
             if cursor.rowcount:
 
                 rows = cursor.fetchall()
@@ -1517,7 +1506,7 @@ def load_report_receipts_summary_api(cmte_id, report_id, levin_account_id=None):
                 result["itemized_receipt_amount"]
             ) + float(result["non_itemized_receipt_amount"])
 
-            logger.debug('loading other la transactions:')
+            logger.debug("loading other la transactions:")
             if levin_account_id:
                 cursor.execute(_sql2, (cmte_id, report_id, levin_account_id))
             else:
@@ -1530,7 +1519,7 @@ def load_report_receipts_summary_api(cmte_id, report_id, levin_account_id=None):
             result["total_receipt_amount"] = float(
                 result["itemized_non_itemized_combined"]
             ) + float(result["other_sl_receipt_amount"])
-            logger.debug('receipts summary:{}'.format(result))
+            logger.debug("receipts summary:{}".format(result))
     except Exception as e:
         raise Exception(
             "Error happens when query and calcualte receipts amount:" + str(e)
@@ -1539,8 +1528,6 @@ def load_report_receipts_summary_api(cmte_id, report_id, levin_account_id=None):
 
 
 ############
-
-
 
 
 @api_view(["GET"])
@@ -1588,8 +1575,7 @@ def get_sl_summary_table(request):
             raise Exception("Missing Input: calendar_year is mandatory")
 
         report_id = check_report_id(request.query_params.get("report_id"))
-        calendar_year = check_calendar_year(
-            request.query_params.get("calendar_year"))
+        calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
 
         # period_args = [
         cal_start = (datetime.date(int(calendar_year), 1, 1),)
@@ -1601,28 +1587,39 @@ def get_sl_summary_table(request):
         # report_id,
         # ]
         # query and calculate receipt amount for current report
-        levin_account_id = request.query_params.get('levin_account_id')
+        levin_account_id = request.query_params.get("levin_account_id")
         if levin_account_id:
-            response.update(load_report_receipts_summary_api(
-                cmte_id, report_id, levin_account_id))
-            response.update(load_report_disbursements_sumamry_api(
-                cmte_id, report_id, levin_account_id))
-            response.update(load_ytd_receipts_summary_api(
-                cmte_id, cal_start, cal_end, levin_account_id))
-            response.update(load_ytd_disbursements_summary_api(
-                cmte_id, cal_start, cal_end, levin_account_id))
+            response.update(
+                load_report_receipts_summary_api(cmte_id, report_id, levin_account_id)
+            )
+            response.update(
+                load_report_disbursements_sumamry_api(
+                    cmte_id, report_id, levin_account_id
+                )
+            )
+            response.update(
+                load_ytd_receipts_summary_api(
+                    cmte_id, cal_start, cal_end, levin_account_id
+                )
+            )
+            response.update(
+                load_ytd_disbursements_summary_api(
+                    cmte_id, cal_start, cal_end, levin_account_id
+                )
+            )
             coh_bop_report = get_cash_on_hand_cop(
-                report_id, cmte_id, False, levin_account_id)
+                report_id, cmte_id, False, levin_account_id
+            )
             coh_bop_ytd = get_cash_on_hand_cop(
-                report_id, cmte_id, True, levin_account_id)
+                report_id, cmte_id, True, levin_account_id
+            )
         else:
             response.update(load_report_receipts_summary_api(cmte_id, report_id))
+            response.update(load_report_disbursements_sumamry_api(cmte_id, report_id))
+            response.update(load_ytd_receipts_summary_api(cmte_id, cal_start, cal_end))
             response.update(
-                load_report_disbursements_sumamry_api(cmte_id, report_id))
-            response.update(load_ytd_receipts_summary_api(
-                cmte_id, cal_start, cal_end))
-            response.update(load_ytd_disbursements_summary_api(
-                cmte_id, cal_start, cal_end))
+                load_ytd_disbursements_summary_api(cmte_id, cal_start, cal_end)
+            )
             coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
             coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
 
@@ -1656,16 +1653,16 @@ def get_sl_summary_table(request):
             "coh_cop_ytd": coh_cop_ytd,
         }
         response.update(cash_summary)
-        subtotal_report = float(response.get('coh_bop_report')) + float(response.get('total_receipt_amount'))
-        subtotal_ytd = float(response.get('coh_bop_ytd')) + float(response.get('total_receipt_amount_ytd'))
-        #adding subtotal numbers
-        response.update(
-            {
-                'subtotal_report' : subtotal_report,
-                'subtotal_ytd' : subtotal_ytd,
-            }
+        subtotal_report = float(response.get("coh_bop_report")) + float(
+            response.get("total_receipt_amount")
         )
-
+        subtotal_ytd = float(response.get("coh_bop_ytd")) + float(
+            response.get("total_receipt_amount_ytd")
+        )
+        # adding subtotal numbers
+        response.update(
+            {"subtotal_report": subtotal_report, "subtotal_ytd": subtotal_ytd}
+        )
 
         """
         calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
@@ -1720,6 +1717,7 @@ def get_sl_transaction_id(cmte_id, report_id, levin_account_id):
     except:
         raise
 
+
 def update_sl_summary(data):
     """
     report-based summary:
@@ -1747,16 +1745,13 @@ def update_sl_summary(data):
 
     we also need a copy of YTD calculation for the same fields
     """
-    logger.debug('update levin summary ...')
-    logger.debug('with data:{}'.format(data))
+    logger.debug("update levin summary ...")
+    logger.debug("with data:{}".format(data))
     sl_data = {}
     try:
-        cmte_id = data.get('cmte_id')
-        report_id = data.get('report_id')
-        levin_account_id = data.get('levin_account_id')
-
-
-
+        cmte_id = data.get("cmte_id")
+        report_id = data.get("report_id")
+        levin_account_id = data.get("levin_account_id")
 
         # if not (
         #     "report_id" in request.query_params
@@ -1781,41 +1776,47 @@ def update_sl_summary(data):
         cal_start = (datetime.date(int(calendar_year), 1, 1),)
         cal_end = cvg_end_date
 
-
-
         # create a levin summary recvord if not exist yet
         # if not sl_record_exist(levin_account_id):
         dummy_data = {
-            'cmte_id':cmte_id,
-            'report_id':report_id,
-            'record_id':levin_account_id,
-            'account_name': get_levin_account(cmte_id, levin_account_id)[0]['levin_account_name'],
-            'cvg_from_date':cvg_start_date,
-            'cvg_end_date':cvg_end_date,
-            'transaction_type_identifier':'SCHED_L_SUM',
+            "cmte_id": cmte_id,
+            "report_id": report_id,
+            "record_id": levin_account_id,
+            "account_name": get_levin_account(cmte_id, levin_account_id)[0][
+                "levin_account_name"
+            ],
+            "cvg_from_date": cvg_start_date,
+            "cvg_end_date": cvg_end_date,
+            "transaction_type_identifier": "SCHED_L_SUM",
         }
         sl_data.update(dummy_data)
-            # post_schedL(dummy_rec)
+        # post_schedL(dummy_rec)
 
         # cmte_id,
         # report_id,
         # ]
         # query and calculate receipt amount for current report
         # levin_account_id = request.query_params.get('levin_account_id')
-        logger.debug('sl_data {}'.format(sl_data))
+        logger.debug("sl_data {}".format(sl_data))
         # if levin_account_id:
-        sl_data.update(load_report_receipts_summary(
-            cmte_id, report_id, levin_account_id))
-        sl_data.update(load_report_disbursements_sumamry(
-            cmte_id, report_id, levin_account_id))
-        sl_data.update(load_ytd_receipts_summary(
-            cmte_id, cal_start, cal_end, levin_account_id))
-        sl_data.update(load_ytd_disbursements_summary(
-            cmte_id, cal_start, cal_end, levin_account_id))
+        sl_data.update(
+            load_report_receipts_summary(cmte_id, report_id, levin_account_id)
+        )
+        sl_data.update(
+            load_report_disbursements_sumamry(cmte_id, report_id, levin_account_id)
+        )
+        sl_data.update(
+            load_ytd_receipts_summary(cmte_id, cal_start, cal_end, levin_account_id)
+        )
+        sl_data.update(
+            load_ytd_disbursements_summary(
+                cmte_id, cal_start, cal_end, levin_account_id
+            )
+        )
         coh_bop_report = get_cash_on_hand_cop(
-            report_id, cmte_id, False, levin_account_id)
-        coh_bop_ytd = get_cash_on_hand_cop(
-            report_id, cmte_id, True, levin_account_id)
+            report_id, cmte_id, False, levin_account_id
+        )
+        coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True, levin_account_id)
         # else:
         #     response.update(load_report_receipts_summary(cmte_id, report_id))
         #     response.update(
@@ -1845,13 +1846,13 @@ def update_sl_summary(data):
             + float(sl_data.get("total_receipts"))
             - float(sl_data.get("total_disb"))
         )
-        logger.debug('coh_cop_report:{}'.format(coh_cop_report))
+        logger.debug("coh_cop_report:{}".format(coh_cop_report))
         coh_cop_ytd = (
             coh_bop_ytd
             + float(sl_data.get("total_receipts_ytd"))
             - float(sl_data.get("total_disb_ytd"))
         )
-        logger.debug('coh_cop_ytd:{}'.format(coh_cop_ytd))
+        logger.debug("coh_cop_ytd:{}".format(coh_cop_ytd))
         cash_summary = {
             "coh_bop": coh_bop_report,
             "coh_coy": coh_bop_ytd,
@@ -1859,20 +1860,20 @@ def update_sl_summary(data):
             "coh_cop_ytd": coh_cop_ytd,
         }
         sl_data.update(cash_summary)
-        logger.debug('sl_data after calculation:{}'.format(sl_data))
+        logger.debug("sl_data after calculation:{}".format(sl_data))
         sl_data = schedL_sql_dict(sl_data)
-        logger.debug('sl data after screening:{}'.format(sl_data))
+        logger.debug("sl data after screening:{}".format(sl_data))
         transaction_id = get_sl_transaction_id(cmte_id, report_id, levin_account_id)
         # print(transaction_id)
         if not transaction_id:
-            logger.debug('no transaction_id found. Saving a new record.')
+            logger.debug("no transaction_id found. Saving a new record.")
             post_schedL(sl_data)
         else:
-            logger.debug('sl transaction_id identified:{}'.format(transaction_id))
-            sl_data['transaction_id'] = transaction_id
+            logger.debug("sl transaction_id identified:{}".format(transaction_id))
+            sl_data["transaction_id"] = transaction_id
             put_schedL(sl_data)
             # sl_data.update({'transaction_id':})
-        logger.debug('update sl done.')
+        logger.debug("update sl done.")
 
         """
         calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
@@ -1971,13 +1972,11 @@ def get_sla_summary_table(request):
         #     raise Exception("Missing Input: calendar_year is mandatory")
 
         report_id = check_report_id(request.query_params.get("report_id"))
-        transaction_tps = ["'" + tp +
-                           "'" for tp in LA_TRANSACTIONS if "MEMO" not in tp]
+        transaction_tps = ["'" + tp + "'" for tp in LA_TRANSACTIONS if "MEMO" not in tp]
         tps_str = ",".join(transaction_tps)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
         logger.debug("transaction_types:{}".format(tps_str))
 
-        
         tran_desc_dic = get_transaction_type_descriptions()
         with connection.cursor() as cursor:
             cursor.execute(_sql_p1 + tps_str + _sql_p2, [cmte_id, report_id])
@@ -1989,17 +1988,20 @@ def get_sla_summary_table(request):
                     obj.update(API_CALL_LA)
                     if obj.get("transaction_type_identifier") == "LEVIN_PARTN_REC":
                         memo_objs = get_la_memos(
-                            cmte_id, obj.get("report_id"), obj.get(
-                                "transaction_id")
+                            cmte_id, obj.get("report_id"), obj.get("transaction_id")
                         )
-                        print('..')
-                        print(memo_objs)
+                        # print("..")
+                        # print(memo_objs)
                         if memo_objs:
                             for m_obj in memo_objs:
-                                levin_account_id, levin_account_name  = load_levin_account_data(m_obj.get('transaction_id'))
-                                m_obj['levin_account_id'] = levin_account_id
-                                m_obj['levin_account_name'] = levin_account_name
-                                m_obj['tran_desc'] = tran_desc_dic.get('LEVIN_PARTN_MEMO')
+                                levin_account_id, levin_account_name = load_levin_account_data(
+                                    m_obj.get("transaction_id")
+                                )
+                                m_obj["levin_account_id"] = levin_account_id
+                                m_obj["levin_account_name"] = levin_account_name
+                                m_obj["tran_desc"] = tran_desc_dic.get(
+                                    "LEVIN_PARTN_MEMO"
+                                )
                                 m_obj.update(API_CALL_LA)
 
                             obj["child"] = memo_objs
@@ -2028,7 +2030,8 @@ def load_levin_account_data(transaction_id):
             _levin = cursor.fetchone()
             return _levin[0], _levin[1]
         else:
-            raise Exception('Error loading levin account.')
+            raise Exception("Error loading levin account.")
+
 
 @api_view(["GET"])
 def get_slb_summary_table(request):
@@ -2070,8 +2073,7 @@ def get_slb_summary_table(request):
         #     raise Exception("Missing Input: calendar_year is mandatory")
 
         report_id = check_report_id(request.query_params.get("report_id"))
-        transaction_tps = ["'" + tp +
-                           "'" for tp in LB_TRANSACTIONS if "MEMO" not in tp]
+        transaction_tps = ["'" + tp + "'" for tp in LB_TRANSACTIONS if "MEMO" not in tp]
         tps_str = ",".join(transaction_tps)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
         logger.debug("transaction_types:{}".format(tps_str))

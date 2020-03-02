@@ -207,27 +207,31 @@ def do_transaction(sql, values):
         raise
 
 
-def update_parent_purpose(data):
+def update_earmark_parent_purpose(data):
     """
     for earmark transaction only:
-    when a earmark child transactions is added or updated,
-    the child entity_name should be update in parents 
+    when an earmark child transaction is added or updated,
+    the child entity_name should be updated in parent transaction 
     'purpose_description' field
+
+    update: part of the description like 'Earmarked for' and 'Earmarked through'
+    is defined in dynamic forms and we only need to update entity name here
     """
     desc_start = {
-        "EAR_REC_CONVEN_ACC_MEMO": "Earmarked for Convention Account ",
-        "EAR_REC_HQ_ACC_MEMO": "Earmarked for Headquarters Account ",
-        "EAR_REC_RECNT_ACC_MEMO": "Earmarked for Recount Account ",
+        # "EAR_REC_CONVEN_ACC_MEMO": "Earmarked for Convention Account ",
+        # "EAR_REC_HQ_ACC_MEMO": "Earmarked for Headquarters Account ",
+        # "EAR_REC_RECNT_ACC_MEMO": "Earmarked for Recount Account ",
     }
     parent_tran_id = data.get("back_ref_transaction_id")
     cmte_id = data.get("cmte_id")
     report_id = data.get("report_id")
     entity_name = data.get("entity_name")
     tran_type = data.get("transaction_type_identifier")
-    if tran_type in desc_start:
-        purpose = desc_start.get(tran_type) + entity_name
-    else:
-        purpose = "Earmarked for " + entity_name
+    # if tran_type in desc_start:
+    #     purpose = desc_start.get(tran_type) + entity_name
+    # else:
+    #     purpose = entity_name
+    purpose = entity_name
     _sql = """
     UPDATE public.sched_a 
     SET purpose_description = %s 
@@ -602,6 +606,14 @@ def get_sched_h6_child_transactions(report_id, cmte_id, transaction_id):
             expenditure_purpose,
             category_code,
             activity_event_type,
+            (
+                CASE
+                WHEN activity_event_type = 'VR' THEN 'Voter Registration'
+                WHEN activity_event_type = 'GO' THEN 'GOTV'
+                WHEN activity_event_type = 'VI' THEN 'Voter ID'
+                WHEN activity_event_type = 'GC' THEN 'Generic Campaign' 
+                ELSE ''::text
+                END) AS activity_event_identifier, 
             memo_code,
             memo_text, 
             create_date
@@ -871,7 +883,7 @@ def get_sched_c2_child(cmte_id, transaction_id):
 
 
 def get_sched_b_transactions(
-    report_id, cmte_id, transaction_id=None, back_ref_transaction_id=None
+    report_id, cmte_id, include_deleted_trans_flag = False, transaction_id=None, back_ref_transaction_id=None
 ):
 
     """
@@ -882,28 +894,54 @@ def get_sched_b_transactions(
         with connection.cursor() as cursor:
             # GET child rows from schedB table
             if transaction_id:
-                query_string = """
-                SELECT cmte_id, report_id, line_number, transaction_type, 
-                                        transaction_id, back_ref_transaction_id, back_ref_sched_name, 
-                                        entity_id, expenditure_date, expenditure_amount, 
-                                        semi_annual_refund_bundled_amount, expenditure_purpose, 
-                                        category_code, memo_code, memo_text, election_code, 
-                                        election_other_description, beneficiary_cmte_id, 
-                                        other_name, other_street_1, 
-                                        other_street_2, other_city, other_state, other_zip, 
-                                        nc_soft_account, transaction_type_identifier, 
-                                        beneficiary_cmte_name,
-                                        beneficiary_cand_entity_id,
-                                        levin_account_id,
-                                        aggregate_amt,
-                                        create_date
-                FROM public.sched_b WHERE report_id in ('{}')
-                AND cmte_id = %s 
-                AND transaction_id = %s 
-                AND delete_ind is distinct from 'Y'
-                """.format(
-                    "', '".join(report_list)
-                )
+                if not include_deleted_trans_flag:
+                    query_string = """
+                    SELECT cmte_id, report_id, line_number, transaction_type, 
+                                            transaction_id, back_ref_transaction_id, back_ref_sched_name, 
+                                            entity_id, expenditure_date, expenditure_amount, 
+                                            semi_annual_refund_bundled_amount, expenditure_purpose, 
+                                            category_code, memo_code, memo_text, election_code, 
+                                            election_other_description, beneficiary_cmte_id, 
+                                            other_name, other_street_1, 
+                                            other_street_2, other_city, other_state, other_zip, 
+                                            nc_soft_account, transaction_type_identifier, 
+                                            beneficiary_cmte_name,
+                                            beneficiary_cand_entity_id,
+                                            levin_account_id,
+                                            aggregate_amt,
+                                            create_date,
+                                            redesignation_id, redesignation_ind
+                    FROM public.sched_b WHERE report_id in ('{}')
+                    AND cmte_id = %s 
+                    AND transaction_id = %s 
+                    AND delete_ind is distinct from 'Y'
+                    """.format(
+                        "', '".join(report_list)
+                    )
+                else:
+                    query_string = """
+                    SELECT cmte_id, report_id, line_number, transaction_type, 
+                                            transaction_id, back_ref_transaction_id, back_ref_sched_name, 
+                                            entity_id, expenditure_date, expenditure_amount, 
+                                            semi_annual_refund_bundled_amount, expenditure_purpose, 
+                                            category_code, memo_code, memo_text, election_code, 
+                                            election_other_description, beneficiary_cmte_id, 
+                                            other_name, other_street_1, 
+                                            other_street_2, other_city, other_state, other_zip, 
+                                            nc_soft_account, transaction_type_identifier, 
+                                            beneficiary_cmte_name,
+                                            beneficiary_cand_entity_id,
+                                            levin_account_id,
+                                            aggregate_amt,
+                                            create_date,
+                                            redesignation_id, redesignation_ind
+                    FROM public.sched_b WHERE report_id in ('{}')
+                    AND cmte_id = %s 
+                    AND transaction_id = %s 
+                    """.format(
+                        "', '".join(report_list)
+                    )
+
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                     [cmte_id, transaction_id],

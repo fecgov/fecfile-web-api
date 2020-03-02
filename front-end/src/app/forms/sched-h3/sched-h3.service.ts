@@ -343,5 +343,35 @@ export class SchedH3Service {
       );
 
   }
+
+  public getH3AccountNames(report_id: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+    const url = '/sh3/get_h3_account_names';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    let params = new HttpParams();
+    params = params.append('report_id', report_id);
+
+    return this._http
+      .get(
+        `${environment.apiUrl}${url}`,
+        {
+          params,
+          headers: httpOptions
+        }
+      )
+      .pipe(map(res => {
+          if (res) {
+            console.log('H3 account name res: ', res);
+            return res;
+          }
+          return false;
+      })
+      );
+
+  }
     
 }

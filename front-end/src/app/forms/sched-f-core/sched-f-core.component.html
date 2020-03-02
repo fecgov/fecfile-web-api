@@ -26,7 +26,7 @@
         <div class="float-left">
           <h2>
             Form 3X
-            <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
+            <ng-container *ngIf="transactionTypeText || isChild()"> / {{ transactionTypeText }} </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && !cloned"> / Edit </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && cloned"> / Clone </ng-container>
           </h2>
@@ -57,13 +57,7 @@
         <div class="row">
           <div class="col col-md-5">
             <div class="form-check form-check-inline">                  
-              <label for="coord_expenditure_y"                   
-                [ngClass]="
-                frmIndividualReceipt.get('coordinated_exp_ind')?.invalid &&
-                (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                  ? 'input-field-label-error'
-                  : ''
-                ">
+              <label for="coord_expenditure_y">
                 <input
                   id="coord_expenditure_y"
                   type="radio"
@@ -75,13 +69,7 @@
               </label>
             </div>
             <div class="form-check form-check-inline">                 
-              <label for="coord_expenditure_n"
-                [ngClass]="
-                frmIndividualReceipt.get('coordinated_exp_ind')?.invalid &&
-                (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
-                  ? 'input-field-label-error'
-                  : ''
-              ">
+              <label for="coord_expenditure_n">
                 <input
                   id="coord_expenditure_n"
                   type="radio"
@@ -98,7 +86,7 @@
           <div class="col col-md-5">
             <div class="form-group">
               <label for="designating_cmte_id">
-                Designating Committee ID Number
+                Designating Committee ID Number {{isDesignatedFiler?'':optional}}
               </label>
               <input class="form-control" 
                 type="text" 
@@ -118,15 +106,15 @@
                   frmIndividualReceipt.get('designating_cmte_id')?.invalid && isDesignatedFiler &&
                   (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                     ? 'input-field-error'
-                    : ''
-                " 
+                    : ''"
+                     (change)="toggleInputFields()"
                 />
             </div>
           </div>
           <div class="col col-md-5">
             <div class="form-group">
               <label for="designating_cmte_name">
-                Designating Committee Name
+                Designating Committee Name {{isDesignatedFiler?'':optional}}
               </label>
               <input class="form-control" 
                 type="text" 
@@ -147,7 +135,7 @@
                   (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                     ? 'input-field-error'
                     : ''
-                "
+                "(change)="toggleInputFields()"
                 />
             </div>
           </div>        
@@ -156,7 +144,7 @@
           <div class="col col-md-5">
             <div class="form-group">
               <label for="subordinate_cmte_id">
-                Subordinate Committee ID Number
+                Subordinate Committee ID Number {{optional}}
               </label>
               <input class="form-control" 
                 type="text"
@@ -172,13 +160,14 @@
                 [style.width]="'45%'" 
                 [style.height]="'30px'"
                 [maxlength]="'9'"
+                     (change)="toggleInputFields()"
               />
             </div>
           </div>
           <div class="col col-md-5">
             <div class="form-group">
               <label for="">
-                  Subordinate Committee Name
+                  Subordinate Committee Name {{optional}}
               </label>
               <input class="form-control"
                 type="text"
@@ -194,6 +183,7 @@
                 [resultTemplate]="rtCommitteeName" 
                 [inputFormatter]="formatterCommitteeName"
                 (selectItem)="handleSelectedSFCommittee($event, 'subordinate_cmte_name')"
+                     (change)="toggleInputFields()"
               />
             </div>
           </div>        
@@ -202,7 +192,7 @@
           <div class="col col-md-5">
             <div class="form-group">
               <label for="subordinate_cmte_street_1">
-                Street 1
+                Street 1 {{optional}}
               </label>
               <input class="form-control" 
                 type="text" 
@@ -228,6 +218,7 @@
                 [style.height]="'30px'"
                 id="subordinate_cmte_street_2"
                 [maxlength]="'34'"
+                     (change)="toggleInputFields()"
               />
             </div>
           </div>        
@@ -236,7 +227,7 @@
           <div class="col col-md-4">
             <div class="form-group">
               <label for="subordinate_cmte_city">
-                City
+                City {{optional}}
               </label>
               <input class="form-control" 
                 type="text" 
@@ -246,13 +237,14 @@
                 [style.width]="'66%'" 
                 [style.height]="'30px'"
                 [maxlength]="'30'"
+                     (change)="toggleInputFields()"
               />
             </div>
           </div>
           <div class="col col-md-4">
             <div class="form-group" [style.width]="'235px'">
               <label for="subordinate_cmte_state">
-                  State
+                  State {{optional}}
               </label>
               <ng-select #stateSelect 
                 [items]="states"                   
@@ -262,6 +254,7 @@
                 bindValue="code" 
                 bindLabel="code" 
                 [selectOnTab]="true"
+                         (change)="toggleInputFields()"
                 >
                 <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
                   <span>{{ item.code + ' - ' + item.name }}</span>
@@ -272,7 +265,7 @@
           <div class="col col-md-4">
             <div class="form-group">
               <label for="subordinate_cmte_zip">
-                  Zip
+                  Zip {{optional}}
               </label>
               <input class="form-control" 
                 type="text" 
@@ -282,6 +275,7 @@
                 [style.width]="'33%'" 
                 [style.height]="'30px'"
                 [maxlength]="'10'"
+                     (change)="toggleInputFields()"
               />
               <div class="error-text" *ngIf="
                 (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
@@ -299,7 +293,7 @@
         </div>                     
       </div>
     </section>
-    <section *ngIf="showPart2" class="paragraph">
+    <section [hidden]="!showPart2" class="paragraph">
       <ng-container *ngFor="let hiddenField of hiddenFields">
         <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
       </ng-container>
@@ -361,6 +355,7 @@
                               && !isFieldName(col?.name, 'beneficiary_cmte_name') 
                               && !isFieldName(col?.name, 'beneficiary_cand_id')
                               && !isFieldName(col?.name, 'payee_cmte_id')
+                              && !isFieldName(col?.name, 'aggregate_general_elec_exp')
                               " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                         [attr.type]="col?.type" [attr.name]="col?.name"
                         [attr.readonly]="isFieldReadOnly(col)"
@@ -376,6 +371,10 @@
                               : ''
                           " (keyup)="handleFormFieldKeyup($event, col)" (change)="(isFieldName(col?.name, 'contribution_date') || isFieldName(col?.name, 'expenditure_date')) 
                                     ? dateChange(col?.name) : null;" />
+                      <input *ngIf="col?.name === 'aggregate_general_elec_exp'" class="form-control" [style.width]="col?.width"
+                             [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                             [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                             [attr.readonly]="isFieldReadOnly(col)"/>
                       <input *ngIf="col?.name === 'last_name'" class="form-control" [style.width]="col?.width"
                         [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                         [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
@@ -706,9 +705,7 @@
       <app-sub-transactions-table [hidden]="!isShowChildTransactions()" 
         [subTransactions]="subTransactions"
         [formType]="formType"
-        [subTransactionsTableType]="subTransactionsTableType"
-        [returnToDebtSummary]="returnToDebtSummary"
-        [returnToDebtSummaryInfo]="returnToDebtSummaryInfo">
+        [subTransactionsTableType]="subTransactionsTableType">
       </app-sub-transactions-table>
       <div class="forms__btn-container">
         <button id="addSingleChildButton" *ngIf="!subTransactionInfo?.isEarmark &&
@@ -743,15 +740,17 @@
                 Previous
               </button>
               <ng-container>
+                <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
+                   (click)="saveAndReturnToParent()">
+                  Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
+                </a>
                 <button *ngIf="scheduleAction === addScheduleAction"
                         class="btn btn-secondary btn-right"
-                        [disabled]="!frmIndividualReceipt.valid"
                         (click)="saveOnly()">
                   Save &amp; Add Transaction
                 </button>
                 <button *ngIf="scheduleAction === editScheduleAction"
                         class="btn btn-secondary btn-right"
-                        [disabled]="!frmIndividualReceipt.valid"
                         (click)="updateOnly()">
                   Save
                 </button>

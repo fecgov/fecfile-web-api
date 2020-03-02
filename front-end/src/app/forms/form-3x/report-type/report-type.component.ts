@@ -30,6 +30,8 @@ import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { Subject } from 'rxjs';
+import {ReportsService} from '../../../reports/service/report.service';
+import {TransactionsMessageService} from '../../transactions/service/transactions-message.service';
 
 @Component({
   selector: 'f3x-report-type',
@@ -81,7 +83,9 @@ export class ReportTypeComponent implements OnInit {
     private _reportTypeService: ReportTypeService,
     private _activatedRoute: ActivatedRoute,
     private _dialogService: DialogService,
-    private _datePipe: DatePipe
+    private _datePipe: DatePipe,
+    private  _reportService: ReportsService,
+    private  _transactionsMessageService: TransactionsMessageService
   ) {}
 
   ngOnInit(): void {
@@ -162,6 +166,7 @@ export class ReportTypeComponent implements OnInit {
               if (typeof res.electionDates[0] === 'object') {
                 this._fromDateSelected = res.electionDates[0].cvg_start_date;
                 this._toDateSelected = res.electionDates[0].cvg_end_date;
+                this._dueDate = res.electionDates[0].due_date;
 
                 if (this._fromDateSelected !== null && this._toDateSelected !== null) {
                   if (this._fromDateSelected.length >= 1 && this._toDateSelected.length >= 1) {
@@ -198,7 +203,7 @@ export class ReportTypeComponent implements OnInit {
     this._setReportTypes();
   }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     this.onDestroy$.next(true);
   }
 
@@ -333,6 +338,7 @@ export class ReportTypeComponent implements OnInit {
       this._form3xReportTypeDetails.additionalEmail1 = '';
       this._form3xReportTypeDetails.additionalEmail2 = '';
       this._form3xReportTypeDetails.formType = '3X';
+      this._form3xReportTypeDetails.reportId = '';
 
       const today: any = new Date();
       const formattedToday: any = this._datePipe.transform(today, 'MM/dd/yyyy');
@@ -351,6 +357,8 @@ export class ReportTypeComponent implements OnInit {
           let reportId = 0;
           if (Array.isArray(res) && !res[0].hasOwnProperty('create_date')) {
             reportId = res[0].report_id;
+            this._form3xReportTypeDetails.reportId = reportId;
+            window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
             const cvgStartDate: any = res[0].cvg_start_date;
             let datearray: any = cvgStartDate.split('-');
 
@@ -363,35 +371,61 @@ export class ReportTypeComponent implements OnInit {
             const alertStr: string = `The coverage dates entered overlap 
                    with ${res[0].report_type} [ ${newcvgStartDate} ${newcvgEndDate} ]`;
 
-            if (environment.name !== 'local') {
-              this._dialogService
-                .reportExist(alertStr, ConfirmModalComponent, 'Report already exists', true, false, true)
-                .then(res => {
-                  if (res === 'cancel') {
-                    this.optionFailed = true;
-                    this.isValidType = false;
-                    window.scrollTo(0, 0);
-                    this.status.emit({
-                      form: {},
-                      direction: 'previous',
-                      step: 'step_1'
+            let reportStatus = '';
+            this._reportService.getReports('current', 1, 1, '', true, null, reportId).subscribe(reportRes => {
+              if (reportRes) {
+              if (reportRes.reports[0] && reportRes.reports[0].status) {
+                reportStatus = reportRes.reports[0].status;
+                console.log('Report %s is already %s', reportId, reportStatus);
+
+                this._dialogService
+                    .reportExist(alertStr, ConfirmModalComponent, 'Report already exists', true, false, true)
+                    .then( userRes => {
+                      if (userRes === 'cancel') {
+                        this.optionFailed = true;
+                        this.isValidType = false;
+                        window.scrollTo(0, 0);
+                        this.status.emit({
+                          form: {},
+                          direction: 'previous',
+                          step: 'step_1'
+                        });
+
+                        return 0;
+                      } else if (userRes === 'ReportExist') {
+                        this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
+                        if (reportStatus.toLowerCase() === 'saved') {
+                          this._router.navigate([`/forms/form/${this._formType}`], {
+                            queryParams: { step: 'transactions', reportId: reportId, edit: true, transactionCategory: 'receipts' }
+                          });
+                        } else if ( reportStatus.toLowerCase() === 'filed' ) {
+                          // navigate to summary page of the filed report
+                          this._router.navigate([`/forms/form/${this._formType}`], {
+                            queryParams: { step: 'financial_summary', reportId: reportId, edit: false, transactionCategory: '' }
+                          });
+                        } else {
+                          // navigate away to the reports view
+                          // this should not happen as a report with report id should be either saved or filed
+                        console.log('report type Existing_Report_id', reportId.toString());
+                        const reporturl = '/reports?reportId=';
+                        this._router.navigateByUrl(`${reporturl}{reportId}`);
+
+                        localStorage.setItem('Existing_Report_id', reportId.toString());
+                        //this._router.navigate(['/reports`'], { queryParams: { reportId: reportId} });
+                        //localStorage.removeItem(`form_${this._formType}_saved`);
+                        localStorage.removeItem('reports.filters');
+                        localStorage.removeItem('Reports.view');
+                      }
+                      }
                     });
-
-                    return 0;
-                  } else if (res === 'ReportExist') {
-                    console.log('report type Existing_Report_id', reportId.toString());
-                    let reporturl = '/reports?reportId=';
-                    this._router.navigateByUrl(`${reporturl}{reportId}`);
-
-                    localStorage.setItem('Existing_Report_id', reportId.toString());
-                    //this._router.navigate(['/reports`'], { queryParams: { reportId: reportId} });
-                    //localStorage.removeItem(`form_${this._formType}_saved`);
-                    localStorage.removeItem('reports.filters');
-                    localStorage.removeItem('Reports.view');
-                  }
-                });
-                return 0;
+              }
             }
+            });
+
+            // if (environment.name !== 'local') {
+
+                return 0;
+            // }
           }
           this.status.emit({
             form: this.frmReportType,
@@ -594,7 +628,7 @@ export class ReportTypeComponent implements OnInit {
     const modifiedReportDueDate = new Date(dueDateYear, dueDateMonth, dueDateDay);
 
     const formattedDateToday: any = this._datePipe.transform(today,'MM/dd/yyyy');
-    const formattedDueDate: any = this._datePipe.transform(reportDueDate,'MM/dd/yyyy');    
+    const formattedDueDate: any = this._datePipe.transform(reportDueDate,'MM/dd/yyyy');
 
     dueDate = Math.round(Math.abs((today.getTime() - modifiedReportDueDate.getTime()) / oneDay));
 

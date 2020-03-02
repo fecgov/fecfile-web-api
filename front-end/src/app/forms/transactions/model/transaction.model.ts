@@ -39,6 +39,12 @@ export class TransactionModel {
   loanIncurredDate: any;
   loanPaymentAmt: any;
   loanPaymentToDate: any;
+  isReattribution = false;
+  reattribution_id:string;
+  isreattributable = false;
+  isRedesignation = false;
+  redesignation_id:string;
+  isredesignatable = false;
   reportType: any;
   activityEventType: any;
   activityEventIdentifier: any;
@@ -66,6 +72,19 @@ export class TransactionModel {
   candElectionYear:string;
   candSupportOpposeFlag:string;
   candElectionOtherDesc: string;
+  originalAmount: any;
+
+  //used by sched f core child trx
+  coordinatedExpInd: string;
+  designatingCmteId: string;
+  designatingCmteName: string;
+  subordinateCmteId: string;
+  subordinateCmteName: string;
+  subordinateCmteStreet_1: string;
+  subordinateCmteStreet_2: string;
+  subordinateCmteCity: string;
+  subordinateCmteState: string;
+  subordinateCmteZip: string;
 
 
 
@@ -134,6 +153,13 @@ export class TransactionModel {
     this.candElectionYear = transaction.candElectionYear;
     this.candElectionOtherDesc = transaction.candElectionOtherDesc;
     this.candSupportOpposeFlag = transaction.candSupportOpposeFlag;
+    this.isReattribution = transaction.isReattribution;
+    this.isreattributable = transaction.isreattributable;
+    this.reattribution_id = transaction.reattribution_id;
+    this.isredesignatable = transaction.isredesignatable;
+    this.isRedesignation = transaction.isRedesignation;
+    this.redesignation_id = transaction.redesignation_id;
+    this.originalAmount = transaction.originalAmount;
 
   }
 }

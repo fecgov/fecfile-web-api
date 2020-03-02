@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
-import { map } from 'rxjs/operators';
+import { map, share } from 'rxjs/operators';
 import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.pipe';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
@@ -203,7 +203,8 @@ export class TransactionsService {
             return res;
           }
           return false;
-        })
+        }),
+        share()
       );
   }
 
@@ -394,6 +395,18 @@ export class TransactionsService {
     model.candElectionYear = row.cand_election_year;
     model.candElectionOtherDesc = row.election_other_desc;
     model.candSupportOpposeFlag = row.support_oppose_code;
+
+    // sched f core child
+    model.coordinatedExpInd = row.coordinated_exp_ind;
+    model.designatingCmteId = row.designating_cmte_id;
+    model.designatingCmteName = row.designating_cmte_name;
+    model.subordinateCmteId = row.subordinate_cmte_id;
+    model.subordinateCmteName = row.subordinate_cmte_name;
+    model.subordinateCmteStreet_1 = row. subordinate_cmte_street_1;
+    model.subordinateCmteStreet_2 = row.subordinate_cmte_street_2;
+    model.subordinateCmteCity = row.subordinate_cmte_city;
+    model.subordinateCmteState = row.subordinate_cmte_state;
+    model.subordinateCmteZip = row.subordinate_cmte_zip;
   }
 
   /**
@@ -979,5 +992,10 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.loanPaymentToDate = row.loan_payment_to_date;
   model.iseditable = row.iseditable;
   model.isTrashable = row.istrashable;
-  
+  model.isReattribution = row.isReattribution;
+  model.isreattributable = row.isreattributable;
+  model.isRedesignation = row.isRedesignation;
+  model.isredesignatable = row.isredesignatable;
+  model.originalAmount = row.original_amount;
+
 }

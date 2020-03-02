@@ -54,8 +54,8 @@ class SchedL(models.Model):
     transaction_type_identifier = models.CharField(
         max_length=12, blank=True, null=True)
     transaction_id = models.CharField(primary_key=True, max_length=20)
-    record_id = models.CharField(primary_key=True, max_length=90)
-    account_name = models.CharField(primary_key=True, max_length=20)
+    record_id = models.CharField(max_length=90)
+    account_name = models.CharField(max_length=20)
     cvg_from_date = models.DateField(blank=True, null=True)
     cvg_end_date = models.DateField(blank=True, null=True)
     item_receipts = models.DecimalField(

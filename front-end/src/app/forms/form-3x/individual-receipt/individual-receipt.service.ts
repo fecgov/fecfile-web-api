@@ -427,7 +427,7 @@ export class IndividualReceiptService {
   }
 
   public getFedNonFedPercentage(amount: string, activityEvent: string, activityEventName: string,
-    transactionType: string, reportId: string, transactionId: string): Observable<any> {
+    transactionType: string, reportId: string, transactionId: string, scheduleHBackRefTransactionId?: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/sh1/get_fed_nonfed_share';
     let httpOptions = new HttpHeaders();
@@ -464,6 +464,10 @@ export class IndividualReceiptService {
 
     if (transactionId) {
       params = params.append('transaction_id', transactionId);
+    }
+
+    if (scheduleHBackRefTransactionId) {
+      params = params.append('back_ref_transaction_id', scheduleHBackRefTransactionId);
     }
 
     return this._http.get(`${environment.apiUrl}${url}`, {
@@ -614,5 +618,22 @@ export class IndividualReceiptService {
       aggregate = amount + selectedEntityAggregate;
     }
     return aggregate;
+  }
+
+  public getReportIdByTransactionDate(transactionDate: string) : Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url: string = '/sa/get_report_id_from_date';
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+
+    params = params.append('transaction_date', transactionDate);
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions, 
+      params
+    });
   }
 }

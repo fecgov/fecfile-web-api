@@ -26,7 +26,10 @@
         <div class="float-left">
           <h2>
             Form 3X
-            <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
+            <ng-container *ngIf="transactionTypeText && !mainTransactionTypeText"> / {{ transactionTypeText }} </ng-container>
+            <ng-container *ngIf="transactionTypeText && mainTransactionTypeText"> / 
+              {{ mainTransactionTypeText }} / {{ transactionTypeText }}
+            </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && !cloned"> / Edit </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && cloned"> / Clone </ng-container>
           </h2>
@@ -690,7 +693,7 @@
                       (click)="saveAndReturnToParent()">
                       Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
                     </a>
-                    <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="viewTransactions()">
+                    <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="(frmIndividualReceipt.dirty) ? saveOrWarn() : viewTransactions()">
                       View Transactions
                     </a>
                   </div>

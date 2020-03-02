@@ -16,6 +16,9 @@ export class F3xMessageService {
   private clearFormSubject = new Subject<any>();
   private loadFormFieldsSubject = new Subject<any>();
   private storeParentModelSubject = new Subject<any>();
+  private populateHiddenFieldsSubject = new Subject<any>();
+  private clearFormFieldsForRedesignationSubject = new Subject<any>();
+  private populateFieldsSubject = new Subject<any>();
 
 
   /**
@@ -42,6 +45,58 @@ export class F3xMessageService {
    */
   public getPopulateFormMessage(): Observable<any> {
     return this.populateFormSubject.asObservable();
+  }
+
+  /**
+   * Used by the F3X parent component to inform the child component
+   * to pre-populate the form with the given data.
+   *
+   * @param message
+   */
+  public sendPopulateFieldsMessage(message: any) {
+    this.populateFieldsSubject.next(message);
+  }
+
+
+  /**
+   * Clear the Populate Form message.
+   */
+  public clearPopulateFieldsMessage() {
+    this.populateFieldsSubject.next();
+  }
+
+
+  /**
+   * A method for subscribers of the Populate Form message.
+   */
+  public getPopulateFieldsMessage(): Observable<any> {
+    return this.populateFieldsSubject.asObservable();
+  }
+
+   /**
+   * Used by the F3X parent component to inform the child component
+   * to pre-populate the form's hidden fields with the given data.
+   *
+   * @param message
+   */
+  public sendPopulateHiddenFieldsMessage(message: any) {
+    this.populateHiddenFieldsSubject.next(message);
+  }
+
+
+  /**
+   * Clear the Populate form's hidden fields.
+   */
+  public clearPopulateHiddenFieldsMessage() {
+    this.populateHiddenFieldsSubject.next();
+  }
+
+
+  /**
+   * A method for subscribers of the Populate form's hidden fields.
+   */
+  public getPopulateHiddenFieldsMessage(): Observable<any> {
+    return this.populateHiddenFieldsSubject.asObservable();
   }
 
   /**
@@ -119,6 +174,26 @@ export class F3xMessageService {
    */
   public getParentModelMessage(): Observable<any> {
     return this.storeParentModelSubject.asObservable();
+  }
+
+  public sendClearFormValuesForRedesignationMessage(message: any) {
+    this.clearFormFieldsForRedesignationSubject.next(message);
+  }
+
+
+  /**
+   * Clear the Populate Form message.
+   */
+  public clearClearFormValuesForRedesignationMessage() {
+    this.clearFormFieldsForRedesignationSubject.next();
+  }
+
+
+  /**
+   * A method for subscribers of the Populate Form message.
+   */
+  public getClearFormValuesForRedesignationMessage(): Observable<any> {
+    return this.clearFormFieldsForRedesignationSubject.asObservable();
   }
 
 }

@@ -120,6 +120,11 @@
     @extend .fa-pencil-alt;
 }
 
+.clipboard-icon {
+    @extend .fas;
+    @extend .fa-clipboard;
+}
+
 .dollar-sign-icon {
   @extend .fas;
   @extend .fa-dollar-sign;

@@ -855,16 +855,28 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     let trxIds = '';
     const selectedTransactions: Array<TransactionModel> = [];
+    let unItemizedCount = 0;
+    let selectedCount = 0;
     for (const trx of this.transactionsModel) {
       if (trx.selected) {
+        selectedCount++;
+        // remove un-itemized  trxIds here when printing multiple
+        if (trx.itemized && trx.itemized === 'U') {
+          unItemizedCount++;
+          continue;
+        }
         selectedTransactions.push(trx);
         trxIds += trx.transactionId + ', ';
       }
     }
+    if ( selectedCount === unItemizedCount ) {
+      this.showUnItemizedWarn();
+    } else {
 
-    trxIds = trxIds.substr(0, trxIds.length - 2);
-    //this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved' );
-    this._reportTypeService.printPreview('transaction_table_screen', '3X', trxIds);
+      trxIds = trxIds.substr(0, trxIds.length - 2);
+      //this._reportTypeService.signandSaveSubmitReport(this.formType, 'Saved' );
+      this._reportTypeService.printPreview('transaction_table_screen', '3X', trxIds);
+    }
   }
 
   public printPreview(): void {
@@ -1026,8 +1038,30 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._transactionsMessageService.sendEditTransactionMessage(trx);
   }
 
+   /**
+   * Reattribute the transaction selected by the user.
+   *
+   * @param trx the Transaction to edit
+   */
+  public reattributeTransaction(trx: TransactionModel): void {
+    this._transactionsMessageService.sendReattributeTransactionMessage(trx);
+  }
+
+  /**
+   * Redesignate the transaction selected by the user.
+   *
+   * @param trx the Transaction to edit
+   */
+  public redesignateTransaction(trx: TransactionModel): void {
+    this._transactionsMessageService.sendRedesignateTransactionMessage(trx);
+  }
+
   public printTransaction(trx: TransactionModel): void {
-    this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transactionId);
+    if (trx.itemized && (trx.itemized === 'U' || trx.itemized === 'u' )) {
+    this.showUnItemizedWarn();
+    } else {
+      this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transactionId);
+    }
   }
 
   /**
@@ -1603,5 +1637,21 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public goToDebtPayment(trx: any) {
     trx.scrollDebtPaymentButtonIntoView = true;
     this.editTransaction(trx);
+  }
+
+  private showUnItemizedWarn() {
+    const WARN_MESSAGE = 'Unitemized Transactions will not be included in your report. Therefore, the transactions are not available for' +
+        ' Print Preview';
+    this._dialogService
+        .confirm(WARN_MESSAGE , ConfirmModalComponent, 'Warning!', false)
+        .then(res => {
+          if (res === 'okay') {
+          }
+        });
+  }
+  private isPrintable(trx: any) {
+    if (trx.itemized && trx.itemized === 'U' )  {
+      return false;
+    } else { return true; }
   }
 }

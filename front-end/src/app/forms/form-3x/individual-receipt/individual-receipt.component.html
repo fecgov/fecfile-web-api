@@ -23,7 +23,10 @@
         <div class="float-left">
           <h2>
             Form 3X
-            <ng-container *ngIf="transactionTypeText"> / {{ transactionTypeText }} </ng-container>
+            <ng-container *ngIf="transactionTypeText && !mainTransactionTypeText"> / {{ transactionTypeText }} </ng-container>
+            <ng-container *ngIf="transactionTypeText && mainTransactionTypeText"> / 
+              {{ mainTransactionTypeText }} / {{ transactionTypeText }}
+            </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && !cloned"> / Edit </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && cloned"> / Clone </ng-container>
             <ng-container *ngIf="scheduleAction === viewScheduleAction"> / View </ng-container>
@@ -64,7 +67,29 @@
               <ng-container *ngFor="let col of row.cols">
                 <div [class]="row.colClassName" *ngIf="isToggleShow(col)">
                   <div class="form-group" [style.width]="setSelectTypeWidth(col)">
-                    <label [for]="col?.name">
+                    <label [for]="col?.name"
+                    *ngIf="col?.name !== 'election_other_description'"
+                    >
+                      {{ col?.text }}
+                      <!-- replace button with div below to resolve tab issue into button -->
+                      <!-- <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </button> -->
+                      <div type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </div>
+                      <ng-container *ngIf="!col?.validation?.required
+                        && !col?.isReadonly && col?.name !== 'activity_event_identifier'">
+                        (Optional)
+                      </ng-container>
+                    </label>
+                    <label
+                    *ngIf="col?.name === 'election_other_description' && frmIndividualReceipt?.get('election_code')?.value  === 'O'"
+                    >
                       {{ col?.text }}
                       <!-- replace button with div below to resolve tab issue into button -->
                       <!-- <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
@@ -110,6 +135,7 @@
                                 && !isFieldName(col?.name, 'beneficiary_cand_id') 
                                 && !isFieldName(col?.name, 'prefix')
                                 && !isFieldName(col?.name, 'suffix')
+                                && !isFieldName(col?.name, 'election_other_description')
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.readonly]="isFieldReadOnly(col)"
@@ -242,6 +268,18 @@
                           [focusFirst]=false [resultTemplate]="rtCommitteeName" [inputFormatter]="formatterCommitteeName"
                           (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                       </div>
+                      <input *ngIf="isFieldName(col?.name, 'election_other_description') && frmIndividualReceipt?.get('election_code')?.value  === 'O'"
+                                class="form-control" [style.width]="col?.width" [style.height]="col?.height"
+                          [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value"
+                          [maxlength]="col?.validation?.max"
+                          [formControlName]="col?.name"
+                          [attr.disabled]="isSelectFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''" />
                       <div class="error-text" *ngIf="
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
                             frmIndividualReceipt.get(col?.name).invalid
@@ -286,8 +324,23 @@
                         </ng-container>
                         <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
                           <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.reportFiled">
+                            The report corresponding to this date is already filed. You must amend the report first.
+                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                              coverage period only. -->
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.reportNotFound">
+                            No report corresponding to this date found.
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
                             *ngIf="frmIndividualReceipt.get(col?.name).errors?.amountExceeded">
-                            Expenditure amount exceeds outstanding debt amount
+                            <ng-container *ngIf="!reattributionTransactionId && !redesignationTransactionId">Expenditure amount exceeds outstanding debt amount</ng-container>
+                            <ng-container *ngIf="reattributionTransactionId || redesignationTransactionId">Amount must be less than the total amount on original transaction</ng-container>
                           </div>
                         </ng-container>
                       </div>
@@ -395,6 +448,7 @@
                         bindValue="eventType"
                         bindLabel="eventTypeDescription" 
                         [selectOnTab]="true"
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -417,6 +471,7 @@
                         bindValue="activityEventDescription"
                         bindLabel="activityEventDescription" 
                         [selectOnTab]="true"
+                        [readonly]="isSelectFieldReadOnly(col)"
                         [ngClass]="
                             frmIndividualReceipt.get(col?.name)?.invalid &&
                             (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -543,7 +598,7 @@
                     (click)="updateOnly()">
                     Save
                   </button>
-                  <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
+                  <a *ngIf="subTransactionInfo?.isParent === false && !reattributionTransactionId" class="btn btn-primary btn-right"
                     (click)="saveAndReturnToParent()">
                     Return to {{ subTransactionInfo.transactionTypeDescription }}
                   </a>                  
@@ -562,7 +617,7 @@
                     class="btn btn-secondary btn-right" (click)="saveAndReturnToNewParent()">
                     Save &amp; Add Transaction
                   </button>
-                  <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
+                  <a *ngIf="subTransactionInfo?.isParent === false && !reattributionTransactionId" class="btn btn-primary btn-right"
                     (click)="saveAndReturnToParent()">
                     Return to {{ subTransactionInfo.transactionTypeDescription }}
                   </a>
@@ -573,7 +628,7 @@
               </div>
 
               <ng-template #allOtherTrx>
-                <div *ngIf="scheduleAction === editScheduleAction; else createActions">
+                <div *ngIf="scheduleAction === editScheduleAction || reattributionTransactionId || redesignationTransactionId; else createActions">
                   <button *ngIf="!isShedH4OrH6TransactionType(transactionType) || cloned" class="btn btn-previous btn-left" type="button" (click)="cancel()">
                     Cancel
                   </button>
@@ -583,7 +638,7 @@
                   <button class="btn btn-secondary btn-right" (click)="updateOnly()">
                     Save
                   </button>
-                  <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
+                  <a *ngIf="subTransactionInfo?.isParent === false && !reattributionTransactionId" class="btn btn-primary btn-right"
                     (click)="saveAndReturnToParent()">
                     Return to {{ subTransactionInfo.transactionTypeDescription }}
                   </a>
@@ -604,7 +659,7 @@
                     <div *ngIf="scheduleAction === viewScheduleAction">
                       <button type="button" class="btn btn-outline-dark btn-right" (click)="viewTransactions()">Close</button>
                     </div>
-                    <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
+                    <a *ngIf="subTransactionInfo?.isParent === false && !reattributionTransactionId" class="btn btn-primary btn-right"
                       (click)="saveAndReturnToParent()">
                       Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
                     </a>

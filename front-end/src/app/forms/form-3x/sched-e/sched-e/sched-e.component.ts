@@ -105,13 +105,13 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     );
 
     _messageService.getMessage().takeUntil(this._schedEonDestroy$).subscribe(message => {
-      if (message && message.parentFormPopulated) {
+      if (message && message.parentFormPopulated && message.component === this.abstractScheduleComponent) {
         this.populateChildData();
       }
     });
 
     _messageService.getPopulateChildComponentMessage().takeUntil(this._schedEonDestroy$).subscribe(message => {
-      if (message && message.populateChildForEdit && message.transactionData) {
+      if (message && message.populateChildForEdit && message.transactionData && message.component === this.abstractScheduleComponent) {
         this.populateFormForEdit(message.transactionData);
       }
     });
@@ -145,10 +145,10 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   }
 
 
-  public ngOnChanges(changes: SimpleChanges) {
+/*   public ngOnChanges(changes: SimpleChanges) {
     this.formType = '3X';
     super.ngOnChanges(changes);
-  }
+  } */
 
 
   public ngOnInit() {
@@ -250,11 +250,19 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.frmIndividualReceipt.patchValue({support_oppose_code:this._parentTransactionModel.candSupportOpposeFlag},{onlySelf:true});
       this.frmIndividualReceipt.patchValue({election_other_description:this._parentTransactionModel.candElectionOtherDesc},{onlySelf:true});
       this.frmIndividualReceipt.patchValue({election_code:this._parentTransactionModel.candElectionCode},{onlySelf:true});
-      
-      if(!this.frmIndividualReceipt.value.election_code){
-        console.log(this.electionTypes);
-      }
 
+      if(this._parentTransactionModel.candOffice){
+        if(this._parentTransactionModel.candOffice === 'P'){
+          this.frmIndividualReceipt.controls['cand_office_state'].clearValidators();
+          this.frmIndividualReceipt.controls['cand_office_state'].updateValueAndValidity();
+          this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+          this.frmIndividualReceipt.controls['cand_office_district'].updateValueAndValidity();
+        }
+        else if(this._parentTransactionModel.candOffice === 'S'){
+          this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
+          this.frmIndividualReceipt.controls['cand_office_district'].updateValueAndValidity();
+        }
+      }
     }
   }
 
@@ -283,8 +291,8 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.updateOfficeSoughtValidations(this.frmIndividualReceipt.controls['cand_office'].value);
     }
     if (this.hiddenFields && this.hiddenFields.length > 0) {
-      this.hiddenFields.push({ type: "hidden", name: "completing_entity_id", value: trx.completing_entity_id });
-      this.hiddenFields.push({ type: "hidden", name: "payee_entity_id", value: trx.payee_entity_id });
+      this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','completing_entity_id',trx.completing_entity_id);
+      this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','payee_entity_id',trx.payee_entity_id);
     }
   }
 
@@ -342,7 +350,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     else if (this.transactionType.endsWith('_MEMO')){
       this.frmIndividualReceipt.patchValue({
         expenditure_aggregate:
-          this._decimalPipe.transform(this.frmIndividualReceipt.controls['expenditure_amount'].value, '.2-2')
+          this._decimalPipe.transform(this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value), '.2-2')
       }, { onlySelf: true });
     }
     else  {
@@ -408,7 +416,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       // also clear any district fields
       this.frmIndividualReceipt.patchValue({ 'cand_office_district': null }, { onlySelf: true });
     }
-    //TODO -- below logic is very confusing. Clean this up . 
+    //TODO -- below logic is very confusing. try to clean this up . 
     else if (office === 'P') {
       if(this.transactionType === 'IE_MULTI' && this.scheduleAction === ScheduleActions.edit) {
         this.frmIndividualReceipt.controls['cand_office_district'].clearValidators();
@@ -441,19 +449,19 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   public handleSelectedIndividual($event: NgbTypeaheadSelectItemEvent, col: any) {
     super.handleSelectedIndividual($event, col);
-    this.hiddenFields.push({ type: "hidden", name: "payee_entity_id", value: $event.item.entity_id });
+    this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','payee_entity_id',$event.item.entity_id);
   }
 
   public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
     super.handleSelectedOrg($event, col);
-    this.hiddenFields.push({ type: "hidden", name: "payee_entity_id", value: $event.item.entity_id });
+    this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','payee_entity_id',$event.item.entity_id);
   }
 
   public handleSelectedCandidate($event: NgbTypeaheadSelectItemEvent, col: any) {
     super.handleSelectedCandidate($event, col);
 
     //also populate election year here since the variable name is different
-    this.hiddenFields.push({ type: "hidden", name: "cand_entity_id", value: $event.item.entity_id });
+    this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','cand_entity_id',$event.item.entity_id);
     if ($event && $event.item && $event.item.cand_office) {
       this.updateOfficeSoughtFields({ code: $event.item.cand_office }, col);
     }
@@ -472,7 +480,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     fieldNames.push('suffix');
     this._patchFormFields(fieldNames, entity, namePrefix);
 
-    this.hiddenFields.push({ type: "hidden", name: "completing_entity_id", value: $event.item.entity_id });
+    this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','completing_entity_id',$event.item.entity_id);
   }
 
 
@@ -558,7 +566,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   }
 
   private addSchedESpecificMetadata() {
-    this.hiddenFields.push({ type: "hidden", name: "full_election_code", value: this.electionCode + this.electionYear });
+    this._utilService.addOrEditObjectValueInArray(this.hiddenFields, 'hidden','full_election_code', this.electionCode[0] + this.electionYear);
   }
 
 

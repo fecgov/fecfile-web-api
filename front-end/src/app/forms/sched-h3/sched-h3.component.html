@@ -1,5 +1,5 @@
 <ng-template #rt let-r="result" let-t="term">
-  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+  <ngb-highlight [result]="formatterAccountName(r)" [term]="t"></ngb-highlight>
 </ng-template>
 <ng-template #rtOrg let-r="result" let-t="term">
   <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
@@ -81,6 +81,9 @@
                     ? 'input-field-error'
                     : ''
                 "
+                [ngbTypeahead]="searchAccountName"
+                [resultTemplate]="rt"
+                [inputFormatter]="formatterAccountName"
               />
             </div>
           </div>
@@ -448,7 +451,7 @@
 
                   <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                     <button class="dropdown-item" (click)="editH3(item)"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="dropdown-item" (click)="printH3(item)"><i class="fas fa-print"></i> Print</button>
+                    <button class="dropdown-item" (click)="printTransaction(item)"><i class="fas fa-print"></i> Print</button>
                     <button class="dropdown-item" (click)="trashTransaction(item)"><i class="fas fa-trash"></i> Trash</button>
                   </div>
                 </div>

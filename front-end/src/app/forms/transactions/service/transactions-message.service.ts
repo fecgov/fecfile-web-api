@@ -28,6 +28,8 @@ export class TransactionsMessageService {
   private viewTransactionSubject = new Subject<any>();
   private restoreTransactionsSubject = new Subject<any>();
   private removeHTransactionsSubject = new Subject<any>();
+  private reattributeTransactionSubject = new Subject<any>();
+  private redesignateTransactionSubject = new Subject<any>();
 
   /**
    * A publisher uses this method to send a message to subscribers
@@ -171,6 +173,31 @@ export class TransactionsMessageService {
   public getEditTransactionMessage(): Observable<any> {
     return this.editTransactionSubject.asObservable();
   }
+
+  public sendReattributeTransactionMessage(message: any) {
+    this.reattributeTransactionSubject.next(message);
+  }
+
+  public clearReattributeTransactionMessage() {
+    this.reattributeTransactionSubject.next();
+  }
+
+  public getReattributeTransactionMessage(): Observable<any> {
+    return this.reattributeTransactionSubject.asObservable();
+  }
+  
+  public sendRedesignateTransactionMessage(message: any) {
+    this.redesignateTransactionSubject.next(message);
+  }
+
+  public clearRedesignateTransactionMessage() {
+    this.redesignateTransactionSubject.next();
+  }
+
+  public getRedesignateTransactionMessage(): Observable<any> {
+    return this.redesignateTransactionSubject.asObservable();
+  }
+  
 
   public sendEditDebtSummaryTransactionMessage(message: any) {
     this.editDebtSummaryTransactionSubject.next(message);

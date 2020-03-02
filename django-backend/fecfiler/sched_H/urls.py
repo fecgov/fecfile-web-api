@@ -24,6 +24,11 @@ urlpatterns = [
         name="get_h3_aggregate_amount",
     ),
     url(r"^sh3/get_h3_summary$", views.get_h3_summary, name="get_h3_summary"),
+    url(
+        r"^sh3/get_h3_account_names$",
+        views.get_h3_account_names,
+        name="get_h3_account_names",
+    ),
     url(r"^sh5/get_h5_summary$", views.get_h5_summary, name="get_h5_summary"),
     url(r"^sh3/schedH3$", views.schedH3, name="schedH3"),
     url(r"^sh4/schedH4$", views.schedH4, name="schedH4"),
@@ -50,9 +55,5 @@ urlpatterns = [
         views.validate_h1_h2_exist,
         name="validate_h1_h2_exist",
     ),
-    url(
-        r"^sh1/validate_pac_h1$",
-        views.validate_pac_h1,
-        name="validate_pac_h1",
-    ),
+    url(r"^sh1/validate_pac_h1$", views.validate_pac_h1, name="validate_pac_h1"),
 ]

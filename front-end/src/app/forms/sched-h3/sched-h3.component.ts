@@ -5,7 +5,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, Observable } from 'rxjs';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
@@ -26,6 +26,7 @@ import { SchedHServiceService } from '../sched-h-service/sched-h-service.service
 import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
 import { GetTransactionsResponse, TransactionsService } from '../transactions/service/transactions.service';
 import { SchedH3Service } from './sched-h3.service';
+import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sched-h3',
@@ -680,7 +681,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
       const formObj = this.schedH3.getRawValue();
 
-      const accountName = this.schedH3.get('account_name').value;
+      let accountName = '';
+      if(typeof this.schedH3.get('account_name').value === 'object') {
+        accountName = this.schedH3.get('account_name').value.account_name;
+      }else {
+        accountName = this.schedH3.get('account_name').value;
+      }
+
+      formObj.account_name = accountName;
+
       const receipt_date = this.schedH3.get('receipt_date').value;
       
       //const total_amount_transferred = Number(this.schedH3.get('total_amount_transferred').value) 
@@ -1220,6 +1229,31 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         }
       }
     )
+  }
+
+  searchAccountName = (text$: Observable<string>) =>
+    text$.pipe(
+      debounceTime(500),
+      distinctUntilChanged(),
+      switchMap(searchText => {
+        if (searchText) {
+          return this._schedH3Service.getH3AccountNames(this._individualReceiptService.getReportIdFromStorage(this.formType))
+        } else {
+          return Observable.of([]);
+        }
+      })
+    );
+
+  formatterAccountName = (x: { account_name: string }) => {
+      if (typeof x !== 'string') {
+        return x.account_name;
+      } else {
+        return x;
+      }
+    };
+
+  public printTransaction(trx: any): void {
+    this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
   }
 
 }

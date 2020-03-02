@@ -76,6 +76,9 @@ list_of_SL_SA_transaction_types = ['LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_O
 
 list_of_SL_SB_transaction_types = ['LEVIN_VOTER_ID', 'LEVIN_GOTV', 'LEVIN_GEN', 'LEVIN_OTH_DISB', 'LEVIN_VOTER_REG']
 
+
+logger = logging.getLogger(__name__)
+
 def get_header_details():
     return {
         "version": "8.3",
@@ -216,6 +219,7 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
     try:
         query_1 = """SELECT query_string FROM public.tran_query_string WHERE tran_type_identifier = %s"""
         query_values_list_1 = [identifier]
+        # print('get_transactions...')
         # print('identifier: '+ identifier)
         output = json_query(query_1, query_values_list_1,
                             "tran_query_string", False)[0]
@@ -230,7 +234,23 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
             query_values_list = [report_id, cmte_id,
                 back_ref_transaction_id, back_ref_transaction_id]
         error_string = identifier + ". Get all transactions"
+        # print(query)
+        # print(query_values_list)
         return json_query(query, query_values_list, error_string, True)
+    except Exception:
+        raise
+
+def get_back_ref_transaction_ids(DB_table, identifier, report_id, cmte_id, transaction_id_list):
+    try:
+        output = []
+        query = """SELECT DISTINCT(back_ref_transaction_id) FROM {} 
+            WHERE transaction_type_identifier = %s AND report_id = %s AND cmte_id = %s
+            AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(DB_table, "', '".join(transaction_id_list))
+        query_values_list = [identifier, report_id, cmte_id]
+        results = json_query(query, query_values_list, DB_table, True)
+        for result in results:
+            output.append(result['back_ref_transaction_id'])
+        return output
     except Exception:
         raise
 
@@ -239,12 +259,12 @@ def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id
         try:
                 if transaction_id_list:
                     # Addressing no back_ref_transaction_id column in sched_D
-                    if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
-                        query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
-                            DB_table, "', '".join(transaction_id_list))
-                    else:
-                        query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
-                            DB_table, "', '".join(transaction_id_list))
+                    # if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
+                    query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
+                        DB_table, "', '".join(transaction_id_list))
+                    # else:
+                    #     query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
+                    #         DB_table, "', '".join(transaction_id_list))
                 else:
                     # Addressing no back_ref_transaction_id column in sched_D
                     if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
@@ -275,24 +295,37 @@ def get_schedules_for_form_type(form_type):
 
 def get_child_identifer(identifier, form_type):
         try:
-                query = """SELECT c.tran_identifier FROM ref_transaction_types p LEFT JOIN ref_transaction_types c ON c.parent_tran_id=p.ref_tran_id WHERE p.tran_identifier = %s AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
-                query_values_list = [identifier, form_type]
-                error_string = "ref_transaction_types"
-                result = json_query(query, query_values_list, error_string, True)
-                # print(result)
-                return result
+              query = """SELECT c.tran_identifier FROM ref_transaction_types p LEFT JOIN ref_transaction_types c ON c.parent_tran_id=p.ref_tran_id WHERE p.tran_identifier = %s AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
+              query_values_list = [identifier, form_type]
+              error_string = "ref_transaction_types"
+              result = json_query(query, query_values_list, error_string, True)
+              # print(result)
+              return result
         except Exception as e:
                 raise Exception(
                     'The get_child_identifer function is raising the following error:' + str(e))
 
+def get_all_child_transaction_identifers(form_type):
+        try:
+              output = []
+              query = """SELECT p.tran_identifier FROM ref_transaction_types p WHERE p.parent_tran_id IS NOT NULL AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
+              query_values_list = [form_type]
+              error_string = "ref_transaction_types"
+              results = json_query(query, query_values_list, error_string, True)
+              for result in results:
+                  output.append(result['tran_identifier'])
+              return output
+        except Exception as e:
+                raise Exception(
+                    'The get_all_child_transaction_identifers function is raising the following error:' + str(e))
 
 @api_view(["POST"])
-
 def create_json_builders(request):
     try:
-        # import ipdb;ipdb.set_trace()  
-        print("request",request)
-        MANDATORY_INPUTS = ['report_id', 'call_from']
+        # import ipdb;ipdb.set_trace()
+        # print("request",request)
+        logger.debug('create json builder with {}'.format(request))
+        MANDATORY_INPUTS = ['report_id', 'call_from'] 
         error_string = ""
         output = {}
         transaction_flag = False
@@ -333,6 +366,8 @@ def create_json_builders(request):
                 'transaction_id').replace(" ", "")
             transaction_id_list = transaction_id_string.split(',')
         # Populating output json with header and data values
+        # print('*** transaction id list***')
+        logger.debug('transaction is list:{}'.format(transaction_id_list))
         output['header'] = get_header_details()
         output['data'] = get_data_details(report_id, cmte_id)
         # Figuring out the form type
@@ -340,6 +375,8 @@ def create_json_builders(request):
         full_form_type = FORMTYPE_FORM_DICT.get(form_type)
         # Figuring out what schedules are to be checked for the form type
         schedule_name_list = get_schedules_for_form_type(full_form_type)
+        # List of all the child transactions that need back_ref_transaction_id
+        ALL_CHILD_TRANSACTION_TYPES_LIST = get_all_child_transaction_identifers(form_type) 
 
         # *******************************TEMPORARY MODIFICATION FTO CHECK ONLY SCHED A AND SCHED B TABLES************************************
         schedule_name_list = [
@@ -363,40 +400,65 @@ def create_json_builders(request):
                     DB_table = "public." + schedule_name.get('sched_type')
                     list_identifier = get_transaction_type_identifier(
                         DB_table, report_id, cmte_id, transaction_id_list)
+                    # print('****')
+                    # print(list_identifier)
                     for identifier in list_identifier:
-                            identifier = identifier.get('transaction_type_identifier')
-                            child_identifier_list = get_child_identifer(
+                        identifier = identifier.get('transaction_type_identifier')
+                        # print(identifier)
+                        # Handling transaction id list: Having no child transactions printed if transaction id list is specified
+                        # *******************************************
+                        # if transaction_id_list:
+                        #     child_identifier_list = []
+                        # else:
+                        child_identifier_list = get_child_identifer(
                                 identifier, form_type)
-                            # SQL QUERY to get all transactions of the specific identifier
-                            if identifier:
-                                parent_transactions = get_transactions(
-                                    identifier, report_id, cmte_id, None, transaction_id_list)
-                                for transaction in parent_transactions:
-                                    if child_identifier_list:
-                                        for child_identifier in child_identifier_list:
-                                            child_identifier = child_identifier.get(
-                                                'tran_identifier')
-                                            if child_identifier:
-                                                    child_transactions = get_transactions(
-                                                        child_identifier, report_id, cmte_id, transaction.get('transactionId'), [])
-                                                    # print(child_transactions)
-                                                    if child_transactions:
-                                                        if 'child' in transaction:
-                                                            transaction['child'].extend(
-                                                                child_transactions)
-                                                        else:
-                                                            transaction['child'] = child_transactions
-                                    if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
-                                        if transaction.get('transactionTypeIdentifier') in list_of_SL_SA_transaction_types:
-                                            if 'SL-A' not in output['data']['schedules']:
-                                                output['data']['schedules']['SL-A'] = []
-                                            output['data']['schedules']['SL-A'].append(transaction)
-                                        elif transaction.get('transactionTypeIdentifier') in list_of_SL_SB_transaction_types:
-                                            if 'SL-B' not in output['data']['schedules']:
-                                                output['data']['schedules']['SL-B'] = []
-                                            output['data']['schedules']['SL-B'].append(transaction)
-                                        else:
-                                            output['data']['schedules'][schedule].append(transaction)
+                        # print('**********child identifer list')
+                        # print(child_identifier_list)
+                                # ********************************************
+                        # SQL QUERY to get all transactions of the specific identifier
+                        if identifier not in ALL_CHILD_TRANSACTION_TYPES_LIST:
+                            # print('*****')
+                            # print('parent')
+                            parent_transactions = get_transactions(
+                                identifier, report_id, cmte_id, None, transaction_id_list)
+                            # print(parent_transactions)
+                        else:
+                            # print('here')
+                            # Handling transaction id list: getting data for child transactions mentioned in transaction list
+                            if transaction_id_list:
+                                parent_transactions = []
+                                back_ref_tran_id_list = get_back_ref_transaction_ids(
+                                    DB_table, identifier, report_id, cmte_id, transaction_id_list)
+                                for back_ref_tran_id in back_ref_tran_id_list:
+                                    parent_transactions.extend(get_transactions(
+                                        identifier, report_id, cmte_id, back_ref_tran_id, transaction_id_list))
+                        for transaction in parent_transactions:
+                            # print(transaction)
+                            if child_identifier_list:
+                                for child_identifier in child_identifier_list:
+                                    child_identifier = child_identifier.get(
+                                        'tran_identifier')
+                                    if child_identifier:
+                                        child_transactions = get_transactions(
+                                            child_identifier, report_id, cmte_id, transaction.get('transactionId'), [])
+                                        # print(child_transactions)
+                                        if child_transactions:
+                                            if 'child' in transaction:
+                                                transaction['child'].extend(
+                                                    child_transactions)
+                                            else:
+                                                transaction['child'] = child_transactions
+                            if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
+                                if transaction.get('transactionTypeIdentifier') in list_of_SL_SA_transaction_types:
+                                    if 'SL-A' not in output['data']['schedules']:
+                                        output['data']['schedules']['SL-A'] = []
+                                    output['data']['schedules']['SL-A'].append(transaction)
+                                elif transaction.get('transactionTypeIdentifier') in list_of_SL_SB_transaction_types:
+                                    if 'SL-B' not in output['data']['schedules']:
+                                        output['data']['schedules']['SL-B'] = []
+                                    output['data']['schedules']['SL-B'].append(transaction)
+                                else:
+                                    output['data']['schedules'][schedule].append(transaction)
         up_datetime = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
         tmp_filename = cmte_id + '_' + str(report_id)+'_'+str(up_datetime)+'.json'
         tmp_path = '/tmp/'+tmp_filename
@@ -412,8 +474,8 @@ def create_json_builders(request):
             file_obj = {'json_file': ('data.json', open(
                 tmp_path, 'rb'), 'application/json')}
 
-            print("data_obj = ", data_obj)
-            print("file_obj = ", file_obj)
+            # print("data_obj = ", data_obj)
+            # print("file_obj = ", file_obj)
             resp = requests.post(settings.NXG_FEC_PRINT_API_URL +
                                  settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
 
@@ -436,8 +498,8 @@ def create_json_builders(request):
                         }
             file_obj = {'fecDataFile': ('data.json', open(
                 tmp_path, 'rb'), 'application/json')}
-            print("data_obj = ", data_obj)
-            print("file_obj = ", file_obj)
+            # print("data_obj = ", data_obj)
+            # print("file_obj = ", file_obj)
 
             add_log(report_id,
                 cmte_id, 
