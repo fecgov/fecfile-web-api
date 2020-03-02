@@ -345,3 +345,4 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
     }
   }
 }
+

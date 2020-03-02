@@ -2,6 +2,7 @@ import logging
 from functools import lru_cache
 from django.db import connection
 from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
+
 import datetime
 
 logger = logging.getLogger(__name__)
@@ -276,6 +277,7 @@ def transaction_exists(tran_id, sched_type):
         raise
 
 
+
 @lru_cache(maxsize=32)
 def populate_transaction_types():
     """
@@ -298,6 +300,7 @@ def populate_transaction_types():
     try:
         with connection.cursor() as cursor:
             cursor.execute(_sql)
+
             if cursor.rowcount == 0:
                 raise Exception("bummer, no transaction_types found in the database.")
             for row in cursor.fetchall():
@@ -351,16 +354,20 @@ def get_line_number_trans_type(transaction_type_identifier):
             return line_number, transaction_type
         else:
             raise Exception(
+
                 "The transaction type identifier is not in the specified list. Input Received: "
                 + transaction_type_identifier
             )
+
     except:
         raise
+
 
 
 def get_sched_a_transactions(
     report_id, cmte_id, transaction_id=None, back_ref_transaction_id=None
 ):
+
     """
     load sched_a transacrtions
     """
@@ -379,10 +386,12 @@ def get_sched_a_transactions(
                 AND transaction_id = %s 
                 AND delete_ind is distinct from 'Y'
                 """
+
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                     [report_id, cmte_id, transaction_id],
                 )
+
             elif back_ref_transaction_id:
                 query_string = """
                 SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
@@ -395,10 +404,12 @@ def get_sched_a_transactions(
                 AND back_ref_transaction_id = %s 
                 AND delete_ind is distinct from 'Y'
                 """
+
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                     [report_id, cmte_id, back_ref_transaction_id],
                 )
+
             else:
                 query_string = """
                 SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, 
@@ -411,10 +422,12 @@ def get_sched_a_transactions(
                 AND delete_ind is distinct from 'Y' 
                 ORDER BY transaction_id DESC
                 """
+
                 cursor.execute(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                     [report_id, cmte_id],
                 )
+
             return post_process_it(cursor, cmte_id)
     except Exception:
         raise
@@ -872,6 +885,7 @@ def get_sched_c2_child(cmte_id, transaction_id):
 def get_sched_b_transactions(
     report_id, cmte_id, include_deleted_trans_flag = False, transaction_id=None, back_ref_transaction_id=None
 ):
+
     """
     load sched_b transactions
     """
@@ -1060,8 +1074,10 @@ def post_process_it(cursor, cmte_id):
     #         return []
     merged_list = []
     for item in transaction_list:
+
         entity_id = item.get("entity_id")
         data = {"entity_id": entity_id, "cmte_id": cmte_id}
+
         entity_list = get_entities(data)
         dictEntity = entity_list[0]
         cand_entity = {}

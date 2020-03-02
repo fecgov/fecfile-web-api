@@ -350,11 +350,13 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
       s.selected = false;
     }
 
+
     this._messageService.sendMessage('Filter deleted');
     
     this.status.emit({
       filterstatus:'deleted'
     });
+
 
   }
 
@@ -525,7 +527,9 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
             break;
             case FilterTypes.type:
             for (const st of this.types) {
+
               if (st.type_code === message.value) {
+
                 st.selected = false;
               }
             }
