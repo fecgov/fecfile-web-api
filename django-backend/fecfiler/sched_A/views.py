@@ -810,7 +810,9 @@ def func_aggregate_amount(
             query_string = """SELECT aggregate_amt FROM sched_a  WHERE entity_id = %s {} AND cmte_id = %s 
     AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
     AND contribution_date <= %s::date
-    AND ((back_ref_transaction_id IS NULL AND memo_code IS NULL) OR (back_ref_transaction_id IS NOT NULL))
+    AND ((back_ref_transaction_id IS NULL 
+    AND (memo_code IS NULL OR (reattribution_ind='A' AND contribution_amount<0) OR reattribution_ind='R')) 
+    OR (back_ref_transaction_id IS NOT NULL))
     AND delete_ind is distinct FROM 'Y' 
     ORDER BY contribution_date DESC, create_date DESC;""".format(
                 params
@@ -854,7 +856,8 @@ def list_all_transactions_entity(
                 (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
                 t1.memo_code, 
                 t1.back_ref_transaction_id,
-                t1.transaction_type_identifier
+                t1.transaction_type_identifier,
+                t1.reattribution_ind
             FROM public.sched_a t1 
             WHERE entity_id = %s 
             AND cmte_id = %s 
@@ -988,7 +991,8 @@ def update_linenumber_aggamt_transactions_SA(
                 # checking if the back_ref_transaction_id is null or not.
                 # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
                 if transaction[7] != None or (
-                    transaction[7] == None and transaction[6] != "X"
+                    transaction[7] == None and 
+                    (transaction[6] != "X" or (transaction[9] == 'A' and transaction[0] < 0) or transaction[9] == 'R')
                 ):
                     if (committee_type == "PAC") and transaction[
                         8
@@ -1279,7 +1283,16 @@ def post_schedA(datum):
             raise Exception(
                 "The post_sql_schedA function is throwing an error: " + str(e)
             )
-
+        # Auto generation of reattribution transactions
+        if 'reattribution_id' in datum:
+            reattribution_auto_generate_transactions(
+                datum["cmte_id"],
+                datum["report_id"],
+                datum["reattribution_id"],
+                datum["contribution_date"],
+                datum["contribution_amount"],
+                datum["transaction_id"],
+            )
         # update line number based on aggregate amount info
         if transaction_id.startswith("SA"):
             update_linenumber_aggamt_transactions_SA(
@@ -1642,6 +1655,11 @@ def put_schedA(datum):
                         transaction_data.get("levin_account_id"),
                         transaction_data.get("transaction_type_identifier"),
                     )
+                # Updating auto generated reattributed transactions
+                if prev_transaction_data.get('reattribution_ind') == 'O':
+                    update_auto_generated_reattribution_transactions(datum,
+                        prev_transaction_data.get('reattribution_id'), entity_id)
+
             except:
                 put_sql_schedA(
                     prev_transaction_data.get("cmte_id"),
@@ -1697,6 +1715,41 @@ def put_schedA(datum):
     except:
         raise
 
+def update_auto_generated_reattribution_transactions(data, reattributed_id, entity_id):
+    try:
+        with connection.cursor() as cursor:
+            auto_sql_1 = """UPDATE public.sched_a SET line_number = %s, transaction_type = %s,
+            entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, 
+            election_code = %s, election_other_description = %s, donor_cmte_id = %s, 
+            donor_cmte_name = %s, levin_account_id = %s WHERE reattribution_ind = 'A' AND reattribution_id = %s 
+            AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND contribution_amount > 0"""
+            # memo_text = 'MEMO: Originally reported '+to_char(data['contribution_date'], 'MM/DD/YYYY'),'. $', %s::text, ' reattributed below')
+            cursor.execute(auto_sql_1, [
+                data['line_number'], data['transaction_type'], entity_id, data['contribution_date'], 
+                data['contribution_amount'], data['purpose_description'], data['election_code'], 
+                data['election_other_description'], data['donor_cmte_id'], data['donor_cmte_name'], data['levin_account_id'],
+                reattributed_id, data['cmte_id']])
+            if cursor.rowcount == 0:
+                raise Exception('There are no auto generated transactions for this reattributed_id:{} and cmte_id:{}'.
+                    format(reattributed_id, data['cmte_id']))
+
+        with connection.cursor() as cursor:
+            auto_sql_2 = """UPDATE public.sched_a SET line_number = %s, transaction_type = %s,
+            entity_id = %s, purpose_description = %s, 
+            memo_text = %s, election_code = %s, election_other_description = %s, donor_cmte_id = %s, 
+            donor_cmte_name = %s, levin_account_id = %s WHERE reattribution_ind = 'A' AND reattribution_id = %s 
+            AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND contribution_amount < 0"""
+            cursor.execute(auto_sql_2, [
+                data['line_number'], data['transaction_type'], entity_id, data['purpose_description'], 
+                data['memo_text'], data['election_code'], data['election_other_description'], 
+                data['donor_cmte_id'], data['donor_cmte_name'], data['levin_account_id'],
+                reattributed_id, data['cmte_id']])
+            if cursor.rowcount == 0:
+                raise Exception('There are no auto generated transactions for this reattributed_id:{} and cmte_id:{}'.
+                    format(reattributed_id, data['cmte_id']))
+
+    except Exception as e:
+        raise Exception('The update_auto_generated_reattribution_transactions function is throwing an error: ' + str(e))
 
 def delete_schedA(data):
     """delete sched_a item and update all associcated items
@@ -2226,18 +2279,9 @@ def schedA(request):
                 datum["report_id"] = check_report_id(
                     request.data["reattribution_report_id"]
                 )
+                datum['reattribution_id'] = request.data["reattribution_id"]
             # posting data into schedA
             data = post_schedA(datum)
-            # Auto generation of reattribution transactions
-            if reattribution_flag:
-                reattribution_auto_generate_transactions(
-                    cmte_id,
-                    datum["report_id"],
-                    request.data["reattribution_id"],
-                    datum["contribution_date"],
-                    datum["contribution_amount"],
-                    data["transaction_id"],
-                )
             output = get_schedA(data)
             # for earmark child transaction: update parent transction  purpose_description
             if datum.get("transaction_type_identifier") in EARMARK_SA_CHILD_LIST:
