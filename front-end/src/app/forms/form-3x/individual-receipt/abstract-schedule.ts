@@ -1517,11 +1517,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.transactionType) {
       // Not sure if this is needed for preventing excessive calls.
       // Removed for now to get working for sched_h.
-      if (this.transactionType !== this._transactionTypePrevious) {
       this._transactionTypePrevious = this.transactionType;
       // reload dynamic form fields
       this._getFormFields();
-      }
     }
   }
 
