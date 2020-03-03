@@ -264,8 +264,8 @@ def put_schedE(data):
         try:
             put_sql_schedE(data)
             # update sched_d parent if IE debt payment
-            if data.get("transaction_type_identifier") == "IE_B4_DISSE_MEMO":
-                if float(existing_expenditure) != float(data.get("enpenditure_amount")):
+            if data.get("transaction_type_identifier") == "IE_B4_DISSE":
+                if float(existing_expenditure) != float(data.get("expenditure_amount")):
                     update_sched_d_parent(
                         data.get("cmte_id"),
                         data.get("back_ref_transaction_id"),
@@ -750,7 +750,7 @@ def post_schedE(data):
             post_sql_schedE(data)
 
             # update sched_d parent if IE debt payment
-            if data.get("transaction_type_identifier") == "IE_B4_DISSE_MEMO":
+            if data.get("transaction_type_identifier") == "IE_B4_DISSE":
                 update_sched_d_parent(
                     data.get("cmte_id"),
                     data.get("back_ref_transaction_id"),

@@ -566,7 +566,10 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   }
 
   private addSchedESpecificMetadata() {
-    this._utilService.addOrEditObjectValueInArray(this.hiddenFields, 'hidden','full_election_code', this.electionCode[0] + this.electionYear);
+    if(this.hiddenFields && this.electionCode && this.electionYear){
+      this._utilService.addOrEditObjectValueInArray(this.hiddenFields, 'hidden','full_election_code', this.electionCode[0] + this.electionYear);
+
+    }
   }
 
 
