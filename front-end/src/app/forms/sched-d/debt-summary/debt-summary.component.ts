@@ -338,7 +338,12 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
           transactionId: debtPayment.transactionId,
           type: debtPayment.transactionTypeDescription,
           transactionTypeIdentifier: debtPayment.transactionTypeIdentifier,
-          apiCall: debtPayment.apiCall
+          apiCall: debtPayment.apiCall,
+          date: debtPayment.paymentDate,
+          amount: debtPayment.paymentAmt,
+          memoCode: debtPayment.memoCode,
+          aggregate: debtPayment.aggregate,
+          entityId: debtPayment.entityId
         }
       }
     });
