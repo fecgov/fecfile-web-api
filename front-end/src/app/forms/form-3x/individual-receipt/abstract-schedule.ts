@@ -356,7 +356,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     this._prePopulateFieldArray = [{name:'purpose_description', value:this.reattrbutionTransaction.purposeDescription}];
 
+    this.clearEntityIdFromHiddenFields();
 
+  }
+
+  private clearEntityIdFromHiddenFields() {
+    if (this.hiddenFields && this.hiddenFields.length > 0) {
+      let entityIdField = this.hiddenFields.find(element => element.name === 'entity_id');
+      entityIdField.value = null;
+    }
   }
 
   public ngOnInit(): void {
@@ -5279,9 +5287,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
   
   protected removeAllValidators() {
-    for (const key in this.frmIndividualReceipt.controls) {
-      this.frmIndividualReceipt.get(key).clearValidators();
-      this.frmIndividualReceipt.get(key).updateValueAndValidity();
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls){
+      for (const key in this.frmIndividualReceipt.controls) {
+        this.frmIndividualReceipt.get(key).clearValidators();
+        this.frmIndividualReceipt.get(key).updateValueAndValidity();
+      }
     }
 }
 
