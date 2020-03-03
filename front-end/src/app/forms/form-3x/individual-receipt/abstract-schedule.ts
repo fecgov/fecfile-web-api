@@ -463,6 +463,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
   checkComponent(changes: SimpleChanges): boolean {
+
+    // Some components pass null explicitly to force the form page to load even without
+    // @Input() changes (SchedFComponent, H3, H5).  If changes === null proceed with page load.
+    if (!changes) {
+      return true;
+    }
+
     if (changes && changes.transactionType && changes.transactionType.currentValue !== '' && changes.transactionType.currentValue === this.transactionType) {
 
       //schedE is set up differently, causing ngOnChange to fire everytime, so need to explicily check the component against the transactionType to prevent
