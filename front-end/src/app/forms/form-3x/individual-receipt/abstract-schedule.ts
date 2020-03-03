@@ -344,6 +344,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.controls['expenditure_amount'].setValidators([Validators.required,validateContributionAmount(Number(this._maxReattributableOrRedesignatableAmount))]);
       this.frmIndividualReceipt.controls['expenditure_amount'].updateValueAndValidity();
     }
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['memo_text']){
+      this.frmIndividualReceipt.patchValue({memo_text:'MEMO: Reattribution'},{onlySelf:true});
+      this.frmIndividualReceipt.get('memo_text').disable();
+    }
   }
 
   private populateDataForReattribution(message: any) {
@@ -356,6 +360,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     this._prePopulateFieldArray = [{name:'purpose_description', value:this.reattrbutionTransaction.purposeDescription}];
 
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['memo_text']){
+      this.frmIndividualReceipt.patchValue({memo_text:'MEMO: Redesignated'},{onlySelf:true});
+      this.frmIndividualReceipt.get('memo_text').disable();
+    }
     this.clearEntityIdFromHiddenFields();
 
   }
