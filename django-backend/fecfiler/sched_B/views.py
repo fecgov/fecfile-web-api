@@ -1626,6 +1626,9 @@ def schedB(request):
             # for earmark child transaction: update parent transction  purpose_description
             if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:
                 update_earmark_parent_purpose(datum)
+            # UPDATE auto generated redesignation transactions
+            if output[0].get('redesignation_ind') == 'O':
+                update_auto_generated_redesignated_transactions(output[0])
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
 
         except Exception as e:
@@ -1670,6 +1673,52 @@ def schedB(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+def update_auto_generated_redesignated_transactions(data):
+    try:
+        with connection.cursor() as cursor:
+            auto_sql_1 = """UPDATE public.sched_b SET line_number = %s, transaction_type = %s, 
+            entity_id = %s, expenditure_date = %s, expenditure_amount = %s, semi_annual_refund_bundled_amount = %s, 
+            expenditure_purpose = %s, category_code = %s, election_code = %s, election_other_description = %s, 
+            beneficiary_cmte_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s, 
+            other_state = %s, other_zip = %s, nc_soft_account = %s, beneficiary_cmte_name = %s, 
+            beneficiary_cand_entity_id = %s, levin_account_id = %s
+            WHERE redesignation_ind = 'A' AND redesignation_id = %s 
+            AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND expenditure_amount > 0"""
+            cursor.execute(auto_sql_1, [
+                data['line_number'], data['transaction_type'], data['entity_id'], data['expenditure_date'], 
+                data['expenditure_amount'], data['semi_annual_refund_bundled_amount'], data['expenditure_purpose'], 
+                data['category_code'], data['election_code'], data['election_other_description'], 
+                data['beneficiary_cmte_id'], data['other_name'], data['other_street_1'], data['other_street_2'], 
+                data['other_city'], data['other_state'], data['other_zip'], data['nc_soft_account'],
+                data['beneficiary_cmte_name'], data['beneficiary_cand_entity_id'], data['levin_account_id'],
+                data['redesignation_id'], data['cmte_id']])
+            if cursor.rowcount == 0:
+                raise Exception('There are no auto generated transactions for this redesignation_id:{} and cmte_id:{}'.
+                    format(data['redesignation_id'], data['cmte_id']))
+
+        with connection.cursor() as cursor:
+            auto_sql_2 = """UPDATE public.sched_b SET line_number = %s, transaction_type = %s, 
+            entity_id = %s, semi_annual_refund_bundled_amount = %s, 
+            expenditure_purpose = %s, category_code = %s, election_code = %s, election_other_description = %s, 
+            beneficiary_cmte_id = %s, other_name = %s, other_street_1 = %s, other_street_2 = %s, other_city = %s, 
+            other_state = %s, other_zip = %s, nc_soft_account = %s, beneficiary_cmte_name = %s, 
+            beneficiary_cand_entity_id = %s, levin_account_id = %s
+            WHERE redesignation_ind = 'A' AND redesignation_id = %s 
+            AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND expenditure_amount < 0"""
+            cursor.execute(auto_sql_2, [
+                data['line_number'], data['transaction_type'], data['entity_id'], 
+                data['semi_annual_refund_bundled_amount'], data['expenditure_purpose'], 
+                data['category_code'], data['election_code'], data['election_other_description'], 
+                data['beneficiary_cmte_id'], data['other_name'], data['other_street_1'], data['other_street_2'], 
+                data['other_city'], data['other_state'], data['other_zip'], data['nc_soft_account'],
+                data['beneficiary_cmte_name'], data['beneficiary_cand_entity_id'], data['levin_account_id'],
+                data['redesignation_id'], data['cmte_id']])
+            if cursor.rowcount == 0:
+                raise Exception('There are no auto generated transactions for this redesignation_id:{} and cmte_id:{}'.
+                    format(data['redesignation_id'], data['cmte_id']))
+
+    except Exception as e:
+        raise Exception('The update_auto_generated_redesignated_transactions function is throwing an error: ' + str(e))
 
 def get_list_schedA_from_schedB(
     report_id, cmte_id, transaction_id=None, include_deleted_trans_flag=False
