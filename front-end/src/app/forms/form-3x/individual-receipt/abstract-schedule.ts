@@ -705,7 +705,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     } else if (this.isFieldName(fieldName, 'expenditure_amount') ||
-      this.isFieldName(fieldName,'contribution_amount') ||
+      this.isFieldName(fieldName, 'contribution_amount') ||
       this.isFieldName(fieldName, 'total_amount')) {
       // Debt payments need a validation to prevent exceeding the incurred debt
       if (this.transactionType === 'OPEXP_DEBT' ||
@@ -714,7 +714,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.transactionType === 'OTH_DISB_DEBT' ||
         this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
         this.transactionType === 'COEXP_PARTY_DEBT' ||
-        this.transactionType === 'IE_B4_DISSE') {
+        this.transactionType === 'IE_B4_DISSE' ||
+        this.transactionType === 'OTH_REC_DEBT') {
         if (this._outstandingDebtBalance !== null) {
           if (this._outstandingDebtBalance >= 0) {
             formValidators.push(validateContributionAmount(this._outstandingDebtBalance));
@@ -5045,7 +5046,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
-   * If originated from Debt Summary, return there othrrwise go to the transactions.
+   * If originated from Debt Summary, return there otherwise go to the transactions.
    */
   public cancel(): void {
     if (
