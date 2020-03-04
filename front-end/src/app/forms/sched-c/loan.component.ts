@@ -21,6 +21,7 @@ import { TransactionsMessageService } from '../transactions/service/transactions
 import { TypeaheadService } from './../../shared/partials/typeahead/typeahead.service';
 import { DialogService } from './../../shared/services/DialogService/dialog.service';
 import { ContributionDateValidator } from './../../shared/utils/forms/validation/contribution-date.validator';
+import { map } from "rxjs/operators";
 
 export enum ActiveView {
   Loans = 'Loans',
@@ -519,7 +520,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       distinctUntilChanged(),
       switchMap(searchText => {
         if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'last_name');
+          let result = this._typeaheadService.getContacts(searchText, 'last_name');
+          result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+          return result;
         } else {
           return Observable.of([]);
         }
@@ -535,7 +538,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       distinctUntilChanged(),
       switchMap(searchText => {
         if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'first_name');
+          let result = this._typeaheadService.getContacts(searchText, 'first_name');
+          result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+          return result;
         } else {
           return Observable.of([]);
         }
@@ -583,7 +588,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       distinctUntilChanged(),
       switchMap(searchText => {
         if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'entity_name');
+          let result = this._typeaheadService.getContacts(searchText, 'entity_name');
+          result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+          return result;
         } else {
           return Observable.of([]);
         }
