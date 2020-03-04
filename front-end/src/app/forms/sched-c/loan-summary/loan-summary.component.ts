@@ -1,6 +1,16 @@
 import { ReportTypeService } from './../../form-3x/report-type/report-type.service';
 import { TransactionsService } from './../../transactions/service/transactions.service';
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  ViewEncapsulation,
+  ViewChild,
+  OnDestroy,
+  Output,
+  EventEmitter,
+  SimpleChanges
+} from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -12,10 +22,14 @@ import { UtilService } from '../../../shared/utils/util.service';
 //import { ActiveView } from '../loan-summary/
 import { LoanMessageService } from '../../sched-c/service/loan-message.service';
 import { Subscription } from 'rxjs/Subscription';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
 import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
+import { TransactionModel } from '../../transactions/model/transaction.model';
 
 export enum ActiveView {
   loanSummary = 'loanSummary',
@@ -31,26 +45,16 @@ export enum loanSumarysActions {
 @Component({
   selector: 'app-loansummary',
   templateUrl: './loan-summary.component.html',
-  styleUrls: [
-    './loan-summary.component.scss'
-  ],
+  styleUrls: ['./loan-summary.component.scss'],
   encapsulation: ViewEncapsulation.None,
   animations: [
     trigger('fadeInOut', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate(500, style({ opacity: 1 }))
-      ]),
-      transition(':leave', [
-        animate(0, style({ opacity: 0 }))
-      ])
+      transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
+      transition(':leave', [animate(0, style({ opacity: 0 }))])
     ])
   ]
 })
-
-
 export class LoanSummaryComponent implements OnInit, OnDestroy {
-
   @ViewChild('columnOptionsModal')
   public columnOptionsModal: ModalDirective;
 
@@ -69,7 +73,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public LoanModel: Array<any>;
 
   public totalAmount: number;
-  public LoanView = ActiveView.loanSummary
+  public LoanView = ActiveView.loanSummary;
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
@@ -86,37 +90,29 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
 
-
   // Local Storage Keys
-  private readonly loanSortableColumnsLSK =
-    'Loan.ctn.sortableColumn';
-  private readonly recycleSortableColumnsLSK =
-    'Loan.recycle.sortableColumn';
-  private readonly loanCurrentSortedColLSK =
-    'Loan.ctn.currentSortedColumn';
-  private readonly recycleCurrentSortedColLSK =
-    'Loan.recycle.currentSortedColumn';
-  private readonly loanPageLSK =
-    'Loan.ctn.page';
-  private readonly recyclePageLSK =
-    'Loan.recycle.page';
-  private readonly filtersLSK =
-    'Loan.filters';
+  private readonly loanSortableColumnsLSK = 'Loan.ctn.sortableColumn';
+  private readonly recycleSortableColumnsLSK = 'Loan.recycle.sortableColumn';
+  private readonly loanCurrentSortedColLSK = 'Loan.ctn.currentSortedColumn';
+  private readonly recycleCurrentSortedColLSK = 'Loan.recycle.currentSortedColumn';
+  private readonly loanPageLSK = 'Loan.ctn.page';
+  private readonly recyclePageLSK = 'Loan.recycle.page';
+  private readonly filtersLSK = 'Loan.filters';
 
   /**.
-	 * Array of columns to be made sortable.
-	 */
+   * Array of columns to be made sortable.
+   */
   private sortableColumns: SortableColumnModel[] = [];
 
   /**
-	 * A clone of the sortableColumns for reverting user
+   * A clone of the sortableColumns for reverting user
    * column options on a Cancel.
-	 */
+   */
   private cloneSortableColumns: SortableColumnModel[] = [];
 
   /**
-	 * Identifies the column currently sorted by name.
-	 */
+   * Identifies the column currently sorted by name.
+   */
   private currentSortedColumnName: string;
 
   /**
@@ -124,7 +120,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * options.
    */
   private showPinColumnsSubscription: Subscription;
-
 
   /**
    * Subscription for running the keyword and filter search
@@ -144,29 +139,24 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
-    private _transactionService: TransactionsService, 
+    private _transactionService: TransactionsService,
     private _reportTypeService: ReportTypeService
   ) {
-    this.showPinColumnsSubscription = this._LoanMessageService.getShowPinColumnMessage()
-      .subscribe(
-        message => {
-          this.showPinColumns();
-        }
-      );
+    this.showPinColumnsSubscription = this._LoanMessageService.getShowPinColumnMessage().subscribe(message => {
+      this.showPinColumns();
+    });
 
-    this.keywordFilterSearchSubscription = this._LoanMessageService.getDoKeywordFilterSearchMessage()
-      .subscribe(
-        message => {
-          this.getPage(this.config.currentPage)
-        }
-      );
-    
-    this._loanSummaryRefreshDataSubscription = this._LoanMessageService.getLoanSummaryRefreshMessage()
-    .subscribe(
-      message => {
+    this.keywordFilterSearchSubscription = this._LoanMessageService
+      .getDoKeywordFilterSearchMessage()
+      .subscribe(message => {
+        this.getPage(this.config.currentPage);
+      });
+
+    this._loanSummaryRefreshDataSubscription = this._LoanMessageService
+      .getLoanSummaryRefreshMessage()
+      .subscribe(message => {
         this.loadPage(message);
-      }
-    )
+      });
   }
   /**
    * Initialize the component.
@@ -176,6 +166,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
+    // If Report ID is not provided by parent component, get it from local storage.
+    if (!this.reportId || this.reportId === '0') {
+      this.reportId = this._reportTypeService.getReportIdFromStorage(this.formType);
+    }
     this.loadPage();
   }
 
@@ -213,17 +207,15 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this._loanSummaryRefreshDataSubscription.unsubscribe();
   }
 
-
   /**
-	 * The Loan for a given page.
-	 *
-	 * @param page the page containing the Loan to get
-	 */
+   * The Loan for a given page.
+   *
+   * @param page the page containing the Loan to get
+   */
   public getPage(page: number, message: any = null): void {
-
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
-    console.log(" getPage this.tableType", this.tableType)
+    console.log(' getPage this.tableType', this.tableType);
     switch (this.tableType) {
       case this.LoanView:
         this.getLoanPage(page, message);
@@ -233,18 +225,18 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
-	 * The Loan for a given page.
-	 *
-	 * @param page the page containing the Loan to get
-	 */
+   * The Loan for a given page.
+   *
+   * @param page the page containing the Loan to get
+   */
   public getLoanPage(page: number, message: any = null): void {
-
     this.config.currentPage = page;
 
-    let sortedCol: SortableColumnModel =
-      this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
+    let sortedCol: SortableColumnModel = this._tableService.getColumnByName(
+      this.currentSortedColumnName,
+      this.sortableColumns
+    );
 
     if (!sortedCol) {
       this.setSortDefault();
@@ -259,15 +251,14 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    const serverSortColumnName = this._LoanService.
-      mapToSingleServerName(this.currentSortedColumnName);
+    const serverSortColumnName = this._LoanService.mapToSingleServerName(this.currentSortedColumnName);
 
-    this._LoanService.getLoan(message)
+    this._LoanService
+      .getLoan(message)
       //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
       .subscribe((res: any) => {
-
         // res=this.tempApiResponse;
-        console.log(" getLoanPage res =", res)
+        console.log(' getLoanPage res =', res);
         this.LoanModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter
@@ -276,42 +267,37 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
           this.config.currentPage = 1;
         }
 
-
         //TODO - ZS -- this is temporary fix to map fields to the right attributes until service response is fixed
         res.forEach(element => {
           //set name
           if (element.entity_type === 'IND') {
             element.name = `${element.last_name}, ${element.first_name}`;
-          }
-          else if (element.entity_type === 'ORG') {
+          } else if (element.entity_type === 'ORG') {
             element.name = element.entity_name;
           }
 
-          //add endorser and c1 check flags to decide whether to show or not in expansion accordion. 
-          if(element.child && element.child.length > 0){
+          //add endorser and c1 check flags to decide whether to show or not in expansion accordion.
+          if (element.child && element.child.length > 0) {
             let c1childArray = element.child.filter(cElement => {
               return cElement.transaction_type_identifier === 'SC1';
             });
-            if(c1childArray.length > 0){
+            if (c1childArray.length > 0) {
               element.hasC1 = true;
             }
 
             let c2childArray = element.child.filter(cElement => {
               return cElement.transaction_type_identifier === 'SC2';
             });
-            if(c2childArray.length > 0){
+            if (c2childArray.length > 0) {
               element.hasC2 = true;
             }
           }
         });
 
-
         this._LoanService.addUIFileds(res);
         this._LoanService.mockApplyFilters(res);
         const LoanModelL = this._LoanService.mapFromServerFields(res);
         this.LoanModel = LoanModelL;
-
-
 
         this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
         this.numberOfPages = res.totalPages;
@@ -319,7 +305,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       });
   }
 
-  public goToC1(loan:any) {
+  public goToC1(loan: any) {
     const c1Exists = this._LoanService.c1Exists(loan);
     const c1EmitObj: any = {
       form: {},
@@ -327,17 +313,17 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       step: 'step_3',
       previousStep: 'step_2',
       scheduleType: 'sched_c1',
-      action: c1Exists ? ScheduleActions.edit: ScheduleActions.add,
+      action: c1Exists ? ScheduleActions.edit : ScheduleActions.add,
       transactionDetail: {
         transactionModel: {
-          transactionId: loan.transaction_id,
+          transactionId: loan.transaction_id
         }
       }
     };
     this.status.emit(c1EmitObj);
   }
 
-  public goToEndorserSummary(loan:any) {
+  public goToEndorserSummary(loan: any) {
     const c1EmitObj: any = {
       form: {},
       direction: 'next',
@@ -347,16 +333,16 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       action: ScheduleActions.add,
       transactionDetail: {
         transactionModel: {
-          endorser:{
-            back_ref_transaction_id:loan.transaction_id,
-          }, 
+          endorser: {
+            back_ref_transaction_id: loan.transaction_id
+          }
         }
       }
     };
     this.status.emit(c1EmitObj);
   }
 
-  public editLoanRepayment(payment:any){
+  public editLoanRepayment(payment: any) {
     const loanRepaymentEmitObj: any = {
       form: {},
       direction: 'next', //TODO-zs -- does this need to be changed?
@@ -366,14 +352,14 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       action: ScheduleActions.edit,
       transactionDetail: {
         transactionModel: {
-          backRefTransactionId:payment.back_ref_transaction_id,
+          backRefTransactionId: payment.back_ref_transaction_id,
           transactionId: payment.transaction_id,
           entityId: payment.entity_id,
-          apiCall:payment.api_call, 
-          transactionTypeIdentifier : payment.transaction_type_identifier,
-          date:payment.expenditure_date,
-          amount:payment.expenditure_amount, 
-          purposeDescription:payment.expenditure_purpose, 
+          apiCall: payment.api_call,
+          transactionTypeIdentifier: payment.transaction_type_identifier,
+          date: payment.expenditure_date,
+          amount: payment.expenditure_amount,
+          purposeDescription: payment.expenditure_purpose,
           memoText: payment.memo_text
         }
       }
@@ -381,45 +367,48 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.status.emit(loanRepaymentEmitObj);
   }
 
-  public deleteLoanRepayment(payment: any){
-    payment.transactionId = payment.transaction_id; //TODO - clean this. 
+  public deleteLoanRepayment(payment: any) {
+    payment.transactionId = payment.transaction_id; //TODO - clean this.
     this._dialogService
-      .confirm('You are about to delete this transaction ' + payment.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .confirm(
+        'You are about to delete this transaction ' + payment.transaction_id + '.',
+        ConfirmModalComponent,
+        'Caution!'
+      )
       .then(res => {
         if (res === 'okay') {
-
-          this._transactionService.trashOrRestoreTransactions('3X','trash',payment.report_id,[payment]).subscribe(res => {
-            this.getPage(this.config.currentPage);
-            this._dialogService.confirm(
-              'Transaction has been successfully deleted. ' + payment.transaction_id,
-              ConfirmModalComponent,
-              'Success!',
-              false,
-              ModalHeaderClassEnum.successHeader
-            );
-          })
+          this._transactionService
+            .trashOrRestoreTransactions('3X', 'trash', payment.report_id, [payment])
+            .subscribe(res => {
+              this.getPage(this.config.currentPage);
+              this._dialogService.confirm(
+                'Transaction has been successfully deleted. ' + payment.transaction_id,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
         } else if (res === 'cancel') {
         }
       });
   }
 
-
   /**
-	 * Wrapper method for the table service to set the class for sort column styling.
-	 *
-	 * @param colName the column to apply the class
-	 * @returns string of classes for CSS styling sorted/unsorted classes
-	 */
+   * Wrapper method for the table service to set the class for sort column styling.
+   *
+   * @param colName the column to apply the class
+   * @returns string of classes for CSS styling sorted/unsorted classes
+   */
   public getSortClass(colName: string): string {
     return this._tableService.getSortClass(colName, this.currentSortedColumnName, this.sortableColumns);
   }
 
-
   /**
-	 * Change the sort direction of the table column.
-	 *
-	 * @param colName the column name of the column to sort
-	 */
+   * Change the sort direction of the table column.
+   *
+   * @param colName the column name of the column to sort
+   */
   public changeSortDirection(colName: string): void {
     this.currentSortedColumnName = this._tableService.changeSortDirection(colName, this.sortableColumns);
     const direction = this._tableService.getBinarySortDirection(colName, this.sortableColumns);
@@ -429,7 +418,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     // this.getPage(this.config.currentPage);
     this.LoanModel = this._LoanService.sortLoan(this.LoanModel, this.currentSortedColumnName, direction);
   }
-
 
   /**
    * Get the SortableColumnModel by name.
@@ -446,7 +434,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     return new SortableColumnModel('', false, false, false, false);
   }
 
-
   /**
    * Determine if the column is to be visible in the table.
    *
@@ -462,7 +449,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Set the visibility of a column in the table.
    *
@@ -475,7 +461,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       sortableCol.visible = visible;
     }
   }
-
 
   /**
    * Set the checked property of a column in the table.
@@ -492,7 +477,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    *
    * @param colName Determine if the checkbox column option should be disabled.
@@ -500,14 +484,12 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public disableOption(colName: string): boolean {
     const sortableCol = this.getSortableColumn(colName);
     if (sortableCol) {
-      if (!sortableCol.checked && this.columnOptionCount >
-        (this.maxColumnOption - 1)) {
+      if (!sortableCol.checked && this.columnOptionCount > this.maxColumnOption - 1) {
         return true;
       }
     }
     return false;
   }
-
 
   /**
    * Toggle the visibility of a column in the table.
@@ -516,7 +498,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * @param e the click event
    */
   public toggleVisibility(colName: string, e: any) {
-
     if (!this.sortableColumns) {
       return;
     }
@@ -542,12 +523,11 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.applyDisabledColumnOptions();
   }
 
-
   /**
    * Disable the unchecked column options if the max is met.
    */
   private applyDisabledColumnOptions() {
-    if (this.columnOptionCount > (this.maxColumnOption - 1)) {
+    if (this.columnOptionCount > this.maxColumnOption - 1) {
       for (const col of this.sortableColumns) {
         col.disabled = !col.checked;
       }
@@ -558,19 +538,16 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Save the columns to show selected by the user.
    */
   public saveColumnOptions() {
-
     for (const col of this.sortableColumns) {
       this.setColumnVisible(col.colName, col.checked);
     }
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
     this.columnOptionsModal.hide();
   }
-
 
   /**
    * Cancel the request to save columns options.
@@ -580,23 +557,21 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.sortableColumns = this._utilService.deepClone(this.cloneSortableColumns);
   }
 
-
   /**
    * Toggle checking all types.
    *
    * @param e the click event
    */
   public toggleAllTypes(e: any) {
-    const checked = (e.target.checked) ? true : false;
+    const checked = e.target.checked ? true : false;
     for (const col of this.sortableColumns) {
       this.setColumnVisible(col.colName, checked);
     }
   }
 
-
   /**
-	 * Determine if pagination should be shown.
-	 */
+   * Determine if pagination should be shown.
+   */
   public showPagination(): boolean {
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
@@ -605,10 +580,9 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  public printLoan(loan){
+  public printLoan(loan) {
     this._reportTypeService.printPreview('transaction_table_screen', '3X', loan.transaction_id);
   }
-
 
   /**
    * View all Loan selected by the user.
@@ -617,14 +591,12 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     alert('View all Loan is not yet supported');
   }
 
-
   /**
    * Print all Loan selected by the user.
    */
   public printAllSelected(): void {
     alert('Print all Loan is not yet supported');
   }
-
 
   /**
    * Export all Loan selected by the user.
@@ -633,7 +605,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     alert('Export all Loan is not yet supported');
   }
 
-
   /**
    * Link all Loan selected by the user.
    */
@@ -641,14 +612,18 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     alert('Link multiple loan requirements have not been finalized');
   }
 
-/**
+  /**
    * Trash the transaction selected by the user.
    *
    * @param trx the Transaction to trash
    */
   public trashLoan(loan: any): void {
     this._dialogService
-      .confirm('You are about to delete this transaction ' + loan.transaction_id + '.', ConfirmModalComponent, 'Caution!')
+      .confirm(
+        'You are about to delete this transaction ' + loan.transaction_id + '.',
+        ConfirmModalComponent,
+        'Caution!'
+      )
       .then(res => {
         if (res === 'okay') {
           this._LoanService.deleteLoan(loan).subscribe(res => {
@@ -660,17 +635,61 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
               false,
               ModalHeaderClassEnum.successHeader
             );
-          })
+          });
         } else if (res === 'cancel') {
         }
       });
   }
 
-
   /**
    * Trash all Loan selected by the user.
    */
   public trashAllSelected(): void {
+    // alert('Trash all Loan is not yet supported');
+
+    let trxIds = '';
+    const selectedTransactions: Array<any> = [];
+    for (const trx of this.LoanModel) {
+      if (trx.selected) {
+        selectedTransactions.push({
+          transactionId: trx.transaction_id,
+          reportId: this.reportId
+        });
+        trxIds += trx.transaction_id + ', ';
+      }
+    }
+    if (trxIds.length > 2) {
+      trxIds = trxIds.substr(0, trxIds.length - 2);
+    }
+
+    this._dialogService
+      .confirm('You are about to delete these transactions.   ' + trxIds, ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._transactionService
+            .trashOrRestoreTransactions(this.formType, 'trash', this.reportId, selectedTransactions)
+            .subscribe((res: any) => {
+              this.getPage(this.config.currentPage);
+              let afterMessage = '';
+              if (selectedTransactions.length === 1) {
+                afterMessage = `Transaction ${selectedTransactions[0].transactionId}
+                has been successfully deleted and sent to the recycle bin.`;
+              } else {
+                afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + trxIds;
+              }
+
+              this._dialogService.confirm(
+                afterMessage,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+
     /* let conIds = '';
      const selectedLoan: Array<LoanModel> = [];
      for (const con of this.LoanModel) {
@@ -710,28 +729,22 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
          } else if (res === 'cancel') {
          }
        });*/
-
   }
-
-
 
   /**
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange(): string {
-
     let start = 0;
     let end = 0;
     // this.numberOfPages = 0;
-    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
-      this.config.currentPage : 1;
+    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? this.config.currentPage : 1;
 
     if (!this.LoanModel) {
       return '0';
     }
 
-    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
-      && this.LoanModel.length > 0) {
+    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0 && this.LoanModel.length > 0) {
       // this.calculateNumberOfPages();
 
       if (this.config.currentPage === this.numberOfPages) {
@@ -740,7 +753,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
       } else {
         end = this.config.currentPage * this.config.itemsPerPage;
-        start = (end - this.config.itemsPerPage) + 1;
+        start = end - this.config.itemsPerPage + 1;
       }
       // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
       // if (end > this.LoanModel.length) {
@@ -752,7 +765,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     return start + ' - ' + end;
   }
 
-
   /**
    * Show the option to select/deselect columns in the table.
    */
@@ -761,39 +773,26 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.columnOptionsModal.show();
   }
 
-
   /**
    * Check/Uncheck all Loan in the table.
    */
   public changeAllLoanSummrysSelected() {
-
-    // TODO Iterating over the trsnactionsModel and setting the selected prop
-    // works when we have server-side pagination as the model will only contain
-    // Loan for the current page.
-
-    // Until the server is ready for pagination,
-    // we are getting the entire set of tranactions (> 500)
-    // and must only count and set the selected prop for the items
-    // on the current page.
-
     this.bulkActionCounter = 0;
-    // for (const t of this.LoanModel) {
-    //   t.selected = this.allLoanSelected;
-    //   if (this.allLoanSelected) {
-    //     this.bulkActionCounter++;
-    //   }
-    // }
 
-    // TODO replace this with the commented code above when server pagination is ready.
-    for (let i = (this.firstItemOnPage - 1); i <= (this.lastItemOnPage - 1); i++) {
-      this.LoanModel[i].selected = this.allLoanSelected;
+    let loansExist = false;
+    for (const loan of this.LoanModel) {
+      loansExist = true;
+      loan.selected = this.allLoanSelected;
       if (this.allLoanSelected) {
         this.bulkActionCounter++;
       }
     }
-    this.bulkActionDisabled = !this.allLoanSelected;
+    if (loansExist) {
+      this.bulkActionDisabled = !this.allLoanSelected;
+    } else {
+      this.bulkActionDisabled = true;
+    }
   }
-
 
   /**
    * Check if the view to show is Loan.
@@ -802,14 +801,12 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     return this.tableType === this.LoanView ? true : false;
   }
 
-
   /**
    * Check if the view to show is Recycle Bin.
    */
   public isRecycleBinViewActive() {
     return this.tableType === this.recycleBinView ? true : false;
   }
-
 
   /**
    * Check for multiple rows checked in the table
@@ -819,7 +816,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * @param the event payload from the click
    */
   public checkForMultiChecked(e: any): void {
-
     if (e.target.checked) {
       this.bulkActionCounter++;
     } else {
@@ -829,12 +825,8 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       }
     }
 
-    // Contact View shows bulk action when more than 1 checked
-    // Recycle Bin shows delete action when 1 or more checked.
-    const count = this.isLoanSummryViewActive() ? 1 : 0;
-    this.bulkActionDisabled = (this.bulkActionCounter > count) ? false : true;
+    this.bulkActionDisabled = this.bulkActionCounter > 1 ? false : true;
   }
-
 
   /**
    * Get cached values from session.
@@ -858,7 +850,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Columns selected in the PIN dialog from the Loan view
    * need to be applied to the Recycling Bin table.
@@ -869,21 +860,17 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     if (localStorage.getItem(key) != null) {
       const ctnCols: SortableColumnModel[] = JSON.parse(sortableColumnsJson);
       for (const col of ctnCols) {
-        this._tableService.getColumnByName(col.colName,
-          this.sortableColumns).visible = col.visible;
+        this._tableService.getColumnByName(col.colName, this.sortableColumns).visible = col.visible;
       }
     }
   }
-
 
   /**
    * Apply the filters from the cache.
    */
   private applyFiltersCache() {
     const filtersJson: string | null = localStorage.getItem(this.filtersLSK);
-
   }
-
 
   /**
    * Get the column and their settings from the cache and apply it to the component.
@@ -899,34 +886,33 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Get the current sorted column from the cache and apply it to the component.
    * @param key the key to the value in the local storage cache
    */
   private applyCurrentSortedColCache(key: string) {
-    const currentSortedColumnJson: string | null =
-      localStorage.getItem(key);
+    const currentSortedColumnJson: string | null = localStorage.getItem(key);
     let currentSortedColumnL: SortableColumnModel = null;
     if (currentSortedColumnJson) {
       currentSortedColumnL = JSON.parse(currentSortedColumnJson);
 
       // sort by the column direction previously set
-      this.currentSortedColumnName = this._tableService.setSortDirection(currentSortedColumnL.colName,
-        this.sortableColumns, currentSortedColumnL.descending);
+      this.currentSortedColumnName = this._tableService.setSortDirection(
+        currentSortedColumnL.colName,
+        this.sortableColumns,
+        currentSortedColumnL.descending
+      );
     } else {
       this.setSortDefault();
     }
   }
-
 
   /**
    * Get the current page from the cache and apply it to the component.
    * @param key the key to the value in the local storage cache
    */
   private applyCurrentPageCache(key: string) {
-    const currentPageCache: string =
-      localStorage.getItem(key);
+    const currentPageCache: string = localStorage.getItem(key);
     if (currentPageCache) {
       if (this._utilService.isNumber(currentPageCache)) {
         this.config.currentPage = this._utilService.toInteger(currentPageCache);
@@ -938,23 +924,23 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    * Retrieve the cahce values from local storage and set the
    * component's class variables.
    */
   private setCachedValues() {
-
     switch (this.tableType) {
       case this.LoanView:
-        this.setCacheValuesforView(this.loanSortableColumnsLSK,
-          this.loanCurrentSortedColLSK, this.loanPageLSK);
-        this.loanPageLSK
+        this.setCacheValuesforView(this.loanSortableColumnsLSK, this.loanCurrentSortedColLSK, this.loanPageLSK);
+        this.loanPageLSK;
         break;
       case this.recycleBinView:
-        this.setCacheValuesforView(this.recycleSortableColumnsLSK,
-          this.recycleCurrentSortedColLSK, this.recyclePageLSK);
-        this.recyclePageLSK
+        this.setCacheValuesforView(
+          this.recycleSortableColumnsLSK,
+          this.recycleCurrentSortedColLSK,
+          this.recyclePageLSK
+        );
+        this.recyclePageLSK;
         break;
       default:
         break;
@@ -962,21 +948,17 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   }
 
   /**
-    * Set the currently sorted column and current page in the cache.
-    *
-    * @param columnsKey the column settings key for the cache
-    * @param sortedColKey currently sorted column key for the cache
-    * @param pageKey current page key from the cache
-    */
-  private setCacheValuesforView(columnsKey: string, sortedColKey: string,
-    pageKey: string) {
-
+   * Set the currently sorted column and current page in the cache.
+   *
+   * @param columnsKey the column settings key for the cache
+   * @param sortedColKey currently sorted column key for the cache
+   * @param pageKey current page key from the cache
+   */
+  private setCacheValuesforView(columnsKey: string, sortedColKey: string, pageKey: string) {
     // shared between ctn and recycle tables
-    localStorage.setItem(columnsKey,
-      JSON.stringify(this.sortableColumns));
+    localStorage.setItem(columnsKey, JSON.stringify(this.sortableColumns));
 
-    const currentSortedCol = this._tableService.getColumnByName(
-      this.currentSortedColumnName, this.sortableColumns);
+    const currentSortedCol = this._tableService.getColumnByName(this.currentSortedColumnName, this.sortableColumns);
     localStorage.setItem(sortedColKey, JSON.stringify(this.sortableColumns));
 
     if (currentSortedCol) {
@@ -985,13 +967,17 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     localStorage.setItem(pageKey, this.config.currentPage.toString());
   }
 
-
   /**
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
-
-    const defaultSortColumns = ['name', 'loan_amount_original', 'loan_payment_to_date', 'loan_balance', 'loan_due_date'];
+    const defaultSortColumns = [
+      'name',
+      'loan_amount_original',
+      'loan_payment_to_date',
+      'loan_balance',
+      'loan_due_date'
+    ];
     const otherSortColumns = [];
 
     this.sortableColumns = [];
@@ -1009,7 +995,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public editLoanPayment(loan: any) {
     this._goToLoan(loan);
   }
-
 
   private _goToLoan(loan: any) {
     const loanRepaymentEmitObj: any = {
@@ -1041,7 +1026,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         transactionModel: {
           transactionId: loan.transaction_id,
           entityId: loan.entity_id,
-          entryScreenScheduleType: 'sched_c_ls',
+          entryScreenScheduleType: 'sched_c_ls'
         }
       }
     };
@@ -1062,7 +1047,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.currentSortedColumnName = 'default';
   }
 
-
   private calculateNumberOfPages(): void {
     if (this.config.currentPage > 0 && this.config.itemsPerPage > 0) {
       if (this.LoanModel && this.LoanModel.length > 0) {
@@ -1071,7 +1055,4 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       }
     }
   }
-
-
-
 }
