@@ -4401,7 +4401,7 @@ def summary_disbursements_for_sumamry_table(args):
             data_row = list(row)
             if data_row[0] in ["21AI", "21A"]:
                 # XXIAI_amount = XXIAI_amount + data_row[1]
-                XXIAI_amount_ytd = data_row[1]
+                XXIAI_amount_ytd += data_row[1]
             if data_row[0] == "21AII":
                 # XXIAII_amount = XXIAII_amount + data_row[1]
                 XXIAII_amount_ytd = data_row[1]
@@ -4745,40 +4745,40 @@ def summary_receipts_for_sumamry_table(args):
                 data_row = list(row)
                 if data_row[0] in ["11AI", "11A"]:
                     # XIAI_amount = XIAI_amount + data_row[1]
-                    XIAI_amount_ytd = data_row[1]
+                    XIAI_amount_ytd += data_row[1]
                 if data_row[0] == "11AII":
                     # XIAII_amount = XIAII_amount + data_row[1]
-                    XIAII_amount_ytd = data_row[1]
+                    XIAII_amount_ytd += data_row[1]
                 if data_row[0] == "11B":
                     # XIB_amount = XIB_amount + data_row[1]
-                    XIB_amount_ytd = data_row[1]
+                    XIB_amount_ytd += data_row[1]
                 if data_row[0] == "11C":
                     # XIC_amount = XIC_amount + data_row[1]
-                    XIC_amount_ytd = data_row[1]
+                    XIC_amount_ytd += data_row[1]
                 if data_row[0] == "12":
                     # XII_amount = XII_amount + data_row[1]
-                    XII_amount_ytd = data_row[1]
+                    XII_amount_ytd += data_row[1]
                 if data_row[0] == "13":
                     # XIII_amount = XIII_amount + data_row[1]
-                    XIII_amount_ytd = data_row[1]
+                    XIII_amount_ytd += data_row[1]
                 if data_row[0] == "14":
                     # XIV_amount = XIV_amount + data_row[1]
-                    XIV_amount_ytd = data_row[1]
+                    XIV_amount_ytd += data_row[1]
                 if data_row[0] == "15":
                     # XV_amount = XV_amount + data_row[1]
-                    XV_amount_ytd = data_row[1]
+                    XV_amount_ytd += data_row[1]
                 if data_row[0] == "16":
                     # XVI_amount = XVI_amount + data_row[1]
-                    XVI_amount_ytd = data_row[1]
+                    XVI_amount_ytd += data_row[1]
                 if data_row[0] == "17":
                     # XVII_amount = XVII_amount + data_row[1]
-                    XVII_amount_ytd = data_row[1]
+                    XVII_amount_ytd += data_row[1]
                 if data_row[0] == "18A":
                     # XVIIIA_amount = XVIIIA_amount + data_row[1]
-                    XVIIIA_amount_ytd = data_row[1]
+                    XVIIIA_amount_ytd += data_row[1]
                 if data_row[0] == "18B":
                     # XVIIIB_amount = XVIIIB_amount + data_row[1]
-                    XVIIIB_amount_ytd = data_row[1]
+                    XVIIIB_amount_ytd += data_row[1]
 
 
         XIA_amount = XIA_amount + XIAI_amount + XIAII_amount
@@ -5047,10 +5047,11 @@ def get_summary_table(request):
                 report_id, calendar_year
             )
         )
-
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         period_args = [
             datetime.date(int(calendar_year), 1, 1),
-            datetime.date(int(calendar_year), 12, 31),
+            # datetime.date(int(calendar_year), 12, 31),
+            cvg_end_date,
             cmte_id,
             report_id,
         ]
