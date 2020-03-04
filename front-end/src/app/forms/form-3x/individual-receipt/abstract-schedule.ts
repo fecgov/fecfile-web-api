@@ -1118,17 +1118,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
     }
 
-    if (
-      this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
-      this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
-      this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
-      this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
-      this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_STAF_REIM_MEMO'
-    ) {
-      activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
+    if(this.subTransactionInfo){
+      if (
+        this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+        this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+        this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+        this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+        this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_STAF_REIM_MEMO'
+      ) {
+        activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
-      if(activityEvent === 'DC' || activityEvent === 'DF') {
-        activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
+        if(activityEvent === 'DC' || activityEvent === 'DF') {
+          activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
+        }
       }
     }
 
