@@ -66,7 +66,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
-  public numberOfPages = 0;
+  public numberOfPages = 1;
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
@@ -167,26 +167,9 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
    * Check/Uncheck all Debts in the table.
    */
   public changeAllDebtSummarysSelected() {
-    // TODO Iterating over the model and setting the selected prop
-    // works when we have server-side pagination as the model will only contain
-    // Debt for the current page.
-
-    // Until the server is ready for pagination,
-    // we are getting the entire set of tranactions (> 500)
-    // and must only count and set the selected prop for the items
-    // on the current page.
-
     this.bulkActionCounter = 0;
-    // for (const t of this.DebtModel) {
-    //   t.selected = this.allDebtSelected;
-    //   if (this.allDebtSelected) {
-    //     this.bulkActionCounter++;
-    //   }
-    // }
-
-    // TODO replace this with the commented code above when server pagination is ready.
-    for (let i = this.firstItemOnPage - 1; i <= this.lastItemOnPage - 1; i++) {
-      this.debtModel[i].selected = this.allDebtSelected;
+    for (const debt of this.debtModel) {
+      debt.selected = this.allDebtSelected;
       if (this.allDebtSelected) {
         this.bulkActionCounter++;
       }
@@ -315,7 +298,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
     if (payment) {
       transactionModel.scrollDebtPaymentButtonIntoView = true;
     }
-    
+
     this.status.emit({
       form: emptyValidForm,
       direction: 'next',
@@ -355,7 +338,12 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
           transactionId: debtPayment.transactionId,
           type: debtPayment.transactionTypeDescription,
           transactionTypeIdentifier: debtPayment.transactionTypeIdentifier,
-          apiCall: debtPayment.apiCall
+          apiCall: debtPayment.apiCall,
+          date: debtPayment.paymentDate,
+          amount: debtPayment.paymentAmt,
+          memoCode: debtPayment.memoCode,
+          aggregate: debtPayment.aggregate,
+          entityId: debtPayment.entityId
         }
       }
     });

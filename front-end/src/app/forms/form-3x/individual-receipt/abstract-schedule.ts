@@ -356,7 +356,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     this._prePopulateFieldArray = [{name:'purpose_description', value:this.reattrbutionTransaction.purposeDescription}];
 
+    this.clearEntityIdFromHiddenFields();
 
+  }
+
+  private clearEntityIdFromHiddenFields() {
+    if (this.hiddenFields && this.hiddenFields.length > 0) {
+      let entityIdField = this.hiddenFields.find(element => element.name === 'entity_id');
+      entityIdField.value = null;
+    }
   }
 
   public ngOnInit(): void {
@@ -463,6 +471,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
   checkComponent(changes: SimpleChanges): boolean {
+
+    // Some components pass null explicitly to force the form page to load even without
+    // @Input() changes (SchedFComponent, H3, H5).  If changes === null proceed with page load.
+    if (!changes) {
+      return true;
+    }
+
     if (changes && changes.transactionType && changes.transactionType.currentValue !== '' && changes.transactionType.currentValue === this.transactionType) {
 
       //schedE is set up differently, causing ngOnChange to fire everytime, so need to explicily check the component against the transactionType to prevent
@@ -705,7 +720,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     } else if (this.isFieldName(fieldName, 'expenditure_amount') ||
-      this.isFieldName(fieldName,'contribution_amount') ||
+      this.isFieldName(fieldName, 'contribution_amount') ||
       this.isFieldName(fieldName, 'total_amount')) {
       // Debt payments need a validation to prevent exceeding the incurred debt
       if (this.transactionType === 'OPEXP_DEBT' ||
@@ -714,7 +729,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.transactionType === 'OTH_DISB_DEBT' ||
         this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
         this.transactionType === 'COEXP_PARTY_DEBT' ||
-        this.transactionType === 'IE_B4_DISSE') {
+        this.transactionType === 'IE_B4_DISSE' ||
+        this.transactionType === 'OTH_REC_DEBT') {
         if (this._outstandingDebtBalance !== null) {
           if (this._outstandingDebtBalance >= 0) {
             formValidators.push(validateContributionAmount(this._outstandingDebtBalance));
@@ -1102,17 +1118,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
     }
 
-    if (
-      this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
-      this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
-      this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
-      this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
-      this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_STAF_REIM_MEMO'
-    ) {
-      activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
+    if(this.subTransactionInfo){
+      if (
+        this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+        this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+        this.subTransactionInfo.subTransactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+        this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+        this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_STAF_REIM_MEMO'
+      ) {
+        activityEvent = this.frmIndividualReceipt.get('activity_event_type').value;
 
-      if(activityEvent === 'DC' || activityEvent === 'DF') {
-        activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
+        if(activityEvent === 'DC' || activityEvent === 'DF') {
+          activityEventName = this.frmIndividualReceipt.get('activity_event_identifier').value;
+        }
       }
     }
 
@@ -1517,11 +1535,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (this.transactionType) {
       // Not sure if this is needed for preventing excessive calls.
       // Removed for now to get working for sched_h.
-      if (this.transactionType !== this._transactionTypePrevious) {
       this._transactionTypePrevious = this.transactionType;
       // reload dynamic form fields
       this._getFormFields();
-      }
     }
   }
 
@@ -5047,7 +5063,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
-   * If originated from Debt Summary, return there othrrwise go to the transactions.
+   * If originated from Debt Summary, return there otherwise go to the transactions.
    */
   public cancel(): void {
     if (
@@ -5281,9 +5297,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
   
   protected removeAllValidators() {
-    for (const key in this.frmIndividualReceipt.controls) {
-      this.frmIndividualReceipt.get(key).clearValidators();
-      this.frmIndividualReceipt.get(key).updateValueAndValidity();
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls){
+      for (const key in this.frmIndividualReceipt.controls) {
+        this.frmIndividualReceipt.get(key).clearValidators();
+        this.frmIndividualReceipt.get(key).updateValueAndValidity();
+      }
     }
 }
 
