@@ -69,7 +69,8 @@ from fecfiler.sched_B.views import (
     put_sql_agg_amount_schedB,
     get_list_child_transactionId_schedB,
     delete_sql_schedB,
-    get_list_schedB
+    get_list_schedB,
+    update_schedB_aggamt_transactions
 )
 
 from fecfiler.sched_L.views import update_sl_summary
@@ -891,12 +892,10 @@ def get_linenumber_itemization(
         else:
             output_line_number = line_number
 
-        if (
-            transaction_type_identifier
-            in ITEMIZED_IND_UPDATE_TRANSACTION_TYPE_IDENTIFIER
-        ):
-            if aggregate_amount <= itemization_value:
-                itemized_ind = "U"
+        if transaction_type_identifier in ITEMIZED_IND_UPDATE_TRANSACTION_TYPE_IDENTIFIER and aggregate_amount <= itemization_value:
+            itemized_ind = "U"
+        else:
+            itemized_ind = "I"
         return output_line_number, itemized_ind
     except Exception as e:
         raise Exception(
@@ -1020,7 +1019,8 @@ def update_linenumber_aggamt_transactions_SA(
                         RE_aggregate_amount += transaction[0]
                         aggregate_amount = RE_aggregate_amount
                     else:
-                        REMAIN_aggregate_amount += transaction[0]
+                        if transaction[8] != 'CON_EAR_DEP':
+                            REMAIN_aggregate_amount += transaction[0]
                         aggregate_amount = REMAIN_aggregate_amount
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
                 # if str(report_id) == str(transaction[2]):
@@ -3043,6 +3043,16 @@ def trash_restore_transactions(request):
                                 cmte_id,
                             )
                         )
+                    datum = get_list_schedB(report_id, cmte_id, transaction_id, True)[0]
+                    update_schedB_aggamt_transactions(
+                        datetime.datetime.strptime(
+                            datum.get("expenditure_date"), "%Y-%m-%d"
+                        ).date(),
+                        datum.get("transaction_type_identifier"),
+                        datum.get("entity_id"),
+                        datum.get("cmte_id"),
+                        datum.get("report_id"),
+                    )
 
                 if transaction_id[:2] == "SF":
                     update_aggregate_sf(
