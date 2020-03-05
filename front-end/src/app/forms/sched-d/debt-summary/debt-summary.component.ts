@@ -60,6 +60,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
   public totalAmount: number;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
+  public formType = '3X';
 
   // ngx-pagination config
   public maxItemsPerPage = 100;
@@ -168,13 +169,19 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
    */
   public changeAllDebtSummarysSelected() {
     this.bulkActionCounter = 0;
+    let debtsExist = false;
     for (const debt of this.debtModel) {
+      debtsExist = true;
       debt.selected = this.allDebtSelected;
       if (this.allDebtSelected) {
         this.bulkActionCounter++;
       }
     }
-    this.bulkActionDisabled = !this.allDebtSelected;
+    if (debtsExist) {
+      this.bulkActionDisabled = !this.allDebtSelected;
+    } else {
+      this.bulkActionDisabled = true;
+    }
   }
 
   /**
@@ -193,6 +200,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
         this.bulkActionCounter--;
       }
     }
+    this.bulkActionDisabled = this.bulkActionCounter > 1 ? false : true;
   }
 
   /**
@@ -402,6 +410,56 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
               this.getDebtSummaries();
               this._dialogService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + payment.transactionId,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  /**
+   * Trash all Loans selected by the user.
+   */
+  public trashAllSelected(): void {
+    let trxIds = '';
+    let reportId = null;
+    const selectedTransactions: Array<any> = [];
+    for (const trx of this.debtModel) {
+      if (trx.selected) {
+        reportId = trx.reportId;
+        selectedTransactions.push({
+          transactionId: trx.transactionId,
+          reportId: trx.reportId
+        });
+        trxIds += trx.transactionId + ', ';
+      }
+    }
+    if (trxIds.length > 2) {
+      trxIds = trxIds.substr(0, trxIds.length - 2);
+    }
+
+    this._dialogService
+      .confirm('You are about to delete these transactions.   ' + trxIds, ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._transactionsService
+            .trashOrRestoreTransactions(this.formType, 'trash', reportId, selectedTransactions)
+            .subscribe((res: any) => {
+              this.getDebtSummaries();
+              let afterMessage = '';
+              if (selectedTransactions.length === 1) {
+                afterMessage = `Transaction ${selectedTransactions[0].transactionId}
+                has been successfully deleted and sent to the recycle bin.`;
+              } else {
+                afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + trxIds;
+              }
+
+              this._dialogService.confirm(
+                afterMessage,
                 ConfirmModalComponent,
                 'Success!',
                 false,
