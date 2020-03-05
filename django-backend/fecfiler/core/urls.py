@@ -38,6 +38,11 @@ urlpatterns = [
         name="autolookup_search_contacts",
     ),
     url(
+        r"^core/autolookup_expand$",
+        views.autolookup_expand,
+        name="autolookup_expand",
+    ),
+    url(
         r"^core/get_all_transactions$",
         views.get_all_transactions,
         name="get_all_transactions",
