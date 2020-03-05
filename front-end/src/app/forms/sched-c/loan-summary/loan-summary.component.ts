@@ -642,11 +642,9 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Trash all Loan selected by the user.
+   * Trash all Loans selected by the user.
    */
   public trashAllSelected(): void {
-    // alert('Trash all Loan is not yet supported');
-
     let trxIds = '';
     const selectedTransactions: Array<any> = [];
     for (const trx of this.LoanModel) {
@@ -689,46 +687,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         } else if (res === 'cancel') {
         }
       });
-
-    /* let conIds = '';
-     const selectedLoan: Array<LoanModel> = [];
-     for (const con of this.LoanModel) {
-       if (con.selected && con.activeTransactionsCnt === 0) {
-         selectedLoan.push(con);
-         conIds += con.id + ', ';
-       }
-     }
- 
-     conIds = conIds.substr(0, conIds.length - 2);
- 
-     this._dialogService
-       .confirm('You are about to delete these Loan.   ' + conIds, ConfirmModalComponent, 'Warning!')
-       .then(res => {
-         if (res === 'okay') {
-           this._LoanService
-             .trashOrRestoreLoan('trash', selectedLoan)
-             .subscribe((res: GetLoanResponse) => {
-               this.getLoanPage(this.config.currentPage);
- 
-               let afterMessage = '';
-               if (selectedLoan.length === 1) {
-                 afterMessage = `Transaction ${selectedLoan[0].id}
-                   has been successfully deleted and sent to the recycle bin.`;
-               } else {
-                 afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + conIds;
-               }
- 
-               this._dialogService.confirm(
-                 afterMessage,
-                 ConfirmModalComponent,
-                 'Success!',
-                 false,
-                 ModalHeaderClassEnum.successHeader
-               );
-             });
-         } else if (res === 'cancel') {
-         }
-       });*/
   }
 
   /**
