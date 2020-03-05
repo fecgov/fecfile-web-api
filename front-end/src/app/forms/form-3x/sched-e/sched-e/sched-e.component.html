@@ -665,7 +665,8 @@
 
               <ng-template #allOtherTrx>
                 <div *ngIf="scheduleAction === editScheduleAction; else createActions">
-                  <button class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                  <button class="btn btn-previous btn-left" type="button" 
+                    (click)="clearFormValues(); returnToParent(editScheduleAction)">
                     Cancel
                   </button>
                   <button class="btn btn-secondary btn-right" (click)="updateOnly()">
