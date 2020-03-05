@@ -152,7 +152,8 @@
           padding-right: 15px;
         }
         .error__committee-id,
-        .error__password-error {
+        .error__password-error,
+        .error__email-id-error{
           @extend .text-error;          
         }
         .login__btn {

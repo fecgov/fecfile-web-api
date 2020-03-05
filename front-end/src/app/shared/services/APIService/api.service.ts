@@ -31,10 +31,11 @@ export class ApiService {
    *
    * @return     {Observable}  The JSON web token response.
    */
-  public signIn(username: string, password: string): Observable<any> {
+  public signIn(email: string, committeeId: string, password: string): Observable<any> {
     return this._http
       .post<Auth>(`${this._appConfigService.getConfig().apiUrl}/token/obtain`, {
-        username,
+        email,
+        committeeId,
         password
       })
       .pipe(map(res => {

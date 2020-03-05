@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit {
   public hasFailed: boolean = false;
   public committeeIdInputError: boolean = false;
   public passwordInputError: boolean = false;
+  public loginEmailInputError: boolean = false;
   public appTitle: string = null;
   public loggedOut: any = '';
   private _subscription: Subscription;
@@ -41,7 +42,8 @@ export class LoginComponent implements OnInit {
   ) {
     this.frm = _fb.group({
       commiteeId: ['', Validators.required],
-      loginPassword: ['', Validators.required]
+      loginPassword: ['', Validators.required],
+      emailId: ['', Validators.required]
     });
     this._subscription =
       this._messageService
@@ -82,6 +84,10 @@ export class LoginComponent implements OnInit {
     if (this.frm.get('loginPassword').valid) {
       this.passwordInputError = false;
     }
+
+      if (this.frm.get('emailId').valid) {
+          this.loginEmailInputError = false;
+      }
   }
 
   /**
@@ -90,20 +96,23 @@ export class LoginComponent implements OnInit {
    */
   public doSignIn(): void {
     if (this.frm.invalid) {
-      this.committeeIdInputError = (this.frm.get('commiteeId').invalid)? true : false;
+      this.committeeIdInputError = (this.frm.get('commiteeId').invalid) ? true : false;
 
-      this.passwordInputError = (this.frm.get('loginPassword').invalid)? true : false;
-      return;
+      this.passwordInputError = (this.frm.get('loginPassword').invalid) ? true : false;
+
+      this.loginEmailInputError = (this.frm.get('emailId').invalid) ? true : false;
+       return;
     }
 
     this.isBusy = true;
     this.hasFailed = false;
 
-    const username: string = this.frm.get('commiteeId').value;
+    const committeeId: string = this.frm.get('commiteeId').value;
     const password: string = this.frm.get('loginPassword').value;
+    const email: string = this.frm.get('emailId').value;
 
     this._apiService
-      .signIn(username, password)
+      .signIn(email, committeeId, password)
       .subscribe(res => {
         if (res.token) {
           this._authService
