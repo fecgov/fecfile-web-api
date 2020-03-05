@@ -2793,8 +2793,8 @@ def autolookup_search_contacts(request):
             if key in allowed_params:
                 if key == "prefix":
                     continue
-                order_string = str(key)
-                param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
+                order_string = 'e.'+str(key)
+                param_string = " AND LOWER(e." + str(key) + ") LIKE LOWER(%s)"
                 # if cand_q:
                 #     query_string = """
                 #     SELECT json_agg(t) FROM
@@ -2836,7 +2836,7 @@ def autolookup_search_contacts(request):
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
                             + param_string
-                            + """ AND delete_ind is distinct from 'Y' ORDER BY """
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
                             + order_string
                             + """) t"""
                         )
@@ -2852,7 +2852,7 @@ def autolookup_search_contacts(request):
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
                             + param_string
-                            + """ AND delete_ind is distinct from 'Y' ORDER BY """
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
                             + order_string
                             + """) t"""
                         )
@@ -2875,7 +2875,7 @@ def autolookup_search_contacts(request):
                         AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                         """
                         + param_string
-                        + """ AND delete_ind is distinct from 'Y' ORDER BY """
+                        + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
                         + order_string
                         + """) t"""
                     )
@@ -2895,7 +2895,7 @@ def autolookup_search_contacts(request):
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
                             + param_string
-                            + """ AND delete_ind is distinct from 'Y' ORDER BY """
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
                             + order_string
                             + """) t"""
                         )
@@ -2911,7 +2911,7 @@ def autolookup_search_contacts(request):
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
                             + param_string
-                            + """ AND delete_ind is distinct from 'Y' ORDER BY """
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
                             + order_string
                             + """) t"""
                         )
