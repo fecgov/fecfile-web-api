@@ -2301,7 +2301,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.transactionType === 'OTH_DISB_DEBT' ||
                 this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
                 this.transactionType === 'COEXP_PARTY_DEBT' ||
-                this.transactionType === 'IE' ||
+                this.transactionType === 'IE_B4_DISSE' ||
                 this.transactionType === 'OTH_REC_DEBT'
               )
             ) {
@@ -5087,7 +5087,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.transactionType === 'OTH_DISB_DEBT' ||
         this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
         this.transactionType === 'COEXP_PARTY_DEBT' ||
-        this.transactionType === 'IE' ||
+        this.transactionType === 'IE_B4_DISSE' ||
         this.transactionType === 'OTH_REC_DEBT'
       )
     ) {
