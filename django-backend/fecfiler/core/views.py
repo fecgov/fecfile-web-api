@@ -2695,9 +2695,10 @@ def autolookup_expand(request):
             e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
             FROM public.entity e, public.candidate_master c WHERE e.ref_cand_cmte_id = c.cand_id
             and c.principal_campaign_committee = %s
-            and e.delete_ind is distinct from 'Y') t
+            and e.delete_ind is distinct from 'Y'
+            and e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
             """
-            parameters = [cmte_id]
+            parameters = [cmte_id, request.user.username]
         if 'cand_id' in request.query_params:
             cand_id = request.query_params.get('cand_id')
             _sql = """
@@ -2708,6 +2709,7 @@ def autolookup_expand(request):
                             FROM public.entity e, public.entity c WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
                             AND c.red_cand_cmte_id = %s
                             AND e.delete_ind is distinct from 'Y'
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
             """
             parameters = [cand_id]
         with connection.cursor() as cursor:
