@@ -348,6 +348,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.patchValue({memo_text:'MEMO: Reattribution'},{onlySelf:true});
       this.frmIndividualReceipt.get('memo_text').disable();
     }
+    this.convertMemoCodeToRequired();
   }
 
   private populateDataForReattribution(message: any) {
@@ -364,8 +365,25 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.patchValue({memo_text:'MEMO: Redesignated'},{onlySelf:true});
       this.frmIndividualReceipt.get('memo_text').disable();
     }
+    
     this.clearEntityIdFromHiddenFields();
+    this.convertMemoCodeToRequired();
 
+  }
+  
+  //TODO -- this method doesn't always do whats its supposed to do but should fix itself once caching issues are fixed. 
+  //will need to revisit. 
+  public convertMemoCodeToRequired() {
+    let field = this.findFormField('memo_code');
+    if(field){
+      field.isReadonly = true;
+    }
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['memo_code']){
+      this.frmIndividualReceipt.controls['memo_code'].setValue(this._memoCodeValue);
+      const memoCntrol = this.frmIndividualReceipt.get('memo_code');
+      memoCntrol.disable();
+      this.memoCode = true;
+    }
   }
 
   private clearEntityIdFromHiddenFields() {

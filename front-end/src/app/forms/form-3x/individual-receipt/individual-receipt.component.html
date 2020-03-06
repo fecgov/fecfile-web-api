@@ -27,8 +27,9 @@
             <ng-container *ngIf="transactionTypeText && mainTransactionTypeText"> / 
               {{ mainTransactionTypeText }} / {{ transactionTypeText }}
             </ng-container>
-            <ng-container *ngIf="reattributionTransactionId"> (Reattribution)</ng-container>
-            <ng-container *ngIf="redesignationTransactionId"> (Redesignation)</ng-container>
+            <!-- TODO - the transaction type check in next two lines is temporary. Once the cache issue is fixed remove the second 'and' claus -->
+            <ng-container *ngIf="reattributionTransactionId && transactionType !== 'CONT_TO_CAN'"> (Reattribution)</ng-container> 
+            <ng-container *ngIf="redesignationTransactionId && transactionType === 'CONT_TO_CAN'"> (Redesignation)</ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && !cloned"> / Edit </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && cloned"> / Clone </ng-container>
             <ng-container *ngIf="scheduleAction === viewScheduleAction"> / View </ng-container>
