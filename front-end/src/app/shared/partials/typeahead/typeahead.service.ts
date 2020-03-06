@@ -23,7 +23,7 @@ export class TypeaheadService {
    *  Possible fields are 'entity_name', 'first_name', 'last_name'.
    *
    */
-  public getContacts(searchString: string, fieldName: string): Observable<any> {
+  public getContacts(searchString: string, fieldName: string, expand?: boolean): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/core/autolookup_search_contacts';
     let httpOptions = new HttpHeaders();
@@ -62,6 +62,31 @@ export class TypeaheadService {
         console.log(`invalid field name for ${url}`);
       }
       return Observable.of([]);
+    }
+
+    if(expand) {
+      params = params.append('expand', 'true');
+    }
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+  }
+
+  public getContactsExpand(cmteId: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    const url = '/core/autolookup_expand';
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    if (!cmteId) {
+      return;
+    }else {
+      params = params.append('cmte_id', cmteId);
     }
 
     return this._http.get(`${environment.apiUrl}${url}`, {

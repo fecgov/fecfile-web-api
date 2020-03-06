@@ -138,6 +138,7 @@
                                 && !isFieldName(col?.name, 'prefix')
                                 && !isFieldName(col?.name, 'suffix')
                                 && !isFieldName(col?.name, 'election_other_description')
+                                && !isFieldName(col?.name, 'election_year')
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.readonly]="isFieldReadOnly(col)"
@@ -277,6 +278,19 @@
                           [maxlength]="col?.validation?.max"
                           [formControlName]="col?.name"
                           [attr.disabled]="isSelectFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''" />
+                      <input *ngIf="isFieldName(col?.name, 'election_year')"
+                                class="form-control" [style.width]="col?.width" [style.height]="col?.height"
+                          [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value"
+                          [maxlength]="col?.validation?.max"
+                          [formControlName]="col?.name"
+                          [attr.disabled]="isSelectFieldReadOnly(col)"
+                          placeholder="YYYY"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
