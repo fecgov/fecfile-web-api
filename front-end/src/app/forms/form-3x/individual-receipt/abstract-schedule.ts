@@ -344,6 +344,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.controls['expenditure_amount'].setValidators([Validators.required,validateContributionAmount(Number(this._maxReattributableOrRedesignatableAmount))]);
       this.frmIndividualReceipt.controls['expenditure_amount'].updateValueAndValidity();
     }
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['memo_text']){
+      this.frmIndividualReceipt.patchValue({memo_text:'MEMO: Reattribution'},{onlySelf:true});
+      this.frmIndividualReceipt.get('memo_text').disable();
+    }
   }
 
   private populateDataForReattribution(message: any) {
@@ -356,6 +360,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
     this._prePopulateFieldArray = [{name:'purpose_description', value:this.reattrbutionTransaction.purposeDescription}];
 
+    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['memo_text']){
+      this.frmIndividualReceipt.patchValue({memo_text:'MEMO: Redesignated'},{onlySelf:true});
+      this.frmIndividualReceipt.get('memo_text').disable();
+    }
     this.clearEntityIdFromHiddenFields();
 
   }
@@ -2293,7 +2301,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.transactionType === 'OTH_DISB_DEBT' ||
                 this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
                 this.transactionType === 'COEXP_PARTY_DEBT' ||
-                this.transactionType === 'IE' ||
+                this.transactionType === 'IE_B4_DISSE' ||
                 this.transactionType === 'OTH_REC_DEBT'
               )
             ) {
@@ -2853,7 +2861,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     // TODO need a way to determine if key was tab.
 
     const entity = $event.item;
+    this.slectedCandidate(entity, col);
+  }
 
+  private slectedCandidate(entity: any, col: any) {
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
     let namePrefix = '';
 
@@ -2982,6 +2993,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   // child name field prefix and it's let error prone.
   public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
     const entity = $event.item;
+
+    if(entity.cmte_id) {
+      this._typeaheadService.getContactsExpand(entity.cmte_id).subscribe(
+        res => {
+          if(res) {
+            const entity = res[0];
+            this.slectedCandidate(entity, col);
+          }
+        }
+      )
+    }
 
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
 
@@ -3180,7 +3202,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.clearOrgData();
         }
         if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'entity_name');
+          if(this.transactionType === 'CON_EAR_DEP_MEMO' || this.transactionType === 'CON_EAR_UNDEP_MEMO') {
+            return this._typeaheadService.getContacts(searchText, 'entity_name', true);
+          }else {
+            return this._typeaheadService.getContacts(searchText, 'entity_name');
+          }
         } else {
           return Observable.of([]);
         }
@@ -5079,7 +5105,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.transactionType === 'OTH_DISB_DEBT' ||
         this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
         this.transactionType === 'COEXP_PARTY_DEBT' ||
-        this.transactionType === 'IE' ||
+        this.transactionType === 'IE_B4_DISSE' ||
         this.transactionType === 'OTH_REC_DEBT'
       )
     ) {

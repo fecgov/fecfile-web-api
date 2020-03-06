@@ -38,8 +38,11 @@ from fecfiler.core.transaction_util import (
     update_sched_d_parent,
     update_sched_c_parent,
     get_transaction_type_descriptions,
+    cmte_type
 )
 from fecfiler.core.report_helper import new_report_date
+
+from fecfiler.core.aggregation_helper import find_form_type, find_aggregate_date
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +115,24 @@ SCHED_C_CHILD_LIST = ["LOAN_REPAY_MADE"]
 
 # adding election_year field needed by front end
 REQT_ELECTION_YR = ""
+
+ITEMIZED_SB_UPDATE_TRANSACTION_TYPE_IDENTIFIER = ['OPEXP',
+'OPEXP_CC_PAY','OPEXP_STAF_REIM','OPEXP_PMT_TO_PROL','OPEXP_VOID',
+'OPEXP_HQ_ACC_OP_EXP_NP','OPEXP_CONV_ACC_OP_EXP_NP','OPEXP_DEBT','OTH_DISB',
+'OTH_DISB_CC_PAY','OTH_DISB_STAF_REIM','OTH_DISB_PMT_TO_PROL','OTH_DISB_RECNT',
+'OTH_DISB_NP_RECNT_ACC','OTH_DISB_NC_ACC','OTH_DISB_NC_ACC_CC_PAY',
+'OTH_DISB_NC_ACC_STAF_REIM','OTH_DISB_NC_ACC_PMT_TO_PROL','OTH_DISB_VOID',
+'REF_CONT_IND','REF_CONT_IND_VOID','FEA_100PCT_PAY','FEA_CC_PAY','FEA_STAF_REIM',
+'FEA_PAY_TO_PROL','FEA_VOID','FEA_100PCT_DEBT_PAY']
+
+def date_format_agg(cvg_date):
+    try:
+        if cvg_date == None or cvg_date in ["none", "null", " ", ""]:
+            return None
+        cvg_dt = datetime.datetime.strptime(cvg_date, "%Y-%m-%d").date()
+        return cvg_dt
+    except:
+        raise
 
 # To avoid circular reference adding sched_a function
 def put_sql_schedA_from_schedB(
@@ -828,6 +849,23 @@ def post_schedB(datum):
                     datum.get("back_ref_transaction_id"),
                     datum.get("expenditure_amount"),
                 )
+            # Auto generation of redesignation transactions
+            if 'redesignation_id' in datum:
+                redesignation_auto_generate_transactions(
+                    datum['cmte_id'],
+                    datum["report_id"],
+                    datum["redesignation_id"],
+                    datum["expenditure_date"],
+                    datum["expenditure_amount"],
+                    transaction_id,
+                )
+            update_schedB_aggamt_transactions(
+                datum.get("expenditure_date"),
+                datum.get("transaction_type_identifier"),
+                entity_id,
+                datum.get("cmte_id"),
+                datum.get("report_id"),
+            )
         except Exception as e:
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -1093,6 +1131,13 @@ def put_schedB(datum):
                     transaction_data.get("donor_cmte_name"),
                     transaction_data.get("transaction_type_identifier"),
                 )
+            update_schedB_aggamt_transactions(
+                datum.get("expenditure_date"),
+                datum.get("transaction_type_identifier"),
+                entity_id,
+                datum.get("cmte_id"),
+                datum.get("report_id"),
+            )
         except Exception as e:
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -1118,7 +1163,15 @@ def delete_schedB(data):
         report_id = data.get("report_id")
         transaction_id = data.get("transaction_id")
         check_transaction_id(transaction_id)
+        datum = get_list_schedB(report_id, cmte_id, transaction_id)[0]
         delete_sql_schedB(transaction_id, report_id, cmte_id)
+        update_schedB_aggamt_transactions(
+                datum.get("expenditure_date"),
+                datum.get("transaction_type_identifier"),
+                datum.get('entity_id'),
+                datum.get("cmte_id"),
+                datum.get("report_id"),
+            )
         # delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
     except:
         raise
@@ -1330,6 +1383,10 @@ def redesignation_auto_generate_transactions(
                itemized_ind, levin_account_id, 'A', %s
           FROM public.sched_b WHERE transaction_id= %s and cmte_id= %s;"""
 
+        query_string_aggregate = """SELECT expenditure_date, transaction_type_identifier,
+        entity_id, cmte_id, report_id FROM public.sched_b WHERE redesignation_id=%s and 
+        redesignation_ind='A' AND expenditure_amount >= 0 AND cmte_id=%s"""
+
         with connection.cursor() as cursor:
             cursor.execute(
                 query_string_auto_1,
@@ -1365,6 +1422,21 @@ def redesignation_auto_generate_transactions(
                 query_string_redesignation,
                 [org_transaction_id, redesignated_id, cmte_id],
             )
+            cursor.execute(
+                query_string_aggregate,
+                [redesignated_id, cmte_id]
+            )
+            # print(cursor.query)
+            aggregate_data = cursor.fetchone()
+            # print(aggregate_data)
+            if aggregate_data: 
+                update_schedB_aggamt_transactions(aggregate_data[0],
+                aggregate_data[1], aggregate_data[2], aggregate_data[3], aggregate_data[4]
+                )
+            if aggregate_data[0].strftime("%Y") != contribution_date.strftime("%Y"):
+                update_schedB_aggamt_transactions(contribution_date,
+                aggregate_data[1], aggregate_data[2], aggregate_data[3], aggregate_data[4]
+                )
     except Exception as e:
         raise Exception(
             "The redesignation_auto_generate_transactions function is throwing an error: "
@@ -1384,6 +1456,10 @@ def redesignation_auto_update_transactions(
 
         query_string_s2 = """UPDATE public.sched_b SET report_id = %s, expenditure_date = %s, expenditure_amount = %s
         WHERE redesignation_id = %s AND cmte_id = %s AND expenditure_amount < 0 AND redesignation_ind='A'"""
+
+        query_string_aggregate = """SELECT expenditure_date, transaction_type_identifier,
+        entity_id, cmte_id, report_id FROM public.sched_b WHERE redesignation_id=%s and 
+        redesignation_ind='A' AND expenditure_amount >= 0 AND cmte_id=%s"""
 
         with connection.cursor() as cursor:
             cursor.execute(query_string, [report_id, redesignated_id, cmte_id])
@@ -1414,9 +1490,181 @@ def redesignation_auto_update_transactions(
                     cmte_id,
                 ],
             )
+            cursor.execute(
+                query_string_aggregate,
+                [redesignated_id, cmte_id]
+            )
+            # print(cursor.query)
+            aggregate_data = cursor.fetchone()
+            # print(aggregate_data)
+            if aggregate_data: 
+                update_schedB_aggamt_transactions(aggregate_data[0],
+                aggregate_data[1], aggregate_data[2], aggregate_data[3], aggregate_data[4]
+                )
+            if aggregate_data[0].strftime("%Y") != expenditure_date.strftime("%Y"):
+                update_schedB_aggamt_transactions(expenditure_date,
+                aggregate_data[1], aggregate_data[2], aggregate_data[3], aggregate_data[4]
+                )
     except Exception as e:
         raise Exception(
             "The redesignation_auto_update_transactions function is throwing an error: "
+            + str(e)
+        )
+
+def list_all_sb_transactions_entity(
+    aggregate_start_date, aggregate_end_date, entity_id, cmte_id
+):
+    """
+    load all transactions for an entity within a time window
+    return value: a list of transction_records [
+       (contribution_amount, transaction_id, report_id, line_number, contribution_date),
+       ....
+    ]
+    return items are sorted by contribution_date in ASC order
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+            SELECT t1.expenditure_amount, 
+                t1.transaction_id, 
+                t1.report_id, 
+                t1.line_number, 
+                t1.expenditure_date, 
+                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
+                t1.memo_code, 
+                t1.back_ref_transaction_id,
+                t1.transaction_type_identifier,
+                t1.redesignation_ind
+            FROM public.sched_b t1 
+            WHERE entity_id = %s 
+            AND cmte_id = %s 
+            AND expenditure_date >= %s 
+            AND expenditure_date <= %s 
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY expenditure_date ASC, create_date ASC
+            """,
+                [entity_id, cmte_id, aggregate_start_date, aggregate_end_date],
+            )
+            # print(cursor.query)
+            transactions_list = cursor.fetchall()
+        return transactions_list
+    except Exception as e:
+        raise Exception(
+            "The list_all_sb_transactions_entity function is throwing an error: " + str(e)
+        )
+
+def get_sb_linenumber_itemization(
+    transaction_type_identifier, aggregate_amount, itemization_value, line_number
+):
+    try:
+        itemized_ind = None
+        output_line_number = line_number
+
+        if transaction_type_identifier in ITEMIZED_SB_UPDATE_TRANSACTION_TYPE_IDENTIFIER and aggregate_amount <= itemization_value:
+            itemized_ind = "U"
+        else:
+            itemized_ind = "I"
+        return output_line_number, itemized_ind
+    except Exception as e:
+        raise Exception(
+            "The get_linenumber_itemization function is throwing an error: " + str(e)
+        )
+
+def put_sql_linenumber_schedB(
+    cmte_id, line_number, itemized_ind, transaction_id, entity_id, aggregate_amount
+):
+    """
+    update line number
+    """
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into schedB table
+            cursor.execute(
+                """UPDATE public.sched_b SET line_number = %s, itemized_ind = %s, aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND entity_id = %s AND delete_ind is distinct from 'Y'""",
+                [
+                    line_number,
+                    itemized_ind,
+                    aggregate_amount,
+                    transaction_id,
+                    cmte_id,
+                    entity_id,
+                ],
+            )
+            # print(cursor.query)
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "put_sql_linenumber_schedB function: The Transaction ID: {} does not exist in schedB table".format(
+                        transaction_id
+                    )
+                )
+    except Exception:
+        raise
+
+def update_schedB_aggamt_transactions(
+    expenditure_date, transaction_type_identifier, entity_id, cmte_id, report_id
+):
+    """
+    helper function for updating private contribution line number based on aggrgate amount
+    the aggregate amount is a contribution_date-based on incremental update, the line number
+    is updated accordingly:
+    edit 1: check if the report corresponding to the transaction is deleted or not (delete_ind flag in reports table) 
+            and only when it is NOT add contribution_amount to aggregate amount
+    edit 2: updation of aggregate amount will roll to all transacctions irrespective of report id and report being filed
+    edit 3: if back_ref_transaction_id is none, then check if memo_code is NOT 'X' and if it is not, add contribution_amount to aggregate amount; 
+            if back_ref_transaction_id is NOT none, then add irrespective of memo_code, add contribution_amount to aggregate amount
+    e.g.
+    date, contribution_amount, aggregate_amount, line_number
+    1/1/2018, 50, 50, 11AII
+    2/1/2018, 60, 110, 11AII
+    3/1/2018, 100, 210, 11AI (aggregate_amount > 200, update line number)
+
+    """
+    try:
+        itemization_value = 200
+        # itemized_transaction_list = []
+        # unitemized_transaction_list = []
+        form_type = find_form_type(report_id, cmte_id)
+        if isinstance(expenditure_date, str):
+            expenditure_date = date_format_agg(expenditure_date)
+        aggregate_start_date, aggregate_end_date = find_aggregate_date(
+            form_type, expenditure_date
+        )
+        # make sure transaction list comes back sorted by contribution_date ASC
+        transactions_list = list_all_sb_transactions_entity(
+            aggregate_start_date, aggregate_end_date, entity_id, cmte_id
+        )
+        aggregate_amount = 0
+        committee_type = cmte_type(cmte_id)
+        for transaction in transactions_list:
+            # checking in reports table if the delete_ind flag is false for the corresponding report
+            if transaction[5] != "Y":
+                # checking if the back_ref_transaction_id is null or not.
+                # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
+                if transaction[7] != None or (
+                    transaction[7] == None and 
+                    (transaction[6] != "X")
+                ):
+                    aggregate_amount += transaction[0]
+                if expenditure_date <= transaction[4]:
+                    line_number, itemized_ind = get_sb_linenumber_itemization(
+                        transaction[8],
+                        aggregate_amount,
+                        itemization_value,
+                        transaction[3],
+                    )
+                    put_sql_linenumber_schedB(
+                        cmte_id,
+                        line_number,
+                        itemized_ind,
+                        transaction[1],
+                        entity_id,
+                        aggregate_amount,
+                    )
+
+    except Exception as e:
+        raise Exception(
+            "The update_schedB_aggamt_transactions function is throwing an error: "
             + str(e)
         )
 
@@ -1465,6 +1713,7 @@ def schedB(request):
                 datum["report_id"] = check_report_id(
                     request.data["redesignation_report_id"]
                 )
+                datum['redesignation_id'] = request.data["redesignation_id"]
             if "entity_id" in request.data and check_null_value(
                 request.data.get("entity_id")
             ):
@@ -1478,16 +1727,6 @@ def schedB(request):
                 data = put_schedB(datum)
             else:
                 data = post_schedB(datum)
-            # Auto generation of redesignation transactions
-            if redesignation_flag:
-                redesignation_auto_generate_transactions(
-                    cmte_id,
-                    datum["report_id"],
-                    request.data["redesignation_id"],
-                    datum["expenditure_date"],
-                    datum["expenditure_amount"],
-                    data["transaction_id"],
-                )
 
             # Associating child transactions to parent and storing them to DB
             if "child" in request.data:
@@ -1782,7 +2021,6 @@ def get_list_schedA_from_schedB(
                     """SELECT json_agg(t) FROM (""" + query_string + """) t""",
                     [cmte_id],
                 )
-            print(cursor.query)
             schedA_list = cursor.fetchone()[0]
             if not schedA_list:
                 raise NoOPError(
