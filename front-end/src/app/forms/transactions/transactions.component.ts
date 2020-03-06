@@ -278,6 +278,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.viewTransactionSubscription.unsubscribe();
     this.getRedesignateTransactionSubscription.unsubscribe();
     this.getReattributeTransactionSubscription.unsubscribe();
+    localStorage.removeItem('transactions.filters');
   }
 
   public goToPreviousStep(): void {
