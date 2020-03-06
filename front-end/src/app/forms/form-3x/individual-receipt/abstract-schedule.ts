@@ -3202,7 +3202,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.clearOrgData();
         }
         if (searchText) {
-          if(this.transactionType === 'CON_EAR_DEP_MEMO' || this.transactionType === 'CON_EAR_UNDEP_MEMO') {
+          if(this.transactionType === 'CON_EAR_DEP_MEMO'
+            || this.transactionType === 'CON_EAR_UNDEP_MEMO'
+            || this.transactionType === 'CONT_TO_CAN') {
             return this._typeaheadService.getContacts(searchText, 'entity_name', true);
           }else {
             return this._typeaheadService.getContacts(searchText, 'entity_name');
