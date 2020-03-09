@@ -2,12 +2,12 @@ import { Component, OnInit, NgZone , ChangeDetectionStrategy } from '@angular/co
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { MessageService } from '../shared/services/MessageService/message.service';
+import { environment } from '../../../environments/environment';
+import { MessageService } from '../../shared/services/MessageService/message.service';
 import { CookieService } from 'ngx-cookie-service';
-import { ApiService } from '../shared/services/APIService/api.service';
-import { AuthService } from '../shared/services/AuthService/auth.service';
-import { SessionService } from '../shared/services/SessionService/session.service';
+import { ApiService } from '../../shared/services/APIService/api.service';
+import { AuthService } from '../../shared/services/AuthService/auth.service';
+import { SessionService } from '../../shared/services/SessionService/session.service';
 
 @Component({
   selector: 'app-login',

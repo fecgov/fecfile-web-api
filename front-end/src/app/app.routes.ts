@@ -2,7 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
 import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
-import { LoginComponent } from './login/login.component';
+import { LoginComponent } from './app-main-login/login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ToolsComponent } from './tools/tools.component';
@@ -31,11 +31,17 @@ import { ContactsComponent } from './contacts/contacts.component';
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { HelpComponent } from './help/help.component';
 // import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
+import {CommitteeLoginComponent} from './app-main-login/committee-login/committee-login.component';
 
 export const AppRoutes: Routes = [
   {
     path: '',
     component: LoginComponent,
+    pathMatch: 'full'
+  },
+  {
+    path: 'committee_login',
+    component: CommitteeLoginComponent,
     pathMatch: 'full'
   },
   {

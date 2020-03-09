@@ -1,0 +1,188 @@
+@import 'src/app/shared/scss/global';
+
+.login {    
+    background-image: url("../../../assets/img/fec-logo-5opac.png");
+    background-color: #cccccc;
+    height: 100%;   
+    padding-top: 15px;
+    //padding-left: 500px;
+    //padding: 25px;
+    background-repeat: no-repeat;
+    //background-size: 100% auto;
+    background-size: 140% auto; //130% auto;
+    background-position: 330px 1px; //350px 75px;
+    //background-position: 1% 1%;
+    header {
+      .logo {
+        margin-bottom: 10px;
+        text-align: center;
+      }
+    }
+  .title-front {
+    color:  #112E51;
+    font-family: 'Lato-Black', sans-serif;
+    font-weight: 900;
+    font-size: 100px;
+    letter-spacing:-7.8px;
+  }
+  .title-rear {
+    color: #CA1A0F;
+    font-family: 'Lato-Black', sans-serif;
+    font-weight: 900;
+    font-size: 100px;
+    letter-spacing:-7.8px;
+  }
+  .or-padding {
+    //padding-left: 5px;
+    //padding-right: 5px;
+    color: #C80505;       
+  }
+  .padding-left {
+    margin-left: -40px;
+  }
+  .eye-logo {
+    width: 30px;
+    height: 30px;
+    //color: #112E51;
+    //margin-top: 2px;
+    margin-bottom: 30px;
+    cursor: pointer;
+  }  
+  .fec-title {
+    height: 50%;
+    width: 50%;   
+  }
+  .link-text {
+    //text-align: right;
+    color: #CA1A0F ;//#C80505;  
+    height: 40px;
+    margin-bottom: 15px;
+    margin-top: 30px;  
+  }
+  .title-name {
+    margin-top: 10px;
+  }
+  .login-box {
+    //background-color: $alto;    
+    //min-height: 375px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 15px;
+    padding-top: 120px;
+    text-align: center;    
+    //width: 300px;
+    
+    //@include make-text-input(265px);
+    @include media(tablet) {
+      width: 500px;
+    }
+    @include media(mediumDesktop) {
+      width: 500px;
+    }
+    @include media(largeDesktop) {
+      width: 800px;
+    }
+  
+    .grid-row {
+      margin: 0;
+      &.form-field__info {
+        height: 50px;
+        //width: 800px; //350px;
+        //font-size: 20px;
+        margin-top: 30px;
+        margin-bottom: 25px; //10px;
+      }
+      &.form-field {
+        margin-bottom: 25px;
+      }
+      .grid-row__col {
+        padding: 0;
+
+        label {          
+          font-family: 'Lato-Reg', sans-serif;
+          font-size: 20px;
+          color: #112E51;
+        }
+        .link {
+          font-family: 'Lato-Reg', sans-serif;
+          color: #CA1A0F;//#C80505;
+          top: 150px;
+          text-align: right; 
+        }
+        .login-input {
+          /*     
+          @include make-text-input(265px, 1.5em, 1em, 1em);
+          @include media(tablet) {
+            @include make-text-input(450px, 1.5em, 1em, 1em);
+          }
+          @include media(mediumDesktop) {
+            @include make-text-input(450px, 1.5em, 1em, 1em);
+          }
+          @include media(largeDesktop) {
+            @include make-text-input(650px, 1.5em, 1em, 1em);
+          }
+          */   
+          @include make-text-input(90px);
+          @include media(tablet) {
+            width: 230px;
+          }
+          @include media(mediumDesktop) {
+            width: 250px;
+          }
+          @include media(largeDesktop) {
+            width: 450px;
+          }       
+          
+          font-family: 'Lato-Reg', sans-serif;  
+          font-size: 20px;      
+          //width: 450px;
+          height: 25px;
+          margin-left: auto;
+          margin-right: auto;
+          //margin-bottom: 25px;
+          border: none;
+          border-radius: 0px;
+          border-bottom: 1px solid  #164F85;
+          background: transparent;
+        }
+        .left-text {
+          padding-left: 15px;
+        }
+        .right-text {
+          padding-right: 15px;
+        }
+        .error__committee-id,
+        .error__password-error,
+        .error__email-id-error{
+          @extend .text-error;          
+        }
+        .login__btn {
+          //@include button-variant($primaryBlue, $primaryBlue);
+          //@include button-size($input-btn-padding-y, $input-btn-padding-x, 1.5em, $input-btn-line-height, $btn-border-radius);
+          cursor: pointer;
+          //font-family: $mainFontFamily;
+          width: 140px;
+          height: 40px;
+          margin-bottom: 15px;
+          margin-top: 30px;          
+          color: #ffffff;
+          background-color: #164F85;
+          font-family: 'Lato-Bold', sans-serif;
+          font-size: 20px;
+          font-weight: 700;
+          border-radius: 5px;
+          border-style: solid;          
+        }
+        .login__btn:hover {
+          background-color: #C80505;
+        }
+        .logged-out-msg {
+          font-size: 1em;
+          font-weight: bold;
+          margin-bottom: 20px;
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+}

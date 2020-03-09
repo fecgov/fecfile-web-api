@@ -8,7 +8,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { AppRoutes, routing } from './app.routes';
 import { AppComponent } from './app.component';
-import { LoginComponent } from './login/login.component';
+import { LoginComponent } from './app-main-login/login/login.component';
 import { AppLayoutComponent } from './app-layout/app-layout.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
