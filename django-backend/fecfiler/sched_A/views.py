@@ -2495,7 +2495,7 @@ def schedA(request):
             )
 
 
-def update_aggregation_status(transaction_id, status):
+def update_sa_aggregation_status(transaction_id, status):
     """
     helpder function to update sa aggregation_ind
     """
