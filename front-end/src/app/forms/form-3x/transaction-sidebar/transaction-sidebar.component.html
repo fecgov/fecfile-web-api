@@ -32,16 +32,10 @@
       <li
         [ngClass]="itemSelected === categoryType?.value ? 'form-sidebar-item selected' : 'form-sidebar-item'"
         *ngFor="let categoryType of transactionCategories"
-        (click)="optionsListClick(categoryType?.text)"
+        (click)="selectItem(categoryType?.value)"
       >
         <div class="float-left">
-          <button
-            type="button"
-            id="{{ categoryType?.text }}"
-            class="btn btn-link"
-            value="{{ categoryType?.value }}"
-            (click)="selectItem($event)"
-          >
+          <button type="button" id="{{ categoryType?.text }}" class="btn btn-link" value="{{ categoryType?.value }}">
             <i class="plus-icon" aria-hidden="true"></i>
             {{ categoryType?.text }}
           </button>

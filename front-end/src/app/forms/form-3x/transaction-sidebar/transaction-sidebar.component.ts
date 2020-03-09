@@ -285,18 +285,18 @@ export class TransactionSidebarComponent implements OnInit {
    *
    * @param      {Object}  e  The event object.
    */
-  public selectItem(e): void {
+  public selectItem(transactionCategoryValue: string): void {
     if (this.editMode) {
-      this.itemSelected = e.target.value;
+      this.itemSelected = transactionCategoryValue;
 
       this.status.emit({
         form: this._formType,
-        transactionCategory: e.target.value
+        transactionCategory: transactionCategoryValue
       });
 
       this._messageService.sendMessage({
         form: this._formType,
-        transactionCategory: e.target.value
+        transactionCategory: transactionCategoryValue
       });
 
       if (
@@ -305,7 +305,7 @@ export class TransactionSidebarComponent implements OnInit {
         localStorage.getItem('Receipts_Entry_Screen') === 'Yes' ||
         localStorage.getItem('Reports_Edit_Screen') === 'Yes'
       ) {
-        let queryParamsMap: any = { step: 'step_2', transactionCategory: e.target.value };
+        let queryParamsMap: any = { step: 'step_2', transactionCategory: transactionCategoryValue };
         if (this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId) {
           queryParamsMap.reportId = this._activatedRoute.snapshot.queryParams.reportId;
         }
@@ -524,15 +524,6 @@ export class TransactionSidebarComponent implements OnInit {
       return result;
     } else {
       return true;
-    }
-  }
-
-  /*
-    This function is called while selecting a list from report screen
-  */
-  public optionsListClick(type): void {
-    if (document.getElementById(type) != null) {
-      document.getElementById(type).click();
     }
   }
 }
