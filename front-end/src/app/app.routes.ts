@@ -110,7 +110,13 @@ export const AppRoutes: Routes = [
           }
         ]
       },
-      { path: 'signandSubmit/:form_id', component: SignComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+      {
+        path: 'signandSubmit/:form_id',
+        component: SignComponent,
+        pathMatch: 'full',
+        canActivate: [CanActivateGuard],
+        canDeactivate: [CanDeactivateGuardService]
+      },
       { path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       {
         path: 'forms/form/edit/:form_id/:report_id',
