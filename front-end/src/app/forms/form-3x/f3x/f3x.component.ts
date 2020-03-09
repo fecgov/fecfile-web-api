@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, NavigationStart } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import 'rxjs/add/operator/takeUntil';
@@ -104,6 +104,10 @@ export class F3xComponent implements OnInit, OnDestroy {
         this.allTransactions = true;
       } else {
         this.allTransactions = false;
+      }
+      // No unsaved changes needed from transactions.
+      if (p.step === 'transactions') {
+        localStorage.removeItem(`form_${this.formType}_saved`);
       }
     });
   }

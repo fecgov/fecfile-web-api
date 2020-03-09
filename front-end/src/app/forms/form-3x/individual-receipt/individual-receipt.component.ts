@@ -107,14 +107,6 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
     super.ngOnInit();
   }
 
-  // tslint:disable-next-line:use-life-cycle-interface
-  public ngDoCheck() {
-    if (this.frmIndividualReceipt != null) {
-      if (this.frmIndividualReceipt.dirty) {
-        localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: false }));
-      }
-    }
-  }
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
     this.formType = '3X';

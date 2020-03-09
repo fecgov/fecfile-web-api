@@ -276,9 +276,14 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
    * Cancel the payment and return to the start or first part.
    */
   public cancelSFPayment() {
-    this.showPart2 = false;
-    this.clearFormValues();
-    this.returnToParent(this.editScheduleAction);
+    this.canDeactivate().then(result => {
+      if (result === true) {
+        localStorage.removeItem(`form_${this.formType}_saved`);
+        // this.showPart2 = false;
+        this.clearFormValues();
+        this.returnToParent(this.editScheduleAction);
+      }
+    });
   }
 
   /**
