@@ -3539,6 +3539,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (res) {
           if (res.reportId) {
             if (res.status && res.status !== 'Filed') {
+
+              this.getContributionAggregate(dateValue, fieldName);
+
               let elementName = null;
               if (this.reattributionTransactionId) {
                 elementName = 'reattribution_report_id'
@@ -3566,6 +3569,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       })
 
+    }
+  }
+
+  private getContributionAggregate(dateValue: any, fieldName: string) {
+    if (this._selectedEntity) {
+      if (this._selectedEntity.entity_id) {
+        const contribDate = this._utilService.formatDate(dateValue);
+        if (fieldName === 'contribution_date') {
+          this._getContributionAggregate(contribDate, this._selectedEntity.entity_id, null);
+        }
+      }
     }
   }
 
