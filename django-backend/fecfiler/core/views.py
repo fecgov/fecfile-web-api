@@ -2675,7 +2675,6 @@ MODIFIED - CORE APP - SPRINT 15 - FNE 1222 - BY PRAVEEN JINKA
 """
 
 @api_view(["GET"])
-############################ PARTIALLY IMPLEMENTED FOR INDIVIDUALS, ORGANIZATIONS, COMMITTEES. NOT IMPLEMENTED FOR CANDIDATES
 def autolookup_expand(request):
     """
     load cand or cmte entity based on cand_id or cmte_id
@@ -2688,7 +2687,6 @@ def autolookup_expand(request):
     try:
         if 'cmte_id' in request.query_params:
             cmte_id = request.query_params.get('cmte_id')
-            
             _sql = """
             SELECT json_agg(t) FROM 
             (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
@@ -2697,9 +2695,23 @@ def autolookup_expand(request):
             e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
             FROM public.entity e, public.candidate_master c WHERE e.ref_cand_cmte_id = c.cand_id
             and c.principal_campaign_committee = %s
-            and e.delete_ind is distinct from 'Y') t
+            and e.delete_ind is distinct from 'Y'
+            and e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
             """
-            parameters = [cmte_id]
+            parameters = [cmte_id, request.user.username]
+        if 'cand_id' in request.query_params:
+            cand_id = request.query_params.get('cand_id')
+            _sql = """
+            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                            e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                            e.last_update_date
+                            FROM public.entity e, public.entity c WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                            AND c.red_cand_cmte_id = %s
+                            AND e.delete_ind is distinct from 'Y'
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
+            """
+            parameters = [cand_id]
         with connection.cursor() as cursor:
             logger.debug("autolookup expand query:{}".format(_sql))
             logger.debug("autolookup expand parameters:{}".format(parameters))
@@ -2722,8 +2734,8 @@ def autolookup_expand(request):
         )
     
 
-@api_view(["GET"])
 ############################ PARTIALLY IMPLEMENTED FOR INDIVIDUALS, ORGANIZATIONS, COMMITTEES. NOT IMPLEMENTED FOR CANDIDATES
+@api_view(["GET"])
 def autolookup_search_contacts(request):
     """
     We are changing autoloopup to the converged entity table:
@@ -2737,8 +2749,6 @@ def autolookup_search_contacts(request):
     logger.debug(
         "autolookup with request params:{}".format(dict(request.query_params.items()))
     )
- 
-
     allowed_params = [
         "entity_name",
         "first_name",
@@ -2764,16 +2774,6 @@ def autolookup_search_contacts(request):
         order_string = ""
         search_string = ""
         query_string = ""
-        # cand_q = False
-        # cmte_q = False
-
-        # for k in request.query_params:
-        #     if k.startswith('cand_'):
-        #         cand_q = True
-        #     if k.startswith('cmte_'):
-        #         cmte_q = True
-
-        # rename parameters for candidate and committee
         query_params = {
             k: v for k, v in request.query_params.items() if k not in field_remapper
         }
@@ -2788,38 +2788,12 @@ def autolookup_search_contacts(request):
             query_params["preffix"] = query_params.get("prefix")
 
         logger.debug("*** autolookup with parameters {}".format(query_params))
-        logger.debug('*********************************')
         for key, value in query_params.items():
             if key in allowed_params:
                 if key == "prefix":
                     continue
                 order_string = 'e.'+str(key)
                 param_string = " AND LOWER(e." + str(key) + ") LIKE LOWER(%s)"
-                # if cand_q:
-                #     query_string = """
-                #     SELECT json_agg(t) FROM
-                #     (SELECT e.preffix as cand_prefix,
-                #             e.last_name as cand_last_name,
-                #             e.first_name as cand_first_name,
-                #             e.middle_name as cand_middle_name,
-                #             e.suffix as cand_suffix,
-                #             *
-                #     FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
-                #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
-                # elif cmte_q:
-                #     query_string = """
-                #     SELECT json_agg(t) FROM
-                #     (SELECT e.preffix as prefix, e.entity_name as cmte_name, *
-                #     FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
-                #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
-                #     pass
-                # else
-                #
-                # :
-                # print('haha')
-                # print('cmte-id' in list(request.query_params.items()))
                 if "cmte_id" in request.query_params:
                     parameters = [committee_id]
                     if 'expand' in request.query_params:
@@ -2862,23 +2836,45 @@ def autolookup_search_contacts(request):
                     or "cand_last_name" in request.query_params
                     or "payee_cmte_id" in request.query_params
                 ):
-                    parameters = [committee_id]
-                    query_string = (
-                        """
-                        SELECT json_agg(t) FROM 
-                        (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
-                        e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
-                        e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
-                        e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
-                        FROM public.entity e WHERE e.cmte_id in ('C00000000') 
-                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                        AND substr(e.ref_cand_cmte_id,1,1) != 'C'
-                        """
-                        + param_string
-                        + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                        + order_string
-                        + """) t"""
-                    )
+                    if 'expand' in request.query_params:
+                        parameters = [committee_id]
+                        query_string = (
+                            """
+                            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
+                            e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
+                            e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
+                            e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
+                            FROM public.entity e , public.entity c WHERE c.ref_cand_cmte_id = e.principal_campaign_committee
+                            AND e.principal_campaign_committee is not null
+                            AND e.cmte_id in ('C00000000') 
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            AND substr(e.ref_cand_cmte_id,1,1) != 'C'
+                            """
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
+                        )
+                        
+                    else:
+                        parameters = [committee_id]
+                        query_string = (
+                            """
+                            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
+                            e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
+                            e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
+                            e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
+                            FROM public.entity e WHERE e.cmte_id in ('C00000000') 
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            AND substr(e.ref_cand_cmte_id,1,1) != 'C'
+                            """
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
+                        )
                 else:
                     parameters = [committee_id, committee_id]
                     if 'expand' in request.query_params:
@@ -2917,19 +2913,6 @@ def autolookup_search_contacts(request):
                         )
 
                 parameters.append(value + "%")
-                # parameters.append('C%')
-            # elif key in ['cmte_id', 'cmte_name']:
-            #     param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
-            #     query_string = """SELECT json_agg(t) FROM (SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix
-            #                                         FROM public.committee_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
-            #     parameters = [value + '%']
-            # elif key in ['cand_id', 'cand_last_name', 'cand_first_name']:
-            #     param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
-            #     query_string = """SELECT json_agg(t) FROM (SELECT cand_id, cand_last_name, cand_first_name, cand_middle_name, cand_prefix, cand_suffix, cand_street_1, cand_street_2, cand_city, cand_state, cand_zip, cand_party_affiliation, cand_office, cand_office_state, cand_office_district, cand_election_year
-            #                                         FROM public.candidate_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
-            #     parameters = [value + '%']
-            # else:
-            #     raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
 
         if query_string == "":
             raise Exception(
@@ -2939,11 +2922,8 @@ def autolookup_search_contacts(request):
             logger.debug("autolookup query:{}".format(query_string))
             logger.debug("autolookup parameters:{}".format(parameters))
             cursor.execute(query_string, parameters)
-            # print(cursor.query)
-            # print('fail..')
             for row in cursor.fetchall():
                 data_row = list(row)
-                # logger.debug('current data row:{}'.format())
                 forms_obj = data_row[0]
         status_value = status.HTTP_200_OK
         if forms_obj is None:
