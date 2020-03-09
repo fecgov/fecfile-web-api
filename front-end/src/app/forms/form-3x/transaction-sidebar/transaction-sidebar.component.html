@@ -101,16 +101,11 @@
           >
             All Transactions
           </button>
-          <button
-            style="align-self:stretch;"
-            type="button"
-            class="btn btn-secondary-gray"
-            (click)="viewSummary()"
-            [routerLink]="['/forms/form/', '3X']"
-            [queryParams]="{ step: 'financial_summary', edit: editMode }"
-          >
+          <button style="align-self:stretch;" type="button" class="btn btn-secondary-gray" (click)="viewSummary()">
             Summary
           </button>
+          <!-- [routerLink]="['/forms/form/', '3X']"
+          [queryParams]="{ step: 'financial_summary', edit: editMode }" -->
         </div>
       </div>
       <ng-container *ngIf="step !== 'step_3'">
