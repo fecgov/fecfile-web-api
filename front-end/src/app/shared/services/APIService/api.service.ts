@@ -31,11 +31,12 @@ export class ApiService {
    *
    * @return     {Observable}  The JSON web token response.
    */
-  public signIn(email: string, committeeId: string, password: string): Observable<any> {
+  public signIn(email: string, username: string, password: string): Observable<any> {
+      // TODO: Allow post using existing API for now 03/09/20
     return this._http
       .post<Auth>(`${this._appConfigService.getConfig().apiUrl}/token/obtain`, {
         email,
-        committeeId,
+        username,
         password
       })
       .pipe(map(res => {
@@ -54,7 +55,7 @@ export class ApiService {
    * @return     {Observable}  The commitee details.
    */
   public getCommiteeDetails(): Observable<any> {
-    let token: string = JSON.parse(this._cookieService.get('user'));
+    const token: string = JSON.parse(this._cookieService.get('user'));
 
     let httpOptions =  new HttpHeaders();
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -66,7 +67,7 @@ export class ApiService {
         {
           headers: httpOptions
         }
-      )
+      );
   }
 
   /**
@@ -78,7 +79,6 @@ export class ApiService {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = '/f99/get_rad_analyst_info'; // This needs to be updated to /core/ on the server side.
     let httpOptions =  new HttpHeaders();
-    let formData: FormData = new FormData();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
