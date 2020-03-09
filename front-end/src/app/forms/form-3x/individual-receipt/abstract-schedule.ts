@@ -322,6 +322,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._f3xMessageService.getInitFormMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this.clearFormValues();
       this.removeAllValidators();
+      // For unsaved changes warning, OnChanges() not called when transaction type 
+      // is same as previous. Removed saved property here to handle that case.
+      localStorage.removeItem(`form_${this.formType}_saved`);
     });
 
     this._f3xMessageService.getLoadFormFieldsMessage().takeUntil(this.onDestroy$).subscribe(message => {
@@ -461,6 +464,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges) {
+
+    localStorage.removeItem(`form_${this.formType}_saved`);
+
     if (this.checkComponent(changes)) {
       if (this.editMode) {
         this._reportsService.getCoverageDates(this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
@@ -570,6 +576,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
       }
     }
+  }
+
+  private _prepareForUnsavedChanges(): void {
+    // TODO look into using takeUntil and destroy to avoid mem leak.
+
+    // this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.takeUntil(this.onDestroy$)
+    // .subscribe(val => {
+
+    this.frmIndividualReceipt.valueChanges.takeUntil(this.onDestroy$)
+      .subscribe(val => {
+      if (this.frmIndividualReceipt.dirty) {
+        localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: false }));
+      }
+    });
   }
 
   /**
@@ -704,6 +724,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     //once the parent is initialized, send message to any child subscriptions to perform any applicable actions
     if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls) {
       this._messageService.sendMessage({ parentFormPopulated: true, component: this.abstractScheduleComponent });
+      this._prepareForUnsavedChanges();
     }
   }
 
@@ -2615,16 +2636,48 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
+   * Determines ability for a person to leave a page with a form on it.
+   *
+   * @return     {boolean}  True if able to deactivate, False otherwise.
+   */
+  public async canDeactivate(): Promise<boolean> {
+    if (this._formService.formHasUnsavedData(this.formType)) {
+      let result: boolean = null;
+      result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
+        let val: boolean = null;
+
+        if (res === 'okay') {
+          val = true;
+        } else if (res === 'cancel') {
+          val = false;
+        }
+
+        return val;
+      });
+
+      return result;
+    } else {
+      return true;
+    }
+  }
+
+  /**
    * Goes to the previous step.
    */
   public previousStep(): void {
-    this.clearFormValues();
-    this.status.emit({
-      form: {},
-      direction: 'previous',
-      step: 'step_2'
+    this.canDeactivate().then(result => {
+      if (result === true) {
+        localStorage.removeItem(`form_${this.formType}_saved`);
+        this.clearFormValues();
+        this.status.emit({
+          form: {},
+          direction: 'previous',
+          step: 'step_2'
+        });
+      }
     });
   }
+
   /**
    * Save the current transaction if valid  and show transactions
    * if invalid show unsaved confirmation and navigate accordingly
@@ -5126,27 +5179,33 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * If originated from Debt Summary, return there otherwise go to the transactions.
    */
   public cancel(): void {
-    if (
-      this.returnToDebtSummary &&
-      (this.transactionType === 'DEBT_TO_VENDOR' || this.transactionType === 'DEBT_BY_VENDOR')
-    ) {
-      this._goDebtSummary();
-    } else if (
-      this.returnToDebtSummary &&
-      (this.transactionType === 'OPEXP_DEBT' ||
-        this.transactionType === 'ALLOC_EXP_DEBT' ||
-        this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
-        this.transactionType === 'OTH_DISB_DEBT' ||
-        this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
-        this.transactionType === 'COEXP_PARTY_DEBT' ||
-        this.transactionType === 'IE_B4_DISSE' ||
-        this.transactionType === 'OTH_REC_DEBT'
-      )
-    ) {
-      this.returnToParent(this.editScheduleAction);
-    } else {
-      this.viewTransactions();
-    }
+
+    this.canDeactivate().then(result => {
+      if (result === true) {
+        localStorage.removeItem(`form_${this.formType}_saved`);
+        if (
+          this.returnToDebtSummary &&
+          (this.transactionType === 'DEBT_TO_VENDOR' || this.transactionType === 'DEBT_BY_VENDOR')
+        ) {
+          this._goDebtSummary();
+        } else if (
+          this.returnToDebtSummary &&
+          (this.transactionType === 'OPEXP_DEBT' ||
+            this.transactionType === 'ALLOC_EXP_DEBT' ||
+            this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
+            this.transactionType === 'OTH_DISB_DEBT' ||
+            this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
+            this.transactionType === 'COEXP_PARTY_DEBT' ||
+            this.transactionType === 'IE_B4_DISSE' ||
+            this.transactionType === 'OTH_REC_DEBT'
+          )
+        ) {
+          this.returnToParent(this.editScheduleAction);
+        } else {
+          this.viewTransactions();
+        }
+      }
+    });
   }
 
   private _goDebtSummary(): void {
