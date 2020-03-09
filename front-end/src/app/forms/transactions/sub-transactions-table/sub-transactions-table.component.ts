@@ -135,8 +135,11 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
 
         model.date = trx.expenditure_date ? trx.expenditure_date : trx.contribution_date;
         model.aggregate = trx.contribution_aggregate;
-        if(!model.aggregate && this.subTransactionsTableType === 'sched_e'){
+        if (!model.aggregate && this.subTransactionsTableType === 'sched_e') {
           model.aggregate = trx.expenditure_aggregate;
+        }
+        if (!model.aggregate && this.subTransactionsTableType === 'sched_d') {
+          model.aggregate = trx.aggregate_amt;
         }
 
         model.activityEventType = trx.activity_event_type;
@@ -243,9 +246,7 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
         returnToDebtSummary: this.returnToDebtSummary,
         returnToDebtSummaryInfo: this.returnToDebtSummaryInfo
       };
-      this._transactionsMessageService.sendEditDebtSummaryTransactionMessage(
-        {trx: trx, debtSummary: debtSummary}
-      );
+      this._transactionsMessageService.sendEditDebtSummaryTransactionMessage({ trx: trx, debtSummary: debtSummary });
     } else {
       this._transactionsMessageService.sendEditTransactionMessage(trx);
     }
@@ -273,9 +274,11 @@ export class SubTransactionsTableComponent implements OnInit, OnChanges {
 
   private isSchedF(trx: TransactionModel) {
     if (trx) {
-      if ( trx.transactionTypeIdentifier === 'COEXP_CC_PAY_MEMO' ||
-          trx.transactionTypeIdentifier === 'COEXP_STAF_REIM_MEMO' ||
-          trx.transactionTypeIdentifier === 'COEXP_PMT_PROL_MEMO' ) {
+      if (
+        trx.transactionTypeIdentifier === 'COEXP_CC_PAY_MEMO' ||
+        trx.transactionTypeIdentifier === 'COEXP_STAF_REIM_MEMO' ||
+        trx.transactionTypeIdentifier === 'COEXP_PMT_PROL_MEMO'
+      ) {
         return true;
       }
     }

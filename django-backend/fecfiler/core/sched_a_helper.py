@@ -49,7 +49,8 @@ def update_earmark_memo_contribution(transaction_id, contribution_amount):
             )
             cursor.execute(_sql2, [contribution_amount, aggregate_amt, transaction_id])
             if cursor.rowcount == 0:
-                raise Exception("Error: updating earmark memo failed.")
+                logger.debug('no memo transaction found.')
+                # raise Exception("Error: updating earmark memo failed.")
     except:
         raise
 

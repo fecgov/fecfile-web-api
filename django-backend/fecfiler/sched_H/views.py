@@ -2698,36 +2698,41 @@ def schedH3(request):
             datum = schedH3_sql_dict(request.data)
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
-                )
-                data = put_schedH3(datum)
-                if "child" in request.data:
-                    for _c in request.data["child"]:
-                        parent_data = data
-                        # _c.update(parent_data)
-                        _c["back_ref_transaction_id"] = parent_data["transaction_id"]
-                        _c = schedH3_sql_dict(_c)
-                        put_schedH3(_c)
-            else:
+
+            # **********************************
+            # TODO: disable transaction_id checking for h3 to fix FNE-2142 bug
+            # if "transaction_id" in request.data and check_null_value(
+            #     request.data.get("transaction_id")
+            # ):
+            #     datum["transaction_id"] = check_transaction_id(
+            #         request.data.get("transaction_id")
+            #     )
+            #     data = put_schedH3(datum)
+            #     if "child" in request.data:
+            #         for _c in request.data["child"]:
+            #             parent_data = data
+            #             # _c.update(parent_data)
+            #             _c["back_ref_transaction_id"] = parent_data["transaction_id"]
+            #             _c = schedH3_sql_dict(_c)
+            #             put_schedH3(_c)
+            # else:
                 # print(datum)
-                logger.debug("saving h3 with data {}".format(datum))
-                data = post_schedH3(datum)
-                logger.debug("parent data saved:{}".format(data))
-                if "child" in request.data:
-                    for _c in request.data["child"]:
-                        child_data = data
-                        child_data.update(_c)
-                        child_data["back_ref_transaction_id"] = data["transaction_id"]
-                        child_data = schedH3_sql_dict(child_data)
-                        logger.debug(
-                            "saving child transaction with data {}".format(child_data)
-                        )
-                        post_schedH3(child_data)
-                        logger.debug("child transaction saved.")
+            # ************************************
+            
+            logger.debug("saving h3 with data {}".format(datum))
+            data = post_schedH3(datum)
+            logger.debug("parent data saved:{}".format(data))
+            if "child" in request.data:
+                for _c in request.data["child"]:
+                    child_data = data
+                    child_data.update(_c)
+                    child_data["back_ref_transaction_id"] = data["transaction_id"]
+                    child_data = schedH3_sql_dict(child_data)
+                    logger.debug(
+                        "saving child transaction with data {}".format(child_data)
+                    )
+                    post_schedH3(child_data)
+                    logger.debug("child transaction saved.")
             # Associating child transactions to parent and storing them to DB
 
             output = get_schedH3(data)

@@ -1654,4 +1654,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       return false;
     } else { return true; }
   }
+
+  private isIKOUT(trx: any) {
+    if(trx.transactionTypeIdentifier === 'IK_OUT' ||
+      trx.transactionTypeIdentifier === 'PARTY_IK_OUT' ||
+      trx.transactionTypeIdentifier === 'PAC_IK_OUT' ||
+      trx.transactionTypeIdentifier === 'IK_BC_OUT' ||
+      trx.transactionTypeIdentifier === 'PAC_IK_BC_OUT' ||
+      trx.transactionTypeIdentifier === 'IK_TRAN_OUT' ||
+      trx.transactionTypeIdentifier === 'IK_TRAN_FEA_OUT' ||
+      trx.transactionTypeIdentifier === 'PARTY_IK_BC_OUT') {
+        return true;
+      }else {
+        return false;
+      }
+  }
 }

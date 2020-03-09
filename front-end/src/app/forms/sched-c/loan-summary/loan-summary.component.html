@@ -50,14 +50,17 @@
               <button class="dropdown-item" (click)="exportAllSelected()">
                 <i class="file-export-icon"></i> Export
               </button>
+              <button class="dropdown-item" (click)="trashAllSelected()">
+                <i class="trash-icon"></i> Trash
+              </button>
             </div>
           </div>
-          <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+          <!-- <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary loanSumamry__bulk_action_btn" (click)="deleteRecyleBin()"
               [disabled]="bulkActionDisabled">
               <i class="trash-icon"></i>
             </button>
-          </div>
+          </div> -->
         </th>
       </tr>
     </thead>

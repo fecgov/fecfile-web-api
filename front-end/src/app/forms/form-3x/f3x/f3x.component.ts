@@ -414,6 +414,9 @@ export class F3xComponent implements OnInit, OnDestroy {
                   // force change to set show first page.
                   this.forceChangeDetectionFDebtPayment = new Date();
                   this._populateFormForEdit(e, AbstractScheduleParentEnum.schedFComponent);
+                  const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
+                  transactionTypeText = transactionModel.type;
+                  transactionType = transactionModel.transactionTypeIdentifier;
                 }
               } else if (apiCall === '/se/schedE') {
                 // force change to set show first page.
@@ -719,6 +722,9 @@ export class F3xComponent implements OnInit, OnDestroy {
       ) {
         e.scheduleType = 'sched_f_core';
       }
+      if (tTypeIdentifier === 'COEXP_PARTY_DEBT') {
+        e.scheduleType = 'sched_f';
+      }
     }
     // default to sched_a ?
     this.scheduleType = e.scheduleType ? e.scheduleType : 'sched_a';
@@ -754,7 +760,7 @@ export class F3xComponent implements OnInit, OnDestroy {
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'OTH_DISB_DEBT' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'FEA_100PCT_DEBT_PAY' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'COEXP_PARTY_DEBT' ||
-        e.transactionDetail.transactionModel.transactionTypeIdentifier === 'IE' ||
+        e.transactionDetail.transactionModel.transactionTypeIdentifier === 'IE_B4_DISSE' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'OTH_REC_DEBT') &&
       e.returnToDebtSummary
     ) {
