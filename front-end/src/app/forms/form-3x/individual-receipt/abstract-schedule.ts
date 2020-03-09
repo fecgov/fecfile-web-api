@@ -106,6 +106,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
   protected _rollbackAfterUnsuccessfulSave = false;
   protected _prePopulateFromSchedHData: any;
+  protected _prePopulateFromSchedPARTNData : any;
 
   /**
    * For toggling between 2 screens of Sched F Debt Payment.
@@ -282,6 +283,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               }
             }
             break;
+          case 'prePopulateFromSchedPARTN':
+            if (message) {
+              if (message.prePopulateFromSchedPARTN) {
+                if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+                  this.scheduleAction = ScheduleActions.addSubTransaction;
+                  this._prePopulateFromSchedPARTNData = message.prePopulateFromSchedPARTN;
+                }
+              }
+            }
+              break;
           default:
             console.log('message key not supported: ' + message.key);
         }
@@ -2305,6 +2316,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.subTransactionInfo.isParent === true
               ){
                 addSubTransEmitObj.prePopulateFromSchedH = res;
+              }else if(
+                this.subTransactionInfo.scheduleType === 'PARTN_REC' &&
+                this.subTransactionInfo.isParent === true
+              ){
+                addSubTransEmitObj.prePopulateFromSchedPARTN = res;
               }
             }
 
@@ -2377,6 +2393,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_STAF_REIM_MEMO') {
                   this._prePopulateFromSchedHData = res;
                   this._prePopulateFromSchedH(this._prePopulateFromSchedHData);
+                }else if (this.subTransactionInfo.subTransactionType === 'PARTN_MEMO') {
+                  this._prePopulateFromSchedPARTNData = res;
+                  this._prePopulateFromSchedPARTN(this._prePopulateFromSchedPARTNData);
                 }
               }
               if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
@@ -3889,6 +3908,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._prePopulateFromSchedH(this._prePopulateFromSchedHData);
           this._prePopulateFromSchedHData = null;
         }
+
+        if (
+          this._prePopulateFromSchedPARTNData &&
+          schedHSubTran &&
+          this.scheduleAction === ScheduleActions.addSubTransaction
+        ) {
+          this._prePopulateFromSchedPARTN(this._prePopulateFromSchedPARTNData);
+          this._prePopulateFromSchedPARTNData = null;
+        }
       });
   }
 
@@ -4049,6 +4077,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._prePopulateFormFieldHelper(schedHData, 'activity_event_identifier', fieldArray);
         }
       }
+    }
+    this.totalAmountReadOnly = false;
+    this._prePopulateFormField(fieldArray);
+  }
+
+  protected _prePopulateFromSchedPARTN(schedPARTNData: any) {
+    let fieldArray = [];
+    if (schedPARTNData.hasOwnProperty('contribution_date')) {
+      const contributionDate = schedPARTNData.contribution_date;
+      if (!contributionDate) {
+        return;
+      }
+      this._prePopulateFormFieldHelper(schedPARTNData, 'contribution_date', fieldArray);
     }
     this.totalAmountReadOnly = false;
     this._prePopulateFormField(fieldArray);
@@ -5103,6 +5144,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             prePopulateFieldArray.push({ name: 'levin_account_id', value: res.levin_account_id });
           }
       }*/
+      else if (this.subTransactionInfo.subTransactionType === 'PARTN_MEMO') {
+        prePopulateFieldArray = [];
+        if (res.hasOwnProperty('contribution_date')) {
+          prePopulateFieldArray.push({ name: 'contribution_date', value: res.contribution_date });
+        }
+      }
     }
     return prePopulateFieldArray;
   }

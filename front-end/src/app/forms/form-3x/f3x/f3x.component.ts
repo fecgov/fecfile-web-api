@@ -501,6 +501,12 @@ export class F3xComponent implements OnInit, OnDestroy {
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
                     prePopulateFromSchedH: e.prePopulateFromSchedH
                   });
+                }else if (e.hasOwnProperty('prePopulateFromSchedPARTN')) {
+                  this._f3xMessageService.sendPopulateFormMessage({
+                    key: 'prePopulateFromSchedPARTN',
+                    abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+                    prePopulateFromSchedPARTN: e.prePopulateFromSchedPARTN
+                  });
                 }
               }
             }
