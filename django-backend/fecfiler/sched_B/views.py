@@ -859,13 +859,19 @@ def post_schedB(datum):
                     datum["expenditure_amount"],
                     transaction_id,
                 )
-            update_schedB_aggamt_transactions(
-                datum.get("expenditure_date"),
-                datum.get("transaction_type_identifier"),
-                entity_id,
-                datum.get("cmte_id"),
-                datum.get("report_id"),
-            )
+
+            # do aggregation: regular sb transactions
+            if not transaction_id.startswith('LB'):
+                update_schedB_aggamt_transactions(
+                    datum.get("expenditure_date"),
+                    datum.get("transaction_type_identifier"),
+                    entity_id,
+                    datum.get("cmte_id"),
+                    datum.get("report_id"),
+                )
+            else: # do aggregation: levin account transactions
+                update_sl_summary(datum)
+
         except Exception as e:
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -875,9 +881,9 @@ def post_schedB(datum):
             raise Exception(
                 "The post_sql_schedB function is throwing an error: " + str(e)
             )
-        logger.debug("sched_b transaction saved successfully.")
-        if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
-            update_sl_summary(datum)
+        # logger.debug("sched_b transaction saved successfully.")
+        # if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
+        #     (datum)update_sl_summary
         return datum
     except Exception as e:
         raise Exception("post_schedB function is throwing error: " + str(e))
@@ -1667,6 +1673,103 @@ def update_schedB_aggamt_transactions(
             "The update_schedB_aggamt_transactions function is throwing an error: "
             + str(e)
         )
+
+
+def update_sb_aggregation_status(transaction_id, status):
+    """
+    helpder function to update sa aggregation_ind
+    """
+    _sql = """
+    update public.sched_b
+    set aggregation_ind = %s
+    where transaction_id = %s
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [status, transaction_id])
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "The Transaction ID: {} does not exist in sb table".format(
+                        transaction_id
+                    )
+                )
+    except:
+        raise
+
+
+@api_view(["PUT"])
+def force_aggregate_sb(request):
+    """
+    api to force a transaction to be aggregated:
+    1. set aggregate_ind = 'Y'
+    2. re-do entity-based aggregation on sb
+    """
+    # if request.method == "GET":
+    try:
+        cmte_id = request.user.username
+        report_id = request.data.get("report_id")
+        transaction_id = request.data.get("transaction_id")
+        if not transaction_id:
+            raise Exception("transaction id is required for this api call.")
+        update_sb_aggregation_status(transaction_id, "Y")
+        sb_data = get_list_schedB(report_id, cmte_id, transaction_id)[0]
+        update_schedB_aggamt_transactions(
+                    sb_data.get("expenditure_date"),
+                    sb_data.get("transaction_type_identifier"),
+                    sb_data.get("entity_id"),
+                    cmte_id,
+                    report_id,
+                )
+        # update_linenumber_aggamt_transactions_SA(
+        #     sb_data.get("contribution_date"),
+        #     sb_data.get("transaction_type_identifier"),
+        #     sb_data.get("entity_id"),
+        #     cmte_id,
+        #     report_id,
+        # )
+    except Exception as e:
+        return Response(
+            "The force_aggregate_sb API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+@api_view(["PUT"])
+def force_unaggregate_sb(request):
+    """
+    api to force a transaction to be un-aggregated:
+    1. set aggregate_ind = 'N'
+    2. re-do entity-based aggregation on sb
+    """
+    # if request.method == "GET":
+    try:
+        cmte_id = request.user.username
+        report_id = request.data.get("report_id")
+        transaction_id = request.data.get("transaction_id")
+        if not transaction_id:
+            raise Exception("transaction id is required for this api call.")
+        update_sb_aggregation_status(transaction_id, "N")
+        sb_data = get_list_schedB(report_id, cmte_id, transaction_id)[0]
+        update_schedB_aggamt_transactions(
+                    sb_data.get("expenditure_date"),
+                    sb_data.get("transaction_type_identifier"),
+                    sb_data.get("entity_id"),
+                    cmte_id,
+                    report_id,
+                )
+        # update_linenumber_aggamt_transactions_SA(
+        #     sb_data.get("contribution_date"),
+        #     sb_data.get("transaction_type_identifier"),
+        #     sb_data.get("entity_id"),
+        #     cmte_id,
+        #     report_id,
+        # )
+    except Exception as e:
+        return Response(
+            "The force_aggregate_sb API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
 
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
