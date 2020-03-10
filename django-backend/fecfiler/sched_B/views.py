@@ -1565,7 +1565,8 @@ def list_all_sb_transactions_entity(
                 t1.memo_code, 
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
-                t1.redesignation_ind
+                t1.redesignation_ind, 
+                t1.aggregation_ind
             FROM public.sched_b t1 
             WHERE entity_id = %s 
             AND cmte_id = %s 
@@ -1684,7 +1685,8 @@ def update_schedB_aggamt_transactions(
                 #     transaction[7] == None and
                 #     (transaction[6] != "X")
                 # ):
-                aggregate_amount += transaction[0]
+                if transaction[10] != "N":
+                    aggregate_amount += transaction[0]
                 if expenditure_date <= transaction[4]:
                     line_number, itemized_ind = get_sb_linenumber_itemization(
                         transaction[8],

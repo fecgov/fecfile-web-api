@@ -858,7 +858,8 @@ def list_all_transactions_entity(
                 t1.memo_code, 
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
-                t1.reattribution_ind
+                t1.reattribution_ind,
+                t1.aggregation_ind
             FROM public.sched_a t1 
             WHERE entity_id = %s 
             AND cmte_id = %s 
@@ -993,14 +994,17 @@ def update_linenumber_aggamt_transactions_SA(
             if transaction[5] != "Y":
                 # checking if the back_ref_transaction_id is null or not.
                 # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
-                if transaction[7] != None or (
-                    transaction[7] == None
-                    and (
-                        # transaction[6] != "X" or
-                        (transaction[9] == "A" and transaction[0] < 0)
-                        or transaction[9] == "R"
+                if (
+                    transaction[7] != None
+                    or (
+                        transaction[7] == None
+                        and (
+                            # transaction[6] != "X" or
+                            (transaction[9] == "A" and transaction[0] < 0)
+                            or transaction[9] == "R"
+                        )
                     )
-                ):
+                ) and transaction[10] != "N":
                     if (committee_type == "PAC") and transaction[
                         8
                     ] in PAC_AGGREGATE_TYPES_1:
