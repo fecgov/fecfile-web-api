@@ -25,6 +25,7 @@ import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstra
 import { schedFstaticFormFields } from './static-form-fields.json';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { SchedHMessageServiceService } from '../sched-h-service/sched-h-message-service.service';
 
 /**
  * Schedule F is a sub-transaction of Schedule D.
@@ -42,6 +43,10 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
   @Input() forceChangeDetection: Date;
+  @Input() parentTransactionModel: any;
+  @Input() transactionData: any;
+  @Input() transactionDataForChild: any;
+
   @Output() status: EventEmitter<any>;
 
   public showPart2: boolean;
@@ -71,7 +76,8 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     _transactionsMessageService: TransactionsMessageService,
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
-    _reportsService: ReportsService
+    _reportsService: ReportsService, 
+    _schedHMessageServce: SchedHMessageServiceService
   ) {
     super(
       _http,
@@ -93,7 +99,8 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService
+      _reportsService, 
+      _schedHMessageServce
     );
   }
 
@@ -112,6 +119,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     this.noValidationRequired.push('subordinate_cmte_street_1');
     this.validateDesignatedFiler.push('designating_cmte_id');
     this.validateDesignatedFiler.push('designating_cmte_name');
+    this._parentTransactionModel = this.parentTransactionModel;
     super.ngOnInit();
     this.showPart2 = false;
     this._setTransactionDetail();

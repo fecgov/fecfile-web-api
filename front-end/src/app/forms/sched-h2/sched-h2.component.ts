@@ -52,6 +52,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
   @Input() scheduleType: string;
+  @Input() transactionData: any;
+
   @Output() status: EventEmitter<any>;
 
   public formType: string;  
@@ -137,7 +139,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService
+      _reportsService,
+      _schedHMessageServiceService
     );
     _schedH2Service;
     _individualReceiptService;
@@ -160,7 +163,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this._schedHMessageServiceService.getpopulateHFormForEditMessage()
     .takeUntil(this._H2onDestroy$)
     .subscribe(p => {
-      if(p.scheduleType === 'Schedule H2'){
+      if(p.scheduleType === 'Schedule H2' || p.scheduleType === 'sched_h2'){
         let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
           if(res && res.length === 1){
             this.editH2(res[0]);
@@ -217,6 +220,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
 
     this.schedH2.patchValue({ select_activity_function: ''}, { onlySelf: true });
+    this.sendPopulateMessageIfApplicable();
    
   }
 

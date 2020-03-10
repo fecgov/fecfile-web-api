@@ -1,3 +1,4 @@
+import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
 import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
@@ -112,6 +113,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     private _schedLService: SchedLService,
     private _individualReceiptService: IndividualReceiptService,
     private _tranMessageService: TransactionsMessageService,
+    _schedHMessageServiceService: SchedHMessageServiceService
   ) {
      super(
       _http,
@@ -133,7 +135,8 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService
+      _reportsService,
+      _schedHMessageServiceService
     );
     _schedLService;
     _individualReceiptService;

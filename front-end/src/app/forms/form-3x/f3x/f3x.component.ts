@@ -74,6 +74,11 @@ export class F3xComponent implements OnInit, OnDestroy {
   private showPart2: boolean;
 
   private onDestroy$ = new Subject();
+  transactionData: any;
+  transactionDataForChild: any;
+  parentTransactionModel: any;
+  populateHiddenFieldsMessageObj: any;
+  populateFieldsMessageObj: any;
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -105,6 +110,16 @@ export class F3xComponent implements OnInit, OnDestroy {
       } else {
         this.allTransactions = false;
       }
+
+      //also clear the schedule type so the current component gets destroyed if leaving the form route
+      if(p.step !== 'step_3'){
+        this.scheduleType = null;
+        this.transactionType = null;
+      }
+    });
+
+    this._f3xMessageService.getParentModelMessage().takeUntil(this.onDestroy$).subscribe(message => {
+        this.parentTransactionModel = message;
     });
   }
 
@@ -485,6 +500,7 @@ export class F3xComponent implements OnInit, OnDestroy {
                     emitObject.returnToDebtSummaryInfo = e.returnToDebtSummaryInfo;
                   }
                   this._f3xMessageService.sendPopulateFormMessage(emitObject);
+                  this.transactionDataForChild = emitObject;
                 } else if (e.hasOwnProperty('prePopulateFromSchedL')) {
                   this._f3xMessageService.sendPopulateFormMessage({
                     key: 'prePopulateFromSchedL',
@@ -625,34 +641,49 @@ export class F3xComponent implements OnInit, OnDestroy {
       if(this.scheduleAction === ScheduleActions.edit){
         maxAmount = transactionModel.originalAmount;
       }
-      if (transactionModel.isReattribution) {
-        if (this.scheduleAction === ScheduleActions.add) {
-          reattributionId = transactionModel.reattribution_id;
-        } else if (this.scheduleAction === ScheduleActions.edit) {
-          reattributionId = transactionModel.transactionId;
+      if(transactionModel.isReattribution || transactionModel.isRedesignation){
+        if (transactionModel.isReattribution) {
+          if (this.scheduleAction === ScheduleActions.add) {
+            reattributionId = transactionModel.reattribution_id;
+          } else if (this.scheduleAction === ScheduleActions.edit) {
+            reattributionId = transactionModel.transactionId;
+          }
+  
+          const hiddenFieldsEmitObj = {
+            abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+            reattributionTransactionId: reattributionId,
+            maxAmount: maxAmount,
+            reattributionTransaction: transactionModel
+          };
+          this._f3xMessageService.sendPopulateHiddenFieldsMessage(hiddenFieldsEmitObj);
+          const fieldArray = [{name:'purpose_description', value:transactionModel.purposeDescription}];
+          const populateFieldsMessageObj = { abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent, fieldArray };
+          this._f3xMessageService.sendPopulateFieldsMessage(populateFieldsMessageObj);
+          this.populateHiddenFieldsMessageObj = hiddenFieldsEmitObj;
+          this.populateFieldsMessageObj = populateFieldsMessageObj;
+        } else if (transactionModel.isRedesignation) {
+          if (this.scheduleAction === ScheduleActions.add) {
+            redesignationId = transactionModel.redesignation_id;
+          } else if (this.scheduleAction === ScheduleActions.edit) {
+            redesignationId = transactionModel.transactionId;
+          }
+          const hiddenFieldsEmitObj = {
+            abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+            redesignationTransactionId: redesignationId,
+            maxAmount: maxAmount
+          };
+          this._f3xMessageService.sendPopulateHiddenFieldsMessage(hiddenFieldsEmitObj);
+          this.populateHiddenFieldsMessageObj = hiddenFieldsEmitObj;
         }
-
-        this._f3xMessageService.sendPopulateHiddenFieldsMessage({
-          abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
-          reattributionTransactionId: reattributionId,
-          maxAmount: maxAmount, 
-          reattributionTransaction: transactionModel
-        });
-        const fieldArray = [{name:'purpose_description', value:transactionModel.purposeDescription}];
-        this._f3xMessageService.sendPopulateFieldsMessage({abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent, fieldArray});
-      } else if (transactionModel.isRedesignation) {
-        if (this.scheduleAction === ScheduleActions.add) {
-          redesignationId = transactionModel.redesignation_id;
-        } else if (this.scheduleAction === ScheduleActions.edit) {
-          redesignationId = transactionModel.transactionId;
-        }
-        this._f3xMessageService.sendPopulateHiddenFieldsMessage({
-          abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
-          redesignationTransactionId: redesignationId,
-          maxAmount: maxAmount
-
-        });
       }
+      else{
+        this.populateHiddenFieldsMessageObj = null;
+        this.populateFieldsMessageObj = null;
+      }
+    }
+    else{
+      this.populateHiddenFieldsMessageObj = null;
+      this.populateFieldsMessageObj = null;
     }
   }
 
@@ -768,6 +799,20 @@ export class F3xComponent implements OnInit, OnDestroy {
       emitObject.returnToDebtSummaryInfo = e.returnToDebtSummaryInfo;
     }
     this._f3xMessageService.sendPopulateFormMessage(emitObject);
+
+    
+    this.storeTransactionDataForPopulatingFormForEdit(emitObject);
+  }
+
+  private storeTransactionDataForPopulatingFormForEdit(emitObject: any) {
+    //there are some transactions/schedules that have their own method and object structure for populating data (i.e. H2),
+    //and in those cases, the object it is already set up, so dont overwrite it. 
+    if(this.scheduleType === 'sched_f'){
+      this.transactionDataForChild = emitObject;
+    }
+    else if (this.scheduleType !== 'sched_h2' && this.scheduleType !== 'sched_h3' && this.scheduleType !== 'sched_h5') {
+      this.transactionData = emitObject;
+    }
   }
 
   /**
@@ -880,6 +925,7 @@ export class F3xComponent implements OnInit, OnDestroy {
     }
 
     this._schedHMessageServce.sendpopulateHFormForEditMessage(transaction);
+    this.transactionData = transaction;
     if (transactionDetail && transactionDetail.transactionModel) {
       this.canContinue(transactionDetail.transactionModel);
     } else {
@@ -956,6 +1002,7 @@ export class F3xComponent implements OnInit, OnDestroy {
               emitObject.returnToDebtSummaryInfo = e.returnToDebtSummaryInfo;
             }
             this._f3xMessageService.sendPopulateFormMessage(emitObject);
+            this.transactionDataForChild = emitObject;
           }
         }
         this.canContinue();

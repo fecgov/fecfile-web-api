@@ -51,6 +51,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
   @Input() scheduleType: string;
+  @Input() transactionData: any;
   @Output() status: EventEmitter<any>;
 
   public formType: string;
@@ -158,7 +159,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService      
+      _reportsService,
+      _schedHMessageServiceService
     );
     _schedH3Service;
     _individualReceiptService;
@@ -247,6 +249,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.h3Ratios['child'] = [];
 
     this.schedH3.patchValue({ category: ''}, { onlySelf: true });
+    this.sendPopulateMessageIfApplicable();
     
   }
 

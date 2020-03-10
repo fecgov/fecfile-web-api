@@ -1,6 +1,7 @@
+import { SchedHMessageServiceService } from './../../../sched-h-service/sched-h-message-service.service';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, SimpleChanges, ViewEncapsulation, Input } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -35,6 +36,9 @@ import { ScheduleActions } from './../../individual-receipt/schedule-actions.enu
 export class SchedEComponent extends IndividualReceiptComponent implements OnInit {
 
 
+  @Input() transactionData: any;
+  @Input() transactionDataForChild: any;
+  @Input() parentTransactionModel: any;
 
   public hideCandidateState = false;
   public coverageStartDate = '';
@@ -80,7 +84,8 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     _reportsService: ReportsService,
     private _multistateValidator: MultiStateValidator,
     private _changeDetector: ChangeDetectorRef,
-    private _schedEService: SchedEService) {
+    private _schedEService: SchedEService,
+    _schedHMessageServiceService:SchedHMessageServiceService) {
     super(
       _http,
       _fb,
@@ -101,7 +106,8 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService
+      _reportsService,
+      _schedHMessageServiceService
     );
 
     _messageService.getMessage().takeUntil(this._schedEonDestroy$).subscribe(message => {
@@ -155,6 +161,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     this.loaded = false;
     this.formFieldsPrePopulated = true;
     this.formType = '3X';
+    this._parentTransactionModel = this.parentTransactionModel;
     super.ngOnInit();
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedEComponent;
     this._reportId = this._activatedRoute.snapshot.queryParams.reportId;
@@ -192,6 +199,10 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.frmIndividualReceipt.controls['election_other_description'].updateValueAndValidity();
     }
 
+    if(!this.entityTypes || (this.entityTypes && this.entityTypes.length === 0)){
+      this.entityTypes = [{ entityType: "ORG", entityTypeDescription: "Organization", group: "org-group"}, { entityType: "IND", entityTypeDescription: "Individual", group: "ind-group"}];
+    }
+    
     //TODO -- currently for some of the forms api is sending entityTypes as null. Setting it here based on transaction type until that is fixed
     if (this.transactionType === 'IE_CC_PAY' || this.transactionType === 'IE_PMT_TO_PROL') {
       let entityItem = { entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: true };

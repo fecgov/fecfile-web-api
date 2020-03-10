@@ -1,3 +1,4 @@
+import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
 import { Component, OnInit, Output, EventEmitter, Input, SimpleChanges, OnDestroy, OnChanges } from '@angular/core';
 import {FormBuilder, ValidationErrors, Validators} from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -66,7 +67,8 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     _transactionsMessageService: TransactionsMessageService,
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
-    _reportsService: ReportsService
+    _reportsService: ReportsService, 
+    _schedHMessageServiceService:SchedHMessageServiceService
   ) {
     super(
       _http,
@@ -88,7 +90,8 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService
+      _reportsService, 
+      _schedHMessageServiceService
     );
     _activatedRoute.queryParams.subscribe(p => {
       this.cloned = p.cloned ? true : false;
