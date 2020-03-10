@@ -5335,7 +5335,10 @@ def getthirdnavamounts(cmte_id, report_id):
                 "18A",
                 "18B",
             ],
-            ["21AI", "21AII", "21B", "22", "28A", "28B", "28C", "29"],
+            ["21A","21AI","21AII","21B","22","23","24","25","26","27","28A","28B","28C","29",
+            "30A","30AI","30AII","30B"],
+            ["10"],
+            ["9"]
         ]
         for table in table_list:
             _sql = """
@@ -5346,20 +5349,19 @@ def getthirdnavamounts(cmte_id, report_id):
             )
             with connection.cursor() as cursor:
                 cursor.execute(_sql, _values)
-                print(cursor.query)
                 amounts.append(cursor.fetchone()[0])
-        loans_table = ["sched_c", "sched_d"]
-        l_sql = """
-            SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE transaction_table in ('{}')
-            AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
-            """.format(
-            "', '".join(loans_table)
-        )
-        with connection.cursor() as cursor:
-            cursor.execute(l_sql, _values)
-            print(cursor.query)
-            amounts.append(cursor.fetchone()[0])
-        return amounts[0], amounts[1], amounts[2]
+        # loans_table = ["sched_c", "sched_d"]
+        # l_sql = """
+        #     SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE transaction_table in ('{}')
+        #     AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
+        #     """.format(
+        #     "', '".join(loans_table)
+        # )
+        # with connection.cursor() as cursor:
+        #     cursor.execute(l_sql, _values)
+        #     print(cursor.query)
+        #     amounts.append(cursor.fetchone()[0])
+        return amounts[0], amounts[1], amounts[2]-amounts[3]
     except Exception as e:
         raise Exception("The getthirdnavamounts function is throwing an error" + str(e))
 
@@ -5387,7 +5389,7 @@ def get_thirdNavigationTransactionTypes(request):
         period_receipt, period_disbursement, loans_and_debts = getthirdnavamounts(
             cmte_id, report_id
         )
-        loans_and_debts = loansanddebts(report_id, cmte_id)
+        # loans_and_debts = loansanddebts(report_id, cmte_id)
 
         coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
         # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
