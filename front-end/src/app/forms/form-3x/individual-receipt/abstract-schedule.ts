@@ -590,11 +590,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   private _prepareForUnsavedChanges(): void {
-    // TODO look into using takeUntil and destroy to avoid mem leak.
-
-    // this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.takeUntil(this.onDestroy$)
-    // .subscribe(val => {
-
     this.frmIndividualReceipt.valueChanges.takeUntil(this.onDestroy$)
       .subscribe(val => {
       if (this.frmIndividualReceipt.dirty) {

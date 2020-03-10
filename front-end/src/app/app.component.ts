@@ -29,7 +29,7 @@ export class AppComponent {
     private _dialogService: DialogService,
     private _sessionService: SessionService,
     private _formService: FormsService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.restart();
@@ -67,7 +67,7 @@ export class AppComponent {
               });
           }
         });
-        this.userIdle.ping$.subscribe(res => {});
+        this.userIdle.ping$.subscribe(res => { });
 
         // Start watch when time is up.
         this.userIdle.onTimeout().subscribe(res => {
@@ -138,6 +138,11 @@ export class AppComponent {
 
   @HostListener('window:beforeunload', ['$event'])
   beforeunloadHandler($event) {
+
+    // TODO beforeunload occurs on browser refresh and browser close. Need to
+    // distinguish between the 2 so that sessionService.destroy() may be called on
+    // browser close.
+
     // localStorage.clear();
     // this._sessionService.destroy(); // <== this will log user out
 
