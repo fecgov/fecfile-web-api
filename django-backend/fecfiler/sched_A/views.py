@@ -70,8 +70,7 @@ from fecfiler.sched_B.views import (
     get_list_child_transactionId_schedB,
     delete_sql_schedB,
     get_list_schedB,
-    update_schedB_aggamt_transactions
-
+    update_schedB_aggamt_transactions,
 )
 
 from fecfiler.sched_L.views import update_sl_summary
@@ -893,7 +892,11 @@ def get_linenumber_itemization(
         else:
             output_line_number = line_number
 
-        if transaction_type_identifier in ITEMIZED_IND_UPDATE_TRANSACTION_TYPE_IDENTIFIER and aggregate_amount <= itemization_value:
+        if (
+            transaction_type_identifier
+            in ITEMIZED_IND_UPDATE_TRANSACTION_TYPE_IDENTIFIER
+            and aggregate_amount <= itemization_value
+        ):
             itemized_ind = "U"
         else:
             itemized_ind = "I"
@@ -993,8 +996,8 @@ def update_linenumber_aggamt_transactions_SA(
                 if transaction[7] != None or (
                     transaction[7] == None
                     and (
-                        transaction[6] != "X"
-                        or (transaction[9] == "A" and transaction[0] < 0)
+                        # transaction[6] != "X" or
+                        (transaction[9] == "A" and transaction[0] < 0)
                         or transaction[9] == "R"
                     )
                 ):
@@ -1024,7 +1027,7 @@ def update_linenumber_aggamt_transactions_SA(
                         RE_aggregate_amount += transaction[0]
                         aggregate_amount = RE_aggregate_amount
                     else:
-                        if transaction[8] != 'CON_EAR_DEP':
+                        if transaction[8] != "CON_EAR_DEP":
                             REMAIN_aggregate_amount += transaction[0]
                         aggregate_amount = REMAIN_aggregate_amount
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
