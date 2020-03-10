@@ -70,8 +70,7 @@ from fecfiler.sched_B.views import (
     get_list_child_transactionId_schedB,
     delete_sql_schedB,
     get_list_schedB,
-    update_schedB_aggamt_transactions
-
+    update_schedB_aggamt_transactions,
 )
 
 from fecfiler.sched_L.views import update_sl_summary
@@ -859,7 +858,8 @@ def list_all_transactions_entity(
                 t1.memo_code, 
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
-                t1.reattribution_ind
+                t1.reattribution_ind,
+                t1.aggregation_ind
             FROM public.sched_a t1 
             WHERE entity_id = %s 
             AND cmte_id = %s 
@@ -893,7 +893,11 @@ def get_linenumber_itemization(
         else:
             output_line_number = line_number
 
-        if transaction_type_identifier in ITEMIZED_IND_UPDATE_TRANSACTION_TYPE_IDENTIFIER and aggregate_amount <= itemization_value:
+        if (
+            transaction_type_identifier
+            in ITEMIZED_IND_UPDATE_TRANSACTION_TYPE_IDENTIFIER
+            and aggregate_amount <= itemization_value
+        ):
             itemized_ind = "U"
         else:
             itemized_ind = "I"
@@ -990,14 +994,17 @@ def update_linenumber_aggamt_transactions_SA(
             if transaction[5] != "Y":
                 # checking if the back_ref_transaction_id is null or not.
                 # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
-                if transaction[7] != None or (
-                    transaction[7] == None
-                    and (
-                        transaction[6] != "X"
-                        or (transaction[9] == "A" and transaction[0] < 0)
-                        or transaction[9] == "R"
+                if (
+                    transaction[7] != None
+                    or (
+                        transaction[7] == None
+                        and (
+                            # transaction[6] != "X" or
+                            (transaction[9] == "A" and transaction[0] < 0)
+                            or transaction[9] == "R"
+                        )
                     )
-                ):
+                ) and transaction[10] != "N":
                     if (committee_type == "PAC") and transaction[
                         8
                     ] in PAC_AGGREGATE_TYPES_1:
@@ -1024,7 +1031,7 @@ def update_linenumber_aggamt_transactions_SA(
                         RE_aggregate_amount += transaction[0]
                         aggregate_amount = RE_aggregate_amount
                     else:
-                        if transaction[8] != 'CON_EAR_DEP':
+                        if transaction[8] != "CON_EAR_DEP":
                             REMAIN_aggregate_amount += transaction[0]
                         aggregate_amount = REMAIN_aggregate_amount
                 # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
