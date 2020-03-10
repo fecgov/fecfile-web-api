@@ -561,7 +561,7 @@ export class SchedC1Component implements OnInit, OnChanges {
   }
 
   public printPreview() {
-    alert('Print not yet implemented');
+    this._reportTypeService.printPreview('transaction_table_screen', '3X', this.transactionDetail.transactionId);
   }
 
   public importTransactions() {
