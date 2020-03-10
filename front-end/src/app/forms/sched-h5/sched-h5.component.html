@@ -64,16 +64,11 @@
                   <span class="sr-only">Click here for more information</span>
                 </button>
               </label>
-              <select
-                id=""
-                formControlName="account_name"
-                class="form-control"
-                [ngClass]="
+              <select id="" formControlName="account_name" class="form-control" [ngClass]="
                   schedH5.get('account_name')?.invalid && (schedH5.touched || schedH5.dirty) && isSubmit
                     ? 'input-field-error'
                     : ''
-                "
-              >
+                ">
                 <option value="" selected>Select account name</option>
                 <option *ngFor="let item of levinAccountsies" [value]="item.levin_account_name">
                   {{ item.levin_account_name }}
@@ -96,20 +91,13 @@
                     <i class="calendar-icon" aria-hidden="true"></i>
                   </span>
                 </div>
-                <input
-                  class="form-control"
-                  type="date"
-                  [formControlName]="'receipt_date'"
-                  [attr.name]="'receipt_date'"
-                  [style.width]="'50%'"
-                  [style.height]="'30px'"
-                  (change)="receiptDateChanged($event.target.value)"
+                <input class="form-control" type="date" [formControlName]="'receipt_date'" [attr.name]="'receipt_date'"
+                  [style.width]="'50%'" [style.height]="'30px'" (change)="receiptDateChanged($event.target.value)"
                   [ngClass]="
                     schedH5.get('receipt_date')?.invalid && (schedH5.touched || schedH5.dirty)
                       ? 'input-field-error'
                       : ''
-                  "
-                />
+                  " />
               </div>
               <div class="text-error text-left" *ngIf="receiptDateErr">
                 The date entered falls outside of the report coverage period. Transactions for this report should fall
@@ -134,15 +122,9 @@
                     <i class="dollar-sign-icon" aria-hidden="true"></i>
                   </span>
                 </div>
-                <input
-                  class="form-control"
-                  type="text"
-                  [formControlName]="'total_amount_transferred'"
-                  [attr.name]="'total_amount_transferred'"
-                  [style.width]="'50%'"
-                  [style.height]="'30px'"
-                  [attr.readonly]="true"
-                />
+                <input class="form-control" type="text" [formControlName]="'total_amount_transferred'"
+                  [attr.name]="'total_amount_transferred'" [style.width]="'50%'" [style.height]="'30px'"
+                  [attr.readonly]="true" />
               </div>
             </div>
           </div>
@@ -177,20 +159,13 @@
                     <i class="dollar-sign-icon" aria-hidden="true"></i>
                   </span>
                 </div>
-                <input
-                  class="form-control"
-                  type="text"
-                  [formControlName]="'transferred_amount'"
-                  [attr.name]="'transferred_amount'"
-                  [style.width]="'50%'"
-                  [style.height]="'30px'"
-                  (blur)="handleOnBlurEvent($event, col)"
-                  [ngClass]="
+                <input class="form-control" type="text" [formControlName]="'transferred_amount'"
+                  [attr.name]="'transferred_amount'" [style.width]="'50%'" [style.height]="'30px'"
+                  (blur)="handleOnBlurEvent($event, col)" [ngClass]="
                     schedH5.get('transferred_amount')?.invalid && (schedH5.touched || schedH5.dirty) && (!isSaveAndAdd)
                       ? 'input-field-error'
                       : ''
-                  "
-                />
+                  " />
               </div>
               <div class="text-error text-left" *ngIf="transferredAmountErr">
                 Please enter a valid amount.
@@ -246,17 +221,19 @@
                     {{ item.transferred_amount }}
                   </td>
                   <td class="bulk_action">
-                      <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-                          <i class="fas fa-ellipsis-h"></i>
-                        </button>
+                    <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                      <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                        <i class="fas fa-ellipsis-h"></i>
+                      </button>
 
-                        <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
-                          <button class="dropdown-item" (click)="editH5Sub(item)"><i class="fas fa-edit"></i> Edit</button>
-                          <button class="dropdown-item" (click)="trashSubTransaction(item)"><i class="fas fa-trash"></i> Trash</button>
-                        </div>
+                      <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
+                        <button class="dropdown-item" (click)="editH5Sub(item)"><i class="fas fa-edit"></i>
+                          Edit</button>
+                        <button class="dropdown-item" (click)="trashSubTransaction(item)"><i class="fas fa-trash"></i>
+                          Trash</button>
                       </div>
-                    </td>
+                    </div>
+                  </td>
                 </tr>
               </ng-container>
             </tbody>
@@ -271,7 +248,8 @@
       <div *ngIf="scheduleAction !== editScheduleAction" class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="forms__btn-container">
-            <button class="btn btn-primary btn-right" type="button" [disabled]="saveAndAddDisabled" (click)="saveAddMore()">
+            <button class="btn btn-primary btn-right" type="button" [disabled]="saveAndAddDisabled"
+              (click)="saveAddMore()">
               Save & Add
             </button>
           </div>
@@ -285,7 +263,7 @@
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
               <div *ngIf="scheduleAction === addScheduleAction">
-                <button class="btn btn-previous btn-left" type="button" (click)="clearFormValues(); previousStep()">
+                <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                   Previous
                 </button>
                 <a class="btn btn-primary btn-right" (click)="goSummary()">
@@ -293,13 +271,13 @@
                 </a>
               </div>
               <div *ngIf="scheduleAction === editScheduleAction">
-                  <button class="btn btn-previous btn-left" type="button" (click)="returnToSum()">
-                      Cancel
-                    </button>
-                    <button class="btn btn-primary btn-right" type="button" (click)="saveEdit()">
-                      Save
-                    </button>
-                </div>
+                <button class="btn btn-previous btn-left" type="button" (click)="cancelReturnToSum()">
+                  Cancel
+                </button>
+                <button class="btn btn-primary btn-right" type="button" (click)="saveEdit()">
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -359,8 +337,10 @@
 
                     <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                       <button class="dropdown-item" (click)="editH5(report)"><i class="fas fa-edit"></i> Edit</button>
-                      <button class="dropdown-item" (click)="printTransaction(report)"><i class="fas fa-print"></i> Print</button>
-                      <button class="dropdown-item" (click)="trashTransaction(report)"><i class="fas fa-trash"></i> Trash</button>
+                      <button class="dropdown-item" (click)="printTransaction(report)"><i class="fas fa-print"></i>
+                        Print</button>
+                      <button class="dropdown-item" (click)="trashTransaction(report)"><i class="fas fa-trash"></i>
+                        Trash</button>
                     </div>
                   </div>
                 </td>
@@ -380,7 +360,7 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" (click)="clearFormValues(); previousStep()">
+              <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                 Previous
               </button>
 
@@ -409,26 +389,19 @@
           <tbody>
             <ng-container *ngFor="let report of h5SumP">
               <tr>
-                <td class="summary_text_level_3"
-                  [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
-                  'totalRow' : 'summary_text_level_3'"
-                >
+                <td class="summary_text_level_3" [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
+                  'totalRow' : 'summary_text_level_3'">
                   {{ report.category }}
-                  <button
-                    type="button"
-                    class="btn btn-info"
-                    ngbTooltip="{{ col?.infoText }}"
-                    tooltipClass="form-tooltip"
-                  >
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    tooltipClass="form-tooltip">
                     <i class="info-icon" aria-hidden="true"></i>
                     <span class="sr-only">Click here for more information</span>
                   </button>
                 </td>
 
-                <td class="summary_text_amt"
-                  [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
-                  'totalRow' : 'summary_text_level_3'"
-                >{{ report.amount | currency:'USD':'symbol-narrow':'1.2-2' }}</td>
+                <td class="summary_text_amt" [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
+                  'totalRow' : 'summary_text_level_3'">{{ report.amount | currency:'USD':'symbol-narrow':'1.2-2' }}
+                </td>
 
               </tr>
             </ng-container>
@@ -442,7 +415,7 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" (click)="clearFormValues(); previousStep()">
+              <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                 Previous
               </button>
             </div>

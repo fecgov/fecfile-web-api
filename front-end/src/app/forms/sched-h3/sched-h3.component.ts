@@ -773,6 +773,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         */
         this.schedH3.patchValue({ category: '' }, { onlySelf: true });
         this.showIdentifer = false;
+
+        // Note: Do after all patching to avoid form change detection which will set to false
+        localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
       }
     }
   }
@@ -799,7 +802,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         this.h3Entries = [];
         this.h3Sum = res;
         this.h3TableConfig.totalItems = res.length;
-        // localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
       }
     });
   }
@@ -1002,7 +1004,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH3.markAsDirty();
       this.schedH3.markAsTouched();
       this.isSubmit = true;
-      // localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: false }));
     }
   }
 
@@ -1189,27 +1190,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       });
   }
 
-  // public goSummary_old() {
-
-  //   this.isSubmit = true;
-
-  //   if (this.schedH3.touched || this.schedH3.dirty) {
-  //     this._dlService
-  //       .confirm('You have unsaved changes! If you leave, your changes will be lost.', ConfirmModalComponent, 'Caution!')
-  //       .then(res => {
-  //         if (res === 'okay') {
-  //           this.returnToSum();
-  //         } else if (res === 'cancel') {
-  //         }
-  //       });
-  //   } else {
-  //     this.returnToSum();
-  //   }
-  // }
-
-  /**
-   * Goes to the previous step.
-   */
   public goSummary(): void {
     this.canDeactivate().then(result => {
       if (result === true) {
