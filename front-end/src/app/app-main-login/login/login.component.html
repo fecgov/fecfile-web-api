@@ -39,14 +39,14 @@
           [ngClass]="{'': (!frm.get('emailId').invalid && frm.get('emailId').touched) || !loginEmailInputError,
               'login-input-error':  (frm.get('emailId').invalid && frm.get('emailId').touched) || loginEmailInputError}"
           />
-        </div>
         <div
                 class="error"
-                *ngIf="(frm.get('emailId').invalid && frm.get('emailId').touched) || committeeIdInputError ">
+                *ngIf="(frm.get('emailId').invalid && frm.get('emailId').touched) || loginEmailInputError ">
           <div class="error__email-id" *ngIf="frm.get('emailId').hasError('required')">
             Please enter Email ID.
           </div>
         </div>
+      </div>
       </div>
 
       <div class="grid-row form-field__info">
@@ -70,8 +70,7 @@
           />
           <div
             class="error"
-            *ngIf="(frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || committeeIdInputError "
-          >
+            *ngIf="(frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || committeeIdInputError ">
             <div class="error__committee-id" *ngIf="frm.get('commiteeId').hasError('required')">
               Please enter Committee ID.
             </div>
