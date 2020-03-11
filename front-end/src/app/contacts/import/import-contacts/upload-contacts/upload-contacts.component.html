@@ -1,0 +1,16 @@
+<div class="upload_contacts__container">
+  <div id="upload_contacts__drop-area" (drop)="drop($event)" (dragenter)="dragEnter($event)"
+    (dragover)="dragOver($event)">
+    <div class="upload_contacts__drop-area-text">
+      Drop or Drag a CSV, Excel, or JSON File Here to Upload
+      <br>
+      or
+      <br>
+      <span>Select a file</span>
+    </div>
+
+    <!-- <span *ngIf="!canDropFolder">
+        File Drop Not Supported by Browser
+    </span> -->
+  </div>
+</div>

@@ -106,6 +106,12 @@ import { SchedH6Component_TOBEDELETED } from './forms/form-3x/sched-h6/sched-h6.
 import { SchedH1Component_TOBEDELETED } from './forms/sched-h1/sched-h1.component';
 import { SchedEComponent } from './forms/form-3x/sched-e/sched-e/sched-e.component';
 import { HelpComponent } from './help/help.component';
+import { UploadContactsComponent } from './contacts/import/import-contacts/upload-contacts/upload-contacts.component';
+import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
+import { ConfigureContactsComponent } from './contacts/import/import-contacts/configure-contacts/configure-contacts.component';
+import { CleanContactsComponent } from './contacts/import/import-contacts/clean-contacts/clean-contacts.component';
+import { ImportDoneContactsComponent } from './contacts/import/import-contacts/import-done-contacts/import-done-contacts.component';
+
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -193,7 +199,12 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     SchedH1Component_TOBEDELETED,
     SchedEComponent,
     SchedFCoreComponent,
-    HelpComponent
+    HelpComponent,
+    UploadContactsComponent,
+    ImportContactsComponent,
+    ConfigureContactsComponent,
+    CleanContactsComponent,
+    ImportDoneContactsComponent
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
@@ -238,4 +249,4 @@ const appInitializerFn = (appConfig: AppConfigService) => {
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AppModule {}
+export class AppModule { }

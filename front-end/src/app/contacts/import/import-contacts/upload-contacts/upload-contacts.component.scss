@@ -1,0 +1,15 @@
+@import '../../../../shared/scss/global';
+
+.upload_contacts__container {
+  #upload_contacts__drop-area {
+    height: 20em;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: $ghost;
+    .upload_contacts__drop-area-text {
+      padding: 9% 25%;
+      text-align: -webkit-center;
+      font-size: 26px;
+    }
+  }
+}

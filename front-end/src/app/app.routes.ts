@@ -30,6 +30,7 @@ import { SubmitComponent } from './shared/partials/submit/submit.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { HelpComponent } from './help/help.component';
+import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
 
 export const AppRoutes: Routes = [
   {
@@ -94,6 +95,20 @@ export const AppRoutes: Routes = [
       { path: 'settings', component: SettingsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       { path: 'contacts', component: ContactsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       {
+        path: 'contacts/import',
+        component: ImportContactsComponent,
+        pathMatch: 'full',
+        canActivate: [CanActivateGuard],
+        canDeactivate: [CanDeactivateGuardService]
+      },
+      {
+        path: 'addContact',
+        component: AddNewContactComponent,
+        pathMatch: 'full',
+        canActivate: [CanActivateGuard],
+        canDeactivate: [CanDeactivateGuardService]
+      },
+      {
         path: 'forms/form/:form_id',
         component: FormsComponent,
         pathMatch: 'full',
@@ -121,13 +136,6 @@ export const AppRoutes: Routes = [
       {
         path: 'forms/form/edit/:form_id/:report_id',
         component: IndividualReceiptComponent,
-        pathMatch: 'full',
-        canActivate: [CanActivateGuard],
-        canDeactivate: [CanDeactivateGuardService]
-      },
-      {
-        path: 'addContact',
-        component: AddNewContactComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService]
