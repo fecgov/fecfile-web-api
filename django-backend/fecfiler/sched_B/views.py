@@ -1755,6 +1755,9 @@ def force_aggregate_sb(request):
             cmte_id,
             report_id,
         )
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
         # update_linenumber_aggamt_transactions_SA(
         #     sb_data.get("contribution_date"),
         #     sb_data.get("transaction_type_identifier"),
@@ -1792,6 +1795,9 @@ def force_unaggregate_sb(request):
             cmte_id,
             report_id,
         )
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
         # update_linenumber_aggamt_transactions_SA(
         #     sb_data.get("contribution_date"),
         #     sb_data.get("transaction_type_identifier"),

@@ -2548,6 +2548,9 @@ def force_aggregate_sa(request):
             cmte_id,
             report_id,
         )
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
     except Exception as e:
         return Response(
             "The force_aggregate_sa API is throwing an error: " + str(e),
@@ -2579,6 +2582,9 @@ def force_unaggregate_sa(request):
             cmte_id,
             report_id,
         )
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
     except Exception as e:
         return Response(
             "The force_aggregate_sa API is throwing an error: " + str(e),
