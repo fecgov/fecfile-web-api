@@ -1416,6 +1416,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (col.type === 'text' && col.isReadonly) {
       return true;
     }
+    if (col.type === 'date' && col.isReadonly) {
+      return true;
+    }
     if (col.name === 'total_amount') {
       return this._isTotalAmountReadOnly(col);
     }
