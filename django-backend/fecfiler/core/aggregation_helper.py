@@ -187,7 +187,8 @@ def list_all_transactions_entity_sl(
                 (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
                 t1.memo_code, 
                 t1.back_ref_transaction_id,
-                t1.transaction_type_identifier
+                t1.transaction_type_identifier,
+                t1.aggregation_ind
             FROM public.sched_a t1 
             WHERE entity_id = %s 
             AND cmte_id = %s 
@@ -288,7 +289,7 @@ def update_aggregate_sl(datum):
         aggregate_amount = 0
         for transaction in transactions_list:
             if transaction[5] != "Y":
-                if not transaction[6]:
+                if not transaction[9] == 'N':
                     aggregate_amount += transaction[0]
 
                 # if transaction[7] != None or (
