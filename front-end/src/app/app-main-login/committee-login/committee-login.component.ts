@@ -23,7 +23,6 @@ export class CommitteeLoginComponent extends AbstractLogin implements OnInit {
   public hasFailed: boolean = false;
   public committeeIdInputError: boolean = false;
   public passwordInputError: boolean = false;
-  public loginEmailInputError: boolean = false;
   public appTitle: string = null;
   public loggedOut: any = '';
   private _subscription: Subscription;
@@ -45,7 +44,6 @@ export class CommitteeLoginComponent extends AbstractLogin implements OnInit {
     this.frm = _fb.group({
       commiteeId: ['', Validators.required],
       loginPassword: ['', Validators.required],
-      emailId: ['', Validators.required]
     });
     this._subscription =
         this._messageService
@@ -86,10 +84,6 @@ export class CommitteeLoginComponent extends AbstractLogin implements OnInit {
     if (this.frm.get('loginPassword').valid) {
       this.passwordInputError = false;
     }
-
-    if (this.frm.get('emailId').valid) {
-      this.loginEmailInputError = false;
-    }
   }
 
   /**
@@ -101,8 +95,6 @@ export class CommitteeLoginComponent extends AbstractLogin implements OnInit {
       this.committeeIdInputError = (this.frm.get('commiteeId').invalid) ? true : false;
 
       this.passwordInputError = (this.frm.get('loginPassword').invalid) ? true : false;
-
-      this.loginEmailInputError = (this.frm.get('emailId').invalid) ? true : false;
       return;
     }
 
@@ -111,16 +103,15 @@ export class CommitteeLoginComponent extends AbstractLogin implements OnInit {
 
     const committeeId: string = this.frm.get('commiteeId').value;
     const password: string = this.frm.get('loginPassword').value;
-    const email: string = this.frm.get('emailId').value;
 
     this._apiService
-        .signIn(email, committeeId, password)
+        .signIn('admin', committeeId, password)
         .subscribe(res => {
               if (res.token) {
                 this._authService
                     .doSignIn(res.token);
 
-                this._router.navigate(['dashboard']);
+                this._router.navigate(['/manage_users']);
               }
             },
             (error) => {

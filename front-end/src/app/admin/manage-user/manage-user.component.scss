@@ -1,0 +1,28 @@
+@import "src/app/shared/scss/global";
+
+.manage-users-container {
+  background: url("../../../assets/img/fec-logo-5opac.png") no-repeat;
+  background-size: 60%;
+
+  .committee-info {
+    h4, h3 {
+      display: inline;
+    }
+
+    .container-add-user {
+      padding-bottom: 15px;
+    }
+
+    .container-basic-info .form-inline{
+      input{
+        outline: 0;
+        border-width: 0 0 2px;
+      }
+    label{
+      margin-right:10px;
+    }
+
+    }
+  }
+
+}

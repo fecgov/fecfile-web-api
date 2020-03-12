@@ -32,6 +32,7 @@ import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.compon
 import { HelpComponent } from './help/help.component';
 // import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
 import {CommitteeLoginComponent} from './app-main-login/committee-login/committee-login.component';
+import {ManageUserComponent} from './admin/manage-user/manage-user.component';
 
 export const AppRoutes: Routes = [
   {
@@ -148,7 +149,12 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService]
       },
-      { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] }
+      { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+      {
+        path: 'manage_users',
+        component: ManageUserComponent,
+        pathMatch: 'full'
+      },
     ]
   },
   { path: '**', redirectTo: '' }

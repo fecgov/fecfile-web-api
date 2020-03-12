@@ -1,0 +1,161 @@
+<div class="manage-users-container" xmlns="http://www.w3.org/1999/html">
+    <hr>
+    <div class="committee-info">
+        <h2>Your Committee Information</h2><br>
+        <div class="row">
+            <div class="col-md-3">
+                <h4>Roger Smith for Congress</h4><br>
+                19093 West Broad Street <br>
+                Richmond, VA 23229<br>
+            </div>
+            <div class="col-md-3">
+                <h4> Treasurer:</h4> {{treasurerName}} Alice Whitney <br>
+                <h4>Email: </h4> {{treasurerEmail}} alice.whitney@rogerforcongress.org<br>
+            </div>
+            <div class="col-md-3">
+                <h4>Telephone:</h4> {{treasurerTel}}(804) 294-2944<br>
+                <h4> Facsimile: </h4>{{treasurerFax}}(804) 294-2945<br>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-3">
+                <h4>Website :</h4> {{website}} RogerForCongress.org
+            </div>
+            <div class="col-md-3">
+                <h4>Asst. Treasurer:</h4> {{asstTreasurerName}} James Madison <br>
+                <h4>Email:</h4>{{asstTreasurerEmail}} jim.madison@rogerforcongress.org
+            </div>
+            <div class="col-md-3">
+                <h4>Telephone:</h4> {{asstTreasurerTel}}(804) 294-2944<br>
+                <h4> Facsimile: </h4>{{asstTreasurerFax}}(804) 294-2945<br>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="add-user">
+        <h2>Add a User to Manage your Committee's Functions</h2><br>
+        <form [formGroup]="frmAddUser">
+            <div class="form-group radio">
+                <div class="col ">
+                    <h3>Role</h3>
+                </div>
+                <div class="row">
+                    <div class="col col-md-2">
+                        <label>
+                            <input formControlName="role-ind"
+                                   name="role-ind"
+                                   id="role-admin"
+                                   type="radio">
+                            Admin</label>
+                    </div>
+                    <div class="col col-md-2">
+                        <label>
+                            <input formControlName="role-ind"
+                                   name="role-ind"
+                                   id="role-entry"
+                                   type="radio">
+                            Entry</label>
+                    </div>
+                    <div class="col col-md-2">
+                        <label>
+                            <input formControlName="role-ind"
+                                   name="role-ind"
+                                   id="role-read-only"
+                                   type="radio">
+                            Read Only</label>
+                    </div>
+                </div>
+            </div>
+            <div class="basic-info">
+                <div class="container-add-user">
+                    <div class="row add-user">
+                        <div class="col-md-6">
+                            <h3>Basic Information</h3>
+                            <div class="container-basic-info">
+                                <div class="row last-name">
+                                    <div class="col-md-7 form-group form-inline">
+                                        <label for="user-last-name">Last Name</label>
+
+                                        <input type="text"
+                                               class="form-control" formControlName="user-last-name"
+                                               id="user-last-name"
+                                               placeholder="Enter Last Name"
+                                               [style.width]="'70%'" >
+                                    </div>
+                                </div>
+                                <div class="row first-name">
+                                    <div class="col-md-7 form-group form-inline">
+                                        <label for="user-first-name">First Name</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               formControlName="user-first-name"
+                                               id="user-first-name"
+                                               placeholder="Enter First Name"
+                                               [style.width]="'70%'">
+                                    </div>
+                                </div>
+                                <div class="row contact-number">
+                                    <div class="col-md-7 form-group form-inline">
+                                        <label for="user-contact-number">Contact Number</label>
+                                        <input type="text"
+                                               class="form-control"
+                                               formControlName="user-contact-number"
+                                               id="user-contact-number"
+                                               placeholder="Enter Contact Number"
+                                               [style.width]="'70%'">
+                                    </div>
+                                </div>
+                                <div class="row email-address">
+                                    <div class="col-md-7 form-group form-inline">
+                                        <label for="user-email-address">Email Address</label>
+                                        <input type="text"
+                                               class="form-control" formControlName="user-email-address"
+                                               id="user-email-address"
+                                               placeholder="Enter Email address"
+                                               [style.width]="'70%'">
+                                    </div>
+                                </div>
+                                <div class="row"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <h3>Role Description</h3>
+                            <div class="container-role-desc">
+                                <div class="row administrator">
+                                    <div class="col-md-4"><label class="font-weight-bold">Admin</label>
+                                        <ul>
+                                            <li>Has Full Access</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row entry">
+                                    <div class="col-md-5"><label class="font-weight-bold">Entry</label>
+                                        <ul>
+                                            <li>Has access to enter, edit and delete information, but cannot upload
+                                                reports or create other users.
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row read-only">
+                                    <div class="col-md-4"><label class="font-weight-bold">Read Only</label>
+                                        <ul>
+                                            <li>Can only view data, and cannot perform any other functions.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </form>
+    </div>
+    <hr>
+    <div class="manage-users">
+        <h2>Manage Existing Users</h2></div>
+</div>

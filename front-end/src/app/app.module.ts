@@ -104,6 +104,7 @@ import { UsersComponent } from './users/users.component';
 import * as AWS from 'aws-sdk/global';
 import * as S3 from 'aws-sdk/clients/s3';
 import {AppMainLoginModule} from './app-main-login/app-main-login.module';
+import {AdminModule} from './admin/admin.module';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -195,6 +196,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
     SharedModule,
+    AdminModule,
     AppMainLoginModule,
     BrowserModule,
     // NgSelectModule,
