@@ -1113,6 +1113,80 @@ def delete_schedE(data):
         raise
 
 
+def update_se_aggregation_status(transaction_id, status):
+    """
+    helpder function to update sa aggregation_ind
+    """
+    _sql = """
+    update public.sched_e
+    set aggregation_ind = %s
+    where transaction_id = %s
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [status, transaction_id])
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "The Transaction ID: {} does not exist in se table".format(
+                        transaction_id
+                    )
+                )
+    except:
+        raise
+
+
+@api_view(["PUT"])
+def force_aggregate_se(request):
+    """
+    api to force a transaction to be aggregated:
+    1. set aggregate_ind = 'Y'
+    2. re-do entity-based aggregation on se
+    """
+    try:
+        cmte_id = request.user.username
+        report_id = request.data.get("report_id")
+        transaction_id = request.data.get("transaction_id")
+        if not transaction_id:
+            raise Exception("transaction id is required for this api call.")
+        update_se_aggregation_status(transaction_id, "Y")
+        tran_data = get_list_schedE(report_id, cmte_id, transaction_id)[0]
+        update_aggregate_amt_se(tran_data)
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
+    except Exception as e:
+        return Response(
+            "The force_aggregate_se API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
+@api_view(["PUT"])
+def force_unaggregate_se(request):
+    """
+    api to force a transaction to be un-aggregated:
+    1. set aggregate_ind = 'N'
+    2. re-do entity-based aggregation on se
+    """
+    try:
+        cmte_id = request.user.username
+        report_id = request.data.get("report_id")
+        transaction_id = request.data.get("transaction_id")
+        if not transaction_id:
+            raise Exception("transaction id is required for this api call.")
+        update_se_aggregation_status(transaction_id, "N")
+        tran_data = get_list_schedE(report_id, cmte_id, transaction_id)[0]
+        update_aggregate_amt_se(tran_data)
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
+    except Exception as e:
+        return Response(
+            "The force_aggregate_se API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedE(request):
     """

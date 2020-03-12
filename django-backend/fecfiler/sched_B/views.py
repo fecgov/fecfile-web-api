@@ -42,7 +42,8 @@ from fecfiler.core.transaction_util import (
 )
 from fecfiler.core.report_helper import new_report_date
 
-from fecfiler.core.aggregation_helper import find_form_type, find_aggregate_date
+from fecfiler.core.aggregation_helper import (find_form_type, find_aggregate_date,
+    update_linenumber_aggamt_transactions_SA)
 
 logger = logging.getLogger(__name__)
 
@@ -490,51 +491,6 @@ def get_list_child_schedB(report_id, cmte_id, transaction_id):
         report_id, cmte_id, back_ref_transaction_id=transaction_id
     )
 
-
-def get_list_child_transactionId_schedB(cmte_id, transaction_id):
-    """
-    get all children sched_b items:
-    back_ref_transaction_id == transaction_id
-    """
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """SELECT transaction_id
-                FROM public.sched_b 
-                WHERE cmte_id = %s 
-                AND back_ref_transaction_id = %s 
-                AND delete_ind is distinct from 'Y'""",
-                [cmte_id, transaction_id],
-            )
-            transactions_list = cursor.fetchall()
-        return transactions_list
-    except Exception as e:
-        raise Exception(
-            "The get_list_child_transactionId_schedB function is throwing an error: "
-            + str(e)
-        )
-
-
-def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
-    """
-    update aggregate amount
-    """
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE public.sched_b SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                [aggregate_amount, transaction_id, cmte_id],
-            )
-            if cursor.rowcount == 0:
-                raise Exception(
-                    "put_sql_agg_amount_schedB function: The Transaction ID: {} does not exist in schedB table".format(
-                        transaction_id
-                    )
-                )
-    except Exception:
-        raise
-
-
 def put_sql_schedB(
     cmte_id,
     report_id,
@@ -896,6 +852,18 @@ def post_schedB(datum):
             else:  # do aggregation: levin account transactions
                 update_sl_summary(datum)
 
+            # update line number based on aggregate amount info
+            if datum['transaction_type_identifier'] in ['OPEXP_HQ_ACC_REG_REF','OPEXP_HQ_ACC_IND_REF',
+                'OPEXP_HQ_ACC_TRIB_REF','OPEXP_CONV_ACC_REG_REF','OPEXP_CONV_ACC_TRIB_REF',
+                'OPEXP_CONV_ACC_IND_REF','OTH_DISB_NP_RECNT_REG_REF','OTH_DISB_NP_RECNT_TRIB_REF',
+                'OTH_DISB_NP_RECNT_IND_REF']:
+                update_linenumber_aggamt_transactions_SA(
+                    datum.get("expenditure_date"),
+                    datum.get("transaction_type_identifier"),
+                    entity_id,
+                    datum.get("cmte_id"),
+                    datum.get("report_id"),
+                )
         except Exception as e:
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -1166,6 +1134,17 @@ def put_schedB(datum):
                 datum.get("cmte_id"),
                 datum.get("report_id"),
             )
+            if datum['transaction_type_identifier'] in ['OPEXP_HQ_ACC_REG_REF','OPEXP_HQ_ACC_IND_REF',
+                'OPEXP_HQ_ACC_TRIB_REF','OPEXP_CONV_ACC_REG_REF','OPEXP_CONV_ACC_TRIB_REF',
+                'OPEXP_CONV_ACC_IND_REF','OTH_DISB_NP_RECNT_REG_REF','OTH_DISB_NP_RECNT_TRIB_REF',
+                'OTH_DISB_NP_RECNT_IND_REF']:
+                update_linenumber_aggamt_transactions_SA(
+                    datum.get("expenditure_date"),
+                    datum.get("transaction_type_identifier"),
+                    entity_id,
+                    datum.get("cmte_id"),
+                    datum.get("report_id"),
+                )
         except Exception as e:
             if flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -1200,6 +1179,17 @@ def delete_schedB(data):
             datum.get("cmte_id"),
             datum.get("report_id"),
         )
+        if datum['transaction_type_identifier'] in ['OPEXP_HQ_ACC_REG_REF','OPEXP_HQ_ACC_IND_REF',
+            'OPEXP_HQ_ACC_TRIB_REF','OPEXP_CONV_ACC_REG_REF','OPEXP_CONV_ACC_TRIB_REF',
+            'OPEXP_CONV_ACC_IND_REF','OTH_DISB_NP_RECNT_REG_REF','OTH_DISB_NP_RECNT_TRIB_REF',
+            'OTH_DISB_NP_RECNT_IND_REF']:
+            update_linenumber_aggamt_transactions_SA(
+                    datum.get("expenditure_date"),
+                    datum.get("transaction_type_identifier"),
+                    entity_id,
+                    datum.get("cmte_id"),
+                    datum.get("report_id"),
+                )
         # delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
     except:
         raise
@@ -1755,6 +1745,9 @@ def force_aggregate_sb(request):
             cmte_id,
             report_id,
         )
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
         # update_linenumber_aggamt_transactions_SA(
         #     sb_data.get("contribution_date"),
         #     sb_data.get("transaction_type_identifier"),
@@ -1792,6 +1785,9 @@ def force_unaggregate_sb(request):
             cmte_id,
             report_id,
         )
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
         # update_linenumber_aggamt_transactions_SA(
         #     sb_data.get("contribution_date"),
         #     sb_data.get("transaction_type_identifier"),
