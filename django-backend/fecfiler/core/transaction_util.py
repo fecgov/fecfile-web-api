@@ -920,6 +920,7 @@ def get_sched_b_transactions(
                                             levin_account_id,
                                             aggregate_amt,
                                             create_date,
+                                            aggregation_ind,
                                             redesignation_id, redesignation_ind
                     FROM public.sched_b WHERE report_id in ('{}')
                     AND cmte_id = %s 

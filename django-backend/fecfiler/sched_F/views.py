@@ -626,6 +626,7 @@ def get_list_schedF(report_id, cmte_id, transaction_id, is_back_ref=False):
             sf.memo_code,
             sf.memo_text,
             sf.delete_ind,
+            sf.aggregation_ind,
             sf.create_date,
             sf.last_update_date,
             (SELECT DISTINCT ON (e.ref_cand_cmte_id) e.entity_id 
