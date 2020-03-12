@@ -2,7 +2,7 @@ import { SchedHServiceService } from './../../sched-h-service/sched-h-service.se
 import { SchedHMessageServiceService } from './../../sched-h-service/sched-h-message-service.service';
 import { ScheduleActions } from './../individual-receipt/schedule-actions.enum';
 import { NgForm } from '@angular/forms';
-import { Component, OnInit, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, Input } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { environment } from '../../../../environments/environment';
@@ -21,6 +21,8 @@ import { TransactionsMessageService } from '../../transactions/service/transacti
 
 
 export class SchedH1Component implements OnInit {
+
+  @Input() transactionData: any;
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('f') form: NgForm;
 
@@ -91,6 +93,9 @@ export class SchedH1Component implements OnInit {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.checkH1Disabled();
     this.checkH1PacDisabled();
+    if(this.transactionData){
+      this._schedHMessageServiceService.sendpopulateHFormForEditMessage(this.transactionData);
+    }
   }
 
   public ngDoCheck() {

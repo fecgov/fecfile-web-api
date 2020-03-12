@@ -228,6 +228,7 @@
           *ngIf="scheduleType === 'sched_h1'"
           [scheduleAction]="scheduleAction"
           [scheduleType]="scheduleType"
+          [transactionData]="transactionData"
           (status)="onNotify($event)"
         >
         </app-sched-h1>
