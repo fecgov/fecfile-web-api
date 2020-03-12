@@ -1046,6 +1046,7 @@ def get_list_schedE(report_id, cmte_id, transaction_id, is_back_ref=False):
             memo_code,
             memo_text,
             line_number,
+            aggregation_ind,
             create_date, 
             last_update_date
             FROM public.sched_e
