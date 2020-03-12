@@ -881,7 +881,7 @@ def post_schedA(datum):
                 datum.get("report_id"),
             )
         if datum.get("transaction_type_identifier") in SCHED_L_A_TRAN_TYPES:
-            print("haha")
+            # print("haha")
             update_aggregate_sl(datum)
             update_sl_summary(datum)
         return datum
