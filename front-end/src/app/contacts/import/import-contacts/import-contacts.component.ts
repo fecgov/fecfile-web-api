@@ -14,6 +14,8 @@ export class ImportContactsComponent implements OnInit {
   public readonly step2Configure = ImportContactsStepsEnum.step2Configure;
   public readonly step3Clean = ImportContactsStepsEnum.step3Clean;
   public readonly step4ImportDone = ImportContactsStepsEnum.step4ImportDone;
+  public userContactFields: Array<string>;
+  public userContacts: Array<any>;
 
   constructor() { }
 
@@ -56,5 +58,11 @@ export class ImportContactsComponent implements OnInit {
         break;
       default:
     }
+  }
+
+  public receiveUserContacts(userContactsMessage: any) {
+    this.userContactFields = userContactsMessage.userContactFields;
+    this.userContacts = userContactsMessage.userContactFields;
+    this.showNextStep();
   }
 }

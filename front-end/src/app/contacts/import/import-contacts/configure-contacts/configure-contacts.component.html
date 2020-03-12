@@ -1,3 +1,31 @@
-<p>
-  configure-contacts works!
-</p>
+<div class="configure_contacts__container">
+  <p>Please map your data to match the FECfile required fields.</p>
+  <div class="container configure_contacts__container-inner">
+    <div class="row configure_contacts__column-title">
+      <div class="col-md-4">
+        <h4>Your File Fields</h4>
+      </div>
+      <div class="col-md-4">
+        <h4>FEC File Required & Optional Fields</h4>
+      </div>
+    </div>
+    <div *ngFor="let userField of userContactFields; let i = index" class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <input type="text" disabled class="form-control configure_contacts__field" aria-label="User Field"
+            [(ngModel)]="userContactFields[i]">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group configure_contacts__field">
+          <ng-select [items]="appContactFieldsUnmapped" (change)="handleSelect($event, i, userField)"
+            class="forms__select" [selectOnTab]="true" bindValue="name" bindLabel="text">
+            <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+              <span>{{ item.text }}</span>
+            </ng-template>
+          </ng-select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

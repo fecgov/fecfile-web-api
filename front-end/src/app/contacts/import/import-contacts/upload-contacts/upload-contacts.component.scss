@@ -5,11 +5,36 @@
     height: 20em;
     padding: 20px;
     margin-bottom: 20px;
-    background-color: $ghost;
+    background-color: $mercury;
     .upload_contacts__drop-area-text {
-      padding: 9% 25%;
-      text-align: -webkit-center;
+      padding: 4% 25%;
+      text-align: center;
       font-size: 26px;
+      i {
+        font-size: 3em;
+        padding: 10px;
+      }
+    }
+  }
+  #upload_contacts__info-area {
+    height: 20em;
+    padding-left: 6%;
+    margin-bottom: 20px;
+    background-color: $mercury;
+    .upload_contacts__info-cell-container {
+      padding: 5%;
+    }
+    .upload_contacts__info-icon {
+      text-align: center;
+    }
+    i {
+      font-size: 3em;
+      padding: 10px;
+      text-align: center;
+      color: $dustyGray;
+    }
+    .upload_contacts__info-cell {
+      padding: 3%;
     }
   }
 }

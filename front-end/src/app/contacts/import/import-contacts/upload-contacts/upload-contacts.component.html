@@ -2,15 +2,43 @@
   <div id="upload_contacts__drop-area" (drop)="drop($event)" (dragenter)="dragEnter($event)"
     (dragover)="dragOver($event)">
     <div class="upload_contacts__drop-area-text">
+      <i (click)="triggerSelectFileInputClick()" class="file-upload-icon"></i>
+      <br>
       Drop or Drag a CSV, Excel, or JSON File Here to Upload
       <br>
       or
       <br>
-      <span>Select a file</span>
+      <span><a (click)="triggerSelectFileInputClick()">Select a file</a></span>
+      <input style="display:none" #selectFileInput type="file" accept=".json, .xls, .csv" (change)="fileSelected()" />
     </div>
-
-    <!-- <span *ngIf="!canDropFolder">
-        File Drop Not Supported by Browser
-    </span> -->
+  </div>
+  <div id="upload_contacts__info-area">
+    <div class="row">
+      <!-- <div class="upload_contacts__info-cell-container"> -->
+      <div class="col col-md-3 upload_contacts__info-cell">
+        <div class="upload_contacts__info-icon">
+          <i class="users-icon"></i>
+        </div>
+        Importing your contacts saves you time. It helps you build your database quicker so you can move
+        through your forms effortlessly and seamlessly. You can upload file varieties, such as CSV, Excel or JSON.
+        <br><br>
+        You can easily convert your Quicken & Quickbooks Data to CSV or Excel files for import.
+      </div>
+      <div class="col col-md-3 upload_contacts__info-cell">
+        <div class="upload_contacts__info-icon">
+          <i class="database-server-icon"></i>
+        </div>
+        To keep your database clean, don’t worry about import duplicates, we will give you a chance to
+        either merge or ignore them individually or in a bulk action.
+      </div>
+      <div class="col col-md-3 upload_contacts__info-cell">
+        <div class="upload_contacts__info-icon">
+          <i class="cloud-icon"></i>
+        </div>
+        Because your contact database is located on our Cloud, you never have to worry about losing your data.
+        We make sure our Cloud technology stays up-to-date and free of errors and major problems.
+      </div>
+      <!-- </div> -->
+    </div>
   </div>
 </div>

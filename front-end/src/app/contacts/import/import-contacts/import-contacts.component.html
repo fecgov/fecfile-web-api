@@ -16,8 +16,10 @@
         </app-steps>
       </div>
       <div class="import_contacts__body">
-        <app-upload-contacts *ngIf="currentStep === step1Upload"></app-upload-contacts>
-        <app-configure-contacts *ngIf="currentStep === step2Configure"></app-configure-contacts>
+        <app-upload-contacts *ngIf="currentStep === step1Upload" (userContactsEmitter)="receiveUserContacts($event)">
+        </app-upload-contacts>
+        <app-configure-contacts *ngIf="currentStep === step2Configure" [userContactFields]="userContactFields">
+        </app-configure-contacts>
         <app-clean-contacts *ngIf="currentStep === step3Clean"></app-clean-contacts>
         <app-import-done-contacts *ngIf="currentStep === step4ImportDone"></app-import-done-contacts>
       </div>
@@ -28,7 +30,8 @@
           (click)="showPreviousStep()">
           Previous for dev
         </button>
-        <button *ngIf="currentStep !== step4ImportDone" class="btn btn-secondary btn-right" (click)="showNextStep()">
+        <button *ngIf="currentStep !== step4ImportDone && currentStep !== step1Upload"
+          class="btn btn-secondary btn-right" (click)="showNextStep()">
           Next for dev
         </button>
       </div>

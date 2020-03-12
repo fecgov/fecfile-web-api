@@ -1,0 +1,20 @@
+// @import '../../../../shared/scss/global';
+
+.configure_contacts__container {
+  .configure_contacts__container-inner {
+    padding: 0 25%;
+    .configure_contacts__field {
+      width: 80%;
+      .ng-select.forms__select {
+        .ng-select-container {
+          height: 52px;
+        }
+      }
+    }
+  }
+  .configure_contacts__column-title {
+      padding: 2em 0;
+  }
+}
+
+

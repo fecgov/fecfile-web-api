@@ -30,6 +30,21 @@
   @extend .fa-user-circle;
 }
 
+.users-icon {
+  @extend .fas;
+  @extend .fa-users;
+}
+
+.database-server-icon {
+  @extend .fas;
+  @extend .fa-server;
+}
+
+.cloud-icon {
+  @extend .fas;
+  @extend .fa-cloud;
+}
+
 .settings-icon {
   @extend .fas;
   @extend .fa-cog;
@@ -153,6 +168,11 @@
 .file-import-icon {
   @extend .fas;
   @extend .fa-file-import;
+}
+
+.file-upload-icon {
+  @extend .fas;
+  @extend .fa-file-upload;
 }
 
 .file-export-icon {
