@@ -359,6 +359,7 @@ def post_sql_schedB(
     aggregate_amt,
     beneficiary_cand_entity_id,
     levin_account_id,
+    aggregation_ind = None,
 ):
     """
     db transaction for post a db transaction
@@ -407,11 +408,12 @@ def post_sql_schedB(
                     aggregate_amt,
                     beneficiary_cand_entity_id,
                     levin_account_id,
+                    aggregation_ind,
                     last_update_date,
                     create_date
                 )
                 VALUES ("""
-                + ",".join(["%s"] * 41)
+                + ",".join(["%s"] * 42)
                 + ")",
                 [
                     cmte_id,
@@ -453,6 +455,7 @@ def post_sql_schedB(
                     aggregate_amt,
                     beneficiary_cand_entity_id,
                     levin_account_id,
+                    aggregation_ind,
                     datetime.datetime.now(),
                     datetime.datetime.now(),
                 ],
@@ -531,6 +534,7 @@ def put_sql_schedB(
     aggregate_amt,
     beneficiary_cand_entity_id,
     levin_account_id,
+    aggregation_ind = None,
 ):
     """
     db transaction for saving current sched_b item
@@ -576,6 +580,7 @@ def put_sql_schedB(
                             aggregate_amt = %s,
                             beneficiary_cand_entity_id = %s,
                             levin_account_id = %s,
+                            aggregation_ind = %s,
                             last_update_date = %s
                     WHERE transaction_id = %s 
                     AND report_id in ('{}') 
@@ -621,6 +626,7 @@ def put_sql_schedB(
                     aggregate_amt,
                     beneficiary_cand_entity_id,
                     levin_account_id,
+                    aggregation_ind,
                     datetime.datetime.now(),
                     transaction_id,
                     cmte_id,
@@ -815,6 +821,7 @@ def post_schedB(datum):
                 datum.get("aggregate_amt"),
                 datum.get("beneficiary_cand_entity_id"),
                 datum.get("levin_account_id"),
+                datum.get("aggregation_ind"),
             )
             logger.debug("payment transaction saved.")
             if datum.get("transaction_type_identifier") in SCHED_D_CHILD_LIST:
@@ -1063,6 +1070,7 @@ def put_schedB(datum):
                 datum.get("aggregate_amt"),
                 datum.get("beneficiary_cand_entity_id"),
                 datum.get("levin_account_id"),
+                datum.get("aggregation_ind"),
             )
             logger.debug("sched_b data saved.")
 
@@ -1235,8 +1243,10 @@ def schedB_sql_dict(data):
     json and validate some field data
     """
     try:
+        logger.debug('filtering data with schedB_sql_dict...')
         validate_negative_transaction(data)
         validate_parent_transaction_exist(data)
+        # print(data)
         datum = {
             "line_number": data.get("line_number"),
             "transaction_type": data.get("transaction_type"),
@@ -1307,7 +1317,9 @@ def schedB_sql_dict(data):
             "cand_zip_code": data.get("cand_zip_code"),
             # levin transaction
             "levin_account_id": data.get("levin_account_id"),
+            "aggregation_ind": data.get("aggregation_ind"),
         }
+        # print('>>>>')
         if "aggregate_amt" in data and check_decimal(data.get("aggregate_amt")):
             datum["aggregate_amt"] = data.get("aggregate_amt")
 
@@ -1323,6 +1335,7 @@ def schedB_sql_dict(data):
         datum["line_number"], datum["transaction_type"] = get_line_number_trans_type(
             data.get("transaction_type_identifier")
         )
+        logger.debug('schedB_sql_dict done with {}'.format(datum))
         return datum
     except:
         raise
@@ -1815,6 +1828,7 @@ def schedB(request):
             REQT_ELECTION_YR = request.query_params.get("election_year")
         try:
             # checking if redesignation is triggered for a transaction
+            logger.debug("sched_b POST call with request data:{}".format(request.data))
             redesignation_flag = False
             if "redesignation_id" in request.data and request.data[
                 "redesignation_id"
@@ -1859,6 +1873,7 @@ def schedB(request):
                 )
                 data = put_schedB(datum)
             else:
+                logger.debug('calling post_schedB with data:{}'.format(datum))
                 data = post_schedB(datum)
 
             # Associating child transactions to parent and storing them to DB
