@@ -11,7 +11,7 @@
       </div>
     </header>
     <section>
-      <div class="form__steps">
+      <div class="import_contacts__steps">
         <app-steps [steps]="steps" [current_step]="currentStep">
         </app-steps>
       </div>
@@ -25,7 +25,7 @@
       </div>
     </section>
     <footer>
-      <div class="forms__btn-container">
+      <div class="import_contacts__btn-container">
         <button *ngIf="currentStep !== step1Upload" class="btn btn-previous btn-left" type="button"
           (click)="showPreviousStep()">
           Previous for dev

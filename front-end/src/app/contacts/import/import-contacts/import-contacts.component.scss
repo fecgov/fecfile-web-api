@@ -8,14 +8,6 @@
   padding: 0;
   width: 100%;
   .import_contacts__container {
-    .grid-row {
-      margin-left: 0;
-      margin-right: 0;
-      .grid-row__col {
-        padding-left: 0;
-        padding-right: 0;
-      }
-    }
 
     header {
       .header-content {
@@ -41,14 +33,17 @@
       }
     }
     section {
+      .import_contacts__steps {
+        padding: 2em 0;
+      }
       .import_contacts__body {
         margin: 2px auto;
         width: 98%;
         padding: .75em 0 .25em 0;
-    }
+      }
     }
     footer {
-      .forms__btn-container {
+      .import_contacts__btn-container {
         margin: 5px auto;
         padding: 0;
         width: 80%;

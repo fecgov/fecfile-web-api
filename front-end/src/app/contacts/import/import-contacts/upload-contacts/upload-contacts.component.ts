@@ -1,4 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { CsvConverterService } from '../service/csv-converter.service';
+import * as XLSX from 'xlsx';
+
+type AOA = any[][];
 
 @Component({
   selector: 'app-upload-contacts',
@@ -16,7 +20,8 @@ export class UploadContactsComponent implements OnInit {
   public userContacts: Array<any>;
   public userContactFields: Array<string>;
 
-  constructor() { }
+
+  constructor(private csvConverterService: CsvConverterService) { }
 
   ngOnInit() {
   }
@@ -27,6 +32,8 @@ export class UploadContactsComponent implements OnInit {
    * @param event the drop event
    */
   public drop(event: any) {
+    // TODO put this in a service for extracting files on drop event.
+
     event.preventDefault();
     const items = event.dataTransfer.items;
 
@@ -49,28 +56,10 @@ export class UploadContactsComponent implements OnInit {
    */
   private scanFiles(entry: any) {
     if (entry.isFile) {
-      // let files = [];
       const promise = this.parseFileEntry(entry).then(file => {
-        // files.push(file);
-        // if (this.isValidFileType(file.name)) {
-        //   const fr = new FileReader();
-        //   fr.onload = function (e) {
-        //     const text = fr.result;
-        //     console.log(text);
-        //   };
-        //   fr.readAsText(file);
-        // }
         this.handleFileType(file);
       });
     }
-    // else if (entry.isDirectory) {
-    //   const directoryReader = entry.createReader();
-    //   directoryReader.readEntries((entries) => {
-    //     entries.forEach((entry) => {
-    //       this.scanFiles(entry);
-    //     });
-    //   });
-    // }
   }
 
   private getFileExtention(fileName: string): string {
@@ -82,9 +71,9 @@ export class UploadContactsComponent implements OnInit {
     return fileExtention;
   }
 
-  private handleFileType(file: any) {
+  private handleFileType(file: File) {
     if (!this.isValidFileType(file.name)) {
-      alert(`Invalid file type for ${file.name}`);
+      console.log(`Invalid file type for ${file.name}`);
     }
     const fileExtention = this.getFileExtention(file.name);
     switch (fileExtention) {
@@ -97,42 +86,74 @@ export class UploadContactsComponent implements OnInit {
       case 'xls':
         this.handleXlsImport(file);
         break;
+      case 'xlsx':
+        this.handleXlsImport(file);
+        break;
       default:
-        console.log('invalif file extention for import contacts ' + fileExtention);
+        console.log('invalid file extention for import contacts ' + fileExtention);
     }
   }
 
-  private handleJsonImport(file: any) {
-    // TODO do this in an angular/testable way
-    const fr = new FileReader();
-    fr.onload = (e) => {
-      const json = fr.result;
+  private handleJsonImport(file: File) {
+    const fileReader = new FileReader();
+    fileReader.onload = (e) => {
+      const json = fileReader.result;
       this.userContacts = JSON.parse(json.toString());
+      this.prepareUserContactFields();
+    };
+    fileReader.readAsText(file);
+  }
 
-      // get property names for mapping user fields
-      this.userContactFields = [];
-      if (this.userContacts) {
-        if (Array.isArray(this.userContacts)) {
-          if (this.userContacts.length > 0) {
-            for (const prop in this.userContacts[0]) {
-              if (prop) {
-                this.userContactFields.push(prop);
-              }
+  private handleCsvImport(file: File) {
+    const fileReader = new FileReader();
+    fileReader.onload = (e) => {
+      const csvText: string | ArrayBuffer = fileReader.result;
+      if (typeof csvText === 'string') {
+        const json = this.csvConverterService.convertCsvToJson(csvText);
+        this.userContacts = JSON.parse(json.toString());
+        this.prepareUserContactFields();
+      }
+    };
+    fileReader.readAsText(file);
+  }
+
+  private handleXlsImport(file: File) {
+    const fileReader = new FileReader();
+    fileReader.onload = (e) => {
+
+      /* read workbook */
+      const bstr = fileReader.result;
+      const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary' });
+
+      /* grab first sheet */
+      const wsname: string = wb.SheetNames[0];
+      const ws: XLSX.WorkSheet = wb.Sheets[wsname];
+
+      /* save data */
+      const data = XLSX.utils.sheet_to_json(ws);
+
+      const json = JSON.stringify(data);
+      this.userContacts = JSON.parse(json.toString());
+      this.prepareUserContactFields();
+    };
+    fileReader.readAsBinaryString(file);
+  }
+
+  private prepareUserContactFields(): void {
+    // get property names for mapping user fields
+    this.userContactFields = [];
+    if (this.userContacts) {
+      if (Array.isArray(this.userContacts)) {
+        if (this.userContacts.length > 0) {
+          for (const prop in this.userContacts[0]) {
+            if (prop) {
+              this.userContactFields.push(prop);
             }
           }
         }
       }
-      this.emitUserContacts();
-    };
-    fr.readAsText(file);
-  }
-
-  private handleCsvImport(file: any) {
-    alert('CSV file import not yet supported');
-  }
-
-  private handleXlsImport(file: any) {
-    alert('XLS file import not yet supported');
+    }
+    this.emitUserContacts();
   }
 
   /**
@@ -169,18 +190,10 @@ export class UploadContactsComponent implements OnInit {
     if (name.indexOf('xls') !== -1) {
       return true;
     }
+    if (name.indexOf('xlsx') !== -1) {
+      return true;
+    }
     return false;
-
-    // switch (name) {
-    //   case 'csv':
-    //     return true;
-    //   case 'json':
-    //     return true;
-    //   case 'xls':
-    //     return true;
-    //   default:
-    //     return false;
-    // }
   }
 
   private parseFileEntry(fileEntry): Promise<File> {
