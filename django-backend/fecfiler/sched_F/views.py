@@ -155,6 +155,7 @@ def schedF_sql_dict(data):
         "state",
         "zip_code",
         "prefix",
+        "aggregation_ind",
     ]
     try:
         output = {k: v for k, v in data.items() if k in valid_fields}
@@ -290,6 +291,7 @@ def put_sql_schedF(data):
                   payee_cand_district = %s,
                   memo_code = %s,
                   memo_text = %s,
+                  aggregation_ind = %s,
                   last_update_date = %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
@@ -328,6 +330,7 @@ def put_sql_schedF(data):
         data.get("payee_cand_district"),
         data.get("memo_code"),
         data.get("memo_text"),
+        data.get("aggregation_ind"),
         datetime.datetime.now(),
         data.get("transaction_id"),
         data.get("report_id"),
@@ -438,10 +441,11 @@ def post_sql_schedF(data):
             payee_cand_district,
             memo_code,
             memo_text,
+            aggregation_ind,
             create_date,
             last_update_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get("cmte_id"),
@@ -480,6 +484,7 @@ def post_sql_schedF(data):
             data.get("payee_cand_district"),
             data.get("memo_code"),
             data.get("memo_text"),
+            data.get("aggregation_ind"),
             datetime.datetime.now(),
             datetime.datetime.now(),
         )
