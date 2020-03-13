@@ -169,6 +169,7 @@ def schedE_sql_dict(data):
         "cand_office_state",
         "cand_office_district",
         "cand_election_year",
+        "aggregation_ind"
     ]
     try:
         datum = {k: v for k, v in data.items() if k in valid_fields}
@@ -322,6 +323,7 @@ def put_sql_schedE(data):
         memo_code= %s,
         memo_text= %s,
         line_number= %s,
+        aggregation_ind = %s,
         last_update_date= %s
     WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
     AND delete_ind is distinct from 'Y';
@@ -354,6 +356,7 @@ def put_sql_schedE(data):
         data.get("memo_code"),
         data.get("memo_text"),
         data.get("line_number"),
+        data.get("aggregation_ind"),
         datetime.datetime.now(),
         data.get("transaction_id"),
         data.get("report_id"),
@@ -833,11 +836,12 @@ def post_sql_schedE(data):
             memo_code,
             memo_text,
             line_number,
+            aggregation_ind,
             create_date
             )
         VALUES ({})
         """.format(
-            ",".join(["%s"] * 32)
+            ",".join(["%s"] * 33)
         )
         _v = (
             data.get("cmte_id"),
@@ -871,6 +875,7 @@ def post_sql_schedE(data):
             data.get("memo_code"),
             data.get("memo_text"),
             data.get("line_number"),
+            data.get("aggregation_ind"),
             datetime.datetime.now(),
         )
         logger.debug("sql:{}".format(_sql))
