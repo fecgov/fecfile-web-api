@@ -590,11 +590,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   private _prepareForUnsavedChanges(): void {
-    // TODO look into using takeUntil and destroy to avoid mem leak.
-
-    // this.frmIndividualReceipt.get('contribution_aggregate').valueChanges.takeUntil(this.onDestroy$)
-    // .subscribe(val => {
-
     this.frmIndividualReceipt.valueChanges.takeUntil(this.onDestroy$)
       .subscribe(val => {
       if (this.frmIndividualReceipt.dirty) {
@@ -1419,6 +1414,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public isFieldReadOnly(col: any) {
     if (col.type === 'text' && col.isReadonly) {
+      return true;
+    }
+    if (col.type === 'date' && col.isReadonly) {
       return true;
     }
     if (col.name === 'total_amount') {
@@ -2471,6 +2469,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * changed (dirty) then don't save and just show parent.
    */
   public saveAndReturnToParent(): void {
+    if(this._cloned) {
+      this._cloned = false;
+    }
+
     if (!this.frmIndividualReceipt.dirty) {
       this.clearFormValues();
       this.returnToParent(ScheduleActions.edit);
@@ -5422,9 +5424,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
 
   private populateSchedFChildData(field: string, receiptObj: any) {
-      // Possible issue : Populating data from parent when  sched f child is created can cause in consistensis
-      // data from child and parent can be out of sync whent the parent is edited
+      // Possible issue : Populating data from parent when  sched f child is created can cause in consistencies
+      // data from child and parent can be out of sync when the parent is edited
       // backend should take care of the updates if parent is modified
+    if (null == this.subTransactionInfo) {
+      return;
+    }
     if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent && !this.subTransactionInfo.isParent) {
       switch (field) {
         case 'coordinated_exp_ind' :

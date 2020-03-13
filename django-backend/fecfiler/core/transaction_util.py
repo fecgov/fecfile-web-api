@@ -1,8 +1,7 @@
 import logging
 from functools import lru_cache
 from django.db import connection
-from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
-
+from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list, cmte_type
 import datetime
 
 logger = logging.getLogger(__name__)
@@ -934,6 +933,7 @@ def get_sched_b_transactions(
                                             levin_account_id,
                                             aggregate_amt,
                                             create_date,
+                                            aggregation_ind,
                                             redesignation_id, redesignation_ind
                     FROM public.sched_b WHERE report_id in ('{}')
                     AND cmte_id = %s 
@@ -1092,27 +1092,3 @@ def post_process_it(cursor, cmte_id):
         merged_dict = {**item, **dictEntity, **cand_entity}
         merged_list.append(merged_dict)
     return merged_list
-
-
-def cmte_type(cmte_id):
-    """
-    to know if the cmte is PAC or PTY and determine the flag values for administrative, generic_voter_drive, public_communications
-    """
-    try:
-        with connection.cursor() as cursor:
-            # Insert data into schedH3 table
-            cursor.execute(
-                """SELECT cmte_type_category FROM public.committee_master WHERE cmte_id=%s""",
-                [cmte_id],
-            )
-            cmte_type_tuple = cursor.fetchone()
-            if cmte_type_tuple:
-                return cmte_type_tuple[0]
-            else:
-                raise Exception(
-                    "The cmte_id: {} does not exist in committee master table.".format(
-                        cmte_id
-                    )
-                )
-    except Exception as err:
-        raise Exception(f"cmte_type function is throwing an error: {err}")

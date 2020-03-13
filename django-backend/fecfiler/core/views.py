@@ -2886,6 +2886,7 @@ def autolookup_search_contacts(request):
                             e.last_update_date
                             FROM public.entity e, public.entity c 
                             WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                            AND e.entity_type in ('IND','ORG')
                             AND c.principal_campaign_committee is not null
                             AND e.cmte_id in (%s, 'C00000000')
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
@@ -2904,6 +2905,7 @@ def autolookup_search_contacts(request):
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                             e.last_update_date
                             FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                            AND e.entity_type in ('IND','ORG')
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
                             + param_string
@@ -3165,7 +3167,7 @@ def get_trans_query(category_type, cmte_id, param_string):
             """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
-                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, isredesignatable, "isRedesignation" from all_disbursements_transactions_view
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, aggregation_ind, hasChild, isredesignatable, "isRedesignation" from all_disbursements_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -3203,7 +3205,7 @@ def get_trans_query(category_type, cmte_id, param_string):
             """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
-                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, isreattributable, "isReattribution" from all_receipts_transactions_view
+                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, aggregation_ind, hasChild, isreattributable, "isReattribution" from all_receipts_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -7901,7 +7903,8 @@ def clone_a_transaction(request):
         rows = cursor.fetchall()
         columns = []
         for row in rows:
-            columns.append(row[0])
+            if row[0] not in ['reattribution_id', 'reattribution_ind', 'redesignation_id', 'redesignation_ind']:
+                columns.append(row[0])
         logger.debug("table columns: {}".format(list(columns)))
 
         insert_str = ",".join(columns)
