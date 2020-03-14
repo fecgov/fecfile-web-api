@@ -1,6 +1,6 @@
 import { ReportTypeService } from './../../form-3x/report-type/report-type.service';
 import { TransactionsService } from './../../transactions/service/transactions.service';
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter, SimpleChanges , ChangeDetectionStrategy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -35,7 +35,7 @@ export enum loanSumarysActions {
     './loan-summary.component.scss'
   ],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
@@ -45,7 +45,7 @@ export enum loanSumarysActions {
         animate(0, style({ opacity: 0 }))
       ])
     ])
-  ]
+  ] */
 })
 
 
@@ -199,7 +199,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   }
 
   public goToPage(pageEvent: any) {
-    console.log(pageEvent);
+    //console.log(pageEvent);
     this.currentPageNumber = pageEvent;
   }
 
@@ -223,7 +223,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
 
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
-    console.log(" getPage this.tableType", this.tableType)
+    //console.log(" getPage this.tableType", this.tableType)
     switch (this.tableType) {
       case this.LoanView:
         this.getLoanPage(page, message);
@@ -267,7 +267,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       .subscribe((res: any) => {
 
         // res=this.tempApiResponse;
-        console.log(" getLoanPage res =", res)
+        //console.log(" getLoanPage res =", res)
         this.LoanModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter

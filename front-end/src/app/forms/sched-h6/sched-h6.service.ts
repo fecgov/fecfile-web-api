@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -37,7 +37,7 @@ export class SchedH6Service {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('H6 Summary res: ', res);
+            //console.log('H6 Summary res: ', res);
             return res;
           }
           return false;

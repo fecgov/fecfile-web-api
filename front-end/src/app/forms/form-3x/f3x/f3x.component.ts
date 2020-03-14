@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import 'rxjs/add/operator/takeUntil';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { SchedHMessageServiceService } from '../../sched-h-service/sched-h-message-service.service';
@@ -79,6 +79,8 @@ export class F3xComponent implements OnInit, OnDestroy {
   parentTransactionModel: any;
   populateHiddenFieldsMessageObj: any;
   populateFieldsMessageObj: any;
+  queryParamsSubscription: Subscription;
+  routerEventsSubscription:Subscription;
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -97,7 +99,7 @@ export class F3xComponent implements OnInit, OnDestroy {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
+    this.queryParamsSubscription =_activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       if (p.edit === 'true' || p.edit === true) {
         this.editMode = true;
@@ -149,8 +151,8 @@ export class F3xComponent implements OnInit, OnDestroy {
         this.transactionCategories = res.data.transactionCategories;
       }
     });
-
-    this._router.events.takeUntil(this.onDestroy$).subscribe(val => {
+    localStorage.setItem('Receipts_Entry_Screen', 'Yes');
+    this.routerEventsSubscription = this._router.events.takeUntil(this.onDestroy$).subscribe(val => {
       if (val) {
         if (val instanceof NavigationEnd) {
           if (
@@ -166,8 +168,8 @@ export class F3xComponent implements OnInit, OnDestroy {
                 `form_${this.formType}_report_type_backup`,
                 localStorage.getItem(`form_${this.formType}_report_type`)
               );
-              // console.log(`form_${this._formType}_report_type_backup` + 'copied ');
-              // console.log(new Date().toISOString());
+              // //console.log(`form_${this._formType}_report_type_backup` + 'copied ');
+              // //console.log(new Date().toISOString());
             }
 
             window.localStorage.removeItem(`form_${this.formType}_report_type`);
@@ -188,6 +190,8 @@ export class F3xComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
+    this.queryParamsSubscription.unsubscribe();
+    this.routerEventsSubscription.unsubscribe();
   }
 
   ngDoCheck(): void {
@@ -288,7 +292,7 @@ export class F3xComponent implements OnInit, OnDestroy {
    */
   public switchSidebar(e: boolean): void {
     this.isShowFilters = e;
-    console.log('showfilters is ' + this.isShowFilters);
+    //console.log('showfilters is ' + this.isShowFilters);
   }
 
   /**

@@ -1,7 +1,7 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -35,7 +35,7 @@ import { SchedH2Service } from './sched-h2.service';
   styleUrls: ['./sched-h2.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
@@ -45,7 +45,7 @@ import { SchedH2Service } from './sched-h2.service';
         animate(0, style({ opacity: 0 }))
       ])
     ])
-  ]
+  ] */
 })
 export class SchedH2Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionTypeText: string;
@@ -154,7 +154,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       .getEditTransactionMessage()
       .takeUntil(this._H2onDestroy$)
       .subscribe((trx: TransactionModel) => {
-        console.log(trx.transactionTypeIdentifier + 'tranc iden');
+        //console.log(trx.transactionTypeIdentifier + 'tranc iden');
         if (trx.transactionTypeIdentifier === 'ALLOC_H2_RATIO') {
           this.editH2(trx);
         }

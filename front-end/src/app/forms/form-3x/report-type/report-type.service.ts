@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -199,9 +199,9 @@ export class ReportTypeService {
 
     let params = new HttpParams();
     let formData: FormData = new FormData();
-    console.log('signandSaveSubmitReport called');
-    console.log('signandSaveSubmitReport formType = ', formType);
-    console.log('signandSaveSubmitReport access_type = ', access_type);
+    //console.log('signandSaveSubmitReport called');
+    //console.log('signandSaveSubmitReport formType = ', formType);
+    //console.log('signandSaveSubmitReport access_type = ', access_type);
 
     // Adding CommitteeId and CommitteeName details to payload while submitting a report
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
@@ -214,13 +214,13 @@ export class ReportTypeService {
 
 
     if (form3xReportType === null) {
-      console.log('get backup object');
+      //console.log('get backup object');
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-      console.log('backup object form3xReportType = ', form3xReportType);
+      //console.log('backup object form3xReportType = ', form3xReportType);
     }
 
     localStorage.setItem('F3X_submit_backup', JSON.stringify(form3xReportType));
-    console.log('signandSaveSubmitReport access_type you reached here = ', access_type);
+    //console.log('signandSaveSubmitReport access_type you reached here = ', access_type);
     formData.append('form_type', `F${formType}`);
 
     if (form3xReportType.hasOwnProperty('reportid')) {
@@ -261,7 +261,7 @@ export class ReportTypeService {
       }
     }
 
-    console.log('signandSaveSubmitReport access_type you reached here1 = ', access_type);
+    //console.log('signandSaveSubmitReport access_type you reached here1 = ', access_type);
 
     if (form3xReportType.hasOwnProperty('amend_Indicator')) {
       if (typeof form3xReportType.amend_Indicator === 'string') {
@@ -317,7 +317,7 @@ export class ReportTypeService {
       }
     }
 
-    console.log(' access_type =', access_type);
+    //console.log(' access_type =', access_type);
 
     if (access_type === 'Saved') {
       formData.append('status', 'Saved');
@@ -369,10 +369,10 @@ export class ReportTypeService {
       }
     }
 
-    console.log('signandSaveSubmitReport formData = ', formData);
+    //console.log('signandSaveSubmitReport formData = ', formData);
 
     if (access_type === 'Saved') {
-      console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
+      //console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
       return this._http
         .put(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions
@@ -380,7 +380,7 @@ export class ReportTypeService {
         .pipe(
           map(res => {
             if (res) {
-              console.log('Form 3X save res = ', res);
+              //console.log('Form 3X save res = ', res);
               if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
                 const reportObj: form3xReportTypeDetails = JSON.parse(
                   window.localStorage.getItem(`form_${formType}_report_type`)
@@ -396,8 +396,8 @@ export class ReportTypeService {
           })
         );
     } else if (access_type === 'Submitted') {
-      console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
-      console.log('submit Report form 3X submitted...');
+      //console.log('signandSaveSubmitReport HTTP called with access_type = ', access_type);
+      //console.log('submit Report form 3X submitted...');
       url = '/core/submit_report';
       return this._http
         .put(`${environment.apiUrl}${url}`, formData, {
@@ -406,7 +406,7 @@ export class ReportTypeService {
         .pipe(
           map(res => {
             if (res) {
-              console.log('submit Report form 3X submitted res = ', res);
+              //console.log('submit Report form 3X submitted res = ', res);
               /*localStorage.removeItem(`form_${formType}_saved_backup`);
               localStorage.removeItem(`form_${formType}_report_type_backup`);*/
               return res;
@@ -425,24 +425,24 @@ export class ReportTypeService {
 
     let params = new HttpParams();
     let formData: FormData = new FormData();
-    console.log('submitForm called');
-    console.log('submitForm formType = ', formType);
-    console.log('submitForm callFrom = ', callFrom);
+    //console.log('submitForm called');
+    //console.log('submitForm formType = ', formType);
+    //console.log('submitForm callFrom = ', callFrom);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
-    console.log(' submitForm form3xReportType = ', form3xReportType);
+    //console.log(' submitForm form3xReportType = ', form3xReportType);
 
     if (form3xReportType === null) {
-      console.log('get backup object');
+      //console.log('get backup object');
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
       if (form3xReportType === null) {
         form3xReportType = JSON.parse(localStorage.getItem('F3X_submit_backup'));
       }
     }
 
-    // console.log(' submitForm form3xReportType = ', form3xReportType);
+    // //console.log(' submitForm form3xReportType = ', form3xReportType);
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
 
     formData.append('call_from', callFrom);
@@ -468,7 +468,7 @@ export class ReportTypeService {
       }
     }*/
 
-    console.log('form3xReportType: ', form3xReportType);
+    //console.log('form3xReportType: ', form3xReportType);
     formData.append('newAmendIndicator', 'N');
     if (form3xReportType !== null) {
       if (form3xReportType.hasOwnProperty('reportId')) {
@@ -532,16 +532,16 @@ export class ReportTypeService {
     //let url: string = '/core/create_json_builders_test';
     let formData: FormData = new FormData();
 
-    console.log('printForm formType = ', formType);
+    //console.log('printForm formType = ', formType);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
     if (form3xReportType === null) {
-      console.log('get backup object');
+      //console.log('get backup object');
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-      console.log('backup object form3xReportType = ', form3xReportType);
+      //console.log('backup object form3xReportType = ', form3xReportType);
     }
 
     if (form3xReportType.hasOwnProperty('reportId')) {
@@ -565,9 +565,9 @@ export class ReportTypeService {
     //let url: string = '/core/create_json_builders_test';
     let formData: FormData = new FormData();
 
-    console.log("printPreviewPdf formType = ", formType);
-    console.log("printPreviewPdf callFrom = ", callFrom);
-    console.log("printPreviewPdf transactions ==", transactions);
+    //console.log("printPreviewPdf formType = ", formType);
+    //console.log("printPreviewPdf callFrom = ", callFrom);
+    //console.log("printPreviewPdf transactions ==", transactions);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -576,14 +576,14 @@ export class ReportTypeService {
     if (form3xReportType === null)
     {
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-      console.log(" printPreviewPdf backup object form3xReportType = ", form3xReportType);
+      //console.log(" printPreviewPdf backup object form3xReportType = ", form3xReportType);
     }
     
     if (form3xReportType.hasOwnProperty('reportId')) {
-      console.log(" printPreviewPdf reportId found");
+      //console.log(" printPreviewPdf reportId found");
       formData.append('report_id', form3xReportType.reportId);
     } else if (form3xReportType.hasOwnProperty('reportid')) {   
-      console.log(" printPreviewPdf reportid found");
+      //console.log(" printPreviewPdf reportid found");
       formData.append('report_id', form3xReportType.reportid);
     }
 
@@ -592,7 +592,7 @@ export class ReportTypeService {
 
     if ( typeof transactions !== 'undefined' ){
       if (transactions.length > 0){
-        console.log(" printPreviewPdf transactions =", transactions);
+        //console.log(" printPreviewPdf transactions =", transactions);
         //formData.append('transaction_id',  JSON.stringify(transactions.replace(' ','')));
         formData.append('transaction_id',  transactions.replace(' ',''));
       }
@@ -611,8 +611,8 @@ export class ReportTypeService {
 
     let formData: FormData = new FormData();
 
-    console.log("prepare_json_builders_data formType = ", formType);
-    console.log("prepare_json_builders_data transactions=", transactions);
+    //console.log("prepare_json_builders_data formType = ", formType);
+    //console.log("prepare_json_builders_data transactions=", transactions);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -621,21 +621,21 @@ export class ReportTypeService {
     if (form3xReportType === null)
     {
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-      console.log("prepare_json_builders_data backup object form3xReportType = ", form3xReportType);
+      //console.log("prepare_json_builders_data backup object form3xReportType = ", form3xReportType);
     }
   
   
     if (form3xReportType.hasOwnProperty('reportId')) {
       formData.append('report_id', form3xReportType.reportId);
-      console.log(" prepare_json_builders_data reportId found");
+      //console.log(" prepare_json_builders_data reportId found");
     } else if (form3xReportType.hasOwnProperty('reportid')) {   
       formData.append('report_id', form3xReportType.reportid);
-      console.log(" printPreprepare_json_builders_dataviewPdf reportid found");
+      //console.log(" printPreprepare_json_builders_dataviewPdf reportid found");
     }
 
     if ( typeof transactions !== 'undefined' ){
       if (transactions.length > 0){
-        console.log("prepare_json_builders_data transactions =", transactions);
+        //console.log("prepare_json_builders_data transactions =", transactions);
         //formData.append('transaction_id', JSON.stringify(transactions.replace(' ','')));
         formData.append('transaction_id',  transactions.replace(' ',''));
       }
@@ -650,70 +650,70 @@ export class ReportTypeService {
     
     if (accessFrom !=='transaction_table_screen') {
       this.signandSaveSubmitReport(formType,'Saved');
-      console.log("printPreview Data saved successfully...!");
-      console.log("printPreview transactions =", transactions);
+      //console.log("printPreview Data saved successfully...!");
+      //console.log("printPreview transactions =", transactions);
     }
 
     if (typeof transactions === 'undefined') {
-      console.log("No transactions data");
-      console.log("formType", formType);
+      //console.log("No transactions data");
+      //console.log("formType", formType);
       this.prepare_json_builders_data(formType)
       .subscribe( res => {
         if (res) {
-             console.log("Form 3X prepare_json_builders_data res = ", res);
+             //console.log("Form 3X prepare_json_builders_data res = ", res);
              if (res['Response']==='Success') {
-                    console.log(" Form 3X prepare_json_builders_data successfully processed...!");
+                    //console.log(" Form 3X prepare_json_builders_data successfully processed...!");
                     this.printPreviewPdf(formType, "PrintPreviewPDF")
                       .subscribe(res => {
                       if(res) {
-                        console.log("Form 3X  printPriview res ...",res);
+                        //console.log("Form 3X  printPriview res ...",res);
                         if (res.hasOwnProperty('results')) {
                           if (res['results.pdf_url'] !== null) {
-                            console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+                            //console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
                             window.open(res.results.pdf_url, '_blank');
                           }
                         }
                       }
                   },
                   (error) => {
-                    console.log('error: ', error);
+                    //console.log('error: ', error);
                   });/*  */
                   }       
         }
       },
         (error) => {
-          console.log('error: ', error);
+          //console.log('error: ', error);
         });/*  */
     } else if (transactions !== 'undefined' && (transactions.length>0)) { 
-      console.log("transactions data");
-      console.log("formType", formType);
+      //console.log("transactions data");
+      //console.log("formType", formType);
       //var transactionsArray: Array<string> = transactions.split(",");
       this.prepare_json_builders_data(formType, transactions)
       .subscribe( res => {
         if (res) {
-             console.log("Form 3X prepare_json_builders_data res = ", res);
+             //console.log("Form 3X prepare_json_builders_data res = ", res);
              if (res['Response']==='Success') {
-                    console.log(" Form 3X prepare_json_builders_data successfully processed...!");
+                    //console.log(" Form 3X prepare_json_builders_data successfully processed...!");
                     this.printPreviewPdf(formType, "PrintPreviewPDF",transactions)
                       .subscribe(res => {
                       if(res) {
-                        console.log("Form 3X  printPriview res ...",res);
+                        //console.log("Form 3X  printPriview res ...",res);
                         if (res.hasOwnProperty('results')) {
                           if (res['results.pdf_url'] !== null) {
-                            console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
+                            //console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
                             window.open(res.results.pdf_url, '_blank');
                           }
                         }
                       }
                   },
                   (error) => {
-                    console.log('error: ', error);
+                    //console.log('error: ', error);
                   });/*  */
                   }       
         }
       },
         (error) => {
-          console.log('error: ', error);
+          //console.log('error: ', error);
         });/*  */
     }
    
@@ -727,7 +727,7 @@ export class ReportTypeService {
       form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
 
-    console.log('viewTransactions form3XReportType', form3XReportType);
+    //console.log('viewTransactions form3XReportType', form3XReportType);
 
     if (typeof form3XReportType === 'object' && form3XReportType !== null) {
       if (form3XReportType.hasOwnProperty('reportId')) {

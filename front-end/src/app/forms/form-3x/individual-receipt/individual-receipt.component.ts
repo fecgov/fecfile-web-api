@@ -1,6 +1,7 @@
+import { Subscription } from 'rxjs/Subscription';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -51,6 +52,7 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
 
   public formType: string;
   public cloned: boolean;
+  queryParamsSubscription: Subscription;
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -98,7 +100,7 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
       _schedHMessageServce
     );
 
-    _activatedRoute.queryParams.takeUntil(this._onDestroy$).subscribe(p => {
+    this.queryParamsSubscription = _activatedRoute.queryParams.takeUntil(this._onDestroy$).subscribe(p => {
       this.cloned = p.cloned ? true : false;
     });
   }
@@ -131,6 +133,7 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
   public ngOnDestroy(): void {
     localStorage.removeItem(`form_${this.formType}_saved`);
     this._onDestroy$.next(true);
+    this.queryParamsSubscription.unsubscribe();
     super.ngOnDestroy();
   }
 }

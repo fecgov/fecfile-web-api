@@ -71,7 +71,7 @@
             {{ debt.closingBalance | currency: 'USD':'symbol-narrow':'1.2-2' }}
           </td>
           <td>
-            <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+            <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
               <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
                 <i class="ellipsis-icon"></i>
               </button>
@@ -98,10 +98,10 @@
             class="payment-bg"
           >
             <td style="padding-left: 70px;" colspan="2">{{ payment.transactionTypeDescription }}</td>
-            <td [@fadeInOut] colspan="2">{{ payment.paymentDate | date: 'MM/dd/yyyy' }}</td>
-            <td [@fadeInOut] colspan="2">{{ payment.paymentAmt | currency: 'USD':'symbol-narrow':'1.2-2' }}</td>
+            <td  colspan="2">{{ payment.paymentDate | date: 'MM/dd/yyyy' }}</td>
+            <td  colspan="2">{{ payment.paymentAmt | currency: 'USD':'symbol-narrow':'1.2-2' }}</td>
             <td>
-              <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+              <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                   <i class="ellipsis-icon"></i>
                 </button>

@@ -1,6 +1,6 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges, Input } from '@angular/core';
+import { EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges, Input , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -291,7 +291,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
             break;
           default:
-            console.log('message key not supported: ' + message.key);
+            //console.log('message key not supported: ' + message.key);
         }
       }
     });
@@ -820,7 +820,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _checkDebtPaymentExceeded(e: any) {
     if (this.isFieldName(e.name, 'expenditure_amount')) {
       if (this.transactionType === 'OPEXP_DEBT') {
-        console.log();
+        //console.log();
         // this.form.controls['expenditure_amount'].setValidators([validateAmount(), validateContributionAmount(this.outstandingLoanBalance)]);
         // formValidators.push(this._contributionDateValidator.contributionDate(cvgStartDate, cvgEndDate));
       }
@@ -1907,12 +1907,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         } else if (field === 'memo_code') {
           if (this.memoCode) {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
-            console.log('memo code val ' + receiptObj[field]);
+            //console.log('memo code val ' + receiptObj[field]);
           }
         } else if (field === this._childFieldNamePrefix + 'memo_code') {
           if (this.memoCodeChild) {
             receiptObj[field] = this.frmIndividualReceipt.get(field).value;
-            console.log('child memo code val ' + receiptObj[field]);
+            //console.log('child memo code val ' + receiptObj[field]);
           }
         }
         // TODO: Incomplete FNE-1984
@@ -2125,7 +2125,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._reportsService
             .updateReportDate(new reportModel({ report_id: reportId }))
             .subscribe((resUpdateReportDate: any) => {
-              console.log(resUpdateReportDate);
+              //console.log(resUpdateReportDate);
             });
           this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
             const message: any = {
@@ -2191,7 +2191,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           if (res.hasOwnProperty('transaction_id')) {
             transactionId = res.transaction_id;
           } else {
-            console.log('schedA save has no transaction_id property');
+            //console.log('schedA save has no transaction_id property');
           }
 
           // UI allows for returning to parent from unsaved child.  If this is the case switch
@@ -2401,7 +2401,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       Object.keys(this.frmIndividualReceipt.controls).forEach(key => {
         if (this.frmIndividualReceipt.get(key).invalid) {
           invalid.push(key);
-          console.log('invalid form field on submit = ' + key);
+          //console.log('invalid form field on submit = ' + key);
         }
       });
 
@@ -2664,7 +2664,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (!this._cloned || this._completedCloning) {
       this.clearFormValues();
       let reportId = this._receiptService.getReportIdFromStorage(this.formType);
-      console.log('reportId', reportId);
+      //console.log('reportId', reportId);
 
       if (!reportId) {
         reportId = '0';
@@ -3431,7 +3431,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * @param fieldName the date field name in the form.
    */
   public dateChange(fieldName: string) {
-    console.log('date has changed!');
+    //console.log('date has changed!');
 
     if (this.reattributionTransactionId || this.redesignationTransactionId) {
       this.handleDateChangeForReattributionOrRedesignation(fieldName);
@@ -3573,7 +3573,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   //   }
   //   if (name === 'first_name' || name === 'last_name' || name === 'prefix') {
   //     if (this._selectedEntityId) {
-  //       console.log('this._selectedEntityId = ' + this._selectedEntityId);
+  //       //console.log('this._selectedEntityId = ' + this._selectedEntityId);
   //       return true;
   //     }
   //   }
@@ -3581,7 +3581,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   // }
 
   private _getFormFields(): void {
-    console.log('get transaction type form fields ' + this.transactionType);
+    //console.log('get transaction type form fields ' + this.transactionType);
 
     // init some of the dynamic form data for each call.
     // TODO may need to add others.
@@ -3843,7 +3843,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * @param res
    */
   private _hijackFormFields(res: any): any {
-    console.log('Hijack for : ' + this.transactionType);
+    //console.log('Hijack for : ' + this.transactionType);
     switch (this.transactionType) {
       case 'COEXP_PARTY':
         res = new CoordinatedPartyExpenditureFields().coordinatedPartyExpenditureFields;
@@ -4126,7 +4126,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                         this.subTransactionsTableType = this.subTransactionInfo.scheduleType;
                       }
                       for (const subTrx of this.subTransactions) {
-                        console.log('sub tran id ' + subTrx.transaction_id);
+                        //console.log('sub tran id ' + subTrx.transaction_id);
                       }
                     }
                   }
@@ -4748,7 +4748,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         purpose += ' ' + field;
       }
 
-      console.log('purpose is: ' + purpose);
+      //console.log('purpose is: ' + purpose);
       if (purpose !== purposePre) {
         this.frmIndividualReceipt.patchValue({ 'child*purpose_description': purpose }, { onlySelf: true });
       }
@@ -4819,7 +4819,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         purpose += ' ' + field;
       }
 
-      console.log('purpose is: ' + purpose);
+      //console.log('purpose is: ' + purpose);
       if (purpose !== purposePre && !this.subTransactionInfo.isParent) {
         this.frmIndividualReceipt.patchValue({ purpose_description: purpose }, { onlySelf: true });
       }
@@ -4934,7 +4934,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   private _getCandidateOfficeTypes() {
     this._contactsService.getContactsDynamicFormFields().subscribe(res => {
       if (res) {
-        console.log('getFormFields res =', res);
+        //console.log('getFormFields res =', res);
         if (res.hasOwnProperty('data')) {
           if (typeof res.data === 'object') {
             if (res.data.hasOwnProperty('officeSought')) {

@@ -1,7 +1,7 @@
 import { SchedHMessageServiceService } from './../../../sched-h-service/sched-h-message-service.service';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit, SimpleChanges, ViewEncapsulation, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, SimpleChanges, ViewEncapsulation, Input , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -349,7 +349,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   private updateYTDAmount() {
 
-    console.log('YTD is being recalculated ...');
+    //console.log('YTD is being recalculated ...');
     let currentExpenditureAmount = this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
     if (this.scheduleAction === ScheduleActions.edit) {
       this.frmIndividualReceipt.patchValue({

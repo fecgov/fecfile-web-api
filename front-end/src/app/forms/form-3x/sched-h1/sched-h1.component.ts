@@ -2,7 +2,7 @@ import { SchedHServiceService } from './../../sched-h-service/sched-h-service.se
 import { SchedHMessageServiceService } from './../../sched-h-service/sched-h-message-service.service';
 import { ScheduleActions } from './../individual-receipt/schedule-actions.enum';
 import { NgForm } from '@angular/forms';
-import { Component, OnInit, Output, EventEmitter, ViewChild, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, Input , ChangeDetectionStrategy } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { environment } from '../../../../environments/environment';
@@ -56,7 +56,7 @@ export class SchedH1Component implements OnInit {
     private _individualReceiptService: IndividualReceiptService,
     private _transactionsMessageService: TransactionsMessageService,
   ) {
-    console.log('h1 constructor ...');
+    //console.log('h1 constructor ...');
     this.populateFormForEdit = this._schedHMessageServiceService.
       getpopulateHFormForEditMessage()
       .subscribe(
@@ -89,7 +89,7 @@ export class SchedH1Component implements OnInit {
 
   ngOnInit() {
     // localStorage.setItem('cmte_type_category', 'PAC')
-    //console.log(localStorage.getItem('cmte_type_category'));
+    ////console.log(localStorage.getItem('cmte_type_category'));
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.checkH1Disabled();
     this.checkH1PacDisabled();
@@ -109,7 +109,7 @@ export class SchedH1Component implements OnInit {
   }
 
   isPac() {
-    //console.log(localStorage.getItem('cmte_type_category'));
+    ////console.log(localStorage.getItem('cmte_type_category'));
     // return true;
 
     let ispac = false;
@@ -132,7 +132,7 @@ export class SchedH1Component implements OnInit {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     httpOptions = httpOptions.append('Content-Type', 'application/json');
-    console.log('post h1 url:' + url);
+    //console.log('post h1 url:' + url);
 
     // build form data and adding report_id
     const formData: FormData = new FormData();
@@ -145,7 +145,7 @@ export class SchedH1Component implements OnInit {
     if (reportType === null || typeof reportType === 'undefined') {
       reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
     }
-    console.log(reportType);
+    //console.log(reportType);
     if (reportType.hasOwnProperty('reportId')) {
       h1_obj['report_id'] = reportType.reportId;
       // formData.append('report_id', reportType.reportId);
@@ -153,7 +153,7 @@ export class SchedH1Component implements OnInit {
       // formData.append('report_id', reportType.reportid);
       h1_obj['report_id'] = reportType.reportid;
     }
-    console.log(reportType.reportid)
+    //console.log(reportType.reportid)
     // formData.append('federal_percent', '0.45');
     // formData.append('non_federal_percent', '0.55');
     // h1_obj['report_id'] = '121';
@@ -195,7 +195,7 @@ export class SchedH1Component implements OnInit {
         headers: httpOptions
       }).subscribe(
         res => {
-          console.log(res);
+          //console.log(res);
           f.value.message = 'h1 saved.'
           f.reset();
           this.previousStep();
@@ -207,7 +207,7 @@ export class SchedH1Component implements OnInit {
         headers: httpOptions
       }).subscribe(
         res => {
-          console.log(res);
+          //console.log(res);
           f.value.message = 'h1 saved.'
           f.reset();
           //also reset this.transaction_id so future transactions dont accidentally use it.
@@ -348,7 +348,7 @@ export class SchedH1Component implements OnInit {
     })
     .pipe(map(res => {
       if (res) {
-        console.log('Get H1 res: ', res);
+        //console.log('Get H1 res: ', res);
         return res;
       }
       return false;
@@ -456,7 +456,7 @@ export class SchedH1Component implements OnInit {
     })
     .pipe(map(res => {
       if (res) {
-        console.log('Get H1 Pac res: ', res);
+        //console.log('Get H1 Pac res: ', res);
         return res;
       }
       return false;

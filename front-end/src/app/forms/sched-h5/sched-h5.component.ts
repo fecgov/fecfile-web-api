@@ -1,6 +1,6 @@
 import { SchedHServiceService } from './../sched-h-service/sched-h-service.service';
 import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -38,7 +38,7 @@ import {
   styleUrls: ['./sched-h5.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
@@ -48,7 +48,7 @@ import {
         animate(0, style({ opacity: 0 }))
       ])
     ])
-  ]
+  ] */
 })
 export class SchedH5Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionTypeText: string;
@@ -213,7 +213,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     //this.transactionTypeText = 'Coordinated Party Expenditure Debt to Vendor';
     super.ngOnChanges(null);
     this._setTransactionDetail();
-    console.log();
+    //console.log();
 
     // temp code - waiting until dynamic forms completes and loads the formGroup
     // before rendering the static fields, otherwise validation error styling

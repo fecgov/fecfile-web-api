@@ -1,4 +1,4 @@
-import { Component, EventEmitter, ElementRef, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, ElementRef, Input, OnInit, Output, SimpleChanges , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -95,7 +95,7 @@ export class ReportTypeSidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     if (this.selectedReport !== null) {
-      // console.log('this.selectedReport: ', this.selectedReport);
+      // //console.log('this.selectedReport: ', this.selectedReport);
       if (this.selectedReport.hasOwnProperty('regular_special_report_ind')) {
         if (typeof this.selectedReport.regular_special_report_ind === 'string') {
           this._reportType = this.selectedReport.regular_special_report_ind;

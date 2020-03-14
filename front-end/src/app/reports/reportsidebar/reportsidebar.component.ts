@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList , ChangeDetectionStrategy } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ReportsMessageService } from '../service/reports-message.service';
@@ -19,7 +19,7 @@ import { ActiveView } from '../reportheader/reportheader.component';
   templateUrl: './reportsidebar.component.html',
   styleUrls: ['./reportsidebar.component.scss'],
   providers: [NgbTooltipConfig, OrderByPipe],
-  animations: [
+  /* animations: [
     trigger('openClose', [
       state('open', style({
         'max-height': '500px', // Set high to handle multiple scenarios.
@@ -68,7 +68,7 @@ import { ActiveView } from '../reportheader/reportheader.component';
         animate('.5s ease')
       ]),
     ]),
-  ]
+  ] */
 })
 export class ReportsidebarComponent implements OnInit {
 
@@ -371,7 +371,7 @@ export class ReportsidebarComponent implements OnInit {
     }
 
     filters.show = modified;
-    console.log("applyFilters filters = ", filters)
+    //console.log("applyFilters filters = ", filters)
     this._reportsMessageService.sendApplyFiltersMessage(filters);
   }
 

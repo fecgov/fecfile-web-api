@@ -7,7 +7,7 @@ import {
   Input,
   SimpleChanges,
   OnChanges
-} from '@angular/core';
+, ChangeDetectionStrategy } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
@@ -36,12 +36,12 @@ export enum DebtSumarysActions {
   styleUrls: ['./debt-summary.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [DebtSummaryService],
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
       transition(':leave', [animate(0, style({ opacity: 0 }))])
     ])
-  ]
+  ] */
 })
 export class DebtSummaryComponent implements OnInit, OnChanges {
   @Input()

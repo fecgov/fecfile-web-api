@@ -1,5 +1,6 @@
+import { Subscription } from 'rxjs/Subscription';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
@@ -54,6 +55,7 @@ export class TransactionSidebarComponent implements OnInit {
   public cashOnHand: CashOnHandModel;
 
   private onDestroy$ = new Subject();
+  routesSubscription: Subscription;
 
   constructor(
     private _config: NgbTooltipConfig,
@@ -70,7 +72,7 @@ export class TransactionSidebarComponent implements OnInit {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
+    this.routesSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       if (p.transactionCategory) {
         this.itemSelected = p.transactionCategory;
       }
@@ -91,7 +93,7 @@ export class TransactionSidebarComponent implements OnInit {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
-    this._transactionTypeService.getTransactionCategories(this._formType).subscribe(res => {
+    this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
         this.cashOnHand = res.data.cashOnHand;
@@ -127,7 +129,7 @@ export class TransactionSidebarComponent implements OnInit {
 
   ngDoCheck(): void {
     //Could this be causing memory leak, memory bloating ? TODO - Investigate. 
-    this._messageService.getMessage().subscribe(res => {
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(res => {
       if (res) {
         if (res.hasOwnProperty('formType')) {
           if (typeof res.formType === 'string') {
@@ -229,6 +231,7 @@ export class TransactionSidebarComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
+    this.routesSubscription.unsubscribe();
     this._messageService.clearMessage();
   }
 

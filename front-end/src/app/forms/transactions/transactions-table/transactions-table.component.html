@@ -46,58 +46,58 @@
       <thead>
         <tr>
           <th class="transactions__table-checkbox">
-            <input [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox" (change)="changeAllTransactionsSelected()">
+            <input  [(ngModel)]="allTransactionsSelected" type="checkbox" (change)="changeAllTransactionsSelected()">
           </th>
-          <th [@fadeInOut] *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
+          <th  *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
+          <th  *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
+          <th  *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
+          <th  *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
+          <th  *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
             Street
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
+          <th  *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
+          <th  *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
             State
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
+          <th  *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
+          <th  *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
           </th>
-        <!--<th [@fadeInOut] *ngIf="isColumnVisible('aggregate')" [class]="getSortClass('aggregate')"
+        <!--<th  *ngIf="isColumnVisible('aggregate')" [class]="getSortClass('aggregate')"
             (click)="changeSortDirection('aggregate')">Aggregate
           </th>-->
-          <th [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
+          <th  *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
             (click)="changeSortDirection('purposeDescription')">Purpose Description
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('contributorEmployer')" [class]="getSortClass('contributorEmployer')"
+          <th  *ngIf="isColumnVisible('contributorEmployer')" [class]="getSortClass('contributorEmployer')"
             (click)="changeSortDirection('contributorEmployer')">Contributor Employer
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('contributorOccupation')" [class]="getSortClass('contributorOccupation')"
+          <th  *ngIf="isColumnVisible('contributorOccupation')" [class]="getSortClass('contributorOccupation')"
             (click)="changeSortDirection('contributorOccupation')">Contributor Occupation
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
+          <th  *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
             (click)="changeSortDirection('memoCode')">Memo
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
+          <th  *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
             (click)="changeSortDirection('memoText')">Memo Text/Description
           </th>
-          <th [@fadeInOut] *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')"
+          <th  *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')"
             (click)="changeSortDirection('deletedate')">Deleted Date
           </th>
-          <th [@fadeInOut] *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
+          <th  *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
             Amount
           </th>        
-          <th [@fadeInOut] *ngIf="isColumnVisible('aggregate')" [class]="getSortClass('aggregate')"
+          <th  *ngIf="isColumnVisible('aggregate')" [class]="getSortClass('aggregate')"
             (click)="changeSortDirection('aggregate')">Aggregate
           </th>
           <th class="bulk_action">
             <div *ngIf="editMode">
-              <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+              <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                 aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
                   [disabled]="bulkActionDisabled">
@@ -121,7 +121,7 @@
                 <i class="ellipsis-icon"></i>
               </button>
             </div>
-            <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+            <div  *ngIf="isRecycleBinViewActive()">
               <button class="btn btn-sm btn-primary transactions__bulk_action_btn" (click)="deleteRecyleBin()"
                 [disabled]="bulkActionDisabled">
                 <i class="trash-icon"></i>
@@ -137,31 +137,31 @@
             <td>
               <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
-            <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('type')">{{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
-            <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" 
+            <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
+            <td  *ngIf="isColumnVisible('type')">{{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+            <td  *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+            <td  [ngClass]="trx.child ? 'parent': ''" 
                 (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''" *ngIf="isColumnVisible('name')">{{trx.name}}
                 <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
             </td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('contributorEmployer')">{{trx.contributorEmployer}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('contributorOccupation')">{{trx.contributorOccupation}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
-            <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+            <td  *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
+            <td  *ngIf="isColumnVisible('city')">{{trx.city}}</td>
+            <td  *ngIf="isColumnVisible('state')">{{trx.state}}</td>
+            <td  *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
+            <td  *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
+            <td  *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
+            <td  *ngIf="isColumnVisible('contributorEmployer')">{{trx.contributorEmployer}}</td>
+            <td  *ngIf="isColumnVisible('contributorOccupation')">{{trx.contributorOccupation}}</td>
+            <td  *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
+            <td  *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+            <td  *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
+            <td  *ngIf="isColumnVisible('amount')" class="transactions__amount">
               {{trx.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
             </td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('aggregate')" class="transactions__amount">
+            <td  *ngIf="isColumnVisible('aggregate')" class="transactions__amount">
               {{trx.aggregate | currency:'USD':'symbol-narrow':'1.2-2'}}
             <td>
-              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+              <div  *ngIf="isRecycleBinViewActive()">
                 <span [title]="!trx.iseditable ? 'This transaction cannot be restored because it is auto generated.': ''">
                   <button class="btn btn-sm btn-primary" [disabled]="!trx.iseditable" (click)="restoreTransaction(trx)">
                     <i class="undo-icon"></i>
@@ -169,7 +169,7 @@
                 </span>
               </div>
               <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
-                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                     <i class="ellipsis-icon"></i>
@@ -214,28 +214,28 @@
             <td style="padding-left: 1.5rem;">
               <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
             </td>
-            <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('contributorEmployer')">{{trxChild.contributorEmployer}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('contributorOccupation')">{{trxChild.contributorOccupation}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
-            <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+            <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
+            <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+            <td  *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
+            <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
+            <td  *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
+            <td  *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
+            <td  *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
+            <td  *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
+            <td  *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
+            <td  *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
+            <td  *ngIf="isColumnVisible('contributorEmployer')">{{trxChild.contributorEmployer}}</td>
+            <td  *ngIf="isColumnVisible('contributorOccupation')">{{trxChild.contributorOccupation}}</td>
+            <td  *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
+            <td  *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
+            <td  *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
+            <td  *ngIf="isColumnVisible('amount')" class="transactions__amount">
               {{trxChild.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
             </td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('aggregate')" class="transactions__amount">
+            <td  *ngIf="isColumnVisible('aggregate')" class="transactions__amount">
               {{trxChild.aggregate | currency:'USD':'symbol-narrow':'1.2-2'}}
             <td>
-              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+              <div  *ngIf="isRecycleBinViewActive()">
                 <span [title]="!trxChild.iseditable ? 'This transaction cannot be restored because it is either auto-generated or its parent is in deleted state.': ''">
                   <button class="btn btn-sm btn-primary" [disabled]="!trxChild.isEditable" (click)="restoreTransaction(trxChild)">
                     <i class="undo-icon"></i>
@@ -243,7 +243,7 @@
                 </span>
               </div>
               <div *ngIf="!_allTransactions || (_allTransactions && trxChild.reportstatus !== 'Filed')">
-                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                     <i class="ellipsis-icon"></i>
@@ -300,7 +300,7 @@
           <td *ngIf="isColumnVisible('memoCode')"></td>
           <td *ngIf="isColumnVisible('memoText')"></td>
           <td *ngIf="isRecycleBinViewActive()"></td>
-          <td [@fadeInOut] *ngIf="isColumnVisible('amount')">
+          <td  *ngIf="isColumnVisible('amount')">
               <div class="transactions__total-amount-container">
                 <div class="transactions__total-amount">
                   <b>Total</b>
@@ -334,56 +334,56 @@
           <tr>
             <th class="transactions__table-checkbox">
               <input 
-                [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
+                 [(ngModel)]="allTransactionsSelected" type="checkbox"
                 (change)="changeAllTransactionsSelected()">
             </th>
-            <th [@fadeInOut] *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
+            <th  *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
+            <th  *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Type
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
+            <th  *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
+            <th  *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
+            <th  *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
               (click)="changeSortDirection('memoCode')">Memo
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
+            <th  *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
                 Amount
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
+            <th  *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
               (click)="changeSortDirection('purposeDescription')">Purpose
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
+            <th  *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
               </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
+            <th  *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
               Street
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
+            <th  *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
+            <th  *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
               State
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
+            <th  *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
+            <th  *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
               (click)="changeSortDirection('memoText')">Memo Text
             </th>
-            <th [@fadeInOut] *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')"
+            <th  *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')"
             (click)="changeSortDirection('deletedDate')">Deleted Date
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('committeeId')" [class]="getSortClass('committeeId')"
+            <th  *ngIf="isColumnVisible('committeeId')" [class]="getSortClass('committeeId')"
               (click)="changeSortDirection('committeeId')">Donor Committee ID
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('electionCode')" [class]="getSortClass('electionCode')"
+            <th  *ngIf="isColumnVisible('electionCode')" [class]="getSortClass('electionCode')"
               (click)="changeSortDirection('electionCode')">Election Code
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('electionYear')" [class]="getSortClass('electionYear')"
+            <th  *ngIf="isColumnVisible('electionYear')" [class]="getSortClass('electionYear')"
               (click)="changeSortDirection('electionYear')">Election Year
             </th>
             <th class="bulk_action">
               <div *ngIf="editMode">
-                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
                     [disabled]="bulkActionDisabled">
@@ -408,7 +408,7 @@
                   <i class="ellipsis-icon"></i>
                 </button>
               </div>
-              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+              <div  *ngIf="isRecycleBinViewActive()">
                 <button class="btn btn-sm btn-primary transactions__bulk_action_btn" 
                   (click)="deleteRecyleBin()"
                   [disabled]="bulkActionDisabled">
@@ -425,31 +425,31 @@
               <td>
                 <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
               </td>
-              <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('type')">
+              <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
+              <td  *ngIf="isColumnVisible('type')">
                 {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
-              <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
+              <td  [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
                 *ngIf="isColumnVisible('name')">{{trx.name}}
                 <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
               </td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+              <td  *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
+              <td  *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
+              <td  *ngIf="isColumnVisible('amount')" class="transactions__amount">
                 {{trx.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
               </td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
-              <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trx.electionCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trx.electionYear}}</td>
+              <td  *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
+              <td  *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+              <td  *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
+              <td  *ngIf="isColumnVisible('city')">{{trx.city}}</td>
+              <td  *ngIf="isColumnVisible('state')">{{trx.state}}</td>
+              <td  *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
+              <td  *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+              <td  *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
+              <td  *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
+              <td  *ngIf="isColumnVisible('electionCode')">{{trx.electionCode}}</td>
+              <td  *ngIf="isColumnVisible('electionYear')">{{trx.electionYear}}</td>
               <td>
-                <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <div  *ngIf="isRecycleBinViewActive()">
                   <span [title]="!trx.iseditable ? 'This transaction cannot be restored because it is auto generated.': ''">
                     <button class="btn btn-sm btn-primary" [disabled]="!trx.iseditable" (click)="restoreTransaction(trx)">
                       <i class="undo-icon"></i>
@@ -457,7 +457,7 @@
                   </span>
                 </div>
                 <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
-                  <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                       <i class="ellipsis-icon"></i>
@@ -503,27 +503,27 @@
               <td style="padding-left: 1.5rem;">
                 <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
               </td>
-              <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+              <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
+              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+              <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
+              <td  *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
+              <td  *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
+              <td  *ngIf="isColumnVisible('amount')" class="transactions__amount">
                   {{trxChild.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
                 </td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
-              <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('electionCode')">{{trxChild.electionCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('electionYear')">{{trxChild.electionYear}}</td>
+              <td  *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
+              <td  *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
+              <td  *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
+              <td  *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
+              <td  *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
+              <td  *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
+              <td  *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
+              <td  *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
+              <td  *ngIf="isColumnVisible('committeeId')">{{committeeDetails.committeeid}}</td>
+              <td  *ngIf="isColumnVisible('electionCode')">{{trxChild.electionCode}}</td>
+              <td  *ngIf="isColumnVisible('electionYear')">{{trxChild.electionYear}}</td>
               <td>
-                <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <div  *ngIf="isRecycleBinViewActive()">
                   <span [title]="!trxChild.iseditable ? 'This transaction cannot be restored because it is either auto-generated or its parent is in deleted state.': ''">
                     <button class="btn btn-sm btn-primary" [disabled]="!trxChild.isEditable" (click)="restoreTransaction(trxChild)">
                       <i class="undo-icon"></i>
@@ -531,7 +531,7 @@
                   </span>
                 </div>
                 <div *ngIf="!_allTransactions || (_allTransactions && trxChild.reportstatus !== 'Filed')">
-                  <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                       <i class="ellipsis-icon"></i>
@@ -571,7 +571,7 @@
             <td *ngIf="isColumnVisible('name')"></td>
             <td *ngIf="isColumnVisible('date')"></td>
             <td *ngIf="isColumnVisible('memoCode')"></td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('amount')">
+            <td  *ngIf="isColumnVisible('amount')">
                 <div class="transactions__total-amount-container">
                   <div class="transactions__total-amount">
                     <b>Total</b>
@@ -609,71 +609,71 @@
           <tr>
             <th class="transactions__table-checkbox">
               <input 
-                [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
+                 [(ngModel)]="allTransactionsSelected" type="checkbox"
                 (change)="changeAllTransactionsSelected()">
             </th>
-            <th [@fadeInOut] *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
+            <th  *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Transaction Type
+            <th  *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Transaction Type
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
+            <th  *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
+            <th  *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
+            <th  *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
               (click)="changeSortDirection('memoCode')">Memo
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('loanBeginningBalance')" [class]="getSortClass('loanBeginningBalance')" (click)="changeSortDirection('loanBeginningBalance')">
+            <th  *ngIf="isColumnVisible('loanBeginningBalance')" [class]="getSortClass('loanBeginningBalance')" (click)="changeSortDirection('loanBeginningBalance')">
               Beginning Balance (D)
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
+            <th  *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
               (click)="changeSortDirection('purposeDescription')">Purpose of Debt (D)
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
+            <th  *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
               </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
+            <th  *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
               Street
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
+            <th  *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
+            <th  *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
               State
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
+            <th  *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
+            <th  *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
               (click)="changeSortDirection('memoText')">Memo/Text Description
             </th>
-            <th [@fadeInOut] *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')"
+            <th  *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')"
               (click)="changeSortDirection('deletedDate')">Deleted Date
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('loanIncurredAmt')" [class]="getSortClass('loanIncurredAmt')"
+            <th  *ngIf="isColumnVisible('loanIncurredAmt')" [class]="getSortClass('loanIncurredAmt')"
               (click)="changeSortDirection('loanIncurredAmt')">Incurred Amount (D)
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('loanPaymentAmt')" [class]="getSortClass('loanPaymentAmt')"
+            <th  *ngIf="isColumnVisible('loanPaymentAmt')" [class]="getSortClass('loanPaymentAmt')"
               (click)="changeSortDirection('loanPaymentAmt')">Payment Amount (D)
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('loanClosingBalance')" [class]="getSortClass('loanClosingBalance')"
+            <th  *ngIf="isColumnVisible('loanClosingBalance')" [class]="getSortClass('loanClosingBalance')"
               (click)="changeSortDirection('loanClosingBalance')">Balance at Close (D)
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('loanAmount')" [class]="getSortClass('loanAmount')"
+            <th  *ngIf="isColumnVisible('loanAmount')" [class]="getSortClass('loanAmount')"
               (click)="changeSortDirection('loanAmount')">Loan Amount (C)
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('loanPaymentToDate')" [class]="getSortClass('loanPaymentToDate')"
+            <th  *ngIf="isColumnVisible('loanPaymentToDate')" [class]="getSortClass('loanPaymentToDate')"
               (click)="changeSortDirection('loanPaymentToDate')">Loan Payment to Date (C)
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('loanBalance')" [class]="getSortClass('loanBalance')"
+            <th  *ngIf="isColumnVisible('loanBalance')" [class]="getSortClass('loanBalance')"
               (click)="changeSortDirection('loanBalance')">Loan Balance (C)
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('loanIncurredDate')" [class]="getSortClass('loanIncurredDate')"
+            <th  *ngIf="isColumnVisible('loanIncurredDate')" [class]="getSortClass('loanIncurredDate')"
               (click)="changeSortDirection('loanIncurredDate')">Loan Incurred Date (C)
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('loanDueDate')" [class]="getSortClass('loanDueDate')"
+            <th  *ngIf="isColumnVisible('loanDueDate')" [class]="getSortClass('loanDueDate')"
               (click)="changeSortDirection('loanDueDate')">Loan Due Date (C)
             </th>
             <th class="bulk_action">
               <div *ngIf="editMode">
-                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
                     [disabled]="bulkActionDisabled">
@@ -697,7 +697,7 @@
                   <i class="ellipsis-icon"></i>
                 </button>
               </div>
-              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+              <div  *ngIf="isRecycleBinViewActive()">
                 <button class="btn btn-sm btn-primary transactions__bulk_action_btn" 
                   (click)="deleteRecyleBin()"
                   [disabled]="bulkActionDisabled">
@@ -713,44 +713,44 @@
               <td>
                 <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
               </td>
-              <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('type')">
+              <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
+              <td  *ngIf="isColumnVisible('type')">
                 {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
               
-              <td [@fadeInOut] [ngClass]="showRow(trx,'sched_c1') || showRow(trx,'sched_c2') ? 'parent': ''" 
+              <td  [ngClass]="showRow(trx,'sched_c1') || showRow(trx,'sched_c2') ? 'parent': ''" 
               (click)="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE') ? trx.toggleChild = !trx.toggleChild: ''"
                 *ngIf="isColumnVisible('name')">{{trx.name}}
                 <div *ngIf="showRow(trx,'sched_c1') || showRow(trx,'sched_c2')" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
               </td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('loanBeginningBalance')" class="transactions__amount">
+              <td  *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
+              <td  *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
+              <td  *ngIf="isColumnVisible('loanBeginningBalance')" class="transactions__amount">
                 {{trx.loanBeginningBalance | currency:'USD':'symbol-narrow':'1.2-2'}}
               </td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
-              <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('loanIncurredAmt')">{{trx.loanIncurredAmt | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('loanPaymentAmt')">{{trx.loanPaymentAmt | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('loanClosingBalance')">{{trx.loanClosingBalance | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('loanAmount')">{{trx.loanAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('loanPaymentToDate')">{{trx.loanPaymentToDate}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('loanBalance')">{{trx.loanBalance | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('loanIncurredDate')">{{trx.loanIncurredDate | date: 'MM/dd/yyyy'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('loanDueDate')">{{trx.loanDueDate}}</td>
+              <td  *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
+              <td  *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+              <td  *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
+              <td  *ngIf="isColumnVisible('city')">{{trx.city}}</td>
+              <td  *ngIf="isColumnVisible('state')">{{trx.state}}</td>
+              <td  *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
+              <td  *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+              <td  *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
+              <td  *ngIf="isColumnVisible('loanIncurredAmt')">{{trx.loanIncurredAmt | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+              <td  *ngIf="isColumnVisible('loanPaymentAmt')">{{trx.loanPaymentAmt | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+              <td  *ngIf="isColumnVisible('loanClosingBalance')">{{trx.loanClosingBalance | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+              <td  *ngIf="isColumnVisible('loanAmount')">{{trx.loanAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+              <td  *ngIf="isColumnVisible('loanPaymentToDate')">{{trx.loanPaymentToDate}}</td>
+              <td  *ngIf="isColumnVisible('loanBalance')">{{trx.loanBalance | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+              <td  *ngIf="isColumnVisible('loanIncurredDate')">{{trx.loanIncurredDate | date: 'MM/dd/yyyy'}}</td>
+              <td  *ngIf="isColumnVisible('loanDueDate')">{{trx.loanDueDate}}</td>
               <td>
-                <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <div  *ngIf="isRecycleBinViewActive()">
                   <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
                     <i class="undo-icon"></i>
                   </button>
                 </div>
                 <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
-                  <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                       <i class="ellipsis-icon"></i>
@@ -787,7 +787,7 @@
               class="child-bg">
               <td style="padding-left: 70px;" colspan="5">Schedule C1</td>
               <td>
-                <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -804,7 +804,7 @@
             class="child-bg">
             <td style="padding-left: 70px;" colspan="5">Endorsers</td>
             <td>
-              <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+              <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
                   <i class="ellipsis-icon"></i>
                 </button>
@@ -834,7 +834,7 @@
             <td *ngIf="isColumnVisible('memoCode')"></td>
             <td *ngIf="isColumnVisible('memoText')"></td>
             <td *ngIf="isRecycleBinViewActive()"></td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('amount')">
+            <td  *ngIf="isColumnVisible('amount')">
                 <div class="transactions__total-amount-container">
                   <div class="transactions__total-amount">
                     <b>Total</b>
@@ -864,49 +864,49 @@
           <tr>
             <th class="transactions__table-checkbox">
               <input 
-                [@fadeInOut] [(ngModel)]="allTransactionsSelected" type="checkbox"
+                 [(ngModel)]="allTransactionsSelected" type="checkbox"
                 (change)="changeAllTransactionsSelected()">
             </th>
-            <th [@fadeInOut] *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
+            <th  *ngIf="_allTransactions" [class]="getSortClass('reportType')" (click)="changeSortDirection('reportType')">Report Type
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('schedule')" [class]="getSortClass('schedule')" (click)="changeSortDirection('schedule')">Schedule
+            <th  *ngIf="isColumnVisible('schedule')" [class]="getSortClass('schedule')" (click)="changeSortDirection('schedule')">Schedule
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Transaction Type
+            <th  *ngIf="isColumnVisible('type')" [class]="getSortClass('type')" (click)="changeSortDirection('type')">Transaction Type
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
+            <th  *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
+            <th  *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
+            <th  *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
               (click)="changeSortDirection('memoCode')">Memo
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
+            <th  *ngIf="isColumnVisible('amount')" [class]="getSortClass('amount')" (click)="changeSortDirection('amount')">
                 Amount
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
+            <th  *ngIf="isColumnVisible('purposeDescription')" [class]="getSortClass('purposeDescription')"
               (click)="changeSortDirection('purposeDescription')">Purpose
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
+            <th  *ngIf="isColumnVisible('transactionId')" [class]="getSortClass('transactionId')" (click)="changeSortDirection('transactionId')">Transaction Id
               </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
+            <th  *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">
               Street
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
+            <th  *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
+            <th  *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
               State
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
+            <th  *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
+            <th  *ngIf="isColumnVisible('memoText')" [class]="getSortClass('memoText')"
               (click)="changeSortDirection('memoText')">Memo Text
             </th>
-            <th [@fadeInOut] *ngIf="isColumnVisible('eventId')" [class]="getSortClass('eventId')"
+            <th  *ngIf="isColumnVisible('eventId')" [class]="getSortClass('eventId')"
               (click)="changeSortDirection('eventId')">Activity or Event Identifier
             </th>
             <th class="bulk_action">
               <div *ngIf="editMode">
-                <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
                     [disabled]="bulkActionDisabled">
@@ -926,14 +926,14 @@
                 </div>
               </div>
               <div *ngIf="!editMode">
-                  <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group"role="group"
+                  <div  *ngIf="isTransactionViewActive()" class="btn-group"role="group"
                   aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                   <i class="ellipsis-icon"></i>
                 </button>
                 </div>
               </div>
-              <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+              <div  *ngIf="isRecycleBinViewActive()">
                 <button class="btn btn-sm btn-primary transactions__bulk_action_btn" 
                   (click)="deleteRecyleBin()"
                   [disabled]="bulkActionDisabled">
@@ -950,29 +950,29 @@
               <td>
                 <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
               </td>
-              <td [@fadeInOut] *ngIf="_allTransactions">{{trx.reportType}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trx.scheduleType}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('type')">
+              <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
+              <td  *ngIf="isColumnVisible('schedule')">{{trx.scheduleType}}</td>
+              <td  *ngIf="isColumnVisible('type')">
                 {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
-              <td [@fadeInOut] [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
+              <td  [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
                 *ngIf="isColumnVisible('name')">{{trx.name}}
                 <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
               </td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+              <td  *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
+              <td  *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
+              <td  *ngIf="isColumnVisible('amount')" class="transactions__amount">
                 {{(trx.transactionTypeIdentifier === 'ALLOC_H1' || trx.transactionTypeIdentifier === 'ALLOC_H2_RATIO') ? '' : (trx.amount | currency:'USD':'symbol-narrow':'1.2-2')}}
               </td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trx.city}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trx.state}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('eventId')">{{trx.eventId}}</td>
+              <td  *ngIf="isColumnVisible('purposeDescription')">{{trx.purposeDescription}}</td>
+              <td  *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
+              <td  *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
+              <td  *ngIf="isColumnVisible('city')">{{trx.city}}</td>
+              <td  *ngIf="isColumnVisible('state')">{{trx.state}}</td>
+              <td  *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
+              <td  *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
+              <td  *ngIf="isColumnVisible('eventId')">{{trx.eventId}}</td>
               <td>
-                <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <div  *ngIf="isRecycleBinViewActive()">
                   <span [title]="!trx.iseditable ? 'This transaction cannot be restored because a linked transaction is also in deleted state. 
                   Please restore the linked transaction first.': ''">
                     <button class="btn btn-sm btn-primary" [disabled]="!trx.iseditable" (click)="restoreTransaction(trx)">
@@ -981,7 +981,7 @@
                   </span>
                 </div>
                 <div *ngIf="editMode">
-                  <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                       <i class="ellipsis-icon"></i>
@@ -1021,25 +1021,25 @@
               <td style="padding-left: 1.5rem;">
                 <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
               </td>
-              <td [@fadeInOut] *ngIf="_allTransactions">{{trxChild.reportType}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('schedule')">{{trxChild.scheduleType}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('amount')" class="transactions__amount">
+              <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
+              <td  *ngIf="isColumnVisible('schedule')">{{trxChild.scheduleType}}</td>
+              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+              <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
+              <td  *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
+              <td  *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
+              <td  *ngIf="isColumnVisible('amount')" class="transactions__amount">
                 {{trxChild.amount | currency:'USD':'symbol-narrow':'1.2-2'}}
               </td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
-              <td [@fadeInOut] *ngIf="isColumnVisible('eventId')">{{trxChild.eventId}}</td>
+              <td  *ngIf="isColumnVisible('purposeDescription')">{{trxChild.purposeDescription}}</td>
+              <td  *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
+              <td  *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
+              <td  *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
+              <td  *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
+              <td  *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
+              <td  *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
+              <td  *ngIf="isColumnVisible('eventId')">{{trxChild.eventId}}</td>
               <td>
-                <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <div  *ngIf="isRecycleBinViewActive()">
                   <span [title]="!trxChild.iseditable ? 'This transaction cannot be restored because it is either auto-generated or its parent is in deleted state.': ''">
                     <button class="btn btn-sm btn-primary" [disabled]="!trxChild.isEditable" (click)="restoreTransaction(trxChild)">
                       <i class="undo-icon"></i>
@@ -1047,7 +1047,7 @@
                   </span>
                 </div>
                 <div *ngIf="editMode">
-                  <div [@fadeInOut] *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                  <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                       <i class="ellipsis-icon"></i>
@@ -1088,7 +1088,7 @@
             <td *ngIf="isColumnVisible('name')"></td>
             <td *ngIf="isColumnVisible('date')"></td>
             <td *ngIf="isColumnVisible('memoCode')"></td>
-            <td [@fadeInOut] *ngIf="isColumnVisible('amount')">
+            <td  *ngIf="isColumnVisible('amount')">
               <div class="transactions__total-amount-container">
                 <div class="transactions__total-amount">
                   <b>Total</b>

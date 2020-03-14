@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -44,7 +44,7 @@ export class SchedH3Service {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('H3 ActivityOrEventIdentifiers res: ', res);
+            //console.log('H3 ActivityOrEventIdentifiers res: ', res);
             return res;
           }
           return false;
@@ -74,7 +74,7 @@ export class SchedH3Service {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('H3 Totdal Amount res: ', res);
+            //console.log('H3 Totdal Amount res: ', res);
             return res;
           }
           return false;
@@ -104,7 +104,7 @@ export class SchedH3Service {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('H3 Summary res: ', res);
+            //console.log('H3 Summary res: ', res);
             return res;
           }
           return false;
@@ -133,7 +133,7 @@ export class SchedH3Service {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('H3 Breakdown res: ', res);
+            //console.log('H3 Breakdown res: ', res);
             return res;
           }
           return false;
@@ -168,7 +168,7 @@ export class SchedH3Service {
         )
         .pipe(map(res => {
             if (res) {
-              console.log('Save H3Ratio res: ', res);
+              //console.log('Save H3Ratio res: ', res);
               return res;
             }
             return false;
@@ -184,7 +184,7 @@ export class SchedH3Service {
         )
         .pipe(map(res => {
             if (res) {
-              console.log('Edit H3Ratio res: ', res);
+              //console.log('Edit H3Ratio res: ', res);
               return res;
             }
             return false;
@@ -220,7 +220,7 @@ export class SchedH3Service {
         )
         .pipe(map(res => {
             if (res) {
-              console.log('Save H3Ratio res: ', res);
+              //console.log('Save H3Ratio res: ', res);
 
               //get summary
               //this.getSummary(reportId);
@@ -249,7 +249,7 @@ export class SchedH3Service {
         )
         .pipe(map(res => {
             if (res) {
-              console.log('Edit H3Ratio res: ', res);
+              //console.log('Edit H3Ratio res: ', res);
 
               //get summary
               //this.getSummary(reportId);
@@ -296,7 +296,7 @@ export class SchedH3Service {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('H3 Aggregate Amount res: ', res);
+            //console.log('H3 Aggregate Amount res: ', res);
             return res;
           }
           return false;
@@ -335,7 +335,7 @@ export class SchedH3Service {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('Validate H1 H2 exist res: ', res);
+            //console.log('Validate H1 H2 exist res: ', res);
             return res;
           }
           return false;
@@ -365,7 +365,7 @@ export class SchedH3Service {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('H3 account name res: ', res);
+            //console.log('H3 account name res: ', res);
             return res;
           }
           return false;

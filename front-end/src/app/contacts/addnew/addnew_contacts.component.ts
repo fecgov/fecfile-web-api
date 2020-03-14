@@ -1,6 +1,6 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -149,13 +149,13 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
 
   public debug(obj: any): void {
-    console.log('obj: ', obj);
+    //console.log('obj: ', obj);
   }
 
 
   private _setForm(fields: any): void {
     const formGroup: any = [];
-    console.log('_setForm fields ', fields);
+    //console.log('_setForm fields ', fields);
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
@@ -386,7 +386,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    */
   
    /*public handleStateChange(stateOption: any, col: any) {
-    console.log("handleStateChange stateOption", stateOption);
+    //console.log("handleStateChange stateOption", stateOption);
     if (this._selectedEntity) {
       //this.showWarn(col.text);
       this.frmContact.patchValue({ state: this._selectedEntity.state }, { onlySelf: true });
@@ -398,7 +398,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           stateCode = stateCode.trim();
           if (stateCode.length > 1) {
             stateCode = stateCode.substring(0, 2);
-            console.log(" handleStateChange stateCode", stateCode);
+            //console.log(" handleStateChange stateCode", stateCode);
           }
         }
       }
@@ -488,7 +488,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }
 
   /*public handleTypeChange(entityOption: any, col: any) {
-    console.log("handleTypeChange entityOption", entityOption);
+    //console.log("handleTypeChange entityOption", entityOption);
     if (this._selectedEntity) {
       //this.showWarn(col.text);
       this.frmContact.patchValue({ entityType: this._selectedEntity.entityType }, { onlySelf: true });
@@ -500,7 +500,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
           entityCode = entityCode.trim();
           if (entityCode.length > 1) {
             entityCode = entityCode.substring(0, 3 );
-            console.log(" handleTypeChange entityCode", entityCode);
+            //console.log(" handleTypeChange entityCode", entityCode);
             this.frmContact.patchValue({ entityType: entityCode }, { onlySelf: true });
             this._entityType = entityCode;
             this.loadDynamiceFormFields();
@@ -512,7 +512,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   }*/
 
   public handleTypeChange(entityOption: any, col: any) {
-    console.log(" handleTypeChange entityOption", entityOption);
+    //console.log(" handleTypeChange entityOption", entityOption);
     this._entityType = entityOption.code;
     if (this._selectedEntity) {
       // this.showWarn(col.text);
@@ -1019,7 +1019,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   private getFormFields(): void {
     this._contactsService.getContactsDynamicFormFields().subscribe(res => {
       if (res) {
-        console.log('getFormFields res =', res);
+        //console.log('getFormFields res =', res);
         if (res.hasOwnProperty('data')) {
           if (typeof res.data === 'object') {
             /*if (res.data.hasOwnProperty('formFields')) {
@@ -1227,7 +1227,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
   /*public selectTypeChange(e): void {
     this._entityType = e.target.value;
     this.loadDynamiceFormFields();
-    console.log('selectTypeChange this._entityType = ', this._entityType);
+    //console.log('selectTypeChange this._entityType = ', this._entityType);
   }*/
 
   public loadDynamiceFormFields(): void {
@@ -1369,7 +1369,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       localStorage.setItem('contactObj', JSON.stringify(contactObj));
       this._contactsService.saveContact(this.scheduleAction).subscribe(res => {
         if (res) {
-          console.log('_contactsService.saveContact res', res);
+          //console.log('_contactsService.saveContact res', res);
           this._contactToEdit = null;
           this.frmContact.reset();
           this._selectedEntity = null;
@@ -1403,7 +1403,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
    * @return     {boolean}  True if able to deactivate, False otherwise.
    */
   public async canDeactivate(): Promise<boolean> {
-    console.log('value for contact back', this._formsService.HasUnsavedData('contact'))
+    //console.log('value for contact back', this._formsService.HasUnsavedData('contact'))
     if (this._formsService.HasUnsavedData('contact')) {
       let result: boolean = null;
       result = await this._dialogService

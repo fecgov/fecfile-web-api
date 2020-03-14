@@ -1,11 +1,12 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, ViewEncapsulation, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy, Output, EventEmitter, Input , ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContactsMessageService } from './service/contacts-message.service';
 import { ContactFilterModel } from './model/contacts-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 import { ContactModel } from './model/contacts.model';
 import { MessageService } from '../shared/services/MessageService/message.service';
+import { Subject } from 'rxjs';
 
 export enum ActiveView {
   contacts = 'contacts',
@@ -34,7 +35,7 @@ export enum FilterTypes {
   templateUrl: './contacts.component.html',
   styleUrls: ['./contacts.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
@@ -44,7 +45,7 @@ export enum FilterTypes {
         animate(10, style({ opacity: 0 }))
       ])
     ])
-  ]
+  ] */
 })
 export class ContactsComponent implements OnInit, OnDestroy {
   @Output() sidebarSwitch: EventEmitter<any> = new EventEmitter<any>();
@@ -82,6 +83,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
 
   private filters: ContactFilterModel = new ContactFilterModel();
   private readonly filtersLSK = 'contacts.filters';
+  private onDestroy$ = new Subject();
   private keywordGroup: any  = [];
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -154,6 +156,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
     this.applyFiltersSubscription.unsubscribe();
     this.editContactSubscription.unsubscribe();
     this.showContactSubscription.unsubscribe();
+    this.onDestroy$.next(true);
   }
 
 
@@ -275,7 +278,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
      // this.tagArray.push({type: FilterTypes.keyword, prefix: null, group: [this.searchText]});
       //this.tagArray.push({type: FilterTypes.keyword, prefix: null, group: 'Contact_Search'});
       
-      this._messageService.getMessage().subscribe(res => {
+      this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(res => {
         if (res==='Filter deleted'){
           if (this.keywordGroup.length > 0) {
             /*while (this.keywordGroup.length > 0) {
@@ -316,7 +319,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
       this.searchText = '';
     }
 
-    console.log(" before search this.tagArray =", this.tagArray);
+    //console.log(" before search this.tagArray =", this.tagArray);
     this.doSearch();
     //this.showFilters();
     this.isShowFilters = true;

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges , ChangeDetectionStrategy } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -352,7 +352,7 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public onFilerChange(change): void {
-    console.log('change %s', change);
+    //console.log('change %s', change);
     if (change === 'Y') {
       this.isDesignatedFiler = true;
       this.addValidator(this.validateDesignatedFiler, this.isDesignatedFiler);

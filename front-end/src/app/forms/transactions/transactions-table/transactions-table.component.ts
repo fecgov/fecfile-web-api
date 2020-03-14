@@ -1,5 +1,5 @@
 import { LoanService } from './../../sched-c/service/loan.service';
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { ActivatedRoute, NavigationEnd, Router, NavigationStart, RoutesRecognized } from '@angular/router';
 import { PaginationInstance } from 'ngx-pagination';
@@ -40,12 +40,12 @@ const transactionCategoryOptions = [];
     '../../../shared/partials/confirm-modal/confirm-modal.component.scss'
   ],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
       transition(':leave', [animate(0, style({ opacity: 0 }))])
     ])
-  ]
+  ] */
 })
 export class TransactionsTableComponent implements OnInit, OnDestroy {
   @ViewChild('columnOptionsModal')
@@ -187,6 +187,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   //subscriptions are piling up, causing a single api call to be made n+1 times. 
   private onDestroy$ = new Subject();
   loadDefaultReceiptsTabSubscription: Subscription;
+  routerSubscription: Subscription;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -241,8 +242,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       });
 
 
-    let routeSubscription = _activatedRoute.queryParams;
-    routeSubscription.takeUntil(this.onDestroy$).subscribe(p => {
+    this.routerSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       this.getPage(1);
       this.clonedTransaction = {};
@@ -301,7 +301,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     if (this.routeData) {
       if (this.routeData.accessedByRoute) {
         if (this.routeData.reportId) {
-          console.log('reportId for transaction accessed directly by route is ' + this.routeData.reportId);
+          //console.log('reportId for transaction accessed directly by route is ' + this.routeData.reportId);
           this.reportId = this.routeData.reportId;
           this.getPage(this.config.currentPage);
         }
@@ -349,6 +349,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.keywordFilterSearchSubscription.unsubscribe();
     this.loadTransactionsSubscription.unsubscribe();
     this.loadDefaultReceiptsTabSubscription.unsubscribe();
+    this.routerSubscription.unsubscribe();
     this.onDestroy$.next(true);
   }
 
@@ -381,7 +382,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
             if (trx.transaction_id === transactionId) {
               if (trx.hasOwnProperty('child')) {
                 for (const subTrx of trx.child) {
-                  console.log('sub tran id ' + subTrx.transaction_id);
+                  //console.log('sub tran id ' + subTrx.transaction_id);
                 }
               }
             }
@@ -504,7 +505,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.numberOfPages = res.totalPages;
         this.allTransactionsSelected = false;
       }, error => {
-        console.log('API Error occured: ' + error);
+        //console.log('API Error occured: ' + error);
         this.apiError = true;
       });
   }
@@ -851,7 +852,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   public printAllSelected(): void {
     //alert('Print all transactions is not yet supported');
-    console.log('TransactionsTableComponent printAllSelected...!');
+    //console.log('TransactionsTableComponent printAllSelected...!');
 
     let trxIds = '';
     const selectedTransactions: Array<TransactionModel> = [];
@@ -880,7 +881,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   public printPreview(): void {
-    console.log('TransactionsTableComponent printPreview...!');
+    //console.log('TransactionsTableComponent printPreview...!');
 
     this._reportTypeService.printPreview('transaction_table_screen', '3X');
   }

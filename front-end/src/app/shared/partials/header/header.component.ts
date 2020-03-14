@@ -1,4 +1,5 @@
-import { Component, ViewEncapsulation, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
+import { Component, ViewEncapsulation, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
@@ -11,9 +12,11 @@ import { AuthService } from '../../services/AuthService/auth.service';
   styleUrls: ['./header.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
+  
 
   public menuActive: boolean = false;
+  routerSubscription: Subscription;
 
   constructor(
     private _messageService: MessageService,
@@ -22,7 +25,7 @@ export class HeaderComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this._router
+    this.routerSubscription = this._router
       .events
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
@@ -53,6 +56,11 @@ export class HeaderComponent implements OnInit {
   public notImplemented() {
     alert('Page/Feature not implemented yet');
   }
+
+  ngOnDestroy(): void {
+    this.routerSubscription.unsubscribe();
+  }
+  
   public toggleMenu(): void {
     if(this.menuActive) {
       this.menuActive = false;

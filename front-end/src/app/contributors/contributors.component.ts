@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit , ChangeDetectionStrategy } from '@angular/core';
 import { FormsService } from '../shared/services/FormsService/forms.service';
 @Component({
   selector: 'app-contributors',
@@ -14,7 +14,7 @@ export class ContributorsComponent implements OnInit {
     this._formService.clearDashBoardReportFilterOptions();
     
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
-      console.log("ContributorsComponent ngOnInit...")
+      //console.log("ContributorsComponent ngOnInit...")
       this._formService.removeFormDashBoard("3X");
     }
   }

@@ -1,5 +1,5 @@
 import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -41,7 +41,7 @@ import {
   styleUrls: ['./sched-h4.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
@@ -51,7 +51,7 @@ import {
         animate(0, style({ opacity: 0 }))
       ])
     ])
-  ]
+  ] */
 })
 export class SchedH4Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() mainTransactionTypeText: string;
@@ -188,7 +188,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     //this.setDefaultValues();
 
     /*
-    console.log("this.transactionType: ", this.transactionType);
+    //console.log("this.transactionType: ", this.transactionType);
     if(this.transactionType === 'ALLOC_H4_RATIO') {
       this.transactionType = 'ALLOC_EXP_DEBT'
     }
