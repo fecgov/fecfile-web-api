@@ -1,6 +1,5 @@
 import { Subscription } from 'rxjs/Subscription';
 import { Component, ViewEncapsulation, OnInit, OnDestroy, Input, OnChanges } from '@angular/core';
-import { Component, ViewEncapsulation, OnInit, Input, OnChanges } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
