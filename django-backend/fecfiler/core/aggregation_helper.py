@@ -1552,6 +1552,37 @@ def list_all_transactions_entity(
             "The list_all_transactions_entity function is throwing an error: " + str(e)
         )
 
+def update_sa_itmization_status(data, status = None):
+    """
+    helpder function
+    """
+    transaction_type_identifier = data.get('transaction_type_identifier')
+    transaction_id = data.get('transaction_id')
+    report_id = data.get('report_id')
+    if transaction_type_identifier in ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST:
+        
+        line_number = '11AI' if status == 'Y' else '11AII'
+        
+        _sql = """
+        update public.sched_a
+        set itemized_ind = %s, line_number = %s
+        where transaction_id = %s and report_id = %s
+        """
+        parameters = [status, line_number, transaction_id, report_id]
+    else:
+        _sql = """
+        update public.sched_a
+        set itemized_ind = %s
+        where transaction_id = %s and report_id = %s
+        """
+        parameters = [status, transaction_id, report_id]
+    with connection.cursor() as cursor:
+        cursor.execute(_sql, parameters)
+        if cursor.rowcount == 0:
+            raise Exception('update itemization status failed for {}'.format(transaction_id))
+
+
+
 def get_linenumber_itemization(
     transaction_type_identifier, aggregate_amount, itemization_value, line_number
 ):
