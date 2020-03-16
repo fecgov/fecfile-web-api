@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { ContactModel } from 'src/app/contacts/model/contacts.model';
+import { ImportContactsService } from '../service/import-contacts.service';
 
 @Component({
   selector: 'app-clean-contacts',
@@ -14,9 +16,19 @@ import { trigger, transition, style, animate } from '@angular/animations';
 })
 export class CleanContactsComponent implements OnInit {
 
-  constructor() { }
+  // public contacts: Array<ContactModel>;
+  public contacts: Array<any>;
+
+  constructor(private importContactsService: ImportContactsService) { }
 
   ngOnInit() {
+    this.getContacts();
+  }
+
+  public getContacts() {
+    this.importContactsService.getDuplicates().subscribe((res: any) => {
+      this.contacts = res;
+    });
   }
 
 }

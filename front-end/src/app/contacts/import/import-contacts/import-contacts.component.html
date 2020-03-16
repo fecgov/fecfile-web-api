@@ -30,8 +30,8 @@
           (click)="showPreviousStep()">
           Previous for dev
         </button>
-        <button *ngIf="currentStep !== step4ImportDone && currentStep !== step1Upload"
-          class="btn btn-secondary btn-right" (click)="showNextStep()">
+        <!-- <button *ngIf="currentStep !== step4ImportDone && currentStep !== step1Upload" -->
+        <button *ngIf="currentStep !== step4ImportDone" class="btn btn-secondary btn-right" (click)="showNextStep()">
           Next for dev
         </button>
       </div>

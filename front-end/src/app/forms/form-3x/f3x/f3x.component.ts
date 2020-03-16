@@ -64,6 +64,7 @@ export class F3xComponent implements OnInit, OnDestroy {
   public forceChangeDetectionC1: Date;
   public forceChangeDetectionFDebtPayment: Date;
   public forceChangeDetectionDebtSummary: Date;
+  public forceChangeDetectionH1: Date;
 
   public allTransactions: boolean = false;
 
@@ -495,13 +496,13 @@ export class F3xComponent implements OnInit, OnDestroy {
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
                     prePopulateFromSchedL: e.prePopulateFromSchedL
                   });
-                }else if (e.hasOwnProperty('prePopulateFromSchedH')) {
+                } else if (e.hasOwnProperty('prePopulateFromSchedH')) {
                   this._f3xMessageService.sendPopulateFormMessage({
                     key: 'prePopulateFromSchedH',
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
                     prePopulateFromSchedH: e.prePopulateFromSchedH
                   });
-                }else if (e.hasOwnProperty('prePopulateFromSchedPARTN')) {
+                } else if (e.hasOwnProperty('prePopulateFromSchedPARTN')) {
                   this._f3xMessageService.sendPopulateFormMessage({
                     key: 'prePopulateFromSchedPARTN',
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
@@ -632,7 +633,7 @@ export class F3xComponent implements OnInit, OnDestroy {
       let reattributionId: string = null;
       let redesignationId: string = null;
       let maxAmount = transactionModel.amount;
-      if(this.scheduleAction === ScheduleActions.edit){
+      if (this.scheduleAction === ScheduleActions.edit) {
         maxAmount = transactionModel.originalAmount;
       }
       if (transactionModel.isReattribution) {
@@ -645,11 +646,11 @@ export class F3xComponent implements OnInit, OnDestroy {
         this._f3xMessageService.sendPopulateHiddenFieldsMessage({
           abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
           reattributionTransactionId: reattributionId,
-          maxAmount: maxAmount, 
+          maxAmount: maxAmount,
           reattributionTransaction: transactionModel
         });
-        const fieldArray = [{name:'purpose_description', value:transactionModel.purposeDescription}];
-        this._f3xMessageService.sendPopulateFieldsMessage({abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent, fieldArray});
+        const fieldArray = [{ name: 'purpose_description', value: transactionModel.purposeDescription }];
+        this._f3xMessageService.sendPopulateFieldsMessage({ abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent, fieldArray });
       } else if (transactionModel.isRedesignation) {
         if (this.scheduleAction === ScheduleActions.add) {
           redesignationId = transactionModel.redesignation_id;
@@ -887,6 +888,12 @@ export class F3xComponent implements OnInit, OnDestroy {
       this.scheduleAction = ScheduleActions.edit;
       this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
       this.scheduleType = 'sched_h6';
+    }
+
+    // Replaces ngDoCheck() with onChange()
+    // to reduce unwanted calls.
+    if (this.scheduleType === 'sched_h1') {
+      this.forceChangeDetectionH1 = new Date();
     }
 
     this._schedHMessageServce.sendpopulateHFormForEditMessage(transaction);
