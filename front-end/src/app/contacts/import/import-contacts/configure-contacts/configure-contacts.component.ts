@@ -1,10 +1,17 @@
 import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-configure-contacts',
   templateUrl: './configure-contacts.component.html',
   styleUrls: ['./configure-contacts.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
+      transition(':leave', [animate(0, style({ opacity: 0 }))])
+    ])
+  ]
 })
 export class ConfigureContactsComponent implements OnInit {
 

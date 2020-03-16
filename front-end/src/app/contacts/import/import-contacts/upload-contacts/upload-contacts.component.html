@@ -1,44 +1,51 @@
-<div class="upload_contacts__container">
-  <div id="upload_contacts__drop-area" (drop)="drop($event)" (dragenter)="dragEnter($event)"
-    (dragover)="dragOver($event)">
-    <div class="upload_contacts__drop-area-text">
-      <i (click)="triggerSelectFileInputClick()" class="file-upload-icon upload_contacts__upload-icon"></i>
-      <br>
-      Drop or Drag a CSV, Excel, or JSON File Here to Upload
-      <br>
-      or
-      <br>
-      <span><a (click)="triggerSelectFileInputClick()">Select a file</a></span>
-      <input style="display:none" #selectFileInput type="file" accept=".json, .xls, .csv" (change)="fileSelected()" />
+<div [@fadeInOut] class="upload_contacts__container">
+  <div [hidden]="!showUpload">
+    <div id="upload_contacts__drop-area" (drop)="drop($event)" (dragenter)="dragEnter($event)"
+      (dragover)="dragOver($event)">
+      <div class="upload_contacts__drop-area-text">
+        <i (click)="triggerSelectFileInputClick()" class="file-upload-icon upload_contacts__upload-icon"></i>
+        <br>
+        Drop or Drag a CSV, Excel, or JSON File Here to Upload
+        <br>
+        or
+        <br>
+        <span><a (click)="triggerSelectFileInputClick()">Select a file</a></span>
+        <input style="display:none" #selectFileInput type="file" accept=".json, .xls, .csv" (change)="fileSelected()" />
+      </div>
+    </div>
+    <div id="upload_contacts__info-area">
+      <div class="row">
+        <!-- <div class="upload_contacts__info-cell-container"> -->
+        <div class="col col-md-3 upload_contacts__info-cell">
+          <div class="upload_contacts__info-icon">
+            <i class="users-icon"></i>
+          </div>
+          Importing your contacts saves you time. It helps you build your database quicker so you can move
+          through your forms effortlessly and seamlessly. You can upload file varieties, such as CSV, Excel or JSON.
+          <br><br>
+          You can easily convert your Quicken & Quickbooks Data to CSV or Excel files for import.
+        </div>
+        <div class="col col-md-3 upload_contacts__info-cell">
+          <div class="upload_contacts__info-icon">
+            <i class="database-server-icon"></i>
+          </div>
+          To keep your database clean, don’t worry about import duplicates, we will give you a chance to
+          either merge or ignore them individually or in a bulk action.
+        </div>
+        <div class="col col-md-3 upload_contacts__info-cell">
+          <div class="upload_contacts__info-icon">
+            <i class="cloud-icon"></i>
+          </div>
+          Because your contact database is located on our Cloud, you never have to worry about losing your data.
+          We make sure our Cloud technology stays up-to-date and free of errors and major problems.
+        </div>
+        <!-- </div> -->
+      </div>
     </div>
   </div>
-  <div id="upload_contacts__info-area">
-    <div class="row">
-      <!-- <div class="upload_contacts__info-cell-container"> -->
-      <div class="col col-md-3 upload_contacts__info-cell">
-        <div class="upload_contacts__info-icon">
-          <i class="users-icon"></i>
-        </div>
-        Importing your contacts saves you time. It helps you build your database quicker so you can move
-        through your forms effortlessly and seamlessly. You can upload file varieties, such as CSV, Excel or JSON.
-        <br><br>
-        You can easily convert your Quicken & Quickbooks Data to CSV or Excel files for import.
-      </div>
-      <div class="col col-md-3 upload_contacts__info-cell">
-        <div class="upload_contacts__info-icon">
-          <i class="database-server-icon"></i>
-        </div>
-        To keep your database clean, don’t worry about import duplicates, we will give you a chance to
-        either merge or ignore them individually or in a bulk action.
-      </div>
-      <div class="col col-md-3 upload_contacts__info-cell">
-        <div class="upload_contacts__info-icon">
-          <i class="cloud-icon"></i>
-        </div>
-        Because your contact database is located on our Cloud, you never have to worry about losing your data.
-        We make sure our Cloud technology stays up-to-date and free of errors and major problems.
-      </div>
-      <!-- </div> -->
-    </div>
+  <div [hidden]="showUpload" class="upload_contacts__progress_container">
+    <ngb-progressbar type="dark" textType="white" animated="true" [value]="progressPercent" showValue="true"
+      height="2rem">
+    </ngb-progressbar>
   </div>
 </div>

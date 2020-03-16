@@ -1,13 +1,21 @@
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
 import { CsvConverterService } from '../service/csv-converter.service';
 import * as XLSX from 'xlsx';
+import { timer, interval } from 'rxjs';
+import { takeUntil, finalize } from 'rxjs/operators';
+import { style, animate, transition, trigger } from '@angular/animations';
 
-type AOA = any[][];
 
 @Component({
   selector: 'app-upload-contacts',
   templateUrl: './upload-contacts.component.html',
-  styleUrls: ['./upload-contacts.component.scss']
+  styleUrls: ['./upload-contacts.component.scss'],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
+      transition(':leave', [animate(0, style({ opacity: 0 }))])
+    ])
+  ]
 })
 export class UploadContactsComponent implements OnInit {
 
@@ -19,11 +27,14 @@ export class UploadContactsComponent implements OnInit {
 
   public userContacts: Array<any>;
   public userContactFields: Array<string>;
+  public showUpload: boolean;
+  public progressPercent = 0;
 
 
   constructor(private csvConverterService: CsvConverterService) { }
 
   ngOnInit() {
+    this.showUpload = true;
   }
 
   /**
@@ -164,13 +175,37 @@ export class UploadContactsComponent implements OnInit {
   }
 
   public fileSelected() {
-    const files = this.selectFileInput.nativeElement.files;
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      this.handleFileType(file);
-      // if (this.isValidFileType(file.name)) {
-      // }
-    }
+    this.progressPercent = 0;
+    this.showUpload = false;
+
+    // For development of the progress bar for file upload, this code is
+    // simulating a long file upload time.  The file to be uploaded in production
+    // may be a big as 10-20 GB.
+
+    const fakeUploadTime = 4000;
+    const fakeUploadInterval = fakeUploadTime / 4; // 2000 and 4 will = 500 milliseconds
+
+    // emit value every interval to increase percent done
+    const source = interval(fakeUploadInterval);
+    // after fakeUploadTime has passed, read the file client side.  This will be server side
+    // read in the future.
+    const timer$ = timer(fakeUploadTime).pipe(finalize(() => {
+      console.log('All done!');
+      this.progressPercent = 100;
+      const files = this.selectFileInput.nativeElement.files;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        this.handleFileType(file);
+      }
+    }));
+    // when timer emits after 5s, complete source
+    const example = source.pipe(takeUntil(timer$));
+    // sub to observable emitted by the interval.
+    const subscribe = example
+      .subscribe(val => {
+        const percentageIncrease = (fakeUploadInterval) * 100 / fakeUploadTime;
+        this.progressPercent = this.progressPercent + percentageIncrease;
+      });
   }
 
   /**

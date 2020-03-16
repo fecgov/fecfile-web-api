@@ -1,6 +1,10 @@
 @import '../../../../shared/scss/global';
 
 .upload_contacts__container {
+  .upload_contacts__progress_container {
+    padding: 0 15em;
+  }
+
   .configure_contacts__instructions {
     font-size: 20px;
   }
