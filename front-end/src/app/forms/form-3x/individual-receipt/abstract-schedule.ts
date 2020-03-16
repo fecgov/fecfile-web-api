@@ -112,6 +112,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
   protected _rollbackAfterUnsuccessfulSave = false;
   protected _prePopulateFromSchedHData: any;
+  protected _prePopulateFromSchedPARTNData : any;
 
   /**
    * For toggling between 2 screens of Sched F Debt Payment.
@@ -290,6 +291,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               }
             }
             break;
+          case 'prePopulateFromSchedPARTN':
+            if (message) {
+              if (message.prePopulateFromSchedPARTN) {
+                if (this.abstractScheduleComponent === message.abstractScheduleComponent) {
+                  this.scheduleAction = ScheduleActions.addSubTransaction;
+                  this._prePopulateFromSchedPARTNData = message.prePopulateFromSchedPARTN;
+                }
+              }
+            }
+              break;
           default:
             //console.log('message key not supported: ' + message.key);
         }
@@ -331,6 +342,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this._f3xMessageService.getInitFormMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this.clearFormValues();
       this.removeAllValidators();
+      // For unsaved changes warning, OnChanges() not called when transaction type 
+      // is same as previous. Removed saved property here to handle that case.
+      localStorage.removeItem(`form_${this.formType}_saved`);
     });
 
     this._f3xMessageService.getLoadFormFieldsMessage().takeUntil(this.onDestroy$).subscribe(message => {
@@ -386,9 +400,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this.frmIndividualReceipt.get('memo_code').disable();
     }
     this.clearEntityIdFromHiddenFields();
-
   }
-
+  
   private clearEntityIdFromHiddenFields() {
     if (this.hiddenFields && this.hiddenFields.length > 0) {
       let entityIdField = this.hiddenFields.find(element => element.name === 'entity_id');
@@ -464,6 +477,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges) {
+
+    localStorage.removeItem(`form_${this.formType}_saved`);
+
     if (this.checkComponent(changes)) {
       if (this.editMode) {
         this._reportsService.getCoverageDates(this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
@@ -575,6 +591,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  private _prepareForUnsavedChanges(): void {
+    this.frmIndividualReceipt.valueChanges.takeUntil(this.onDestroy$)
+      .subscribe(val => {
+      if (this.frmIndividualReceipt.dirty) {
+        localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: false }));
+      }
+    });
+  }
+
   /**
    * Generates the dynamic form after all the form fields are retrived.
    *
@@ -665,6 +690,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     //once the parent is initialized, send message to any child subscriptions to perform any applicable actions
     if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls) {
       this._messageService.sendMessage({ parentFormPopulated: true, component: this.abstractScheduleComponent });
+      this._prepareForUnsavedChanges();
     }
   }
 
@@ -1385,6 +1411,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public isFieldReadOnly(col: any) {
     if (col.type === 'text' && col.isReadonly) {
+      return true;
+    }
+    if (col.type === 'date' && col.isReadonly) {
       return true;
     }
     if (col.name === 'total_amount') {
@@ -2283,6 +2312,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.subTransactionInfo.isParent === true
               ){
                 addSubTransEmitObj.prePopulateFromSchedH = res;
+              }else if(
+                this.subTransactionInfo.scheduleType === 'PARTN_REC' &&
+                this.subTransactionInfo.isParent === true
+              ){
+                addSubTransEmitObj.prePopulateFromSchedPARTN = res;
               }
             }
 
@@ -2318,7 +2352,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                 this.transactionType === 'OTH_DISB_DEBT' ||
                 this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
                 this.transactionType === 'COEXP_PARTY_DEBT' ||
-                this.transactionType === 'IE' ||
+                this.transactionType === 'IE_B4_DISSE' ||
                 this.transactionType === 'OTH_REC_DEBT'
               )
             ) {
@@ -2355,6 +2389,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     this.subTransactionInfo.subTransactionType === 'ALLOC_FEA_STAF_REIM_MEMO') {
                   this._prePopulateFromSchedHData = res;
                   this._prePopulateFromSchedH(this._prePopulateFromSchedHData);
+                }else if (this.subTransactionInfo.subTransactionType === 'PARTN_MEMO') {
+                  this._prePopulateFromSchedPARTNData = res;
+                  this._prePopulateFromSchedPARTN(this._prePopulateFromSchedPARTNData);
                 }
               }
               if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
@@ -2430,6 +2467,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * changed (dirty) then don't save and just show parent.
    */
   public saveAndReturnToParent(): void {
+    if(this._cloned) {
+      this._cloned = false;
+    }
+
     if (!this.frmIndividualReceipt.dirty) {
       this.clearFormValues();
       this.returnToParent(ScheduleActions.edit);
@@ -2615,16 +2656,48 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   /**
+   * Determines ability for a person to leave a page with a form on it.
+   *
+   * @return     {boolean}  True if able to deactivate, False otherwise.
+   */
+  public async canDeactivate(): Promise<boolean> {
+    if (this._formService.formHasUnsavedData(this.formType)) {
+      let result: boolean = null;
+      result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
+        let val: boolean = null;
+
+        if (res === 'okay') {
+          val = true;
+        } else if (res === 'cancel') {
+          val = false;
+        }
+
+        return val;
+      });
+
+      return result;
+    } else {
+      return true;
+    }
+  }
+
+  /**
    * Goes to the previous step.
    */
   public previousStep(): void {
-    this.clearFormValues();
-    this.status.emit({
-      form: {},
-      direction: 'previous',
-      step: 'step_2'
+    this.canDeactivate().then(result => {
+      if (result === true) {
+        localStorage.removeItem(`form_${this.formType}_saved`);
+        this.clearFormValues();
+        this.status.emit({
+          form: {},
+          direction: 'previous',
+          step: 'step_2'
+        });
+      }
     });
   }
+
   /**
    * Save the current transaction if valid  and show transactions
    * if invalid show unsaved confirmation and navigate accordingly
@@ -2879,7 +2952,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     // TODO need a way to determine if key was tab.
 
     const entity = $event.item;
+    this.slectedCandidate(entity, col);
+  }
 
+  private slectedCandidate(entity: any, col: any) {
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
     let namePrefix = '';
 
@@ -3008,6 +3084,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   // child name field prefix and it's let error prone.
   public handleSelectedOrg($event: NgbTypeaheadSelectItemEvent, col: any) {
     const entity = $event.item;
+
+    if(entity.cmte_id) {
+      this._typeaheadService.getContactsExpand(entity.cmte_id).subscribe(
+        res => {
+          if(res) {
+            const entity = res[0];
+            this.slectedCandidate(entity, col);
+          }
+        }
+      )
+    }
 
     const isChildForm = col.name.startsWith(this._childFieldNamePrefix) ? true : false;
 
@@ -3206,7 +3293,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.clearOrgData();
         }
         if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'entity_name');
+          if(this.transactionType === 'CON_EAR_DEP_MEMO'
+            || this.transactionType === 'CON_EAR_UNDEP_MEMO'
+            || this.transactionType === 'CONT_TO_CAN') {
+            return this._typeaheadService.getContacts(searchText, 'entity_name', true);
+          }else {
+            return this._typeaheadService.getContacts(searchText, 'entity_name');
+          }
         } else {
           return Observable.of([]);
         }
@@ -3778,7 +3871,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.populateDataForSchedHSubTransaction(schedHSubTran);
 
         this.sendPopulateMessageIfApplicable();
-        
       });
 
   }
@@ -3994,6 +4086,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._prePopulateFormFieldHelper(schedHData, 'activity_event_identifier', fieldArray);
         }
       }
+    }
+    this.totalAmountReadOnly = false;
+    this._prePopulateFormField(fieldArray);
+  }
+
+  protected _prePopulateFromSchedPARTN(schedPARTNData: any) {
+    let fieldArray = [];
+    if (schedPARTNData.hasOwnProperty('contribution_date')) {
+      const contributionDate = schedPARTNData.contribution_date;
+      if (!contributionDate) {
+        return;
+      }
+      this._prePopulateFormFieldHelper(schedPARTNData, 'contribution_date', fieldArray);
     }
     this.totalAmountReadOnly = false;
     this._prePopulateFormField(fieldArray);
@@ -5063,6 +5168,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             prePopulateFieldArray.push({ name: 'levin_account_id', value: res.levin_account_id });
           }
       }*/
+      else if (this.subTransactionInfo.subTransactionType === 'PARTN_MEMO') {
+        prePopulateFieldArray = [];
+        if (res.hasOwnProperty('contribution_date')) {
+          prePopulateFieldArray.push({ name: 'contribution_date', value: res.contribution_date });
+        }
+      }
     }
     return prePopulateFieldArray;
   }
@@ -5139,27 +5250,33 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * If originated from Debt Summary, return there otherwise go to the transactions.
    */
   public cancel(): void {
-    if (
-      this.returnToDebtSummary &&
-      (this.transactionType === 'DEBT_TO_VENDOR' || this.transactionType === 'DEBT_BY_VENDOR')
-    ) {
-      this._goDebtSummary();
-    } else if (
-      this.returnToDebtSummary &&
-      (this.transactionType === 'OPEXP_DEBT' ||
-        this.transactionType === 'ALLOC_EXP_DEBT' ||
-        this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
-        this.transactionType === 'OTH_DISB_DEBT' ||
-        this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
-        this.transactionType === 'COEXP_PARTY_DEBT' ||
-        this.transactionType === 'IE' ||
-        this.transactionType === 'OTH_REC_DEBT'
-      )
-    ) {
-      this.returnToParent(this.editScheduleAction);
-    } else {
-      this.viewTransactions();
-    }
+
+    this.canDeactivate().then(result => {
+      if (result === true) {
+        localStorage.removeItem(`form_${this.formType}_saved`);
+        if (
+          this.returnToDebtSummary &&
+          (this.transactionType === 'DEBT_TO_VENDOR' || this.transactionType === 'DEBT_BY_VENDOR')
+        ) {
+          this._goDebtSummary();
+        } else if (
+          this.returnToDebtSummary &&
+          (this.transactionType === 'OPEXP_DEBT' ||
+            this.transactionType === 'ALLOC_EXP_DEBT' ||
+            this.transactionType === 'ALLOC_FEA_DISB_DEBT' ||
+            this.transactionType === 'OTH_DISB_DEBT' ||
+            this.transactionType === 'FEA_100PCT_DEBT_PAY' ||
+            this.transactionType === 'COEXP_PARTY_DEBT' ||
+            this.transactionType === 'IE_B4_DISSE' ||
+            this.transactionType === 'OTH_REC_DEBT'
+          )
+        ) {
+          this.returnToParent(this.editScheduleAction);
+        } else {
+          this.viewTransactions();
+        }
+      }
+    });
   }
 
   private _goDebtSummary(): void {
@@ -5329,9 +5446,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
 
   private populateSchedFChildData(field: string, receiptObj: any) {
-      // Possible issue : Populating data from parent when  sched f child is created can cause in consistensis
-      // data from child and parent can be out of sync whent the parent is edited
+      // Possible issue : Populating data from parent when  sched f child is created can cause in consistencies
+      // data from child and parent can be out of sync when the parent is edited
       // backend should take care of the updates if parent is modified
+    if (null == this.subTransactionInfo) {
+      return;
+    }
     if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent && !this.subTransactionInfo.isParent) {
       switch (field) {
         case 'coordinated_exp_ind' :

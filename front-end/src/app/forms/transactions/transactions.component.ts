@@ -280,6 +280,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.getRedesignateTransactionSubscription.unsubscribe();
     this.getReattributeTransactionSubscription.unsubscribe();
     this.activatedRouteSubscription.unsubscribe();
+    localStorage.removeItem('transactions.filters');
   }
 
   public goToPreviousStep(): void {

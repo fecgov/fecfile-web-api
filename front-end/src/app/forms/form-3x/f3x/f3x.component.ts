@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, NavigationStart } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, Subscription } from 'rxjs';
 import 'rxjs/add/operator/takeUntil';
@@ -111,6 +111,10 @@ export class F3xComponent implements OnInit, OnDestroy {
         this.allTransactions = true;
       } else {
         this.allTransactions = false;
+      }
+      // No unsaved changes needed from transactions.
+      if (p.step === 'transactions') {
+        localStorage.removeItem(`form_${this.formType}_saved`);
       }
 
       //also clear the schedule type so the current component gets destroyed if leaving the form route
@@ -517,6 +521,12 @@ export class F3xComponent implements OnInit, OnDestroy {
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
                     prePopulateFromSchedH: e.prePopulateFromSchedH
                   });
+                }else if (e.hasOwnProperty('prePopulateFromSchedPARTN')) {
+                  this._f3xMessageService.sendPopulateFormMessage({
+                    key: 'prePopulateFromSchedPARTN',
+                    abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
+                    prePopulateFromSchedPARTN: e.prePopulateFromSchedPARTN
+                  });
                 }
               }
             }
@@ -795,7 +805,7 @@ export class F3xComponent implements OnInit, OnDestroy {
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'OTH_DISB_DEBT' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'FEA_100PCT_DEBT_PAY' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'COEXP_PARTY_DEBT' ||
-        e.transactionDetail.transactionModel.transactionTypeIdentifier === 'IE' ||
+        e.transactionDetail.transactionModel.transactionTypeIdentifier === 'IE_B4_DISSE' ||
         e.transactionDetail.transactionModel.transactionTypeIdentifier === 'OTH_REC_DEBT') &&
       e.returnToDebtSummary
     ) {

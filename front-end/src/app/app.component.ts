@@ -7,6 +7,7 @@ import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { UserIdleService } from 'angular-user-idle';
 import { SessionService } from './shared/services/SessionService/session.service';
 import { formatDate } from '@angular/common';
+import { FormsService } from './shared/services/FormsService/forms.service';
 
 @Component({
   selector: 'app-root',
@@ -36,8 +37,9 @@ export class AppComponent implements OnInit, OnDestroy{
     private _router: Router,
     private _messageService: MessageService,
     private _dialogService: DialogService,
-    private _sessionService: SessionService
-  ) {}
+    private _sessionService: SessionService,
+    private _formService: FormsService
+  ) { }
 
   ngOnInit() {
     this.restart();
@@ -154,9 +156,60 @@ export class AppComponent implements OnInit, OnDestroy{
   // }
 
   @HostListener('window:beforeunload', ['$event'])
- beforeunloadHandler(event) {
-       localStorage.clear();
-       this._sessionService.destroy();
+  beforeunloadHandler($event) {
+
+    // TODO beforeunload occurs on browser refresh and browser close. Need to
+    // distinguish between the 2 so that sessionService.destroy() may be called on
+    // browser close.
+
+    // localStorage.clear();
+    // this._sessionService.destroy(); // <== this will log user out
+
+    // TODO deriving form type from URL. Since this may break if URL pattern
+    // changes in the application, consider passing the formType from the each form
+    // component to this component via a service.  Or consider adding a HostListener for
+    // beforeunload for each form.
+    let formType = '';
+    if (this._router.url.includes('/form/3X')) {
+      formType = '3X';
+    } else if (this._router.url.includes('/form/99')) {
+      formType = '99';
+    }
+
+    if (this._formService.formHasUnsavedData(formType)) {
+      console.log('unsaved data on refresh');
+      $event.returnValue = false;
+      $event.preventDefault();
+    } else {
+      console.log('refresh ok - no unsaved changes');
+      return;
+    }
+  }
+
+  /**
+   * Determines ability for a person to leave a page with a form on it.
+   *
+   * @return     {boolean}  True if able to deactivate, False otherwise.
+   */
+  public async canDeactivate(): Promise<boolean> {
+    if (this._formService.formHasUnsavedData('3X')) {
+      let result: boolean = null;
+      result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
+        let val: boolean = null;
+
+        if (res === 'okay') {
+          val = true;
+        } else if (res === 'cancel') {
+          val = false;
+        }
+
+        return val;
+      });
+
+      return result;
+    } else {
+      return true;
+    }
   }
 
   @HostListener('keypress') onKeyPress() {

@@ -2674,9 +2674,68 @@ MODIFIED - CORE APP - SPRINT 15 - FNE 1222 - BY PRAVEEN JINKA
 ************************************************ FUNCTIONS - ENTITIES **********************************************************
 """
 
-
 @api_view(["GET"])
+def autolookup_expand(request):
+    """
+    load cand or cmte entity based on cand_id or cmte_id
+    """
+    logger.debug(
+        "autolookup expand with request params:{}".format(dict(request.query_params.items()))
+    )
+    _sql = ''
+    parameters = []
+    try:
+        if 'cmte_id' in request.query_params:
+            cmte_id = request.query_params.get('cmte_id')
+            _sql = """
+            SELECT json_agg(t) FROM 
+            (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
+            e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
+            e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
+            e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
+            FROM public.entity e, public.candidate_master c WHERE e.ref_cand_cmte_id = c.cand_id
+            and c.principal_campaign_committee = %s
+            and e.delete_ind is distinct from 'Y'
+            and e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
+            """
+            parameters = [cmte_id, request.user.username]
+        if 'cand_id' in request.query_params:
+            cand_id = request.query_params.get('cand_id')
+            _sql = """
+            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                            e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                            e.last_update_date
+                            FROM public.entity e, public.entity c WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                            AND c.red_cand_cmte_id = %s
+                            AND e.delete_ind is distinct from 'Y'
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
+            """
+            parameters = [cand_id]
+        with connection.cursor() as cursor:
+            logger.debug("autolookup expand query:{}".format(_sql))
+            logger.debug("autolookup expand parameters:{}".format(parameters))
+            cursor.execute(_sql, parameters)
+            # print(cursor.query)
+            # print('fail..')
+            # for row in cursor.fetchall():
+            #     data_row = list(row)
+            #     # logger.debug('current data row:{}'.format())
+            forms_obj = cursor.fetchone()[0]
+            status_value = status.HTTP_200_OK
+            if forms_obj is None:
+                forms_obj = []
+                status_value = status.HTTP_204_NO_CONTENT
+        return Response(forms_obj, status=status_value)
+    except Exception as e:
+        return Response(
+            "The autolookup_expand API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    
+
 ############################ PARTIALLY IMPLEMENTED FOR INDIVIDUALS, ORGANIZATIONS, COMMITTEES. NOT IMPLEMENTED FOR CANDIDATES
+@api_view(["GET"])
 def autolookup_search_contacts(request):
     """
     We are changing autoloopup to the converged entity table:
@@ -2690,7 +2749,6 @@ def autolookup_search_contacts(request):
     logger.debug(
         "autolookup with request params:{}".format(dict(request.query_params.items()))
     )
-
     allowed_params = [
         "entity_name",
         "first_name",
@@ -2716,16 +2774,6 @@ def autolookup_search_contacts(request):
         order_string = ""
         search_string = ""
         query_string = ""
-        # cand_q = False
-        # cmte_q = False
-
-        # for k in request.query_params:
-        #     if k.startswith('cand_'):
-        #         cand_q = True
-        #     if k.startswith('cmte_'):
-        #         cmte_q = True
-
-        # rename parameters for candidate and committee
         query_params = {
             k: v for k, v in request.query_params.items() if k not in field_remapper
         }
@@ -2739,109 +2787,134 @@ def autolookup_search_contacts(request):
         if "prefix" in query_params:
             query_params["preffix"] = query_params.get("prefix")
 
-        logger.debug("autolookup with parameters {}".format(query_params))
+        logger.debug("*** autolookup with parameters {}".format(query_params))
         for key, value in query_params.items():
             if key in allowed_params:
                 if key == "prefix":
                     continue
-                order_string = str(key)
-                param_string = " AND LOWER(" + str(key) + ") LIKE LOWER(%s)"
-                # if cand_q:
-                #     query_string = """
-                #     SELECT json_agg(t) FROM
-                #     (SELECT e.preffix as cand_prefix,
-                #             e.last_name as cand_last_name,
-                #             e.first_name as cand_first_name,
-                #             e.middle_name as cand_middle_name,
-                #             e.suffix as cand_suffix,
-                #             *
-                #     FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
-                #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
-                # elif cmte_q:
-                #     query_string = """
-                #     SELECT json_agg(t) FROM
-                #     (SELECT e.preffix as prefix, e.entity_name as cmte_name, *
-                #     FROM public.entity e WHERE cmte_id in (%s, 'C00000000')
-                #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                #     """ + param_string + """ AND delete_ind is distinct from 'Y' ORDER BY """ + order_string + """) t"""
-                #     pass
-                # else
-                #
-                # :
-                # print('haha')
-                # print('cmte-id' in list(request.query_params.items()))
+                order_string = 'e.'+str(key)
+                param_string = " AND LOWER(e." + str(key) + ") LIKE LOWER(%s)"
                 if "cmte_id" in request.query_params:
                     parameters = [committee_id]
-                    query_string = (
-                        """
-                        SELECT json_agg(t) FROM 
-                        (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
-                          e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
-                        e.last_update_date
-                        FROM public.entity e WHERE e.cmte_id in ('C00000000') 
-                        AND substr(e.ref_cand_cmte_id,1,1)='C'
-                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                        """
-                        + param_string
-                        + """ AND delete_ind is distinct from 'Y' ORDER BY """
-                        + order_string
-                        + """) t"""
-                    )
+                    if 'expand' in request.query_params:
+                        query_string = (
+                            """
+                            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                            e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                            e.last_update_date
+                            FROM public.entity e, public.entity c WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                            AND c.principal_campaign_committee is not null
+                            AND e.cmte_id in ('C00000000') 
+                            AND substr(e.ref_cand_cmte_id,1,1)='C'
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            """
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
+                        )
+                    else:
+                        query_string = (
+                            """
+                            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                            e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                            e.last_update_date
+                            FROM public.entity e WHERE e.cmte_id in ('C00000000') 
+                            AND substr(e.ref_cand_cmte_id,1,1)='C'
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            """
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
+                        )
                 elif (
                     "cand_id" in request.query_params
                     or "cand_first_name" in request.query_params
                     or "cand_last_name" in request.query_params
                     or "payee_cmte_id" in request.query_params
                 ):
-                    parameters = [committee_id]
-                    query_string = (
-                        """
-                        SELECT json_agg(t) FROM 
-                        (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
-                        e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
-                        e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
-                        e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
-                        FROM public.entity e WHERE e.cmte_id in ('C00000000') 
-                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                        AND substr(e.ref_cand_cmte_id,1,1) != 'C'
-                        """
-                        + param_string
-                        + """ AND delete_ind is distinct from 'Y' ORDER BY """
-                        + order_string
-                        + """) t"""
-                    )
+                    if 'expand' in request.query_params:
+                        parameters = [committee_id]
+                        query_string = (
+                            """
+                            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
+                            e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
+                            e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
+                            e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
+                            FROM public.entity e , public.entity c WHERE c.ref_cand_cmte_id = e.principal_campaign_committee
+                            AND e.principal_campaign_committee is not null
+                            AND e.cmte_id in ('C00000000') 
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            AND substr(e.ref_cand_cmte_id,1,1) != 'C'
+                            """
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
+                        )
+                        
+                    else:
+                        parameters = [committee_id]
+                        query_string = (
+                            """
+                            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
+                            e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
+                            e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
+                            e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
+                            FROM public.entity e WHERE e.cmte_id in ('C00000000') 
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            AND substr(e.ref_cand_cmte_id,1,1) != 'C'
+                            """
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
+                        )
                 else:
                     parameters = [committee_id, committee_id]
-                    query_string = (
-                        """
-                        SELECT json_agg(t) FROM 
-                        (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
-                        e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
-                        e.last_update_date
-                        FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
-                        AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                        """
-                        + param_string
-                        + """ AND delete_ind is distinct from 'Y' ORDER BY """
-                        + order_string
-                        + """) t"""
-                    )
+                    if 'expand' in request.query_params:
+                        query_string = (
+                            """
+                            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                            e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                            e.last_update_date
+                            FROM public.entity e, public.entity c 
+                            WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                            AND e.entity_type in ('IND','ORG')
+                            AND c.principal_campaign_committee is not null
+                            AND e.cmte_id in (%s, 'C00000000')
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            """
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
+                        )
+                        # pass 
+                    else:
+                        query_string = (
+                            """
+                            SELECT json_agg(t) FROM 
+                            (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                            e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                            e.last_update_date
+                            FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                            AND e.entity_type in ('IND','ORG')
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            """
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
+                        )
 
                 parameters.append(value + "%")
-                # parameters.append('C%')
-            # elif key in ['cmte_id', 'cmte_name']:
-            #     param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
-            #     query_string = """SELECT json_agg(t) FROM (SELECT cmte_id, cmte_name, street_1, street_2, city, state, zip_code, cmte_email_1, cmte_email_2, phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, treasurer_last_name, treasurer_first_name, treasurer_middle_name, treasurer_prefix, treasurer_suffix
-            #                                         FROM public.committee_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
-            #     parameters = [value + '%']
-            # elif key in ['cand_id', 'cand_last_name', 'cand_first_name']:
-            #     param_string = " LOWER(" + str(key) + ") LIKE LOWER(%s)"
-            #     query_string = """SELECT json_agg(t) FROM (SELECT cand_id, cand_last_name, cand_first_name, cand_middle_name, cand_prefix, cand_suffix, cand_street_1, cand_street_2, cand_city, cand_state, cand_zip, cand_party_affiliation, cand_office, cand_office_state, cand_office_district, cand_election_year
-            #                                         FROM public.candidate_master WHERE""" + param_string + """ ORDER BY """ + order_string + """) t"""
-            #     parameters = [value + '%']
-            # else:
-            #     raise Exception("The parameters for this api should be limited to: ['entity_name', 'first_name', 'last_name', 'cmte_id', 'cmte_name', 'cand_id', 'cand_last_name', 'cand_first_name']")
 
         if query_string == "":
             raise Exception(
@@ -2851,11 +2924,8 @@ def autolookup_search_contacts(request):
             logger.debug("autolookup query:{}".format(query_string))
             logger.debug("autolookup parameters:{}".format(parameters))
             cursor.execute(query_string, parameters)
-            # print(cursor.query)
-            # print('fail..')
             for row in cursor.fetchall():
                 data_row = list(row)
-                # logger.debug('current data row:{}'.format())
                 forms_obj = data_row[0]
         status_value = status.HTTP_200_OK
         if forms_obj is None:
@@ -2867,6 +2937,8 @@ def autolookup_search_contacts(request):
             "The autolookup_search_contacts API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
 
 
 """
@@ -3095,7 +3167,7 @@ def get_trans_query(category_type, cmte_id, param_string):
             """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
-                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, isredesignatable, "isRedesignation" from all_disbursements_transactions_view
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, aggregation_ind, hasChild, isredesignatable, "isRedesignation" from all_disbursements_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -3133,7 +3205,7 @@ def get_trans_query(category_type, cmte_id, param_string):
             """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
-                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, isreattributable, "isReattribution" from all_receipts_transactions_view
+                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, aggregation_ind, hasChild, isreattributable, "isReattribution" from all_receipts_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -5265,7 +5337,10 @@ def getthirdnavamounts(cmte_id, report_id):
                 "18A",
                 "18B",
             ],
-            ["21AI", "21AII", "21B", "22", "28A", "28B", "28C", "29"],
+            ["21A","21AI","21AII","21B","22","23","24","25","26","27","28A","28B","28C","29",
+            "30A","30AI","30AII","30B"],
+            ["10"],
+            ["9"]
         ]
         for table in table_list:
             _sql = """
@@ -5276,20 +5351,19 @@ def getthirdnavamounts(cmte_id, report_id):
             )
             with connection.cursor() as cursor:
                 cursor.execute(_sql, _values)
-                print(cursor.query)
                 amounts.append(cursor.fetchone()[0])
-        loans_table = ["sched_c", "sched_d"]
-        l_sql = """
-            SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE transaction_table in ('{}')
-            AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
-            """.format(
-            "', '".join(loans_table)
-        )
-        with connection.cursor() as cursor:
-            cursor.execute(l_sql, _values)
-            print(cursor.query)
-            amounts.append(cursor.fetchone()[0])
-        return amounts[0], amounts[1], amounts[2]
+        # loans_table = ["sched_c", "sched_d"]
+        # l_sql = """
+        #     SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE transaction_table in ('{}')
+        #     AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
+        #     """.format(
+        #     "', '".join(loans_table)
+        # )
+        # with connection.cursor() as cursor:
+        #     cursor.execute(l_sql, _values)
+        #     print(cursor.query)
+        #     amounts.append(cursor.fetchone()[0])
+        return amounts[0], amounts[1], amounts[2]-amounts[3]
     except Exception as e:
         raise Exception("The getthirdnavamounts function is throwing an error" + str(e))
 
@@ -5317,7 +5391,7 @@ def get_thirdNavigationTransactionTypes(request):
         period_receipt, period_disbursement, loans_and_debts = getthirdnavamounts(
             cmte_id, report_id
         )
-        loans_and_debts = loansanddebts(report_id, cmte_id)
+        # loans_and_debts = loansanddebts(report_id, cmte_id)
 
         coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
         # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
@@ -7829,7 +7903,8 @@ def clone_a_transaction(request):
         rows = cursor.fetchall()
         columns = []
         for row in rows:
-            columns.append(row[0])
+            if row[0] not in ['reattribution_id', 'reattribution_ind', 'redesignation_id', 'redesignation_ind']:
+                columns.append(row[0])
         logger.debug("table columns: {}".format(list(columns)))
 
         insert_str = ",".join(columns)
