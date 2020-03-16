@@ -1776,6 +1776,31 @@ def force_aggregate_sb(request):
 
 
 @api_view(["PUT"])
+def force_itemize_sb(request):
+    """
+    api to force a sched_b transaction to be itemized:
+    1. set itemized_ind = 'Y'
+    2. update line number if necessary
+    """
+    # if request.method == "GET":
+    try:
+        cmte_id = request.user.username
+        report_id = request.data.get("report_id")
+        transaction_id = request.data.get("transaction_id")
+        if not transaction_id:
+            raise Exception("transaction id is required for this api call.")
+        sb_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+        # update_sa_itmization_status(sb_data, status = 'Y')
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
+    except Exception as e:
+        return Response(
+            "The force_itemize_sb API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+
+
+@api_view(["PUT"])
 def force_unaggregate_sb(request):
     """
     api to force a transaction to be un-aggregated:
