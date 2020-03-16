@@ -7903,7 +7903,8 @@ def clone_a_transaction(request):
         rows = cursor.fetchall()
         columns = []
         for row in rows:
-            columns.append(row[0])
+            if row[0] not in ['reattribution_id', 'reattribution_ind', 'redesignation_id', 'redesignation_ind']:
+                columns.append(row[0])
         logger.debug("table columns: {}".format(list(columns)))
 
         insert_str = ",".join(columns)

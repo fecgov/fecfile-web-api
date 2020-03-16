@@ -337,6 +337,7 @@ def post_sql_schedA(
     donor_cmte_name,
     transaction_type_identifier,
     levin_account_id,
+    aggregation_ind,
 ):
     """persist one sched_a item."""
     try:
@@ -366,9 +367,10 @@ def post_sql_schedA(
                 donor_cmte_id, 
                 donor_cmte_name, 
                 levin_account_id, 
-                transaction_type_identifier
+                transaction_type_identifier,
+                aggregation_ind
             )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
                 [
                     cmte_id,
@@ -392,6 +394,7 @@ def post_sql_schedA(
                     donor_cmte_name,
                     levin_account_id,
                     transaction_type_identifier,
+                    aggregation_ind,
                 ],
             )
             if cursor.rowcount != 1:
@@ -418,12 +421,12 @@ def get_list_schedA(
             # GET single row from schedA table
             if transaction_id:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind
                                     FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format(
                         "', '".join(report_list)
                     )
                 else:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind
                                     FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format(
                         "', '".join(report_list)
                     )
@@ -528,6 +531,7 @@ def put_sql_schedA(
     donor_cmte_name,
     levin_account_id,
     transaction_type_identifier,
+    aggregation_ind,
 ):
     """
     update a schedule_a item
@@ -537,10 +541,28 @@ def put_sql_schedA(
         with connection.cursor() as cursor:
             # Insert data into schedA table
             cursor.execute(
-                """UPDATE public.sched_a SET line_number = %s, transaction_type = %s, back_ref_transaction_id = %s, back_ref_sched_name = %s, 
-              entity_id = %s, contribution_date = %s, contribution_amount = %s, purpose_description = %s, memo_code = %s, memo_text = %s, election_code = %s, 
-              election_other_description = %s, donor_cmte_id = %s, donor_cmte_name = %s, levin_account_id = %s, transaction_type_identifier = %s, last_update_date = %s 
-              WHERE transaction_id = %s AND report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(
+                """
+                UPDATE public.sched_a 
+                SET line_number = %s, 
+                    transaction_type = %s, 
+                    back_ref_transaction_id = %s, 
+                    back_ref_sched_name = %s, 
+                    entity_id = %s, 
+                    contribution_date = %s, 
+                    contribution_amount = %s, 
+                    purpose_description = %s, 
+                    memo_code = %s, 
+                    memo_text = %s, 
+                    election_code = %s, 
+                    election_other_description = %s, 
+                    donor_cmte_id = %s, 
+                    donor_cmte_name = %s, 
+                    levin_account_id = %s, 
+                    transaction_type_identifier = %s, 
+                    aggregation_ind = %s, 
+                    last_update_date = %s 
+                WHERE transaction_id = %s AND report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y'
+                """.format(
                     "', '".join(report_list)
                 ),
                 [
@@ -560,6 +582,7 @@ def put_sql_schedA(
                     donor_cmte_name,
                     levin_account_id,
                     transaction_type_identifier,
+                    aggregation_ind,
                     datetime.datetime.now(),
                     transaction_id,
                     cmte_id,
@@ -773,6 +796,7 @@ def post_schedA(datum):
                 datum.get("donor_cmte_name"),
                 datum.get("transaction_type_identifier"),
                 datum.get("levin_account_id"),
+                datum.get("aggregation_ind")
             )
             logger.debug("transaction saved...")
             try:
@@ -998,6 +1022,7 @@ def put_schedA(datum):
                 datum.get("donor_cmte_name"),
                 datum.get("levin_account_id"),
                 datum.get("transaction_type_identifier"),
+                datum.get("aggregation_ind"),
             )
             try:
                 if (
@@ -1063,6 +1088,7 @@ def put_schedA(datum):
                             child_datum.get("aggregate_amt"),
                             child_datum.get("beneficiary_cand_entity_id"),
                             child_datum.get("levin_account_id"),
+                            child_datum.get("aggregation_ind"),
                         )
                         # put_sql_schedB(datum.get('cmte_id'), datum.get('report_id'), child_line_number, child_transaction_type, child_transaction_id, transaction_id, datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), '0.00', expenditure_purpose, None, None, None, datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), None, datum.get('donor_cmte_name'), None, None, None, None, None, None, child_transaction_type_identifier)
                     child_SA_transaction_id = get_child_transaction_schedA(
@@ -1122,6 +1148,8 @@ def put_schedA(datum):
                             child_datum.get("donor_cmte_name"),
                             child_datum.get("levin_account_id"),
                             child_datum.get("transaction_type_identifier"),
+                            child_datum.get("aggregation_ind"),
+
                         )
                     child_SB_transaction_id = get_child_transaction_schedB(
                         datum.get("cmte_id"), datum.get("report_id"), transaction_id
@@ -1232,6 +1260,7 @@ def put_schedA(datum):
                         transaction_data.get("donor_cmte_name"),
                         transaction_data.get("levin_account_id"),
                         transaction_data.get("transaction_type_identifier"),
+                        transaction_data.get("aggregation_ind"),
                     )
                 # Updating auto generated reattributed transactions
                 if prev_transaction_data.get("reattribution_ind") == "O":
@@ -1260,6 +1289,7 @@ def put_schedA(datum):
                     prev_transaction_data.get("donor_cmte_name"),
                     prev_transaction_data.get("levin_account_id"),
                     prev_transaction_data.get("transaction_type_identifier"),
+                    prev_transaction_data.get("aggregation_ind"),
                 )
                 raise
         except Exception as e:
@@ -1455,6 +1485,7 @@ def schedA_sql_dict(data):
             "donor_cmte_id": data.get("donor_cmte_id"),
             "levin_account_id": data.get("levin_account_id"),
             "donor_cmte_name": data.get("donor_cmte_name"),
+            "aggregation_ind": data.get("aggregation_ind"),
         }
         if "entity_id" in data and check_null_value(data.get("entity_id")):
             datum["entity_id"] = data.get("entity_id")
