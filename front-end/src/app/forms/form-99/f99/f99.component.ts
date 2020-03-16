@@ -1,7 +1,7 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import 'rxjs/add/operator/takeUntil';
 import { ApiService } from '../../../shared/services/APIService/api.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
@@ -37,6 +37,7 @@ export class F99Component implements OnInit , OnDestroy{
   private _form_submitted: boolean = false;
 
   private onDestroy$ = new Subject();
+  routerEventsSubscription: Subscription;
   
 
   constructor(
@@ -87,7 +88,7 @@ export class F99Component implements OnInit , OnDestroy{
     }
 
 
-    this._router.events.takeUntil(this.onDestroy$).subscribe(val => {
+    this.routerEventsSubscription = this._router.events.takeUntil(this.onDestroy$).subscribe(val => {
         if(val) {
           if(val instanceof NavigationEnd) {
             if(val.url.indexOf('/forms/form/99') === -1) {
@@ -119,6 +120,7 @@ export class F99Component implements OnInit , OnDestroy{
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
+    this.routerEventsSubscription.unsubscribe();
   }
 
 

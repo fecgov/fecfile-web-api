@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -114,7 +114,7 @@ export class EndorserService {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('Contact Table res: ', res);
+            //console.log('Contact Table res: ', res);
 
             return res;
           }
@@ -164,7 +164,7 @@ export class EndorserService {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('Contact Recycle Bin Table res: ', res);
+            //console.log('Contact Recycle Bin Table res: ', res);
 
             return res;
           }
@@ -492,7 +492,7 @@ export class EndorserService {
     )
     .pipe(map(res => {
         if (res) {
-          console.log('Trash Restore response: ', res);
+          //console.log('Trash Restore response: ', res);
           return res;
         }
         return false;
@@ -561,7 +561,7 @@ export class EndorserService {
         .pipe(
           map(res => {
             if (res) {
-              console.log(" saveContact called res...!", res);
+              //console.log(" saveContact called res...!", res);
               return res;
             }
             return false;

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
 import { ReportTypeService } from '../../form-3x/report-type/report-type.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
@@ -54,7 +54,7 @@ export class SchedC1Service {
         .pipe(
           map(res => {
             if (res) {
-              console.log(' saveLoan called res...!', res);
+              //console.log(' saveLoan called res...!', res);
               return res;
             }
             return false;

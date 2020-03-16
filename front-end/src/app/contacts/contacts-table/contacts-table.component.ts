@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -22,7 +22,7 @@ import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
     './contacts-table.component.scss'
   ],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
@@ -32,7 +32,7 @@ import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
         animate(0, style({ opacity: 0 }))
       ])
     ])
-  ]
+  ] */
 })
 export class ContactsTableComponent implements OnInit, OnDestroy {
 
@@ -238,7 +238,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         page, this.config.itemsPerPage,
         serverSortColumnName, sortedCol.descending, this.filters)
       .subscribe((res: GetContactsResponse) => {
-        console.log(" getContactsPage res =", res)
+        //console.log(" getContactsPage res =", res)
         this.contactsModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter
@@ -292,7 +292,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
       this.currentSortedColumnName,
       sortedCol.descending, this.filters)
       .subscribe((res: GetContactsResponse) => {
-        console.log(" getRecyclingPage res =", res)
+        //console.log(" getRecyclingPage res =", res)
         this.contactsModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter

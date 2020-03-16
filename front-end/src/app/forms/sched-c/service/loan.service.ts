@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -112,7 +112,7 @@ export class LoanService {
       )
       .pipe(map(res => {
         if (res) {
-          console.log('get_outstanding_loans API res: ', res);
+          //console.log('get_outstanding_loans API res: ', res);
 
           return res;
         }
@@ -140,7 +140,7 @@ export class LoanService {
     )
       .pipe(map(res => {
         if (res) {
-          console.log('get_outstanding_loans API res: ', res);
+          //console.log('get_outstanding_loans API res: ', res);
 
           return res;
         }
@@ -663,7 +663,7 @@ export class LoanService {
      )
      .pipe(map(res => {
          if (res) {
-           console.log('Trash Restore response: ', res);
+           //console.log('Trash Restore response: ', res);
            return res;
          }
          return false;
@@ -773,8 +773,8 @@ export class LoanService {
     let loanhiddenFields: any;
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    console.log(" saveSched_C transactionTypeIdentifier =", transactionTypeIdentifier)
-    console.log(" saveSched_C subType =", subType)
+    //console.log(" saveSched_C transactionTypeIdentifier =", transactionTypeIdentifier)
+    //console.log(" saveSched_C subType =", subType)
 
     for (const [key, value] of Object.entries(loan)) {
       if (value !== null) {
@@ -794,7 +794,7 @@ export class LoanService {
       loanhiddenFields = loanToCommObj;
     }
 
-    console.log("loanhiddenFields", loanhiddenFields);
+    //console.log("loanhiddenFields", loanhiddenFields);
 
     //Add loan hidden fields
     for (const [key, value] of Object.entries(loanhiddenFields)) {
@@ -804,7 +804,7 @@ export class LoanService {
         }
       }
     }
-    console.log("saveSched_C reportId =", reportId);
+    //console.log("saveSched_C reportId =", reportId);
 
     formData.append('report_id', reportId);
 
@@ -816,7 +816,7 @@ export class LoanService {
         .pipe(
           map(res => {
             if (res) {
-              console.log(" saveLoan called res...!", res);
+              //console.log(" saveLoan called res...!", res);
               return res;
             }
             return false;
@@ -944,7 +944,7 @@ export class LoanService {
     } */
     loanhiddenFields = hiddenFieldsObj;
 
-    console.log("loanhiddenFields", loanhiddenFields);
+    //console.log("loanhiddenFields", loanhiddenFields);
 
     //Add loan hidden fields
     for (const [key, value] of Object.entries(loanhiddenFields)) {
@@ -954,7 +954,7 @@ export class LoanService {
         }
       }
     }
-    console.log("saveSched_C reportId =", reportId);
+    //console.log("saveSched_C reportId =", reportId);
 
     formData.append('report_id', reportId);
 
@@ -966,7 +966,7 @@ export class LoanService {
         .pipe(
           map(res => {
             if (res) {
-              console.log(" saveLoan called res...!", res);
+              //console.log(" saveLoan called res...!", res);
               return res;
             }
             return false;

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -32,12 +32,12 @@ import { FormsService } from '../../shared/services/FormsService/forms.service';
   templateUrl: './reportdetails.component.html',
   styleUrls: ['./reportdetails.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
       transition(':leave', [animate(10, style({ opacity: 0 }))])
     ])
-  ]
+  ] */
 })
 export class ReportdetailsComponent implements OnInit, OnDestroy {
   @ViewChild('columnOptionsModal')
@@ -304,7 +304,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.setAmendmentIndicator(this.reportsModel);
         this.setAmendmentShow(this.reportsModel);
 
-        console.log(' getReportsPage this.reportsModel= ', this.reportsModel);
+        //console.log(' getReportsPage this.reportsModel= ', this.reportsModel);
         this.config.totalItems = res.totalreportsCount ? res.totalreportsCount : 0;
         this.numberOfPages =
           res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
@@ -336,7 +336,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.reportsModel = [];
         this._reportsService.mockApplyFilters(res, this.filters);
         const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
-        console.log(' getRecyclingPage reportsModelL', reportsModelL);
+        //console.log(' getRecyclingPage reportsModelL', reportsModelL);
 
         this.config.totalItems = this.reportsModel.length;
         this.reportsModel = this._reportsService.sortReports(
@@ -779,7 +779,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
 public printReport(report: reportModel): void{
     if (report.form_type === 'F99') {
       this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
-        console.log('getReportInfo res =', res);
+        //console.log('getReportInfo res =', res);
         localStorage.setItem('form_99_details', JSON.stringify(res));
         let formSavedObj: any = {
           saved: true
@@ -794,7 +794,7 @@ public printReport(report: reportModel): void{
             }
           },
           error => {
-            console.log('error: ', error);
+            //console.log('error: ', error);
           }
         );
       }, 1500);
@@ -802,7 +802,7 @@ public printReport(report: reportModel): void{
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
-          console.log('getReportInfo res =', res);
+          //console.log('getReportInfo res =', res);
           localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
           localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
 
@@ -821,7 +821,7 @@ public printReport(report: reportModel): void{
   public uploadReport(report: reportModel): void{
     if (report.form_type === 'F99') {
       this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
-        console.log('getReportInfo res =', res);
+        //console.log('getReportInfo res =', res);
         localStorage.setItem('form_99_details', JSON.stringify(res));
         let formSavedObj: any = {
           saved: true
@@ -835,7 +835,7 @@ public printReport(report: reportModel): void{
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
-          console.log('getReportInfo res =', res);
+          //console.log('getReportInfo res =', res);
           localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
           localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
 
@@ -858,7 +858,7 @@ public printReport(report: reportModel): void{
     
     const imageNumber="201804139108073637"; // Todo in the production get the imagenumber from reports table
     const url=`https://www.fec.gov/data/filings/?data_type=processed&committee_id=${report.cmte_id}&beginning_image_number=${imageNumber}`;
-    console.log("downloadReport url = ", url);
+    //console.log("downloadReport url = ", url);
     window.open(url, '_blank');
 
   }
@@ -975,7 +975,7 @@ public printReport(report: reportModel): void{
     localStorage.setItem('Reports_Edit_Screen', 'Yes');
     if (report.form_type === 'F99') {
       this._reportsService.getReportInfo(report.form_type, report.report_id).subscribe((res: form99) => {
-        console.log('getReportInfo res =', res);
+        //console.log('getReportInfo res =', res);
         localStorage.setItem('form_99_details', JSON.stringify(res));
         //return false;
       });
@@ -987,7 +987,7 @@ public printReport(report: reportModel): void{
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
-          console.log('getReportInfo res =', res);
+          //console.log('getReportInfo res =', res);
           localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
           localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
 
@@ -1469,7 +1469,7 @@ public printReport(report: reportModel): void{
       .then(res => {
         if (res === 'okay') {
           this._reportsService.trashOrRestoreReports('trash', [rep]).subscribe((res: GetReportsResponse) => {
-            console.log("trashReport res =", res);
+            //console.log("trashReport res =", res);
             if (res['result'] === 'success') {
               this.getReportsPage(this.config.currentPage);
               this._dialogService.confirm(
@@ -1566,13 +1566,13 @@ public printReport(report: reportModel): void{
     this._reportsService.amendReport(report).subscribe(res =>
       {        
         report = res;
-        console.log('new amend Res: ', report)
+        //console.log('new amend Res: ', report)
       
         if (report.form_type === 'F3X') {
         this._reportsService
           .getReportInfo(report.form_type, report.report_id)
           .subscribe((res: form3xReportTypeDetails) => {
-            console.log('getReportInfo res =', res);
+            //console.log('getReportInfo res =', res);
             localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
             localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
 

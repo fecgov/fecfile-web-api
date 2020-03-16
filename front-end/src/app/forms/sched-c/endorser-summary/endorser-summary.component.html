@@ -14,20 +14,20 @@
     <thead>
       <tr>
         <th class="endorserSummary__table-checkbox">
-        <input [@fadeInOut]  [(ngModel)]="allEndorserSelected" type="checkbox"
+        <input   [(ngModel)]="allEndorserSelected" type="checkbox"
             (change)="changeAllendorserSummarysSelected()">
         </th>
-         <th [@fadeInOut]  [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
+         <th   [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
         </th>
-        <th [@fadeInOut]  [class]="getSortClass('contribution_amount')" (click)="changeSortDirection('contribution_amount')">Guaranteed Amount`
+        <th   [class]="getSortClass('contribution_amount')" (click)="changeSortDirection('contribution_amount')">Guaranteed Amount`
         </th>
-        <th [@fadeInOut]  [class]="getSortClass('employer')" (click)="changeSortDirection('employer')">Employer
+        <th   [class]="getSortClass('employer')" (click)="changeSortDirection('employer')">Employer
         </th>
-        <th [@fadeInOut]  [class]="getSortClass('occupation')" (click)="changeSortDirection('occupation')">Occupation
+        <th   [class]="getSortClass('occupation')" (click)="changeSortDirection('occupation')">Occupation
         </th>
 
         <th class="bulk_action">
-          <div [@fadeInOut] class="btn-group" ngbDropdown role="group"
+          <div  class="btn-group" ngbDropdown role="group"
             aria-label="Action dropdown">
             <button class="btn btn-sm btn-primary endorserSummary__bulk_action_btn" 
               ngbDropdownToggle [disabled]="bulkActionDisabled">
@@ -50,14 +50,14 @@
         <td>
           <input [(ngModel)]="end.selected" type="checkbox" (click)="checkForMultiChecked($event)">
         </td>
-        <!-- <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{end.entity_type === 'IND' ? end.last_name + ', ' + end.first_name : end.entity_nm}}</td> -->
-        <td [@fadeInOut]>{{end.name}}</td>
-        <td [@fadeInOut] >{{end.contribution_amount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-        <td [@fadeInOut] >{{end.employer}}</td>
-        <td [@fadeInOut] >{{end.occupation}}</td>        
+        <!-- <td  *ngIf="isColumnVisible('name')">{{end.entity_type === 'IND' ? end.last_name + ', ' + end.first_name : end.entity_nm}}</td> -->
+        <td >{{end.name}}</td>
+        <td  >{{end.contribution_amount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+        <td  >{{end.employer}}</td>
+        <td  >{{end.occupation}}</td>        
 
         <td>
-          <div [@fadeInOut] class="btn-group" ngbDropdown role="group"
+          <div  class="btn-group" ngbDropdown role="group"
             aria-label="Action dropdown">
             <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
               <i class="ellipsis-icon"></i>

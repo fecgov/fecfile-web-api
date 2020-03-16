@@ -1,4 +1,5 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
@@ -34,6 +35,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private _toggleNavClicked: boolean = false;
 
   private onDestroy$ = new Subject();
+  routerSubscription: Subscription;
+  childRouteSubscription: Subscription;
+  routerEventsSubscription: Subscription;
 
   constructor(
     private _router: Router,
@@ -48,7 +52,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this._formService.get_filed_form_types().takeUntil(this.onDestroy$)
      .subscribe(res => this.committee_forms = <Icommittee_forms[]> res);
 
-    this._router
+    this.routerSubscription = this._router
       .events
       .subscribe(val => {
         if(val) {
@@ -87,6 +91,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
+    this.routerSubscription.unsubscribe();
+    if(this.childRouteSubscription){
+      this.childRouteSubscription.unsubscribe();
+    }
+    if(this.routerEventsSubscription){
+      this.routerEventsSubscription.unsubscribe();
+    }
   }
   
 
@@ -98,7 +109,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
         let formSelected: string = null;
 
-        this._activatedRoute
+        this.childRouteSubscription = this._activatedRoute
           .children[0]
           .params
           .subscribe(param => {
@@ -141,7 +152,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
    */
   public formSelected(form: string): void {
 
-    this._router
+    this.routerEventsSubscription = this._router
       .events
       .subscribe(val => {
         if(val instanceof NavigationEnd) {
@@ -203,10 +214,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
    */
   private _closeNavBar(): void {
     this.iconClass = 'bars-icon';
-
-    setTimeout(() => {
-      this.sidebarVisibleClass = 'sidebar-hidden';
-    }, 100);
+    this.sidebarVisibleClass = 'sidebar-hidden';
 
     this.status.emit({
       showSidebar: false
@@ -219,9 +227,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private _openNavBar(): void {
     this.iconClass = 'close-icon';
 
-    setTimeout(() => {
-      this.sidebarVisibleClass = 'sidebar-visible';
-    }, 100);
+    this.sidebarVisibleClass = 'sidebar-visible';
 
     this.status.emit({
       showSidebar: true

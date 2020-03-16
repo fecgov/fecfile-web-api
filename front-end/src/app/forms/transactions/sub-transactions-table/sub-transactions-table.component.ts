@@ -9,7 +9,7 @@ import {
   ViewChildren,
   QueryList,
   OnChanges
-} from '@angular/core';
+, ChangeDetectionStrategy } from '@angular/core';
 import { TransactionsService, GetTransactionsResponse } from '../service/transactions.service';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { TransactionModel } from '../model/transaction.model';
@@ -29,12 +29,12 @@ import { trigger, transition, style, animate } from '@angular/animations';
   selector: 'app-sub-transactions-table',
   templateUrl: './sub-transactions-table.component.html',
   styleUrls: ['./sub-transactions-table.component.scss'],
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
       transition(':leave', [animate(0, style({ opacity: 0 }))])
     ])
-  ]
+  ] */
 })
 export class SubTransactionsTableComponent implements OnInit, OnChanges {
   @Input()

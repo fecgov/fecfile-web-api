@@ -180,25 +180,25 @@
           <table class="table table-striped table-hover table__sortable">
             <thead>
               <tr>
-                <th [@fadeInOut]></th>
-                <th [@fadeInOut] (click)="changeSortDirection('date')">
+                <th ></th>
+                <th  (click)="changeSortDirection('date')">
                   Date
                   <i class="fa fa-sort" aria-hidden="false"></i>
                 </th>
-                <th [@fadeInOut] (click)="changeSortDirection('transfer_type')">
+                <th  (click)="changeSortDirection('transfer_type')">
                   Transfer Type
                   <i class="fa fa-sort" aria-hidden="false"></i>
                 </th>
-                <th [@fadeInOut] (click)="changeSortDirection('account_name')">
+                <th  (click)="changeSortDirection('account_name')">
                   Account Name
                   <i class="fa fa-sort" aria-hidden="false"></i>
                 </th>
 
-                <th [@fadeInOut] (click)="changeSortDirection('transfer_amount')">
+                <th  (click)="changeSortDirection('transfer_amount')">
                   Transfer Amount
                   <i class="fa fa-sort" aria-hidden="false"></i>
                 </th>
-                <!-- <th [@fadeInOut] (click)="changeSortDirection('federal_percent')">Aggregate Amount -->
+                <!-- <th  (click)="changeSortDirection('federal_percent')">Aggregate Amount -->
                 <!-- <i class="fa fa-sort" aria-hidden="false"></i> -->
                 <!-- </th> -->
               </tr>
@@ -221,11 +221,10 @@
                     {{ item.transferred_amount }}
                   </td>
                   <td class="bulk_action">
-                    <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-                      <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-                        <i class="fas fa-ellipsis-h"></i>
-                      </button>
-
+                      <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                          <i class="fas fa-ellipsis-h"></i>
+                        </button>
                       <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
                         <button class="dropdown-item" (click)="editH5Sub(item)"><i class="fas fa-edit"></i>
                           Edit</button>
@@ -289,25 +288,25 @@
         <table class="table table-striped table-hover table__sortable">
           <thead>
             <tr>
-              <th [@fadeInOut]></th>
-              <th [@fadeInOut] (click)="changeSortDirection('date')">
+              <th ></th>
+              <th  (click)="changeSortDirection('date')">
                 Date
                 <i class="fa fa-sort" aria-hidden="false"></i>
               </th>
-              <th [@fadeInOut] (click)="changeSortDirection('transfer_type')">
+              <th  (click)="changeSortDirection('transfer_type')">
                 Transfer Type
                 <i class="fa fa-sort" aria-hidden="false"></i>
               </th>
-              <th [@fadeInOut] (click)="changeSortDirection('account_name')">
+              <th  (click)="changeSortDirection('account_name')">
                 Account Name
                 <i class="fa fa-sort" aria-hidden="false"></i>
               </th>
 
-              <th [@fadeInOut] (click)="changeSortDirection('transfer_amount')">
+              <th  (click)="changeSortDirection('transfer_amount')">
                 Transfer Amount
                 <i class="fa fa-sort" aria-hidden="false"></i>
               </th>
-              <!-- <th [@fadeInOut] (click)="changeSortDirection('federal_percent')">Aggregate Amount -->
+              <!-- <th  (click)="changeSortDirection('federal_percent')">Aggregate Amount -->
               <!-- <i class="fa fa-sort" aria-hidden="false"></i> -->
               <!-- </th> -->
             </tr>
@@ -330,7 +329,7 @@
                 <!-- <td class="summary_text_amt">{{ report.aggregateAmount | currency:'USD':'symbol-narrow':'1.2-2' }}</td> -->
 
                 <td class="bulk_action">
-                  <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                  <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                       <i class="fas fa-ellipsis-h"></i>
                     </button>

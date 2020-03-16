@@ -1,4 +1,4 @@
-import { Component, HostListener, SimpleChanges } from '@angular/core';
+import { Component, HostListener, SimpleChanges, OnDestroy, OnInit, HostBinding , ChangeDetectionStrategy } from '@angular/core';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { MessageService } from './shared/services/MessageService/message.service';
 import { DialogService } from './shared/services/DialogService/dialog.service';
@@ -14,13 +14,23 @@ import { FormsService } from './shared/services/FormsService/forms.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy{
+
+  @HostBinding('@.disabled')
+  public animationsDisabled = true;
+  
+  routerEventsSubscription: any;
+  
   timeStart = false;
   seconds = 1200;
 
   clientX = 0;
   clientY = 0;
-  private timeIsUp: boolean = false;
+  private timeIsUp:boolean = false;
+  timerSubscription: any;
+  idlePingSubscription: any;
+  timeoutSubscription: any;
+  routerEventsSubscriptionOnNgDoCheck: any;
 
   constructor(
     private userIdle: UserIdleService,
@@ -33,15 +43,15 @@ export class AppComponent {
 
   ngOnInit() {
     this.restart();
-    this._router.events.subscribe(val => {
+    this.routerEventsSubscription = this._router.events.subscribe(val => {
       if (val instanceof NavigationEnd && val.url !== '/') {
         // Start watching for user inactivity.
         this.userIdle.startWatching();
 
         // Start watching when user idle is starting.
-        this.userIdle.onTimerStart().subscribe(count => {
+        this.timerSubscription = this.userIdle.onTimerStart().subscribe(count => {
           this.seconds = this.seconds - 1;
-          this.timeStart = true; /* console.log(count) */
+          this.timeStart = true; /* //console.log(count) */
           if (this.timeStart && !this.timeIsUp) {
             // Enhancement: To display countdown timer
             const minutes: number = Math.floor(count / 60);
@@ -67,10 +77,11 @@ export class AppComponent {
               });
           }
         });
-        this.userIdle.ping$.subscribe(res => { });
+        this.idlePingSubscription = this.userIdle.ping$.subscribe(res => {
+        });
 
         // Start watch when time is up.
-        this.userIdle.onTimeout().subscribe(res => {
+        this.timeoutSubscription = this.userIdle.onTimeout().subscribe(res => {
           this.timeIsUp = true;
           this._dialogService.checkIfModalOpen();
           this._sessionService.destroy();
@@ -91,12 +102,20 @@ export class AppComponent {
     });
   }
 
+  ngOnDestroy(): void {
+    this.routerEventsSubscription.unsubscribe();
+    this.timerSubscription.unsubscribe();
+    this.idlePingSubscription.unsubscribe();
+    this.timeoutSubscription.unsubscribe();
+    this.routerEventsSubscriptionOnNgDoCheck.unsubscribe();
+  }
+  
   ngDoCheck(): void {
     if (this._router.url === '/') {
       this.stopWatching();
       this._dialogService.checkIfModalOpen();
     }
-    this._router.events.subscribe(val => {
+    this.routerEventsSubscriptionOnNgDoCheck = this._router.events.subscribe(val => {
       let oldUrl = '';
       if (val instanceof NavigationEnd) {
         oldUrl = val.url;

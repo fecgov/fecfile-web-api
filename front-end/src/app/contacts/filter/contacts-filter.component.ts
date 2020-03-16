@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ContactsMessageService } from '../service/contacts-message.service';
@@ -21,7 +21,7 @@ import { MessageService } from '../../shared/services/MessageService/message.ser
   templateUrl: './contacts-filter.component.html',
   styleUrls: ['./contacts-filter.component.scss'],
   providers: [NgbTooltipConfig, OrderByPipe],
-  animations: [
+   animations: [
     trigger('openClose', [
       state('open', style({
         'max-height': '500px', // Set high to handle multiple scenarios.
@@ -70,7 +70,7 @@ import { MessageService } from '../../shared/services/MessageService/message.ser
         animate('.5s ease')
       ]),
     ]),
-  ]
+  ] 
 })
 export class ContactsFilterComponent implements OnInit, OnDestroy {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
@@ -324,7 +324,7 @@ export class ContactsFilterComponent implements OnInit, OnDestroy {
 
     filters.show = modified;
 
-    console.log("filters = ", filters);
+    //console.log("filters = ", filters);
     filters.show = modified;
     this._contactsMessageService.sendApplyFiltersMessage({filters: filters, isClearKeyword: isClearKeyword});
   }

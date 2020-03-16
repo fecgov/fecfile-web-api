@@ -16,7 +16,7 @@
               <div class="header-container">
                 <!--<h1 class="pb-1 m-3 border-bottom">Reports</h1>-->
                   <h1>Reports
-                  <span [@fadeInOut] *ngIf="isRecycleBinViewActive()"> / Recycling Bin
+                  <span  *ngIf="isRecycleBinViewActive()"> / Recycling Bin
                     <span class="trash-icon"></span>
                   </span></h1>
                 </div>
@@ -26,7 +26,7 @@
             <div class="grid-row">
                  <div class="grid-row__col grid-row__col--12">
                    <div class="reports__btn-container">                 
-                     <!-- <button [@fadeInOut] *ngIf="isReportViewActive()"  class="btn btn-primary" type="button" (click)="showPinColumns()">
+                     <!-- <button  *ngIf="isReportViewActive()"  class="btn btn-primary" type="button" (click)="showPinColumns()">
                       <i class="thumbtack-icon"></i>Pin Columns
                       </button> &nbsp;&nbsp;&nbsp;-->
           

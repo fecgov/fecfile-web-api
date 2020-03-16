@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter, SimpleChanges , ChangeDetectionStrategy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
@@ -30,7 +30,7 @@ export enum loanSumarysActions {
   templateUrl: './endorser-summary.component.html',
   styleUrls: ['./endorser-summary.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
@@ -40,7 +40,7 @@ export enum loanSumarysActions {
         animate(0, style({ opacity: 0 }))
       ])
     ])
-  ]
+  ] */
 })
 export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
@@ -156,12 +156,12 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
   }
 
   public ngOnChanges(changes:SimpleChanges){
-    console.log('this.ngOnChanges is called');
+    //console.log('this.ngOnChanges is called');
     this.ngOnInit();
   }
 
   public goToPage(pageEvent: any){
-    console.log(pageEvent);
+    //console.log(pageEvent);
     this.currentPageNumber = pageEvent;
   }
 
@@ -198,7 +198,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
 
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
-    console.log(" getPage this.tableType", this.tableType)
+    //console.log(" getPage this.tableType", this.tableType)
     switch (this.tableType) {
       case this.endorserView:
         this.getendorserPage(page);
@@ -243,7 +243,7 @@ export class EndorserSummaryComponent implements OnInit , OnDestroy {
       .subscribe((res: any) => {
 
         // res=this.tempApiResponse;
-        console.log(" getEndorserPage res =", res)
+        //console.log(" getEndorserPage res =", res)
         this.endorserModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter
