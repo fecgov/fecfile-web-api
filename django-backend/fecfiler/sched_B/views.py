@@ -1774,6 +1774,9 @@ def force_aggregate_sb(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+@api_view(["PUT"])
+def force_unitemize_sb(request):
+    pass
 
 @api_view(["PUT"])
 def force_itemize_sb(request):
@@ -1798,6 +1801,7 @@ def force_itemize_sb(request):
         return Response(
             "The force_itemize_sb API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 @api_view(["PUT"])
