@@ -50,7 +50,8 @@ from fecfiler.core.aggregation_helper import (
     load_schedE,
     update_aggregate_sl,
     update_linenumber_aggamt_transactions_SA,
-    func_aggregate_amount
+    func_aggregate_amount,
+    update_sa_itmization_status,
 )
 
 from fecfiler.core.report_helper import renew_report_update_date
@@ -2120,6 +2121,56 @@ def update_sa_aggregation_status(transaction_id, status):
     except:
         raise
 
+
+@api_view(["PUT"])
+def force_itemize_sa(request):
+    """
+    api to force a transaction to be itemized:
+    1. set itemized_ind = 'Y'
+    2. update line number if necessary
+    """
+    # if request.method == "GET":
+    try:
+        cmte_id = request.user.username
+        report_id = request.data.get("report_id")
+        transaction_id = request.data.get("transaction_id")
+        if not transaction_id:
+            raise Exception("transaction id is required for this api call.")
+        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+        update_sa_itmization_status(sa_data, status = 'Y')
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
+    except Exception as e:
+        return Response(
+            "The force_aggregate_sa API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+@api_view(["PUT"])
+def force_unitemize_sa(request):
+    """
+    api to force a transaction to be un-itemized:
+    1. set itemized_ind = 'N'
+    2. update line number if necessary
+    """
+    # if request.method == "GET":
+    try:
+        cmte_id = request.user.username
+        report_id = request.data.get("report_id")
+        transaction_id = request.data.get("transaction_id")
+        if not transaction_id:
+            raise Exception("transaction id is required for this api call.")
+        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+        update_sa_itmization_status(sa_data, status = 'N')
+        return JsonResponse(
+                {"status": "success"}, status=status.HTTP_200_OK
+            )
+    except Exception as e:
+        return Response(
+            "The force_aggregate_sa API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 @api_view(["PUT"])
 def force_aggregate_sa(request):

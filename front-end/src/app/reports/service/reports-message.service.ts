@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Subject } from 'rxjs/Subject';
 
@@ -50,7 +50,7 @@ export class ReportsMessageService {
    * @param message
    */
   public sendApplyFiltersMessage(message: any) {
-    console.log("sendApplyFiltersMessage message = ", message);
+    //console.log("sendApplyFiltersMessage message = ", message);
     this.applyFiltersSubject.next(message);
   }
 

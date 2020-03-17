@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -57,9 +57,9 @@ export class TypeaheadService {
       fieldName = fieldName.substring(6);
     } else {
       if (fieldName) {
-        console.log(`invalid field name for ${url} of ${fieldName}`);
+        //console.log(`invalid field name for ${url} of ${fieldName}`);
       } else {
-        console.log(`invalid field name for ${url}`);
+        //console.log(`invalid field name for ${url}`);
       }
       return Observable.of([]);
     }

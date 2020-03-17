@@ -1,17 +1,6 @@
 import { ReportTypeService } from './../../form-3x/report-type/report-type.service';
 import { TransactionsService } from './../../transactions/service/transactions.service';
-import {
-  Component,
-  Input,
-  OnInit,
-  ViewEncapsulation,
-  ViewChild,
-  OnDestroy,
-  Output,
-  EventEmitter,
-  SimpleChanges
-} from '@angular/core';
-import { style, animate, transition, trigger } from '@angular/animations';
+import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy, Output, EventEmitter, SimpleChanges  } from '@angular/core';
 import { PaginationInstance } from 'ngx-pagination';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { LoanModel } from '../model/loan.model';
@@ -19,7 +8,6 @@ import { SortableColumnModel } from '../../../shared/services/TableService/sorta
 import { LoanService, GetLoanResponse } from '../../sched-c/service/loan.service';
 import { TableService } from '../../../shared/services/TableService/table.service';
 import { UtilService } from '../../../shared/utils/util.service';
-//import { ActiveView } from '../loan-summary/
 import { LoanMessageService } from '../../sched-c/service/loan-message.service';
 import { Subscription } from 'rxjs/Subscription';
 import {
@@ -47,12 +35,12 @@ export enum loanSumarysActions {
   templateUrl: './loan-summary.component.html',
   styleUrls: ['./loan-summary.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
       transition(':leave', [animate(0, style({ opacity: 0 }))])
     ])
-  ]
+  ] */
 })
 export class LoanSummaryComponent implements OnInit, OnDestroy {
   @ViewChild('columnOptionsModal')
@@ -193,7 +181,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   }
 
   public goToPage(pageEvent: any) {
-    console.log(pageEvent);
+    //console.log(pageEvent);
     this.currentPageNumber = pageEvent;
   }
 
@@ -215,7 +203,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public getPage(page: number, message: any = null): void {
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
-    console.log(' getPage this.tableType', this.tableType);
+    //console.log(" getPage this.tableType", this.tableType)
     switch (this.tableType) {
       case this.LoanView:
         this.getLoanPage(page, message);
@@ -258,7 +246,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
       .subscribe((res: any) => {
         // res=this.tempApiResponse;
-        console.log(' getLoanPage res =', res);
+        //console.log(" getLoanPage res =", res)
         this.LoanModel = [];
 
         // fixes an issue where no items shown when current page != 1 and new filter

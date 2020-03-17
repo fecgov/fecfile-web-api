@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit , ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
@@ -47,19 +47,19 @@ export class FinancialSummaryComponent implements OnInit, OnDestroy {
     this.step = this._activatedRoute.snapshot.queryParams.step;
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
-    console.log('this.step = ', this.step);
+    //console.log('this.step = ', this.step);
 
     this._financialSummaryService.getSummaryDetails('3X').subscribe(
       res => {
         if (res) {
-          console.log('Accessing FinancialSummaryComponent res ...', res);
+          //console.log('Accessing FinancialSummaryComponent res ...', res);
           this.tab1Data = res['Total Raised'];
           this.tab2Data = res['Total Spent'];
           this.tab3Data = res['Cash summary'];
         }
       },
       error => {
-        console.log('error: ', error);
+        //console.log('error: ', error);
       }
     );
   }
@@ -76,7 +76,7 @@ export class FinancialSummaryComponent implements OnInit, OnDestroy {
   }
 
   public printPreview(): void {
-    console.log('FinancialSummaryComponent printPreview this._formType = ', this._formType);
+    //console.log('FinancialSummaryComponent printPreview this._formType = ', this._formType);
     this._reportTypeService.printPreview('financial_screen', this._formType);
   }
 
@@ -94,7 +94,7 @@ export class FinancialSummaryComponent implements OnInit, OnDestroy {
         this.reportId = this._form3XReportType.reportid;
       }
     }
-    console.log(' FinancialSummaryComponent this.reportId = ', this.reportId);
+    //console.log(' FinancialSummaryComponent this.reportId = ', this.reportId);
     this._transactionsMessageService.sendLoadTransactionsMessage(this.reportId);
     this._router.navigate([`/forms/form/${this._formType}`], {
       queryParams: { step: 'transactions', reportId: this.reportId, edit: this.editMode, transactionCategory: transactionCategory }

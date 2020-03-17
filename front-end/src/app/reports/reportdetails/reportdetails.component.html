@@ -79,37 +79,37 @@
         <thead>
             <tr>
                 <!--<th class="reports__table-checkbox">
-                    <input [@fadeInOut]  [(ngModel)]="allReportsSelected" type="checkbox"
+                    <input   [(ngModel)]="allReportsSelected" type="checkbox"
                     (change)="changeAllReportsSelected()">
                 </th>-->
                 
-                <th [@fadeInOut] *ngIf="isColumnVisible('form_type')" [class]="getSortClass('form_type')"
+                <th  *ngIf="isColumnVisible('form_type')" [class]="getSortClass('form_type')"
                     (click)="changeSortDirection('form_type')">Form
                 </th>
-                <th [@fadeInOut] *ngIf="isColumnVisible('status')" [class]="getSortClass('status')"
+                <th  *ngIf="isColumnVisible('status')" [class]="getSortClass('status')"
                     (click)="changeSortDirection('status')">Status
                 </th>
-                <th [@fadeInOut] *ngIf="isColumnVisible('fec_id')" [class]="getSortClass('fec_id')"
+                <th  *ngIf="isColumnVisible('fec_id')" [class]="getSortClass('fec_id')"
                     (click)="changeSortDirection('fec_id')">FEC ID
                 </th>
-                <th [@fadeInOut] *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())" [class]="getSortClass('amend_ind')"
+                <th  *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())" [class]="getSortClass('amend_ind')"
                     (click)="changeSortDirection('amend_ind')">Amendment <br /> Indicator
                 </th>
-                <th [@fadeInOut] *ngIf="isColumnVisible('cvg_start_date')" [class]="getSortClass('cvg_start_date')"
+                <th  *ngIf="isColumnVisible('cvg_start_date')" [class]="getSortClass('cvg_start_date')"
                     (click)="changeSortDirection('cvg_start_date')">Coverage Date <br />Cycle
                 </th>
-                <th [@fadeInOut] *ngIf="isColumnVisible('report_type_desc')" [class]="getSortClass('report_type_desc')"
+                <th  *ngIf="isColumnVisible('report_type_desc')" [class]="getSortClass('report_type_desc')"
                     (click)="changeSortDirection('report_type_desc')">Report
                 </th>
-                <th [@fadeInOut] *ngIf="isColumnVisible('filed_date')" [class]="getSortClass('filed_date')"
+                <th  *ngIf="isColumnVisible('filed_date')" [class]="getSortClass('filed_date')"
                     (click)="changeSortDirection('filed_date')">Filed/Saved <br />Date Time
                 </th>
-                <th [@fadeInOut] *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())" [class]="getSortClass('deleted_date')"
+                <th  *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())" [class]="getSortClass('deleted_date')"
                     (click)="changeSortDirection('deleted_date')">Deleted Date <br />Time
                  </th>
 
             <!--    <th class="bulk_action">
-                    <div [@fadeInOut] *ngIf="isReportViewActive()" class="btn-group" 
+                    <div  *ngIf="isReportViewActive()" class="btn-group" 
                             ngbDropdown role="group" aria-label="Action dropdown">
                         <button class="btn btn-sm btn-primary reports__bulk_action_btn" 
                             ngbDropdownToggle [disabled]="bulkActionDisabled">
@@ -124,7 +124,7 @@
                             </button>
                         </div>
                     </div> 
-                    <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                    <div  *ngIf="isRecycleBinViewActive()">
                         <button class="btn btn-sm btn-primary reports__bulk_action_btn" 
                           (click)="deleteRecyleBin()"
                           [disabled]="bulkActionDisabled">
@@ -174,7 +174,7 @@
                         </button>
                     </div>
 
-                    <div [@fadeInOut]
+                    <div 
                         *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status === 'Saved' && (report.amend_ind === 'N' || report.amend_ind === 'T')"
                         class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
@@ -199,7 +199,7 @@
                         </div>
                     </div>
 
-                    <div [@fadeInOut]
+                    <div 
                         *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status !== 'Filed' && !(report.amend_ind === 'N' || report.amend_ind === 'T')"
                         class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
@@ -223,7 +223,7 @@
                         </div>
                     </div>
 
-                    <div [@fadeInOut]
+                    <div 
                         *ngIf="isReportViewActive() && report.form_type !== 'F99' && report.status === 'Filed'"
                         class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
@@ -246,7 +246,7 @@
                         </div>
                     </div>
 
-                    <div [@fadeInOut]
+                    <div 
                         *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status === 'Filed'"
                         class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 
@@ -266,7 +266,7 @@
                         </div>
                     </div>
 
-                    <div [@fadeInOut]
+                    <div 
                         *ngIf="isReportViewActive() && report.form_type === 'F99' && report.status !== 'Filed'"
                         class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
 

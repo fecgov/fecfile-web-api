@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ApiService } from '../shared/services/APIService/api.service';
 import { FormsService } from '../shared/services/FormsService/forms.service';
@@ -46,7 +46,7 @@ export class ReportsComponent implements OnInit , OnDestroy{
     }
 }
   ngOnInit() {
-    console.log("accessing service call...");
+    //console.log("accessing service call...");
 
     if (localStorage.getItem('form3XReportInfo.showDashBoard')==="Y"){
       this._formService.removeFormDashBoard("3X");
@@ -55,7 +55,7 @@ export class ReportsComponent implements OnInit , OnDestroy{
     this._reportService.getReports()
     .takeUntil(this.onDestroy$)
       .subscribe(res => this.reports = <IReport[]> res);
-    console.log(this.reports)
+    //console.log(this.reports)
   }
 
   public open(): void{

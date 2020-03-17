@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -40,7 +40,7 @@ export class SchedLService {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('SL Transactions res: ', res);
+            //console.log('SL Transactions res: ', res);
             return res;
           }
           return false;
@@ -68,7 +68,7 @@ export class SchedLService {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('SL Summary res: ', res);
+            //console.log('SL Summary res: ', res);
             return res;
           }
           return false;

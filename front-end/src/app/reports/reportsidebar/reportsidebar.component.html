@@ -12,7 +12,7 @@
                   [ngClass]="toggleFilterDirection(isHideFormFilter)">
                 </i>          
               </div>
-              <div class="card-body" [@openCloseScroll]="determineScrollState(isHideFormFilter)">
+              <div class="card-body" >
                 <div class="transactions__filter-type-list-body">
                   <ul class="transactions__filter-type-list">
                     <li *ngFor="let form of forms">
@@ -35,7 +35,7 @@
                     [ngClass]="toggleFilterDirection(isHideStatusFilter)">
                   </i>          
                 </div>
-                <div class="card-body" [@openCloseScroll]="determineScrollState(isHideStatusFilter)">
+                <div class="card-body" >
                   <div class="transactions__filter-type-list-body">
                     <ul class="transactions__filter-type-list">
                       <li *ngFor="let status of statuss">
@@ -58,7 +58,7 @@
                       [ngClass]="toggleFilterDirection(isHideAmendmentIndicatorFilter)">
                     </i>          
                   </div>
-                  <div class="card-body" [@openCloseScroll]="determineScrollState(isHideAmendmentIndicatorFilter)">
+                  <div class="card-body" >
                     <div class="transactions__filter-type-list-body">
                       <ul class="transactions__filter-type-list">
                         <li *ngFor="let amendmentindicator of amendmentindicators">
@@ -81,7 +81,7 @@
             [ngClass]="toggleFilterDirection(isHideCvgDateFilter)">
           </i>
         </div>
-        <div class="card-body" [@openClose]="!isHideCvgDateFilter ? 'open' : 'closed'">
+        <div class="card-body" >
           <div *ngIf="dateFilterValidation.isError" class="text-error text-center">
             {{ dateFilterValidation.message }}
           </div>
@@ -129,7 +129,7 @@
               [ngClass]="toggleFilterDirection(isHideTypeFilter)">
             </i>          
           </div>
-          <div class="card-body" [@openCloseScroll]="determineScrollState(isHideReportFilter)">
+          <div class="card-body" >
             <div class="transactions__filter-type-list-body">
               <ul class="transactions__filter-type-list">
                 <li *ngFor="let report of reports">
@@ -152,7 +152,7 @@
             [ngClass]="toggleFilterDirection(isHideFiledDateFilter)">
           </i>
         </div>
-        <div class="card-body" [@openClose]="!isHideFiledDateFilter ? 'open' : 'closed'">
+        <div class="card-body" >
           <div *ngIf="filedDateFilterValidation.isError" class="text-error text-center">
             {{ filedDateFilterValidation.message }}
           </div>
@@ -200,7 +200,7 @@
             [ngClass]="toggleFilterDirection(isHideDeletedDateFilter)">
           </i>
         </div>
-        <div class="card-body" [@openClose]="!isHideDeletedDateFilter ? 'open' : 'closed'">
+        <div class="card-body" >
           <div *ngIf="deletedDateFilterValidation.isError" class="text-error text-center">
             {{ deletedDateFilterValidation.message }}
           </div>

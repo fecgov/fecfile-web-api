@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -485,7 +485,7 @@ export class ReportsService {
       })
       .map(res => {
         if (res) {
-          console.log('Report Trash Restore response: ', res);
+          //console.log('Report Trash Restore response: ', res);
           return res;
         }
         return false;
@@ -534,7 +534,7 @@ export class ReportsService {
       .pipe(
         map(res => {
           if (res) {
-            console.log('amend res: ', res);
+            //console.log('amend res: ', res);
             return res;
           }
           return false;
@@ -559,7 +559,7 @@ export class ReportsService {
       })
       .map(res => {
         if (res) {
-          // console.log('Ypdate Report Date response: ', res);
+          // //console.log('Ypdate Report Date response: ', res);
           return res;
         }
         return false;

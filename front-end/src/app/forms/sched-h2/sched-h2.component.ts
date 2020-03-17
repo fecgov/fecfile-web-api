@@ -47,18 +47,20 @@ import { SchedH2Service } from './sched-h2.service';
   styleUrls: ['./sched-h2.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
       transition(':leave', [animate(0, style({ opacity: 0 }))])
     ])
-  ]
+  ] */
 })
 export class SchedH2Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
   @Input() scheduleType: string;
+  @Input() transactionData: any;
+
   @Output() status: EventEmitter<any>;
 
   public formType: string;
@@ -143,7 +145,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService
+      _reportsService,
+      _schedHMessageServiceService
     );
     _schedH2Service;
     _individualReceiptService;
@@ -157,7 +160,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       .getEditTransactionMessage()
       .takeUntil(this._H2onDestroy$)
       .subscribe((trx: TransactionModel) => {
-        console.log(trx.transactionTypeIdentifier + 'tranc iden');
+        //console.log(trx.transactionTypeIdentifier + 'tranc iden');
         if (trx.transactionTypeIdentifier === 'ALLOC_H2_RATIO') {
           this.editH2(trx);
         }
@@ -214,7 +217,9 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');
 
-    this.schedH2.patchValue({ select_activity_function: '' }, { onlySelf: true });
+    this.schedH2.patchValue({ select_activity_function: ''}, { onlySelf: true });
+    this.sendPopulateMessageIfApplicable();
+   
   }
 
   pageChanged(event) {

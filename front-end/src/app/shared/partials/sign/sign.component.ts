@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, Input, ViewEncapsulation, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input, ViewEncapsulation, SimpleChanges, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -17,7 +17,8 @@ import { loadElementInternal } from '@angular/core/src/render3/util';
   styleUrls: ['./sign.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class SignComponent implements OnInit {
+export class SignComponent implements OnInit, OnDestroy {
+  
   @Input() comittee_details;
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
@@ -54,6 +55,8 @@ export class SignComponent implements OnInit {
   public confirm_email_1: string = '';
   public confirm_email_2: string = '';
   public fec_id = '';
+  queryParamsSubscription: Subscription;
+  messageSubscription: Subscription;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -64,7 +67,7 @@ export class SignComponent implements OnInit {
     private _router: Router,
     private _reportTypeService: ReportTypeService
   ) {
-    _activatedRoute.queryParams.subscribe(p => {
+    this.queryParamsSubscription  = _activatedRoute.queryParams.subscribe(p => {
       if (p.refresh) {
         this._setRefresh = true;
         this.ngOnInit();
@@ -87,13 +90,13 @@ export class SignComponent implements OnInit {
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
     }
 
-    console.log('this._form_details = ', this._form_details);
+    //console.log('this._form_details = ', this._form_details);
 
     this._setForm();
 
-    this._messageService.getMessage().subscribe(res => {
+    this.messageSubscription = this._messageService.getMessage().subscribe(res => {
       if (res.message) {
-        console.log('res.message', res.message);
+        //console.log('res.message', res.message);
         if (res.message === 'New form99') {
           this._setForm();
         }
@@ -102,8 +105,15 @@ export class SignComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
+    //console.log(changes);
   }
+
+
+  ngOnDestroy(): void {
+    this.queryParamsSubscription.unsubscribe();
+    this.messageSubscription.unsubscribe();
+  }
+
 
   ngDoCheck(): void {
     if (this.formType === '99') {
@@ -135,7 +145,7 @@ export class SignComponent implements OnInit {
   public async canDeactivate(): Promise<boolean> {
     if (this.hasUnsavedData()) {
       let result: boolean = null;
-      console.log('true');
+      //console.log('true');
       result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
         let val: boolean = null;
 
@@ -150,7 +160,7 @@ export class SignComponent implements OnInit {
 
       return result;
     } else {
-      console.log('no unsaved data false');
+      //console.log('no unsaved data false');
       return true;
     }
   }
@@ -428,7 +438,7 @@ export class SignComponent implements OnInit {
                 }
               },
               error => {
-                console.log('error: ', error);
+                //console.log('error: ', error);
               }
             );
           }
@@ -446,13 +456,13 @@ export class SignComponent implements OnInit {
                 }
               },
               error => {
-                console.log('error: ', error);
+                //console.log('error: ', error);
               }
             );
           }
         }
       }
-      console.log(' saveForm this.frmSaved =', this.frmSaved);
+      //console.log(' saveForm this.frmSaved =', this.frmSaved);
     } else {
       if (this.formType === '99') {
         this._dialogService
@@ -555,7 +565,7 @@ export class SignComponent implements OnInit {
                   if (saveResponse) {
                     this._formsService.submitForm({}, this.formType).subscribe(res => {
                       if (res) {
-                        console.log(' response = ', res);
+                        //console.log(' response = ', res);
                         this.status.emit({
                           form: this.frmSignee,
                           direction: 'next',
@@ -579,7 +589,7 @@ export class SignComponent implements OnInit {
                   }
                 },
                 error => {
-                  console.log('error: ', error);
+                  //console.log('error: ', error);
                 }
               );
             } else if (this.formType === '3X') {
@@ -616,7 +626,7 @@ export class SignComponent implements OnInit {
             if (this.formType === '99') {
               this._formsService.submitForm({}, this.formType).subscribe(res => {
                 if (res) {
-                  console.log(' response = ', res);
+                  //console.log(' response = ', res);
                   this.status.emit({
                     form: this.frmSignee,
                     direction: 'next',
@@ -634,7 +644,7 @@ export class SignComponent implements OnInit {
             } else if (this.formType === '3X') {
               this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
                 if (res) {
-                  console.log(' response = ', res);
+                  //console.log(' response = ', res);
                   this.fec_id = res.fec_id;
                   /*this.frmSaved = true;
           
@@ -881,7 +891,7 @@ export class SignComponent implements OnInit {
           });
       }
     }
-    console.log('this.signFailed: ', this.signFailed);
+    //console.log('this.signFailed: ', this.signFailed);
   }
 
   public toggleToolTip(tooltip): void {
@@ -898,13 +908,13 @@ export class SignComponent implements OnInit {
    */
   public goToPreviousStep(): void {
     if (this.formType === '99') {
-      console.log('im in previous');
+      //console.log('im in previous');
       this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
       this._form_details['additional_email_1'] = '';
       this._form_details['additional_email_2'] = '';
       localStorage.setItem(`form_99_details`, JSON.stringify(this._form_details));
       this.frmSaved = false;
-      console.log('Email 1' +  this._form_details.additional_email_1);
+      //console.log('Email 1' +  this._form_details.additional_email_1);
       this.status.emit({
         form: {},
         direction: 'previous',
@@ -928,7 +938,7 @@ export class SignComponent implements OnInit {
         '', ConfirmModalComponent, '', true)
         .then(res => {
           if (res === 'okay' ? true : false ) {
-            console.log('im here value of res:' + res);
+            //console.log('im here value of res:' + res);
             this.goToPreviousStep();
           }
         });
@@ -939,10 +949,10 @@ export class SignComponent implements OnInit {
     if (this._form_details) {
       if (this.formType === '99') {
         if (this._form_details.additional_email_1.length <= 0) {
-          console.log(this._form_details.additional_email_1.length);
+          //console.log(this._form_details.additional_email_1.length);
           return false;
         }
-        console.log(this._form_details.additional_email_1.length);
+        //console.log(this._form_details.additional_email_1.length);
         return  true;
       }
 
@@ -1000,7 +1010,7 @@ export class SignComponent implements OnInit {
               }
             },
             error => {
-              console.log('error: ', error);
+              //console.log('error: ', error);
             }
           );
         } else if (this.formType === '3X') {
@@ -1016,7 +1026,7 @@ export class SignComponent implements OnInit {
             }
           },
           error => {
-            console.log('error: ', error);
+            //console.log('error: ', error);
           }
         );
       } else if (this.formType === '3X') {
