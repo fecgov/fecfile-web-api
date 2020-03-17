@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
 
     url(
-        r'^sb/schedB$', 
+        r'^sb/schedB$',
         views.schedB,
         name='schedB'
     ),
@@ -20,8 +20,8 @@ urlpatterns = [
 #        name="force_unitemize_sb",
 #    ),
     url(
-        r"^sb/force_aggregate_sb$", 
-        views.force_aggregate_sb, 
+        r"^sb/force_aggregate_sb$",
+        views.force_aggregate_sb,
         name="force_aggregate_sb"
     ),
     url(
