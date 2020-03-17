@@ -1,4 +1,5 @@
-import { Component, ViewEncapsulation, OnInit, Input, OnChanges } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
+import { Component, ViewEncapsulation, OnInit, OnDestroy, Input, OnChanges } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
@@ -14,10 +15,12 @@ import { DialogService } from '../../services/DialogService/dialog.service';
   styleUrls: ['./header.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class HeaderComponent implements OnInit, OnChanges {
+export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
+  
   @Input() formType: string;
 
   public menuActive: boolean = false;
+  routerSubscription: Subscription;
 
   constructor(
     private _messageService: MessageService,
@@ -28,7 +31,7 @@ export class HeaderComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    this._router.events.subscribe(val => {
+    this.routerSubscription = this._router.events.subscribe(val => {
       if (val instanceof NavigationEnd) {
         if (val.url.indexOf('/logout') === 0) {
           let arr: any = [];
@@ -64,6 +67,11 @@ export class HeaderComponent implements OnInit, OnChanges {
   public notImplemented() {
     alert('Page/Feature not implemented yet');
   }
+
+  ngOnDestroy(): void {
+    this.routerSubscription.unsubscribe();
+  }
+  
   public toggleMenu(): void {
     if (this.menuActive) {
       this.menuActive = false;

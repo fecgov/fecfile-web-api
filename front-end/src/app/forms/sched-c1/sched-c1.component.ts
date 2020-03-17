@@ -1,6 +1,6 @@
 import { ReportTypeService } from './../form-3x/report-type/report-type.service';
 import { LoanService } from './../sched-c/service/loan.service';
-import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges, OnChanges, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, SimpleChanges, OnChanges, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
@@ -579,7 +579,7 @@ export class SchedC1Component implements OnInit, OnChanges {
       });
       } else {
         alert('Form is invalid. Errors exist on previous screens. ')
-        console.log('Errors exist on previous screens.');
+        //console.log('Errors exist on previous screens.');
       }
     } else {
       this.c1Form.markAsTouched();

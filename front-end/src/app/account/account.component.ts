@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit  } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable, Subject } from 'rxjs';
@@ -33,7 +33,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     private _cookieService: CookieService,
   ) {
     this.getLevinAccounts().takeUntil(this.onDestroy$).subscribe(res => {
-      console.log(res);
+      //console.log(res);
       if (res) {
         this.levin_accounts = res;
       }
@@ -76,13 +76,13 @@ export class AccountComponent implements OnInit, OnDestroy {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     httpOptions = httpOptions.append('Content-Type', 'application/json');
-    console.log('levin url:' + url);
+    //console.log('levin url:' + url);
     let levin_acct = { "levin_account_name": levin_name.value }
     this._http.post(url, JSON.stringify(levin_acct), {
       headers: httpOptions
     }).subscribe(
       res => {
-        console.log(res);
+        //console.log(res);
         levin_acct['levin_account_id'] = res[0].levin_account_id;
         this.levin_accounts.splice(0, 0, levin_acct);
       });
@@ -99,7 +99,7 @@ export class AccountComponent implements OnInit, OnDestroy {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     httpOptions = httpOptions.append('Content-Type', 'application/json');
-    console.log('levin url:' + url);
+    //console.log('levin url:' + url);
     return this._http.get(url, {
       headers: httpOptions,
       // params: {

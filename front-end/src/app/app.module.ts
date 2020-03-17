@@ -1,13 +1,14 @@
+import { TokenInterceptorService } from './shared/services/TokenInterceptorService/token-interceptor-service.service';
 import { SchedH5Component } from './forms/sched-h5/sched-h5.component';
 import { TrashConfirmComponent1 } from './forms/transactions/transactions-table/trash-confirm/trash-confirm.component';
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { LoanpaymentComponent } from './forms/sched-c/loanpayment/loanpayment.component';
-import { HttpClientModule } from '@angular/common/http';
-import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule , ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -214,7 +215,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ReactiveFormsModule,
     HttpClientModule,
     HttpModule,
-    BrowserAnimationsModule,
+    // BrowserAnimationsModule,
+    NoopAnimationsModule,
     routing,
     AngularFileUploaderModule,
     ArchwizardModule,
@@ -244,7 +246,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     DecimalPipe,
     DatePipe,
     UtilService,
-    OrderByPipe
+    OrderByPipe,
+    {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorService, multi:true}
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

@@ -1,6 +1,6 @@
-import { Component, EventEmitter, OnInit, Output, Input, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription, Subject } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { form99 } from '../../interfaces/FormsService/FormsService';
 import { MessageService } from '../../services/MessageService/message.service';
@@ -15,7 +15,8 @@ import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./preview.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class PreviewComponent implements OnInit {
+export class PreviewComponent implements OnInit , OnDestroy{
+  
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   public committeeDetails: any = {};
@@ -37,6 +38,8 @@ export class PreviewComponent implements OnInit {
   private _printPriviewPdfFileLink: string = '';
   private _formDetails: any = {};
   private _setRefresh: boolean = false;
+  queryParamsSubscription: Subscription;
+  private onDestroy$ = new Subject();
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -45,7 +48,7 @@ export class PreviewComponent implements OnInit {
     private _formsService: FormsService,
     private _dialogService: DialogService
   ) {
-    _activatedRoute.queryParams.subscribe(p => {
+    this.queryParamsSubscription = _activatedRoute.queryParams.subscribe(p => {
       if (p.refresh === 'true' || p.refresh === true) {
         this._setRefresh = true;
         this.ngOnInit();
@@ -56,8 +59,8 @@ export class PreviewComponent implements OnInit {
   ngOnInit(): void {
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
-    this._messageService.getMessage().subscribe(res => {
-      console.log('Preview screen this.formDetails ', this.formDetails);
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(res => {
+      //console.log('Preview screen this.formDetails ', this.formDetails);
       this.committeeDetails = JSON.parse(localStorage.getItem('committee_details'));
 
       // if (this.editMode) {
@@ -94,8 +97,8 @@ export class PreviewComponent implements OnInit {
               this.orgFileUrl = '';
             }
 
-            console.log('this.orgFileUrl', this.orgFileUrl);
-            console.log('this.fileName', this.fileName);
+            //console.log('this.orgFileUrl', this.orgFileUrl);
+            //console.log('this.fileName', this.fileName);
           }
 
           if (this.formDetails && typeof this.formDetails !== 'undefined' && this.formDetails.reason) {
@@ -106,6 +109,11 @@ export class PreviewComponent implements OnInit {
         }
       }, 500);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.queryParamsSubscription.unsubscribe();
+    this.onDestroy$.next(true);
   }
 
   ngDoCheck(): void {
@@ -299,18 +307,18 @@ export class PreviewComponent implements OnInit {
   public printPreview(): void {
     this._formDetails = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
 
-    console.log('Accessing PreviewComponent printPriview ...');
+    //console.log('Accessing PreviewComponent printPriview ...');
     localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._formDetails));
-    console.log('Accessing PreviewComponent printPriview ...');
+    //console.log('Accessing PreviewComponent printPriview ...');
     this._formsService.PreviewForm_Preview_sign_Screen({}, '99').subscribe(
       res => {
         if (res) {
-          console.log('Accessing PreviewComponent printPriview res ...', res);
+          //console.log('Accessing PreviewComponent printPriview res ...', res);
           window.open(localStorage.getItem('form_99_details.printpriview_fileurl'), '_blank');
         }
       },
       error => {
-        console.log('error: ', error);
+        //console.log('error: ', error);
       }
     );
   }

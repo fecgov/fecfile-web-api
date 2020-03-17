@@ -2,7 +2,7 @@ import { SchedHServiceService } from './../../sched-h-service/sched-h-service.se
 import { SchedHMessageServiceService } from './../../sched-h-service/sched-h-message-service.service';
 import { ScheduleActions } from './../individual-receipt/schedule-actions.enum';
 import { NgForm } from '@angular/forms';
-import { Component, OnInit, Output, EventEmitter, ViewChild, OnChanges, DoCheck, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, Input, OnChanges, OnDestroy } from '@angular/core';
 import { Observable, Subscription, Subject } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { environment } from '../../../../environments/environment';
@@ -22,6 +22,7 @@ import { TransactionsMessageService } from '../../transactions/service/transacti
 
 export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
   @Input() forceChangeDetection: Date;
+  @Input() transactionData: any;
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('f') form: NgForm;
 
@@ -57,7 +58,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     private _individualReceiptService: IndividualReceiptService,
     private _transactionsMessageService: TransactionsMessageService,
   ) {
-    console.log('h1 constructor ...');
+    //console.log('h1 constructor ...');
     this.populateFormForEdit = this._schedHMessageServiceService.
       getpopulateHFormForEditMessage()
       .subscribe(
@@ -90,10 +91,13 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
 
   ngOnInit() {
     // localStorage.setItem('cmte_type_category', 'PAC')
-    //console.log(localStorage.getItem('cmte_type_category'));
+    ////console.log(localStorage.getItem('cmte_type_category'));
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.checkH1Disabled();
     this.checkH1PacDisabled();
+    if (this.transactionData) {
+      this._schedHMessageServiceService.sendpopulateHFormForEditMessage(this.transactionData);
+    }
   }
 
   public ngOnChanges() {
@@ -124,7 +128,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
   }
 
   isPac() {
-    //console.log(localStorage.getItem('cmte_type_category'));
+    ////console.log(localStorage.getItem('cmte_type_category'));
     // return true;
 
     let ispac = false;
@@ -147,7 +151,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     httpOptions = httpOptions.append('Content-Type', 'application/json');
-    console.log('post h1 url:' + url);
+    //console.log('post h1 url:' + url);
 
     // build form data and adding report_id
     const formData: FormData = new FormData();
@@ -160,7 +164,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     if (reportType === null || typeof reportType === 'undefined') {
       reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
     }
-    console.log(reportType);
+    //console.log(reportType);
     if (reportType.hasOwnProperty('reportId')) {
       h1_obj['report_id'] = reportType.reportId;
       // formData.append('report_id', reportType.reportId);
@@ -168,7 +172,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
       // formData.append('report_id', reportType.reportid);
       h1_obj['report_id'] = reportType.reportid;
     }
-    console.log(reportType.reportid)
+    //console.log(reportType.reportid)
     // formData.append('federal_percent', '0.45');
     // formData.append('non_federal_percent', '0.55');
     // h1_obj['report_id'] = '121';
@@ -210,7 +214,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
         headers: httpOptions
       }).subscribe(
         res => {
-          console.log(res);
+          //console.log(res);
           f.value.message = 'h1 saved.'
           f.reset();
           localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
@@ -223,7 +227,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
         headers: httpOptions
       }).subscribe(
         res => {
-          console.log(res);
+          //console.log(res);
           f.value.message = 'h1 saved.'
           f.reset();
           //also reset this.transaction_id so future transactions dont accidentally use it.
@@ -368,7 +372,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     })
       .pipe(map(res => {
         if (res) {
-          console.log('Get H1 res: ', res);
+          //console.log('Get H1 res: ', res);
           return res;
         }
         return false;
@@ -476,7 +480,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     })
       .pipe(map(res => {
         if (res) {
-          console.log('Get H1 Pac res: ', res);
+          //console.log('Get H1 Pac res: ', res);
           return res;
         }
         return false;

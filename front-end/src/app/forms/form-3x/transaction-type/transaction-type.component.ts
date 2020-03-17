@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbAccordion, NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import 'rxjs/add/operator/takeUntil';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
@@ -49,6 +49,7 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
   private _transactionCategories: any = [];
 
   private onDestroy$ = new Subject();
+  routeSubscription: Subscription;
 
   constructor(
     private _fb: FormBuilder,
@@ -65,8 +66,7 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    let routeSubscription = _activatedRoute.queryParams;
-    routeSubscription.takeUntil(this.onDestroy$).subscribe(p => {
+    this.routeSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
 	
       const setTargetVal = { value: null, placeholder: null, text: null };
       this.frmOption = this._fb.group({
@@ -95,6 +95,7 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
   }
   
   ngOnDestroy(): void {
+    this.routeSubscription.unsubscribe();
     this.onDestroy$.next(true);
   }
 
@@ -151,13 +152,13 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
       }
 
       // if (this.transactionType === 'LOAN_FROM_IND_BANK' && this.scheduleType === 'sched_c'){
-      //   console.log("Accessing sched_c loans...");
+      //   //console.log("Accessing sched_c loans...");
       //   let reportId = this._reportTypeService.getReportIdFromStorage(this._formType);
       //   this._router.navigate([`/forms/form/${this._formType}`], {
       //     queryParams: { step: 'loan', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory, transactionTypeIdentifier: 'LOANS_OWED_BY_CMTE'}
       //   });
       // }else if (this.transactionType === 'LOAN_SUMMARY' ){
-      //   console.log("Accessing sched_c loans summary...");
+      //   //console.log("Accessing sched_c loans summary...");
       //   let reportId = this._reportTypeService.getReportIdFromStorage(this._formType);
       //   this._router.navigate([`/forms/form/${this._formType}`], {
       //     queryParams: { step: 'loansummary', reportId: reportId, edit: this.editMode, transactionCategory: this._transactionCategory,  transactionTypeIdentifier: 'LOANS_OWED_BY_CMTE'}
@@ -316,7 +317,7 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
   */
   public childOptionsListClick(id): void {
     if (this.editMode) {
-      console.log('transaction type selected: ', id);
+      //console.log('transaction type selected: ', id);
       if (document.getElementById(id) != null) {
         const obj = <HTMLInputElement>document.getElementById('option_' + id);
         if (obj) {

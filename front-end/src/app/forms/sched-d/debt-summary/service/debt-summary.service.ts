@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
@@ -90,7 +90,7 @@ export class DebtSummaryService {
       .pipe(
         map(res => {
           if (res) {
-            console.log('get_outstanding_loans API res: ', res);
+            //console.log('get_outstanding_loans API res: ', res);
 
             return res;
           }

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, ChangeDetectionStrategy } from '@angular/core';
 import {Http, Response} from '@angular/http';
 import {IAccount} from './account';
 import {Observable} from 'rxjs/Observable';
@@ -31,7 +31,7 @@ export class AccountService{
         httpOptions = httpOptions.append('Content-Type', 'application/json');
         httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-        console.log(`${environment.apiUrl}${url}`);
+        //console.log(`${environment.apiUrl}${url}`);
         
         return this._http
         .get(

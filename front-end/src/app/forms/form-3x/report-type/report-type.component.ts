@@ -10,7 +10,7 @@ import {
   ViewChild,
   ViewEncapsulation,
   DoCheck
-} from '@angular/core';
+, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, NgForm, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
@@ -376,7 +376,7 @@ export class ReportTypeComponent implements OnInit {
               if (reportRes) {
               if (reportRes.reports[0] && reportRes.reports[0].status) {
                 reportStatus = reportRes.reports[0].status;
-                console.log('Report %s is already %s', reportId, reportStatus);
+                //console.log('Report %s is already %s', reportId, reportStatus);
 
                 this._dialogService
                     .reportExist(alertStr, ConfirmModalComponent, 'Report already exists', true, false, true)
@@ -406,7 +406,7 @@ export class ReportTypeComponent implements OnInit {
                         } else {
                           // navigate away to the reports view
                           // this should not happen as a report with report id should be either saved or filed
-                        console.log('report type Existing_Report_id', reportId.toString());
+                        //console.log('report type Existing_Report_id', reportId.toString());
                         const reporturl = '/reports?reportId=';
                         this._router.navigateByUrl(`${reporturl}{reportId}`);
 
@@ -639,10 +639,10 @@ export class ReportTypeComponent implements OnInit {
     This function is called while selecting a list from report screen
   */
   public optionsListClick(type): void {
-    console.log('report type selected: ', type);
+    //console.log('report type selected: ', type);
     if(document.getElementById(type) != null) {
         document.getElementById(type).click();
-        console.log(type, ' report clicked');
+        //console.log(type, ' report clicked');
     }
   }
 }

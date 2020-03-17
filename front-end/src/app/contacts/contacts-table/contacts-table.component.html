@@ -9,41 +9,41 @@
       <tr>
         <th class="contacts__table-checkbox">
             <!-- *ngIf="isContactViewActive()" -->
-        <input [@fadeInOut]  [(ngModel)]="allContactsSelected" type="checkbox"
+        <input   [(ngModel)]="allContactsSelected" type="checkbox"
             (change)="changeAllContactsSelected()">
         </th>
 
-         <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
+         <th  *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('entity_type')" [class]="getSortClass('entity_type')" (click)="changeSortDirection('entity_type')">Entity Type
+        <th  *ngIf="isColumnVisible('entity_type')" [class]="getSortClass('entity_type')" (click)="changeSortDirection('entity_type')">Entity Type
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('id')" [class]="getSortClass('id')" (click)="changeSortDirection('id')">Entity Number
+        <th  *ngIf="isColumnVisible('id')" [class]="getSortClass('id')" (click)="changeSortDirection('id')">Entity Number
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('candCmteId')" [class]="getSortClass('candCmteId')" (click)="changeSortDirection('candCmteId')">Candidate/Committee <br /> ID
+        <th  *ngIf="isColumnVisible('candCmteId')" [class]="getSortClass('candCmteId')" (click)="changeSortDirection('candCmteId')">Candidate/Committee <br /> ID
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">Address
+        <th  *ngIf="isColumnVisible('street')" [class]="getSortClass('street')" (click)="changeSortDirection('street')">Address
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
+        <th  *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">State
+        <th  *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">State
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">zip
+        <th  *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">zip
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('employer')" [class]="getSortClass('employer')" (click)="changeSortDirection('employer')">Employer
+        <th  *ngIf="isColumnVisible('employer')" [class]="getSortClass('employer')" (click)="changeSortDirection('employer')">Employer
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('occupation')" [class]="getSortClass('occupation')" (click)="changeSortDirection('occupation')">Occupation
+        <th  *ngIf="isColumnVisible('occupation')" [class]="getSortClass('occupation')" (click)="changeSortDirection('occupation')">Occupation
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('candOffice')" [class]="getSortClass('candOffice')" (click)="changeSortDirection('candOffice')">Candidate Office
+        <th  *ngIf="isColumnVisible('candOffice')" [class]="getSortClass('candOffice')" (click)="changeSortDirection('candOffice')">Candidate Office
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('candOfficeState')" [class]="getSortClass('candOfficeState')" (click)="changeSortDirection('candOfficeState')">Candidate Office <br /> State
+        <th  *ngIf="isColumnVisible('candOfficeState')" [class]="getSortClass('candOfficeState')" (click)="changeSortDirection('candOfficeState')">Candidate Office <br /> State
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('candOfficeDistrict')" [class]="getSortClass('candOfficeDistrict')" (click)="changeSortDirection('candOfficeDistrict')">Candidate Office <br /> District
+        <th  *ngIf="isColumnVisible('candOfficeDistrict')" [class]="getSortClass('candOfficeDistrict')" (click)="changeSortDirection('candOfficeDistrict')">Candidate Office <br /> District
         </th>
-        <th [@fadeInOut] *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')" (click)="changeSortDirection('deletedDate')">Deleted Date <br />and time
+        <th  *ngIf="isRecycleBinViewActive()" [class]="getSortClass('deletedDate')" (click)="changeSortDirection('deletedDate')">Deleted Date <br />and time
         </th>
 
         <th class="bulk_action">
-          <div [@fadeInOut] *ngIf="isContactViewActive()" class="btn-group" ngbDropdown role="group"
+          <div  *ngIf="isContactViewActive()" class="btn-group" ngbDropdown role="group"
             aria-label="Action dropdown">
             <button class="btn btn-sm btn-primary contacts__bulk_action_btn" 
               ngbDropdownToggle [disabled]="bulkActionDisabled">
@@ -64,7 +64,7 @@
               </button> -->
             </div> 
           </div>
-          <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+          <div  *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary contacts__bulk_action_btn" 
               (click)="deleteRecyleBin()"
               [disabled]="bulkActionDisabled">
@@ -79,30 +79,30 @@
         <td>
           <input [(ngModel)]="cnt.selected" type="checkbox" (click)="checkForMultiChecked($event)">
         </td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{cnt.name}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('entity_type')">{{cnt.entity_type}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('id')">{{cnt.id}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('candCmteId')">{{cnt.candCmteId}}</td>        
-        <td [@fadeInOut] *ngIf="isColumnVisible('street')">{{cnt.street1}} {{cnt.street2}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('city')">{{cnt.city}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('state')">{{cnt.state}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('zip')">{{cnt.zip | zipCode}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('employer')">{{cnt.employer}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('occupation')">{{cnt.occupation}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('candOffice')">{{cnt.candOffice}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('candOfficeState')">{{cnt.candOfficeState}}</td>
-        <td [@fadeInOut] *ngIf="isColumnVisible('candOfficeDistrict')">{{cnt.candOfficeDistrict}}</td>
-        <td [@fadeInOut] *ngIf="isRecycleBinViewActive()">{{cnt.deletedDate === ''? '': (cnt.deletedDate| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
+        <td  *ngIf="isColumnVisible('name')">{{cnt.name}}</td>
+        <td  *ngIf="isColumnVisible('entity_type')">{{cnt.entity_type}}</td>
+        <td  *ngIf="isColumnVisible('id')">{{cnt.id}}</td>
+        <td  *ngIf="isColumnVisible('candCmteId')">{{cnt.candCmteId}}</td>        
+        <td  *ngIf="isColumnVisible('street')">{{cnt.street1}} {{cnt.street2}}</td>
+        <td  *ngIf="isColumnVisible('city')">{{cnt.city}}</td>
+        <td  *ngIf="isColumnVisible('state')">{{cnt.state}}</td>
+        <td  *ngIf="isColumnVisible('zip')">{{cnt.zip | zipCode}}</td>
+        <td  *ngIf="isColumnVisible('employer')">{{cnt.employer}}</td>
+        <td  *ngIf="isColumnVisible('occupation')">{{cnt.occupation}}</td>
+        <td  *ngIf="isColumnVisible('candOffice')">{{cnt.candOffice}}</td>
+        <td  *ngIf="isColumnVisible('candOfficeState')">{{cnt.candOfficeState}}</td>
+        <td  *ngIf="isColumnVisible('candOfficeDistrict')">{{cnt.candOfficeDistrict}}</td>
+        <td  *ngIf="isRecycleBinViewActive()">{{cnt.deletedDate === ''? '': (cnt.deletedDate| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
         </td>
-        <!--<td [@fadeInOut] *ngIf="(isColumnVisible('deletedDate') && isRecycleBinViewActive())">{{cnt.deletedDate}}
+        <!--<td  *ngIf="(isColumnVisible('deletedDate') && isRecycleBinViewActive())">{{cnt.deletedDate}}
         </td>-->
         <td>
-          <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+          <div  *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary" (click)="restoreContact(cnt)">
               <i class="undo-icon"></i>
             </button>
           </div>
-          <div [@fadeInOut] *ngIf="isContactViewActive()" class="btn-group" ngbDropdown role="group"
+          <div  *ngIf="isContactViewActive()" class="btn-group" ngbDropdown role="group"
             aria-label="Action dropdown">
             <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
               <i class="ellipsis-icon"></i>

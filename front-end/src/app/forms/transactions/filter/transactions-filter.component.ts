@@ -1,5 +1,5 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { Component, Input, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, QueryList, ViewChildren , ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
@@ -23,7 +23,7 @@ import { TransactionsFilterTypeComponent } from './filter-type/transactions-filt
   templateUrl: './transactions-filter.component.html',
   styleUrls: ['./transactions-filter.component.scss'],
   providers: [NgbTooltipConfig, OrderByPipe],
-  animations: [
+   animations: [
     trigger('openClose', [
       state(
         'open',
@@ -82,7 +82,7 @@ import { TransactionsFilterTypeComponent } from './filter-type/transactions-filt
       transition('open => closed', [animate('.25s ease')]),
       transition('closed => open', [animate('.5s ease')])
     ])
-  ]
+  ] 
 })
 export class TransactionsFilterComponent implements OnInit, OnDestroy {
   @Input()
@@ -166,6 +166,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   private cachedFilters: TransactionFilterModel = new TransactionFilterModel();
   private msEdge = true;
   private view = ActiveView.transactions;
+  queryParamSubscription: Subscription;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -199,7 +200,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             break;
           default:
             this.view = ActiveView.transactions;
-            console.log('unexpected ActiveView received: ' + message);
+            //console.log('unexpected ActiveView received: ' + message);
         }
       });
 
@@ -210,7 +211,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       this.clearAndApplyFilters();
     })
 
-    _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
+    this.queryParamSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       if (p.edit === 'true' || p.edit === true) {
         this.editMode = true;
@@ -273,6 +274,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   public ngOnDestroy(): void {
     this.onDestroy$.next(true);
+    this.queryParamSubscription.unsubscribe();
   }
 
   /**
@@ -552,23 +554,23 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       filters.filterElectionYearTo = this.filterElectionYearTo;
       modified = true;
     }
-    console.log('itemizations = ', this.itemizations);
+    //console.log('itemizations = ', this.itemizations);
     const filterItemizations = [];
     for (const I of this.itemizations) {
       if (I.selected) {
-        console.log('I.itemized', I.itemized);
+        //console.log('I.itemized', I.itemized);
         filterItemizations.push(I.itemized);
-        console.log('itemization tag found...');
+        //console.log('itemization tag found...');
         modified = true;
       }
     }
     filters.filterItemizations = filterItemizations;
-    console.log('filters.filterItemizations =', filters.filterItemizations);
+    //console.log('filters.filterItemizations =', filters.filterItemizations);
 
     const filterElectionCodes = [];
     for (const I of this.electionCodes) {
       if (I.selected) {
-        console.log('I.electionCode', I.option);
+        //console.log('I.electionCode', I.option);
         filterElectionCodes.push(I.option);
         modified = true;
       }
@@ -783,7 +785,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this._transactionsService.getItemizations().subscribe(res => {
       let itemizationExist = false;
       if (res.data) {
-        console.log('res.data', res.data);
+        //console.log('res.data', res.data);
         itemizationExist = true;
         for (const s of res.data) {
           // check for Itemizations selected in the filter cache
@@ -802,7 +804,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       }
       if (itemizationExist) {
         this.itemizations = res.data;
-        console.log('this.itemizations', this.itemizations);
+        //console.log('this.itemizations', this.itemizations);
       } else {
         this.itemizations = [];
       }
@@ -1148,7 +1150,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             this.filterSchedule = null;
             break;
           default:
-            console.log('unexpected key for remove filter = ' + message.key);
+            //console.log('unexpected key for remove filter = ' + message.key);
         }
       }
     }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation, Input } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, Input, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { MessageService } from '../../services/MessageService/message.service';
@@ -15,13 +15,16 @@ import { FormsComponent } from 'src/app/forms/forms.component';
   styleUrls: ['./submit.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class SubmitComponent implements OnInit {
+export class SubmitComponent implements OnInit, OnDestroy {
+  
   public form_type: string = '';
   @Input() public FEC_Id: string = '#####';
 
   private _reportId: number;
   private _subscription: Subscription;
   public checkStatus: boolean = true;
+  messageSubscription: Subscription;
+  routerSubscription: Subscription;
   constructor(
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
@@ -38,21 +41,21 @@ export class SubmitComponent implements OnInit {
       this.FEC_Id = this._activatedRoute.snapshot.queryParams.fec_id;
       // this._checkReportStatus();
     }
-    console.log('form submitted ...', this.form_type);
+    //console.log('form submitted ...', this.form_type);
 
-    this._messageService.getMessage().subscribe(res => {
+    this.messageSubscription = this._messageService.getMessage().subscribe(res => {
       this._reportId = res.id;
-      console.log('SubmitComponent res =', res);
+      //console.log('SubmitComponent res =', res);
       if (res.form_submitted) {
         if (this.form_type === '99') {
           localStorage.removeItem(`form_${this.form_type}_details`);
         } else if (this.form_type === '3X') {
           // Below code has been temporarily commented to not generate json files while submitting report - 02/06
-          /*console.log('Accessing SubmitComponent F3x submit Data Receiver API ');
+          /*//console.log('Accessing SubmitComponent F3x submit Data Receiver API ');
           this._reportTypeService.submitForm('3X', 'Submit').subscribe(
             res => {
               if (res) {
-                console.log('Accessing SubmitComponent F3x submit res ...', res);
+                //console.log('Accessing SubmitComponent F3x submit res ...', res);
                 if (res['status'] === 'Accepted') {
                   localStorage.removeItem(`form_${this.form_type}_report_type_backup`);
                   localStorage.removeItem(`form_${this.form_type}_report_type`);
@@ -64,17 +67,17 @@ export class SubmitComponent implements OnInit {
               }
             },
             error => {
-              console.log('error: ', error);
+              //console.log('error: ', error);
             }
           );*/ /*  */
         }
       }
     });
 
-    this._router.events.subscribe(val => {
+    this.routerSubscription = this._router.events.subscribe(val => {
       if (val) {
         if (val instanceof NavigationEnd) {
-          console.log('val.url = ', val.url);
+          //console.log('val.url = ', val.url);
           if (val.url.indexOf('/forms/form/99') === -1 || val.url.indexOf('/forms/form/3X') === -1) {
             this._messageService.sendMessage({
               validateMessage: {
@@ -99,6 +102,12 @@ export class SubmitComponent implements OnInit {
     //}
   }
 
+  ngOnDestroy(): void {
+    this.messageSubscription.unsubscribe();
+    this.routerSubscription.unsubscribe();
+    this._subscription.unsubscribe();
+  }
+
   private _checkReportStatus() {
     // we need to revisit to see if we really need this code
     /*if (this._router.url.indexOf('step_5') > -1) {
@@ -113,7 +122,7 @@ export class SubmitComponent implements OnInit {
           }
         },
         error => {
-          console.log('error: ', error);
+          //console.log('error: ', error);
         }
       );
     }*/

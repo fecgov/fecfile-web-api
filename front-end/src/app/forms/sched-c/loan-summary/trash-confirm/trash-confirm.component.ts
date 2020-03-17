@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild , ChangeDetectionStrategy } from '@angular/core';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { LoanModel } from '../../model/loan.model';
 import { TransactionModel } from '../../../transactions/model/transaction.model';
