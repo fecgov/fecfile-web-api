@@ -119,12 +119,14 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     if (this.onDestroy$) {
       this.onDestroy$.next(true);
     }
-    this.form.valueChanges.takeUntil(this.onDestroy$)
-      .subscribe(val => {
-        if (this.form.dirty) {
-          localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: false }));
-        }
-      });
+    if (this.form) {
+      this.form.valueChanges.takeUntil(this.onDestroy$)
+        .subscribe(val => {
+          if (this.form.dirty) {
+            localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: false }));
+          }
+        });
+    }
   }
 
   isPac() {

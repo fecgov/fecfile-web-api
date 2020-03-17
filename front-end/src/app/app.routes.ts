@@ -30,7 +30,7 @@ import { SubmitComponent } from './shared/partials/submit/submit.component';
 import { ContactsComponent } from './contacts/contacts.component';
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { HelpComponent } from './help/help.component';
-import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
+// import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
 
 export const AppRoutes: Routes = [
   {
@@ -94,12 +94,16 @@ export const AppRoutes: Routes = [
       { path: 'users', component: UsersComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       { path: 'settings', component: SettingsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       { path: 'contacts', component: ContactsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+      // {
+      //   path: 'contacts/import',
+      //   component: ImportContactsComponent,
+      //   pathMatch: 'full',
+      //   canActivate: [CanActivateGuard],
+      //   canDeactivate: [CanDeactivateGuardService]
+      // },
       {
-        path: 'contacts/import',
-        component: ImportContactsComponent,
-        pathMatch: 'full',
-        canActivate: [CanActivateGuard],
-        canDeactivate: [CanDeactivateGuardService]
+        path: 'import-contacts',
+        loadChildren: 'src/app/import-contacts-module/import-contacts.module#ImportContactsModule'
       },
       {
         path: 'addContact',

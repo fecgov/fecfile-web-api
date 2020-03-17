@@ -65,4 +65,34 @@ export class ImportContactsComponent implements OnInit {
     this.userContacts = userContactsMessage.userContactFields;
     this.showNextStep();
   }
+
+  /**
+ * Determines ability for a person to leave a page with a form on it.
+ *
+ * @return     {boolean}  True if able to deactivate, False otherwise.
+ */
+  public async canDeactivate(): Promise<boolean> {
+    // TODO check for form changes and set boolean property in this class.
+
+    //   if (this.hasUnsavedData()) {
+    //     let result: boolean = null;
+    //     result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
+    //       let val: boolean = null;
+
+    //       if (res === 'okay') {
+    //         val = true;
+    //       } else if (res === 'cancel') {
+    //         val = false;
+    //       }
+
+    //       return val;
+    //     });
+
+    //     return result;
+    //   } else {
+    //     return true;
+    //   }
+    // }
+    return true;
+  }
 }

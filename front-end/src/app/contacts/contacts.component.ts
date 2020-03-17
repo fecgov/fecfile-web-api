@@ -601,7 +601,8 @@ export class ContactsComponent implements OnInit, OnDestroy {
    * Import contacts from an external file.
    */
   public doImport() {
-    this._router.navigate(['/contacts/import']);
+    // this._router.navigate(['/contacts/import']);
+    this._router.navigate(['/import-contacts']);
   }
 
 
