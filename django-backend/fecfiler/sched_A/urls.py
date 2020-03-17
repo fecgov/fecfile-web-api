@@ -17,6 +17,14 @@ urlpatterns = [
         views.force_unaggregate_sa,
         name="force_unaggregate_sa",
     ),
+    url(
+        r"^sa/force_itemize_sa$", views.force_itemize_sa, name="force_itemize_sa"
+    ),
+    url(
+        r"^sa/force_unitemize_sa$",
+        views.force_unitemize_sa,
+        name="force_unitemize_sa",
+    ),
     # This API was brought in from CORE APP as it used few sched_A functions which were conflicting usage
     url(
         r"^core/trash_restore_transactions$",
