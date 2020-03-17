@@ -2,7 +2,7 @@ import { SchedHServiceService } from './../../sched-h-service/sched-h-service.se
 import { SchedHMessageServiceService } from './../../sched-h-service/sched-h-message-service.service';
 import { ScheduleActions } from './../individual-receipt/schedule-actions.enum';
 import { NgForm } from '@angular/forms';
-import { Component, OnInit, Output, EventEmitter, ViewChild, Input, OnChanges, OnDestroy } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, Input, OnChanges, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Observable, Subscription, Subject } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { environment } from '../../../../environments/environment';
