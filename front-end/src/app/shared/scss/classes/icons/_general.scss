@@ -135,6 +135,11 @@
     @extend .fa-pencil-alt;
 }
 
+.edit-broom {
+  @extend .fas;
+  @extend .fa-broom;
+}
+
 .clipboard-icon {
     @extend .fas;
     @extend .fa-clipboard;

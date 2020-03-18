@@ -213,7 +213,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     CollapseModule.forRoot(),
     AngularEditorModule,
     ModalModule.forRoot(),
-    NgxPaginationModule,
+    // NgxPaginationModule,
     NgPipesModule,
     UserIdleModule.forRoot({ idle: 1200, timeout: 120, ping: 500000 })
   ],

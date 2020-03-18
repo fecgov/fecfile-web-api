@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ImportContactsStepsEnum } from './import-contacts-setps.enum';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
+import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-import-contacts',
   templateUrl: './import-contacts.component.html',
-  styleUrls: ['./import-contacts.component.scss']
+  styleUrls: ['./import-contacts.component.scss'],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ImportContactsComponent implements OnInit {
 
@@ -17,7 +20,9 @@ export class ImportContactsComponent implements OnInit {
   public userContactFields: Array<string>;
   public userContacts: Array<any>;
 
-  constructor() { }
+  private unsavedData: boolean;
+
+  constructor(private _dialogService: DialogService) { }
 
   ngOnInit() {
     this.steps = [
@@ -27,6 +32,7 @@ export class ImportContactsComponent implements OnInit {
       { text: 'Import', step: this.step4ImportDone }
     ];
     this.currentStep = this.step1Upload;
+    this.unsavedData = true; // false
   }
 
   public showNextStep() {
@@ -74,25 +80,24 @@ export class ImportContactsComponent implements OnInit {
   public async canDeactivate(): Promise<boolean> {
     // TODO check for form changes and set boolean property in this class.
 
-    //   if (this.hasUnsavedData()) {
-    //     let result: boolean = null;
-    //     result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
-    //       let val: boolean = null;
+    if (this.unsavedData) {
+      let result: boolean = null;
+      result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
+        let val: boolean = null;
 
-    //       if (res === 'okay') {
-    //         val = true;
-    //       } else if (res === 'cancel') {
-    //         val = false;
-    //       }
+        if (res === 'okay') {
+          val = true;
+        } else if (res === 'cancel') {
+          val = false;
+        }
 
-    //       return val;
-    //     });
+        return val;
+      });
 
-    //     return result;
-    //   } else {
-    //     return true;
-    //   }
-    // }
-    return true;
+      return result;
+    } else {
+      return true;
+    }
   }
+
 }

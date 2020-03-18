@@ -1,21 +1,18 @@
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { CsvConverterService } from '../service/csv-converter.service';
 import * as XLSX from 'xlsx';
 import { timer, interval } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 import { style, animate, transition, trigger } from '@angular/animations';
+import { UploadContactsService } from './service/upload-contacts.service';
+import { UtilService } from 'src/app/shared/utils/util.service';
 
 
 @Component({
   selector: 'app-upload-contacts',
   templateUrl: './upload-contacts.component.html',
   styleUrls: ['./upload-contacts.component.scss'],
-  animations: [
-    trigger('fadeInOut', [
-      transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
-      transition(':leave', [animate(0, style({ opacity: 0 }))])
-    ])
-  ]
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UploadContactsComponent implements OnInit {
 
@@ -28,13 +25,19 @@ export class UploadContactsComponent implements OnInit {
   public userContacts: Array<any>;
   public userContactFields: Array<string>;
   public showUpload: boolean;
-  public progressPercent = 0;
+  // public progressPercent: number;
+  public foo = { progressPercent: 0 };
 
-
-  constructor(private csvConverterService: CsvConverterService) { }
+  constructor(
+    private csvConverterService: CsvConverterService,
+    private uploadContactsService: UploadContactsService,
+    private utilService: UtilService
+  ) { }
 
   ngOnInit() {
     this.showUpload = true;
+    // this.progressPercent = 0;
+    this.foo = { progressPercent: 0 };
   }
 
   /**
@@ -54,7 +57,6 @@ export class UploadContactsComponent implements OnInit {
       const item = items[i];
       if (item.kind === 'file') {
         const entry = item.webkitGetAsEntry();
-        console.log('');
         this.scanFiles(entry);
       }
     }
@@ -84,7 +86,7 @@ export class UploadContactsComponent implements OnInit {
 
   private handleFileType(file: File) {
     if (!this.isValidFileType(file.name)) {
-      console.log(`Invalid file type for ${file.name}`);
+      // console.log(`Invalid file type for ${file.name}`);
     }
     const fileExtention = this.getFileExtention(file.name);
     switch (fileExtention) {
@@ -101,7 +103,7 @@ export class UploadContactsComponent implements OnInit {
         this.handleXlsImport(file);
         break;
       default:
-        console.log('invalid file extention for import contacts ' + fileExtention);
+      // console.log('invalid file extention for import contacts ' + fileExtention);
     }
   }
 
@@ -175,8 +177,18 @@ export class UploadContactsComponent implements OnInit {
   }
 
   public fileSelected() {
-    this.progressPercent = 0;
+    // this.progressPercent = 0;
+    this.foo = { progressPercent: 0 };
     this.showUpload = false;
+
+    if (this.selectFileInput.nativeElement.files) {
+      if (this.selectFileInput.nativeElement.files[0]) {
+        const file = this.selectFileInput.nativeElement.files[0];
+        this.uploadContactsService.uploadFile(file).subscribe((res: any) => {
+          const userCols = res;
+        });
+      }
+    }
 
     // For development of the progress bar for file upload, this code is
     // simulating a long file upload time.  The file to be uploaded in production
@@ -190,8 +202,9 @@ export class UploadContactsComponent implements OnInit {
     // after fakeUploadTime has passed, read the file client side.  This will be server side
     // read in the future.
     const timer$ = timer(fakeUploadTime).pipe(finalize(() => {
-      console.log('All done!');
-      this.progressPercent = 100;
+      // console.log('All done!');
+      // this.progressPercent = 100;
+      this.foo = { progressPercent: 100 };
       const files = this.selectFileInput.nativeElement.files;
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -204,7 +217,8 @@ export class UploadContactsComponent implements OnInit {
     const subscribe = example
       .subscribe(val => {
         const percentageIncrease = (fakeUploadInterval) * 100 / fakeUploadTime;
-        this.progressPercent = this.progressPercent + percentageIncrease;
+        // this.progressPercent = this.progressPercent + percentageIncrease;
+        this.foo = { progressPercent: this.foo.progressPercent + percentageIncrease };
       });
   }
 

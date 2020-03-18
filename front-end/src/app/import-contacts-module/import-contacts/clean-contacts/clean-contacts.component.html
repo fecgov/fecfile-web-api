@@ -1,4 +1,4 @@
-<div [@fadeInOut] class="clean_contacts__container">
+<div class="clean_contacts__container">
   <p>
     The list below is where we found possible duplicates. Reduce issues with your data’s integrity by cleaning up the
     duplicates to ensure your data is clean and free of redundant entries. This can be done by selecting the edit icon
@@ -46,8 +46,8 @@
         </tr>
       </thead>
       <tbody>
-        <!-- <tr *ngFor="let trx of contacts | paginate: config; let i = index;"> -->
-        <tr *ngFor="let contact of contacts; let i = index;">
+        <tr *ngFor="let contact of contacts | paginate: config; let i = index;">
+          <!-- <tr *ngFor="let contact of contacts; let i = index;"> -->
           <td>
             {{contact.first_name}}
           </td>
@@ -79,10 +79,17 @@
             {{contact.occupation}}
           </td>
           <td>
-
+            <button class="btn btn-sm btn-primary" (click)="cleanContact(contact)">
+              <i class="edit-broom"></i>
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+  <hr />
+  <div *ngIf="showPagination()" class="d-flex justify-content-center clean_contacts__table-pagination-container">
+    <pagination-controls [id]="config.id" (pageChange)="getContacts($event)">
+    </pagination-controls>
   </div>
 </div>
