@@ -31,8 +31,6 @@ export class TokenInterceptorService implements HttpInterceptor{
   let newHeaders = req.headers;
   const token = this._sessionService.getToken();
   if(token){
-    let expirationDate = this._sessionService.getTokenExpirationDate(token);
-    console.log(expirationDate);
     this._sessionService.isSessionAboutToExpire();
   }
 
@@ -88,7 +86,6 @@ export class TokenInterceptorService implements HttpInterceptor{
           filter(token => token !== null),
           take(1),
           switchMap(jwt =>{
-            console.log('token ' + jwt);
             this.isRefreshing = false;
             return next.handle(req);
           }) 
