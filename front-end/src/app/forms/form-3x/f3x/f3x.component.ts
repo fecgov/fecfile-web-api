@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router, NavigationStart } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -64,6 +64,7 @@ export class F3xComponent implements OnInit, OnDestroy {
   public forceChangeDetectionC1: Date;
   public forceChangeDetectionFDebtPayment: Date;
   public forceChangeDetectionDebtSummary: Date;
+  public forceChangeDetectionH1: Date;
 
   public allTransactions: boolean = false;
 
@@ -80,7 +81,7 @@ export class F3xComponent implements OnInit, OnDestroy {
   populateHiddenFieldsMessageObj: any;
   populateFieldsMessageObj: any;
   queryParamsSubscription: Subscription;
-  routerEventsSubscription:Subscription;
+  routerEventsSubscription: Subscription;
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -99,7 +100,7 @@ export class F3xComponent implements OnInit, OnDestroy {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    this.queryParamsSubscription =_activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
+    this.queryParamsSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       if (p.edit === 'true' || p.edit === true) {
         this.editMode = true;
@@ -118,14 +119,14 @@ export class F3xComponent implements OnInit, OnDestroy {
       }
 
       //also clear the schedule type so the current component gets destroyed if leaving the form route
-      if(p.step !== 'step_3'){
+      if (p.step !== 'step_3') {
         this.scheduleType = null;
         this.transactionType = null;
       }
     });
 
     this._f3xMessageService.getParentModelMessage().takeUntil(this.onDestroy$).subscribe(message => {
-        this.parentTransactionModel = message;
+      this.parentTransactionModel = message;
     });
   }
 
@@ -515,13 +516,13 @@ export class F3xComponent implements OnInit, OnDestroy {
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
                     prePopulateFromSchedL: e.prePopulateFromSchedL
                   });
-                }else if (e.hasOwnProperty('prePopulateFromSchedH')) {
+                } else if (e.hasOwnProperty('prePopulateFromSchedH')) {
                   this._f3xMessageService.sendPopulateFormMessage({
                     key: 'prePopulateFromSchedH',
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
                     prePopulateFromSchedH: e.prePopulateFromSchedH
                   });
-                }else if (e.hasOwnProperty('prePopulateFromSchedPARTN')) {
+                } else if (e.hasOwnProperty('prePopulateFromSchedPARTN')) {
                   this._f3xMessageService.sendPopulateFormMessage({
                     key: 'prePopulateFromSchedPARTN',
                     abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
@@ -652,17 +653,17 @@ export class F3xComponent implements OnInit, OnDestroy {
       let reattributionId: string = null;
       let redesignationId: string = null;
       let maxAmount = transactionModel.amount;
-      if(this.scheduleAction === ScheduleActions.edit){
+      if (this.scheduleAction === ScheduleActions.edit) {
         maxAmount = transactionModel.originalAmount;
       }
-      if(transactionModel.isReattribution || transactionModel.isRedesignation){
+      if (transactionModel.isReattribution || transactionModel.isRedesignation) {
         if (transactionModel.isReattribution) {
           if (this.scheduleAction === ScheduleActions.add) {
             reattributionId = transactionModel.reattribution_id;
           } else if (this.scheduleAction === ScheduleActions.edit) {
             reattributionId = transactionModel.transactionId;
           }
-  
+
           const hiddenFieldsEmitObj = {
             abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent,
             reattributionTransactionId: reattributionId,
@@ -670,7 +671,7 @@ export class F3xComponent implements OnInit, OnDestroy {
             reattributionTransaction: transactionModel
           };
           this._f3xMessageService.sendPopulateHiddenFieldsMessage(hiddenFieldsEmitObj);
-          const fieldArray = [{name:'purpose_description', value:transactionModel.purposeDescription}];
+          const fieldArray = [{ name: 'purpose_description', value: transactionModel.purposeDescription }];
           const populateFieldsMessageObj = { abstractScheduleComponent: AbstractScheduleParentEnum.schedMainComponent, fieldArray };
           this._f3xMessageService.sendPopulateFieldsMessage(populateFieldsMessageObj);
           this.populateHiddenFieldsMessageObj = hiddenFieldsEmitObj;
@@ -690,12 +691,12 @@ export class F3xComponent implements OnInit, OnDestroy {
           this.populateHiddenFieldsMessageObj = hiddenFieldsEmitObj;
         }
       }
-      else{
+      else {
         this.populateHiddenFieldsMessageObj = null;
         this.populateFieldsMessageObj = null;
       }
     }
-    else{
+    else {
       this.populateHiddenFieldsMessageObj = null;
       this.populateFieldsMessageObj = null;
     }
@@ -814,14 +815,14 @@ export class F3xComponent implements OnInit, OnDestroy {
     }
     this._f3xMessageService.sendPopulateFormMessage(emitObject);
 
-    
-    this.storeTransactionDataForPopulatingFormForEdit(emitObject);
+
+    this.storeTransactionDataForPopulatingForm(emitObject);
   }
 
-  private storeTransactionDataForPopulatingFormForEdit(emitObject: any) {
+  private storeTransactionDataForPopulatingForm(emitObject: any) {
     //there are some transactions/schedules that have their own method and object structure for populating data (i.e. H2),
     //and in those cases, the object it is already set up, so dont overwrite it. 
-    if(this.scheduleType === 'sched_f'){
+    if (this.scheduleType === 'sched_f') {
       this.transactionDataForChild = emitObject;
     }
     else if (this.scheduleType !== 'sched_h2' && this.scheduleType !== 'sched_h3' && this.scheduleType !== 'sched_h5') {
@@ -936,6 +937,12 @@ export class F3xComponent implements OnInit, OnDestroy {
       this.scheduleAction = ScheduleActions.edit;
       this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
       this.scheduleType = 'sched_h6';
+    }
+
+    // Replaces ngDoCheck() with onChange()
+    // to reduce unwanted calls.
+    if (this.scheduleType === 'sched_h1') {
+      this.forceChangeDetectionH1 = new Date();
     }
 
     this._schedHMessageServce.sendpopulateHFormForEditMessage(transaction);
@@ -1150,6 +1157,7 @@ export class F3xComponent implements OnInit, OnDestroy {
     };
 
     this._f3xMessageService.sendPopulateFormMessage(emitObject);
+    this.storeTransactionDataForPopulatingForm(emitObject);
   }
 
   private _findMainTransactionTypeText(transactionType: string): string {
