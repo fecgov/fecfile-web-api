@@ -2876,8 +2876,10 @@ def autolookup_search_contacts(request):
                             + """) t"""
                         )
                 else:
-                    parameters = [committee_id, committee_id]
+                    # parameters = [committee_id, committee_id]
                     if 'expand' in request.query_params:
+
+                        parameters = [committee_id]
                         query_string = (
                             """
                             SELECT json_agg(t) FROM 
@@ -2888,9 +2890,21 @@ def autolookup_search_contacts(request):
                             WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
                             AND e.entity_type in ('IND','ORG')
                             AND c.principal_campaign_committee is not null
-                            AND e.cmte_id in (%s, 'C00000000')
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
+                        # query_string = (
+                        #     """
+                        #     SELECT json_agg(t) FROM 
+                        #     (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                        #     e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                        #     e.last_update_date
+                        #     FROM public.entity e, public.entity c 
+                        #     WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                        #     AND e.entity_type in ('IND','ORG')
+                        #     AND c.principal_campaign_committee is not null
+                        #     AND e.cmte_id in (%s, 'C00000000')
+                        #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                        #     """
                             + param_string
                             + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
                             + order_string
@@ -2898,6 +2912,7 @@ def autolookup_search_contacts(request):
                         )
                         # pass 
                     else:
+                        parameters = [committee_id, committee_id]
                         query_string = (
                             """
                             SELECT json_agg(t) FROM 
