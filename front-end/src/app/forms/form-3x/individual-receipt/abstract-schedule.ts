@@ -5499,7 +5499,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   protected sendPopulateMessageIfApplicable(){
-    if(this.scheduleAction === ScheduleActions.edit && this.transactionData){
+    if((this.scheduleAction === ScheduleActions.edit || this.scheduleAction === ScheduleActions.view) && this.transactionData){
       //check schedules 
       if(this.scheduleType.startsWith('sched_h')){
         this._schedHMessageServce.sendpopulateHFormForEditMessage(this.transactionData);
