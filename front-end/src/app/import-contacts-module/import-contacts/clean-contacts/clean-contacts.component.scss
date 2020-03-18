@@ -1,0 +1,29 @@
+.clean_contacts__container {
+
+  .clean_contacts__heading {
+      padding: .5em 0;
+  }
+
+  .clean_contacts__table-pagination-container {
+    padding: 1em;
+  } 
+
+  /* style ngx-pagination - start */
+  /* override some styling where use of !important is made. */
+
+  .ngx-pagination .current{
+    padding: 0.1875rem 0.625rem;
+    background: #9B9B9B !important;;
+    color: #fefefe;
+    cursor: default;
+  }
+
+  .ngx-pagination a, .ngx-pagination button {
+    color: #9B9B9B !important;;
+    display: block;
+    padding: 0.1875rem 0.625rem;
+    border-radius: 0;
+  }	
+
+  /* style ngx-pagination - end */
+}
