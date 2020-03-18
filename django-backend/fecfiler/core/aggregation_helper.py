@@ -1727,14 +1727,14 @@ def func_aggregate_amount(
                 )
 
             query_string = """SELECT aggregate_amt, contribution_date as transaction_date, create_date
-    FROM sched_a  WHERE entity_id = %s {0} AND cmte_id = %s 
-    AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
-    AND contribution_date <= %s::date
-    AND ((back_ref_transaction_id IS NULL 
-    AND (memo_code IS NULL OR (reattribution_ind='A' AND contribution_amount<0) OR reattribution_ind='R')) 
-    OR (back_ref_transaction_id IS NOT NULL))
-    AND delete_ind is distinct FROM 'Y' 
-    ORDER BY transaction_date DESC, create_date DESC;""".format(
+                FROM sched_a  WHERE entity_id = %s {0} AND cmte_id = %s 
+                AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
+                AND contribution_date <= %s::date
+                AND ((back_ref_transaction_id IS NULL 
+                AND (memo_code IS NULL OR (reattribution_ind='A' AND contribution_amount<0) OR reattribution_ind='R')) 
+                OR (back_ref_transaction_id IS NOT NULL))
+                AND delete_ind is distinct FROM 'Y' 
+                ORDER BY transaction_date DESC, create_date DESC;""".format(
                 params
             )
 
@@ -1742,21 +1742,33 @@ def func_aggregate_amount(
                 query_string, [entity_id, cmte_id, contribution_date, contribution_date]
             )
             result = cursor.fetchone()
-            if result and result[0]:
+            if result:
                 aggregate_amt = result[0]
+                # Handling aggregate for few schedule B transactions as they are expected to be added to SA aggregate
+                query_string_1 = """SELECT SUM(expenditure_amount)
+                    FROM sched_b WHERE entity_id = %s {0} AND cmte_id = %s
+                    AND extract('year' FROM expenditure_date) = extract('year' FROM %s::date)
+                    AND expenditure_date <= %s::date
+                    AND expenditure_date >= %s::date
+                    AND back_ref_transaction_id IS NULL
+                    AND delete_ind is distinct FROM 'Y'""".format(params)
+                cursor.execute(
+                    query_string_1, [entity_id, cmte_id, contribution_date, contribution_date, result[1]])
+                SB_agg = cursor.fetchone()
+
             else:
                 aggregate_amt = 0
+                # Handling aggregate for few schedule B transactions as they are expected to be added to SA aggregate
+                query_string_1 = """SELECT SUM(expenditure_amount)
+                    FROM sched_b WHERE entity_id = %s {0} AND cmte_id = %s
+                    AND extract('year' FROM expenditure_date) = extract('year' FROM %s::date)
+                    AND expenditure_date <= %s::date
+                    AND back_ref_transaction_id IS NULL
+                    AND delete_ind is distinct FROM 'Y'""".format(params)
+                cursor.execute(
+                    query_string_1, [entity_id, cmte_id, contribution_date, contribution_date])
+                SB_agg = cursor.fetchone()
 
-            query_string_1 = """SELECT SUM(expenditure_amount)
-    FROM sched_b WHERE entity_id = %s {0} AND cmte_id = %s
-    AND extract('year' FROM expenditure_date) = extract('year' FROM %s::date)
-    AND expenditure_date <= %s::date
-    AND expenditure_date >= %s::date
-    AND back_ref_transaction_id IS NULL
-    AND delete_ind is distinct FROM 'Y'""".format(params)
-            cursor.execute(
-                query_string_1, [entity_id, cmte_id, contribution_date, contribution_date, result[1]])
-            SB_agg = cursor.fetchone()
             if SB_agg and SB_agg[0]:
                 aggregate_amt -= SB_agg[0]
 
