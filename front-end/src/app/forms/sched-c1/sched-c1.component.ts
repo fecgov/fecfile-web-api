@@ -678,7 +678,7 @@ export class SchedC1Component implements OnInit, OnChanges {
     this.c1Form.patchValue({ treasurer_last_name: entity.last_name }, { onlySelf: true });
     this.c1Form.patchValue({ treasurer_first_name: entity.first_name }, { onlySelf: true });
     this.c1Form.patchValue({ treasurer_middle_name: entity.middle_name }, { onlySelf: true });
-    this.c1Form.patchValue({ treasurer_prefix: entity.prefix }, { onlySelf: true });
+    this.c1Form.patchValue({ treasurer_prefix: entity.preffix }, { onlySelf: true });
     this.c1Form.patchValue({ treasurer_suffix: entity.suffix }, { onlySelf: true });
     this.c1Form.patchValue({ treasurer_entity_id: entity.entity_id }, { onlySelf: true });
   }
@@ -693,9 +693,9 @@ export class SchedC1Component implements OnInit, OnChanges {
     this.c1Form.patchValue({ authorized_last_name: entity.last_name }, { onlySelf: true });
     this.c1Form.patchValue({ authorized_first_name: entity.first_name }, { onlySelf: true });
     this.c1Form.patchValue({ authorized_middle_name: entity.middle_name }, { onlySelf: true });
-    this.c1Form.patchValue({ authorized_prefix: entity.prefix }, { onlySelf: true });
-    this.c1Form.patchValue({ authorized_middle_suffix: entity.suffix }, { onlySelf: true });
-    this.c1Form.patchValue({ authorized_middle_suffix: entity.suffix }, { onlySelf: true });
+    this.c1Form.patchValue({ authorized_prefix: entity.preffix }, { onlySelf: true });
+    this.c1Form.patchValue({ authorized_suffix: entity.suffix }, { onlySelf: true });
+    //this.c1Form.patchValue({ authorized_middle_suffix: entity.suffix }, { onlySelf: true });
     this.c1Form.patchValue({ authorized_entity_id: entity.entity_id }, { onlySelf: true });
   }
 

@@ -4,13 +4,13 @@ import { TrashConfirmComponent1 } from './forms/transactions/transactions-table/
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { LoanpaymentComponent } from './forms/sched-c/loanpayment/loanpayment.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule , ChangeDetectionStrategy } from '@angular/core';
+import { APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA, NgModule, ChangeDetectionStrategy } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { AngularEditorModule } from '@kolkov/angular-editor';
-import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ArchwizardModule } from 'angular-archwizard';
 import { AngularFileUploaderModule } from 'angular-file-uploader';
@@ -56,7 +56,6 @@ import { HeaderComponent } from './shared/partials/header/header.component';
 import { PreviewComponent } from './shared/partials/preview/preview.component';
 import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
 import { SignComponent } from './shared/partials/sign/sign.component';
-import { StepsComponent } from './shared/partials/steps/steps.component';
 import { SubmitComponent } from './shared/partials/submit/submit.component';
 import { ValidateComponent } from './shared/partials/validate/validate.component';
 import { FilterPipe } from './shared/pipes/filter/filter.pipe';
@@ -107,6 +106,7 @@ import { SchedH6Component_TOBEDELETED } from './forms/form-3x/sched-h6/sched-h6.
 import { SchedH1Component_TOBEDELETED } from './forms/sched-h1/sched-h1.component';
 import { SchedEComponent } from './forms/form-3x/sched-e/sched-e/sched-e.component';
 import { HelpComponent } from './help/help.component';
+import { SharedModule } from './shared/shared.module';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -138,7 +138,6 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     F99Component,
     TypeComponent,
     ReasonComponent,
-    StepsComponent,
     PreviewComponent,
     ValidateComponent,
     SignComponent,
@@ -198,13 +197,13 @@ const appInitializerFn = (appConfig: AppConfigService) => {
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
+    SharedModule,
     BrowserModule,
-    NgSelectModule,
-    FormsModule,
-    ReactiveFormsModule,
+    // NgSelectModule,
+    // FormsModule,
+    // ReactiveFormsModule,
     HttpClientModule,
     HttpModule,
-    // BrowserAnimationsModule,
     NoopAnimationsModule,
     routing,
     AngularFileUploaderModule,
@@ -213,9 +212,8 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TooltipModule.forRoot(),
     CollapseModule.forRoot(),
     AngularEditorModule,
-    NgbModule.forRoot(),
     ModalModule.forRoot(),
-    NgxPaginationModule,
+    // NgxPaginationModule,
     NgPipesModule,
     UserIdleModule.forRoot({ idle: 1200, timeout: 120, ping: 500000 })
   ],
@@ -236,9 +234,9 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     DatePipe,
     UtilService,
     OrderByPipe,
-    {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorService, multi:true}
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorService, multi: true }
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AppModule {}
+export class AppModule { }
