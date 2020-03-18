@@ -397,7 +397,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
     this.endorserForm.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.endorserForm.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.endorserForm.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
-    this.endorserForm.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    this.endorserForm.patchValue({ prefix: contact.preffix }, { onlySelf: true });
     this.endorserForm.patchValue({ suffix: contact.suffix }, { onlySelf: true });
     this.endorserForm.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
     this.endorserForm.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
