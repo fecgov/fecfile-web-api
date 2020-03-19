@@ -1005,7 +1005,8 @@ def update_aggregate_general_elec_exp(cmte_id, beneficiary_cand_id, expenditure_
             cvg_start_date, cvg_end_date, beneficiary_cand_id
         )
         for transaction in transaction_list:
-            if transaction["memo_code"] != "X":
+            # memo_code checking removed
+            if transaction["aggregation_ind"] != 'N':
                 aggregate_amount += float(transaction["expenditure_amount"])
             if transaction["expenditure_date"] >= expenditure_date:
                 put_aggregate_SF(aggregate_amount, transaction["transaction_id"])
@@ -1020,11 +1021,22 @@ def get_SF_transactions_candidate(start_date, end_date, beneficiary_cand_id):
     try:
         with connection.cursor() as cursor:
             cursor.execute(
-                """SELECT json_agg(t) FROM (SELECT t1.transaction_id, t1.expenditure_date, t1.expenditure_amount, 
-                t1.aggregate_general_elec_exp, t1.memo_code FROM public.sched_f t1 WHERE t1.payee_cand_id = %s AND t1.expenditure_date >= %s AND 
-                t1.expenditure_date <= %s AND t1.delete_ind is distinct FROM 'Y' 
-                AND (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id) is distinct FROM 'Y'
-                ORDER BY t1.expenditure_date ASC, t1.create_date ASC) t""",
+                """SELECT json_agg(t) FROM (
+                    SELECT 
+                    t1.transaction_id, 
+                    t1.expenditure_date, 
+                    t1.expenditure_amount, 
+                    t1.aggregate_general_elec_exp, 
+                    t1.memo_code,
+                    t1.aggregation_ind
+                    FROM public.sched_f t1 
+                    WHERE t1.payee_cand_id = %s 
+                    AND t1.expenditure_date >= %s 
+                    AND t1.expenditure_date <= %s 
+                    AND t1.delete_ind is distinct FROM 'Y' 
+                    AND (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id) is distinct FROM 'Y'
+                    ORDER BY t1.expenditure_date ASC, t1.create_date ASC
+                ) t""",
                 [beneficiary_cand_id, start_date, end_date],
             )
             if cursor.rowcount == 0:
