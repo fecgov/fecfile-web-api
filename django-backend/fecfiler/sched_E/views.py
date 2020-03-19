@@ -614,7 +614,7 @@ def update_aggregate_amt_se(data):
         dissemination_date, disbursement_date = data.get('dissemination_date'), data.get('disbursement_date')
         curr_tran_date = dissemination_date if dissemination_date else disbursement_date 
         for transaction in transaction_list:
-            if trnasaction[3] != 'N':
+            if transaction[3] != 'N':
                 aggregate_amount += transaction[1]
             logger.debug(
                 "update aggregate amount for transaction:{}".format(transaction[0])
@@ -799,6 +799,7 @@ def post_schedE(data):
             raise Exception(
                 "The post_sql_schedE function is throwing an error: " + str(e)
             )
+        
         update_aggregate_amt_se(data)
         return data
     except:
