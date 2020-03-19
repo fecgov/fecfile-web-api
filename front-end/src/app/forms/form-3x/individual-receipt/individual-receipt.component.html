@@ -27,6 +27,9 @@
             <ng-container *ngIf="transactionTypeText && mainTransactionTypeText"> / 
               {{ mainTransactionTypeText }} / {{ transactionTypeText }}
             </ng-container>
+            <!-- TODO - the transaction type check in next two lines is temporary. Once the cache issue is fixed remove the second 'and' claus -->
+            <ng-container *ngIf="reattributionTransactionId && transactionType !== 'CONT_TO_CAN'"> (Reattribution)</ng-container> 
+            <ng-container *ngIf="redesignationTransactionId && transactionType === 'CONT_TO_CAN'"> (Redesignation)</ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && !cloned"> / Edit </ng-container>
             <ng-container *ngIf="scheduleAction === editScheduleAction && cloned"> / Clone </ng-container>
             <ng-container *ngIf="scheduleAction === viewScheduleAction"> / View </ng-container>
@@ -136,6 +139,7 @@
                                 && !isFieldName(col?.name, 'prefix')
                                 && !isFieldName(col?.name, 'suffix')
                                 && !isFieldName(col?.name, 'election_other_description')
+                                && !isFieldName(col?.name, 'election_year')
                                 " class="form-control" [style.width]="col?.width" [style.height]="col?.height"
                           [attr.type]="col?.type" [attr.name]="col?.name"
                           [attr.readonly]="isFieldReadOnly(col)"
@@ -275,6 +279,19 @@
                           [maxlength]="col?.validation?.max"
                           [formControlName]="col?.name"
                           [attr.disabled]="isSelectFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''" />
+                      <input *ngIf="isFieldName(col?.name, 'election_year')"
+                                class="form-control" [style.width]="col?.width" [style.height]="col?.height"
+                          [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value"
+                          [maxlength]="col?.validation?.max"
+                          [formControlName]="col?.name"
+                          [attr.disabled]="isSelectFieldReadOnly(col)"
+                          placeholder="YYYY"
                           [ngClass]="
                               frmIndividualReceipt.get(col?.name)?.invalid &&
                               (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
@@ -649,7 +666,7 @@
                       (click)="previousStep()">
                       Previous
                     </button>
-                    <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false" class="btn btn-previous btn-left"
+                    <button *ngIf="subTransactionInfo && subTransactionInfo.isParent === false && scheduleAction !== viewScheduleAction" class="btn btn-previous btn-left"
                       type="button" (click)="returnToParent(editScheduleAction)">
                       Cancel
                     </button>
@@ -659,7 +676,7 @@
                     <div *ngIf="scheduleAction === viewScheduleAction">
                       <button type="button" class="btn btn-outline-dark btn-right" (click)="viewTransactions()">Close</button>
                     </div>
-                    <a *ngIf="subTransactionInfo?.isParent === false && !reattributionTransactionId" class="btn btn-primary btn-right"
+                    <a *ngIf="subTransactionInfo?.isParent === false && !reattributionTransactionId && scheduleAction !== viewScheduleAction" class="btn btn-primary btn-right"
                       (click)="saveAndReturnToParent()">
                       Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
                     </a>

@@ -1,5 +1,6 @@
+import { Subscription } from 'rxjs/Subscription';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
@@ -8,7 +9,10 @@ import 'rxjs/add/operator/takeUntil';
 import { debounceTime, distinctUntilChanged, filter, map, merge } from 'rxjs/operators';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { TransactionTypeService } from '../../../forms/form-3x/transaction-type/transaction-type.service';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../../shared/partials/confirm-modal/confirm-modal.component';
+import {
+  ConfirmModalComponent,
+  ModalHeaderClassEnum
+} from '../../../shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from '../../../shared/services/DialogService/dialog.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
@@ -54,6 +58,7 @@ export class TransactionSidebarComponent implements OnInit {
   public cashOnHand: CashOnHandModel;
 
   private onDestroy$ = new Subject();
+  routesSubscription: Subscription;
 
   constructor(
     private _config: NgbTooltipConfig,
@@ -64,13 +69,13 @@ export class TransactionSidebarComponent implements OnInit {
     private _router: Router,
     private _formsService: FormsService,
     private _dialogService: DialogService,
-    private _typeaheadService: TypeaheadService, 
+    private _typeaheadService: TypeaheadService,
     private _transactionMessageService: TransactionsMessageService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
+    this.routesSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       if (p.transactionCategory) {
         this.itemSelected = p.transactionCategory;
       }
@@ -91,7 +96,7 @@ export class TransactionSidebarComponent implements OnInit {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
-    this._transactionTypeService.getTransactionCategories(this._formType).subscribe(res => {
+    this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
         this.cashOnHand = res.data.cashOnHand;
@@ -126,8 +131,7 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   ngDoCheck(): void {
-    //Could this be causing memory leak, memory bloating ? TODO - Investigate. 
-    this._messageService.getMessage().subscribe(res => {
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(res => {
       if (res) {
         if (res.hasOwnProperty('formType')) {
           if (typeof res.formType === 'string') {
@@ -179,16 +183,16 @@ export class TransactionSidebarComponent implements OnInit {
               if (res.hasOwnProperty('totals')) {
                 if (typeof res.totals === 'object') {
                   if (res.totals.hasOwnProperty('Loans/Debts')) {
-                      if (typeof res.totals['Loans/Debts'] === 'number') {
-                        this.loansanddebtsTotal = res.totals['Loans/Debts'];
-                        const totals: any = {
-                          receipts: this.receiptsTotal,
-                          cashOnHand : this.cashOnHandTotal,
-                          disbursements: this.disbursementsTotal,
-                          loansanddebtsTotal: this.loansanddebtsTotal
-                        };
-                        localStorage.setItem(`form_${this._formType}_totals`, JSON.stringify(totals));
-                      }
+                    if (typeof res.totals['Loans/Debts'] === 'number') {
+                      this.loansanddebtsTotal = res.totals['Loans/Debts'];
+                      const totals: any = {
+                        receipts: this.receiptsTotal,
+                        cashOnHand: this.cashOnHandTotal,
+                        disbursements: this.disbursementsTotal,
+                        loansanddebtsTotal: this.loansanddebtsTotal
+                      };
+                      localStorage.setItem(`form_${this._formType}_totals`, JSON.stringify(totals));
+                    }
                   }
                 }
               }
@@ -229,6 +233,7 @@ export class TransactionSidebarComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
+    this.routesSubscription.unsubscribe();
     this._messageService.clearMessage();
   }
 
@@ -267,12 +272,11 @@ export class TransactionSidebarComponent implements OnInit {
       merge(this.focus$),
       merge(this.click$.pipe(filter(() => !this.instance.isPopupOpen()))),
       map(term =>
-        (term === ''
+        term === ''
           ? transactionCategoryOptions
           : transactionCategoryOptions.filter(v => v.text.toLowerCase().indexOf(term.toLowerCase()) > -1)
-        )
       )
-    )
+    );
 
   formatter = (x: { text: string }) => x.text;
 
@@ -281,18 +285,18 @@ export class TransactionSidebarComponent implements OnInit {
    *
    * @param      {Object}  e  The event object.
    */
-  public selectItem(e): void {
+  public selectItem(transactionCategoryValue: string): void {
     if (this.editMode) {
-      this.itemSelected = e.target.value;
+      this.itemSelected = transactionCategoryValue;
 
       this.status.emit({
         form: this._formType,
-        transactionCategory: e.target.value
+        transactionCategory: transactionCategoryValue
       });
 
       this._messageService.sendMessage({
         form: this._formType,
-        transactionCategory: e.target.value
+        transactionCategory: transactionCategoryValue
       });
 
       if (
@@ -301,12 +305,18 @@ export class TransactionSidebarComponent implements OnInit {
         localStorage.getItem('Receipts_Entry_Screen') === 'Yes' ||
         localStorage.getItem('Reports_Edit_Screen') === 'Yes'
       ) {
-        let queryParamsMap : any = { step: 'step_2', transactionCategory: e.target.value};
-        if(this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
+        let queryParamsMap: any = { step: 'step_2', transactionCategory: transactionCategoryValue };
+        if (this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId) {
           queryParamsMap.reportId = this._activatedRoute.snapshot.queryParams.reportId;
         }
-        this._router.navigate([`/forms/form/${this._formType}`], {
-          queryParams: queryParamsMap
+
+        this.canDeactivate().then(result => {
+          if (result === true) {
+            localStorage.removeItem(`form_${this._formType}_saved`);
+            this._router.navigate([`/forms/form/${this._formType}`], {
+              queryParams: queryParamsMap
+            });
+          }
         });
       }
     } else {
@@ -330,32 +340,34 @@ export class TransactionSidebarComponent implements OnInit {
     }
   }
 
-  public goToAllTransactions(){
-    // go to different tab
-    let transactionCategory = this._activatedRoute.snapshot.queryParams.transactionCategory;
+  public goToAllTransactions() {
+    this.canDeactivate().then(result => {
+      if (result === true) {
+        localStorage.removeItem(`form_${this._formType}_saved`);
+        // go to different tab
+        let transactionCategory = this._activatedRoute.snapshot.queryParams.transactionCategory;
 
-    if(!transactionCategory) {
-      if (localStorage.getItem('form_3X_temp_transaction_type') !== null) {
-        const form3xTransactionType = JSON.parse(localStorage.getItem('form_3X_temp_transaction_type'));
-        if (form3xTransactionType !== null) {
-          transactionCategory = form3xTransactionType.mainTransactionTypeValue;
+        if (!transactionCategory) {
+          if (localStorage.getItem('form_3X_temp_transaction_type') !== null) {
+            const form3xTransactionType = JSON.parse(localStorage.getItem('form_3X_temp_transaction_type'));
+            if (form3xTransactionType !== null) {
+              transactionCategory = form3xTransactionType.mainTransactionTypeValue;
+            }
+          } else if (localStorage.getItem('form_3X_transaction_type') !== null) {
+            const form3xTransactionType = JSON.parse(localStorage.getItem('form_3X_transaction_type'));
+            if (form3xTransactionType !== null) {
+              transactionCategory = form3xTransactionType.mainTransactionTypeValue;
+            }
+          }
         }
-      }else if (localStorage.getItem('form_3X_transaction_type') !== null) {
-        const form3xTransactionType = JSON.parse(localStorage.getItem('form_3X_transaction_type'));
-        if (form3xTransactionType !== null) {
-          transactionCategory = form3xTransactionType.mainTransactionTypeValue;
-        }
+        this._transactionMessageService.sendLoadDefaultTabMessage({
+          step: 'transactions',
+          reportId: this.reportId,
+          edit: this.editMode,
+          transactionCategory: transactionCategory
+        });
       }
-    }
-
-    this._transactionMessageService.sendLoadDefaultTabMessage(
-      {
-        step: 'transactions',
-        reportId: this.reportId,
-        edit: this.editMode,
-        transactionCategory: transactionCategory
-      }
-    )
+    });
   }
 
   public selectedTypeAheadValue(e): void {
@@ -442,10 +454,15 @@ export class TransactionSidebarComponent implements OnInit {
   }
 
   public viewSummary(): void {
-    localStorage.setItem('Summary_Screen', 'Yes');
-    localStorage.setItem(`form_${this._formType}_summary_screen`, 'Yes');
-    this._router.navigate([`/forms/form/${this._formType}`], {
-      queryParams: { step: 'financial_summary', edit: this.editMode }
+    this.canDeactivate().then(result => {
+      if (result === true) {
+        localStorage.removeItem(`form_${this._formType}_saved`);
+        localStorage.setItem('Summary_Screen', 'Yes');
+        localStorage.setItem(`form_${this._formType}_summary_screen`, 'Yes');
+        this._router.navigate([`/forms/form/${this._formType}`], {
+          queryParams: { step: 'financial_summary', edit: this.editMode }
+        });
+      }
     });
   }
 
@@ -507,15 +524,6 @@ export class TransactionSidebarComponent implements OnInit {
       return result;
     } else {
       return true;
-    }
-  }
-
-  /*
-    This function is called while selecting a list from report screen
-  */
-  public optionsListClick(type): void {
-    if (document.getElementById(type) != null) {
-      document.getElementById(type).click();
     }
   }
 }

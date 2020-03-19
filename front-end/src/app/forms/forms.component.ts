@@ -1,4 +1,5 @@
-import { Component, HostListener, OnInit, NgZone, ViewChild, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
+import { Component, HostListener, OnInit, NgZone, ViewChild, ViewEncapsulation, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
@@ -27,6 +28,8 @@ export class FormsComponent implements OnInit, OnDestroy {
   private _openModal: any = null;
   private _step: string;
   private _editMode: boolean;
+  private queryParamsSubscription:Subscription;
+  private paramsSubscription:Subscription;
 
   constructor(
     private _activeRoute: ActivatedRoute,
@@ -38,7 +41,7 @@ export class FormsComponent implements OnInit, OnDestroy {
     private _formsService: FormsService
   ) {
 
-    _activeRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
+    this.queryParamsSubscription = _activeRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       if (p.step) {
         this._step = p.step;
       }
@@ -47,13 +50,15 @@ export class FormsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this._activeRoute.params.subscribe(params => {
+    this.paramsSubscription = this._activeRoute.params.subscribe(params => {
       this.formType = params.form_id;
     });
   }
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
+    this.queryParamsSubscription.unsubscribe();
+    this.paramsSubscription.unsubscribe();
   }
 
 
@@ -65,7 +70,7 @@ export class FormsComponent implements OnInit, OnDestroy {
   public async canDeactivate(): Promise<boolean> {
     if (this._formsService.formHasUnsavedData(this.formType) && this._editMode) {
       let result: boolean = null;
-      console.log(' form not saved...');
+      //console.log(' form not saved...');
       result = await this._dialogService.confirm('', ConfirmModalComponent).then(res => {
         let val: boolean = null;
 
@@ -81,7 +86,7 @@ export class FormsComponent implements OnInit, OnDestroy {
       return result;
     } else if (this._formsService.checkCanDeactivate()) {
       let result: boolean = null;
-      console.log(' form not saved...');
+      //console.log(' form not saved...');
       result = await this._dialogService
       .confirm(
         'FEC ID has not been generated yet. Please check the FEC ID under reports if you want to leave the page.',
@@ -105,7 +110,7 @@ export class FormsComponent implements OnInit, OnDestroy {
 
       return result;
     } else {
-      console.log('Not any unsaved data...');
+      //console.log('Not any unsaved data...');
       return true;
     }
   }

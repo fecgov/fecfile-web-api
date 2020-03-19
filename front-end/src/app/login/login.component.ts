@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone , ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
@@ -113,7 +113,7 @@ export class LoginComponent implements OnInit {
         }
       },
       (error) => {
-        console.log('error: ', error);
+        //console.log('error: ', error);
         this.isBusy = false;
         this.hasFailed = true;
       });

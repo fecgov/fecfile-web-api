@@ -1,111 +1,107 @@
 <nav class="navbar navbar-expand-lg float-right">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
-      <ul class="navbar-nav float-right">
-        <li class="nav-item">
-              <a class="nav-link" draggable="false" [routerLink]="['/dashboard']">
-                Dashboard
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" draggable="false" [routerLink]="['/reports']">
-                Reports
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" draggable="false" [routerLink]="['/contacts']">
-                Contacts
-              </a>
-            </li>
-  
-            <li class="nav-item dropdown">
-              <div
-                class="d-inline-block"
-                ngbDropdown
-                placement="bottom-left"
-              >
-                <button
-                  type="button"
-                  class="btn btn-link btn-height dropdown-toggle"
-                  id="dropdownTools"
-                  [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
-                  (click)="toggleMenu()"
-                  ngbDropdownToggle
-                >
-                Tools
-                </button>
-                <div class="secondary-dropdown-menu tools" aria-labelledby="dropdownTools" ngbDropdownMenu>
-                  <a class="dropdown-item" draggable="false" [routerLink]="['/forms/form/3X']" [queryParams]="{step: 'transactions', transactionCategory: 'receipts', allTransactions: true}">
-                    All Transactions
-                  </a>
-                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_transactions']">
-                    Import Transactions
-                  </a>
-                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_names']">
-                    Import Names
-                  </a>
-                
-                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_export_names']">
-                    Export Names
-                  </a>
-                
-                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_merge_names']">
-                    Merge Names
-                  </a>
-                  <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">
-                    Create Backup
-                  </a>
-                </div>
-              </div>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" draggable="false" [routerLink]="['/help']">Help</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" draggable="false" [routerLink]="['/help']">
-                <i class="notifications-icon icon"></i>
-                Notifications
-              </a>
-            </li>
-            <li class="nav-item dropdown">
-              <div
-                class="d-inline-block"
-                ngbDropdown
-                placement="bottom-left"
-              >
-                <button
-                  type="button"
-                  class="btn btn-link btn-height dropdown-toggle"
-                  id="dropdownProfile"
-                  [ngClass]="{ 'toggleMenuLink' : menuActive === true }"
-                  (click)="toggleMenu()"
-                  ngbDropdownToggle
-                >
-                  <i class="profile-icon icon" aria-hidden="true"></i>
-                  Profile
-                </button>
-                <div
-                  class="secondary-dropdown-menu profile"
-                  aria-labelledby="dropdownProfile"
-                  ngbDropdownMenu
-                >
-                    <a class="dropdown-item" draggable="false" [routerLink]="['/account']">
-                      Account
-                    </a>
-                    <a class="dropdown-item" draggable="false" [routerLink]="['/users']">
-                      Users
-                    </a>
-                    <a class="dropdown-item" draggable="false" [routerLink]="['/settings']">
-                      Settings
-                    </a>
-                    <a class="dropdown-item" draggable="false" [routerLink]="['/logout']">
-                      Logout
-                    </a>
-                </div>
-              </div>
-            </li>
-      </ul>
-    </div>
-  </nav>
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-toggle="collapse"
+    data-target="#navbarNavDropdown"
+    aria-controls="navbarNavDropdown"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav float-right">
+      <li class="nav-item">
+        <a class="nav-link" draggable="false" [routerLink]="['/dashboard']">
+          Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" draggable="false" [routerLink]="['/reports']">
+          Reports
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" draggable="false" [routerLink]="['/contacts']">
+          Contacts
+        </a>
+      </li>
+
+      <li class="nav-item dropdown">
+        <div class="d-inline-block" ngbDropdown placement="bottom-left">
+          <button
+            type="button"
+            class="btn btn-link btn-height dropdown-toggle"
+            id="dropdownTools"
+            [ngClass]="{ toggleMenuLink: menuActive === true }"
+            (click)="toggleMenu()"
+            ngbDropdownToggle
+          >
+            Tools
+          </button>
+          <div class="secondary-dropdown-menu tools" aria-labelledby="dropdownTools" ngbDropdownMenu>
+            <a class="dropdown-item" draggable="false" (click)="viewAllTransactions()">
+              All Transactions
+            </a>
+            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_transactions']">
+              Import Transactions
+            </a>
+            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_names']">
+              Import Names
+            </a>
+
+            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_export_names']">
+              Export Names
+            </a>
+
+            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_merge_names']">
+              Merge Names
+            </a>
+            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">
+              Create Backup
+            </a>
+          </div>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" draggable="false" [routerLink]="['/help']">Help</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" draggable="false" [routerLink]="['/help']">
+          <i class="notifications-icon icon"></i>
+          Notifications
+        </a>
+      </li>
+      <li class="nav-item dropdown">
+        <div class="d-inline-block" ngbDropdown placement="bottom-left">
+          <button
+            type="button"
+            class="btn btn-link btn-height dropdown-toggle"
+            id="dropdownProfile"
+            [ngClass]="{ toggleMenuLink: menuActive === true }"
+            (click)="toggleMenu()"
+            ngbDropdownToggle
+          >
+            <i class="profile-icon icon" aria-hidden="true"></i>
+            Profile
+          </button>
+          <div class="secondary-dropdown-menu profile" aria-labelledby="dropdownProfile" ngbDropdownMenu>
+            <a class="dropdown-item" draggable="false" [routerLink]="['/account']">
+              Account
+            </a>
+            <a class="dropdown-item" draggable="false" [routerLink]="['/users']">
+              Users
+            </a>
+            <a class="dropdown-item" draggable="false" [routerLink]="['/settings']">
+              Settings
+            </a>
+            <a class="dropdown-item" draggable="false" [routerLink]="['/logout']">
+              Logout
+            </a>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>

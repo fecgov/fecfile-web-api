@@ -1,6 +1,6 @@
 import { SchedHServiceService } from './../sched-h-service/sched-h-service.service';
 import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
 import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
 import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -23,7 +23,7 @@ import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.
 import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedule';
 import { ReportsService } from 'src/app/reports/service/report.service';
 import { TransactionModel } from '../transactions/model/transaction.model';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, Subject } from 'rxjs';
 import { SchedH5Service } from './sched-h5.service';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
@@ -38,7 +38,7 @@ import {
   styleUrls: ['./sched-h5.component.scss'],
   providers: [NgbTooltipConfig, CurrencyPipe, DecimalPipe],
   encapsulation: ViewEncapsulation.None,
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [
         style({ opacity: 0 }),
@@ -48,13 +48,14 @@ import {
         animate(0, style({ opacity: 0 }))
       ])
     ])
-  ]
+  ] */
 })
 export class SchedH5Component extends AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionTypeText: string;
   @Input() transactionType: string;
   @Input() scheduleAction: ScheduleActions;
   @Input() scheduleType: string;
+  @Input() transactionData: any;
   @Output() status: EventEmitter<any>;
 
   public formType: string;
@@ -105,6 +106,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public restoreSubscription: Subscription;
   public trashSubscription: Subscription;
 
+  private _h5OnDestroy$ = new Subject();
+
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -134,7 +137,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     private _tranService: TransactionsService,
     private _dlService: DialogService,
     private _schedHMessageServiceService: SchedHMessageServiceService,
-    private _schedHService:SchedHServiceService,
+    private _schedHService: SchedHServiceService,
     private _tranMessageService: TransactionsMessageService,
   ) {
     super(
@@ -157,7 +160,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService
+      _reportsService,
+      _schedHMessageServiceService
     );
     _schedH5Service;
     _individualReceiptService;
@@ -169,35 +173,35 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _tranMessageService;
 
     this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
-    .subscribe(p => {
-      if(p.scheduleType === 'Schedule H5'){
-        let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
-          if(res && res.length === 1){
-            this.editH5(res[0]);
-          }
-        });
-      }
-    })
+      .subscribe(p => {
+        if (p.scheduleType === 'Schedule H5') {
+          let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
+            if (res && res.length === 1) {
+              this.editH5(res[0]);
+            }
+          });
+        }
+      })
 
     this.restoreSubscription = this._tranMessageService
-        .getRestoreTransactionsMessage()
-        .subscribe(
-          message => {
-            if(message.scheduleType === 'Schedule H5') {
-              this.setH5Sum();
-            }
+      .getRestoreTransactionsMessage()
+      .subscribe(
+        message => {
+          if (message.scheduleType === 'Schedule H5') {
+            this.setH5Sum();
           }
-        )
+        }
+      )
 
     this.trashSubscription = this._tranMessageService
-        .getRemoveHTransactionsMessage()
-        .subscribe(
-          message => {
-            if(message.scheduleType === 'Schedule H5') {
-              this.setH5Sum();
-            }
+      .getRemoveHTransactionsMessage()
+      .subscribe(
+        message => {
+          if (message.scheduleType === 'Schedule H5') {
+            this.setH5Sum();
           }
-        )
+        }
+      )
   }
 
   public ngOnInit() {
@@ -211,7 +215,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     //this.transactionTypeText = 'Coordinated Party Expenditure Debt to Vendor';
     super.ngOnChanges(null);
     this._setTransactionDetail();
-    console.log();
+    //console.log();
 
     // temp code - waiting until dynamic forms completes and loads the formGroup
     // before rendering the static fields, otherwise validation error styling
@@ -253,11 +257,11 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.showPart2 = false;
     this._setTransactionDetail();
 
-    if(this.transactionType === 'ALLOC_H5_SUM') {      
-      this.setH5Sum();      
+    if (this.transactionType === 'ALLOC_H5_SUM') {
+      this.setH5Sum();
     }
 
-    if(this.transactionType === 'ALLOC_H5_SUM_P') {      
+    if (this.transactionType === 'ALLOC_H5_SUM_P') {
       this.setH5SumP();
     }
   }
@@ -269,6 +273,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public ngOnDestroy(): void {
+    this._h5OnDestroy$.next(true);
     this.populateFormForEdit.unsubscribe();
     this.restoreSubscription.unsubscribe();
     this.trashSubscription.unsubscribe();
@@ -291,10 +296,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.saveAndReturnToParent();
   }
 
-  pageChanged(event){
+  pageChanged(event) {
     this.h5TableConfig.currentPage = event;
   }
-  entryPageChanged(event){
+  entryPageChanged(event) {
     this.h5EntryTableConfig.currentPage = event;
   }
 
@@ -398,14 +403,14 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public saveAndGetSummary(ratio: any, scheduleAction: any) {
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
-    
+
     this._schedH5Service.saveAndGetSummary(ratio, reportId, scheduleAction).subscribe(res => {
-      if (res) {        
+      if (res) {
         //this.saveHRes = res;
         this.h5Entries = [];
 
         this.h5Sum = [];
-        this.h5Sum =  res;
+        this.h5Sum = res;
         this.h5TableConfig.totalItems = res.length;
       }
     });
@@ -429,23 +434,23 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.h5Ratios['report_id'] = reportId;
     this.h5Ratios.transaction_type_identifier = 'TRAN_FROM_LEVIN_ACC';
-    this.h5Ratios['account_name'] = this.schedH5.get('account_name').value;    
+    this.h5Ratios['account_name'] = this.schedH5.get('account_name').value;
 
     const formObj = this.schedH5.getRawValue();
-    
+
     //const total_amount_transferred = +(this.schedH5.get('total_amount_transferred').value) 
     //      + (+this.schedH5.get('transferred_amount').value);
     const total_amount_transferred = this.convertFormattedAmountToDecimal(this.schedH5.get('total_amount_transferred').value) +
-          this.convertFormattedAmountToDecimal(this.schedH5.get('transferred_amount').value)
+      this.convertFormattedAmountToDecimal(this.schedH5.get('transferred_amount').value)
     this.h5Ratios.total_amount_transferred = total_amount_transferred;
-    
+
     //this.schedH5.patchValue({total_amount_transferred: total_amount_transferred}, { onlySelf: true });
-    
+
 
     formObj['report_id'] = reportId;
     formObj['transaction_type_identifier'] = "TRAN_FROM_LEVIN_ACC";
     formObj['back_ref_transaction_id'] = this.back_ref_transaction_id;
-    
+
     delete formObj.total_amount_transferred;
 
     const transferred_amount = this.convertFormattedAmountToDecimal(this.schedH5.get('transferred_amount').value);
@@ -464,16 +469,16 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     formObj['receipt_date'] = this.schedH5.get('receipt_date').value;
 
     formObj['transaction_id'] = this.transaction_id;
-   
+
     const serializedForm = JSON.stringify(formObj);
 
     this.isSubmit = true;
 
     if (this.schedH5.status === 'VALID') {
 
-      this.schedH5.patchValue({total_amount_transferred: this._decPipe.transform(total_amount_transferred, '.2-2')}, { onlySelf: true });
-     
-      if(this.scheduleAction !== ScheduleActions.edit) {
+      this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(total_amount_transferred, '.2-2') }, { onlySelf: true });
+
+      if (this.scheduleAction !== ScheduleActions.edit) {
         this.h5Entries.push(formObj);
         this.h5EntryTableConfig.totalItems = this.h5Entries.length;
         this.h5Ratios.child.push(formObj);
@@ -487,14 +492,17 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.isSubmit = false;
 
       this.schedH5.reset();
-      this.schedH5.patchValue({account_name: accountName}, { onlySelf: true });
-      this.schedH5.patchValue({receipt_date: receipt_date}, { onlySelf: true });
-      this.schedH5.patchValue({category: ''}, { onlySelf: true });
-      this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true });
-      this.schedH5.patchValue({total_amount_transferred:  this._decPipe.transform(total_amount_transferred, '.2-2')}, { onlySelf: true });
+      this.schedH5.patchValue({ account_name: accountName }, { onlySelf: true });
+      this.schedH5.patchValue({ receipt_date: receipt_date }, { onlySelf: true });
+      this.schedH5.patchValue({ category: '' }, { onlySelf: true });
+      this.schedH5.patchValue({ transferred_amount: '' }, { onlySelf: true });
+      this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(total_amount_transferred, '.2-2') }, { onlySelf: true });
 
       //this.saveH5(serializedForm);
       //this.schedH5.reset();
+
+      // Note: Do after all patching to avoid form change detection which will set to false
+      localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
     }
   }
 
@@ -510,6 +518,15 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       // activity_event_name: new FormControl(''),
       // amount: new FormControl(''),
       // total_amount: new FormControl('')
+    });
+    this._prepareForUnsavedH5Changes();
+  }
+
+  private _prepareForUnsavedH5Changes(): void {
+    this.schedH5.valueChanges.takeUntil(this._h5OnDestroy$).subscribe(val => {
+      if (this.schedH5.dirty) {
+        localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: false }));
+      }
     });
   }
 
@@ -563,11 +580,11 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public returnToSum(): void {
 
-    if(this.h5Ratios.child.length > 0) {
+    if (this.h5Ratios.child.length > 0) {
       this.addEntries();
     }
 
-    if( this.scheduleAction === ScheduleActions.edit) {
+    if (this.scheduleAction === ScheduleActions.edit) {
       this.scheduleAction = ScheduleActions.add;
     }
 
@@ -577,7 +594,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.setH5();
 
     this.h5Entries = [];
-    this.schedH5.patchValue({ transferred_amount: 0}, { onlySelf: true });
+    this.schedH5.patchValue({ transferred_amount: 0 }, { onlySelf: true });
 
     this.schedH5 = this._formBuilder.group({
       category: ['']
@@ -590,7 +607,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToAdd(): void {
-    this.setH5();    
+    this.setH5();
     this.transactionType = 'ALLOC_H5_RATIO';
   }
 
@@ -603,7 +620,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.isSaveAndAdd = false;
 
-    this.schedH5.patchValue({transferred_amount: ''}, { onlySelf: true });
+    this.schedH5.patchValue({ transferred_amount: '' }, { onlySelf: true });
 
     if (!this.schedH5.get('category').value) {
       this.showIdentifer = false;
@@ -631,7 +648,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.showIdentiferSelect = false
     }
 
-    if(e.target.value !== '') {
+    if (e.target.value !== '') {
       this._noH1H2Popup(e.target.value)
     }
   }
@@ -642,13 +659,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
-    this.h5Subscription = this._schedH5Service.getSummary(reportId).subscribe(res =>
-      {        
-        if(res) {          
-          this.h5Sum =  res;         
-          this.h5TableConfig.totalItems = res.length;
-        }
-      });
+    this.h5Subscription = this._schedH5Service.getSummary(reportId).subscribe(res => {
+      if (res) {
+        this.h5Sum = res;
+        this.h5TableConfig.totalItems = res.length;
+      }
+    });
 
     /*  
     this.h5Sum = [
@@ -685,34 +701,33 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public setH5SumP() {
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
-    this.h5Subscription = this._schedH5Service.getBreakDown(reportId).subscribe(res =>
-      {        
-        if(res) {
+    this.h5Subscription = this._schedH5Service.getBreakDown(reportId).subscribe(res => {
+      if (res) {
 
-          this.h5SumP = [];
+        this.h5SumP = [];
 
-          this.h5SumP.push(
-            {
-              'category': 'Voter ID',
-              'amount': +res[0].voter_id
-            },{
-              'category': 'Voter Registration',
-              'amount': +res[0].voter_registration
-            },{
-              'category': 'Generic Campaign Activities',
-              'amount': +res[0].generic_campaign
-            },{
-              'category': 'GOTV',
-              'amount': +res[0].gotv
-            },{
-              'category': 'This Period (Total Amount of Transfer Received)',
-              'amount': +res[0].total
-            }
-          );
+        this.h5SumP.push(
+          {
+            'category': 'Voter ID',
+            'amount': +res[0].voter_id
+          }, {
+            'category': 'Voter Registration',
+            'amount': +res[0].voter_registration
+          }, {
+            'category': 'Generic Campaign Activities',
+            'amount': +res[0].generic_campaign
+          }, {
+            'category': 'GOTV',
+            'amount': +res[0].gotv
+          }, {
+            'category': 'This Period (Total Amount of Transfer Received)',
+            'amount': +res[0].total
+          }
+        );
 
-          //this.h5SumP =  res;
-        }
-      });
+        //this.h5SumP =  res;
+      }
+    });
 
     /*  
     this.h5SumP = [
@@ -742,13 +757,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public setLevinAccounts() {
 
-    this.h5Subscription = this._schedH5Service.getLevinAccounts().subscribe(res =>
-      {        
-        if(res) {          
-          this.levinAccountsies  =  res;          
-        }
-      });
-    
+    this.h5Subscription = this._schedH5Service.getLevinAccounts().subscribe(res => {
+      if (res) {
+        this.levinAccountsies = res;
+      }
+    });
+
   }
 
   public addEntries() {
@@ -756,14 +770,14 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     //this.saveH5(serializedForm);
 
     let serializedForm: any;
-    if(this.scheduleAction === ScheduleActions.add) {
+    if (this.scheduleAction === ScheduleActions.add) {
       serializedForm = JSON.stringify(this.h5Ratios);
-    }else if(this.scheduleAction === ScheduleActions.edit) {
+    } else if (this.scheduleAction === ScheduleActions.edit) {
       serializedForm = JSON.stringify(this.h5EntrieEdit);
     }
 
     this.saveAndGetSummary(serializedForm, this.scheduleAction);
-    this.schedH5.patchValue({transferred_amount: 0}, { onlySelf: true });
+    this.schedH5.patchValue({ transferred_amount: 0 }, { onlySelf: true });
     this.h5Ratios = {};
     this.h5Ratios['child'] = [];
   }
@@ -774,13 +788,13 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.cvgStartDate = formInfo.cvgStartDate;
     this.cvgEndDate = formInfo.cvgEndDate;
 
-    let startDate =  new Date(this.cvgStartDate);
+    let startDate = new Date(this.cvgStartDate);
     startDate.setDate(startDate.getDate() - 1);
 
     if ((!this._uService.compareDatesAfter((new Date(receiptDate)), new Date(this.cvgEndDate)) ||
-      this._uService.compareDatesAfter((new Date(receiptDate)), startDate))) {     
+      this._uService.compareDatesAfter((new Date(receiptDate)), startDate))) {
       this.receiptDateErr = true;
-      this.schedH5.controls['receipt_date'].setErrors({'incorrect': true});
+      this.schedH5.controls['receipt_date'].setErrors({ 'incorrect': true });
     } else {
       this.receiptDateErr = false;
     }
@@ -790,32 +804,36 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public handleOnBlurEvent($event: any, col: any) {
 
     let val = 0;
-    if(this.schedH5.get('transferred_amount').value){
+    if (this.schedH5.get('transferred_amount').value) {
       val = this.convertFormattedAmountToDecimal(this.schedH5.get('transferred_amount').value);
     }
 
     const entry = $event.target.value.replace(/,/g, ``);
-    if(this.isNumber(entry)) {
+    if (this.isNumber(entry)) {
       this.transferredAmountErr = false;
       //this.schedH5.patchValue({transferred_amount: this._decPipe.transform(
       //  this.convertFormattedAmountToDecimal(entry), '.2-2')}, { onlySelf: true });
-      this.schedH5.patchValue({transferred_amount: this._decPipe.transform(
-        this.convertFormattedAmountToDecimal(
-          this.schedH5.get('transferred_amount').value), '.2-2')}, { onlySelf: true });
+      this.schedH5.patchValue({
+        transferred_amount: this._decPipe.transform(
+          this.convertFormattedAmountToDecimal(
+            this.schedH5.get('transferred_amount').value), '.2-2')
+      }, { onlySelf: true });
       this.schedH5.controls['transferred_amount'].setErrors(null);
 
-      if(this.scheduleAction === ScheduleActions.edit) {
-        this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(
-          this.total_amount_edit - this.transferred_amount_edit + val, '.2-2')}, { onlySelf: true });
+      if (this.scheduleAction === ScheduleActions.edit) {
+        this.schedH5.patchValue({
+          total_amount_transferred: this._decPipe.transform(
+            this.total_amount_edit - this.transferred_amount_edit + val, '.2-2')
+        }, { onlySelf: true });
       }
-    }else {
+    } else {
       this.transferredAmountErr = true
-      this.schedH5.controls['transferred_amount'].setErrors({'incorrect': true});  
+      this.schedH5.controls['transferred_amount'].setErrors({ 'incorrect': true });
     }
   }
 
   private convertFormattedAmountToDecimal(formatedAmount: string): number {
-    if(!formatedAmount) {
+    if (!formatedAmount) {
       formatedAmount = '0'
     }
     if (typeof formatedAmount === 'string') {
@@ -837,7 +855,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.h5Ratios = {};
     this.h5Ratios['child'] = [];
     this.transferredAmountErr = false;
-    if(this.scheduleAction === ScheduleActions.edit) {
+    if (this.scheduleAction === ScheduleActions.edit) {
       this.scheduleAction = ScheduleActions.add
     }
   }
@@ -851,20 +869,20 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.setCategory();
 
-    if(item.transfer_type === 'Voter ID') {
-      this.schedH5.patchValue({ category: 'voter_id'}, { onlySelf: true });
-    }else if(item.transfer_type === 'Voter Registration') {
-      this.schedH5.patchValue({ category: 'voter_registration'}, { onlySelf: true });
-    }else if(item.transfer_type === 'Generic Campaign Activities') {
-      this.schedH5.patchValue({ category: 'generic_campaign'}, { onlySelf: true });
-    }else if(item.transfer_type === 'GOTV') {
-      this.schedH5.patchValue({ category: 'gotv'}, { onlySelf: true });
+    if (item.transfer_type === 'Voter ID') {
+      this.schedH5.patchValue({ category: 'voter_id' }, { onlySelf: true });
+    } else if (item.transfer_type === 'Voter Registration') {
+      this.schedH5.patchValue({ category: 'voter_registration' }, { onlySelf: true });
+    } else if (item.transfer_type === 'Generic Campaign Activities') {
+      this.schedH5.patchValue({ category: 'generic_campaign' }, { onlySelf: true });
+    } else if (item.transfer_type === 'GOTV') {
+      this.schedH5.patchValue({ category: 'gotv' }, { onlySelf: true });
     }
 
-    this.schedH5.patchValue({ account_name: item.account_name}, { onlySelf: true });
-    this.schedH5.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
-    this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(item.transfer_amount, '.2-2')}, { onlySelf: true });
-    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.total_amount_transferred, '.2-2')}, { onlySelf: true });
+    this.schedH5.patchValue({ account_name: item.account_name }, { onlySelf: true });
+    this.schedH5.patchValue({ receipt_date: item.receipt_date }, { onlySelf: true });
+    this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(item.transfer_amount, '.2-2') }, { onlySelf: true });
+    this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.total_amount_transferred, '.2-2') }, { onlySelf: true });
 
     this.transferred_amount_edit = item.transfer_amount
     this.total_amount_edit = item.total_amount_transferred;
@@ -872,11 +890,11 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public saveEdit() {
-    if(this.schedH5.status === 'VALID') {
+    if (this.schedH5.status === 'VALID') {
       this.saveAddMore();
       this.addEntries();
       this.returnToSum();
-    }else {
+    } else {
       this.schedH5.markAsDirty();
       this.schedH5.markAsTouched();
       this.isSubmit = true;
@@ -887,33 +905,37 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.setCategory();
 
-    if(item.transfer_type === 'Voter ID') {
-      this.schedH5.patchValue({ category: 'voter_id'}, { onlySelf: true });
-    }else if(item.transfer_type === 'Voter Registration') {
-      this.schedH5.patchValue({ category: 'voter_registration'}, { onlySelf: true });
-    }else if(item.transfer_type === 'Generic Campaign Activities') {
-      this.schedH5.patchValue({ category: 'generic_campaign'}, { onlySelf: true });
-    }else if(item.transfer_type === 'GOTV') {
-      this.schedH5.patchValue({ category: 'gotv'}, { onlySelf: true });
+    if (item.transfer_type === 'Voter ID') {
+      this.schedH5.patchValue({ category: 'voter_id' }, { onlySelf: true });
+    } else if (item.transfer_type === 'Voter Registration') {
+      this.schedH5.patchValue({ category: 'voter_registration' }, { onlySelf: true });
+    } else if (item.transfer_type === 'Generic Campaign Activities') {
+      this.schedH5.patchValue({ category: 'generic_campaign' }, { onlySelf: true });
+    } else if (item.transfer_type === 'GOTV') {
+      this.schedH5.patchValue({ category: 'gotv' }, { onlySelf: true });
     }
 
-    this.schedH5.patchValue({ category: item.category}, { onlySelf: true });
+    this.schedH5.patchValue({ category: item.category }, { onlySelf: true });
 
-    this.schedH5.patchValue({ account_name: item.account_name}, { onlySelf: true });
-    this.schedH5.patchValue({ receipt_date: item.receipt_date}, { onlySelf: true });
-    this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(
-      this.convertFormattedAmountToDecimal(item.transferred_amount), '.2-2')}, { onlySelf: true });
+    this.schedH5.patchValue({ account_name: item.account_name }, { onlySelf: true });
+    this.schedH5.patchValue({ receipt_date: item.receipt_date }, { onlySelf: true });
+    this.schedH5.patchValue({
+      transferred_amount: this._decPipe.transform(
+        this.convertFormattedAmountToDecimal(item.transferred_amount), '.2-2')
+    }, { onlySelf: true });
 
     this.h5Entries = this.h5Entries.filter(obj => obj !== item);
     this.h5Ratios.child = this.h5Ratios.child.filter(obj => obj !== item);
 
     let sum = 0;
     this.h5Entries.forEach(obj => {
-     sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+      sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
     })
 
-    this.schedH5.patchValue({ total_amount_transferred:
-      this._decPipe.transform(sum, '.2-2')}, { onlySelf: true });
+    this.schedH5.patchValue({
+      total_amount_transferred:
+        this._decPipe.transform(sum, '.2-2')
+    }, { onlySelf: true });
 
   }
 
@@ -955,11 +977,13 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
           let sum = 0;
           this.h5Entries.forEach(obj => {
-          sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
+            sum += this.convertFormattedAmountToDecimal(obj.transferred_amount);
           })
 
-          this.schedH5.patchValue({ total_amount_transferred:
-            this._decPipe.transform(sum, '.2-2')}, { onlySelf: true });
+          this.schedH5.patchValue({
+            total_amount_transferred:
+              this._decPipe.transform(sum, '.2-2')
+          }, { onlySelf: true });
 
           this._dlService.confirm(
             'Transaction has been successfully deleted.',
@@ -973,40 +997,39 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       });
   }
 
-  public goSummary() {
+  public goSummary(): void {
+    this.canDeactivate().then(result => {
+      if (result === true) {
+        localStorage.removeItem(`form_${this.formType}_saved`);
+        this.returnToSum();
+      }
+    });
+  }
 
-    this.isSubmit = true;
-
-    if(this.schedH5.touched || this.schedH5.dirty) {
-      this._dlService
-      .confirm('You have unsaved changes! If you leave, your changes will be lost.', ConfirmModalComponent, 'Caution!')
-      .then(res => {
-        if (res === 'okay') {
-          this.returnToSum();
-        } else if (res === 'cancel') {
-        }
-      });
-    }else {
-      this.returnToSum();
-    }
+  public cancelReturnToSum(): void {
+    this.canDeactivate().then(result => {
+      if (result === true) {
+        localStorage.removeItem(`form_${this.formType}_saved`);
+        this.returnToSum();
+      }
+    });
   }
 
   private _noH1H2Popup(category: string) {
 
     let activityEventScheduleType = '';
-    if(category === 'DC' || category === 'DF') {
+    if (category === 'DC' || category === 'DF') {
       activityEventScheduleType = 'sched_h2'
-    }else {
+    } else {
       activityEventScheduleType = 'sched_h1'
     }
 
     const report_id = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
     this.getH1H2ExistSubscription = this._schedH5Service.getH1H2ExistStatus(report_id, category)
-    .subscribe(res =>
-      {
-        if(res) {
-          if(res.count === 0) {
+      .subscribe(res => {
+        if (res) {
+          if (res.count === 0) {
 
             this.saveAndAddDisabled = true;
 
@@ -1034,12 +1057,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
               } else if (res === 'cancel') {
               }
             });
-          }else {
+          } else {
             this.saveAndAddDisabled = false;
           }
         }
       }
-    )
+      )
   }
 
   public printTransaction(trx: any): void {

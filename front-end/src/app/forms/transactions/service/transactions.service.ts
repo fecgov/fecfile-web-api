@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -188,8 +188,8 @@ export class TransactionsService {
       request.filters = emptyFilters;
     }
 
-    console.log(' Transaction Table request = ', request);
-    console.log(' Transaction Table httpOptions = ', httpOptions);
+    //console.log(' Transaction Table request = ', request);
+    //console.log(' Transaction Table httpOptions = ', httpOptions);
 
     return this._http
       .post(`${environment.apiUrl}${url}`, request, {
@@ -198,7 +198,7 @@ export class TransactionsService {
       .pipe(
         map(res => {
           if (res) {
-            console.log('Transaction Table res: ', res);
+            //console.log('Transaction Table res: ', res);
 
             return res;
           }
@@ -279,8 +279,8 @@ export class TransactionsService {
     // };
     // return Observable.of(mockResponse);
 
-    console.log(' Transaction Recycle Bin Table request = ', request);
-    console.log(' Transaction Recycle Bin Table httpOptions = ', httpOptions);
+    //console.log(' Transaction Recycle Bin Table request = ', request);
+    //console.log(' Transaction Recycle Bin Table httpOptions = ', httpOptions);
 
     return this._http
       .post(`${environment.apiUrl}${url}`, request, {
@@ -289,7 +289,7 @@ export class TransactionsService {
       .pipe(
         map(res => {
           if (res) {
-            console.log('Transaction Recycle Bin Table res: ', res);
+            //console.log('Transaction Recycle Bin Table res: ', res);
 
             return res;
           }
@@ -911,7 +911,7 @@ export class TransactionsService {
       .pipe(
         map(res => {
           if (res) {
-            console.log('Trash Restore response: ', res);
+            //console.log('Trash Restore response: ', res);
             // refresh the left summary menu
             this._receiptService.getSchedule(formType, { report_id: reportId }).subscribe(resp => {
               const message: any = {

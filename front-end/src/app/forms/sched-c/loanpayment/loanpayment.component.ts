@@ -1,6 +1,6 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
 import { NgForm, Validators } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { Subscription } from 'rxjs';
@@ -191,7 +191,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
   }
 
   handleTypeChange(event, form: any) {
-    console.log(event);
+    //console.log(event);
     form.entity = event.code;
     this.selectedEntity = event.code;
   }
@@ -222,9 +222,9 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
 
     if ((!this.utilService.compareDatesAfter((new Date(expenditureDate)), new Date(cvgEndDate)) ||
       this.utilService.compareDatesAfter((new Date(expenditureDate)), new Date(cvgStartDate)))) {
-      console.log('Date is invalid');
+      //console.log('Date is invalid');
     } else {
-      console.log('date is valid');
+      //console.log('date is valid');
     }
 
   }
@@ -325,7 +325,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
         formData.append('entity_id', this.transactionDetail.entityId);
       }
 
-      console.log();
+      //console.log();
 
       for (const [key, value] of Object.entries(this.form.controls)) {
         if (value.value !== null) {
@@ -348,7 +348,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
           })
           .subscribe((res:any) => {
             if (res) {
-              console.log('success!!!')
+              //console.log('success!!!')
 
               //update sidebar
               this._receiptService.getSchedule(formType, res).subscribe(resp => {
@@ -364,7 +364,7 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
               this._goToLoanSummary(res.report_id);
               // return res;
             }
-            console.log('success but no response.. failure?')
+            //console.log('success but no response.. failure?')
             return false;
           }
           );
@@ -389,12 +389,12 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
               this._goToLoanSummary(res.report_id);
               // return res;
             }
-            console.log('success but no response.. failure?')
+            //console.log('success but no response.. failure?')
             return false;
           }
           );
       } else {
-        console.log('unexpected ScheduleActions received - ' + this.scheduleAction);
+        //console.log('unexpected ScheduleActions received - ' + this.scheduleAction);
       }
     }
   }

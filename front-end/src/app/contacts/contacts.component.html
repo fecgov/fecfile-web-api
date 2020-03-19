@@ -11,7 +11,7 @@
       <div class="header-content">
         <div class="float-left">
           <h1 *ngIf="!isEditViewActive(); else editHeading">Contacts 
-            <span [@fadeInOut] *ngIf="isRecycleBinViewActive()"> / Recycling Bin
+            <span  *ngIf="isRecycleBinViewActive()"> / Recycling Bin
               <span class="trash-icon"></span>
             </span>
           </h1>
@@ -24,37 +24,37 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="contacts__btn-container">
-              <button [@fadeInOut] *ngIf="isContactViewActive()"
+              <button  *ngIf="isContactViewActive()"
                 class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="AddContacts()">
                 <i class="fas fa-plus-circle"></i>
                 Add New
               </button>
-              <button [@fadeInOut] *ngIf="isContactViewActive()"
+              <button  *ngIf="isContactViewActive()"
                 class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showPinColumns()">
                 <i class="thumbtack-icon"></i>
                 Pin Columns
               </button>
-              <button [@fadeInOut] *ngIf="isContactViewActive()"
+              <button  *ngIf="isContactViewActive()"
                 class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showRecycleBin()">
                 <i class="trash-icon"></i>
                 Recycle Bin
               </button>
-              <button [@fadeInOut] *ngIf="isContactViewActive()"
+              <button  *ngIf="isContactViewActive()"
                 class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="doImport()">
                 <i class="file-import-icon"></i>
                 Import
               </button>
-              <button [@fadeInOut] *ngIf="isContactViewActive()"
+              <button  *ngIf="isContactViewActive()"
                 class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showFilters()">
                 <i class="filter-icon"></i>
                 Filter
               </button>
-              <button [@fadeInOut] *ngIf="isRecycleBinViewActive()"
+              <button  *ngIf="isRecycleBinViewActive()"
                   class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showContacts()">
                   <i class="table-icon"></i>
                 Contacts
               </button>
-              <button [@fadeInOut] *ngIf="isRecycleBinViewActive()"
+              <button  *ngIf="isRecycleBinViewActive()"
                 class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showFilters()">
                 <i class="filter-icon"></i>
                 Filter

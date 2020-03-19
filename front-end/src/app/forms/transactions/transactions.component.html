@@ -24,20 +24,20 @@
             <div class="float-left">
               <h1 *ngIf="!isEditViewActive(); else editHeading">
                 Form {{ formType }} / Transactions / {{transactionCategory | titlecase}}
-                <span [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+                <span  *ngIf="isRecycleBinViewActive()">
                   / Recycling Bin
                   <span class="trash-icon"></span>
                 </span>
               </h1>
               <ng-template #editHeading>
-                <h1 [@fadeInOut] *ngIf="isEditViewActive()">
+                <h1  *ngIf="isEditViewActive()">
                   Form {{ formType }} / {{ transactionToEdit.type }} / Edit
                 </h1>
               </ng-template>
             </div>
             <div class="float-right">
               <button
-                [@fadeInOut]
+                
                 *ngIf="isShowFilters"
                 class="btn btn-primary btn-right"
                 type="submit"
@@ -72,7 +72,7 @@
           <div class="grid-row__col grid-row__col--12">
             <div class="transactions__btn-container">
               <button
-                [@fadeInOut]
+                
                 *ngIf="isTransactionViewActive()"
                 class="btn btn-primary btn-left transactions__trx-btn"
                 type="button"
@@ -82,7 +82,7 @@
                 Pin Columns
               </button>
               <button
-                [@fadeInOut]
+                
                 *ngIf="isTransactionViewActive()"
                 class="btn btn-primary btn-left transactions__trx-btn"
                 type="button"
@@ -92,7 +92,7 @@
                 Recycle Bin
               </button>
               <button
-                [@fadeInOut]
+                
                 *ngIf="isTransactionViewActive()"
                 class="btn btn-primary btn-left transactions__trx-btn"
                 type="button"
@@ -103,7 +103,7 @@
                 Filter
               </button>
               <button
-                [@fadeInOut]
+                
                 *ngIf="isRecycleBinViewActive()"
                 class="btn btn-primary btn-left transactions__trx-btn"
                 type="button"
@@ -113,7 +113,7 @@
                 Transactions
               </button>
               <button
-                [@fadeInOut]
+                
                 *ngIf="isRecycleBinViewActive()"
                 class="btn btn-primary btn-left transactions__trx-btn"
                 type="button"

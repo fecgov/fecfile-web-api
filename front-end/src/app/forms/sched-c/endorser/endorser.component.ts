@@ -10,7 +10,7 @@ import {
   ViewEncapsulation,
   ViewChild,
   OnDestroy
-} from '@angular/core';
+, ChangeDetectionStrategy } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
@@ -156,14 +156,14 @@ export class EndorserComponent implements OnInit, OnDestroy {
   }
 
   public debug(obj: any): void {
-    console.log('obj: ', obj);
+    //console.log('obj: ', obj);
   }
 
 
   private _setForm(fields: any): void {
     const formGroup: any = [];
     this._employerOccupationRequired = false;
-    console.log('_setForm fields ', fields);
+    //console.log('_setForm fields ', fields);
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
@@ -397,7 +397,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
     this.endorserForm.patchValue({ last_name: contact.last_name }, { onlySelf: true });
     this.endorserForm.patchValue({ first_name: contact.first_name }, { onlySelf: true });
     this.endorserForm.patchValue({ middle_name: contact.middle_name }, { onlySelf: true });
-    this.endorserForm.patchValue({ prefix: contact.prefix }, { onlySelf: true });
+    this.endorserForm.patchValue({ prefix: contact.preffix }, { onlySelf: true });
     this.endorserForm.patchValue({ suffix: contact.suffix }, { onlySelf: true });
     this.endorserForm.patchValue({ street_1: contact.street_1 }, { onlySelf: true });
     this.endorserForm.patchValue({ street_2: contact.street_2 }, { onlySelf: true });
@@ -477,7 +477,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
   private getFormFields(): void {
     this._endorserService.get_sched_c_endorser_dynamic_forms_fields().subscribe(res => {
       if (res) {
-        console.log('getFormFields res =', res);
+        //console.log('getFormFields res =', res);
         if (res.hasOwnProperty('data')) {
           if (typeof res.data === 'object') {
             if (res.data.hasOwnProperty('formFields')) {
@@ -597,8 +597,8 @@ export class EndorserComponent implements OnInit, OnDestroy {
 
 
     this._loanservice.saveSched_C2(this.scheduleAction, endorserObj, hiddenFieldsObj).subscribe(res => {
-      console.log('success');
-      console.log(res);
+      //console.log('success');
+      //console.log(res);
       if (!addmore) {
         this.goToEndorserSummary();
       }
@@ -606,7 +606,7 @@ export class EndorserComponent implements OnInit, OnDestroy {
         this.endorserForm.reset();
       }
     }, error => {
-      console.log(error);
+      //console.log(error);
 
     });
   }

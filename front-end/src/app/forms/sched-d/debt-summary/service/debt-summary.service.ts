@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
@@ -78,25 +78,25 @@ export class DebtSummaryService {
     const actions = [];
     actions.push({
       action: 'trash',
-      report_id: debt.reportId && debt.reportId !== 'undefined'? debt.reportId :reportId, 
+      report_id: debt.reportId && debt.reportId !== 'undefined' ? debt.reportId : reportId,
       transaction_id: debt.transactionId
     });
     request.actions = actions;
 
     return this._http
-    .put(`${environment.apiUrl}${url}`, request, {
-      headers: httpOptions
-    })
-    .pipe(
-      map(res => {
-        if (res) {
-          console.log('get_outstanding_loans API res: ', res);
-
-          return res;
-        }
-        return false;
+      .put(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
       })
-    );
+      .pipe(
+        map(res => {
+          if (res) {
+            //console.log('get_outstanding_loans API res: ', res);
+
+            return res;
+          }
+          return false;
+        })
+      );
   }
 
   /**
@@ -135,6 +135,7 @@ export class DebtSummaryService {
       model.backRefTransactionId = row.back_ref_transaction_id;
       model.child = this._mapChildFromServerFields(row.child);
       model.entityType = row.entity_type;
+      model.entityId = row.entity_id;
       this._setDebtName(row);
       model.name = row.name;
       model.beginningBalance = row.beginning_balance ? row.beginning_balance : 0;
@@ -166,11 +167,13 @@ export class DebtSummaryService {
       model.transactionId = row.transaction_id;
       model.backRefTransactionId = row.back_ref_transaction_id;
       model.entityType = row.entity_type;
+      model.entityId = row.entity_id;
       this._setDebtName(row);
       model.name = row.name;
       model.paymentAmt = row.expenditure_amount ? row.expenditure_amount : row.contribution_amount;
       model.paymentDate = row.expenditure_date ? row.expenditure_date : row.contribution_date;
-
+      model.memoCode = row.memo_code;
+      model.aggregate = row.aggregate_amt;
       modelArray.push(model);
     }
     return modelArray;

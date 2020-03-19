@@ -1,4 +1,5 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs/Subscription';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { environment } from '../../../../environments/environment';
@@ -15,7 +16,7 @@ import { Subject } from 'rxjs';
   providers: [NgbTooltipConfig]
 })
 export class SidebarComponent implements OnInit, OnDestroy {
-  
+
 
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
@@ -34,35 +35,39 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private _toggleNavClicked: boolean = false;
 
   private onDestroy$ = new Subject();
+  routerSubscription: Subscription;
+  childRouteSubscription: Subscription;
+  routerEventsSubscription: Subscription;
 
   constructor(
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
-    private _formService:FormsService,
+    private _formService: FormsService,
     private _config: NgbTooltipConfig
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const route: string = this._router.url;
 
     this._formService.get_filed_form_types().takeUntil(this.onDestroy$)
-     .subscribe(res => this.committee_forms = <Icommittee_forms[]> res);
+      .subscribe(res => this.committee_forms = <Icommittee_forms[]>res);
 
-    this._router
+    this.routerSubscription = this._router
       .events
       .subscribe(val => {
-        if(val) {
-          if(val instanceof NavigationEnd) {
-            if(
+        if (val) {
+          if (val instanceof NavigationEnd) {
+            if (
               val.url.indexOf('/forms/form/') === 0 ||
               val.url.indexOf('/forms/transactions/') === 0 ||
               val.url.indexOf('/signandSubmit/3X') === 0 ||
               val.url.indexOf('/contacts') === 0 ||
               val.url.indexOf('/addContact') === 0 ||
-              val.url.indexOf('/reports') === 0 
-             ) {
+              val.url.indexOf('/import-contacts') === 0 ||
+              val.url.indexOf('/reports') === 0
+            ) {
               this._closeNavBar();
-            } else if(
+            } else if (
               val.url.indexOf('/dashboard') === 0 ||
               val.url.indexOf('/forms/form/') === -1
             ) {
@@ -76,7 +81,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     this.screenWidth = window.innerWidth;
 
-    if(this.screenWidth < 768) {
+    if (this.screenWidth < 768) {
       this.tooltipPosition = 'bottom';
       this.tooltipLeft = '0';
     } else if (this.screenWidth >= 768) {
@@ -87,18 +92,25 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
+    this.routerSubscription.unsubscribe();
+    if (this.childRouteSubscription) {
+      this.childRouteSubscription.unsubscribe();
+    }
+    if (this.routerEventsSubscription) {
+      this.routerEventsSubscription.unsubscribe();
+    }
   }
-  
+
 
   ngDoCheck(): void {
     const route: string = this._router.url;
 
     if (!this._toggleNavClicked) {
-      if(route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
+      if (route.indexOf('/forms/form/') === 0 && this.sidebarVisibleClass !== 'sidebar-hidden') {
 
         let formSelected: string = null;
 
-        this._activatedRoute
+        this.childRouteSubscription = this._activatedRoute
           .children[0]
           .params
           .subscribe(param => {
@@ -108,7 +120,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
         this._closeNavBar();
 
-        if(this.formType === null) {
+        if (this.formType === null) {
           this.formType = formSelected;
         }
       }
@@ -125,7 +137,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   onResize(event) {
     this.screenWidth = event.target.innerWidth;
 
-    if(this.screenWidth < 768) {
+    if (this.screenWidth < 768) {
       this.tooltipPosition = 'bottom';
       this.tooltipLeft = '0';
     } else if (this.screenWidth >= 768) {
@@ -141,18 +153,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
    */
   public formSelected(form: string): void {
 
-    this._router
+    this.routerEventsSubscription = this._router
       .events
       .subscribe(val => {
-        if(val instanceof NavigationEnd) {
-          if(val.url.indexOf(form) >= 1) {
-            if (form !== '3X'){
-           // Except Forn3X screens we should not show Form3X related dashboard
-              if (localStorage.getItem('form3XReportInfo.showDashBoard')==='Y'){
+        if (val instanceof NavigationEnd) {
+          if (val.url.indexOf(form) >= 1) {
+            if (form !== '3X') {
+              // Except Forn3X screens we should not show Form3X related dashboard
+              if (localStorage.getItem('form3XReportInfo.showDashBoard') === 'Y') {
                 this._formService.removeFormDashBoard('3X');
               }
             }
-            else if (form === '3X'){
+            else if (form === '3X') {
               localStorage.removeItem("form3XReportInfo.dueDate");
               localStorage.removeItem("form3XReportInfo.electionDate");
               localStorage.removeItem("form3XReportInfo.fromDate");
@@ -178,7 +190,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   public toggleSideNav(): void {
     this._toggleNavClicked = true;
 
-    if(this.iconClass === 'close-icon') {
+    if (this.iconClass === 'close-icon') {
       this._closeNavBar();
     } else {
       this._openNavBar();
@@ -191,7 +203,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
    * @param      {String}  navType  The navigation type
    */
   public toggleFormNav(navType: string): void {
-    if(navType === 'other-forms') {
+    if (navType === 'other-forms') {
       this.otherFormsHidden = !this.otherFormsHidden;
     } else if (navType === 'my-forms') {
       this.myFormsHidden = !this.myFormsHidden;
@@ -203,10 +215,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
    */
   private _closeNavBar(): void {
     this.iconClass = 'bars-icon';
-
-    setTimeout(() => {
-      this.sidebarVisibleClass = 'sidebar-hidden';
-    }, 100);
+    this.sidebarVisibleClass = 'sidebar-hidden';
 
     this.status.emit({
       showSidebar: false
@@ -219,9 +228,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private _openNavBar(): void {
     this.iconClass = 'close-icon';
 
-    setTimeout(() => {
-      this.sidebarVisibleClass = 'sidebar-visible';
-    }, 100);
+    this.sidebarVisibleClass = 'sidebar-visible';
 
     this.status.emit({
       showSidebar: true

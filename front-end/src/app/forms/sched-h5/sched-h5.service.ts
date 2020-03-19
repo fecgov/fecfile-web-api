@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -43,7 +43,7 @@ export class SchedH5Service {
       )
       .pipe(map(res => {
         if (res) {
-          console.log('H5 Summary Table res: ', res);
+          //console.log('H5 Summary Table res: ', res);
           return res;
         }
         return false;
@@ -72,7 +72,7 @@ export class SchedH5Service {
       )
       .pipe(map(res => {
         if (res) {
-          console.log('H5 Breakdown res: ', res);
+          //console.log('H5 Breakdown res: ', res);
           return res;
         }
         return false;
@@ -109,7 +109,7 @@ export class SchedH5Service {
       )
       .pipe(map(res => {
         if (res) {
-          console.log('Save H5 res: ', res);
+          //console.log('Save H5 res: ', res);
           return res;
         }
         return false;
@@ -134,7 +134,7 @@ export class SchedH5Service {
       )
       .pipe(map(res => {
         if (res) {
-          console.log('Levin Accounts res: ', res);
+          //console.log('Levin Accounts res: ', res);
           return res;
         }
         return false;
@@ -169,7 +169,7 @@ export class SchedH5Service {
         )
         .pipe(map(res => {
             if (res) {
-              console.log('Save H5Ratio res: ', res);
+              //console.log('Save H5Ratio res: ', res);
 
               //get summary
               //this.getSummary(reportId);
@@ -198,7 +198,7 @@ export class SchedH5Service {
         )
         .pipe(map(res => {
             if (res) {
-              console.log('Edit H5Ratio res: ', res);
+              //console.log('Edit H5Ratio res: ', res);
 
               //get summary
               //this.getSummary(reportId);
@@ -251,7 +251,7 @@ export class SchedH5Service {
       )
       .pipe(map(res => {
           if (res) {
-            console.log('Validate H1 H2 exist res: ', res);
+            //console.log('Validate H1 H2 exist res: ', res);
             return res;
           }
           return false;

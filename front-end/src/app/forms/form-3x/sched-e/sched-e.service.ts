@@ -1,6 +1,6 @@
 import { CookieService } from 'ngx-cookie-service';
 
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -66,7 +66,7 @@ export class SchedEService {
         )
         .pipe(map(res => {
           if (res) {
-            console.log('get_outstanding_loans API res: ', res);
+            //console.log('get_outstanding_loans API res: ', res);
 
             return res;
           }

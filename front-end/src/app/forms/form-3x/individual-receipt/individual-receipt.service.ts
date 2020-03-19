@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -21,7 +21,7 @@ export class IndividualReceiptService {
     private _utilService: UtilService,
     private _decimalPipe: DecimalPipe
   ) {
-    console.log();
+    //console.log();
   }
 
   /**
@@ -129,7 +129,7 @@ export class IndividualReceiptService {
       formData.append('report_id',reportId);
     }
 
-    console.log();
+    //console.log();
 
     for (const [key, value] of Object.entries(receipt)) {
       if (value !== null) {
@@ -172,7 +172,7 @@ export class IndividualReceiptService {
           })
         );
     } else {
-      console.log('unexpected ScheduleActions received - ' + scheduleAction);
+      //console.log('unexpected ScheduleActions received - ' + scheduleAction);
     }
   }
 
@@ -488,7 +488,7 @@ export class IndividualReceiptService {
       form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
 
-    console.log('viewTransactions form3XReportType', form3XReportType);
+    //console.log('viewTransactions form3XReportType', form3XReportType);
 
     if (typeof form3XReportType === 'object' && form3XReportType !== null) {
       if (form3XReportType.hasOwnProperty('reportId')) {

@@ -2,17 +2,11 @@
   <!--div class="form__sidebar" *ngIf="step !== 'financial_summary'">-->
   <div *ngIf="step !== 'step_6'" class="form__sidebar">
     <div [hidden]="step !== 'step_1'" *ngIf="!allTransactions">
-      <report-type-sidebar
-        title="Report Coverage Dates"
-        (status)="onNotify($event)"
-        [selectedReport]="selectedReport"
-        [specialReports]="specialReports"
-        [regularReports]="regularReports"
-      >
+      <report-type-sidebar title="Report Coverage Dates" (status)="onNotify($event)" [selectedReport]="selectedReport"
+        [specialReports]="specialReports" [regularReports]="regularReports">
       </report-type-sidebar>
     </div>
-    <div
-      *ngIf="
+    <div *ngIf="
         step === 'step_2' ||
         step === 'step_3' ||
         step === 'financial_summary' ||
@@ -22,40 +16,27 @@
         step === 'loansummary' ||
         step === 'loan' ||
         step === 'loanpayment'
-      "
-    >
-      <transaction-sidebar
-        [step]="step"
-        title="Transaction Categories"
-        [transactionCategories]="transactionCategories"
-        (status)="onNotify($event)"
-        [hidden]="isShowFilters"
-        *ngIf="!allTransactions"
-      >
+      ">
+      <transaction-sidebar [step]="step" title="Transaction Categories" [transactionCategories]="transactionCategories"
+        (status)="onNotify($event)" [hidden]="isShowFilters" *ngIf="!allTransactions">
       </transaction-sidebar>
       <app-transactions-filter [hidden]="!allTransactions && !isShowFilters" title="Filters" [formType]="formType">
       </app-transactions-filter>
     </div>
   </div>
-  <div
-    class="form__container"
-    [ngClass]="{
+  <div class="form__container" [ngClass]="{
       'show-alerts': showValidateBar === true,
       'hide-alerts': step === 'step_6'
-    }"
-  >
+    }">
     <div class="form__steps" *ngIf="!allTransactions">
-      <app-steps
-        [steps]="[
+      <app-steps [steps]="[
           { text: 'Report', step: 'step_1', edit: editMode },
           { text: 'Type', step: 'step_2', edit: editMode },
           { text: 'Form', step: 'step_3', edit: editMode, transactionCategory: transactionCategory },
           { text: 'Preview', step: 'step_4', edit: editMode },
           { text: 'Sign', step: 'step_5', edit: editMode },
           { text: 'Submit', step: 'step_6', edit: editMode }
-        ]"
-        [current_step]="currentStep"
-      >
+        ]" [current_step]="currentStep">
       </app-steps>
     </div>
     <div class="form__content">
@@ -63,30 +44,21 @@
         <f3x-financial-summary> </f3x-financial-summary>
       </div>
       <div class="form__step" [hidden]="step !== 'step_1'">
-        <f3x-report-type
-          [formRadioOptionsVisible]="formRadioOptionsVisible"
-          (status)="onNotify($event)"
-          [reportType]="reportType"
-          [reportsLoading]="reportsLoading"
-          [coverageDateNotSelected]="coverageDateNotSelected"
-          [committeeReportTypes]="reportTypes"
-          [selectedReportInfo]="selectedReportInfo"
-        >
+        <f3x-report-type [formRadioOptionsVisible]="formRadioOptionsVisible" (status)="onNotify($event)"
+          [reportType]="reportType" [reportsLoading]="reportsLoading"
+          [coverageDateNotSelected]="coverageDateNotSelected" [committeeReportTypes]="reportTypes"
+          [selectedReportInfo]="selectedReportInfo">
         </f3x-report-type>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_2'">
-        <f3x-transaction-type
-          (status)="onNotify($event)"
-          [transactionCategory]="transactionCategory"
-          [transactionCategories]="transactionCategories"
-        >
+        <f3x-transaction-type (status)="onNotify($event)" [transactionCategory]="transactionCategory"
+          [transactionCategories]="transactionCategories">
         </f3x-transaction-type>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_3'">
-        <div
-          [hidden]="
+        <div [hidden]="
             transactionType === 'ALLOC_H4_TYPES' ||
             transactionType === 'ALLOC_H4_SUM' ||
             transactionType === 'ALLOC_H6_TYPES' ||
@@ -96,199 +68,109 @@
             transactionType === 'LA_SUM' ||
             transactionType === 'LB_SUM' ||
             transactionType === 'L_SUM'
-          "
-        >
-          
-          <app-sched-e
-            [hidden]="scheduleType !== 'sched_e'"
-            [mainTransactionTypeText]="mainTransactionTypeText"
-            [transactionTypeText]="transactionTypeText"
-            [transactionType]="transactionType"
-            [scheduleAction]="scheduleAction"
-            [scheduleType]="scheduleType"
-            (status)="onNotify($event)"
-          >
+          ">
+
+          <app-sched-e *ngIf="scheduleType === 'sched_e'" [transactionData]="transactionData"
+            [transactionDataForChild]="transactionDataForChild" [parentTransactionModel]="parentTransactionModel"
+            [mainTransactionTypeText]="mainTransactionTypeText" [transactionTypeText]="transactionTypeText"
+            [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+            (status)="onNotify($event)">
           </app-sched-e>
-          <f3x-individual-receipt
-            [hidden]="
-              scheduleType !== 'sched_a' &&
-              scheduleType !== 'sched_b' &&
-              scheduleType !== 'sched_d' &&
-              scheduleType !== 'sched_h4' &&
-              scheduleType !== 'sched_h6' &&
-              scheduleType !== 'sched_L'
-            "
-            [mainTransactionTypeText]="mainTransactionTypeText"
-            [transactionTypeText]="transactionTypeText"
-            [transactionType]="transactionType"
-            [scheduleAction]="scheduleAction"
-            [scheduleType]="scheduleType"
-            (status)="onNotify($event)"
-          >
+          <f3x-individual-receipt *ngIf="
+              scheduleType === 'sched_a' ||
+              scheduleType === 'sched_b' ||
+              scheduleType === 'sched_d' ||
+              scheduleType === 'sched_h4' ||
+              scheduleType === 'sched_h6' ||
+              scheduleType === 'sched_L'
+            " [mainTransactionTypeText]="mainTransactionTypeText" [transactionTypeText]="transactionTypeText"
+            [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+            [transactionData]="transactionData" [transactionDataForChild]="transactionDataForChild"
+            [populateHiddenFieldsMessageObj]="populateHiddenFieldsMessageObj"
+            [populateFieldsMessageObj]="populateFieldsMessageObj" (status)="onNotify($event)">
           </f3x-individual-receipt>
-          
+
         </div>
         <!-- This is for Sched F payment on a Debt.  Not the same as sched_f_core -->
-        <app-sched-f
-          [hidden]="scheduleType !== 'sched_f'"
-          [formType]="'3X'"
-          [forceChangeDetection]="forceChangeDetectionFDebtPayment"
-          [mainTransactionTypeText]="mainTransactionTypeText"
-          [transactionTypeText]="transactionTypeTextSchedF"
-          [transactionType]="transactionTypeSchedF"
-          [scheduleAction]="scheduleFAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-f *ngIf="scheduleType === 'sched_f'" [formType]="'3X'"
+          [forceChangeDetection]="forceChangeDetectionFDebtPayment" [mainTransactionTypeText]="mainTransactionTypeText"
+          [transactionTypeText]="transactionTypeTextSchedF" [transactionType]="transactionTypeSchedF"
+          [scheduleAction]="scheduleFAction" [scheduleType]="scheduleType" (status)="onNotify($event)"
+          [transactionData]="transactionData" [transactionDataForChild]="transactionDataForChild"
+          [parentTransactionModel]="parentTransactionModel">
         </app-sched-f>
         <!-- This component is for the 'core' Schedule F, a different component handles sched F payment -->
-        <app-sched-f-core
-          [hidden]="scheduleType !== 'sched_f_core'"
-          [formType]="'3X'"
-          [transactionTypeText]="transactionTypeTextSchedFCore"
-          [transactionType]="transactionTypeSchedFCore"
-          [scheduleAction]="scheduleFCoreAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-f-core *ngIf="scheduleType === 'sched_f_core'" [formType]="'3X'"
+          [transactionTypeText]="transactionTypeTextSchedFCore" [transactionType]="transactionTypeSchedFCore"
+          [scheduleAction]="scheduleFCoreAction" [scheduleType]="scheduleType"
+          [transactionDataForChild]="transactionDataForChild" [transactionData]="transactionData"
+          (status)="onNotify($event)">
         </app-sched-f-core>
 
-        <app-sched-c-loans
-          *ngIf="scheduleType === 'sched_c'"
-          [formType]="'3X'"
-          [scheduleAction]="scheduleCAction"
-          [transactionDetail]="transactionDetailSchedC"
-          (status)="onNotify($event)"
-        >
+        <app-sched-c-loans *ngIf="scheduleType === 'sched_c'" [formType]="'3X'" [scheduleAction]="scheduleCAction"
+          [transactionDetail]="transactionDetailSchedC" (status)="onNotify($event)">
         </app-sched-c-loans>
 
-        <app-loanendorser
-          *ngIf="scheduleType === 'sched_c_en'"
-          [formType]="'3X'"
-          [scheduleAction]="scheduleCAction"
-          [transactionDetail]="transactionDetailSchedC"
-          (status)="onNotify($event)"
-        >
+        <app-loanendorser *ngIf="scheduleType === 'sched_c_en'" [formType]="'3X'" [scheduleAction]="scheduleCAction"
+          [transactionDetail]="transactionDetailSchedC" (status)="onNotify($event)">
         </app-loanendorser>
 
-        <app-loanendorsersummary
-          *ngIf="scheduleType === 'sched_c_es'"
-          [formType]="'3X'"
-          [scheduleAction]="scheduleCAction"
-          [transactionDetail]="transactionDetailSchedC"
-          (status)="onNotify($event)"
-        >
+        <app-loanendorsersummary *ngIf="scheduleType === 'sched_c_es'" [formType]="'3X'"
+          [scheduleAction]="scheduleCAction" [transactionDetail]="transactionDetailSchedC" (status)="onNotify($event)">
         </app-loanendorsersummary>
 
         <app-loansummary *ngIf="scheduleType === 'sched_c_ls'" [formType]="'3X'" (status)="onNotify($event)">
         </app-loansummary>
 
-        <app-loanpayment
-          *ngIf="scheduleType === 'sched_c_loan_payment'"
-          [transactionDetail]="transactionDetailSchedC"
-          (status)="onNotify($event)"
-          [scheduleAction]="loanPaymentScheduleAction"
-        >
+        <app-loanpayment *ngIf="scheduleType === 'sched_c_loan_payment'" [transactionDetail]="transactionDetailSchedC"
+          (status)="onNotify($event)" [scheduleAction]="loanPaymentScheduleAction">
         </app-loanpayment>
 
         <!-- [hidden]="scheduleType !== 'sched_c1'" -->
-        <app-sched-c1
-          *ngIf="scheduleType === 'sched_c1'"
-          [forceChangeDetection]="forceChangeDetectionC1"
-          [transactionDetail]="transactionDetailSchedC"
-          [scheduleAction]="scheduleAction"
-          (status)="onNotify($event)"
-        >
+        <app-sched-c1 *ngIf="scheduleType === 'sched_c1'" [forceChangeDetection]="forceChangeDetectionC1"
+          [transactionDetail]="transactionDetailSchedC" [scheduleAction]="scheduleAction" (status)="onNotify($event)">
         </app-sched-c1>
 
-        <!-- <app-sched-c2
-          [hidden]="scheduleType !== 'sched_c2'"
-          [transactionTypeText]="transactionTypeTextSchedC"
-          [transactionType]="transactionTypeSchedC"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
-        </app-sched-c2> -->
-
-        <app-debt-summary
-          *ngIf="scheduleType === 'sched_d_ds'"
-          [forceChangeDetection]="forceChangeDetectionDebtSummary"
-          [transactionType]="transactionTypeDebtSummary"
-          [transactionTypeText]="transactionTypeTextDebtSummary"
-          (status)="onNotify($event)"
-        >
+        <app-debt-summary *ngIf="scheduleType === 'sched_d_ds'" [forceChangeDetection]="forceChangeDetectionDebtSummary"
+          [transactionType]="transactionTypeDebtSummary" [transactionTypeText]="transactionTypeTextDebtSummary"
+          (status)="onNotify($event)">
         </app-debt-summary>
 
-        <app-sched-h1
-          [hidden]="scheduleType !== 'sched_h1'"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-h1 *ngIf="scheduleType === 'sched_h1'" [forceChangeDetection]="forceChangeDetectionH1"
+          [scheduleAction]="scheduleAction" [scheduleType]="scheduleType" [transactionData]="transactionData"
+          (status)="onNotify($event)">
         </app-sched-h1>
-        <app-sched-h2
-          [hidden]="scheduleType !== 'sched_h2'"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-h2 *ngIf="scheduleType === 'sched_h2'" [transactionData]="transactionData"
+          [transactionTypeText]="transactionTypeText" [transactionType]="transactionType"
+          [scheduleAction]="scheduleAction" [scheduleType]="scheduleType" (status)="onNotify($event)">
         </app-sched-h2>
-        <app-sched-h3
-          [hidden]="scheduleType !== 'sched_h3'"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-h3 *ngIf="scheduleType ===  'sched_h3'" [transactionData]="transactionData"
+          [transactionTypeText]="transactionTypeText" [transactionType]="transactionType"
+          [scheduleAction]="scheduleAction" [scheduleType]="scheduleType" (status)="onNotify($event)">
         </app-sched-h3>
-        <app-sched-h5
-          [hidden]="scheduleType !== 'sched_h5'"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-h5 *ngIf="scheduleType ===  'sched_h5'" [transactionData]="transactionData"
+          [transactionTypeText]="transactionTypeText" [transactionType]="transactionType"
+          [scheduleAction]="scheduleAction" [scheduleType]="scheduleType" (status)="onNotify($event)">
         </app-sched-h5>
-        <app-sched-h4
-          [hidden]="transactionType !== 'ALLOC_H4_TYPES' && transactionType !== 'ALLOC_H4_SUM'"
-          [mainTransactionTypeText]="mainTransactionTypeText"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-h4 *ngIf="transactionType === 'ALLOC_H4_TYPES' || transactionType === 'ALLOC_H4_SUM'"
+          [mainTransactionTypeText]="mainTransactionTypeText" [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
         </app-sched-h4>
-        <app-sched-h6
-          [hidden]="transactionType !== 'ALLOC_H6_TYPES' && transactionType !== 'ALLOC_H6_SUM'"
-          [mainTransactionTypeText]="mainTransactionTypeText"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-h6 *ngIf="transactionType === 'ALLOC_H6_TYPES' || transactionType === 'ALLOC_H6_SUM'"
+          [mainTransactionTypeText]="mainTransactionTypeText" [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
         </app-sched-h6>
-        <app-sched-l
-          [hidden]="
-            transactionType !== 'LA_ENTRY' &&
-            transactionType !== 'LB_ENTRY' &&
-            transactionType !== 'LA_SUM' &&
-            transactionType !== 'LB_SUM' &&
-            transactionType !== 'L_SUM'
-          "
-          [mainTransactionTypeText]="mainTransactionTypeText"
-          [transactionTypeText]="transactionTypeText"
-          [transactionType]="transactionType"
-          [scheduleAction]="scheduleAction"
-          [scheduleType]="scheduleType"
-          (status)="onNotify($event)"
-        >
+        <app-sched-l *ngIf="
+            transactionType === 'LA_ENTRY' ||
+            transactionType === 'LB_ENTRY' ||
+            transactionType === 'LA_SUM' ||
+            transactionType === 'LB_SUM' ||
+            transactionType === 'L_SUM'
+          " [mainTransactionTypeText]="mainTransactionTypeText" [transactionTypeText]="transactionTypeText"
+          [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+          (status)="onNotify($event)">
         </app-sched-l>
       </div>
 

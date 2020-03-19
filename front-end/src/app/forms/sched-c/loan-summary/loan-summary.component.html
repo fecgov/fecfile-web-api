@@ -17,27 +17,27 @@
       <tr>
         <th class="loanSumamry__table-checkbox">
           <!-- *ngIf="isLoanSummryViewActive()" -->
-          <input [@fadeInOut] [(ngModel)]="allLoanSelected" type="checkbox"
+          <input  [(ngModel)]="allLoanSelected" type="checkbox"
             (change)="changeAllLoanSummrysSelected()">
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('name')" [class]="getSortClass('name')"
+        <th  *ngIf="isColumnVisible('name')" [class]="getSortClass('name')"
           (click)="changeSortDirection('name')">Name/Bank
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('loan_amount_original')" [class]="getSortClass('loan_amount_original')"
+        <th  *ngIf="isColumnVisible('loan_amount_original')" [class]="getSortClass('loan_amount_original')"
           (click)="changeSortDirection('loan_amount_original')">Original Loan
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('loan_payment_to_date')" [class]="getSortClass('loan_payment_to_date')"
+        <th  *ngIf="isColumnVisible('loan_payment_to_date')" [class]="getSortClass('loan_payment_to_date')"
           (click)="changeSortDirection('loan_payment_to_date')">Cumulative Payment <br> to Date
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('loan_balance')" [class]="getSortClass('loan_balance')"
+        <th  *ngIf="isColumnVisible('loan_balance')" [class]="getSortClass('loan_balance')"
           (click)="changeSortDirection('loan_balance')">Outstanding Balance at <br>the Close of Period
         </th>
-        <th [@fadeInOut] *ngIf="isColumnVisible('loan_due_date')" [class]="getSortClass('loan_due_date')"
+        <th  *ngIf="isColumnVisible('loan_due_date')" [class]="getSortClass('loan_due_date')"
           (click)="changeSortDirection('loan_due_date')">Due Date
         </th>
 
         <th class="bulk_action">
-          <div [@fadeInOut] *ngIf="isLoanSummryViewActive()" class="btn-group" ngbDropdown role="group"
+          <div  *ngIf="isLoanSummryViewActive()" class="btn-group" ngbDropdown role="group"
             aria-label="Action dropdown">
             <button class="btn btn-sm btn-primary loanSumamry__bulk_action_btn" ngbDropdownToggle
               [disabled]="bulkActionDisabled">
@@ -50,14 +50,17 @@
               <button class="dropdown-item" (click)="exportAllSelected()">
                 <i class="file-export-icon"></i> Export
               </button>
+              <button class="dropdown-item" (click)="trashAllSelected()">
+                <i class="trash-icon"></i> Trash
+              </button>
             </div>
           </div>
-          <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
+          <!-- <div [@fadeInOut] *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary loanSumamry__bulk_action_btn" (click)="deleteRecyleBin()"
               [disabled]="bulkActionDisabled">
               <i class="trash-icon"></i>
             </button>
-          </div>
+          </div> -->
         </th>
       </tr>
     </thead>
@@ -67,27 +70,27 @@
           <td>
             <input [(ngModel)]="ln.selected" type="checkbox" (click)="checkForMultiChecked($event)">
           </td>
-          <!-- <td [@fadeInOut] *ngIf="isColumnVisible('name')">{{ln.entity_type === 'IND' ? ln.last_name + ', ' + ln.first_name : ln.entity_nm}}</td> -->
-          <td [@fadeInOut] [ngClass]="(ln.entity_type === 'ORG') ? 'parent': ''"
+          <!-- <td  *ngIf="isColumnVisible('name')">{{ln.entity_type === 'IND' ? ln.last_name + ', ' + ln.first_name : ln.entity_nm}}</td> -->
+          <td  [ngClass]="(ln.entity_type === 'ORG') ? 'parent': ''"
             (click)="ln.entity_type === 'ORG' ? ln.toggleChild = !ln.toggleChild : ''" *ngIf="isColumnVisible('name')">
             {{ln.name}}
             <div *ngIf="ln.entity_type === 'ORG' && (ln.hasC1 || ln.hasC2)" class="align_right arrow"
               [ngClass]="ln.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
           </td>
-          <td [@fadeInOut] *ngIf="isColumnVisible('loan_amount_original')">
+          <td  *ngIf="isColumnVisible('loan_amount_original')">
             {{ln.loan_amount_original | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-          <td [@fadeInOut] *ngIf="isColumnVisible('loan_payment_to_date')" [ngClass]="(ln?.payments?.length > 0) ? 'parent': ''"
+          <td  *ngIf="isColumnVisible('loan_payment_to_date')" [ngClass]="(ln?.payments?.length > 0) ? 'parent': ''"
           (click)="ln?.payments?.length > 0 ? ln.togglePayments = !ln.togglePayments : ''">
             {{ln.loan_payment_to_date | currency:'USD':'symbol-narrow':'1.2-2'}}
             <div *ngIf="ln?.payments?.length > 0" class="align_right arrow"
               [ngClass]="ln.togglePayments ? 'arrow-top' : 'arrow-bottom'"></div>
           </td>
-          <td [@fadeInOut] *ngIf="isColumnVisible('loan_balance')">
+          <td  *ngIf="isColumnVisible('loan_balance')">
             {{ln.loan_balance | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-          <td [@fadeInOut] *ngIf="isColumnVisible('loan_due_date')">{{ln.loan_due_date | date: 'MM/dd/yyyy' }}</td>
+          <td  *ngIf="isColumnVisible('loan_due_date')">{{ln.loan_due_date | date: 'MM/dd/yyyy' }}</td>
 
           <td>
-            <div [@fadeInOut] *ngIf="isLoanSummryViewActive()" class="btn-group" ngbDropdown role="group"
+            <div  *ngIf="isLoanSummryViewActive()" class="btn-group" ngbDropdown role="group"
               aria-label="Action dropdown">
               <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
                 <i class="ellipsis-icon"></i>
@@ -113,7 +116,7 @@
           class="child-bg">
           <td style="padding-left: 70px;" colspan="6">Schedule C1</td>
           <td>
-            <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+            <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
               <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
                 <i class="ellipsis-icon"></i>
               </button>
@@ -132,7 +135,7 @@
           class="child-bg">
           <td style="padding-left: 70px;" colspan="6">Endorsers</td>
           <td>
-            <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+            <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
               <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
                 <i class="ellipsis-icon"></i>
               </button>
@@ -157,10 +160,10 @@
           <tr [ngbCollapse]="ln?.payments?.length > 0 ? !ln.togglePayments: ''" 
             *ngFor="let payment of ln.payments;" class="payment-bg">
             <td style="padding-left: 70px;" colspan="2">Loan Payment</td>
-            <td [@fadeInOut] colspan="2">{{payment.expenditure_date | date: 'MM/dd/yyyy'}}</td>
-            <td [@fadeInOut] colspan="2">{{payment.expenditure_amount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
+            <td  colspan="2">{{payment.expenditure_date | date: 'MM/dd/yyyy'}}</td>
+            <td  colspan="2">{{payment.expenditure_amount | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
             <td>
-              <div [@fadeInOut] class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+              <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
                   <i class="ellipsis-icon"></i>
                 </button>

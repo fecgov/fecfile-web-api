@@ -7,7 +7,7 @@ import {
   Input,
   SimpleChanges,
   OnChanges
-} from '@angular/core';
+, ChangeDetectionStrategy } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
@@ -36,12 +36,12 @@ export enum DebtSumarysActions {
   styleUrls: ['./debt-summary.component.scss'],
   encapsulation: ViewEncapsulation.None,
   providers: [DebtSummaryService],
-  animations: [
+  /* animations: [
     trigger('fadeInOut', [
       transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
       transition(':leave', [animate(0, style({ opacity: 0 }))])
     ])
-  ]
+  ] */
 })
 export class DebtSummaryComponent implements OnInit, OnChanges {
   @Input()
@@ -60,13 +60,14 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
   public totalAmount: number;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
+  public formType = '3X';
 
   // ngx-pagination config
   public maxItemsPerPage = 100;
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
-  public numberOfPages = 0;
+  public numberOfPages = 1;
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
@@ -167,31 +168,20 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
    * Check/Uncheck all Debts in the table.
    */
   public changeAllDebtSummarysSelected() {
-    // TODO Iterating over the model and setting the selected prop
-    // works when we have server-side pagination as the model will only contain
-    // Debt for the current page.
-
-    // Until the server is ready for pagination,
-    // we are getting the entire set of tranactions (> 500)
-    // and must only count and set the selected prop for the items
-    // on the current page.
-
     this.bulkActionCounter = 0;
-    // for (const t of this.DebtModel) {
-    //   t.selected = this.allDebtSelected;
-    //   if (this.allDebtSelected) {
-    //     this.bulkActionCounter++;
-    //   }
-    // }
-
-    // TODO replace this with the commented code above when server pagination is ready.
-    for (let i = this.firstItemOnPage - 1; i <= this.lastItemOnPage - 1; i++) {
-      this.debtModel[i].selected = this.allDebtSelected;
+    let debtsExist = false;
+    for (const debt of this.debtModel) {
+      debtsExist = true;
+      debt.selected = this.allDebtSelected;
       if (this.allDebtSelected) {
         this.bulkActionCounter++;
       }
     }
-    this.bulkActionDisabled = !this.allDebtSelected;
+    if (debtsExist) {
+      this.bulkActionDisabled = !this.allDebtSelected;
+    } else {
+      this.bulkActionDisabled = true;
+    }
   }
 
   /**
@@ -210,6 +200,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
         this.bulkActionCounter--;
       }
     }
+    this.bulkActionDisabled = this.bulkActionCounter > 1 ? false : true;
   }
 
   /**
@@ -315,7 +306,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
     if (payment) {
       transactionModel.scrollDebtPaymentButtonIntoView = true;
     }
-    
+
     this.status.emit({
       form: emptyValidForm,
       direction: 'next',
@@ -355,7 +346,12 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
           transactionId: debtPayment.transactionId,
           type: debtPayment.transactionTypeDescription,
           transactionTypeIdentifier: debtPayment.transactionTypeIdentifier,
-          apiCall: debtPayment.apiCall
+          apiCall: debtPayment.apiCall,
+          date: debtPayment.paymentDate,
+          amount: debtPayment.paymentAmt,
+          memoCode: debtPayment.memoCode,
+          aggregate: debtPayment.aggregate,
+          entityId: debtPayment.entityId
         }
       }
     });
@@ -414,6 +410,56 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
               this.getDebtSummaries();
               this._dialogService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + payment.transactionId,
+                ConfirmModalComponent,
+                'Success!',
+                false,
+                ModalHeaderClassEnum.successHeader
+              );
+            });
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  /**
+   * Trash all Loans selected by the user.
+   */
+  public trashAllSelected(): void {
+    let trxIds = '';
+    let reportId = null;
+    const selectedTransactions: Array<any> = [];
+    for (const trx of this.debtModel) {
+      if (trx.selected) {
+        reportId = trx.reportId;
+        selectedTransactions.push({
+          transactionId: trx.transactionId,
+          reportId: trx.reportId
+        });
+        trxIds += trx.transactionId + ', ';
+      }
+    }
+    if (trxIds.length > 2) {
+      trxIds = trxIds.substr(0, trxIds.length - 2);
+    }
+
+    this._dialogService
+      .confirm('You are about to delete these transactions.   ' + trxIds, ConfirmModalComponent, 'Caution!')
+      .then(res => {
+        if (res === 'okay') {
+          this._transactionsService
+            .trashOrRestoreTransactions(this.formType, 'trash', reportId, selectedTransactions)
+            .subscribe((res: any) => {
+              this.getDebtSummaries();
+              let afterMessage = '';
+              if (selectedTransactions.length === 1) {
+                afterMessage = `Transaction ${selectedTransactions[0].transactionId}
+                has been successfully deleted and sent to the recycle bin.`;
+              } else {
+                afterMessage = 'Transactions have been successfully deleted and sent to the recycle bin.   ' + trxIds;
+              }
+
+              this._dialogService.confirm(
+                afterMessage,
                 ConfirmModalComponent,
                 'Success!',
                 false,
