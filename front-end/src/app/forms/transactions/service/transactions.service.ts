@@ -997,5 +997,6 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.isRedesignation = row.isRedesignation;
   model.isredesignatable = row.isredesignatable;
   model.originalAmount = row.original_amount;
+  model.aggregation_ind = row.aggregation_ind;
 
 }
