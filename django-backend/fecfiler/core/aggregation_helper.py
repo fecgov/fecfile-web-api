@@ -94,6 +94,7 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
 #     "REATT_FROM",
 #     "REATT_TO",
 # ]
+# itemization rules updated against the newest version of spreadsheet
 ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST = [
         "TRIB_REC",
         "IK_REC",
