@@ -349,45 +349,42 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     // console.log('YTD is being recalculated ...');
     let currentExpenditureAmount = this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
     const currentAggregate = this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_aggregate'].value);
-    if (this.scheduleAction === ScheduleActions.edit) {
 
+    if (this.scheduleAction === ScheduleActions.edit) {
+      let newAggregate = null;
+      const originalAggregationInd = this._utilService.aggregateIndToBool(this._transactionToEdit.aggregation_ind);
       if (this._transactionToEdit) {
-        if (this._utilService.aggregateIndToBool(this._transactionToEdit.aggregation_ind) === this.isAggregate) {
+        if (originalAggregationInd === this.isAggregate) {
           // the aggregation indicator is same since initial load
-          console.log('Transactions aggregation has not been changed since load');
-          if (this.isAggregate && this._utilService.aggregateIndToBool(this._transactionToEdit.aggregation_ind) === true) {
+          if (this.isAggregate && originalAggregationInd === true) {
           // is Aggregated already check if amount changed
             if (this._originalExpenditureAmount !== currentExpenditureAmount) {
               // amount has changed since last load
               // recalculate aggregate with new amount
-              const newAggregate = this._originalExpenditureAggregate - this._originalExpenditureAmount + currentExpenditureAmount;
-              this.frmIndividualReceipt.patchValue(
-                  {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
+              newAggregate = this._originalExpenditureAggregate - this._originalExpenditureAmount + currentExpenditureAmount;
             }
-          } else if (!this.isAggregate && this._utilService.aggregateIndToBool(this._transactionToEdit.aggregation_ind) === false) {
+          } else if (!this.isAggregate && originalAggregationInd === false) {
             // check if aggregate is the same as initial load
             if (currentAggregate === this._originalExpenditureAggregate) {
               // do nothing
             } else {
-              this.frmIndividualReceipt.patchValue(
-                  {expenditure_aggregate: this._decimalPipe.transform(this._originalExpenditureAggregate, '.2-2')}, {onlySelf: true});
+              newAggregate = this._originalExpenditureAggregate;
             }
           }
         } else {
           // the aggregation indicator has changed since initial load
           // recalculate aggregate
-          console.log('Transactions aggregation has changed since load');
-          if (this.isAggregate && this._utilService.aggregateIndToBool(this._transactionToEdit.aggregation_ind) === false) {
+          if (this.isAggregate && originalAggregationInd === false) {
             // amount was not aggregated during initial load
-            // aggregate the amount
-            const newAggregate = currentExpenditureAmount  + this._originalExpenditureAggregate;
+            // aggregate the amount now
+            newAggregate = currentExpenditureAmount  + this._originalExpenditureAggregate;
             this.frmIndividualReceipt.patchValue(
                 {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
-          } else if (this.isAggregate === false && this._utilService.aggregateIndToBool(this._transactionToEdit.aggregation_ind) === true) {
+          } else if (this.isAggregate === false && originalAggregationInd === true) {
             // amount was aggregated during initial load
             // un-aggregate the amount now
             if (currentExpenditureAmount === this._originalExpenditureAmount) {
-              const newAggregate = this._originalExpenditureAggregate - currentExpenditureAmount;
+              newAggregate = this._originalExpenditureAggregate - currentExpenditureAmount;
               this.frmIndividualReceipt.patchValue(
                   {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
             } else {
@@ -399,6 +396,10 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
           }
         }
 
+      }
+      if (newAggregate) {
+        this.frmIndividualReceipt.patchValue(
+            {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
       }
     }
     // all the memos are aggregated by default with the new rule
