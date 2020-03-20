@@ -86,6 +86,7 @@ export class TransactionModel {
   subordinateCmteState: string;
   subordinateCmteZip: string;
 
+  aggregation_ind: string;
 
 
   constructor(transaction: any) {
@@ -160,6 +161,7 @@ export class TransactionModel {
     this.isRedesignation = transaction.isRedesignation;
     this.redesignation_id = transaction.redesignation_id;
     this.originalAmount = transaction.originalAmount;
+    this.aggregation_ind = transaction.aggregation_ind;
 
   }
 }
