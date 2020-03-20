@@ -6,8 +6,8 @@ import { UploadContactsComponent } from './import-contacts/upload-contacts/uploa
 import { ConfigureContactsComponent } from './import-contacts/configure-contacts/configure-contacts.component';
 import { CleanContactsComponent } from './import-contacts/clean-contacts/clean-contacts.component';
 import { ImportDoneContactsComponent } from './import-contacts/import-done-contacts/import-done-contacts.component';
-import { FooComponent } from './foo/foo.component';
 import { SharedModule } from '../shared/shared.module';
+import { ProgressBarComponent } from './import-contacts/progress-bar/progress-bar.component';
 
 @NgModule({
   imports: [
@@ -15,12 +15,12 @@ import { SharedModule } from '../shared/shared.module';
     ImportContactsRoutingModule
   ],
   declarations: [
-    FooComponent,
     ImportContactsComponent,
     UploadContactsComponent,
     ConfigureContactsComponent,
     CleanContactsComponent,
-    ImportDoneContactsComponent
+    ImportDoneContactsComponent,
+    ProgressBarComponent
   ]
 })
 export class ImportContactsModule { }

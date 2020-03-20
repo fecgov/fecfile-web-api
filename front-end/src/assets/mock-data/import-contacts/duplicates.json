@@ -10,19 +10,43 @@
       "state": "TX",
       "zip": "77023",
       "employer": "Programmer",
-      "occupation": "DataCom"
+      "occupation": "DataCom",
+      "userContact": {
+        "first_name": "larry",
+        "last_name": "smith",
+        "entity_name": "T Corp.",
+        "street1": "198 Greenway Dr",
+        "street2": "",
+        "city": "Houston",
+        "state": "TX",
+        "zip": "77023",
+        "employer": "Programmer",
+        "occupation": "Datacom"
+      }
     },
     {
-      "first_name": "Alisah",
-      "last_name": "Tasman",
+      "first_name": "alisah",
+      "last_name": "tasman",
       "entity_name": "Lawson Corp.",
       "street1": "9000 Sunset Blvd.",
       "street2": "19th Flr",
-      "city": "W. Hollywood",
+      "city": "West. Hollywood",
       "state": "CA",
       "zip": "90069",
       "employer": "Mercury Films",
-      "occupation": "Producer"
+      "occupation": "Producer",
+      "userContact": {
+        "first_name": "Alisah",
+        "last_name": "Tasman",
+        "entity_name": "Lawson Corp.",
+        "street1": "9000 Sunset Blvd.",
+        "street2": "19th Flr",
+        "city": "W. Hollywood",
+        "state": "CA",
+        "zip": "90069",
+        "employer": "Mercury Films",
+        "occupation": "Producer"
+      }
     },
     {
       "first_name": "Andy",
@@ -34,7 +58,19 @@
       "state": "CA",
       "zip": "91723",
       "employer": "Self",
-      "occupation": "Guitarist"
+      "occupation": "Guitarist",
+      "userContact": {
+        "first_name": "Andy",
+        "last_name": "Taylor",
+        "entity_name": "Jenkins",
+        "street1": "8912 Covina Dr",
+        "street2": "",
+        "city": "Covina",
+        "state": "CA",
+        "zip": "91723",
+        "employer": "Self-Employed",
+        "occupation": "Guitarist"
+      }
     },
     {
       "first_name": "Rachael",
@@ -46,7 +82,19 @@
       "state": "TX",
       "zip": "75208",
       "employer": "Delmar",
-      "occupation": "Expo Coordinator"
+      "occupation": "Expo Coordinator",
+      "userContact": {
+        "first_name": "Rachael",
+        "last_name": "Cruz",
+        "entity_name": "Rand Corp.",
+        "street1": "18920 West Pike",
+        "street2": "",
+        "city": "Dallas",
+        "state": "TX",
+        "zip": "75208",
+        "employer": "Delmar",
+        "occupation": "Expo Coordinator"
+      }
     },
     {
       "first_name": "Joe",
@@ -58,7 +106,19 @@
       "state": "MA",
       "zip": "67788",
       "employer": "Strong Arm Tech",
-      "occupation": "Business Dev"
+      "occupation": "Business Dev",
+      "userContact": {
+        "first_name": "Joe",
+        "last_name": "Anderson",
+        "entity_name": "Int. Org.",
+        "street1": "80522 Elmore Rd.",
+        "street2": "8th Floor",
+        "city": "Springfield",
+        "state": "MA",
+        "zip": "67788",
+        "employer": "Strong Arm Tech",
+        "occupation": "Business Dev"
+      }
     },
     {
       "first_name": "Susan",
@@ -70,7 +130,19 @@
       "state": "VA",
       "zip": "22206",
       "employer": "Empire",
-      "occupation": "Analyst"
+      "occupation": "Analyst",
+      "userContact": {
+        "first_name": "Susan",
+        "last_name": "Jacobs",
+        "entity_name": "Lucent",
+        "street1": "40404 Cedar Way",
+        "street2": "Suite B",
+        "city": "Arlington",
+        "state": "VA",
+        "zip": "22206",
+        "employer": "Empire",
+        "occupation": "Analyst"
+      }
     },
     {
       "first_name": "June",
@@ -82,9 +154,22 @@
       "state": "TX",
       "zip": "22206",
       "employer": "Kronos",
-      "occupation": "Developer"
+      "occupation": "Developer",
+      "userContact": {
+        "first_name": "June",
+        "last_name": "Mayers",
+        "entity_name": "",
+        "street1": "2222 Almond Dr.",
+        "street2": "",
+        "city": "Arlington",
+        "state": "TX",
+        "zip": "22206",
+        "employer": "Kronos",
+        "occupation": "Developer"
+      }
     }
   ],
+  "uploadFileId": 123456789,
   "totalCount": 70,
   "itemsPerPage": 7,
   "pageNumber": 1,
