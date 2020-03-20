@@ -1459,20 +1459,22 @@ def update_linenumber_aggamt_transactions_SA(
                     'OPEXP_HQ_ACC_IND_REF','OPEXP_HQ_ACC_TRIB_REF','OPEXP_CONV_ACC_REG_REF','OPEXP_CONV_ACC_TRIB_REF',
                     'OPEXP_CONV_ACC_IND_REF','OTH_DISB_NP_RECNT_REG_REF','OTH_DISB_NP_RECNT_TRIB_REF',
                     'OTH_DISB_NP_RECNT_IND_REF']:
-                    line_number, itemized_ind = get_linenumber_itemization(
-                        transaction[8],
-                        aggregate_amount,
-                        itemization_value,
-                        transaction[3],
-                    )
-                    put_sql_linenumber_schedA(
-                        cmte_id,
-                        line_number,
-                        itemized_ind,
-                        transaction[1],
-                        entity_id,
-                        aggregate_amount,
-                    )
+                    if not transaction[11] in ['FU', 'FI']: # if not forced
+
+                        line_number, itemized_ind = get_linenumber_itemization(
+                            transaction[8],
+                            aggregate_amount,
+                            itemization_value,
+                            transaction[3],
+                        )
+                        put_sql_linenumber_schedA(
+                            cmte_id,
+                            line_number,
+                            itemized_ind,
+                            transaction[1],
+                            entity_id,
+                            aggregate_amount,
+                        )
 
                 # Updating aggregate amount to child auto generate sched A transactions
                 if child_flag_SA:
@@ -1527,6 +1529,7 @@ def list_all_transactions_entity(
                 t1.transaction_type_identifier,
                 t1.reattribution_ind,
                 t1.aggregation_ind,
+                t1.itemized_ind,
                 t1.create_date
             FROM public.sched_a t1 
             WHERE entity_id = %s 
@@ -1544,7 +1547,8 @@ def list_all_transactions_entity(
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
                 null as reattribution_ind,
-                null as aggregation_ind, 
+                null as aggregation_ind,
+                t1.itemized_ind,
                 t1.create_date
             FROM public.sched_b t1
             WHERE entity_id = %s 
@@ -1575,7 +1579,7 @@ def list_all_transactions_entity(
             "The list_all_transactions_entity function is throwing an error: " + str(e)
         )
 
-def update_sa_itmization_status(data, status = None):
+def update_sa_itmization_status(data, _status = None):
     """
     helpder function
     """
@@ -1591,14 +1595,14 @@ def update_sa_itmization_status(data, status = None):
         set itemized_ind = %s, line_number = %s
         where transaction_id = %s and report_id = %s
         """
-        parameters = [status, line_number, transaction_id, report_id]
+        parameters = [_status, line_number, transaction_id, report_id]
     else:
         _sql = """
         update public.sched_a
         set itemized_ind = %s
         where transaction_id = %s and report_id = %s
         """
-        parameters = [status, transaction_id, report_id]
+        parameters = [_status, transaction_id, report_id]
     with connection.cursor() as cursor:
         cursor.execute(_sql, parameters)
         if cursor.rowcount == 0:

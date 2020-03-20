@@ -101,6 +101,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   public viewScheduleAction: ScheduleActions = ScheduleActions.view;
   public reattributionTransactionId: string;
   public redesignationTransactionId: string;
+  public isAggregate: boolean = true;
   private _maxReattributableOrRedesignatableAmount: string;
 
   protected abstractScheduleComponent: AbstractScheduleParentEnum;
@@ -1038,11 +1039,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._contributionAggregateValue,
       contributionAmountNum,
       this.scheduleAction,
-      this.memoCode,
+      this.isAggregate,
       this._selectedEntity,
       this._transactionToEdit,
       this.transactionType,
-      this._isSubOfParent(),
       transactionDate
     );
     this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
@@ -1456,6 +1456,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     const isChildForm = fieldName.startsWith(this._childFieldNamePrefix) ? true : false;
     let contributionAmount: string = e.target.value;
 
+    const isScheduleF = (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent)
+                          || (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent);
+
     // default to 0 when no value
     contributionAmount = contributionAmount ? contributionAmount : '0';
 
@@ -1497,26 +1500,31 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
     let transactionDate = null;
-    if (this.frmIndividualReceipt.get('contribution_date')) {
-      transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
+
+    if (isScheduleF) {
+      if (this.frmIndividualReceipt.get('expenditure_date')) {
+        transactionDate = this.frmIndividualReceipt.get('expenditure_date').value;
+      }
+    } else {
+      if (this.frmIndividualReceipt.get('contribution_date')) {
+        transactionDate = this.frmIndividualReceipt.get('contribution_date').value;
+      }
     }
     const aggregateValue: string = this._receiptService.determineAggregate(
       this._contributionAggregateValue,
       contributionAmountNum,
       this.scheduleAction,
-      this.memoCode,
+      this.isAggregate,
       this._selectedEntity,
       this._transactionToEdit,
       this.transactionType,
-      this._isSubOfParent(),
       transactionDate
     );
 
     if (isChildForm) {
       this.frmIndividualReceipt.patchValue({ 'child*contribution_aggregate': aggregateValue }, { onlySelf: true });
     } else {
-      if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFComponent ||
-        this.abstractScheduleComponent === AbstractScheduleParentEnum.schedFCoreComponent) {
+      if (isScheduleF) {
         this.frmIndividualReceipt.patchValue({ aggregate_general_elec_exp: aggregateValue }, { onlySelf: true });
       } else {
         this.frmIndividualReceipt.patchValue({ contribution_aggregate: aggregateValue }, { onlySelf: true });
@@ -2130,6 +2138,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           receiptObj.redesignation_report_id = this._transactionToEdit.reportId.toString();
         }
       }
+
+      // set the forced aggregation indicator
+      receiptObj['aggregation_ind'] = this.isAggregate ? 'Y' : 'N';
 
       localStorage.setItem(`form_${this.formType}_receipt`, JSON.stringify(receiptObj));
 
@@ -4396,6 +4407,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                     }
                     // TODO add for _selectedCandidate
                   }
+                  // set forced aggregation indicator
+                  if (prop === 'aggregation_ind' ) {
+                    if (trx[prop] == null || trx[prop] === 'Y') {
+                      this.isAggregate = true;
+                    } else {
+                      this.isAggregate = false;
+                    }
+                  }
                 }
                 // loop through props again now that aggregate should be set
                 // and apply contributionAmountChange() formatting, setting, etc.
@@ -4967,11 +4986,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this._contributionAggregateValue,
           contributionAmountNum,
           this.scheduleAction,
-          this.memoCode,
+          this.isAggregate,
           this._selectedEntity,
           this._transactionToEdit,
           this.transactionType,
-          this._isSubOfParent(),
           transactionDate
         );
 
@@ -5021,11 +5039,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this._contributionAggregateValue,
         contributionAmountNum,
         this.scheduleAction,
-        this.memoCode,
+        this.isAggregate,
         this._selectedCandidate,
         transactionToEditClone,
         this.transactionType,
-        this._isSubOfParent(),
         transactionDate
       );
 
@@ -5533,15 +5550,53 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   
   removePurposeFromObjIfNotApplicableForPrepopulation() {
     const purposeDescriptionFormField = this.findFormField('purpose_description');
-    if(!purposeDescriptionFormField.isReadonly && this.populateFieldsMessageObj && this.populateFieldsMessageObj.fieldArray){
+    if (!purposeDescriptionFormField.isReadonly && this.populateFieldsMessageObj && this.populateFieldsMessageObj.fieldArray){
       this.populateFieldsMessageObj.fieldArray = this.populateFieldsMessageObj.fieldArray.filter(item => item.name !== 'purpose_description');
     }
   }
   
   updateDebtPaymentAmountFieldValidator() {
-    if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['expenditure_amount']){
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['expenditure_amount']){
       this.frmIndividualReceipt.controls['expenditure_amount'].setValidators([floatingPoint,Validators.required, validateContributionAmount(this._outstandingDebtBalance)]);
       this.frmIndividualReceipt.controls['expenditure_amount'].updateValueAndValidity();
+    }
+  }
+
+  public toggleAggregation(): void {
+
+    let dateField: string;
+    // checking for expenditure_date in form parameter
+    // If expenditure_date is not found setting contribution_date and contribution_amount
+    if (this.frmIndividualReceipt.controls['expenditure_date']) {
+      dateField = 'expenditure_date';
+    } else {
+      dateField = 'contribution_date';
+    }
+    const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
+    let transactionDate = null;
+    if (this.frmIndividualReceipt.get(dateField)) {
+      transactionDate = this.frmIndividualReceipt.get(dateField).value;
+    }
+
+    // toggle isAggregate
+    this.isAggregate = !this.isAggregate;
+
+    const aggregateValue: string = this._receiptService.determineAggregate(
+        this._contributionAggregateValue,
+        contributionAmountNum,
+        this.scheduleAction,
+        this.isAggregate,
+        this._selectedEntity,
+        this._transactionToEdit,
+        this.transactionType,
+        transactionDate
+    );
+
+    if (AbstractScheduleParentEnum.schedFCoreComponent === this.abstractScheduleComponent ||
+        AbstractScheduleParentEnum.schedFComponent === this.abstractScheduleComponent) {
+      this.frmIndividualReceipt.patchValue({ aggregate_general_elec_exp: aggregateValue }, { onlySelf: true });
+    } else {
+      this.frmIndividualReceipt.patchValue({contribution_aggregate: aggregateValue}, {onlySelf: true});
     }
   }
 

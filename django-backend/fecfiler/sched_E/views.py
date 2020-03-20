@@ -611,8 +611,11 @@ def update_aggregate_amt_se(data):
             aggregate_start_date, aggregate_end_date, data
         )
         aggregate_amount = 0
-        dissemination_date, disbursement_date = data.get('dissemination_date'), data.get('disbursement_date')
-        curr_tran_date = dissemination_date if dissemination_date else disbursement_date 
+        # dissemination_date, disbursement_date = data.get('dissemination_date'), data.get('disbursement_date')
+        # curr_tran_date = dissemination_date if dissemination_date else disbursement_date 
+        # curr_tran_date =  datetime.datetime.strptime(
+        #                     curr_tran_date, "%Y-%m-%d"
+        #                 ).date()
         for transaction in transaction_list:
             if transaction[3] != 'N':
                 aggregate_amount += transaction[1]
@@ -620,8 +623,8 @@ def update_aggregate_amt_se(data):
                 "update aggregate amount for transaction:{}".format(transaction[0])
             )
             logger.debug("current aggregate amount:{}".format(aggregate_amount))
-            if curr_tran_date <= transaction[2]:
-                update_aggregate_on_transaction(
+            # if curr_tran_date <= transaction[2]:
+            update_aggregate_on_transaction(
                     cmte_id, report_id, transaction[0], aggregate_amount
                 )
             # # checking in reports table if the delete_ind flag is false for the corresponding report

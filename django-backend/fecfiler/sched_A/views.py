@@ -2137,7 +2137,7 @@ def force_itemize_sa(request):
         if not transaction_id:
             raise Exception("transaction id is required for this api call.")
         sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, status = 'Y')
+        update_sa_itmization_status(sa_data, _status = 'FI')
         return JsonResponse(
                 {"status": "success"}, status=status.HTTP_200_OK
             )
@@ -2162,7 +2162,7 @@ def force_unitemize_sa(request):
         if not transaction_id:
             raise Exception("transaction id is required for this api call.")
         sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, status = 'N')
+        update_sa_itmization_status(sa_data, _status = 'FU')
         return JsonResponse(
                 {"status": "success"}, status=status.HTTP_200_OK
             )
