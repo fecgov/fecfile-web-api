@@ -89,7 +89,6 @@
     </table>
   </div>
   <hr />
-  {{config.currentPage}}
   <div *ngIf="showPagination()" class="d-flex justify-content-center clean_contacts__table-pagination-container">
     <pagination-controls [id]="config.id" (pageChange)="getContacts($event)">
     </pagination-controls>
