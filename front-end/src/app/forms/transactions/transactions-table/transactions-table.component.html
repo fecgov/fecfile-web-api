@@ -138,7 +138,7 @@
               <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
             <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
-            <td  *ngIf="isColumnVisible('type')">{{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+            <td  *ngIf="isColumnVisible('type')">{{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
             <td  *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
             <td  [ngClass]="trx.child ? 'parent': ''" 
                 (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''" *ngIf="isColumnVisible('name')">{{trx.name}}
@@ -218,7 +218,7 @@
               <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
             </td>
             <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
-            <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+            <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
             <td  *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
             <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
             <td  *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
@@ -433,7 +433,7 @@
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')">
-                {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+                {{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
               <td  [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
                 *ngIf="isColumnVisible('name')">{{trx.name}}
                 <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
@@ -513,7 +513,7 @@
                 <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
               </td>
               <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
-              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
               <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
               <td  *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
               <td  *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
@@ -727,7 +727,7 @@
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')">
-                {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+                {{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
               
               <td  [ngClass]="showRow(trx,'sched_c1') || showRow(trx,'sched_c2') ? 'parent': ''" 
               (click)="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE') ? trx.toggleChild = !trx.toggleChild: ''"
@@ -971,7 +971,7 @@
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('schedule')">{{trx.scheduleType}}</td>
               <td  *ngIf="isColumnVisible('type')">
-                {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+                {{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
               <td  [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
                 *ngIf="isColumnVisible('name')">{{trx.name}}
                 <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
@@ -1044,7 +1044,7 @@
               </td>
               <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
               <td  *ngIf="isColumnVisible('schedule')">{{trxChild.scheduleType}}</td>
-              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
               <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
               <td  *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
               <td  *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
