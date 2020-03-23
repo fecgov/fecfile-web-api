@@ -72,4 +72,14 @@ export class ConfigureContactsComponent implements OnInit {
     this.appContactFieldsUnmapped = fields;
   }
 
+  public checkSaveValid(): boolean {
+
+    // TODO Validate all required fields have been mapped
+    return true;
+  }
+
+  public save() {
+    // TODO call service
+  }
+
 }

@@ -46,47 +46,50 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let contact of contacts | paginate: config; let i = index;">
-          <td>
-            {{contact.first_name}}
-          </td>
-          <td>
-            {{contact.last_name}}
-          </td>
-          <td>
-            {{contact.entity_name}}
-          </td>
-          <td>
-            {{contact.street1}}
-          </td>
-          <td>
-            {{contact.street2}}
-          </td>
-          <td>
-            {{contact.city}}
-          </td>
-          <td>
-            {{contact.state}}
-          </td>
-          <td>
-            {{contact.zip}}
-          </td>
-          <td>
-            {{contact.employer}}
-          </td>
-          <td>
-            {{contact.occupation}}
-          </td>
-          <td>
-            <button class="btn btn-sm btn-primary" (click)="cleanContact(contact, mergeContactsModal)">
-              <i class="edit-broom"></i>
-            </button>
-          </td>
-        </tr>
+        <ng-container *ngIf="contacts$">
+          <tr *ngFor="let contact of contacts$ | async | paginate: config; let i = index;">
+            <td>
+              {{contact.first_name}}
+            </td>
+            <td>
+              {{contact.last_name}}
+            </td>
+            <td>
+              {{contact.entity_name}}
+            </td>
+            <td>
+              {{contact.street1}}
+            </td>
+            <td>
+              {{contact.street2}}
+            </td>
+            <td>
+              {{contact.city}}
+            </td>
+            <td>
+              {{contact.state}}
+            </td>
+            <td>
+              {{contact.zip}}
+            </td>
+            <td>
+              {{contact.employer}}
+            </td>
+            <td>
+              {{contact.occupation}}
+            </td>
+            <td>
+              <button class="btn btn-sm btn-primary" (click)="cleanContact(contact, mergeContactsModal)">
+                <i class="edit-broom"></i>
+              </button>
+            </td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>
   <hr />
+  {{config.currentPage}}
   <div *ngIf="showPagination()" class="d-flex justify-content-center clean_contacts__table-pagination-container">
     <pagination-controls [id]="config.id" (pageChange)="getContacts($event)">
     </pagination-controls>
@@ -106,86 +109,6 @@
     </div>
   </div>
 </div>
-<ng-template #mergeContactsModal_whyyyyyyyyyyyyyy let-modal>
-  <div class="modal-header" id="clean_contacts__pin-modal-header">
-    <h1 class="modal-title pull-left clean_contacts__merge-title">Merge Contacts</h1>
-    <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelMerge(mergeContactsModal)">
-      <span aria-hidden="true">×</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <p>
-      Select the information you would like to keep. Once complete, click Merge to join the information of each
-      entry together into the Final Entry which is displayed to the right. Duplicate entries will then become one
-      entry based on your selections.
-    </p>
-    <table class="table table-striped table-hover clean_contacts__merge-table">
-      <thead>
-        <tr>
-          <th class="clean_contacts__name-col"></th>
-          <th class="clean_contacts__merge-label">
-            <div class="checkbox">
-              <label>
-                <input [(ngModel)]="existingEntryHead.selected" (change)="useAllExistingEntry($event)" type="checkbox"
-                  class="clean_contacts__checkbox" [disabled]="existingEntryHead.disabled">
-                <span class="clean_contacts__checkbox-label">Existing Entry</span>
-              </label>
-            </div>
-          </th>
-          <th class="clean_contacts__merge-label">
-            <div class="checkbox">
-              <label>
-                <input [(ngModel)]="newEntryHead.selected" (change)="useAllNewEntry($event)" type="checkbox"
-                  class="clean_contacts__checkbox" [disabled]="newEntryHead.disabled">
-                <span class="clean_contacts__checkbox-label">New Entry</span>
-              </label>
-            </div>
-          </th>
-          <th class="clean_contacts__merge-label">Final Entry</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let field of contactToClean; let i = index;">
-          <td class="clean_contacts__display-name">{{field.displayName}}</td>
-          <td class="text-center">
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" class="clean_contacts__checkbox" [disabled]="field.existingEntry.disabled"
-                  [(ngModel)]="field.existingEntry.selected" (change)="existingFieldSelectedChange($event, field)">
-                <span>{{field.existingEntry.value}}</span>
-              </label>
-            </div>
-          </td>
-          <td class="text-center">
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" [ngClass]="!field.newEntry.originallyEmpty 
-                    ? 'clean_contacts__checkbox' 
-                    : 'clean_contacts__checkbox-missing-val'" [disabled]="field.newEntry.disabled"
-                  [(ngModel)]="field.newEntry.selected" (change)="newFieldSelectedChange($event, field)">
-                <span *ngIf="!field.newEntry.originallyEmpty">{{field.newEntry.value}}</span>
-                <input *ngIf="field.newEntry.originallyEmpty" type="text" name="prop_{{i}}"
-                  [(ngModel)]="field.newEntry.value" (keyup)="applyUserEditToFinal($event, field)"
-                  class="form-control clean_contacts__missing-field" aria-label="Missing Value">
-              </label>
-            </div>
-          </td>
-          <td class="text-center">{{field.finalEntry}}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary btn-modal-footer btn-right" [disabled]="!checkMergeValid()"
-      (click)="confirmFinalizeMerge(finalizeMergeModal)">
-      Merge
-    </button>
-    <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray"
-      (click)="cancelMerge(mergeContactsModal)">
-      Cancel
-    </button>
-  </div>
-</ng-template>
 
 <ng-template #mergeContactsModal let-modal>
   <div class="modal-header" id="clean_contacts__pin-modal-header">
@@ -314,15 +237,3 @@
     </button>
   </div>
 </ng-template>
-
-<!-- <ng-template #contentAhhhhhhh let-modal>
-  <div class="modal-header" id="clean_contacts__pin-modal-header">
-    <h2 class="modal-title pull-left clean_contacts__merge-title">Finalize Merge</h2>
-  </div>
-  <div class="modal-body">
-    <p>
-      Ahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh!
-    </p>
-  </div>
-</ng-template>
-<button (click)="showAhhhhhModal(contentAhhhhhhh)">Click me to ahhhhhh</button> -->

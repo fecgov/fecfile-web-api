@@ -1,0 +1,26 @@
+[
+  {
+    "first_name": "Larry",
+    "last_name": "Smith",
+    "entity_name": "Truimph Corp.",
+    "street1": "198 Greenway Drive",
+    "street2": "",
+    "city": "Houston",
+    "state": "TX",
+    "zip": "77023",
+    "employer": "Programmer",
+    "occupation": "DataCom",
+    "userContact": {
+      "first_name": "larry",
+      "last_name": "smith",
+      "entity_name": "T Corp.",
+      "street1": "198 Greenway Dr",
+      "street2": "",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77023",
+      "employer": "Programmer",
+      "occupation": "Datacom"
+    }
+  }
+]

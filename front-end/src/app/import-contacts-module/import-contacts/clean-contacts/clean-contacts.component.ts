@@ -7,18 +7,20 @@ import { ModalDirective } from 'ngx-bootstrap';
 import { ContactToCleanModel } from './model/contact-to-clean.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UtilService } from 'src/app/shared/utils/util.service';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-clean-contacts',
   templateUrl: './clean-contacts.component.html',
   styleUrls: ['./clean-contacts.component.scss'],
   encapsulation: ViewEncapsulation.None,
-  // changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CleanContactsComponent implements OnInit {
 
   // public contacts: Array<ContactModel>;
   public contacts: Array<any>;
+  public contacts$: Observable<Array<any>>;
   public contactToClean: Array<ContactToCleanModel>;
   public existingEntryHead: any;
   public newEntryHead: any;
@@ -30,6 +32,7 @@ export class CleanContactsComponent implements OnInit {
   public config: PaginationInstance;
   public numberOfPages = 0;
 
+  private contactsSubject: BehaviorSubject<Array<any>>;
   private readonly contactFields = [
     { displayName: 'Last Name', name: 'last_name' },
     { displayName: 'First Name', name: 'first_name' },
@@ -51,6 +54,8 @@ export class CleanContactsComponent implements OnInit {
 
   ngOnInit() {
     this.contacts = [];
+    this.contactsSubject = new BehaviorSubject<any>([]);
+    this.contacts$ = this.contactsSubject.asObservable();
     const config: PaginationInstance = {
       id: 'clean_contacts__table-pagination',
       itemsPerPage: this.maxItemsPerPage,
@@ -74,8 +79,9 @@ export class CleanContactsComponent implements OnInit {
 
   public getContacts(page: number) {
     this.config.currentPage = page;
-    this._importContactsService.getDuplicates().subscribe((res: any) => {
-      this.contacts = res.duplicates;
+    this._importContactsService.getDuplicates(page).subscribe((res: any) => {
+      // this.contacts = res.duplicates; // this us for default change detection strategy.
+      this.contactsSubject.next(res.duplicates);
       this.config.totalItems = res.totalCount ? res.totalCount : 0;
       this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
       this.numberOfPages = res.totalPages;
@@ -159,6 +165,8 @@ export class CleanContactsComponent implements OnInit {
   ///////////////////
 
   public confirmFinalizeImport(modal: any) {
+    // const contact0 = this.contacts[0];
+    // this.contacts[0] = { ...contact0, entity_name: new Date().toString() };
     this._modalService.open(modal, { centered: true, backdrop: 'static' });
   }
 
