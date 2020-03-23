@@ -87,6 +87,7 @@ export class TransactionModel {
   subordinateCmteZip: string;
 
   aggregation_ind: string;
+  forceitemizable: boolean;
 
 
   constructor(transaction: any) {
@@ -162,6 +163,7 @@ export class TransactionModel {
     this.redesignation_id = transaction.redesignation_id;
     this.originalAmount = transaction.originalAmount;
     this.aggregation_ind = transaction.aggregation_ind;
+    this.forceitemizable = transaction.forceitemizable;
 
   }
 }
