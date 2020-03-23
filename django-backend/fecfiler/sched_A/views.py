@@ -2100,7 +2100,7 @@ def schedA(request):
             )
 
 
-def update_sa_aggregation_status(transaction_id, status):
+def update_sa_aggregation_status(transaction_id, aggregation_status = None):
     """
     helpder function to update sa aggregation_ind
     """
@@ -2111,7 +2111,7 @@ def update_sa_aggregation_status(transaction_id, status):
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [status, transaction_id])
+            cursor.execute(_sql, [aggregation_status, transaction_id])
             if cursor.rowcount == 0:
                 raise Exception(
                     "The Transaction ID: {} does not exist in sa table".format(
@@ -2137,7 +2137,7 @@ def force_itemize_sa(request):
         if not transaction_id:
             raise Exception("transaction id is required for this api call.")
         sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, _status = 'FI')
+        update_sa_itmization_status(sa_data, item_status = 'FI')
         return JsonResponse(
                 {"status": "success"}, status=status.HTTP_200_OK
             )
@@ -2162,7 +2162,7 @@ def force_unitemize_sa(request):
         if not transaction_id:
             raise Exception("transaction id is required for this api call.")
         sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, _status = 'FU')
+        update_sa_itmization_status(sa_data, item_status = 'FU')
         return JsonResponse(
                 {"status": "success"}, status=status.HTTP_200_OK
             )
@@ -2186,7 +2186,7 @@ def force_aggregate_sa(request):
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
             raise Exception("transaction id is required for this api call.")
-        update_sa_aggregation_status(transaction_id, "Y")
+        update_sa_aggregation_status(transaction_id, aggregation_status="Y")
         sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
 
         update_linenumber_aggamt_transactions_SA(
@@ -2220,7 +2220,7 @@ def force_unaggregate_sa(request):
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
             raise Exception("transaction id is required for this api call.")
-        update_sa_aggregation_status(transaction_id, "N")
+        update_sa_aggregation_status(transaction_id, aggregation_status="N")
         sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
 
         update_linenumber_aggamt_transactions_SA(
