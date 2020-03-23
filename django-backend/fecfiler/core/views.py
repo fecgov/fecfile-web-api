@@ -2883,7 +2883,7 @@ def autolookup_search_contacts(request):
                         query_string = (
                             """
                             SELECT json_agg(t) FROM 
-                            (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                            (SELECT distinct e.entity_name, e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name, e.first_name,e.last_name,e.middle_name,
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                             e.last_update_date
                             FROM public.entity e, public.entity c 
