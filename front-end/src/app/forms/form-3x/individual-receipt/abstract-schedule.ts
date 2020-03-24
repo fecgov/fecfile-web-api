@@ -1,6 +1,6 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, OnChanges, OnDestroy, OnInit, SimpleChanges, Input , ChangeDetectionStrategy } from '@angular/core';
+import { EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -28,16 +28,15 @@ import { CoordinatedPartyExpenditureVoidFields } from '../../sched-f-core/coordi
 import { CoordinatedExpenditureCcMemoFields } from '../../sched-f-core/memo/coordinated-expenditure-cc-memo-fields';
 import { CoordinatedExpenditurePayrollMemoFields } from '../../sched-f-core/memo/coordinated-expenditure-Payroll-memo-fields';
 import { CoordinatedExpenditureStaffMemoFields } from '../../sched-f-core/memo/coordinated-expenditure-staff-memo-fields';
+import { SchedHMessageServiceService } from '../../sched-h-service/sched-h-message-service.service';
 import { TransactionModel } from '../../transactions/model/transaction.model';
 import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
 import { GetTransactionsResponse, TransactionsService } from '../../transactions/service/transactions.service';
 import { ReportTypeService } from '../report-type/report-type.service';
 import { F3xMessageService } from '../service/f3x-message.service';
 import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
-import { entityTypes } from './entity-types-json';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { ScheduleActions } from './schedule-actions.enum';
-import { SchedHMessageServiceService } from '../../sched-h-service/sched-h-message-service.service';
 
 
 
@@ -57,6 +56,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   @Input() transactionDataForChild: any;
   @Input() populateHiddenFieldsMessageObj: any;
   @Input() populateFieldsMessageObj: any;
+  @Input() returnToGlobalAllTransaction: boolean;
 
   mainTransactionTypeText = '';
   transactionTypeText = '';
@@ -2746,14 +2746,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       localStorage.setItem('Transaction_Table_Screen', 'Yes');
       this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
 
-      this._router.navigate([`/forms/form/${this.formType}`], {
-        queryParams: {
-          step: 'transactions',
-          reportId: reportId,
-          edit: this.editMode,
-          transactionCategory: this._transactionCategory
-        }
-      });
+      if(this.returnToGlobalAllTransaction){
+        this.goToGlobalAllTransactions();        
+      }
+      else{
+        this._router.navigate([`/forms/form/${this.formType}`], {
+          queryParams: {
+            step: 'transactions',
+            reportId: reportId,
+            edit: this.editMode,
+            transactionCategory: this._transactionCategory
+          }
+        });
+      }
     } else {
       let reportId = this._receiptService.getReportIdFromStorage(this.formType);
       /*
@@ -2804,26 +2809,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       response === ModalDismissReasons.BACKDROP_CLICK ||
                       response === ModalDismissReasons.ESC
                     ) {
-                      this._router.navigate([`/forms/form/${this.formType}`], {
-                        queryParams: {
-                          step: 'transactions',
-                          reportId: reportId,
-                          edit: this.editMode,
-                          transactionCategory: this._transactionCategory,
-                          refresh: 1
-                        }
-                      });
-                      /*
-                      this._router.navigateByUrl('/dashboard', { skipLocationChange: true }).then(() => {
+                      if(this.returnToGlobalAllTransaction){
+                        this.goToGlobalAllTransactions();
+                      }
+                      else{
                         this._router.navigate([`/forms/form/${this.formType}`], {
                           queryParams: {
                             step: 'transactions',
                             reportId: reportId,
                             edit: this.editMode,
-                            transactionCategory: this._transactionCategory
+                            transactionCategory: this._transactionCategory,
+                            refresh: 1
                           }
                         });
-                      });*/
+                      }
                     }
                   });
               });
@@ -2831,6 +2830,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           }
         });
     }
+  }
+
+  private goToGlobalAllTransactions() {
+    this._router.navigate([`/forms/form/global`], {
+      queryParams: {
+        step: 'transactions',
+        allTransactions: true,
+        transactionCategory: this._transactionCategory
+      }
+    });
   }
 
   public printPreview(): void {

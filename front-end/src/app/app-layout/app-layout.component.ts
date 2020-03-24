@@ -59,7 +59,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     private _utilService: UtilService,
     private _router: Router,
     private _modalService: NgbModal,
-    private _activatedRoute: ActivatedRoute
+    public _activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {

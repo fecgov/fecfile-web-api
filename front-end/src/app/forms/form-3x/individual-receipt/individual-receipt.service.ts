@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
@@ -19,7 +20,8 @@ export class IndividualReceiptService {
     private _http: HttpClient,
     private _cookieService: CookieService,
     private _utilService: UtilService,
-    private _decimalPipe: DecimalPipe
+    private _decimalPipe: DecimalPipe, 
+    private _activatedRoute: ActivatedRoute
   ) {
     //console.log();
   }
@@ -480,6 +482,12 @@ export class IndividualReceiptService {
    * Obtain the Report ID from local storage.
    */
   public getReportIdFromStorage(formType: string) {
+
+    //If the reportId is in current URL queryParams, get it directly from there first
+    if(this._activatedRoute.snapshot && this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
+      return this._activatedRoute.snapshot.queryParams.reportId;
+    }
+
     let reportId = '0';
     let form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
     const reportIdFromLocalStorage = localStorage.getItem('reportId');

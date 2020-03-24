@@ -96,7 +96,7 @@
             (click)="changeSortDirection('aggregate')">Aggregate
           </th>
           <th class="bulk_action">
-            <div *ngIf="editMode">
+            <div *ngIf="editMode || _allTransactions">
               <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                 aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
@@ -116,7 +116,7 @@
                 </div>
               </div>
             </div>
-            <div *ngIf="!editMode">
+            <div *ngIf="!editMode && !_allTransactions">
               <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                 <i class="ellipsis-icon"></i>
               </button>
@@ -137,7 +137,7 @@
             <td>
               <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
-            <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
+            <td  *ngIf="_allTransactions">{{trx.formType}} - {{trx.reportType}}</td>
             <td  *ngIf="isColumnVisible('type')">{{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
             <td  *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
             <td  [ngClass]="trx.child ? 'parent': ''" 
@@ -382,7 +382,7 @@
               (click)="changeSortDirection('electionYear')">Election Year
             </th>
             <th class="bulk_action">
-              <div *ngIf="editMode">
+              <div *ngIf="editMode || _allTransactions">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
@@ -403,7 +403,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="!editMode">
+              <div *ngIf="!editMode && !_allTransactions">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                   <i class="ellipsis-icon"></i>
                 </button>
@@ -672,7 +672,7 @@
               (click)="changeSortDirection('loanDueDate')">Loan Due Date (C)
             </th>
             <th class="bulk_action">
-              <div *ngIf="editMode">
+              <div *ngIf="editMode || _allTransactions">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
@@ -692,7 +692,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="!editMode">
+              <div *ngIf="!editMode && !_allTransactions">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                   <i class="ellipsis-icon"></i>
                 </button>
@@ -817,44 +817,6 @@
             </td>
           </tr>
           </ng-container>
-          
-          <!-- <tr *ngIf="isTransactionViewActive()">
-            <td></td>
-            <td *ngIf="isColumnVisible('type')"></td>
-            <td *ngIf="isColumnVisible('transactionId')"></td>
-            <td *ngIf="isColumnVisible('name')"></td>
-            <td *ngIf="isColumnVisible('street')"></td>
-            <td *ngIf="isColumnVisible('city')"></td>
-            <td *ngIf="isColumnVisible('state')"></td>
-            <td *ngIf="isColumnVisible('zip')"></td>
-            <td *ngIf="isColumnVisible('date')"></td>
-            <td *ngIf="isColumnVisible('purposeDescription')"></td>
-            <td *ngIf="isColumnVisible('contributorEmployer')"></td>
-            <td *ngIf="isColumnVisible('contributorOccupation')"></td>
-            <td *ngIf="isColumnVisible('memoCode')"></td>
-            <td *ngIf="isColumnVisible('memoText')"></td>
-            <td *ngIf="isRecycleBinViewActive()"></td>
-            <td  *ngIf="isColumnVisible('amount')">
-                <div class="transactions__total-amount-container">
-                  <div class="transactions__total-amount">
-                    <b>Total</b>
-    
-                    <i class="info-icon transactions__total-amount-tip" 
-                      ngbTooltip="Represents the total amount of transactions entered on the report. 
-                        Those transactions that are memo entries are not added into the total amount."
-                      tooltipClass="transactions__tooltip"
-                      triggers="click">
-                    </i>
-    
-                  </div>
-                  <div class="transactions__total-amount-val">
-                    <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</b>
-                  </div>
-                </div>
-            </td>
-            <td *ngIf="isColumnVisible('aggregate')"></td>
-            <td></td>
-          </tr> -->
         </tbody>
       </table>
 
@@ -905,7 +867,7 @@
               (click)="changeSortDirection('eventId')">Activity or Event Identifier
             </th>
             <th class="bulk_action">
-              <div *ngIf="editMode">
+              <div *ngIf="editMode || _allTransactions">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
@@ -925,7 +887,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="!editMode">
+              <div *ngIf="!editMode && !_allTransactions">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group"role="group"
                   aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
@@ -980,7 +942,7 @@
                     </button>
                   </span>
                 </div>
-                <div *ngIf="editMode">
+                <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -1010,7 +972,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="!editMode">
+                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -1046,7 +1008,7 @@
                     </button>
                   </span>
                 </div>
-                <div *ngIf="editMode">
+                <div *ngIf="!_allTransactions || (_allTransactions && trxChild.reportstatus !== 'Filed')">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -1071,7 +1033,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="!editMode">
+                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -1578,10 +1540,11 @@
               <div class="col-md">
                 <div class="checkbox">
                   <label>
-                    <input [(ngModel)]="getSortableColumn('amount').checked" (change)="toggleVisibility('amount', $event)"
-                      type="checkbox" [disabled]="getSortableColumn('amount').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('amount').disabled}">
-                      Amount
+                    <input [(ngModel)]="getSortableColumn('loanDueDate').checked"
+                      (change)="toggleVisibility('loanDueDate', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('loanDueDate').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('loanDueDate').disabled}">
+                      Loan Due Date (C)
                     </span>
                   </label>
                 </div>
@@ -1746,24 +1709,6 @@
                     </span>
                   </label>
                 </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md">
-                <div class="checkbox">
-                  <label>
-                    <input [(ngModel)]="getSortableColumn('loanDueDate').checked"
-                      (change)="toggleVisibility('loanDueDate', $event)" type="checkbox"
-                      [disabled]="getSortableColumn('loanDueDate').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('loanDueDate').disabled}">
-                      Loan Due Date (C)
-                    </span>
-                  </label>
-                </div>
-              </div>
-              <div class="col-md">
-              </div>
-              <div class="col-md">
               </div>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute, NavigationEnd, Router, NavigationStart } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, Subscription } from 'rxjs';
 import 'rxjs/add/operator/takeUntil';
@@ -24,6 +24,9 @@ import { TransactionModel } from './../../transactions/model/transaction.model';
   encapsulation: ViewEncapsulation.None
 })
 export class F3xComponent implements OnInit, OnDestroy {
+
+  @Input() jumpToTransaction: any;
+
   public loadingData = false;
   public currentStep: string = 'step_1';
   public editMode: boolean = true;
@@ -82,6 +85,7 @@ export class F3xComponent implements OnInit, OnDestroy {
   populateFieldsMessageObj: any;
   queryParamsSubscription: Subscription;
   routerEventsSubscription: Subscription;
+  returnToGlobalAllTransaction: boolean;
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -191,6 +195,14 @@ export class F3xComponent implements OnInit, OnDestroy {
         }
       }
     });
+
+    //jumpToTransaction is used to pass transaction info from the "Global" All Transactions component 
+    //to "Report specific" All Transaction component. Idea is to first load the "Report specific" All Transaction component
+    //from "Global" and then if a transaction is passed, then invoke onNotify with that data. 
+    if(this.jumpToTransaction){
+      this.returnToGlobalAllTransaction = true;
+      this.onNotify(this.jumpToTransaction);
+    }
   }
 
   ngOnDestroy(): void {
