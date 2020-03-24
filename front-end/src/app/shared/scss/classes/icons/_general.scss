@@ -190,6 +190,11 @@
   @extend .fa-print;
 }
 
+.calculator-icon{
+  @extend .fas;
+  @extend  .fa-calculator;
+}
+
 .table-icon {
   @extend .fas;
   @extend .fa-table;

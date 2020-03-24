@@ -328,7 +328,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     if (this.scheduleAction === ScheduleActions.add) {
       this.getH1Subscription = this.getH1().subscribe(
         res => {
-          if (res.length === 1 && !this.isPac()) {
+          if (res.length !== 0 && !this.isPac()) {
             if (res[0].federal_percent === 0.28) {
               this.form.control.patchValue({ h1_election_year_options: '1' }, { onlySelf: true });
             } else if (res[0].federal_percent === 0.36) {

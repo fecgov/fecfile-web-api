@@ -40,6 +40,9 @@
               <button class="dropdown-item">
                 <i class="file-import-icon" (click)="ImportTransactions()"></i> Import
               </button>
+              <button class="dropdown-item" (click)="toggleAggregation()">
+                <i class="calculator-icon" >{{isAggregate?' Un-Aggregate':' Aggregate'}}</i>
+              </button>
             </div>
           </div>
         </div>

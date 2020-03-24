@@ -1699,4 +1699,38 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         return false;
       }
   }
+
+  private isForceItemizable(trx: TransactionModel): boolean {
+    if (trx) {
+      return trx.forceitemizable;
+    } else {
+      return false;
+    }
+  }
+
+  private forceItemizationToggle(trx: TransactionModel): void {
+
+    this._reportTypeService.forceItemizationToggle(trx).subscribe(res => {
+      // on response reload the transaction table to get latest data
+      this.apiError = false;
+      this.getTransactionsPage(this.config.currentPage);
+
+    }, error => {
+      console.error('Error Toggling Itemization ');
+      this.apiError = true;
+    });
+  }
+
+  private getItemizationInd(trx: TransactionModel): string {
+    return this.getCurrentItemizationStatus(trx) ? ' Unitemize' : ' Itemize';
+  }
+  private getCurrentItemizationStatus(trx: TransactionModel): boolean {
+    if (trx) {
+      if (trx.itemized === 'U' || trx.itemized === 'FU') {
+        return false;
+      } else if (trx.itemized === null || trx.itemized === 'FI') {
+        return true;
+      }
+    }
+  }
 }
