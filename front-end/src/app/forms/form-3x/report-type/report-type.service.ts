@@ -6,6 +6,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
 import { form3xReportTypeDetails } from '../../../shared/interfaces/FormsService//FormsService';
 import { DatePipe } from '@angular/common';
+import {TransactionModel} from '../../transactions/model/transaction.model';
 
 
 @Injectable({
@@ -737,5 +738,44 @@ export class ReportTypeService {
       }
     }
     return reportId;
+  }
+
+  public forceItemizationToggle(trx: TransactionModel): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    // Assuming first two letters of a transaction ID would be the transaction type itself
+    const transactionType = trx.transactionId.substring(0, 2).toLowerCase();
+    let isItemized: boolean;
+    if (trx.itemized) {
+      if (trx.itemized === 'U' || trx.itemized === 'FU') {
+        isItemized = false;
+      } else {
+        isItemized = true;
+      }
+      } else if (trx.itemized === null) {
+      isItemized = true;
+    }
+    const toggleWay = isItemized ? 'unitemize' : 'itemize';
+    const putURL: string = '/' + transactionType + '/force_' + toggleWay + '_' + transactionType + '?' ;
+    const formData: FormData = new FormData();
+
+    let httpOptions = new HttpHeaders();
+
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+    formData.append('report_id', trx.reportId);
+    formData.append('transaction_id', trx.transactionId);
+
+    return this._http
+        .put(`${environment.apiUrl}${putURL}`, formData, {
+          headers: httpOptions
+        })
+        .pipe(
+            map(res => {
+              if (res) {
+                return res;
+              }
+              return false;
+            })
+        );
+
   }
 }

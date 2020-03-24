@@ -1578,7 +1578,8 @@ def list_all_sb_transactions_entity(
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
                 t1.redesignation_ind, 
-                t1.aggregation_ind
+                t1.aggregation_ind,
+                t1.itemized_ind
             FROM public.sched_b t1 
             WHERE entity_id = %s 
             AND cmte_id = %s 
@@ -1700,12 +1701,16 @@ def update_schedB_aggamt_transactions(
                 if transaction[10] != "N":
                     aggregate_amount += transaction[0]
                 if expenditure_date <= transaction[4]:
-                    line_number, itemized_ind = get_sb_linenumber_itemization(
-                        transaction[8],
-                        aggregate_amount,
-                        itemization_value,
-                        transaction[3],
-                    )
+                    line_number, itemized_ind = transaction[3], transaction[11]
+                    if itemized_ind.startswith('F'): # forced itemize/unitemize
+                        pass
+                    else:
+                        line_number, itemized_ind = get_sb_linenumber_itemization(
+                            transaction[8],
+                            aggregate_amount,
+                            itemization_value,
+                            transaction[3],
+                        )
                     put_sql_linenumber_schedB(
                         cmte_id,
                         line_number,
@@ -1842,7 +1847,7 @@ def force_unitemize_sb(request):
     api to force a sched_b transaction to be itemized:
     1. set itemized_ind = 'Y'
     """
-    return force_itemize_unitemize(request, itemize='N')
+    return force_itemize_unitemize(request, itemize='FU')
     
 
 @api_view(["PUT"])
@@ -1851,7 +1856,7 @@ def force_itemize_sb(request):
     api to force a sched_b transaction to be itemized:
     1. set itemized_ind = 'Y'
     """
-    return force_itemize_unitemize(request, itemize='Y')
+    return force_itemize_unitemize(request, itemize='FI')
     # # if request.method == "GET":
     # try:
     #     cmte_id = request.user.username
