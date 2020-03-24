@@ -1,10 +1,11 @@
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { Component, Input, OnDestroy, OnInit, QueryList, ViewChildren , ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import 'rxjs/add/operator/takeUntil';
 import { Subscription } from 'rxjs/Subscription';
+import { ReportsService } from 'src/app/reports/service/report.service';
 import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
 import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
 import { FilterTypes } from "../enums/filterTypes.enum";
@@ -13,6 +14,7 @@ import { ValidationErrorModel } from '../model/validation-error.model';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { TransactionsService } from '../service/transactions.service';
 import { ActiveView } from '../transactions.component';
+import { ContactsService } from './../../../contacts/service/contacts.service';
 import { TransactionsFilterTypeComponent } from './filter-type/transactions-filter-type.component';
 
 /**
@@ -97,6 +99,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public isHideTypeFilter: boolean;
   public isHideDateFilter: boolean;
   public isHideDeletedDateFilter: boolean;
+  public isHideReportTypeFilter: boolean;
   public isHideAmountFilter: boolean;
   public isHideAggregateAmountFilter: boolean;
   public isHideStateFilter: boolean;
@@ -109,6 +112,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public isHideDebtBeginningBalanceFilter: boolean;
   public transactionCategories: any = [];
   public states: any = [];
+  public reportTpes: any = [];
   public itemizations: any = [];
   public electionCodes: any = [
     { option: 'primary', selected: false },
@@ -172,7 +176,9 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     private _transactionsService: TransactionsService,
     private _transactionsMessageService: TransactionsMessageService,
     private _transactionTypeService: TransactionTypeService,
-    private _activatedRoute: ActivatedRoute
+    public _activatedRoute: ActivatedRoute,
+    private _contactsService:ContactsService, 
+    private _reportsService: ReportsService
   ) {
     this._transactionsMessageService
       .getRemoveFilterMessage()
@@ -246,6 +252,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.isHideTypeFilter = true;
     this.isHideDateFilter = true;
     this.isHideDeletedDateFilter = true;
+    this.isHideReportTypeFilter = true;
     this.isHideAmountFilter = true;
     this.isHideAggregateAmountFilter = true;
     this.isHideloanClosingBalanceFilter = true;
@@ -264,8 +271,12 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       this.getCategoryTypes();
       this.getStates();
       this.getItemizations();
+      if(this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.allTransactions === 'true'){
+        this.getReportTypes();
+      }
     }
   }
+ 
 
  
 
@@ -296,6 +307,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   public toggleDeletedDateFilterItem() {
     this.isHideDeletedDateFilter = !this.isHideDeletedDateFilter;
+  }
+
+  /**
+   * Toggle visibility of the Report Type filter
+   */
+  public toggleReportTypeFilterItem() {
+    this.isHideReportTypeFilter = !this.isHideReportTypeFilter;
   }
 
   /**
@@ -465,6 +483,17 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     }
     filters.filterStates = filterStates;
 
+    //reportTypes
+    const filterReportTypes = [];
+    for (const r of this.reportTpes) {
+      if (r.selected) {
+        filterReportTypes.push(r.rpt_type);
+        modified = true;
+      }
+    }
+    filters.fitlerReportTypes = filterReportTypes;
+
+
     // type/category
     const filterCategories = [];
     // if (this.filterCategoriesText.length > 0) {
@@ -596,6 +625,11 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     for (const s of this.states) {
       s.selected = false;
     }
+
+    for (const r of this.reportTpes) {
+      r.selected = false;
+    }
+
     for (const category of this.transactionCategories) {
       if (category.options) {
         for (const option of category.options) {
@@ -748,10 +782,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * Get US State Codes and Values.
    */
   private getStates() {
-    // TODO using this service to get states until available in another API.
-    // Passing INDV_REC as type but any should do as states are not specific to
-    // transaction type.
-    this._transactionsService.getStates(this.formType, 'INDV_REC').subscribe(res => {
+    this._contactsService.getContactsDynamicFormFields().subscribe(res => {
       let statesExist = false;
       if (res.data) {
         if (res.data.states) {
@@ -776,6 +807,34 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         this.states = res.data.states;
       } else {
         this.states = [];
+      }
+    });
+  }
+
+  getReportTypes() {
+    this._reportsService.getReportTypes().subscribe(res => {
+      let reportsExist = false;
+      if (res) {
+        reportsExist = true;
+          for (const r of res) {
+            // check for states selected in the filter cache
+            // TODO scroll to first check item
+            if (this.cachedFilters) {
+              if (this.cachedFilters.fitlerReportTypes) {
+                if (this.cachedFilters.fitlerReportTypes.includes(r.rpt_type)) {
+                  r.selected = true;
+                  this.isHideReportTypeFilter = false;
+                } else {
+                  r.selected = false;
+                }
+              }
+            }
+          }
+      }
+      if (reportsExist) {
+        this.reportTpes = res;
+      } else {
+        this.reportTpes = [];
       }
     });
   }
@@ -1083,11 +1142,18 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         switch (message.key) {
           case FilterTypes.state:
             for (const st of this.states) {
-              if (st.code === message.value) {
+              if (st.rpt_type === message.value) {
                 st.selected = false;
               }
             }
             break;
+          case FilterTypes.reportType:
+            for (const reportType of this.reportTpes) {
+              if (reportType.code === message.value) {
+                reportType.selected = false;
+              }
+            }
+            break;  
           case FilterTypes.category:
             for (const categoryGroup of this.transactionCategories) {
               for (const categoryType of categoryGroup.options) {

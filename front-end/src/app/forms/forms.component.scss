@@ -8,6 +8,7 @@
   min-height: $mainContentHeight;
   position: relative;
   width: 100%;
+  
   .forms-container__main {
     display: flex;
     padding-left: 0;
@@ -34,10 +35,76 @@
           padding: 0;
         }
       }
+      
     }
     @include clearfix();
   }
   @include clearfix();
 }
-
+.forms__wizard {
+  display: block;
+  min-height: $mainContentHeight;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  @include media(tablet) {
+    display: block;
+  }
+  @include media(mediumDesktop) {
+    display: table;
+    table-layout: fixed;
+  }
+  @include media(largeDesktop) {
+    display: table;
+    table-layout: fixed;
+  }
+  .form__sidebar {
+    background-color: $bombay;
+    display: block;
+    flex-grow: 1;
+    display: block;
+    padding-left: 0;
+    width: 100%;
+    @include media(tablet) {
+      display: block;
+      width: 100%;
+    }
+    @include media(mediumDesktop) {
+      display: table-cell;
+      width: 22%;
+    }
+    @include media(largeDesktop) {
+      display: table-cell;
+      width: 22%;
+    }
+  }
+  .form__container {
+    display: block;
+    width: 99%;
+    @include media(tablet) {
+      display: block;
+    }
+    @include media(mediumDesktop) {
+      display: table-cell;
+      margin-left: 5px;
+      min-height: 100vh;
+      width: 78%;
+    }
+    @include media(largeDesktop) {
+      display: table-cell;
+      margin-left: 5px;
+      min-height: 100vh;
+      width: 78%;
+    }
+    section {
+      .form-content {
+      }
+    }
+    footer {
+      div {
+        margin-top: 15px;
+      }
+    }
+  } // .form__container
+}
 

@@ -1,27 +1,21 @@
-import { F3xMessageService } from './../form-3x/service/f3x-message.service';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, NavigationStart } from '@angular/router';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
-import { FormsService } from '../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../shared/services/MessageService/message.service';
 import { alphaNumeric } from '../../shared/utils/forms/validation/alpha-numeric.validator';
 import { validateAmount } from '../../shared/utils/forms/validation/amount.validator';
 import { UtilService } from '../../shared/utils/util.service';
 import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
-import { LoanModel } from '../sched-c/model/loan.model';
-import { LoanMessageService } from '../sched-c/service/loan-message.service';
 import { LoanService } from '../sched-c/service/loan.service';
 import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
 import { TypeaheadService } from './../../shared/partials/typeahead/typeahead.service';
-import { DialogService } from './../../shared/services/DialogService/dialog.service';
 import { ContributionDateValidator } from './../../shared/utils/forms/validation/contribution-date.validator';
-import { map } from "rxjs/operators";
+import { F3xMessageService } from './../form-3x/service/f3x-message.service';
 
 export enum ActiveView {
   Loans = 'Loans',
@@ -76,14 +70,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
   public entityType = 'IND';
 
-  private _formType = '';
-  private _transactionTypePrevious: string = null;
-  private _contributionAggregateValue = 0.0;
   private _selectedEntity: any;
   private _contributionAmountMax = 12;
   private readonly _childFieldNamePrefix = 'child*';
-  private _loanToEdit: LoanModel;
-  private _loading: boolean = false;
   private _selectedChangeWarn: any;
   private _transactionId: string;
   private _transactionTypeIdentifier: string;
@@ -95,10 +84,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   private typeChangeEventOccured = false;
   _routeListener: Subscription;
   private c1ExistsFlag: any;
+  reportId: any;
 
   constructor(
-    private _http: HttpClient,
-    private _fb: FormBuilder,
     private _loansService: LoanService,
     private _config: NgbTooltipConfig,
     private _router: Router,
@@ -106,50 +94,29 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     private _messageService: MessageService,
     private _decimalPipe: DecimalPipe,
     private _typeaheadService: TypeaheadService,
-    private _dialogService: DialogService,
-    private _LoanSumamrysMessageService: LoanMessageService,
-    private _formsService: FormsService,
     private _receiptService: ReportTypeService,
-    private _activatedRoute: ActivatedRoute,
     private _transactionsMessageService: TransactionsMessageService,
     private _contributionDateValidator: ContributionDateValidator,
-    private _f3xMessageService: F3xMessageService
+    private _f3xMessageService: F3xMessageService,
+    private _activatedRoute: ActivatedRoute
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
-
-
-
     this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
       if (this.frmLoan) {
         this.frmLoan.reset();
         this.setupForm();
       }
     });
-
+    this.reportId = this._activatedRoute.snapshot.queryParams.reportId;
   }
 
   ngOnInit(): void {
-    /* this._routeListener = this._router.events.subscribe(val => {
-
-      //whenver navigation starts, check the current form and set dirty status in the service to be retreived during GuardCheck
-      if (val instanceof NavigationStart) {
-        this._formsService.setFormDirtyFlag(this.frmLoan);
-      }
-
-
-      //check
-      console.info('checking router can deactivate or not');
-      console.info('route value: ' + val);
-    }); */
-
     this.setupForm();
   }
 
   private setupForm() {
     this._selectedEntity = null;
-    this._loanToEdit = null;
-    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this._transactionTypeIdentifier = 'LOANS_OWED_BY_CMTE';
     this._transactionCategory = 'loans-and-debts';
     this._messageService.clearMessage();
@@ -158,22 +125,16 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    //console.log('inside ngOnChanges');
     this.ngOnInit();
   }
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
     this._clearFormSubscription.unsubscribe();
-    //this._routeListener.unsubscribe();
   }
-
-
-
 
   private _setForm(fields: any): void {
     const formGroup: any = [];
-    //console.log('_setForm fields ', fields);
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
@@ -744,7 +705,6 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
               }
             }
 
-            this._loading = false;
           } // typeof res.data
         } // res.hasOwnProperty('data')
 
@@ -959,12 +919,12 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       //console.log('LoanObj =', JSON.stringify(LoanObj));
 
       localStorage.setItem('LoanObj', JSON.stringify(LoanObj));
+      
       this._loansService
-        .saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, LoanObj.entity_type)
+        .saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, LoanObj.entity_type, this.reportId)
         .subscribe(res => {
           if (res) {
             //console.log('_LoansService.saveContact res', res);
-            this._loanToEdit = null;
             this.frmLoan.reset();
             this._selectedEntity = null;
             localStorage.removeItem(LoanObj);
