@@ -3184,10 +3184,11 @@ def get_trans_query(category_type, cmte_id, param_string):
 
     if category_type == "disbursements_tran":
         query_string = (
-            """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+            """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
-                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isredesignatable, "isRedesignation" from all_disbursements_transactions_view
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isredesignatable, "isRedesignation" 
+                                from all_disbursements_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -3197,9 +3198,10 @@ def get_trans_query(category_type, cmte_id, param_string):
 
     elif category_type == "loans_tran":
         query_string = (
-            """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
+            """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
                           purpose_description, loan_amount, loan_payment_to_date, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
-                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild from all_loans_debts_transactions_view
+                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild 
+                          from all_loans_debts_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -3209,7 +3211,7 @@ def get_trans_query(category_type, cmte_id, param_string):
 
     elif category_type == "other_tran":
         query_string = (
-            """SELECT report_id, schedule, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
+            """SELECT report_id, schedule, form_type, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
                           name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, 
                                 election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, istrashable
@@ -3222,10 +3224,11 @@ def get_trans_query(category_type, cmte_id, param_string):
         )
     else:
         query_string = (
-            """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+            """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
-                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isreattributable, "isReattribution" from all_receipts_transactions_view
+                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isreattributable, "isReattribution" 
+                                from all_receipts_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -3323,6 +3326,13 @@ def filter_get_all_trans(request, param_string):
             param_string
             + " AND election_year <= '"
             + filt_dict["filterElectionYearTo"]
+            + "'"
+        )
+    if filt_dict.get("reportType") not in [None, "null"]:
+        param_string = (
+            param_string
+            + " AND report_type = '"
+            + filt_dict["reportType"]
             + "'"
         )
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
