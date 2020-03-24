@@ -86,38 +86,61 @@ AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT = {
 
 # list of all transaction type identifiers that have itemization rule applied to it
 # TODO: need to update this list: PAR_CON?, PAR_MEMO?, REATT_TO?
+# ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST = [
+#     "INDV_REC",
+#     "PAR_CON",
+#     "PAR_MEMO",
+#     "IK_REC",
+#     "REATT_FROM",
+#     "REATT_TO",
+# ]
+# itemization rules updated against the newest version of spreadsheet
 ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST = [
-    "INDV_REC",
-    "PAR_CON",
-    "PAR_MEMO",
-    "IK_REC",
-    "REATT_FROM",
-    "REATT_TO",
+        "TRIB_REC",
+        "IK_REC",
+        "IK_BC_REC",
+        "PARTN_MEMO",
+        "BC_TO_IND_MEMO",
+        "BC_TO_UNKN_MEMO",
+        "INDV_REC",
+        "PARTN_REC",
+        "REATT_FROM",
+        "REATT_TO",
+        "RET_REC",
+        "BC_TO_IND",
+        "BC_TO_UNKN",
 ]
 
 # Updating itemized_ind for the below list
 ITEMIZED_IND_UPDATE_TRANSACTION_TYPE_IDENTIFIER = [
-    "INDV_REC",
-    "PARTN_REC",
-    "IK_REC",
-    "REATT_FROM",
-    "RET_REC",
-    "TRIB_REC",
-    "IND_NP_HQ_ACC",
-    "TRIB_NP_HQ_ACC",
-    "IND_NP_CONVEN_ACC",
-    "TRIB_NP_CONVEN_ACC",
-    "EAR_REC_RECNT_ACC",
-    "EAR_REC_CONVEN_ACC",
-    "EAR_REC_HQ_ACC",
-    "IND_REC_NON_CONT_ACC",
-    "BUS_LAB_NON_CONT_ACC",
-    "OFFSET_TO_OPEX",
-    "TRIB_NP_RECNT_ACC",
-    "IND_NP_RECNT_ACC",
-    "IND_RECNT_REC",
-    "OTH_REC",
-    "OTH_REC_DEBT",
+        "TRIB_REC",
+        "IK_REC",
+        "IK_BC_REC",
+        "PARTN_MEMO",
+        "BC_TO_IND_MEMO",
+        "BC_TO_UNKN_MEMO",
+        "INDV_REC",
+        "PARTN_REC",
+        "REATT_FROM",
+        "REATT_TO",
+        "RET_REC",
+        "BC_TO_IND",
+        "BC_TO_UNKN",
+        "IND_NP_HQ_ACC",
+        "TRIB_NP_HQ_ACC",
+        "IND_NP_CONVEN_ACC",
+        "TRIB_NP_CONVEN_ACC",
+        "EAR_REC_RECNT_ACC",
+        "EAR_REC_CONVEN_ACC",
+        "EAR_REC_HQ_ACC",
+        "IND_REC_NON_CONT_ACC",
+        "BUS_LAB_NON_CONT_ACC",
+        "OFFSET_TO_OPEX",
+        "TRIB_NP_RECNT_ACC",
+        "IND_NP_RECNT_ACC",
+        "IND_RECNT_REC",
+        "OTH_REC",
+        "OTH_REC_DEBT",
 ]
 
 AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT = {}
@@ -1436,20 +1459,22 @@ def update_linenumber_aggamt_transactions_SA(
                     'OPEXP_HQ_ACC_IND_REF','OPEXP_HQ_ACC_TRIB_REF','OPEXP_CONV_ACC_REG_REF','OPEXP_CONV_ACC_TRIB_REF',
                     'OPEXP_CONV_ACC_IND_REF','OTH_DISB_NP_RECNT_REG_REF','OTH_DISB_NP_RECNT_TRIB_REF',
                     'OTH_DISB_NP_RECNT_IND_REF']:
-                    line_number, itemized_ind = get_linenumber_itemization(
-                        transaction[8],
-                        aggregate_amount,
-                        itemization_value,
-                        transaction[3],
-                    )
-                    put_sql_linenumber_schedA(
-                        cmte_id,
-                        line_number,
-                        itemized_ind,
-                        transaction[1],
-                        entity_id,
-                        aggregate_amount,
-                    )
+                    if not transaction[11] in ['FU', 'FI']: # if not forced
+
+                        line_number, itemized_ind = get_linenumber_itemization(
+                            transaction[8],
+                            aggregate_amount,
+                            itemization_value,
+                            transaction[3],
+                        )
+                        put_sql_linenumber_schedA(
+                            cmte_id,
+                            line_number,
+                            itemized_ind,
+                            transaction[1],
+                            entity_id,
+                            aggregate_amount,
+                        )
 
                 # Updating aggregate amount to child auto generate sched A transactions
                 if child_flag_SA:
@@ -1504,6 +1529,7 @@ def list_all_transactions_entity(
                 t1.transaction_type_identifier,
                 t1.reattribution_ind,
                 t1.aggregation_ind,
+                t1.itemized_ind,
                 t1.create_date
             FROM public.sched_a t1 
             WHERE entity_id = %s 
@@ -1521,7 +1547,8 @@ def list_all_transactions_entity(
                 t1.back_ref_transaction_id,
                 t1.transaction_type_identifier,
                 null as reattribution_ind,
-                null as aggregation_ind, 
+                null as aggregation_ind,
+                t1.itemized_ind,
                 t1.create_date
             FROM public.sched_b t1
             WHERE entity_id = %s 
@@ -1552,30 +1579,30 @@ def list_all_transactions_entity(
             "The list_all_transactions_entity function is throwing an error: " + str(e)
         )
 
-def update_sa_itmization_status(data, status = None):
+def update_sa_itmization_status(data, item_status = None):
     """
-    helpder function
+    helpder function for force itemization
     """
     transaction_type_identifier = data.get('transaction_type_identifier')
     transaction_id = data.get('transaction_id')
     report_id = data.get('report_id')
     if transaction_type_identifier in ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST:
         
-        line_number = '11AI' if status == 'Y' else '11AII'
+        line_number = '11AI' if item_status == 'FI' else '11AII'
         
         _sql = """
         update public.sched_a
         set itemized_ind = %s, line_number = %s
         where transaction_id = %s and report_id = %s
         """
-        parameters = [status, line_number, transaction_id, report_id]
+        parameters = [item_status, line_number, transaction_id, report_id]
     else:
         _sql = """
         update public.sched_a
         set itemized_ind = %s
         where transaction_id = %s and report_id = %s
         """
-        parameters = [status, transaction_id, report_id]
+        parameters = [item_status, transaction_id, report_id]
     with connection.cursor() as cursor:
         cursor.execute(_sql, parameters)
         if cursor.rowcount == 0:
@@ -1727,14 +1754,14 @@ def func_aggregate_amount(
                 )
 
             query_string = """SELECT aggregate_amt, contribution_date as transaction_date, create_date
-    FROM sched_a  WHERE entity_id = %s {0} AND cmte_id = %s 
-    AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
-    AND contribution_date <= %s::date
-    AND ((back_ref_transaction_id IS NULL 
-    AND (memo_code IS NULL OR (reattribution_ind='A' AND contribution_amount<0) OR reattribution_ind='R')) 
-    OR (back_ref_transaction_id IS NOT NULL))
-    AND delete_ind is distinct FROM 'Y' 
-    ORDER BY transaction_date DESC, create_date DESC;""".format(
+                FROM sched_a  WHERE entity_id = %s {0} AND cmte_id = %s 
+                AND extract('year' FROM contribution_date) = extract('year' FROM %s::date)
+                AND contribution_date <= %s::date
+                AND ((back_ref_transaction_id IS NULL 
+                AND (memo_code IS NULL OR (reattribution_ind='A' AND contribution_amount<0) OR reattribution_ind='R')) 
+                OR (back_ref_transaction_id IS NOT NULL))
+                AND delete_ind is distinct FROM 'Y' 
+                ORDER BY transaction_date DESC, create_date DESC;""".format(
                 params
             )
 
@@ -1742,21 +1769,33 @@ def func_aggregate_amount(
                 query_string, [entity_id, cmte_id, contribution_date, contribution_date]
             )
             result = cursor.fetchone()
-            if result and result[0]:
+            if result:
                 aggregate_amt = result[0]
+                # Handling aggregate for few schedule B transactions as they are expected to be added to SA aggregate
+                query_string_1 = """SELECT SUM(expenditure_amount)
+                    FROM sched_b WHERE entity_id = %s {0} AND cmte_id = %s
+                    AND extract('year' FROM expenditure_date) = extract('year' FROM %s::date)
+                    AND expenditure_date <= %s::date
+                    AND expenditure_date >= %s::date
+                    AND back_ref_transaction_id IS NULL
+                    AND delete_ind is distinct FROM 'Y'""".format(params)
+                cursor.execute(
+                    query_string_1, [entity_id, cmte_id, contribution_date, contribution_date, result[1]])
+                SB_agg = cursor.fetchone()
+
             else:
                 aggregate_amt = 0
+                # Handling aggregate for few schedule B transactions as they are expected to be added to SA aggregate
+                query_string_1 = """SELECT SUM(expenditure_amount)
+                    FROM sched_b WHERE entity_id = %s {0} AND cmte_id = %s
+                    AND extract('year' FROM expenditure_date) = extract('year' FROM %s::date)
+                    AND expenditure_date <= %s::date
+                    AND back_ref_transaction_id IS NULL
+                    AND delete_ind is distinct FROM 'Y'""".format(params)
+                cursor.execute(
+                    query_string_1, [entity_id, cmte_id, contribution_date, contribution_date])
+                SB_agg = cursor.fetchone()
 
-            query_string_1 = """SELECT SUM(expenditure_amount)
-    FROM sched_b WHERE entity_id = %s {0} AND cmte_id = %s
-    AND extract('year' FROM expenditure_date) = extract('year' FROM %s::date)
-    AND expenditure_date <= %s::date
-    AND expenditure_date >= %s::date
-    AND back_ref_transaction_id IS NULL
-    AND delete_ind is distinct FROM 'Y'""".format(params)
-            cursor.execute(
-                query_string_1, [entity_id, cmte_id, contribution_date, contribution_date, result[1]])
-            SB_agg = cursor.fetchone()
             if SB_agg and SB_agg[0]:
                 aggregate_amt -= SB_agg[0]
 

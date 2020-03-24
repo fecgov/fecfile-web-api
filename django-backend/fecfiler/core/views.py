@@ -2876,21 +2876,35 @@ def autolookup_search_contacts(request):
                             + """) t"""
                         )
                 else:
-                    parameters = [committee_id, committee_id]
+                    # parameters = [committee_id, committee_id]
                     if 'expand' in request.query_params:
+
+                        parameters = [committee_id]
                         query_string = (
                             """
                             SELECT json_agg(t) FROM 
-                            (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                            (SELECT distinct e.entity_name, e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name, e.first_name,e.last_name,e.middle_name,
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                             e.last_update_date
                             FROM public.entity e, public.entity c 
                             WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
                             AND e.entity_type in ('IND','ORG')
                             AND c.principal_campaign_committee is not null
-                            AND e.cmte_id in (%s, 'C00000000')
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
+                        # query_string = (
+                        #     """
+                        #     SELECT json_agg(t) FROM 
+                        #     (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                        #     e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                        #     e.last_update_date
+                        #     FROM public.entity e, public.entity c 
+                        #     WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                        #     AND e.entity_type in ('IND','ORG')
+                        #     AND c.principal_campaign_committee is not null
+                        #     AND e.cmte_id in (%s, 'C00000000')
+                        #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                        #     """
                             + param_string
                             + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
                             + order_string
@@ -2898,6 +2912,7 @@ def autolookup_search_contacts(request):
                         )
                         # pass 
                     else:
+                        parameters = [committee_id, committee_id]
                         query_string = (
                             """
                             SELECT json_agg(t) FROM 
@@ -5247,8 +5262,13 @@ def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT COALESCE(t1.coh_cop, 0) from public.form_3x t1 where t1.cmte_id = %s AND t1.cvg_end_dt = %s AND t1.delete_ind is distinct from 'Y' AND (SELECT t2.delete_ind from public.reports t2 where t2.report_id = t1.report_id) is distinct from 'Y'",
-                [cmte_id, prev_cvg_end_dt],
+                """SELECT COALESCE(t1.coh_cop, 0) from public.form_3x t1 
+                where t1.cmte_id = %s AND t1.cvg_end_dt < %s 
+                AND t1.delete_ind is distinct from 'Y' 
+                AND (SELECT t2.delete_ind from public.reports t2 
+                where t2.report_id = t1.report_id) is distinct from 'Y'
+                ORDER BY t1.cvg_end_dt DESC""",
+                [cmte_id, cvg_start_date],
             )
             if cursor.rowcount == 0:
                 coh_cop = 0
@@ -5262,6 +5282,29 @@ def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
             "The prev_cash_on_hand_cop function is throwing an error: " + str(e)
         )
 
+def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id):
+    try:
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT COALESCE(t1.coh_cop, 0) FROM public.form_3x t1 
+                WHERE t1.cmte_id = %s AND t1.report_id = (SELECT r.report_id FROM public.reports r 
+                WHERE r.cmte_id = %s AND r.cvg_end_date < %s AND r.delete_ind IS DISTINCT FROM 'Y' 
+                ORDER BY r.cvg_end_date DESC
+                LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'""",
+                [cmte_id, cmte_id, cvg_start_date],
+            )
+            if cursor.rowcount == 0:
+                coh_cop = 0
+            else:
+                result = cursor.fetchone()
+                coh_cop = result[0]
+
+        return coh_cop
+    except Exception as e:
+        raise Exception(
+            "The prev_cash_on_hand_cop_3rd_nav function is throwing an error: " + str(e)
+        )
 
 # @api_view(['GET'])
 # def get_thirdNavigationCOH(request):
@@ -5293,25 +5336,31 @@ GET THIRD NAVIGATION TRANSACTION TYPES VALUES API - CORE APP - SPRINT 13 - FNE 1
 
 def loansanddebts(report_id, cmte_id):
     try:
-        loans_sc_sql = "SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c WHERE memo_code IS NULL AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'"
+        loans_sc_sql = """SELECT ((SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
+        WHERE transaction_type_identifier = 'LOANS_OWED_BY_CMTE' AND memo_code IS NULL 
+        AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y') - 
+        (SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
+        WHERE transaction_type_identifier = 'LOANS_OWED_TO_CMTE' AND memo_code IS NULL 
+        AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y')) AS loans"""
+
         error_message_sc = (
-            "The loans_sql function is throwing an error for sched_c table : "
+            "The loans sql is throwing an error for sched_c table: "
         )
 
-        loans_sc1_sql = "SELECT COALESCE(SUM(total_outstanding_balance), 0.0) FROM public.sched_c1 WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'"
-        error_message_sc1 = (
-            "The loans_sql function is throwing an error for sched_c1 table : "
-        )
+        loans_sd_sql = """SELECT ((SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
+        WHERE transaction_type_identifier = 'DEBT_TO_VENDOR' AND cmte_id = %s AND report_id = %s 
+        AND delete_ind is distinct from 'Y') -
+        (SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
+        WHERE transaction_type_identifier = 'DEBT_BY_VENDOR' AND cmte_id = %s AND report_id = %s 
+        AND delete_ind is distinct from 'Y')) AS debts"""
 
-        loans_sd_sql = "SELECT COALESCE(SUM(payment_amount), 0.0) FROM public.sched_d WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'"
         error_message_sd = (
-            "The loans_sql function is throwing an error for sched_d table : "
+            "The debts sql is throwing an error for sched_d table: "
         )
 
-        value_list = [cmte_id, report_id]
+        value_list = [cmte_id, report_id, cmte_id, report_id]
         output = (
             loans_sql(loans_sc_sql, value_list, error_message_sc)[0]
-            + loans_sql(loans_sc1_sql, value_list, error_message_sc1)[0]
             + loans_sql(loans_sd_sql, value_list, error_message_sd)[0]
         )
         return output
@@ -5331,6 +5380,8 @@ def getthirdnavamounts(cmte_id, report_id):
                 "11B",
                 "11C",
                 "12",
+                "13",
+                "14",
                 "15",
                 "16",
                 "17",
@@ -5338,19 +5389,28 @@ def getthirdnavamounts(cmte_id, report_id):
                 "18B",
             ],
             ["21A","21AI","21AII","21B","22","23","24","25","26","27","28A","28B","28C","29",
-            "30A","30AI","30AII","30B"],
-            ["10"],
-            ["9"]
+            "30A","30AI","30AII","30B"]
         ]
+        sd_line_number_list = ["10","9"]
         for table in table_list:
-            _sql = """
-                SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view WHERE line_number in ('{}')
-                AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
-                """.format(
+            _sql = """SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view 
+                WHERE line_number in ('{}') AND memo_code IS DISTINCT FROM 'X' 
+                AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s AND report_id = %s
+                AND transaction_table not in ('sched_c')""".format(
                 "', '".join(table)
             )
             with connection.cursor() as cursor:
                 cursor.execute(_sql, _values)
+                amounts.append(cursor.fetchone()[0])
+
+        for sd_line in sd_line_number_list:
+            _sql_sched_d = """SELECT COALESCE(SUM(COALESCE(beginning_balance,0.0)+COALESCE(incurred_amount,0.0)),0.0)
+                              FROM public.sched_d WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
+                              AND cmte_id = %s AND report_id = %s """
+            _sd_values = [sd_line, cmte_id, report_id]
+
+            with connection.cursor() as cursor:
+                cursor.execute(_sql_sched_d, _sd_values)
                 amounts.append(cursor.fetchone()[0])
         # loans_table = ["sched_c", "sched_d"]
         # l_sql = """
@@ -5363,7 +5423,7 @@ def getthirdnavamounts(cmte_id, report_id):
         #     cursor.execute(l_sql, _values)
         #     print(cursor.query)
         #     amounts.append(cursor.fetchone()[0])
-        return amounts[0], amounts[1], amounts[2]-amounts[3]
+        return amounts[0], amounts[1], amounts[0]-amounts[1]+amounts[2]-amounts[3]
     except Exception as e:
         raise Exception("The getthirdnavamounts function is throwing an error" + str(e))
 
@@ -5388,14 +5448,14 @@ def get_thirdNavigationTransactionTypes(request):
         # period_receipt = summary_receipts_for_sumamry_table(period_args)
         # period_disbursement = summary_disbursements_for_sumamry_table(period_args)
 
-        period_receipt, period_disbursement, loans_and_debts = getthirdnavamounts(
+        period_receipt, period_disbursement, report_balance = getthirdnavamounts(
             cmte_id, report_id
         )
-        # loans_and_debts = loansanddebts(report_id, cmte_id)
+        loans_and_debts = loansanddebts(report_id, cmte_id)
 
-        coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
+        coh_bop = prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id)
         # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
-        coh_cop = coh_bop + period_receipt - period_disbursement + loans_and_debts
+        coh_cop = coh_bop + report_balance
 
         # forms_obj = { 'Receipts': period_receipt[0].get('amt'),
         #                 'Disbursements': period_disbursement[0].get('amt'),

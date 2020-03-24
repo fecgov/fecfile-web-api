@@ -158,4 +158,12 @@ export class UtilService {
       array.push({ type: type, name: name, value: value.toString() });
     }
   }
+
+  public aggregateIndToBool(aggregate_ind: string): boolean {
+    if (aggregate_ind == null || aggregate_ind === 'Y') {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

@@ -828,10 +828,10 @@ export class F3xComponent implements OnInit, OnDestroy {
     this._f3xMessageService.sendPopulateFormMessage(emitObject);
 
 
-    this.storeTransactionDataForPopulatingFormForEdit(emitObject);
+    this.storeTransactionDataForPopulatingForm(emitObject);
   }
 
-  private storeTransactionDataForPopulatingFormForEdit(emitObject: any) {
+  private storeTransactionDataForPopulatingForm(emitObject: any) {
     //there are some transactions/schedules that have their own method and object structure for populating data (i.e. H2),
     //and in those cases, the object it is already set up, so dont overwrite it. 
     if (this.scheduleType === 'sched_f') {
@@ -1169,6 +1169,7 @@ export class F3xComponent implements OnInit, OnDestroy {
     };
 
     this._f3xMessageService.sendPopulateFormMessage(emitObject);
+    this.storeTransactionDataForPopulatingForm(emitObject);
   }
 
   private _findMainTransactionTypeText(transactionType: string): string {
