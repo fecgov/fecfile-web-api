@@ -1561,7 +1561,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
-    let defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
+    let defaultSortColumns = ['reportType','type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
     let otherSortColumns = [
       'transactionId',
       'street',
@@ -1574,7 +1574,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       'memoText'
     ];
     if (this.transactionCategory === 'disbursements') {
-      defaultSortColumns = ['type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
+      defaultSortColumns = ['reportType','type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
       otherSortColumns = [
         'transactionId',
         'street',
@@ -1587,7 +1587,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'electionYear'
       ];
     } else if (this.transactionCategory === 'loans-and-debts') {
-      defaultSortColumns = ['type', 'name', 'loanClosingBalance', 'loanIncurredDate'];
+      defaultSortColumns = ['reportType','type', 'name', 'loanClosingBalance', 'loanIncurredDate'];
       otherSortColumns = [
         'transactionId',
         'street',
@@ -1605,7 +1605,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         'loanPaymentToDate'
       ];
     } else if (this.transactionCategory === 'other') {
-      defaultSortColumns = ['schedule', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
+      defaultSortColumns = ['reportType','schedule', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
       otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', 'eventId'];
     }
 

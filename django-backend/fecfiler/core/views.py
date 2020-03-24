@@ -3328,13 +3328,10 @@ def filter_get_all_trans(request, param_string):
             + filt_dict["filterElectionYearTo"]
             + "'"
         )
-    if filt_dict.get("reportType") not in [None, "null"]:
-        param_string = (
-            param_string
-            + " AND report_type = '"
-            + filt_dict["reportType"]
-            + "'"
-        )
+    if filt_dict.get("filterReportTypes"):
+        reportTypes_tuple = "('" + "','".join(filt_dict["filterReportTypes"]) + "')"
+        param_string = param_string + " AND report_type In " + reportTypes_tuple
+    
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
         None,
         "null",
