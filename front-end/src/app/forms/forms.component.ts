@@ -118,7 +118,7 @@ export class FormsComponent implements OnInit, OnDestroy {
     // this.returnToGlobalAllTransaction = true;
     const formType = this.getFormType(e.form);
     if(e.transactionDetail.transactionModel.reportId){
-      this.setCoverageDates(e.transactionDetail.transactionModel.reportId,e,formType);
+      this.setReportSpecificMetaDataAndProceed(e.transactionDetail.transactionModel.reportId,e,formType);
     }
   }
   
@@ -141,16 +141,21 @@ export class FormsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setCoverageDates(reportId:string,e:any, formType:string) {
-    this._reportsService.getCoverageDates(reportId).subscribe(response => {
-      if (response && response.cvg_end_date && response.cvg_start_date){
+  private setReportSpecificMetaDataAndProceed(reportId:string,e:any, formType:string) {
+    const form_type = formType === '3X' ? 'F3X' : formType;
+    this._reportsService.getReportInfo(form_type,reportId).subscribe(response => {
+      if (response && response.length > 0){
+        response = response[0];
         let reportTypeObj : any = localStorage.getItem(`form_${this.formType}_report_type`);
         if(!reportTypeObj){
           reportTypeObj = {};
         }
-        reportTypeObj.cvgStartDate = this._utilService.formatDate(response.cvg_start_date);;
-        reportTypeObj.cvgEndDate = this._utilService.formatDate(response.cvg_end_date);
-        localStorage.setItem(`form_${formType}_report_type`,JSON.stringify(reportTypeObj));
+        localStorage.setItem('form_3X_details', JSON.stringify(response));
+        localStorage.setItem(`form_3X_report_type`, JSON.stringify(response));
+        /* reportTypeObj = localStorage.getItem(`form_${this.formType}_report_type`);
+        reportTypeObj.cvgStartDate = this._utilService.formatDate(response.cvgstartdate);;
+        reportTypeObj.cvgEndDate = this._utilService.formatDate(response.cvgenddate);
+        localStorage.setItem(`form_${formType}_report_type`,JSON.stringify(reportTypeObj)); */
         this.navigateToReportSpecificAllTransactions(true, e, formType);
       }
     }),
