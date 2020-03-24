@@ -3838,6 +3838,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       }
                     }
                   }
+                  if(this.transactionType === 'LEVIN_INDV_REC') {
+                    this.selectedEntityType.entityType = 'IND';
+                  }
                   // expecting default entity type to be IND
                   this.toggleValidationIndOrg(this.selectedEntityType.entityType);
                   this._entityTypeDefault = this.selectedEntityType;
