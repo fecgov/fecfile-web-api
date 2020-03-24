@@ -1370,7 +1370,11 @@ def reposit_f3x_data(cmte_id, report_id):
             columns = []
             for row in rows:
                 # exclude report_seq from reports
-                if row[0] != "report_seq":
+                if row[0] != "report_seq" and row[0] not in [
+                    "reattribution_id",
+                    "eattirbution_ind",
+                    "aggregation_ind",
+                ]:
                     columns.append(row[0])
             logger.debug("table columns: {}".format(list(columns)))
 
@@ -2674,19 +2678,22 @@ MODIFIED - CORE APP - SPRINT 15 - FNE 1222 - BY PRAVEEN JINKA
 ************************************************ FUNCTIONS - ENTITIES **********************************************************
 """
 
+
 @api_view(["GET"])
 def autolookup_expand(request):
     """
     load cand or cmte entity based on cand_id or cmte_id
     """
     logger.debug(
-        "autolookup expand with request params:{}".format(dict(request.query_params.items()))
+        "autolookup expand with request params:{}".format(
+            dict(request.query_params.items())
+        )
     )
-    _sql = ''
+    _sql = ""
     parameters = []
     try:
-        if 'cmte_id' in request.query_params:
-            cmte_id = request.query_params.get('cmte_id')
+        if "cmte_id" in request.query_params:
+            cmte_id = request.query_params.get("cmte_id")
             _sql = """
             SELECT json_agg(t) FROM 
             (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
@@ -2699,8 +2706,8 @@ def autolookup_expand(request):
             and e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
             """
             parameters = [cmte_id, request.user.username]
-        if 'cand_id' in request.query_params:
-            cand_id = request.query_params.get('cand_id')
+        if "cand_id" in request.query_params:
+            cand_id = request.query_params.get("cand_id")
             _sql = """
             SELECT json_agg(t) FROM 
                             (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
@@ -2732,7 +2739,7 @@ def autolookup_expand(request):
             "The autolookup_expand API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
-    
+
 
 ############################ PARTIALLY IMPLEMENTED FOR INDIVIDUALS, ORGANIZATIONS, COMMITTEES. NOT IMPLEMENTED FOR CANDIDATES
 @api_view(["GET"])
@@ -2792,11 +2799,11 @@ def autolookup_search_contacts(request):
             if key in allowed_params:
                 if key == "prefix":
                     continue
-                order_string = 'e.'+str(key)
+                order_string = "e." + str(key)
                 param_string = " AND LOWER(e." + str(key) + ") LIKE LOWER(%s)"
                 if "cmte_id" in request.query_params:
                     parameters = [committee_id]
-                    if 'expand' in request.query_params:
+                    if "expand" in request.query_params:
                         query_string = (
                             """
                             SELECT json_agg(t) FROM 
@@ -2836,7 +2843,7 @@ def autolookup_search_contacts(request):
                     or "cand_last_name" in request.query_params
                     or "payee_cmte_id" in request.query_params
                 ):
-                    if 'expand' in request.query_params:
+                    if "expand" in request.query_params:
                         parameters = [committee_id]
                         query_string = (
                             """
@@ -2856,7 +2863,7 @@ def autolookup_search_contacts(request):
                             + order_string
                             + """) t"""
                         )
-                        
+
                     else:
                         parameters = [committee_id]
                         query_string = (
@@ -2877,7 +2884,7 @@ def autolookup_search_contacts(request):
                         )
                 else:
                     # parameters = [committee_id, committee_id]
-                    if 'expand' in request.query_params:
+                    if "expand" in request.query_params:
 
                         parameters = [committee_id]
                         query_string = (
@@ -2892,25 +2899,25 @@ def autolookup_search_contacts(request):
                             AND c.principal_campaign_committee is not null
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
-                        # query_string = (
-                        #     """
-                        #     SELECT json_agg(t) FROM 
-                        #     (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
-                        #     e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
-                        #     e.last_update_date
-                        #     FROM public.entity e, public.entity c 
-                        #     WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
-                        #     AND e.entity_type in ('IND','ORG')
-                        #     AND c.principal_campaign_committee is not null
-                        #     AND e.cmte_id in (%s, 'C00000000')
-                        #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                        #     """
+                            # query_string = (
+                            #     """
+                            #     SELECT json_agg(t) FROM
+                            #     (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                            #     e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                            #     e.last_update_date
+                            #     FROM public.entity e, public.entity c
+                            #     WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                            #     AND e.entity_type in ('IND','ORG')
+                            #     AND c.principal_campaign_committee is not null
+                            #     AND e.cmte_id in (%s, 'C00000000')
+                            #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            #     """
                             + param_string
                             + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
                             + order_string
                             + """) t"""
                         )
-                        # pass 
+                        # pass
                     else:
                         parameters = [committee_id, committee_id]
                         query_string = (
@@ -2952,8 +2959,6 @@ def autolookup_search_contacts(request):
             "The autolookup_search_contacts API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
-
-
 
 
 """
@@ -3179,10 +3184,11 @@ def get_trans_query(category_type, cmte_id, param_string):
 
     if category_type == "disbursements_tran":
         query_string = (
-            """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+            """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
-                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isredesignatable, "isRedesignation" from all_disbursements_transactions_view
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isredesignatable, "isRedesignation" 
+                                from all_disbursements_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -3192,9 +3198,10 @@ def get_trans_query(category_type, cmte_id, param_string):
 
     elif category_type == "loans_tran":
         query_string = (
-            """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
+            """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
                           purpose_description, loan_amount, loan_payment_to_date, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
-                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild from all_loans_debts_transactions_view
+                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild 
+                          from all_loans_debts_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -3204,7 +3211,7 @@ def get_trans_query(category_type, cmte_id, param_string):
 
     elif category_type == "other_tran":
         query_string = (
-            """SELECT report_id, schedule, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
+            """SELECT report_id, schedule, form_type, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
                           name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, 
                                 election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, istrashable
@@ -3217,10 +3224,11 @@ def get_trans_query(category_type, cmte_id, param_string):
         )
     else:
         query_string = (
-            """SELECT report_id, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+            """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
-                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isreattributable, "isReattribution" from all_receipts_transactions_view
+                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isreattributable, "isReattribution" 
+                                from all_receipts_transactions_view
                             where cmte_id='"""
             + cmte_id
             + """' """
@@ -3318,6 +3326,13 @@ def filter_get_all_trans(request, param_string):
             param_string
             + " AND election_year <= '"
             + filt_dict["filterElectionYearTo"]
+            + "'"
+        )
+    if filt_dict.get("reportType") not in [None, "null"]:
+        param_string = (
+            param_string
+            + " AND report_type = '"
+            + filt_dict["reportType"]
             + "'"
         )
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
@@ -3807,10 +3822,12 @@ def get_all_transactions(request):
                 else:
                     if ctgry_type == "disbursements_tran":
                         for transaction in transaction_list:
-                            if transaction['isRedesignation'] is True:
-                                original_amount = get_original_amount_by_redesignation_id(transaction['transaction_id'])
+                            if transaction["isRedesignation"] is True:
+                                original_amount = get_original_amount_by_redesignation_id(
+                                    transaction["transaction_id"]
+                                )
                                 if original_amount is not None:
-                                    transaction['original_amount'] = original_amount[0]
+                                    transaction["original_amount"] = original_amount[0]
                     transaction_dict = {
                         trans.get("transaction_id"): trans for trans in transaction_list
                     }
@@ -4273,7 +4290,11 @@ def period_receipts_for_summary_table_sql(
     """
     return line number, contribution_amount of each transaction and calendar_year sum of all contribution_amount
     """
-    logger.debug('loading period_receipts for calendar start {}, end {}, report_id {}'.format(calendar_start_dt, calendar_end_dt, report_id))
+    logger.debug(
+        "loading period_receipts for calendar start {}, end {}, report_id {}".format(
+            calendar_start_dt, calendar_end_dt, report_id
+        )
+    )
     rep_sql = """
         SELECT line_number, COALESCE(contribution_amount,0) 
         FROM public.sched_a t1 
@@ -4295,18 +4316,12 @@ def period_receipts_for_summary_table_sql(
         with connection.cursor() as cursor:
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             # print('rep_sql query:')
-            cursor.execute(
-                rep_sql,
-                [cmte_id, report_id],
-            )
+            cursor.execute(rep_sql, [cmte_id, report_id])
             report_transactions = cursor.fetchall()
-            logger.debug('transactions for current report:{}'.format(cursor.rowcount))
-            cursor.execute(
-                ytd_sql,
-                [cmte_id, calendar_start_dt, calendar_end_dt],
-            )
+            logger.debug("transactions for current report:{}".format(cursor.rowcount))
+            cursor.execute(ytd_sql, [cmte_id, calendar_start_dt, calendar_end_dt])
             ytd_transactions = cursor.fetchall()
-            logger.debug('transaction_linenumber for ytd:{}'.format(cursor.rowcount))
+            logger.debug("transaction_linenumber for ytd:{}".format(cursor.rowcount))
             return report_transactions, ytd_transactions
     except Exception as e:
         raise Exception(
@@ -4315,11 +4330,17 @@ def period_receipts_for_summary_table_sql(
         )
 
 
-def period_disbursements_for_summary_table_sql( calendar_start_dt, calendar_end_dt, cmte_id, report_id):
+def period_disbursements_for_summary_table_sql(
+    calendar_start_dt, calendar_end_dt, cmte_id, report_id
+):
     """
     helper function on querying report-wise and ytd total amount for sched_b
     """
-    logger.debug('loading period_dsibursements for calendar start {}, end {}, report_id {}'.format(calendar_start_dt, calendar_end_dt, report_id))
+    logger.debug(
+        "loading period_dsibursements for calendar start {}, end {}, report_id {}".format(
+            calendar_start_dt, calendar_end_dt, report_id
+        )
+    )
     rep_sql = """
         SELECT line_number, COALESCE(expenditure_amount,0) 
         FROM public.sched_b t1 
@@ -4339,18 +4360,12 @@ def period_disbursements_for_summary_table_sql( calendar_start_dt, calendar_end_
     """
     try:
         with connection.cursor() as cursor:
-            cursor.execute(
-                rep_sql,
-                [cmte_id, report_id],
-            )
+            cursor.execute(rep_sql, [cmte_id, report_id])
             report_transactions = cursor.fetchall()
-            logger.debug('transactions for current report:{}'.format(cursor.rowcount))
-            cursor.execute(
-                ytd_sql,
-                [cmte_id, calendar_start_dt, calendar_end_dt],
-            )
+            logger.debug("transactions for current report:{}".format(cursor.rowcount))
+            cursor.execute(ytd_sql, [cmte_id, calendar_start_dt, calendar_end_dt])
             ytd_transactions = cursor.fetchall()
-            logger.debug('transaction_linenumber for ytd:{}'.format(cursor.rowcount))
+            logger.debug("transaction_linenumber for ytd:{}".format(cursor.rowcount))
             return report_transactions, ytd_transactions
             # cursor.execute("SELECT line_number, expenditure_amount FROM public.sched_b WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             # cursor.execute(
@@ -4431,7 +4446,7 @@ def summary_disbursements_for_sumamry_table(args):
         rep_trans, ytd_trans = period_disbursements_for_summary_table_sql(
             calendar_start_dt, calendar_end_dt, cmte_id, report_id
         )
-        logger.debug('summarizing report sched_b...')
+        logger.debug("summarizing report sched_b...")
         for row in rep_trans:
             data_row = list(row)
             if data_row[0] in ["21AI", "21A"]:
@@ -4483,7 +4498,7 @@ def summary_disbursements_for_sumamry_table(args):
                 XXXB_amount = XXXB_amount + data_row[1]
                 # XXXB_amount_ytd = data_row[2]
 
-        logger.debug('summarizing ytd sched_b...')
+        logger.debug("summarizing ytd sched_b...")
         for row in ytd_trans:
             data_row = list(row)
             if data_row[0] in ["21AI", "21A"]:
@@ -4866,7 +4881,6 @@ def summary_receipts_for_sumamry_table(args):
                 if data_row[0] == "18B":
                     # XVIIIB_amount = XVIIIB_amount + data_row[1]
                     XVIIIB_amount_ytd += data_row[1]
-
 
         XIA_amount = XIA_amount + XIAI_amount + XIAII_amount
         XIA_amount_ytd = XIA_amount_ytd + XIAI_amount_ytd + XIAII_amount_ytd
@@ -5282,6 +5296,7 @@ def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
             "The prev_cash_on_hand_cop function is throwing an error: " + str(e)
         )
 
+
 def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
@@ -5305,6 +5320,7 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id):
         raise Exception(
             "The prev_cash_on_hand_cop_3rd_nav function is throwing an error: " + str(e)
         )
+
 
 # @api_view(['GET'])
 # def get_thirdNavigationCOH(request):
@@ -5343,9 +5359,7 @@ def loansanddebts(report_id, cmte_id):
         WHERE transaction_type_identifier = 'LOANS_OWED_TO_CMTE' AND memo_code IS NULL 
         AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y')) AS loans"""
 
-        error_message_sc = (
-            "The loans sql is throwing an error for sched_c table: "
-        )
+        error_message_sc = "The loans sql is throwing an error for sched_c table: "
 
         loans_sd_sql = """SELECT ((SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
         WHERE transaction_type_identifier = 'DEBT_TO_VENDOR' AND cmte_id = %s AND report_id = %s 
@@ -5354,9 +5368,7 @@ def loansanddebts(report_id, cmte_id):
         WHERE transaction_type_identifier = 'DEBT_BY_VENDOR' AND cmte_id = %s AND report_id = %s 
         AND delete_ind is distinct from 'Y')) AS debts"""
 
-        error_message_sd = (
-            "The debts sql is throwing an error for sched_d table: "
-        )
+        error_message_sd = "The debts sql is throwing an error for sched_d table: "
 
         value_list = [cmte_id, report_id, cmte_id, report_id]
         output = (
@@ -5388,10 +5400,28 @@ def getthirdnavamounts(cmte_id, report_id):
                 "18A",
                 "18B",
             ],
-            ["21A","21AI","21AII","21B","22","23","24","25","26","27","28A","28B","28C","29",
-            "30A","30AI","30AII","30B"]
+            [
+                "21A",
+                "21AI",
+                "21AII",
+                "21B",
+                "22",
+                "23",
+                "24",
+                "25",
+                "26",
+                "27",
+                "28A",
+                "28B",
+                "28C",
+                "29",
+                "30A",
+                "30AI",
+                "30AII",
+                "30B",
+            ],
         ]
-        sd_line_number_list = ["10","9"]
+        sd_line_number_list = ["10", "9"]
         for table in table_list:
             _sql = """SELECT COALESCE(SUM(transaction_amount),0.0) FROM public.all_transactions_view 
                 WHERE line_number in ('{}') AND memo_code IS DISTINCT FROM 'X' 
@@ -5423,7 +5453,7 @@ def getthirdnavamounts(cmte_id, report_id):
         #     cursor.execute(l_sql, _values)
         #     print(cursor.query)
         #     amounts.append(cursor.fetchone()[0])
-        return amounts[0], amounts[1], amounts[0]-amounts[1]+amounts[2]-amounts[3]
+        return amounts[0], amounts[1], amounts[0] - amounts[1] + amounts[2] - amounts[3]
     except Exception as e:
         raise Exception("The getthirdnavamounts function is throwing an error" + str(e))
 
@@ -7963,7 +7993,12 @@ def clone_a_transaction(request):
         rows = cursor.fetchall()
         columns = []
         for row in rows:
-            if row[0] not in ['reattribution_id', 'reattribution_ind', 'redesignation_id', 'redesignation_ind']:
+            if row[0] not in [
+                "reattribution_id",
+                "reattribution_ind",
+                "redesignation_id",
+                "redesignation_ind",
+            ]:
                 columns.append(row[0])
         logger.debug("table columns: {}".format(list(columns)))
 
@@ -8640,6 +8675,7 @@ def delete_levin_account(cmte_id, levin_account_id):
     except Exception as e:
         raise Exception("Error deleting levin account.")
 
+
 def levin_deletable(cmte_id, levin_account_id):
     """
     check and see if a levin_acct is deletable: if there are transactions associated with levin account,
@@ -8733,7 +8769,7 @@ def levin_accounts(request):
             if not levin_account_id:
                 raise Exception("a valid levin account id is required.")
             if not levin_deletable(cmte_id, levin_account_id):
-                raise Exception('levin account has transactions and not deletable.')
+                raise Exception("levin account has transactions and not deletable.")
             delete_levin_account(cmte_id, levin_account_id)
             return Response(
                 "The account: {} has been successfully deleted".format(
@@ -9503,9 +9539,8 @@ def prepare_Schedl_summary_data(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-def get_original_amount_by_redesignation_id(
-    transaction_id
-    ):
+
+def get_original_amount_by_redesignation_id(transaction_id):
 
     try:
         with connection.cursor() as cursor:
@@ -9514,11 +9549,11 @@ def get_original_amount_by_redesignation_id(
                 FROM public.sched_b 
                 WHERE  redesignation_id = %s AND redesignation_ind = 'O'"""
 
-                cursor.execute(query_string ,[transaction_id],)
+                cursor.execute(query_string, [transaction_id])
                 print(cursor.query)
                 original_amount = cursor.fetchone()
                 return original_amount
-            else: 
-                raise Exception("No transaction id found");
+            else:
+                raise Exception("No transaction id found")
     except Exception:
         raise

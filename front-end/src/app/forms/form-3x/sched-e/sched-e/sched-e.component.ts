@@ -362,6 +362,8 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
               // amount has changed since last load
               // recalculate aggregate with new amount
               newAggregate = this._originalExpenditureAggregate - this._originalExpenditureAmount + currentExpenditureAmount;
+            } else {
+              newAggregate = this._originalExpenditureAggregate;
             }
           } else if (!this.isAggregate && originalAggregationInd === false) {
             // check if aggregate is the same as initial load
@@ -383,34 +385,16 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
           } else if (this.isAggregate === false && originalAggregationInd === true) {
             // amount was aggregated during initial load
             // un-aggregate the amount now
-            if (currentExpenditureAmount === this._originalExpenditureAmount) {
-              newAggregate = this._originalExpenditureAggregate - currentExpenditureAmount;
-              this.frmIndividualReceipt.patchValue(
-                  {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
-            } else {
-              // amount has changed
-              console.log('isAggregate Toggled :' + this.isAggregate + ' current Amount: ' + currentExpenditureAmount + ' Old Amount : +'
-                  + this._originalExpenditureAmount + ' originalInd : ' + this._transactionToEdit.aggregation_ind);
-            }
-
+              newAggregate = this._originalExpenditureAggregate - this._originalExpenditureAmount;
           }
         }
 
       }
-      if (newAggregate) {
+      if (newAggregate != null ) {
         this.frmIndividualReceipt.patchValue(
             {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
       }
-    }
-    // all the memos are aggregated by default with the new rule
-    // TODO: remove these after review
-    // else if (this.transactionType.endsWith('_MEMO')){
-    //   this.frmIndividualReceipt.patchValue({
-    //     expenditure_aggregate:
-    //       this._decimalPipe.transform(this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value), '.2-2')
-    //   }, { onlySelf: true });
-    // }
-    else  {
+    } else  {
       this._schedEService.getAggregate(this.frmIndividualReceipt.value).subscribe(res => {
 
         this._currentAggregate = '0';

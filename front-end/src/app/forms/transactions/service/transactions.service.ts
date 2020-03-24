@@ -375,6 +375,7 @@ export class TransactionsService {
   public mapSchedDatabaseRowToModel(model: TransactionModel, row: any) {
     // TODO add full field mapping if needed in the future.
     model.transactionId = row.transaction_id;
+    model.reportId = row.report_id;
     model.date = row.contribution_date;
     model.memoCode = row.memo_code;
     model.amount = row.contribution_amount;

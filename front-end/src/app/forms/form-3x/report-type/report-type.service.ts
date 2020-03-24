@@ -559,16 +559,12 @@ export class ReportTypeService {
     });
   }*/
 
-  public printPreviewPdf(formType: string, callFrom: string, transactions?: string): Observable<any> {
+  public printPreviewPdf(formType: string, callFrom: string, transactions?: string, reportId?:string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url: string = '/core/create_json_builders'; //Actual JSON file genaration URL
     //let url: string = '/core/create_json_builders_test';
     let formData: FormData = new FormData();
-
-    //console.log("printPreviewPdf formType = ", formType);
-    //console.log("printPreviewPdf callFrom = ", callFrom);
-    //console.log("printPreviewPdf transactions ==", transactions);
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
@@ -577,14 +573,13 @@ export class ReportTypeService {
     if (form3xReportType === null)
     {
       form3xReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
-      //console.log(" printPreviewPdf backup object form3xReportType = ", form3xReportType);
     }
     
-    if (form3xReportType.hasOwnProperty('reportId')) {
-      //console.log(" printPreviewPdf reportId found");
+    if(reportId){
+      formData.append('report_id', reportId);
+    } else if (form3xReportType.hasOwnProperty('reportId')) {
       formData.append('report_id', form3xReportType.reportId);
     } else if (form3xReportType.hasOwnProperty('reportid')) {   
-      //console.log(" printPreviewPdf reportid found");
       formData.append('report_id', form3xReportType.reportid);
     }
 
@@ -605,7 +600,7 @@ export class ReportTypeService {
       });
    }
 
-   public prepare_json_builders_data(formType: string,  transactions?:string): Observable<any> {
+   public prepare_json_builders_data(formType: string,  transactions?:string, reportId?:string): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url: string = '/core/prepare_json_builders_data';  //JSON builder data preparation URL
@@ -625,8 +620,9 @@ export class ReportTypeService {
       //console.log("prepare_json_builders_data backup object form3xReportType = ", form3xReportType);
     }
   
-  
-    if (form3xReportType.hasOwnProperty('reportId')) {
+    if(reportId){
+      formData.append('report_id', reportId);
+    } else if (form3xReportType.hasOwnProperty('reportId')) {
       formData.append('report_id', form3xReportType.reportId);
       //console.log(" prepare_json_builders_data reportId found");
     } else if (form3xReportType.hasOwnProperty('reportid')) {   
@@ -647,75 +643,60 @@ export class ReportTypeService {
       });
    }
 
-   public printPreview(accessFrom: string, formType: string, transactions?: string): void {
+   public printPreview(accessFrom: string, formType: string, transactions?: string, reportId?: string ): void {
     
     if (accessFrom !=='transaction_table_screen') {
       this.signandSaveSubmitReport(formType,'Saved');
-      //console.log("printPreview Data saved successfully...!");
-      //console.log("printPreview transactions =", transactions);
     }
 
     if (typeof transactions === 'undefined') {
-      //console.log("No transactions data");
-      //console.log("formType", formType);
-      this.prepare_json_builders_data(formType)
+      this.prepare_json_builders_data(formType,undefined,reportId)
       .subscribe( res => {
         if (res) {
-             //console.log("Form 3X prepare_json_builders_data res = ", res);
              if (res['Response']==='Success') {
-                    //console.log(" Form 3X prepare_json_builders_data successfully processed...!");
-                    this.printPreviewPdf(formType, "PrintPreviewPDF")
-                      .subscribe(res => {
-                      if(res) {
-                        //console.log("Form 3X  printPriview res ...",res);
-                        if (res.hasOwnProperty('results')) {
-                          if (res['results.pdf_url'] !== null) {
-                            //console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
-                            window.open(res.results.pdf_url, '_blank');
-                          }
-                        }
+                this.printPreviewPdf(formType, "PrintPreviewPDF", undefined,reportId)
+                  .subscribe(res => {
+                  if(res) {
+                    if (res.hasOwnProperty('results')) {
+                      if (res['results.pdf_url'] !== null) {
+                        window.open(res.results.pdf_url, '_blank');
                       }
-                  },
-                  (error) => {
-                    //console.log('error: ', error);
-                  });/*  */
-                  }       
+                    }
+                  }
+              },
+              (error) => {
+                console.error('error: ', error);
+              });
+            }       
         }
       },
         (error) => {
-          //console.log('error: ', error);
-        });/*  */
+          console.error('error: ', error);
+        });
     } else if (transactions !== 'undefined' && (transactions.length>0)) { 
-      //console.log("transactions data");
-      //console.log("formType", formType);
-      //var transactionsArray: Array<string> = transactions.split(",");
-      this.prepare_json_builders_data(formType, transactions)
+      this.prepare_json_builders_data(formType, transactions, reportId)
       .subscribe( res => {
         if (res) {
-             //console.log("Form 3X prepare_json_builders_data res = ", res);
              if (res['Response']==='Success') {
-                    //console.log(" Form 3X prepare_json_builders_data successfully processed...!");
-                    this.printPreviewPdf(formType, "PrintPreviewPDF",transactions)
+                    this.printPreviewPdf(formType, "PrintPreviewPDF",transactions, reportId)
                       .subscribe(res => {
                       if(res) {
-                        //console.log("Form 3X  printPriview res ...",res);
                         if (res.hasOwnProperty('results')) {
                           if (res['results.pdf_url'] !== null) {
-                            //console.log("res['results.pdf_url'] = ",res['results.pdf_url']);
                             window.open(res.results.pdf_url, '_blank');
                           }
                         }
                       }
                   },
                   (error) => {
-                    //console.log('error: ', error);
-                  });/*  */
-                  }       
+                    console.error('error: ', error);
+                  });
+                }       
         }
       },
         (error) => {
-          //console.log('error: ', error);
-        });/*  */
+          console.log('error: ', error);
+        });
     }
    
   }

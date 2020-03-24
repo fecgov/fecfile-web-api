@@ -5,6 +5,7 @@ export class TransactionFilterModel {
   show: boolean;
   formType: string;
   filterStates: string[];
+  fitlerReportTypes: string[];
   filterCategoriesText: string;
   filterCategories: string[];
   filterAmountMin: number;
