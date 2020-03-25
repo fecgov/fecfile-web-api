@@ -1,17 +1,14 @@
-
 <div class="contacts__main-container">
-    <div class="contacts__sidebar"  *ngIf="showSideBar">
-      <app-contacts-filter [hidden]="!isShowFilters" 
-        title="Filters"
-        [formType]="formType">
-      </app-contacts-filter>
-    </div>
+  <div class="contacts__sidebar" *ngIf="showSideBar">
+    <app-contacts-filter [hidden]="!isShowFilters" title="Filters" [formType]="formType">
+    </app-contacts-filter>
+  </div>
   <div class="contacts__container">
     <header *ngIf="!isEditViewActive()">
       <div class="header-content">
         <div class="float-left">
-          <h1 *ngIf="!isEditViewActive(); else editHeading">Contacts 
-            <span  *ngIf="isRecycleBinViewActive()"> / Recycling Bin
+          <h1 *ngIf="!isEditViewActive(); else editHeading">Contacts
+            <span *ngIf="isRecycleBinViewActive()"> / Recycling Bin
               <span class="trash-icon"></span>
             </span>
           </h1>
@@ -24,58 +21,57 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="contacts__btn-container">
-              <button  *ngIf="isContactViewActive()"
-                class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="AddContacts()">
+              <button *ngIf="isContactViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
+                (click)="AddContacts()">
                 <i class="fas fa-plus-circle"></i>
                 Add New
               </button>
-              <button  *ngIf="isContactViewActive()"
-                class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showPinColumns()">
+              <button *ngIf="isContactViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
+                (click)="showPinColumns()">
                 <i class="thumbtack-icon"></i>
                 Pin Columns
               </button>
-              <button  *ngIf="isContactViewActive()"
-                class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showRecycleBin()">
+              <button *ngIf="isContactViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
+                (click)="showRecycleBin()">
                 <i class="trash-icon"></i>
                 Recycle Bin
               </button>
-              <button  *ngIf="isContactViewActive()"
-                class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="doImport()">
+              <button *ngIf="isContactViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
+                (click)="doImport()">
                 <i class="file-import-icon"></i>
                 Import
               </button>
-              <button  *ngIf="isContactViewActive()"
-                class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showFilters()">
-                <i class="filter-icon"></i>
+              <button *ngIf="isContactViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
+                (click)="showFilters()">
+                <i class="exclamation-triangle-icon"></i>
                 Filter
               </button>
-              <button  *ngIf="isRecycleBinViewActive()"
-                  class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showContacts()">
-                  <i class="table-icon"></i>
+              <button *ngIf="isRecycleBinViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
+                (click)="showContacts()">
+                <i class="table-icon"></i>
                 Contacts
               </button>
-              <button  *ngIf="isRecycleBinViewActive()"
-                class="btn btn-primary btn-left contacts__trx-btn" type="button" (click)="showFilters()">
+              <button *ngIf="isRecycleBinViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
+                (click)="showFilters()">
                 <i class="filter-icon"></i>
                 Filter
-              </button>               
+              </button>
               <div class="input-group pl-0 contacts__trx-search">
-                <div class="input-group-append" (click)="clearSearchAndFilters()" 
-                    ngbTooltip="Clear Keywords and Filters" tooltipClass="form-tooltip">
+                <div class="input-group-append" (click)="clearSearchAndFilters()"
+                  ngbTooltip="Clear Keywords and Filters" tooltipClass="form-tooltip">
                   <span class="input-group-text" id="">
                     <i class="fas fa-eraser text-grey" aria-hidden="true"></i>
                   </span>
-                </div>                
-                <input class="form-control py-1" type="text" placeholder="Search All" 
-                  [(ngModel)]="searchText" aria-label="Search">
-                <div class="input-group-append" (click)="search()"
-                    ngbTooltip="Search All" tooltipClass="form-tooltip">
+                </div>
+                <input class="form-control py-1" type="text" placeholder="Search All" [(ngModel)]="searchText"
+                  aria-label="Search">
+                <div class="input-group-append" (click)="search()" ngbTooltip="Search All" tooltipClass="form-tooltip">
                   <span class="input-group-text" id="">
                     <!-- <i class="search-icon text-grey" aria-hidden="true"></i> no longer working?-->
                     <i class="fas fa-search text-grey" aria-hidden="true"></i>
                   </span>
                 </div>
-              </div>              
+              </div>
             </div>
           </div>
         </div>
@@ -83,41 +79,38 @@
           <div class="grid-row__col grid-row__col--12">
             <div class="contacts__btn-container">
               <div class="contacts__tag-outer-wrapper">
-                  <div id="button-container" class="contacts__tag_wrapper">
-                      <div *ngFor="let tag of tagArray">
-                        <div *ngIf="tag.group.length > 0" class="contacts__tag_group">
-                          <span *ngFor="let gTag of tag.group; let i = index">
-                            <button 
-                              class="btn contacts__tag_btn contacts__btn-search-filter"
-                              (click)="removeTag(tag.type, i, gTag)">
-                              <i class="fas fa-window-close contacts__close-tag"></i>
-                                <span *ngIf="tag.type !== 'amount' &&
+                <div id="button-container" class="contacts__tag_wrapper">
+                  <div *ngFor="let tag of tagArray">
+                    <div *ngIf="tag.group.length > 0" class="contacts__tag_group">
+                      <span *ngFor="let gTag of tag.group; let i = index">
+                        <button class="btn contacts__tag_btn contacts__btn-search-filter"
+                          (click)="removeTag(tag.type, i, gTag)">
+                          <i class="fas fa-window-close contacts__close-tag"></i>
+                          <span *ngIf="tag.type !== 'amount' &&
                                              tag.type !== 'aggregateAmount' && 
-                                             tag.type !== 'date'"
-                                >
-                                  <span *ngIf="tag.prefix">{{tag.prefix}}: </span>{{gTag}}
-                                </span>
-                                <span *ngIf="tag.type === 'date'">{{tag.prefix}}:
-                                    {{ gTag.filterDateFrom | date: 'MM/dd/yyyy'}} - 
-                                    {{ gTag.filterDateTo | date: 'MM/dd/yyyy'}}
-                                </span>                              
-                                <span *ngIf="tag.type === 'amount'">{{tag.prefix}}:
-                                    {{ gTag.filterAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} - 
-                                    {{ gTag.filterAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
-                                </span>
-                                <span *ngIf="tag.type === 'aggregateAmount'">{{tag.prefix}}:
-                                    {{ gTag.filterAggregateAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} - 
-                                    {{ gTag.filterAggregateAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
-                                </span>
-                            </button>
-                            <span class="contacts__btn-search-filter-join" 
-                              *ngIf="i < (tag.group.length -1 )">
-                                or
-                            </span>
+                                             tag.type !== 'date'">
+                            <span *ngIf="tag.prefix">{{tag.prefix}}: </span>{{gTag}}
                           </span>
-                        </div>
-                      </div>
+                          <span *ngIf="tag.type === 'date'">{{tag.prefix}}:
+                            {{ gTag.filterDateFrom | date: 'MM/dd/yyyy'}} -
+                            {{ gTag.filterDateTo | date: 'MM/dd/yyyy'}}
+                          </span>
+                          <span *ngIf="tag.type === 'amount'">{{tag.prefix}}:
+                            {{ gTag.filterAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} -
+                            {{ gTag.filterAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </span>
+                          <span *ngIf="tag.type === 'aggregateAmount'">{{tag.prefix}}:
+                            {{ gTag.filterAggregateAmountMin | currency:'USD':'symbol-narrow':'1.2-2'}} -
+                            {{ gTag.filterAggregateAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </span>
+                        </button>
+                        <span class="contacts__btn-search-filter-join" *ngIf="i < (tag.group.length -1 )">
+                          or
+                        </span>
+                      </span>
+                    </div>
                   </div>
+                </div>
               </div>
 
               <!-- <br>
@@ -191,9 +184,9 @@
                     </button>
                   </div>                    
                 </div> -->
-                                
 
-                <!-- <div id="" class="contacts__tag_wrapper">
+
+              <!-- <div id="" class="contacts__tag_wrapper">
                   <span *ngFor="let categoryZ of filters.filterCategories; let i = index">
                     <button
                       class="btn contacts__tag_btn contacts__btn-search-filter"
@@ -269,37 +262,24 @@
                           {{ filters.filterAmountMax | currency:'USD':'symbol-narrow':'1.2-2'}}
                 </button>
               </div>  -->
-            </div>          
+            </div>
           </div>
         </div>
       </div>
-      <app-contacts-table 
-        *ngIf="isContactViewActive()"
-        tableType="{{contactsView}}"
-      >
+      <app-contacts-table *ngIf="isContactViewActive()" tableType="{{contactsView}}">
       </app-contacts-table>
-      <app-contacts-table
-        *ngIf="isRecycleBinViewActive()"
-        tableType="{{recycleBinView}}"
-      >
+      <app-contacts-table *ngIf="isRecycleBinViewActive()" tableType="{{recycleBinView}}">
       </app-contacts-table>
       <!--<app-contacts-edit
         *ngIf="isEditViewActive()"
       >
       </app-contacts-edit>-->
 
-      <addnew_contacts
-        *ngIf="isEditViewActive()"      
-          [formOptionsVisible]=false
-          [selectedOptions]=null
-          [transactionTypeText]=""
-          [transactionType]=""
-          [scheduleAction]="view"
-          [transactionToEdit]="transactionToEdit"
-          (status)="onNotify($event)"
-        >
+      <addnew_contacts *ngIf="isEditViewActive()" [formOptionsVisible]=false [selectedOptions]=null
+        [transactionTypeText]="" [transactionType]="" [scheduleAction]="view" [transactionToEdit]="transactionToEdit"
+        (status)="onNotify($event)">
       </addnew_contacts>
-  
+
     </div>
   </div>
 </div>
