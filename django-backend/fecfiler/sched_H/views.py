@@ -3321,9 +3321,9 @@ def post_schedH4(data):
         try:
             post_sql_schedH4(data)
             # update ytd aggregation if not memo transaction
-            if not data.get("transaction_type_identifier").endswith("_MEMO"):
-                logger.info("update ytd amount...")
-                update_activity_event_amount_ytd(data)
+            # if not data.get("transaction_type_identifier").endswith("_MEMO"):
+            logger.info("update ytd amount...")
+            update_activity_event_amount_ytd(data)
 
             # sched_d debt payment, need to update parent
             if data.get("transaction_type_identifier") == "ALLOC_EXP_DEBT":
@@ -4851,8 +4851,8 @@ def post_schedH6(data):
         try:
             post_sql_schedH6(data)
             # update ytd aggregation if not memo transaction
-            if not data.get("transaction_type_identifier").endswith("_MEMO"):
-                update_activity_event_amount_ytd_h6(data)
+            # if not data.get("transaction_type_identifier").endswith("_MEMO"):
+            update_activity_event_amount_ytd_h6(data)
             if data.get("transaction_type_identifier") == "ALLOC_FEA_DISB_DEBT":
                 update_sched_d_parent(
                     data.get("cmte_id"),
