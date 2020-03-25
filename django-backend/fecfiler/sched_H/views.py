@@ -827,7 +827,8 @@ def get_old_amount(transaction_id):
     helper function for loading total_amount
     """
     _sql = """
-    SELECT transaction_amount
+    SELECT transaction_amount,
+    aggregation_ind
     FROM public.all_other_transactions_view
     WHERE transaction_id = %s
     """
@@ -835,7 +836,7 @@ def get_old_amount(transaction_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [transaction_id])
             if cursor.rowcount:
-                return cursor.fetchone()[0]
+                return cursor.fetchone()[0], cursor.fetchone()[1]
             return 0
     except:
         raise
@@ -882,8 +883,9 @@ def get_fed_nonfed_share(request):
 
         # for editing purpose, need grab old amount
         old_amount = 0
+        aggregation_ind = "Y"
         if transaction_id:
-            old_amount = float(get_old_amount(transaction_id))
+            old_amount, aggregation_ind = float(get_old_amount(transaction_id))
 
         cmte_type_category = request.query_params.get("cmte_type_category")
         total_amount = request.query_params.get("total_amount")
@@ -1088,9 +1090,7 @@ def get_fed_nonfed_share(request):
         logger.debug("aggregate_amount loaded:{}".format(aggregate_amount))
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
-        if transaction_type_identifier and transaction_type_identifier.endswith(
-            "_MEMO"
-        ):
+        if transaction_type_identifier and aggregation_ind == "N":
             new_aggregate_amount = aggregate_amount
         else:
             new_aggregate_amount = aggregate_amount + float(total_amount) - old_amount
@@ -2716,9 +2716,9 @@ def schedH3(request):
             #             _c = schedH3_sql_dict(_c)
             #             put_schedH3(_c)
             # else:
-                # print(datum)
+            # print(datum)
             # ************************************
-            
+
             logger.debug("saving h3 with data {}".format(datum))
             data = post_schedH3(datum)
             logger.debug("parent data saved:{}".format(data))
@@ -2909,6 +2909,7 @@ def schedH4_sql_dict(data):
         "activity_event_type",
         "memo_code",
         "memo_text",
+        "aggregation_ind",
         # entity_data
         "entity_id",
         "entity_type",
@@ -3054,6 +3055,7 @@ def put_sql_schedH4(data):
                   memo_text = %s,
                   line_number = %s, 
                   transaction_type = %s,
+                  aggregation_ind = %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y'
@@ -3076,6 +3078,7 @@ def put_sql_schedH4(data):
         data.get("memo_text"),
         data.get("line_number"),
         data.get("transaction_type"),
+        data.get("aggregation_ind"),
         datetime.datetime.now(),
         data.get("transaction_id"),
         data.get("report_id"),
@@ -3134,7 +3137,8 @@ def list_all_transactions_event_type(start_dt, end_dt, activity_event_type, cmte
     # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
     _sql = """
             SELECT t1.total_amount, 
-                t1.transaction_id
+                t1.transaction_id,
+                t1.aggregation_ind
             FROM public.sched_h4 t1 
             WHERE activity_event_type = %s 
             AND cmte_id = %s
@@ -3181,7 +3185,8 @@ def list_all_transactions_event_identifier(
     # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
     _sql = """
             SELECT t1.total_amount, 
-                t1.transaction_id
+                t1.transaction_id,
+                t1.aggregation_ind
             FROM public.sched_h4 t1 
             WHERE activity_event_identifier = %s 
             AND cmte_id = %s
@@ -3265,7 +3270,8 @@ def update_activity_event_amount_ytd(data):
             )
         aggregate_amount = 0
         for transaction in transactions_list:
-            aggregate_amount += transaction[0]
+            if transaction[2] != "N":
+                aggregate_amount += transaction[0]
             transaction_id = transaction[1]
             update_transaction_ytd_amount(
                 data.get("cmte_id"), transaction_id, aggregate_amount
@@ -3315,9 +3321,9 @@ def post_schedH4(data):
         try:
             post_sql_schedH4(data)
             # update ytd aggregation if not memo transaction
-            if not data.get("transaction_type_identifier").endswith("_MEMO"):
-                logger.info("update ytd amount...")
-                update_activity_event_amount_ytd(data)
+            # if not data.get("transaction_type_identifier").endswith("_MEMO"):
+            logger.info("update ytd amount...")
+            update_activity_event_amount_ytd(data)
 
             # sched_d debt payment, need to update parent
             if data.get("transaction_type_identifier") == "ALLOC_EXP_DEBT":
@@ -3364,9 +3370,10 @@ def post_sql_schedH4(data):
             memo_text,
             line_number,
             transaction_type,
+            aggregation_ind,
             create_date
             )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get("cmte_id"),
@@ -3389,6 +3396,7 @@ def post_sql_schedH4(data):
             data.get("memo_text"),
             data.get("line_number"),
             data.get("transaction_type"),
+            data.get("aggregation_ind"),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -3451,7 +3459,8 @@ def get_list_all_schedH4(report_id, cmte_id):
             memo_text,
             line_number,
             transaction_type,
-            create_date ,
+            aggregation_ind,
+            create_date,
             last_update_date
             FROM public.sched_h4
             WHERE report_id = %s AND cmte_id = %s
@@ -3502,6 +3511,7 @@ def get_list_schedH4(report_id, cmte_id, transaction_id):
             memo_text,
             line_number,
             transaction_type,
+            aggregation_ind,
             create_date,
             last_update_date
             FROM public.sched_h4
@@ -3577,8 +3587,8 @@ def schedH4(request):
                         request.data.get("transaction_id")
                     )
                     data = put_schedH4(datum)
-                except: 
-                    datum['transaction_id'] = None
+                except:
+                    datum["transaction_id"] = None
                     data = post_schedH4(datum)
             else:
                 # print(datum)
@@ -3743,9 +3753,9 @@ def schedH5_sql_dict(data):
     ]
     try:
         valid_data = {k: v for k, v in data.items() if k in valid_fields}
-        valid_data["line_number"], valid_data["transaction_type"] = get_line_number_trans_type(
-            data["transaction_type_identifier"]
-            )
+        valid_data["line_number"], valid_data[
+            "transaction_type"
+        ] = get_line_number_trans_type(data["transaction_type_identifier"])
         return valid_data
     except:
         raise Exception("invalid request data.")
@@ -4450,6 +4460,7 @@ def schedH6_sql_dict(data):
         "activity_event_type",
         "memo_code",
         "memo_text",
+        "aggregation_ind",
         # 'create_date',
         # 'last_update_date',
         # entity_data
@@ -4600,6 +4611,7 @@ def put_sql_schedH6(data):
                   activity_event_type = %s,
                   memo_code = %s,
                   memo_text = %s,
+                  aggregation_ind = %s,
                   last_update_date= %s
               WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
               AND delete_ind is distinct from 'Y';
@@ -4622,6 +4634,7 @@ def put_sql_schedH6(data):
         data.get("activity_event_type"),
         data.get("memo_code"),
         data.get("memo_text"),
+        data.get("aggregation_ind"),
         datetime.datetime.now(),
         data.get("transaction_id"),
         data.get("report_id"),
@@ -4665,9 +4678,10 @@ def post_sql_schedH6(data):
             activity_event_type,
             memo_code,
             memo_text,
+            aggregation_ind,
             create_date
          )
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s); 
         """
         _v = (
             data.get("cmte_id"),
@@ -4690,6 +4704,7 @@ def post_sql_schedH6(data):
             data.get("activity_event_type"),
             data.get("memo_code"),
             data.get("memo_text"),
+            data.get("aggregation_ind"),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -4711,7 +4726,8 @@ def list_all_transactions_event_type_h6(start_dt, end_dt, activity_event_type, c
     # logger.debug('load ttransactionsransactions with cmte-id:{}'.format(cmte_id))
     _sql = """
             SELECT t1.total_fed_levin_amount, 
-                t1.transaction_id
+                t1.transaction_id,
+                t1.aggregation_ind
             FROM public.sched_h6 t1 
             WHERE activity_event_type = %s 
             AND cmte_id = %s
@@ -4785,7 +4801,8 @@ def update_activity_event_amount_ytd_h6(data):
         )
         aggregate_amount = 0
         for transaction in transactions_list:
-            aggregate_amount += transaction[0]
+            if transaction[2] != "N":
+                aggregate_amount += transaction[0]
             transaction_id = transaction[1]
             update_transaction_ytd_amount_h6(
                 data.get("cmte_id"), transaction_id, aggregate_amount
@@ -4834,8 +4851,8 @@ def post_schedH6(data):
         try:
             post_sql_schedH6(data)
             # update ytd aggregation if not memo transaction
-            if not data.get("transaction_type_identifier").endswith("_MEMO"):
-                update_activity_event_amount_ytd_h6(data)
+            # if not data.get("transaction_type_identifier").endswith("_MEMO"):
+            update_activity_event_amount_ytd_h6(data)
             if data.get("transaction_type_identifier") == "ALLOC_FEA_DISB_DEBT":
                 update_sched_d_parent(
                     data.get("cmte_id"),
@@ -4913,6 +4930,7 @@ def get_list_all_schedH6(report_id, cmte_id):
             activity_event_type,
             memo_code,
             memo_text,
+            aggregation_ind,
             create_date,
             last_update_date
             FROM public.sched_h6
@@ -4963,6 +4981,7 @@ def get_list_schedH6(report_id, cmte_id, transaction_id):
             activity_event_type,
             memo_code,
             memo_text,
+            aggregation_ind,
             create_date,
             last_update_date
             FROM public.sched_h6
@@ -5155,4 +5174,3 @@ def schedH6(request):
 
     else:
         raise NotImplementedError
-

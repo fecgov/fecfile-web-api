@@ -375,6 +375,7 @@ export class TransactionsService {
   public mapSchedDatabaseRowToModel(model: TransactionModel, row: any) {
     // TODO add full field mapping if needed in the future.
     model.transactionId = row.transaction_id;
+    model.reportId = row.report_id;
     model.date = row.contribution_date;
     model.memoCode = row.memo_code;
     model.amount = row.contribution_amount;
@@ -954,6 +955,7 @@ export class TransactionsService {
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.reportId = row.report_id;
   model.reportType = row.report_type;
+  model.formType = row.form_type;
   model.type = row.transaction_type_desc;
   model.scheduleType = row.schedule;
   model.entityId = row.entity_id;
@@ -997,5 +999,7 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.isRedesignation = row.isRedesignation;
   model.isredesignatable = row.isredesignatable;
   model.originalAmount = row.original_amount;
+  model.aggregation_ind = row.aggregation_ind;
+  model.forceitemizable = row.forceitemizable;
 
 }

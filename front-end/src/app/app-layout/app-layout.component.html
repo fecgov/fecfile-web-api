@@ -48,7 +48,7 @@
             {{ committeeName }}
           </h2> 
         </div>
-        <div class="float-right">
+        <div class="float-right" [hidden]="_activatedRoute?.snapshot?.queryParams?.allTransactions === 'true'">
           <div class="float-right" *ngIf="showFormDueDate">
             <div>
               <div>

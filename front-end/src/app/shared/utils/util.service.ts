@@ -168,4 +168,12 @@ export class UtilService {
   public isStringEmpty(strg: string) {
     return (strg === null || strg === undefined || strg === '');
   }
+
+  public aggregateIndToBool(aggregate_ind: string): boolean {
+    if (aggregate_ind == null || aggregate_ind === 'Y') {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

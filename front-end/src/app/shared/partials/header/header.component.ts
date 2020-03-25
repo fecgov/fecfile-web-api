@@ -110,7 +110,7 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
     this.canDeactivate().then(result => {
       if (result === true) {
         localStorage.removeItem(`form_${this.formType}_saved`);
-        this._router.navigate([`/forms/form/${this.formType}`], {
+        this._router.navigate([`/forms/form/global`], {
           queryParams: { step: 'transactions', transactionCategory: 'receipts', allTransactions: true }
         });
       }

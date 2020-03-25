@@ -1,37 +1,17 @@
-import { validateAmount } from 'src/app/shared/utils/forms/validation/amount.validator';
-import { LoanService } from './../service/loan.service';
-import {
-  Component,
-  EventEmitter,
-  ElementRef,
-  Input,
-  OnInit,
-  Output,
-  ViewEncapsulation,
-  ViewChild,
-  OnDestroy
-, ChangeDetectionStrategy } from '@angular/core';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { environment } from '../../../../environments/environment';
-import { FormsService } from '../../../shared/services/FormsService/forms.service';
-import { UtilService } from '../../../shared/utils/util.service';
-import { MessageService } from '../../../shared/services/MessageService/message.service';
-import { EndorserService } from '../endorser/service/endorser.service';
-import { f3xTransactionTypes } from '../../../shared/interfaces/FormsService/FormsService';
-import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
-import { floatingPoint } from '../../../shared/utils/forms/validation/floating-point.validator';
-import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { ContactsMessageService } from '../../../contacts/service/contacts-message.service';
-import { EndorserModel } from '../endorser/model/endorser.model';
-import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
 import { TypeaheadService } from '../../../shared/partials/typeahead/typeahead.service';
-import { DialogService } from '../../../shared/services/DialogService/dialog.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
+import { alphaNumeric } from '../../../shared/utils/forms/validation/alpha-numeric.validator';
+import { UtilService } from '../../../shared/utils/util.service';
+import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
+import { EndorserService } from '../endorser/service/endorser.service';
+import { LoanService } from './../service/loan.service';
 
 export enum ActiveView {
   Endorsers = 'Endorsers',
@@ -58,21 +38,13 @@ export class EndorserComponent implements OnInit, OnDestroy {
   @Input() transactionTypeText = '';
   @Input() transactionType = '';
   @Input() transactionDetail: any;
-  //@Input() scheduleAction: EndorsersActions = null;
   @Input() scheduleAction: ScheduleActions;
-
-  /**
-   * Subscription for pre-populating the form for view or edit.
-   */
-  private _populateFormSubscription: Subscription;
-  private _loadFormFieldsSubscription: Subscription;
 
   public checkBoxVal: boolean = false;
   public endorserForm: FormGroup;
   public formFields: any = [];
   public formVisible: boolean = false;
   public hiddenFields: any = [];
-  //public memoCode: boolean = false;
   public testForm: FormGroup;
   public titles: any = [];
   public states: any = [];
@@ -86,49 +58,28 @@ export class EndorserComponent implements OnInit, OnDestroy {
   public officeSought: any = [];
   public officeState: any = [];
 
-  private _formType: string = '';
-  private _transactionTypePrevious: string = null;
-  private _contributionAggregateValue = 0.0;
   private _selectedEntity: any;
   private _contributionAmountMax: number;
-  private _entityType: string = 'IND';
   private readonly _childFieldNamePrefix = 'child*';
-  private _contactToEdit: EndorserModel;
-  private _loading: boolean = false;
   private _selectedChangeWarn: any;
-  private typeChangeEventOccured = false;
-  private _employerOccupationRequired: boolean = false;
 
   constructor(
-    private _http: HttpClient,
     private _fb: FormBuilder,
     private _endorserService: EndorserService,
     private _config: NgbTooltipConfig,
-    private _router: Router,
     private _utilService: UtilService,
     private _messageService: MessageService,
     private _decimalPipe: DecimalPipe,
     private _typeaheadService: TypeaheadService,
-    private _dialogService: DialogService,
-    private _contactsMessageService: ContactsMessageService,
-    private _formsService: FormsService,
     private _loanservice: LoanService,
+    private _activatedRoute: ActivatedRoute
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-/*     this._populateFormSubscription = this._contactsMessageService.getPopulateFormMessage().subscribe(message => {
-      this.populateFormForEdit(message);
-      //this.getFormFields();
-    });
-
-    this._loadFormFieldsSubscription = this._contactsMessageService.getLoadFormFieldsMessage().subscribe(message => {
-      //this.getFormFields();
-    }); */
   }
 
   ngOnInit(): void {
-    this._contactToEdit = null;
 
     this._messageService.clearMessage();
 
@@ -151,8 +102,6 @@ export class EndorserComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this._messageService.clearMessage();
-    // this._populateFormSubscription.unsubscribe();
-    //localStorage.removeItem('contactsaved');
   }
 
   public debug(obj: any): void {
@@ -162,8 +111,6 @@ export class EndorserComponent implements OnInit, OnDestroy {
 
   private _setForm(fields: any): void {
     const formGroup: any = [];
-    this._employerOccupationRequired = false;
-    //console.log('_setForm fields ', fields);
     fields.forEach(el => {
       if (el.hasOwnProperty('cols')) {
         el.cols.forEach(e => {
@@ -264,15 +211,6 @@ export class EndorserComponent implements OnInit, OnDestroy {
       if ("add" === this.scheduleAction) {
         this.endorserForm.patchValue({ contribution_amount: amountValue }, { onlySelf: true });
       }
-      // else {
-      //   //calculate balance and updated fields
-      //   // let currentOutstandingBalance = this.currentLoanData.loan_balance;
-      //   currentOutstandingBalance = parseFloat(currentOutstandingBalance.toString().replace(/,/g, ``));
-      //   let currentLoanAmountFromDB = this.currentLoanData.loan_amount_original;
-      //   let newOutstandingBalance = contributionAmountNum - currentLoanAmountFromDB + currentOutstandingBalance;
-      //   this.frmLoan.patchValue({ loan_balance: this._decimalPipe.transform(newOutstandingBalance, '.2-2') }, { onlySelf: true });
-      // }
-
     }
   }
 
@@ -498,8 +436,6 @@ export class EndorserComponent implements OnInit, OnDestroy {
                 this.states = res.data.states;
               }
             }
-
-            this._loading = false;
           } // typeof res.data
         } // res.hasOwnProperty('data')
       } // res
@@ -596,18 +532,13 @@ export class EndorserComponent implements OnInit, OnDestroy {
     let endorserObj = this._prepareDataForApiCall();
 
 
-    this._loanservice.saveSched_C2(this.scheduleAction, endorserObj, hiddenFieldsObj).subscribe(res => {
-      //console.log('success');
-      //console.log(res);
+    this._loanservice.saveSched_C2(this.scheduleAction, endorserObj, hiddenFieldsObj,this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
       if (!addmore) {
         this.goToEndorserSummary();
       }
       else {
         this.endorserForm.reset();
       }
-    }, error => {
-      //console.log(error);
-
     });
   }
 

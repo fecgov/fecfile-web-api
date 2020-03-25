@@ -41,7 +41,12 @@
           </button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
             <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
-            <button class="dropdown-item"><i class="file-import-icon" (click)="ImportTransactions()"></i> Import</button>
+            <button class="dropdown-item"  (click)="ImportTransactions()">
+              <i class="file-import-icon"></i> Import
+            </button>
+            <button class="dropdown-item" (click)="toggleAggregation()">
+              <i class="calculator-icon" *ngIf="isShowForceAggregate()">{{isAggregate?' Un-Aggregate':' Aggregate'}}</i>
+            </button>
           </div>
         </div>
       </div>
