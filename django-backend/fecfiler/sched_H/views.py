@@ -836,7 +836,8 @@ def get_old_amount(transaction_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [transaction_id])
             if cursor.rowcount:
-                return cursor.fetchone()[0], cursor.fetchone()[1]
+                row_data = cursor.fetchone()
+                return row_data[0], row_data[1]
             return 0
     except:
         raise
@@ -885,7 +886,8 @@ def get_fed_nonfed_share(request):
         old_amount = 0
         aggregation_ind = "Y"
         if transaction_id:
-            old_amount, aggregation_ind = float(get_old_amount(transaction_id))
+            old_amount, aggregation_ind = get_old_amount(transaction_id)
+        old_amount = float(old_amount)
 
         cmte_type_category = request.query_params.get("cmte_type_category")
         total_amount = request.query_params.get("total_amount")
