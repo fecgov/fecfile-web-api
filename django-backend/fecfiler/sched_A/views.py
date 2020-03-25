@@ -48,7 +48,8 @@ from fecfiler.core.aggregation_helper import (
     update_aggregate_se,
     load_schedF,
     load_schedE,
-    update_aggregate_sl,
+    update_aggregate_la,
+    update_aggregate_lb,
     update_linenumber_aggamt_transactions_SA,
     func_aggregate_amount,
     update_sa_itmization_status,
@@ -701,6 +702,7 @@ def find_aggregate_date(form_type, contribution_date):
             "The aggregate_start_date function is throwing an error: " + str(e)
         )
 
+
 def none_to_empty(val):
     if val is None:
         return ""
@@ -797,7 +799,7 @@ def post_schedA(datum):
                 datum.get("donor_cmte_name"),
                 datum.get("transaction_type_identifier"),
                 datum.get("levin_account_id"),
-                datum.get("aggregation_ind")
+                datum.get("aggregation_ind"),
             )
             logger.debug("transaction saved...")
             try:
@@ -907,7 +909,7 @@ def post_schedA(datum):
             )
         if datum.get("transaction_type_identifier") in SCHED_L_A_TRAN_TYPES:
             # print("haha")
-            update_aggregate_sl(datum)
+            update_aggregate_la(datum)
             update_sl_summary(datum)
         return datum
     except:
@@ -1150,7 +1152,6 @@ def put_schedA(datum):
                             child_datum.get("levin_account_id"),
                             child_datum.get("transaction_type_identifier"),
                             child_datum.get("aggregation_ind"),
-
                         )
                     child_SB_transaction_id = get_child_transaction_schedB(
                         datum.get("cmte_id"), datum.get("report_id"), transaction_id
@@ -1319,7 +1320,7 @@ def put_schedA(datum):
                 datum.get("report_id"),
             )
         if datum.get("transaction_type_identifier") in SCHED_L_A_TRAN_TYPES:
-            update_aggregate_sl(datum)
+            update_aggregate_la(datum)
             update_sl_summary(datum)
         return datum
     except:
@@ -2100,7 +2101,7 @@ def schedA(request):
             )
 
 
-def update_sa_aggregation_status(transaction_id, aggregation_status = None):
+def update_sa_aggregation_status(transaction_id, aggregation_status=None):
     """
     helpder function to update sa aggregation_ind
     """
@@ -2137,15 +2138,14 @@ def force_itemize_sa(request):
         if not transaction_id:
             raise Exception("transaction id is required for this api call.")
         sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, item_status = 'FI')
-        return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+        update_sa_itmization_status(sa_data, item_status="FI")
+        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The force_aggregate_sa API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
+
 
 @api_view(["PUT"])
 def force_unitemize_sa(request):
@@ -2162,15 +2162,14 @@ def force_unitemize_sa(request):
         if not transaction_id:
             raise Exception("transaction id is required for this api call.")
         sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, item_status = 'FU')
-        return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+        update_sa_itmization_status(sa_data, item_status="FU")
+        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The force_aggregate_sa API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
+
 
 @api_view(["PUT"])
 def force_aggregate_sa(request):
@@ -2196,9 +2195,7 @@ def force_aggregate_sa(request):
             cmte_id,
             report_id,
         )
-        return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The force_aggregate_sa API is throwing an error: " + str(e),
@@ -2230,9 +2227,7 @@ def force_unaggregate_sa(request):
             cmte_id,
             report_id,
         )
-        return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The force_aggregate_sa API is throwing an error: " + str(e),
@@ -2797,7 +2792,7 @@ def trash_restore_transactions(request):
                     logger.debug(
                         "update sl aggregate with LA data {}".format(tran_data)
                     )
-                    update_aggregate_sl(tran_data)
+                    update_aggregate_la(tran_data)
                     logger.debug("update sl summary with LA data {}".format(tran_data))
                     update_sl_summary(tran_data)
 
@@ -2806,6 +2801,7 @@ def trash_restore_transactions(request):
                         report_id, cmte_id, transaction_id=transaction_id
                     )[0]
                     logger.debug("update sl summary with LB data {}".format(tran_data))
+                    update_aggregate_lb(tran_data)
                     update_sl_summary(tran_data)
 
                 # Handling delete of sched_B, sched_E, sched_F child transactions
@@ -2855,10 +2851,17 @@ def trash_restore_transactions(request):
                         datum.get("cmte_id"),
                         datum.get("report_id"),
                     )
-                    if datum['transaction_type_identifier'] in ['OPEXP_HQ_ACC_REG_REF','OPEXP_HQ_ACC_IND_REF',
-                        'OPEXP_HQ_ACC_TRIB_REF','OPEXP_CONV_ACC_REG_REF','OPEXP_CONV_ACC_TRIB_REF',
-                        'OPEXP_CONV_ACC_IND_REF','OTH_DISB_NP_RECNT_REG_REF','OTH_DISB_NP_RECNT_TRIB_REF',
-                        'OTH_DISB_NP_RECNT_IND_REF']:
+                    if datum["transaction_type_identifier"] in [
+                        "OPEXP_HQ_ACC_REG_REF",
+                        "OPEXP_HQ_ACC_IND_REF",
+                        "OPEXP_HQ_ACC_TRIB_REF",
+                        "OPEXP_CONV_ACC_REG_REF",
+                        "OPEXP_CONV_ACC_TRIB_REF",
+                        "OPEXP_CONV_ACC_IND_REF",
+                        "OTH_DISB_NP_RECNT_REG_REF",
+                        "OTH_DISB_NP_RECNT_TRIB_REF",
+                        "OTH_DISB_NP_RECNT_IND_REF",
+                    ]:
                         update_linenumber_aggamt_transactions_SA(
                             datetime.datetime.strptime(
                                 datum.get("expenditure_date"), "%Y-%m-%d"
