@@ -17,8 +17,9 @@ export class SchedH6Model {
     entity_name: string;
     entity_type: string;
     arrow_dir: string;
+    aggregation_ind: string;
     child: SchedH6Model[] = [];
-    constructor(schedH6: any) {        
+    constructor(schedH6: any) {
         this.cmte_id = schedH6.cmte_id ? schedH6.cmte_id : '';
         this.report_id = schedH6.report_id ? schedH6.report_id : '';
         this.transaction_type_identifier = schedH6.transaction_type_identifier ? schedH6.transaction_type_identifier : '';
@@ -38,5 +39,6 @@ export class SchedH6Model {
         this.entity_type = schedH6.entity_type ? schedH6.entity_type : '';
         this.arrow_dir = schedH6.arrow_dir ? schedH6.arrow_dir : '';
         this.child = schedH6.child;
+        this.aggregation_ind = schedH6.aggregation_ind;
     }
 }
