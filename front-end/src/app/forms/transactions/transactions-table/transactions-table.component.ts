@@ -1728,7 +1728,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     if (trx) {
       if (trx.itemized === 'U' || trx.itemized === 'FU') {
         return false;
-      } else if (trx.itemized === null || trx.itemized === 'FI') {
+      } else if (trx.itemized === null || trx.itemized === 'FI' || trx.itemized === 'I') {
         return true;
       }
     }
