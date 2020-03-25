@@ -1721,7 +1721,9 @@ def update_schedB_aggamt_transactions(
                     aggregate_amount += transaction[0]
                 if expenditure_date <= transaction[4]:
                     line_number, itemized_ind = transaction[3], transaction[11]
-                    if itemized_ind.startswith("F"):  # forced itemize/unitemize
+                    if itemized_ind and itemized_ind.startswith(
+                        "F"
+                    ):  # forced itemize/unitemize
                         pass
                     else:
                         line_number, itemized_ind = get_sb_linenumber_itemization(
