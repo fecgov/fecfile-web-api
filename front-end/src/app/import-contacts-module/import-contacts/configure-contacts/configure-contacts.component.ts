@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { Component, OnInit, Input, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-configure-contacts',
   templateUrl: './configure-contacts.component.html',
   styleUrls: ['./configure-contacts.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfigureContactsComponent implements OnInit {
 

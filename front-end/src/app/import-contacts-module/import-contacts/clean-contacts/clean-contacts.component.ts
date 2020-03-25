@@ -1,9 +1,6 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, ViewChild, TemplateRef } from '@angular/core';
-import { trigger, transition, style, animate } from '@angular/animations';
-import { ContactModel } from 'src/app/contacts/model/contacts.model';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { ImportContactsService } from '../service/import-contacts.service';
 import { PaginationInstance } from 'ngx-pagination';
-import { ModalDirective } from 'ngx-bootstrap';
 import { ContactToCleanModel } from './model/contact-to-clean.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UtilService } from 'src/app/shared/utils/util.service';
@@ -148,7 +145,9 @@ export class CleanContactsComponent implements OnInit {
 
   public merge(modal: any) {
     modal.close('close it');
-    // TODO call API to save merge data for the file ID.
+    // TODO call API to save merge data for the file ID. use this.contactToClean
+    // Either get the page data again from API removing the merged contact
+    // or slice the merged contact out of the array.  Former is preferred.
   }
 
   public cancelFinalizeMerge(modal: any) {

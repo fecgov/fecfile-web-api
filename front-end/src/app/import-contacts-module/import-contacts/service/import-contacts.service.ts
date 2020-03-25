@@ -8,14 +8,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 })
 export class ImportContactsService {
 
-  private duplicatesSubject = new BehaviorSubject<any>([]);
-  public duplicates$: Observable<any> = this.duplicatesSubject.asObservable();
-
   constructor(private _http: HttpClient) { }
-
-  loadDuplicates(duplicates: any) {
-    this.duplicatesSubject.next(duplicates);
-  }
 
   public getDuplicates(page: number) {
     let httpOptions = new HttpHeaders();
@@ -37,8 +30,7 @@ export class ImportContactsService {
             }
             return false;
           })
-        )
-        ;
+        );
     } else {
       // TODO Using mock server data until API is integrated
       return this._http
@@ -53,10 +45,8 @@ export class ImportContactsService {
             }
             return false;
           })
-        )
-        ;
+        );
     }
-
   }
 
 }
