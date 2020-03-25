@@ -955,6 +955,7 @@ export class TransactionsService {
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.reportId = row.report_id;
   model.reportType = row.report_type;
+  model.formType = row.form_type;
   model.type = row.transaction_type_desc;
   model.scheduleType = row.schedule;
   model.entityId = row.entity_id;

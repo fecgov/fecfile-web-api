@@ -3315,7 +3315,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (searchText) {
           if(this.transactionType === 'CON_EAR_DEP_MEMO'
             || this.transactionType === 'CON_EAR_UNDEP_MEMO'
-            || this.transactionType === 'CONT_TO_CAN') {
+            || this.transactionType === 'CONT_TO_CAN'
+            || this.transactionType === 'CONT_VOID') {
             return this._typeaheadService.getContacts(searchText, 'entity_name', true);
           }else {
             return this._typeaheadService.getContacts(searchText, 'entity_name');
@@ -5473,7 +5474,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     return false;
   }
 
-
   private populateSchedFChildData(field: string, receiptObj: any) {
       // Possible issue : Populating data from parent when  sched f child is created can cause in consistencies
       // data from child and parent can be out of sync when the parent is edited
@@ -5612,4 +5612,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   *  Show/Hide forced aggregation button
+   *  Return true to show else false
+   */
+  public isShowForceAggregate(): boolean {
+    if (this.transactionType) {
+      // exclusion
+      if (this.transactionType.endsWith('CON_EAR_DEP')) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

@@ -1372,7 +1372,7 @@ def reposit_f3x_data(cmte_id, report_id):
                 # exclude report_seq from reports
                 if row[0] != "report_seq" and row[0] not in [
                     "reattribution_id",
-                    "eattirbution_ind",
+                    "reattribution_ind",
                     "aggregation_ind",
                 ]:
                     columns.append(row[0])
@@ -3214,7 +3214,7 @@ def get_trans_query(category_type, cmte_id, param_string):
             """SELECT report_id, schedule, form_type, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
                           name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, 
-                                election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, istrashable
+                                election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, aggregation_ind, hasChild, istrashable
                             from all_other_transactions_view
                             where cmte_id='"""
             + cmte_id
@@ -3328,13 +3328,10 @@ def filter_get_all_trans(request, param_string):
             + filt_dict["filterElectionYearTo"]
             + "'"
         )
-    if filt_dict.get("reportType") not in [None, "null"]:
-        param_string = (
-            param_string
-            + " AND report_type = '"
-            + filt_dict["reportType"]
-            + "'"
-        )
+    if filt_dict.get("filterReportTypes"):
+        reportTypes_tuple = "('" + "','".join(filt_dict["filterReportTypes"]) + "')"
+        param_string = param_string + " AND report_type In " + reportTypes_tuple
+    
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
         None,
         "null",

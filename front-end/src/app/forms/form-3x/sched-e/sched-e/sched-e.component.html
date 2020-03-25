@@ -45,7 +45,7 @@
               <i class="file-import-icon"></i> Import
             </button>
             <button class="dropdown-item" (click)="toggleAggregation()">
-              <i class="calculator-icon" >{{isAggregate?' Un-Aggregate':' Aggregate'}}</i>
+              <i class="calculator-icon" *ngIf="isShowForceAggregate()">{{isAggregate?' Un-Aggregate':' Aggregate'}}</i>
             </button>
           </div>
         </div>

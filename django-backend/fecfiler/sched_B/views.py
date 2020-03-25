@@ -42,8 +42,12 @@ from fecfiler.core.transaction_util import (
 )
 from fecfiler.core.report_helper import new_report_date
 
-from fecfiler.core.aggregation_helper import (find_form_type, find_aggregate_date,
-    update_linenumber_aggamt_transactions_SA)
+from fecfiler.core.aggregation_helper import (
+    find_form_type,
+    find_aggregate_date,
+    update_linenumber_aggamt_transactions_SA,
+    update_aggregate_lb,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -362,7 +366,7 @@ def post_sql_schedB(
     aggregate_amt,
     beneficiary_cand_entity_id,
     levin_account_id,
-    aggregation_ind = None,
+    aggregation_ind=None,
 ):
     """
     db transaction for post a db transaction
@@ -498,6 +502,7 @@ def get_list_child_schedB(report_id, cmte_id, transaction_id):
         report_id, cmte_id, back_ref_transaction_id=transaction_id
     )
 
+
 def put_sql_schedB(
     cmte_id,
     report_id,
@@ -538,7 +543,7 @@ def put_sql_schedB(
     aggregate_amt,
     beneficiary_cand_entity_id,
     levin_account_id,
-    aggregation_ind = None,
+    aggregation_ind=None,
 ):
     """
     db transaction for saving current sched_b item
@@ -863,13 +868,21 @@ def post_schedB(datum):
                     datum.get("report_id"),
                 )
             else:  # do aggregation: levin account transactions
+                update_aggregate_lb(datum)
                 update_sl_summary(datum)
 
             # update line number based on aggregate amount info
-            if datum['transaction_type_identifier'] in ['OPEXP_HQ_ACC_REG_REF','OPEXP_HQ_ACC_IND_REF',
-                'OPEXP_HQ_ACC_TRIB_REF','OPEXP_CONV_ACC_REG_REF','OPEXP_CONV_ACC_TRIB_REF',
-                'OPEXP_CONV_ACC_IND_REF','OTH_DISB_NP_RECNT_REG_REF','OTH_DISB_NP_RECNT_TRIB_REF',
-                'OTH_DISB_NP_RECNT_IND_REF']:
+            if datum["transaction_type_identifier"] in [
+                "OPEXP_HQ_ACC_REG_REF",
+                "OPEXP_HQ_ACC_IND_REF",
+                "OPEXP_HQ_ACC_TRIB_REF",
+                "OPEXP_CONV_ACC_REG_REF",
+                "OPEXP_CONV_ACC_TRIB_REF",
+                "OPEXP_CONV_ACC_IND_REF",
+                "OTH_DISB_NP_RECNT_REG_REF",
+                "OTH_DISB_NP_RECNT_TRIB_REF",
+                "OTH_DISB_NP_RECNT_IND_REF",
+            ]:
                 update_linenumber_aggamt_transactions_SA(
                     datum.get("expenditure_date"),
                     datum.get("transaction_type_identifier"),
@@ -1143,17 +1156,25 @@ def put_schedB(datum):
                     transaction_data.get("donor_cmte_name"),
                     transaction_data.get("transaction_type_identifier"),
                 )
-            update_schedB_aggamt_transactions(
-                datum.get("expenditure_date"),
-                datum.get("transaction_type_identifier"),
-                entity_id,
-                datum.get("cmte_id"),
-                datum.get("report_id"),
-            )
-            if datum['transaction_type_identifier'] in ['OPEXP_HQ_ACC_REG_REF','OPEXP_HQ_ACC_IND_REF',
-                'OPEXP_HQ_ACC_TRIB_REF','OPEXP_CONV_ACC_REG_REF','OPEXP_CONV_ACC_TRIB_REF',
-                'OPEXP_CONV_ACC_IND_REF','OTH_DISB_NP_RECNT_REG_REF','OTH_DISB_NP_RECNT_TRIB_REF',
-                'OTH_DISB_NP_RECNT_IND_REF']:
+            if not datum.get(transaction_id).startswith("LB"):
+                update_schedB_aggamt_transactions(
+                    datum.get("expenditure_date"),
+                    datum.get("transaction_type_identifier"),
+                    entity_id,
+                    datum.get("cmte_id"),
+                    datum.get("report_id"),
+                )
+            if datum["transaction_type_identifier"] in [
+                "OPEXP_HQ_ACC_REG_REF",
+                "OPEXP_HQ_ACC_IND_REF",
+                "OPEXP_HQ_ACC_TRIB_REF",
+                "OPEXP_CONV_ACC_REG_REF",
+                "OPEXP_CONV_ACC_TRIB_REF",
+                "OPEXP_CONV_ACC_IND_REF",
+                "OTH_DISB_NP_RECNT_REG_REF",
+                "OTH_DISB_NP_RECNT_TRIB_REF",
+                "OTH_DISB_NP_RECNT_IND_REF",
+            ]:
                 update_linenumber_aggamt_transactions_SA(
                     datum.get("expenditure_date"),
                     datum.get("transaction_type_identifier"),
@@ -1171,6 +1192,7 @@ def put_schedB(datum):
                 "The put_sql_schedB function is throwing an error: " + str(e)
             )
         if datum.get("transaction_type_identifier") in SCHED_L_B_TRAN_TYPES:
+            update_aggregate_lb(datum)
             update_sl_summary(datum)
         return datum
     except:
@@ -1195,17 +1217,24 @@ def delete_schedB(data):
             datum.get("cmte_id"),
             datum.get("report_id"),
         )
-        if datum['transaction_type_identifier'] in ['OPEXP_HQ_ACC_REG_REF','OPEXP_HQ_ACC_IND_REF',
-            'OPEXP_HQ_ACC_TRIB_REF','OPEXP_CONV_ACC_REG_REF','OPEXP_CONV_ACC_TRIB_REF',
-            'OPEXP_CONV_ACC_IND_REF','OTH_DISB_NP_RECNT_REG_REF','OTH_DISB_NP_RECNT_TRIB_REF',
-            'OTH_DISB_NP_RECNT_IND_REF']:
+        if datum["transaction_type_identifier"] in [
+            "OPEXP_HQ_ACC_REG_REF",
+            "OPEXP_HQ_ACC_IND_REF",
+            "OPEXP_HQ_ACC_TRIB_REF",
+            "OPEXP_CONV_ACC_REG_REF",
+            "OPEXP_CONV_ACC_TRIB_REF",
+            "OPEXP_CONV_ACC_IND_REF",
+            "OTH_DISB_NP_RECNT_REG_REF",
+            "OTH_DISB_NP_RECNT_TRIB_REF",
+            "OTH_DISB_NP_RECNT_IND_REF",
+        ]:
             update_linenumber_aggamt_transactions_SA(
-                    datum.get("expenditure_date"),
-                    datum.get("transaction_type_identifier"),
-                    entity_id,
-                    datum.get("cmte_id"),
-                    datum.get("report_id"),
-                )
+                datum.get("expenditure_date"),
+                datum.get("transaction_type_identifier"),
+                entity_id,
+                datum.get("cmte_id"),
+                datum.get("report_id"),
+            )
         # delete_parent_child_link_sql_schedB(transaction_id, report_id, cmte_id)
     except:
         raise
@@ -1252,7 +1281,7 @@ def schedB_sql_dict(data):
     json and validate some field data
     """
     try:
-        logger.debug('filtering data with schedB_sql_dict...')
+        logger.debug("filtering data with schedB_sql_dict...")
         validate_negative_transaction(data)
         validate_parent_transaction_exist(data)
         # print(data)
@@ -1344,7 +1373,7 @@ def schedB_sql_dict(data):
         datum["line_number"], datum["transaction_type"] = get_line_number_trans_type(
             data.get("transaction_type_identifier")
         )
-        logger.debug('schedB_sql_dict done with {}'.format(datum))
+        logger.debug("schedB_sql_dict done with {}".format(datum))
         return datum
     except:
         raise
@@ -1670,7 +1699,6 @@ def update_schedB_aggamt_transactions(
     1/1/2018, 50, 50, 11AII
     2/1/2018, 60, 110, 11AII
     3/1/2018, 100, 210, 11AI (aggregate_amount > 200, update line number)
-
     """
     try:
         itemization_value = 200
@@ -1702,7 +1730,9 @@ def update_schedB_aggamt_transactions(
                     aggregate_amount += transaction[0]
                 if expenditure_date <= transaction[4]:
                     line_number, itemized_ind = transaction[3], transaction[11]
-                    if itemized_ind.startswith('F'): # forced itemize/unitemize
+                    if itemized_ind and itemized_ind.startswith(
+                        "F"
+                    ):  # forced itemize/unitemize
                         pass
                     else:
                         line_number, itemized_ind = get_sb_linenumber_itemization(
@@ -1772,9 +1802,7 @@ def force_aggregate_sb(request):
             cmte_id,
             report_id,
         )
-        return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
         # update_linenumber_aggamt_transactions_SA(
         #     sb_data.get("contribution_date"),
         #     sb_data.get("transaction_type_identifier"),
@@ -1788,6 +1816,7 @@ def force_aggregate_sb(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+
 def force_itemize_unitemize(request, itemize=None):
     """
     helper function to itemize/un-itemize a transaction
@@ -1800,26 +1829,25 @@ def force_itemize_unitemize(request, itemize=None):
             raise Exception("transaction id is required for this api call.")
         sb_data = get_list_schedB(report_id, cmte_id, transaction_id)[0]
         update_sb_itmization_status(sb_data, status=itemize)
-        return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The force_itemize_sb API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-def update_sb_itmization_status(data, status = None):
+
+def update_sb_itmization_status(data, status=None):
     """
     helpder function
     """
-    transaction_type_identifier = data.get('transaction_type_identifier')
-    transaction_id = data.get('transaction_id')
-    report_id = data.get('report_id')
+    transaction_type_identifier = data.get("transaction_type_identifier")
+    transaction_id = data.get("transaction_id")
+    report_id = data.get("report_id")
     if transaction_type_identifier in ITEMIZED_SB_UPDATE_TRANSACTION_TYPE_IDENTIFIER:
-        
+
         # line_number = '11AI' if status == 'Y' else '11AII'
-        
+
         _sql = """
         update public.sched_b
         set itemized_ind = %s
@@ -1827,7 +1855,7 @@ def update_sb_itmization_status(data, status = None):
         """
         parameters = [status, transaction_id, report_id]
     else:
-        raise Exception('current transaction cannot be force-unitemized.')
+        raise Exception("current transaction cannot be force-unitemized.")
         # _sql = """
         # update public.sched_a
         # set itemized_ind = %s
@@ -1837,8 +1865,9 @@ def update_sb_itmization_status(data, status = None):
     with connection.cursor() as cursor:
         cursor.execute(_sql, parameters)
         if cursor.rowcount == 0:
-            raise Exception('update itemization status failed for {}'.format(transaction_id))
-
+            raise Exception(
+                "update itemization status failed for {}".format(transaction_id)
+            )
 
 
 @api_view(["PUT"])
@@ -1847,8 +1876,8 @@ def force_unitemize_sb(request):
     api to force a sched_b transaction to be itemized:
     1. set itemized_ind = 'Y'
     """
-    return force_itemize_unitemize(request, itemize='FU')
-    
+    return force_itemize_unitemize(request, itemize="FU")
+
 
 @api_view(["PUT"])
 def force_itemize_sb(request):
@@ -1856,7 +1885,7 @@ def force_itemize_sb(request):
     api to force a sched_b transaction to be itemized:
     1. set itemized_ind = 'Y'
     """
-    return force_itemize_unitemize(request, itemize='FI')
+    return force_itemize_unitemize(request, itemize="FI")
     # # if request.method == "GET":
     # try:
     #     cmte_id = request.user.username
@@ -1899,9 +1928,7 @@ def force_unaggregate_sb(request):
             cmte_id,
             report_id,
         )
-        return JsonResponse(
-                {"status": "success"}, status=status.HTTP_200_OK
-            )
+        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
         # update_linenumber_aggamt_transactions_SA(
         #     sb_data.get("contribution_date"),
         #     sb_data.get("transaction_type_identifier"),
@@ -1974,7 +2001,7 @@ def schedB(request):
                 )
                 data = put_schedB(datum)
             else:
-                logger.debug('calling post_schedB with data:{}'.format(datum))
+                logger.debug("calling post_schedB with data:{}".format(datum))
                 data = post_schedB(datum)
 
             # Associating child transactions to parent and storing them to DB
