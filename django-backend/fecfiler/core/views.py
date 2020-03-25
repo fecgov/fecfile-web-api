@@ -1372,7 +1372,7 @@ def reposit_f3x_data(cmte_id, report_id):
                 # exclude report_seq from reports
                 if row[0] != "report_seq" and row[0] not in [
                     "reattribution_id",
-                    "eattirbution_ind",
+                    "reattribution_ind",
                     "aggregation_ind",
                 ]:
                     columns.append(row[0])
