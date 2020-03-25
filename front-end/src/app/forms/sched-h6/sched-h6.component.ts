@@ -336,10 +336,10 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     const modelArray: any = [];
 
     for (const row of serverData) {
-      const model = new SchedH6Model({});      
+      const model = new SchedH6Model({});
 
       model.cmte_id = row.cmte_id;
-      model.report_id = row.report_id;     
+      model.report_id = row.report_id;
       model.transaction_type_identifier = row.transaction_type_identifier;
       model.transaction_id = row.transaction_id;
       model.back_ref_transaction_id = row.back_ref_transaction_id;
@@ -355,9 +355,10 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
       model.last_name = row.last_name;
       model.entity_name = row.entity_name;
       model.entity_type = row.entity_type;
+      model.aggregation_ind = row.aggregation_ind;
 
       modelArray.push(model);
-    
+
     }
 
     return modelArray;

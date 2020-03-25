@@ -1225,9 +1225,37 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'non_fed_share_amount', false);
               this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'levin_share', false);
             }
-            if (res.aggregate_amount) {
+            if (res.aggregate_amount !== null) {
+              // forced aggregation
+              totalAmount  = this.convertAmountToNumber(totalAmount);
+              const aggregatedResponse = this.convertAmountToNumber(res.aggregate_amount);
+              let newAggregate: number;
+              if (this.scheduleAction === ScheduleActions.edit) {
+                // get the initial aggregation indicator during load
+                const initialAggregateInd: boolean = this._utilService.aggregateIndToBool(this._transactionToEdit.aggregation_ind);
+                if ( (initialAggregateInd && this.isAggregate) || (!initialAggregateInd && !this.isAggregate)) {
+                  // if initial and current aggregation flags remain the same
+                  // lets patch the response from API
+                  newAggregate = aggregatedResponse;
+                } else if (initialAggregateInd && !this.isAggregate) {
+                  // if initial was aggregated and now unaggregated
+                  // un-aggregate now
+                  newAggregate = aggregatedResponse - totalAmount;
+                } else if (!initialAggregateInd && this.isAggregate) {
+                  // if initial was un-aggregated and now aggregated
+                  // aggregate now
+                  newAggregate = aggregatedResponse + totalAmount;
+                }
+              } else {
+                // if new transaction API responds with aggregate + current amount
+                if (this.isAggregate) {
+                  totalAmount = 0;
+                }
+              newAggregate = res.aggregate_amount - totalAmount;
+              }
+
               this._formatAmount(
-                { target: { value: res.aggregate_amount.toString() } },
+                { target: { value: newAggregate.toString() } },
                 'activity_event_amount_ytd',
                 false
               );
@@ -5584,6 +5612,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     } else {
       dateField = 'contribution_date';
     }
+    // schedule H4/H6
+    if (this.frmIndividualReceipt.controls['incurred_amount'] || this.frmIndividualReceipt.controls['total_amount']) {
+      this.isAggregate = !this.isAggregate;
+      this.forceAggregateSchedH();
+      return;
+    }
     const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
     let transactionDate = null;
     if (this.frmIndividualReceipt.get(dateField)) {
@@ -5624,5 +5658,31 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
     return true;
+  }
+
+  private forceAggregateSchedH() {
+    // find the amount field name
+    let fieldName;
+    if (this.frmIndividualReceipt.controls['incurred_amount']) {
+      fieldName = 'incurred_amount';
+    } else if (this.frmIndividualReceipt.controls['total_amount']) {
+      fieldName = 'total_amount';
+    }
+    if (this.isFieldName(fieldName, 'total_amount') && this.totalAmountReadOnly) {
+      return;
+    }
+
+    // will take care of forced aggregation now
+    if (fieldName === 'total_amount') {
+      this._getFedNonFedPercentage();
+      return;
+    }
+
+    if (fieldName === 'incurred_amount') {
+      // TODO: has nothing to do with aggregation
+      // Verify and remove
+      // this._adjustDebtBalanceAtClose();
+    }
+
   }
 }
