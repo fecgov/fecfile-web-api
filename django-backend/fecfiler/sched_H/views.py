@@ -827,7 +827,8 @@ def get_old_amount(transaction_id):
     helper function for loading total_amount
     """
     _sql = """
-    SELECT transaction_amount
+    SELECT transaction_amount,
+    aggregation_ind
     FROM public.all_other_transactions_view
     WHERE transaction_id = %s
     """
@@ -835,7 +836,7 @@ def get_old_amount(transaction_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [transaction_id])
             if cursor.rowcount:
-                return cursor.fetchone()[0]
+                return cursor.fetchone()[0], cursor.fetchone()[1]
             return 0
     except:
         raise
@@ -882,8 +883,9 @@ def get_fed_nonfed_share(request):
 
         # for editing purpose, need grab old amount
         old_amount = 0
+        aggregation_ind = "Y"
         if transaction_id:
-            old_amount = float(get_old_amount(transaction_id))
+            old_amount, aggregation_ind = float(get_old_amount(transaction_id))
 
         cmte_type_category = request.query_params.get("cmte_type_category")
         total_amount = request.query_params.get("total_amount")
@@ -1088,9 +1090,7 @@ def get_fed_nonfed_share(request):
         logger.debug("aggregate_amount loaded:{}".format(aggregate_amount))
         fed_share = float(total_amount) * fed_percent
         nonfed_share = float(total_amount) - fed_share
-        if transaction_type_identifier and transaction_type_identifier.endswith(
-            "_MEMO"
-        ):
+        if transaction_type_identifier and aggregation_ind == "N":
             new_aggregate_amount = aggregate_amount
         else:
             new_aggregate_amount = aggregate_amount + float(total_amount) - old_amount
