@@ -25,7 +25,7 @@ from django.conf import settings
 import re
 import csv
 from django.core.paginator import Paginator
-from datetime import date, timedelta, time, datetime
+from datetime import date, timedelta, time
 from dateutil.relativedelta import relativedelta
 from collections import OrderedDict
 from xml.etree import ElementTree
@@ -1567,7 +1567,9 @@ def submit_report(request):
         raise Exception("Error: invalid form type.")
 
     with connection.cursor() as cursor:
-        cursor.execute(_sql_update, [datetime.now(), SUBMIT_STATUS, fec_id, report_id])
+        cursor.execute(
+            _sql_update, [datetime.datetime.now(), SUBMIT_STATUS, fec_id, report_id]
+        )
         if cursor.rowcount == 0:
             raise Exception("report {} update failed".format(report_id))
 
