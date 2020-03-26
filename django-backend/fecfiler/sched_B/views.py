@@ -149,7 +149,7 @@ ITEMIZED_SB_UPDATE_TRANSACTION_TYPE_IDENTIFIER = [
     "FEA_PAY_TO_PROL",
     "FEA_VOID",
     "FEA_100PCT_DEBT_PAY",
-    "IK_OUT"
+    "IK_OUT",
 ]
 
 
@@ -1149,7 +1149,7 @@ def put_schedB(datum):
                     transaction_data.get("donor_cmte_name"),
                     transaction_data.get("transaction_type_identifier"),
                 )
-            if not datum.get(transaction_id).startswith("LB"):
+            if not datum.get("transaction_id").startswith("LB"):
                 update_schedB_aggamt_transactions(
                     datum.get("expenditure_date"),
                     datum.get("transaction_type_identifier"),
