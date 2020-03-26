@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { StepsComponent } from './partials/steps/steps.component';
+import { ModalModule } from 'ngx-bootstrap';
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import { StepsComponent } from './partials/steps/steps.component';
     FormsModule,
     ReactiveFormsModule,
     NgxPaginationModule,
+    ModalModule,
     StepsComponent,
   ]
 })

@@ -15,8 +15,9 @@ export class SchedH4Model {
     entity_name: string;
     entity_type: string;
     arrow_dir: string;
+    aggregation_ind: string;
     child: SchedH4Model[] = [];
-    constructor(schedH4: any) {        
+    constructor(schedH4: any) {
         this.cmte_id = schedH4.cmte_id ? schedH4.cmte_id : '';
         this.report_id = schedH4.report_id ? schedH4.report_id : '';
         this.transaction_type_identifier = schedH4.transaction_type_identifier ? schedH4.transaction_type_identifier : '';
