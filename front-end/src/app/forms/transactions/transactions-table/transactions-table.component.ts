@@ -1725,12 +1725,14 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     return this.getCurrentItemizationStatus(trx) ? ' Unitemize' : ' Itemize';
   }
   private getCurrentItemizationStatus(trx: TransactionModel): boolean {
-    if (trx) {
+    if (trx && trx.itemized) {
       if (trx.itemized === 'U' || trx.itemized === 'FU') {
         return false;
-      } else if (trx.itemized === null || trx.itemized === 'FI' || trx.itemized === 'I') {
+      } else if (trx.itemized === 'FI' || trx.itemized === 'I') {
         return true;
       }
+    } else {
+      return true;
     }
   }
 }
