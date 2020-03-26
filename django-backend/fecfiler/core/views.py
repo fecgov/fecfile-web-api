@@ -25,7 +25,7 @@ from django.conf import settings
 import re
 import csv
 from django.core.paginator import Paginator
-from datetime import date, timedelta, time
+from datetime import date, timedelta, time, datetime
 from dateutil.relativedelta import relativedelta
 from collections import OrderedDict
 from xml.etree import ElementTree
@@ -1370,10 +1370,11 @@ def reposit_f3x_data(cmte_id, report_id):
             columns = []
             for row in rows:
                 # exclude report_seq from reports
-                if row[0] != "report_seq" and row[0] not in [
+                if not row[0] in [
                     "reattribution_id",
                     "reattribution_ind",
                     "aggregation_ind",
+                    "report_seq",
                 ]:
                     columns.append(row[0])
             logger.debug("table columns: {}".format(list(columns)))
@@ -1541,7 +1542,7 @@ def submit_report(request):
                 update_tbl
             )
             + """
-            SET status = %s, fec_id = %s"""
+            SET filed_date = %s, status = %s, fec_id = %s"""
             + """
             WHERE {} = %s
             """.format(
@@ -1555,7 +1556,7 @@ def submit_report(request):
                 update_tbl
             )
             + """
-            SET is_submitted = true, status = %s, fec_id = %s"""
+            SET is_submitted = true, updated_at = %s, status = %s, fec_id = %s"""
             + """
             WHERE {} = %s
             """.format(
@@ -1566,7 +1567,7 @@ def submit_report(request):
         raise Exception("Error: invalid form type.")
 
     with connection.cursor() as cursor:
-        cursor.execute(_sql_update, [SUBMIT_STATUS, fec_id, report_id])
+        cursor.execute(_sql_update, [datetime.now(), SUBMIT_STATUS, fec_id, report_id])
         if cursor.rowcount == 0:
             raise Exception("report {} update failed".format(report_id))
 
@@ -3329,7 +3330,7 @@ def filter_get_all_trans(request, param_string):
     if filt_dict.get("filterReportTypes"):
         reportTypes_tuple = "('" + "','".join(filt_dict["filterReportTypes"]) + "')"
         param_string = param_string + " AND report_type In " + reportTypes_tuple
-    
+
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
         None,
         "null",
