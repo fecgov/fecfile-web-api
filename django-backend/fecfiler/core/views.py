@@ -1370,10 +1370,11 @@ def reposit_f3x_data(cmte_id, report_id):
             columns = []
             for row in rows:
                 # exclude report_seq from reports
-                if row[0] != "report_seq" and row[0] not in [
+                if not row[0] in [
                     "reattribution_id",
                     "reattribution_ind",
                     "aggregation_ind",
+                    "report_seq",
                 ]:
                     columns.append(row[0])
             logger.debug("table columns: {}".format(list(columns)))
@@ -1541,7 +1542,7 @@ def submit_report(request):
                 update_tbl
             )
             + """
-            SET status = %s, fec_id = %s"""
+            SET filed_date = %s, status = %s, fec_id = %s"""
             + """
             WHERE {} = %s
             """.format(
@@ -1555,7 +1556,7 @@ def submit_report(request):
                 update_tbl
             )
             + """
-            SET is_submitted = true, status = %s, fec_id = %s"""
+            SET is_submitted = true, updated_at = %s, status = %s, fec_id = %s"""
             + """
             WHERE {} = %s
             """.format(
@@ -1566,7 +1567,9 @@ def submit_report(request):
         raise Exception("Error: invalid form type.")
 
     with connection.cursor() as cursor:
-        cursor.execute(_sql_update, [SUBMIT_STATUS, fec_id, report_id])
+        cursor.execute(
+            _sql_update, [datetime.datetime.now(), SUBMIT_STATUS, fec_id, report_id]
+        )
         if cursor.rowcount == 0:
             raise Exception("report {} update failed".format(report_id))
 
@@ -2882,6 +2885,41 @@ def autolookup_search_contacts(request):
                             + order_string
                             + """) t"""
                         )
+                elif "entity_name" in request.query_params:
+                    if "expand" in request.query_params:
+                        parameters = [committee_id]
+                        query_string = (
+                                """
+                                SELECT json_agg(t) FROM 
+                                (SELECT distinct e.entity_name, e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name, e.first_name,e.last_name,e.middle_name,
+                                e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                                e.last_update_date
+                                FROM public.entity e, public.entity c 
+                                WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                                AND c.principal_campaign_committee is not null
+                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                                """
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
+                        )
+                    else:
+                        parameters = [committee_id, committee_id]
+                        query_string = (
+                                """
+                                SELECT json_agg(t) FROM 
+                                (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                                e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                                e.last_update_date
+                                FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                                """
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
+                        )
                 else:
                     # parameters = [committee_id, committee_id]
                     if "expand" in request.query_params:
@@ -2895,6 +2933,7 @@ def autolookup_search_contacts(request):
                             e.last_update_date
                             FROM public.entity e, public.entity c 
                             WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                            AND e.entity_type in ('IND','ORG') 
                             AND c.principal_campaign_committee is not null
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
@@ -2926,6 +2965,7 @@ def autolookup_search_contacts(request):
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                             e.last_update_date
                             FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                            AND e.entity_type in ('IND','ORG') 
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
                             + param_string
@@ -3329,7 +3369,7 @@ def filter_get_all_trans(request, param_string):
     if filt_dict.get("filterReportTypes"):
         reportTypes_tuple = "('" + "','".join(filt_dict["filterReportTypes"]) + "')"
         param_string = param_string + " AND report_type In " + reportTypes_tuple
-    
+
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
         None,
         "null",
