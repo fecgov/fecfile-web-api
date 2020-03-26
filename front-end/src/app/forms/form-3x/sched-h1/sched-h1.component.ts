@@ -48,6 +48,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
   pacSaveDisable = true;
 
   private onDestroy$ = new Subject();
+  reportId: any;
 
   constructor(
     private _http: HttpClient,
@@ -85,7 +86,9 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
             this.form.control.patchValue({ h1_election_year_options: '' }, { onlySelf: true });
           }
         }
-      )
+      );
+
+    this.reportId = this._activatedRoute.snapshot.queryParams.reportId;
   }
 
 
@@ -153,31 +156,23 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
     httpOptions = httpOptions.append('Content-Type', 'application/json');
-    //console.log('post h1 url:' + url);
 
-    // build form data and adding report_id
     const formData: FormData = new FormData();
-    // formData = new FormData() 
     let h1_obj = { "transaction_type_identifier": "ALLOC_H1" };
-    // set report_id
+    
     h1_obj['report_id'] = '0'
 
     let reportType: any = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
     if (reportType === null || typeof reportType === 'undefined') {
       reportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
     }
-    //console.log(reportType);
-    if (reportType.hasOwnProperty('reportId')) {
+    if(this.reportId){
+      h1_obj['report_id'] = this.reportId;
+    } else if (reportType.hasOwnProperty('reportId')) {
       h1_obj['report_id'] = reportType.reportId;
-      // formData.append('report_id', reportType.reportId);
     } else if (reportType.hasOwnProperty('reportid')) {
-      // formData.append('report_id', reportType.reportid);
       h1_obj['report_id'] = reportType.reportid;
     }
-    //console.log(reportType.reportid)
-    // formData.append('federal_percent', '0.45');
-    // formData.append('non_federal_percent', '0.55');
-    // h1_obj['report_id'] = '121';
 
     if (this.isPac()) {
       h1_obj['federal_percent'] = f.value.federal_share / 100;
@@ -333,7 +328,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     if (this.scheduleAction === ScheduleActions.add) {
       this.getH1Subscription = this.getH1().subscribe(
         res => {
-          if (res.length === 1 && !this.isPac()) {
+          if (res.length !== 0 && !this.isPac()) {
             if (res[0].federal_percent === 0.28) {
               this.form.control.patchValue({ h1_election_year_options: '1' }, { onlySelf: true });
             } else if (res[0].federal_percent === 0.36) {
@@ -357,7 +352,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
 
   public getH1(): Observable<any> {
 
-    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    const reportId = this.reportId ? this.reportId :this._individualReceiptService.getReportIdFromStorage(this.formType);
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/sh1/schedH1`;
 
@@ -465,7 +460,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
 
   public getH1Pac(): Observable<any> {
 
-    const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
+    const reportId = this.reportId ? this.reportId : this._individualReceiptService.getReportIdFromStorage(this.formType);
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url: string = `${environment.apiUrl}/sh1/validate_pac_h1`;
 

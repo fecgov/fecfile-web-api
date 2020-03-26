@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
@@ -19,7 +20,8 @@ export class IndividualReceiptService {
     private _http: HttpClient,
     private _cookieService: CookieService,
     private _utilService: UtilService,
-    private _decimalPipe: DecimalPipe
+    private _decimalPipe: DecimalPipe, 
+    private _activatedRoute: ActivatedRoute
   ) {
     //console.log();
   }
@@ -480,6 +482,12 @@ export class IndividualReceiptService {
    * Obtain the Report ID from local storage.
    */
   public getReportIdFromStorage(formType: string) {
+
+    //If the reportId is in current URL queryParams, get it directly from there first
+    if(this._activatedRoute.snapshot && this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId){
+      return this._activatedRoute.snapshot.queryParams.reportId;
+    }
+
     let reportId = '0';
     let form3XReportType = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
     const reportIdFromLocalStorage = localStorage.getItem('reportId');
@@ -531,11 +539,10 @@ export class IndividualReceiptService {
     selectedEntityAggregate: number,
     amount: number,
     scheduleAction: string,
-    memoCode: boolean,
+    isAggregate: boolean,
     selectedEntity: any,
     transactionToEdit: TransactionModel,
     transactionType: string,
-    isSubTransaction: boolean,
     transactionDate: string
   ): string {
     let aggregate = 0;
@@ -543,7 +550,7 @@ export class IndividualReceiptService {
     selectedEntityAggregate = selectedEntityAggregate ? selectedEntityAggregate : 0;
 
     if (scheduleAction === ScheduleActions.add || scheduleAction === ScheduleActions.addSubTransaction) {
-      aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount, memoCode, isSubTransaction);
+      aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount,  isAggregate);
       return this._decimalPipe.transform(aggregate, '.2-2');
     } else if (scheduleAction === ScheduleActions.edit) {
       if (!transactionToEdit) {
@@ -552,28 +559,28 @@ export class IndividualReceiptService {
       // If nothing has changed, show the original.
       const origDate = transactionToEdit.date ? transactionToEdit.date.toString() : null;
       if (transactionDate === origDate) {
-        if (
-          (memoCode && transactionToEdit.memoCode === this._memoCodeValue) ||
-          (!memoCode && transactionToEdit.memoCode !== this._memoCodeValue)
-        ) {
           if (amount === transactionToEdit.amount) {
-            aggregate = transactionToEdit.aggregate;
-            return this._decimalPipe.transform(aggregate, '.2-2');
-          }
+              if (isAggregate === this._utilService.aggregateIndToBool (transactionToEdit.aggregation_ind)) {
+                aggregate = transactionToEdit.aggregate;
+                return this._decimalPipe.transform(aggregate, '.2-2');
+              }
+
         }
       }
       if (selectedEntity) {
         if (selectedEntity.entity_id) {
           if (selectedEntity.entity_id === transactionToEdit.entityId) {
             let origAmt = transactionToEdit.amount ? transactionToEdit.amount : 0;
-            if (isSubTransaction === false) {
-              if (transactionToEdit.memoCode === this._memoCodeValue) {
-                origAmt = 0;
-              }
-              if (memoCode) {
-                amount = 0;
-              }
+            if (transactionDate !== origDate) {
+              origAmt = 0;
             }
+            if (this._utilService.aggregateIndToBool (transactionToEdit.aggregation_ind) === false && isAggregate) {
+              origAmt = 0;
+            }
+            if (!isAggregate) {
+              amount = 0;
+            }
+            // TODO: comments might not be relevant after memo_code aggregation rule change - edit
             // selected entity is same on saved transaction
             // backout the old amount from aggregate and
             // apply new (if memo was check on old or new they will be 0 for parent).
@@ -583,13 +590,13 @@ export class IndividualReceiptService {
             // don't back out the saved amount from aggregate
             // apply new if memo not checked.
 
-            aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount, memoCode, isSubTransaction);
+            aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount,  isAggregate);
             return this._decimalPipe.transform(aggregate, '.2-2');
           }
         }
       } else {
         // edit for entity not selected, same as add no entity aggregate to include
-        aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount, memoCode, isSubTransaction);
+        aggregate = this._determineAggregateHelper(selectedEntityAggregate, amount,  isAggregate);
         return this._decimalPipe.transform(aggregate, '.2-2');
       }
     } else {
@@ -601,23 +608,13 @@ export class IndividualReceiptService {
   private _determineAggregateHelper(
     selectedEntityAggregate: number,
     amount: number,
-    memoCode: boolean,
-    isSubTransaction: boolean
+    isAggregate: boolean
   ): number {
-    let aggregate = 0;
-    if (isSubTransaction === false) {
-      if (memoCode) {
-        aggregate = selectedEntityAggregate;
-      } else {
-        aggregate = amount + selectedEntityAggregate;
-      }
+    if (isAggregate) {
+      return amount + selectedEntityAggregate;
     } else {
-      // Sub transactions always get the amount added to aggregate
-      // even if memo is checked/disabled.  If the rules change or we encounter
-      // a memo subtran that requires user changes to memo, handle it here.
-      aggregate = amount + selectedEntityAggregate;
+      return selectedEntityAggregate;
     }
-    return aggregate;
   }
 
   public getReportIdByTransactionDate(transactionDate: string) : Observable<any>{

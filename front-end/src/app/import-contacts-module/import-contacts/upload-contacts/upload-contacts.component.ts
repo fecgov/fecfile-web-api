@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { CsvConverterService } from '../service/csv-converter.service';
 import * as XLSX from 'xlsx';
-import { timer, interval } from 'rxjs';
+import { timer, interval, Observable } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { UploadContactsService } from './service/upload-contacts.service';
@@ -25,8 +25,9 @@ export class UploadContactsComponent implements OnInit {
   public userContacts: Array<any>;
   public userContactFields: Array<string>;
   public showUpload: boolean;
-  // public progressPercent: number;
+  public progressPercent: number;
   public foo = { progressPercent: 0 };
+  // public fooBar = [];
 
   constructor(
     private csvConverterService: CsvConverterService,
@@ -36,8 +37,9 @@ export class UploadContactsComponent implements OnInit {
 
   ngOnInit() {
     this.showUpload = true;
-    // this.progressPercent = 0;
+    this.progressPercent = 0;
     this.foo = { progressPercent: 0 };
+    // this.fooBar = [0];
   }
 
   /**
@@ -177,8 +179,9 @@ export class UploadContactsComponent implements OnInit {
   }
 
   public fileSelected() {
-    // this.progressPercent = 0;
-    this.foo = { progressPercent: 0 };
+    this.progressPercent = 0;
+    this.foo.progressPercent = 0;
+    // this.fooBar = [0];
     this.showUpload = false;
 
     if (this.selectFileInput.nativeElement.files) {
@@ -203,8 +206,9 @@ export class UploadContactsComponent implements OnInit {
     // read in the future.
     const timer$ = timer(fakeUploadTime).pipe(finalize(() => {
       // console.log('All done!');
-      // this.progressPercent = 100;
-      this.foo = { progressPercent: 100 };
+      this.progressPercent = 100;
+      this.foo.progressPercent = 100;
+      // this.fooBar = [100];
       const files = this.selectFileInput.nativeElement.files;
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -217,8 +221,9 @@ export class UploadContactsComponent implements OnInit {
     const subscribe = example
       .subscribe(val => {
         const percentageIncrease = (fakeUploadInterval) * 100 / fakeUploadTime;
-        // this.progressPercent = this.progressPercent + percentageIncrease;
-        this.foo = { progressPercent: this.foo.progressPercent + percentageIncrease };
+        this.progressPercent = this.progressPercent + percentageIncrease;
+        this.foo.progressPercent = this.foo.progressPercent + percentageIncrease;
+        // this.fooBar = [this.foo.progressPercent + percentageIncrease];
       });
   }
 

@@ -331,43 +331,76 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   private updateOfficeSoughtFields($event: any, col: any) {
     if ($event && $event.code === 'P') {
-      //hide state and district and update validations
+      // hide state and district and update validations
       this.updateOfficeSoughtForPresident(col);
-    }
-    else if ($event && $event.code === 'S') {
-      //show state && hide district and update validations
+    } else if ($event && $event.code === 'S') {
+      // show state && hide district and update validations
       this.updateOfficeSoughtForSenate(col);
-    }
-    else if ($event && $event.code === 'H') {
-      //show state and district and update validations
+    } else if ($event && $event.code === 'H') {
+      // show state and district and update validations
       this.updateOfficeSoughtForHouse(col);
     }
 
-    //on any update to officeSought fields, YTD needs to be calculated and set. 
+    // on any update to officeSought fields, YTD needs to be calculated and set.
     this.updateYTDAmount();
   }
 
   private updateYTDAmount() {
-
-    //console.log('YTD is being recalculated ...');
+    // console.log('YTD is being recalculated ...');
     let currentExpenditureAmount = this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value);
+    const currentAggregate = this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_aggregate'].value);
+
     if (this.scheduleAction === ScheduleActions.edit) {
-      this.frmIndividualReceipt.patchValue({
-        expenditure_aggregate:
-          this._decimalPipe.transform(this._originalExpenditureAggregate - this._originalExpenditureAmount +
-            this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value), '.2-2')
-      }, { onlySelf: true });
-    }
-    else if (this.transactionType.endsWith('_MEMO')){
-      this.frmIndividualReceipt.patchValue({
-        expenditure_aggregate:
-          this._decimalPipe.transform(this._convertAmountToNumber(this.frmIndividualReceipt.controls['expenditure_amount'].value), '.2-2')
-      }, { onlySelf: true });
-    }
-    else  {
+      let newAggregate = null;
+      const originalAggregationInd = this._utilService.aggregateIndToBool(this._transactionToEdit.aggregation_ind);
+      if (this._transactionToEdit) {
+        if (originalAggregationInd === this.isAggregate) {
+          // the aggregation indicator is same since initial load
+          if (this.isAggregate && originalAggregationInd === true) {
+          // is Aggregated already check if amount changed
+            if (this._originalExpenditureAmount !== currentExpenditureAmount) {
+              // amount has changed since last load
+              // recalculate aggregate with new amount
+              newAggregate = this._originalExpenditureAggregate - this._originalExpenditureAmount + currentExpenditureAmount;
+            } else {
+              newAggregate = this._originalExpenditureAggregate;
+            }
+          } else if (!this.isAggregate && originalAggregationInd === false) {
+            // check if aggregate is the same as initial load
+            if (currentAggregate === this._originalExpenditureAggregate) {
+              // do nothing
+            } else {
+              newAggregate = this._originalExpenditureAggregate;
+            }
+          }
+        } else {
+          // the aggregation indicator has changed since initial load
+          // recalculate aggregate
+          if (this.isAggregate && originalAggregationInd === false) {
+            // amount was not aggregated during initial load
+            // aggregate the amount now
+            newAggregate = currentExpenditureAmount  + this._originalExpenditureAggregate;
+            this.frmIndividualReceipt.patchValue(
+                {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
+          } else if (this.isAggregate === false && originalAggregationInd === true) {
+            // amount was aggregated during initial load
+            // un-aggregate the amount now
+              newAggregate = this._originalExpenditureAggregate - this._originalExpenditureAmount;
+          }
+        }
+
+      }
+      if (newAggregate != null ) {
+        this.frmIndividualReceipt.patchValue(
+            {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
+      }
+    } else  {
       this._schedEService.getAggregate(this.frmIndividualReceipt.value).subscribe(res => {
 
-        this._currentAggregate = "0";
+        this._currentAggregate = '0';
+        if (!this.isAggregate) {
+          currentExpenditureAmount = 0;
+        }
 
         if (res && res.ytd_amount) {
           this._currentAggregate = res.ytd_amount;
@@ -383,7 +416,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
         }, { onlySelf: true });
       });
     }
-     
+
   }
 
   private _convertAmountToNumber(amount: string) {
@@ -701,5 +734,12 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
     return `${payeeCmteID}, ${candidateId}, ${lastName}, ${firstName}, ${office},
       ${officeState}, ${officeDistrict}`;
+  }
+
+  public toggleAggregation(): void {
+    this.isAggregate = !this.isAggregate;
+
+    this.updateYTDAmount();
+
   }
 }

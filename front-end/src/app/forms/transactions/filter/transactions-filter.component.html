@@ -34,6 +34,28 @@
           </div>
         </div>
       </div>
+      <div class="card">
+        <div class="card-header transactions__filter-title" (click)="toggleReportTypeFilterItem()">
+          Report Type
+          <i class="float-right" aria-hidden="true" 
+            [ngClass]="toggleFilterDirection(isHideReportTypeFilter)">
+          </i>          
+        </div>
+        <div class="card-body" [@openCloseScroll]="!isHideReportTypeFilter ? 'open' : 'closed'">
+          <div class="transactions__filter-type-list-body">
+            <ul class="transactions__filter-type-list">
+              <li *ngFor="let reportType of reportTpes">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="{{ reportType?.rpt_type }}" 
+                    [(ngModel)]="reportType.selected">
+                  <label class="form-check-label" for="{{ reportType?.rpt_type }}">
+                    {{ reportType?.rpt_type }} - {{ reportType?.rpt_type_desc}}</label>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
       <div class="card" *ngIf="transactionCategory !== 'loans-and-debts'">
         <div class="card-header transactions__filter-title" (click)="toggleDateFilterItem()">
           Date

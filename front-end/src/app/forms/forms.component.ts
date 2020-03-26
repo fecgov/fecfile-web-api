@@ -1,14 +1,12 @@
-import { Subscription } from 'rxjs/Subscription';
-import { Component, HostListener, OnInit, NgZone, ViewChild, ViewEncapsulation, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Observable, of, Subject } from 'rxjs';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { environment } from '../../environments/environment';
-import { FormsService } from '../shared/services/FormsService/forms.service';
-import { MessageService } from '../shared/services/MessageService/message.service';
-import { DialogService } from '../shared/services/DialogService/dialog.service';
-import { ValidateComponent } from '../shared/partials/validate/validate.component';
+import { BehaviorSubject, of, Subject } from 'rxjs';
+import { Subscription } from 'rxjs/Subscription';
+import { ReportsService } from 'src/app/reports/service/report.service';
+import { UtilService } from 'src/app/shared/utils/util.service';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from '../shared/partials/confirm-modal/confirm-modal.component';
+import { DialogService } from '../shared/services/DialogService/dialog.service';
+import { FormsService } from '../shared/services/FormsService/forms.service';
 
 @Component({
   selector: 'app-forms',
@@ -24,21 +22,22 @@ export class FormsComponent implements OnInit, OnDestroy {
   public confirmModal: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   private onDestroy$ = new Subject();
-
+  
   private _openModal: any = null;
   private _step: string;
   private _editMode: boolean;
   private queryParamsSubscription:Subscription;
   private paramsSubscription:Subscription;
+  public jumpToTransaction: any;
+  returnToGlobalAllTransaction: boolean;
 
   constructor(
     private _activeRoute: ActivatedRoute,
-    private _modalService: NgbModal,
-    private _ngZone: NgZone,
     private _router: Router,
-    private _messageService: MessageService,
     private _dialogService: DialogService,
-    private _formsService: FormsService
+    private _formsService: FormsService,
+    private _reportsService: ReportsService,
+    private _utilService: UtilService
   ) {
 
     this.queryParamsSubscription = _activeRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
@@ -113,5 +112,69 @@ export class FormsComponent implements OnInit, OnDestroy {
       //console.log('Not any unsaved data...');
       return true;
     }
+  }
+
+  public onNotify(e: any): void {
+    // this.returnToGlobalAllTransaction = true;
+    const formType = this.getFormType(e.form);
+    if(e.transactionDetail.transactionModel.reportId){
+      this.setReportSpecificMetaDataAndProceed(e.transactionDetail.transactionModel.reportId,e,formType);
+    }
+  }
+  
+  private navigateToReportSpecificAllTransactions(success: any, e: any, formType: string) {
+    if (success) {
+      this.jumpToTransaction = e;
+      let queryParamsMap: any = {
+        step: 'transactions',
+        edit: true,
+        transactionCategory: e.transactionCategory,
+        allTransactions: false,
+        reportId: e.transactionDetail.transactionModel.reportId
+      };
+      this._router.navigate([`/forms/form/${formType}`], {
+        queryParams: queryParamsMap
+      });
+    }
+    else {
+      console.error('There was an issue setting coverage dates for this report');
+    }
+  }
+
+  private setReportSpecificMetaDataAndProceed(reportId:string,e:any, formType:string) {
+    const form_type = formType === '3X' ? 'F3X' : formType;
+    this._reportsService.getReportInfo(form_type,reportId).subscribe(response => {
+      if (response && response.length > 0){
+        response = response[0];
+        let reportTypeObj : any = localStorage.getItem(`form_${this.formType}_report_type`);
+        if(!reportTypeObj){
+          reportTypeObj = {};
+        }
+        localStorage.setItem('form_3X_details', JSON.stringify(response));
+        localStorage.setItem(`form_3X_report_type`, JSON.stringify(response));
+        /* reportTypeObj = localStorage.getItem(`form_${this.formType}_report_type`);
+        reportTypeObj.cvgStartDate = this._utilService.formatDate(response.cvgstartdate);;
+        reportTypeObj.cvgEndDate = this._utilService.formatDate(response.cvgenddate);
+        localStorage.setItem(`form_${formType}_report_type`,JSON.stringify(reportTypeObj)); */
+        this.navigateToReportSpecificAllTransactions(true, e, formType);
+      }
+    }),
+    error =>{
+      console.error('There was an issue retrieving coverage dates for this report. ', error);
+      return of(false);
+    };
+    // return of(false);
+  }
+
+
+  /**
+   * This method should return the form type (F3X, F99 etc.) based on the metadata
+   * @param form 
+   */
+  private getFormType(form: any):string {
+    
+    //returning hardcoded F3X for now but logic should be added to this method later on.
+    return "3X";
+    
   }
 }

@@ -190,6 +190,11 @@
   @extend .fa-print;
 }
 
+.calculator-icon{
+  @extend .fas;
+  @extend  .fa-calculator;
+}
+
 .table-icon {
   @extend .fas;
   @extend .fa-table;
@@ -198,4 +203,9 @@
 .undo-icon {
   @extend .fas;
   @extend .fa-undo;
+}
+
+.exclamation-triangle-icon {
+  @extend .fas;
+  @extend .fa-exclamation-triangle;
 }

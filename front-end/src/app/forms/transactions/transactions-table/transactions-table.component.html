@@ -96,7 +96,7 @@
             (click)="changeSortDirection('aggregate')">Aggregate
           </th>
           <th class="bulk_action">
-            <div *ngIf="editMode">
+            <div *ngIf="editMode || _allTransactions">
               <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                 aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
@@ -116,7 +116,7 @@
                 </div>
               </div>
             </div>
-            <div *ngIf="!editMode">
+            <div *ngIf="!editMode && !_allTransactions">
               <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                 <i class="ellipsis-icon"></i>
               </button>
@@ -137,8 +137,8 @@
             <td>
               <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
             </td>
-            <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
-            <td  *ngIf="isColumnVisible('type')">{{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+            <td  *ngIf="_allTransactions">{{trx.formType}} - {{trx.reportType}}</td>
+            <td  *ngIf="isColumnVisible('type')">{{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
             <td  *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
             <td  [ngClass]="trx.child ? 'parent': ''" 
                 (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''" *ngIf="isColumnVisible('name')">{{trx.name}}
@@ -183,6 +183,9 @@
                         <i class="edit-icon"></i> Edit
                       </button>
                     </span>
+                    <button *ngIf="isForceItemizable(trx)" class="dropdown-item" (click)="forceItemizationToggle(trx)">
+                      <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
+                    </button>
                     <button *ngIf="trx.isreattributable" class="dropdown-item" (click)="reattributeTransaction(trx)">
                         <i class="clipboard-icon"></i> Reattribute
                     </button>
@@ -215,7 +218,7 @@
               <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
             </td>
             <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
-            <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+            <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
             <td  *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
             <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
             <td  *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
@@ -254,6 +257,9 @@
                         <i class="edit-icon"></i> Edit
                       </button>
                     </span>
+                    <button *ngIf="isForceItemizable(trxChild)" class="dropdown-item" (click)="forceItemizationToggle(trxChild)">
+                      <i class="fas fa-calculator"></i>{{getItemizationInd(trxChild)}}
+                    </button>
                     <button *ngIf="trxChild.isreattributable" class="dropdown-item" (click)="reattributeTransaction(trxChild)">
                         <i class="clipboard-icon"></i> Reattribute
                     </button>
@@ -382,7 +388,7 @@
               (click)="changeSortDirection('electionYear')">Election Year
             </th>
             <th class="bulk_action">
-              <div *ngIf="editMode">
+              <div *ngIf="editMode || _allTransactions">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
@@ -403,7 +409,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="!editMode">
+              <div *ngIf="!editMode && !_allTransactions">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                   <i class="ellipsis-icon"></i>
                 </button>
@@ -427,7 +433,7 @@
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')">
-                {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+                {{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
               <td  [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
                 *ngIf="isColumnVisible('name')">{{trx.name}}
                 <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
@@ -471,6 +477,9 @@
                           <i class="edit-icon"></i> Edit
                         </button>
                       </span>
+                      <button *ngIf="isForceItemizable(trx)" class="dropdown-item" (click)="forceItemizationToggle(trx)">
+                        <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
+                      </button>
                       <button *ngIf="trx.isredesignatable" class="dropdown-item" (click)="redesignateTransaction(trx)">
                         <i class="clipboard-icon"></i> Redesignate
                       </button>
@@ -504,7 +513,7 @@
                 <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
               </td>
               <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
-              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
               <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
               <td  *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
               <td  *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
@@ -542,6 +551,9 @@
                       </button>
                       <button class="dropdown-item" (click)="editTransaction(trxChild)">
                         <i class="edit-icon"></i> Edit
+                      </button>
+                      <button *ngIf="isForceItemizable(trxChild)" class="dropdown-item" (click)="forceItemizationToggle(trxChild)">
+                        <i class="fas fa-calculator"></i>{{getItemizationInd(trxChild)}}
                       </button>
                       <button class="dropdown-item" (click)="printTransaction(trxChild)">
                         <i class="fas fa-print"></i> Print
@@ -672,7 +684,7 @@
               (click)="changeSortDirection('loanDueDate')">Loan Due Date (C)
             </th>
             <th class="bulk_action">
-              <div *ngIf="editMode">
+              <div *ngIf="editMode || _allTransactions">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
@@ -692,7 +704,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="!editMode">
+              <div *ngIf="!editMode && !_allTransactions">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                   <i class="ellipsis-icon"></i>
                 </button>
@@ -715,7 +727,7 @@
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')">
-                {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+                {{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
               
               <td  [ngClass]="showRow(trx,'sched_c1') || showRow(trx,'sched_c2') ? 'parent': ''" 
               (click)="trx?.entityType === 'ORG' && (trx?.transactionTypeIdentifier === 'LOANS_OWED_BY_CMTE' || trx?.transactionTypeIdentifier === 'LOANS_OWED_TO_CMTE') ? trx.toggleChild = !trx.toggleChild: ''"
@@ -759,8 +771,14 @@
                       <button class="dropdown-item" (click)="editTransaction(trx)">
                         <i class="edit-icon"></i> Edit
                       </button>
+                      <button *ngIf="isForceItemizable(trx)" class="dropdown-item" (click)="forceItemizationToggle(trx)">
+                        <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
+                      </button>
                       <button class="dropdown-item" (click)="printTransaction(trx)">
                         <i class="fas fa-print"></i> Print
+                      </button>
+                      <button *ngIf="isForceItemizable(trx)" class="dropdown-item" (click)="forceItemizationToggle(trx)">
+                        <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
                       </button>
                       <button *ngIf="checkIfTrashable()" class="dropdown-item"
                         (click)="trashTransaction(trx)">
@@ -817,44 +835,6 @@
             </td>
           </tr>
           </ng-container>
-          
-          <!-- <tr *ngIf="isTransactionViewActive()">
-            <td></td>
-            <td *ngIf="isColumnVisible('type')"></td>
-            <td *ngIf="isColumnVisible('transactionId')"></td>
-            <td *ngIf="isColumnVisible('name')"></td>
-            <td *ngIf="isColumnVisible('street')"></td>
-            <td *ngIf="isColumnVisible('city')"></td>
-            <td *ngIf="isColumnVisible('state')"></td>
-            <td *ngIf="isColumnVisible('zip')"></td>
-            <td *ngIf="isColumnVisible('date')"></td>
-            <td *ngIf="isColumnVisible('purposeDescription')"></td>
-            <td *ngIf="isColumnVisible('contributorEmployer')"></td>
-            <td *ngIf="isColumnVisible('contributorOccupation')"></td>
-            <td *ngIf="isColumnVisible('memoCode')"></td>
-            <td *ngIf="isColumnVisible('memoText')"></td>
-            <td *ngIf="isRecycleBinViewActive()"></td>
-            <td  *ngIf="isColumnVisible('amount')">
-                <div class="transactions__total-amount-container">
-                  <div class="transactions__total-amount">
-                    <b>Total</b>
-    
-                    <i class="info-icon transactions__total-amount-tip" 
-                      ngbTooltip="Represents the total amount of transactions entered on the report. 
-                        Those transactions that are memo entries are not added into the total amount."
-                      tooltipClass="transactions__tooltip"
-                      triggers="click">
-                    </i>
-    
-                  </div>
-                  <div class="transactions__total-amount-val">
-                    <b>{{totalAmount | currency:'USD':'symbol-narrow':'1.2-2'}}</b>
-                  </div>
-                </div>
-            </td>
-            <td *ngIf="isColumnVisible('aggregate')"></td>
-            <td></td>
-          </tr> -->
         </tbody>
       </table>
 
@@ -905,7 +885,7 @@
               (click)="changeSortDirection('eventId')">Activity or Event Identifier
             </th>
             <th class="bulk_action">
-              <div *ngIf="editMode">
+              <div *ngIf="editMode || _allTransactions">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
@@ -925,7 +905,7 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="!editMode">
+              <div *ngIf="!editMode && !_allTransactions">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group"role="group"
                   aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
@@ -953,7 +933,7 @@
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('schedule')">{{trx.scheduleType}}</td>
               <td  *ngIf="isColumnVisible('type')">
-                {{trx.itemized ==='U' ? trx.type +' ('+ trx.itemized + ') ' : trx.type}}</td>
+                {{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
               <td  [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
                 *ngIf="isColumnVisible('name')">{{trx.name}}
                 <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
@@ -980,7 +960,7 @@
                     </button>
                   </span>
                 </div>
-                <div *ngIf="editMode">
+                <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -989,6 +969,9 @@
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
                       <button class="dropdown-item" (click)="editTransaction(trx)">
                         <i class="edit-icon"></i> Edit
+                      </button>
+                      <button *ngIf="isForceItemizable(trx)" class="dropdown-item" (click)="forceItemizationToggle(trx)">
+                        <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
                       </button>
                       <button class="dropdown-item" (click)="printTransaction(trx)">
                         <i class="fas fa-print"></i> Print
@@ -1010,7 +993,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="!editMode">
+                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -1023,7 +1006,7 @@
               </td>
               <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
               <td  *ngIf="isColumnVisible('schedule')">{{trxChild.scheduleType}}</td>
-              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{trxChild.itemized ==='U' ? trxChild.type +' ('+ trxChild.itemized + ') ' : trxChild.type}}</td>
+              <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
               <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
               <td  *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
               <td  *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
@@ -1046,7 +1029,7 @@
                     </button>
                   </span>
                 </div>
-                <div *ngIf="editMode">
+                <div *ngIf="!_allTransactions || (_allTransactions && trxChild.reportstatus !== 'Filed')">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -1055,6 +1038,9 @@
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
                       <button class="dropdown-item" (click)="editTransaction(trxChild)">
                         <i class="edit-icon"></i> Edit
+                      </button>
+                      <button *ngIf="isForceItemizable(trxChild)" class="dropdown-item" (click)="forceItemizationToggle(trxChild)">
+                        <i class="fas fa-calculator"></i>{{getItemizationInd(trxChild)}}
                       </button>
                       <button class="dropdown-item" (click)="printTransaction(trxChild)">
                         <i class="fas fa-print"></i> Print
@@ -1071,7 +1057,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="!editMode">
+                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -1578,10 +1564,11 @@
               <div class="col-md">
                 <div class="checkbox">
                   <label>
-                    <input [(ngModel)]="getSortableColumn('amount').checked" (change)="toggleVisibility('amount', $event)"
-                      type="checkbox" [disabled]="getSortableColumn('amount').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('amount').disabled}">
-                      Amount
+                    <input [(ngModel)]="getSortableColumn('loanDueDate').checked"
+                      (change)="toggleVisibility('loanDueDate', $event)" type="checkbox"
+                      [disabled]="getSortableColumn('loanDueDate').disabled">
+                    <span [ngClass]="{'disabled-column-option':getSortableColumn('loanDueDate').disabled}">
+                      Loan Due Date (C)
                     </span>
                   </label>
                 </div>
@@ -1746,24 +1733,6 @@
                     </span>
                   </label>
                 </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md">
-                <div class="checkbox">
-                  <label>
-                    <input [(ngModel)]="getSortableColumn('loanDueDate').checked"
-                      (change)="toggleVisibility('loanDueDate', $event)" type="checkbox"
-                      [disabled]="getSortableColumn('loanDueDate').disabled">
-                    <span [ngClass]="{'disabled-column-option':getSortableColumn('loanDueDate').disabled}">
-                      Loan Due Date (C)
-                    </span>
-                  </label>
-                </div>
-              </div>
-              <div class="col-md">
-              </div>
-              <div class="col-md">
               </div>
             </div>
           </div>
