@@ -17,7 +17,7 @@
               <tbody>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="radio" name="h1_election_year_options" value="1" id="opt1" [disabled]="h1Disabled">
+                    <input ngModel type="radio" name="h1_election_year_options" value="1" id="opt1" [disabled]="h1Disabled" (click)="clickPartyOptions($event)">
                     <label for="opt1">Presidential-Only Election Year (28% Federal)</label>
 
                     <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
@@ -29,7 +29,7 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="radio" name="h1_election_year_options" value="2" id="opt2" [disabled]="h1Disabled">
+                    <input ngModel type="radio" name="h1_election_year_options" value="2" id="opt2" [disabled]="h1Disabled" (click)="clickPartyOptions($event)">
                     <label for="opt2"> Presidential and Senate Election Year (36% Federal)</label>
 
                     <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
@@ -41,7 +41,7 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="radio" name="h1_election_year_options" value="3" id="opt3" [disabled]="h1Disabled">
+                    <input ngModel type="radio" name="h1_election_year_options" value="3" id="opt3" [disabled]="h1Disabled" (click)="clickPartyOptions($event)">
                     <label for="opt3">Senate-Only Election Year (21% Federal)</label>
 
                     <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
@@ -53,7 +53,7 @@
                 </tr>
                 <tr>
                   <td class="summary_text">
-                    <input ngModel type="radio" name="h1_election_year_options" value="4" id="opt4" [disabled]="h1Disabled">
+                    <input ngModel type="radio" name="h1_election_year_options" value="4" id="opt4" [disabled]="h1Disabled" (click)="clickPartyOptions($event)">
                     <label for="opt4">None-Presidential and None-Senate Election Year (15% Federal)</label>
 
                     <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
@@ -71,7 +71,7 @@
             <div class="grid-row">
               <div class="grid-row__col grid-row__col--12">
                 <div class="forms__btn-container">
-                  <button type="submit" class="btn btn-primary btn-right" [disabled]="!f.valid || h1Disabled" (click)="saveH1(f)">
+                  <button type="submit" class="btn btn-primary btn-right" [disabled]="!f.valid || h1Disabled || partySaveDisable" (click)="saveH1(f)">
                       Save
                     </button>
                 </div>
