@@ -46,6 +46,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
   removedH1PacSubscription: Subscription;
 
   pacSaveDisable = true;
+  partySaveDisable = true;
 
   private onDestroy$ = new Subject();
   reportId: any;
@@ -243,6 +244,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     this.transaction_id = item.transaction_id;
 
     this.pacSaveDisable = false;
+    this.partySaveDisable = false;
 
     this.checkH1Disabled();
     this.checkH1PacDisabled();
@@ -339,12 +341,15 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
               this.form.control.patchValue({ h1_election_year_options: '4' }, { onlySelf: true });
             }
             this.getH1Disable = true;
+            this.h1Disabled = true;
           } else {
             this.getH1Disable = false;
+            this.h1Disabled = false;
           }
         }
       )
-      this.h1Disabled = this.getH1Disable;
+      //this.h1Disabled = this.getH1Disable;
+      //this.h1Disabled = true;
     } else {
       this.h1Disabled = false;
     }
@@ -410,6 +415,8 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
       }
 
       this.pacSaveDisable = true;
+      this.partySaveDisable = true;
+
     }
   }
 
@@ -494,6 +501,18 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
       || !this.form.value.applied_activity1 && !this.form.value.applied_activity3 && this.form.value.applied_activity2 && e.target.value === 'generic_voter_drive'
       || !this.form.value.applied_activity1 && !this.form.value.applied_activity2 && this.form.value.applied_activity3 && e.target.value === 'public_communication') {
       this.pacSaveDisable = true;
+    }
+  }
+
+  public clickPartyOptions(e: any) {
+    if(this.scheduleAction === ScheduleActions.add) {
+      if(e.target.value) {
+        this.partySaveDisable = false;
+       }else{
+        this.partySaveDisable = true;
+      }
+    }else if(this.scheduleAction === ScheduleActions.edit) {
+      this.partySaveDisable = false;
     }
   }
 
