@@ -420,7 +420,7 @@ def update_aggregate_lb(datum):
         # child_flag_SA = False
         itemization_value = 200
         form_type = find_form_type(report_id, cmte_id)
-        if isinstance(contribution_date, str):
+        if isinstance(expenditure_date, str):
             expenditure_date = date_agg_format(expenditure_date)
         aggregate_start_date, aggregate_end_date = find_aggregate_date(
             form_type, expenditure_date
@@ -445,7 +445,7 @@ def update_aggregate_lb(datum):
                 # ):
                 # aggregate_amount += transaction[0]
 
-                if contribution_date <= transaction[4]:
+                if expenditure_date <= transaction[4]:
                     transaction_id = transaction[1]
                     put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount)
 
@@ -460,7 +460,7 @@ def update_aggregate_lb(datum):
 
     except Exception as e:
         raise Exception(
-            "The update_aggregate_la function is throwing an error: " + str(e)
+            "The update_aggregate_lb function is throwing an error: " + str(e)
         )
 
 
