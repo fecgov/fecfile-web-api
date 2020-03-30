@@ -147,7 +147,9 @@ export const AppRoutes: Routes = [
       {
         path: 'manage_users',
         component: ManageUserComponent,
-        pathMatch: 'full'
+        pathMatch: 'full',
+        canActivate: [CanActivateGuard],
+        canDeactivate: [CanDeactivateGuardService]
       },
     ]
   },
