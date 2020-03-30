@@ -245,15 +245,25 @@ def list_all_transactions_entity_sl(
         )
 
 
-def put_sql_agg_amount_schedA(cmte_id, transaction_id, aggregate_amount):
+def put_sql_agg_amount_schedA(
+    cmte_id, transaction_id, aggregate_amount, itemized_ind, line_number
+):
     """
     update aggregate amount
     """
     try:
         with connection.cursor() as cursor:
             cursor.execute(
-                """UPDATE public.sched_a SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                [aggregate_amount, transaction_id, cmte_id],
+                """
+                UPDATE public.sched_a 
+                SET aggregate_amt = %s,
+                    itemized_ind = %s,
+                    line_number = %s
+                WHERE transaction_id = %s 
+                AND cmte_id = %s 
+                AND delete_ind is distinct from 'Y'
+                """,
+                [aggregate_amount, itemized_ind, line_number, transaction_id, cmte_id],
             )
             if cursor.rowcount == 0:
                 raise Exception(
@@ -318,10 +328,18 @@ def update_aggregate_la(datum):
         if not transactions_list:
             return
         aggregate_amount = 0
+        itemized_ind = ""
+        output_line_number = ""
         for transaction in transactions_list:
             if transaction[5] != "Y":
                 if not transaction[9] == "N":
                     aggregate_amount += transaction[0]
+                    if aggregate_amount <= itemization_value:
+                        output_line_number = "11AII"
+                        itemized_ind = "U"
+                    else:
+                        output_line_number = "11AI"
+                        itemized_ind = "I"
 
                 # if transaction[7] != None or (
                 #     transaction[7] == None and transaction[6] != "X"
@@ -330,7 +348,13 @@ def update_aggregate_la(datum):
 
                 if contribution_date <= transaction[4]:
                     transaction_id = transaction[1]
-                    put_sql_agg_amount_schedA(cmte_id, transaction_id, aggregate_amount)
+                    put_sql_agg_amount_schedA(
+                        cmte_id,
+                        transaction_id,
+                        aggregate_amount,
+                        itemized_ind,
+                        output_line_number,
+                    )
 
                     # child_SA_transaction_list = get_list_agg_child_schedA(report_id, cmte_id, transaction[1])
                     # for child_SA_transaction in child_SA_transaction_list:
