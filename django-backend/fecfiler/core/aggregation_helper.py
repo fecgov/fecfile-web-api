@@ -109,6 +109,12 @@ ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST = [
     "RET_REC",
     "BC_TO_IND",
     "BC_TO_UNKN",
+    "LEVIN_PARTN_MEMO",
+    "LEVIN_TRIB_REC",
+    "LEVIN_PARTN_REC",
+    "LEVIN_ORG_REC",
+    "LEVIN_INDV_REC",
+    "LEVIN_NON_FED_REC",
 ]
 
 # Updating itemized_ind for the below list
