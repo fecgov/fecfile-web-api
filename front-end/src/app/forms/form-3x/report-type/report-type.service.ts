@@ -724,7 +724,11 @@ export class ReportTypeService {
   public forceItemizationToggle(trx: TransactionModel): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     // Assuming first two letters of a transaction ID would be the transaction type itself
-    const transactionType = trx.transactionId.substring(0, 2).toLowerCase();
+    let transactionType = trx.transactionId.substring(0, 2).toLowerCase();
+    // L-A and L-B transactions use A/B API
+    if (transactionType.charAt(0) === 'l') {
+      transactionType = 's' + transactionType.charAt(1);
+    }
     let isItemized: boolean;
     if (trx.itemized) {
       if (trx.itemized === 'U' || trx.itemized === 'FU') {
@@ -732,7 +736,7 @@ export class ReportTypeService {
       } else {
         isItemized = true;
       }
-      } else if (trx.itemized === null) {
+    } else if (trx.itemized === null) {
       isItemized = true;
     }
     const toggleWay = isItemized ? 'unitemize' : 'itemize';
