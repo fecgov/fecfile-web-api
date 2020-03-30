@@ -31,18 +31,12 @@ import { ContactsComponent } from './contacts/contacts.component';
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { HelpComponent } from './help/help.component';
 // import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
-import {CommitteeLoginComponent} from './app-main-login/committee-login/committee-login.component';
 import {ManageUserComponent} from './admin/manage-user/manage-user.component';
 
 export const AppRoutes: Routes = [
   {
     path: '',
     component: LoginComponent,
-    pathMatch: 'full'
-  },
-  {
-    path: 'committee_login',
-    component: CommitteeLoginComponent,
     pathMatch: 'full'
   },
   {

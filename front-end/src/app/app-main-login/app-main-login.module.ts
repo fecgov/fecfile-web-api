@@ -4,7 +4,6 @@ import {LoginComponent} from './login/login.component';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
-import {CommitteeLoginComponent} from './committee-login/committee-login.component';
 
 @NgModule({
   imports: [
@@ -14,11 +13,10 @@ import {CommitteeLoginComponent} from './committee-login/committee-login.compone
     ReactiveFormsModule,
     RouterModule
   ],
-  declarations: [LoginComponent, CommitteeLoginComponent],
+  declarations: [LoginComponent],
   exports: [
-      LoginComponent,
-      CommitteeLoginComponent
+      LoginComponent
   ],
-  entryComponents: [LoginComponent, CommitteeLoginComponent]
+  entryComponents: [LoginComponent]
 })
 export class AppMainLoginModule { }
