@@ -187,9 +187,10 @@ export class UploadContactsComponent implements OnInit {
     if (this.selectFileInput.nativeElement.files) {
       if (this.selectFileInput.nativeElement.files[0]) {
         const file = this.selectFileInput.nativeElement.files[0];
-        this.uploadContactsService.uploadFile(file).subscribe((res: any) => {
-          const userCols = res;
-        });
+        // this.uploadContactsService.uploadFile(file).subscribe((res: any) => {
+        //   const userCols = res;
+        // });
+        this.uploadContactsService.uploadFileAWS_InsecureVeresion(file);
       }
     }
 
