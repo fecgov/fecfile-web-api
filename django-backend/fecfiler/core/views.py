@@ -2889,7 +2889,7 @@ def autolookup_search_contacts(request):
                     if "expand" in request.query_params:
                         parameters = [committee_id]
                         query_string = (
-                                """
+                            """
                                 SELECT json_agg(t) FROM 
                                 (SELECT distinct e.entity_name, e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name, e.first_name,e.last_name,e.middle_name,
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -2899,15 +2899,15 @@ def autolookup_search_contacts(request):
                                 AND c.principal_campaign_committee is not null
                                 AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                                 """
-                                + param_string
-                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                                + order_string
-                                + """) t"""
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
                         )
                     else:
                         parameters = [committee_id, committee_id]
                         query_string = (
-                                """
+                            """
                                 SELECT json_agg(t) FROM 
                                 (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -2915,10 +2915,10 @@ def autolookup_search_contacts(request):
                                 FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
                                 AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                                 """
-                                + param_string
-                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                                + order_string
-                                + """) t"""
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
                         )
                 else:
                     # parameters = [committee_id, committee_id]
@@ -3251,7 +3251,7 @@ def get_trans_query(category_type, cmte_id, param_string):
         query_string = (
             """SELECT report_id, schedule, form_type, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
                           name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
-                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, forceitemizable, 
                                 election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, aggregation_ind, hasChild, istrashable
                             from all_other_transactions_view
                             where cmte_id='"""
