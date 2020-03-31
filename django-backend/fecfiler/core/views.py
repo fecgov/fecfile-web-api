@@ -5100,6 +5100,7 @@ def load_loan_debt_summary(period_args):
         FROM   sched_c 
         WHERE  cmte_id = %s 
             AND report_id = %s 
+            AND delete_ind is distinct from 'Y'
             AND transaction_type_identifier IN ( 
                 'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE' ) 
         GROUP  BY transaction_type_identifier 
@@ -5109,8 +5110,9 @@ def load_loan_debt_summary(period_args):
         FROM   sched_d 
         WHERE  cmte_id = %s 
             AND report_id = %s 
+            AND delete_ind is distinct from 'Y'
             AND transaction_type_identifier IN ( 
-                'DEBT_TO_VENDER') 
+                'DEBT_TO_VENDOR', 'DEBT_BY_VENDOR') 
         GROUP  BY transaction_type_identifier 
     """
     _sql_ytd = """
@@ -5118,6 +5120,7 @@ def load_loan_debt_summary(period_args):
             Sum(loan_balance) 
         FROM   sched_c 
         WHERE  cmte_id = %s 
+            AND delete_ind is distinct from 'Y'
             AND loan_incurred_date BETWEEN %s AND %s 
             AND transaction_type_identifier IN ( 
                 'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE' ) 
@@ -5127,9 +5130,10 @@ def load_loan_debt_summary(period_args):
             Sum(balance_at_close) 
         FROM   sched_d 
         WHERE  cmte_id = %s
+            AND delete_ind is distinct from 'Y'
             AND create_date BETWEEN %s AND %s
             AND transaction_type_identifier IN ( 
-                'DEBT_TO_VENDER') 
+                'DEBT_TO_VENDOR', 'DEBT_BY_VENDOR') 
         GROUP  BY transaction_type_identifier 
     """
     try:
@@ -5137,17 +5141,17 @@ def load_loan_debt_summary(period_args):
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             cursor.execute(_sql_rep, [cmte_id, report_id] * 2)
             for row in cursor.fetchall():
-                if row[0].endswith("TO_CMTE"):
+                if row[0] in ("LOANS_OWED_TO_CMTE", "DEBT_BY_VENDOR"):
                     loan_debt_dic["DEBTS/LOANS OWED TO COMMITTEE"] += float(row[1])
-                elif row[0].endswith("BY_CMTE"):
+                elif row[0] in ("LOANS_OWED_BY_CMTE", "DEBT_TO_VENDOR"):
                     loan_debt_dic["DEBTS/LOANS OWED BY COMMITTEE"] += float(row[1])
                 else:
                     pass
             cursor.execute(_sql_ytd, [cmte_id, start_dt, end_dt] * 2)
             for row in cursor.fetchall():
-                if row[0].endswith("TO_CMTE"):
+                if row[0] in ("LOANS_OWED_TO_CMTE", "DEBT_BY_VENDOR"):
                     loan_debt_dic["DEBTS/LOANS OWED TO COMMITTEE YTD"] += float(row[1])
-                elif row[0].endswith("BY_CMTE"):
+                elif row[0] in ("LOANS_OWED_BY_CMTE", "DEBT_TO_VENDOR"):
                     loan_debt_dic["DEBTS/LOANS OWED BY COMMITTEE YTD"] += float(row[1])
                 else:
                     pass
