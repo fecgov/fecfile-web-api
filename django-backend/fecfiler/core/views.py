@@ -5306,11 +5306,15 @@ def get_cvg_dates(report_id, cmte_id):
 
 
 def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
+    """
+    get cash on hand from last report and previous year
+    """
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         if prev_yr:
             prev_cvg_year = cvg_start_date.year - 1
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
+            cvg_start_date = datetime.date(cvg_start_date.year, 1, 1)
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
         with connection.cursor() as cursor:
