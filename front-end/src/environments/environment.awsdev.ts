@@ -3,5 +3,7 @@ export const environment = {
   name: 'awsdev',
   apiUrl: 'https://dev-fecfile-api.efdev.fec.gov/api/v1',
   validateSuccess: 'All required fields have passed validation.',
-  appTitle: 'FECfile'
+  appTitle: 'FECfile',
+  ACCESS_KEY: _process.env.ACCESS_KEY,
+  SECRET_KEY: _process.env.SECRET_KEY
 };
