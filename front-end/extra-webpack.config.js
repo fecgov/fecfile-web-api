@@ -5,7 +5,7 @@ let env = {};
 keys.forEach(key => {
   if (key === 'ACCESS_KEY' || key === 'SECRET_KEY') {
     env[key] = JSON.stringify(process.env[key]);
-    console.log(`${key} is ${env[key]}`);
+    // console.log(`${key} is ${env[key]}`);
   }
 });
 
