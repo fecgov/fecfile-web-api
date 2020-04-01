@@ -181,7 +181,6 @@ export class UploadContactsComponent implements OnInit {
   public fileSelected() {
     this.progressPercent = 0;
     this.foo.progressPercent = 0;
-    // this.fooBar = [0];
     this.showUpload = false;
 
     if (this.selectFileInput.nativeElement.files) {
@@ -190,7 +189,7 @@ export class UploadContactsComponent implements OnInit {
         // this.uploadContactsService.uploadFile(file).subscribe((res: any) => {
         //   const userCols = res;
         // });
-        this.uploadContactsService.uploadFileAWS_InsecureVeresion(file);
+        this.uploadContactsService.uploadFile(file);
       }
     }
 
@@ -206,10 +205,8 @@ export class UploadContactsComponent implements OnInit {
     // after fakeUploadTime has passed, read the file client side.  This will be server side
     // read in the future.
     const timer$ = timer(fakeUploadTime).pipe(finalize(() => {
-      // console.log('All done!');
       this.progressPercent = 100;
       this.foo.progressPercent = 100;
-      // this.fooBar = [100];
       const files = this.selectFileInput.nativeElement.files;
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -224,7 +221,6 @@ export class UploadContactsComponent implements OnInit {
         const percentageIncrease = (fakeUploadInterval) * 100 / fakeUploadTime;
         this.progressPercent = this.progressPercent + percentageIncrease;
         this.foo.progressPercent = this.foo.progressPercent + percentageIncrease;
-        // this.fooBar = [this.foo.progressPercent + percentageIncrease];
       });
   }
 
