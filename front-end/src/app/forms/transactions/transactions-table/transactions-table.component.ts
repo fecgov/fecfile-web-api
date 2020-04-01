@@ -1397,7 +1397,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       return false;
     }
     for (const trx of this.transactionsModel) {
-      if (trx.reportstatus === 'FILED') {
+      if (trx.reportstatus.toUpperCase() === 'FILED') {
         return false;
       }
     }
@@ -1701,6 +1701,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   private isForceItemizable(trx: TransactionModel): boolean {
+    if (!this.editMode) {
+      return false;
+    }
     if (trx) {
       return trx.forceitemizable;
     } else {

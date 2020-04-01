@@ -108,6 +108,7 @@
             id="sidebar_signBtn"
             type="button"
             class="btn btn-secondary"
+            [disabled]="!editMode"
             [routerLink]="['/signandSubmit', '3X']"
             [queryParams]="{ edit: editMode }"
           >

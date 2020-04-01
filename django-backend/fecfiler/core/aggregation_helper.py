@@ -109,6 +109,12 @@ ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST = [
     "RET_REC",
     "BC_TO_IND",
     "BC_TO_UNKN",
+    "LEVIN_PARTN_MEMO",
+    "LEVIN_TRIB_REC",
+    "LEVIN_PARTN_REC",
+    "LEVIN_ORG_REC",
+    "LEVIN_INDV_REC",
+    "LEVIN_NON_FED_REC",
 ]
 
 # Updating itemized_ind for the below list
@@ -183,7 +189,63 @@ def find_form_type(report_id, cmte_id):
         raise Exception("The form_type function is throwing an error:" + str(e))
 
 
-def list_all_transactions_entity_sl(
+def list_all_transactions_entity_lb(
+    aggregate_start_date, aggregate_end_date, entity_id, cmte_id, levin_account_id
+):
+    """
+    load all transactions for an entity within a time window
+    return value: a list of transction_records [
+       (contribution_amount, transaction_id, report_id, line_number, contribution_date),
+       ....
+    ]
+    return items are sorted by contribution_date in ASC order
+    """
+    logger.debug(
+        "fetching transactions for entity {} and levin acct {}".format(
+            entity_id, levin_account_id
+        )
+    )
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+            SELECT t1.expenditure_amount, 
+                t1.transaction_id, 
+                t1.report_id, 
+                t1.line_number, 
+                t1.expenditure_date, 
+                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
+                t1.memo_code, 
+                t1.back_ref_transaction_id,
+                t1.transaction_type_identifier,
+                t1.aggregation_ind
+            FROM public.sched_b t1 
+            WHERE entity_id = %s 
+            AND cmte_id = %s 
+            AND expenditure_date >= %s 
+            AND expenditure_date <= %s
+            AND levin_account_id = %s 
+            AND delete_ind is distinct FROM 'Y' 
+            ORDER BY expenditure_date ASC, create_date ASC
+            """,
+                [
+                    entity_id,
+                    cmte_id,
+                    aggregate_start_date,
+                    aggregate_end_date,
+                    levin_account_id,
+                ],
+            )
+            transactions_list = cursor.fetchall()
+        logger.debug("transaction list loaded.")
+        return transactions_list
+    except Exception as e:
+        raise Exception(
+            "The list_all_transactions_entity function is throwing an error: " + str(e)
+        )
+
+
+def list_all_transactions_entity_la(
     aggregate_start_date, aggregate_end_date, entity_id, cmte_id, levin_account_id
 ):
     """
@@ -239,15 +301,25 @@ def list_all_transactions_entity_sl(
         )
 
 
-def put_sql_agg_amount_schedA(cmte_id, transaction_id, aggregate_amount):
+def put_sql_agg_amount_schedA(
+    cmte_id, transaction_id, aggregate_amount, itemized_ind, line_number
+):
     """
     update aggregate amount
     """
     try:
         with connection.cursor() as cursor:
             cursor.execute(
-                """UPDATE public.sched_a SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                [aggregate_amount, transaction_id, cmte_id],
+                """
+                UPDATE public.sched_a 
+                SET aggregate_amt = %s,
+                    itemized_ind = %s,
+                    line_number = %s
+                WHERE transaction_id = %s 
+                AND cmte_id = %s 
+                AND delete_ind is distinct from 'Y'
+                """,
+                [aggregate_amount, itemized_ind, line_number, transaction_id, cmte_id],
             )
             if cursor.rowcount == 0:
                 raise Exception(
@@ -302,7 +374,7 @@ def update_aggregate_la(datum):
         aggregate_start_date, aggregate_end_date = find_aggregate_date(
             form_type, contribution_date
         )
-        transactions_list = list_all_transactions_entity_sl(
+        transactions_list = list_all_transactions_entity_la(
             aggregate_start_date,
             aggregate_end_date,
             entity_id,
@@ -312,10 +384,18 @@ def update_aggregate_la(datum):
         if not transactions_list:
             return
         aggregate_amount = 0
+        itemized_ind = ""
+        output_line_number = ""
         for transaction in transactions_list:
             if transaction[5] != "Y":
                 if not transaction[9] == "N":
                     aggregate_amount += transaction[0]
+                    if aggregate_amount <= itemization_value:
+                        output_line_number = "11AII"
+                        itemized_ind = "U"
+                    else:
+                        output_line_number = "11AI"
+                        itemized_ind = "I"
 
                 # if transaction[7] != None or (
                 #     transaction[7] == None and transaction[6] != "X"
@@ -324,7 +404,13 @@ def update_aggregate_la(datum):
 
                 if contribution_date <= transaction[4]:
                     transaction_id = transaction[1]
-                    put_sql_agg_amount_schedA(cmte_id, transaction_id, aggregate_amount)
+                    put_sql_agg_amount_schedA(
+                        cmte_id,
+                        transaction_id,
+                        aggregate_amount,
+                        itemized_ind,
+                        output_line_number,
+                    )
 
                     # child_SA_transaction_list = get_list_agg_child_schedA(report_id, cmte_id, transaction[1])
                     # for child_SA_transaction in child_SA_transaction_list:
@@ -341,60 +427,60 @@ def update_aggregate_la(datum):
         )
 
 
-def list_all_transactions_entity_lb(
-    aggregate_start_date, aggregate_end_date, entity_id, cmte_id, levin_account_id
-):
-    """
-    load all transactions for an entity within a time window
-    return value: a list of transction_records [
-       (contribution_amount, transaction_id, report_id, line_number, contribution_date),
-       ....
-    ]
-    return items are sorted by contribution_date in ASC order
-    """
-    logger.debug(
-        "fetching transactions for entity {} and levin acct {}".format(
-            entity_id, levin_account_id
-        )
-    )
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-            SELECT t1.expenditure_amount, 
-                t1.transaction_id, 
-                t1.report_id, 
-                t1.line_number, 
-                t1.expenditure_date, 
-                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
-                t1.memo_code, 
-                t1.back_ref_transaction_id,
-                t1.transaction_type_identifier,
-                t1.aggregation_ind
-            FROM public.sched_a t1 
-            WHERE entity_id = %s 
-            AND cmte_id = %s 
-            AND expenditure_date >= %s 
-            AND expenditure_date <= %s
-            AND levin_account_id = %s 
-            AND delete_ind is distinct FROM 'Y' 
-            ORDER BY expenditure_date ASC, create_date ASC
-            """,
-                [
-                    entity_id,
-                    cmte_id,
-                    aggregate_start_date,
-                    aggregate_end_date,
-                    levin_account_id,
-                ],
-            )
-            transactions_list = cursor.fetchall()
-        logger.debug("transaction list loaded.")
-        return transactions_list
-    except Exception as e:
-        raise Exception(
-            "The list_all_transactions_entity function is throwing an error: " + str(e)
-        )
+# def list_all_transactions_entity_lb(
+#     aggregate_start_date, aggregate_end_date, entity_id, cmte_id, levin_account_id
+# ):
+#     """
+#     load all transactions for an entity within a time window
+#     return value: a list of transction_records [
+#        (contribution_amount, transaction_id, report_id, line_number, contribution_date),
+#        ....
+#     ]
+#     return items are sorted by contribution_date in ASC order
+#     """
+#     logger.debug(
+#         "fetching transactions for entity {} and levin acct {}".format(
+#             entity_id, levin_account_id
+#         )
+#     )
+#     try:
+#         with connection.cursor() as cursor:
+#             cursor.execute(
+#                 """
+#             SELECT t1.expenditure_amount,
+#                 t1.transaction_id,
+#                 t1.report_id,
+#                 t1.line_number,
+#                 t1.expenditure_date,
+#                 (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id),
+#                 t1.memo_code,
+#                 t1.back_ref_transaction_id,
+#                 t1.transaction_type_identifier,
+#                 t1.aggregation_ind
+#             FROM public.sched_a t1
+#             WHERE entity_id = %s
+#             AND cmte_id = %s
+#             AND expenditure_date >= %s
+#             AND expenditure_date <= %s
+#             AND levin_account_id = %s
+#             AND delete_ind is distinct FROM 'Y'
+#             ORDER BY expenditure_date ASC, create_date ASC
+#             """,
+#                 [
+#                     entity_id,
+#                     cmte_id,
+#                     aggregate_start_date,
+#                     aggregate_end_date,
+#                     levin_account_id,
+#                 ],
+#             )
+#             transactions_list = cursor.fetchall()
+#         logger.debug("transaction list loaded.")
+#         return transactions_list
+#     except Exception as e:
+#         raise Exception(
+#             "The list_all_transactions_entity function is throwing an error: " + str(e)
+#         )
 
 
 def update_aggregate_lb(datum):
@@ -425,7 +511,7 @@ def update_aggregate_lb(datum):
         aggregate_start_date, aggregate_end_date = find_aggregate_date(
             form_type, expenditure_date
         )
-        transactions_list = list_all_transactions_entity_sl(
+        transactions_list = list_all_transactions_entity_lb(
             aggregate_start_date,
             aggregate_end_date,
             entity_id,
@@ -435,10 +521,21 @@ def update_aggregate_lb(datum):
         if not transactions_list:
             return
         aggregate_amount = 0
+        line_number = None
+        itemized_ind = None
         for transaction in transactions_list:
             if transaction[5] != "Y":
                 if not transaction[9] == "N":
                     aggregate_amount += transaction[0]
+                if transaction[8] != "LEVIN_OTH_DISB":
+                    itemized_ind = "I"
+                else:
+                    if aggregate_amount <= 200:
+                        itemized_ind = "U"
+                        line_number = "11AII"
+                    else:
+                        itemzied_ind = "I"
+                        line_number = "11AI"
 
                 # if transaction[7] != None or (
                 #     transaction[7] == None and transaction[6] != "X"
@@ -447,7 +544,13 @@ def update_aggregate_lb(datum):
 
                 if expenditure_date <= transaction[4]:
                     transaction_id = transaction[1]
-                    put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount)
+                    put_sql_agg_amount_LB(
+                        cmte_id,
+                        transaction_id,
+                        aggregate_amount,
+                        itemized_ind,
+                        line_number,
+                    )
 
                     # child_SA_transaction_list = get_list_agg_child_schedA(report_id, cmte_id, transaction[1])
                     # for child_SA_transaction in child_SA_transaction_list:
@@ -1861,12 +1964,48 @@ def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
     try:
         with connection.cursor() as cursor:
             cursor.execute(
-                """UPDATE public.sched_b SET aggregate_amt = %s WHERE transaction_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                """
+                UPDATE public.sched_b 
+                SET aggregate_amt = %s
+                WHERE transaction_id = %s 
+                AND cmte_id = %s 
+                AND delete_ind is distinct from 'Y'
+                """,
                 [aggregate_amount, transaction_id, cmte_id],
             )
             if cursor.rowcount == 0:
                 raise Exception(
                     "put_sql_agg_amount_schedB function: The Transaction ID: {} does not exist in schedB table".format(
+                        transaction_id
+                    )
+                )
+    except Exception:
+        raise
+
+
+def put_sql_agg_amount_LB(
+    cmte_id, transaction_id, aggregate_amount, itemized_ind, line_number
+):
+    """
+    update aggregate amount
+    """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE public.sched_b 
+                SET aggregate_amt = %s,
+                    itemized_ind = %s,
+                    line_number = %s
+                WHERE transaction_id = %s 
+                AND cmte_id = %s 
+                AND delete_ind is distinct from 'Y'
+                """,
+                [aggregate_amount, itemized_ind, line_number, transaction_id, cmte_id],
+            )
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "put_sql_agg_amount_LB function: The Transaction ID: {} does not exist in schedB table".format(
                         transaction_id
                     )
                 )
