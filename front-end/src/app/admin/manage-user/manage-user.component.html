@@ -67,95 +67,80 @@
                     </div>
                 </div>
             </div>
-            <div class="basic-info">
-                <div class="container-add-user">
-                    <div class="row add-user">
-                        <div class="col-md-6">
-                            <h3>Basic Information</h3>
-                            <div class="container-basic-info">
-                                <div class="row last-name">
-                                    <div class="col-md-7 form-group form-inline">
-                                        <label for="user-last-name">Last Name</label>
 
-                                        <input type="text"
-                                               class="form-control" formControlName="user-last-name"
-                                               id="user-last-name"
-                                               placeholder="Enter Last Name"
-                                               [style.width]="'70%'" >
-                                    </div>
-                                </div>
-                                <div class="row first-name">
-                                    <div class="col-md-7 form-group form-inline">
-                                        <label for="user-first-name">First Name</label>
-                                        <input type="text"
-                                               class="form-control"
-                                               formControlName="user-first-name"
-                                               id="user-first-name"
-                                               placeholder="Enter First Name"
-                                               [style.width]="'70%'">
-                                    </div>
-                                </div>
-                                <div class="row contact-number">
-                                    <div class="col-md-7 form-group form-inline">
-                                        <label for="user-contact-number">Contact Number</label>
-                                        <input type="text"
-                                               class="form-control"
-                                               formControlName="user-contact-number"
-                                               id="user-contact-number"
-                                               placeholder="Enter Contact Number"
-                                               [style.width]="'70%'">
-                                    </div>
-                                </div>
-                                <div class="row email-address">
-                                    <div class="col-md-7 form-group form-inline">
-                                        <label for="user-email-address">Email Address</label>
-                                        <input type="text"
-                                               class="form-control" formControlName="user-email-address"
-                                               id="user-email-address"
-                                               placeholder="Enter Email address"
-                                               [style.width]="'70%'">
-                                    </div>
-                                </div>
-                                <div class="row"></div>
-                            </div>
-                        </div>
-                        <div class="col-md-5">
-                            <h3>Role Description</h3>
-                            <div class="container-role-desc">
-                                <div class="row administrator">
-                                    <div class="col-md-4"><label class="font-weight-bold">Admin</label>
-                                        <ul>
-                                            <li>Has Full Access</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="row entry">
-                                    <div class="col-md-5"><label class="font-weight-bold">Entry</label>
-                                        <ul>
-                                            <li>Has access to enter, edit and delete information, but cannot upload
-                                                reports or create other users.
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="row read-only">
-                                    <div class="col-md-4"><label class="font-weight-bold">Read Only</label>
-                                        <ul>
-                                            <li>Can only view data, and cannot perform any other functions.</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <table class="user-input table table-borderless">
+                <thead>
+                <tr>
+                    <th style="text-align: left;">Basic Information</th>
+                    <th style="text-align: left;">Role Description</th>
+                </tr>
+                </thead>
+                <tbody class="user-data">
+                    <tr>
+                        <td class="basic-info" >
+                            <table class="basic-info">
+                                <tr>
+                                    <td class="label-info"><label>Last Name</label></td>
+                                    <td class="user-text"><input placeholder="Enter Last Name" type="text"></td>
+                                </tr>
+                                <tr>
+                                    <td><label>First Name</label></td>
+                                    <td><input placeholder="Enter First Name" type="text"></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Contact Number</label></td>
+                                    <td><input placeholder="Enter Phone Number" type="text"></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Email Address</label></td>
+                                    <td><input placeholder="Enter Email Address" type="text"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="role-desc" >
+                            <b>Administrator</b>
+                                <ul>
+                                    <li>Has full access.</li>
+                                </ul>
+                            <b>Entry</b>
+                            <ul>
+                                 <li>Has access to enter, edit and delete information, but cannot upload reports or create other
+                                    users.</li>
+                            </ul>
+                            <b>Read Only</b>
+                            <ul>
+                               <li>
+                                    Can only view data, and cannot perform any other functions.
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
 
-
+            <div style="padding-left: 35px;">
+                <button
+                    class="btn btn-primary">
+                    Add User
+                </button> &nbsp;
+                <button
+                    class="btn btn-secondary-dark-gray">
+                    Clear Form
+                 </button>
             </div>
-
         </form>
     </div>
     <hr>
     <div class="manage-users">
-        <h2>Manage Existing Users</h2></div>
+        <h2>Manage Existing Users</h2>
+    <table class="table table-bordered sort-true" style="width:80%">
+        <thead>
+        <th>Last Name <i class="fas fa-sort"></i></th>
+        <th>First Name <i class="fas fa-sort"></i></th>
+        <th>Email Address <i class="fas fa-sort"></i></th>
+        <th>Role <i class="fas fa-sort"></i></th>
+        <th>Action <i class="fas fa-sort"></i></th>
+        </thead>
+    </table>
+    </div>
 </div>

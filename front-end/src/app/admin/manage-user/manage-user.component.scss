@@ -13,16 +13,104 @@
       padding-bottom: 15px;
     }
 
-    .container-basic-info .form-inline{
-      input{
+    .container-basic-info .form-inline {
+      input {
         outline: 0;
         border-width: 0 0 2px;
       }
-    label{
-      margin-right:10px;
     }
 
+
+    .add-user {
+      .user-input {
+        // input{
+        //   float: left;
+        //   @include make-text-input(90px);
+        //   @include media(tablet) {
+        //     width: 230px;
+        //   }
+        //   @include media(mediumDesktop) {
+        //     width: 250px;
+        //   }
+        //   @include media(largeDesktop) {
+        //     width: 450px;
+        //   }
+        //
+        //   font-family: 'Lato-Reg', sans-serif;
+        //   font-size: 20px;
+        //   //width: 450px;
+        //   height: 25px;
+        //   margin-left: auto;
+        //   margin-right: auto;
+        //   //margin-bottom: 25px;
+        //   border: none;
+        //   border-radius: 0px;
+        //   border-bottom: 1px solid  #164F85;
+        //   background: transparent;
+        // }
+        //label{
+        //   display: inline-block;
+        //   float: left;
+        //   clear: left;
+        //   width: 250px;
+        //   text-align: left;
+        // }
+      }
     }
+
+    label {
+      margin-right: 10px;
+    }
+
   }
 
+  .add-user {
+
+    padding-left: 10px;
+
+    .radio {
+      padding-left: 10px;
+    }
+  .user-data {
+
+    .role-desc {
+      width: 40%;
+    ul {
+      border-bottom: 10px;
+      padding-bottom: 20px;
+    }
+    li {
+      padding-top: 5px;
+      padding-left: 25px;
+    }
+    }
+    .basic-info {
+
+      width: 60%;
+
+      .label-info {
+        width: 30%;
+      }
+      .user-text {
+        width: 60%;
+      }
+
+      input {
+        outline: 0;
+        border: none;
+        border-bottom: 1px solid #164F85;
+        width: 100%;
+      }
+
+      input:focus {
+        border-color: green
+      }
+    }
+  }
 }
+
+
+
+}
+
+

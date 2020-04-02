@@ -28,4 +28,7 @@ export class ManageUserComponent implements OnInit {
   ngOnInit() {
   }
 
+  isContactViewActive() {
+    return false;
+  }
 }
