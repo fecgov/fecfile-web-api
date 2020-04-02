@@ -103,7 +103,7 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {'Convention Account' : ['IND_NP_CONVEN_ACC','
                                     'See Memos Below' : ['LEVIN_PARTN_REC', 'PARTN_REC'],
                                     # Removing 'EAR_MEMO' from below as it being populated from front-end
                                     'Total Earmarked through Conduit' : ['EAR_REC_CONVEN_ACC_MEMO','EAR_REC_HQ_ACC_MEMO','EAR_REC_RECNT_ACC_MEMO','PAC_EAR_MEMO'],
-                                    'Earmarked from' : ['CON_EAR_DEP_MEMO']
+                                    'Earmarked from' : ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO']
                                     }
 
 logger = logging.getLogger(__name__)
