@@ -135,7 +135,7 @@
         <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
           <tr>
             <td>
-              <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+              <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)">
             </td>
             <td  *ngIf="_allTransactions">{{trx.formType}} - {{trx.reportType}}</td>
             <td  *ngIf="isColumnVisible('type')">{{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
@@ -215,7 +215,7 @@
           </tr>
           <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
             <td style="padding-left: 1.5rem;">
-              <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
+              <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)" hidden>
             </td>
             <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
             <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
@@ -429,7 +429,7 @@
           <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
             <tr>
               <td>
-                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)">
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')">
@@ -510,7 +510,7 @@
             </tr>
             <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
               <td style="padding-left: 1.5rem;">
-                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
+                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)" hidden>
               </td>
               <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
@@ -723,7 +723,7 @@
           <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
             <tr>
               <td>
-                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)">
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')">
@@ -930,7 +930,7 @@
           <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
             <tr>
               <td>
-                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)">
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('schedule')">{{trx.scheduleType}}</td>
@@ -1004,7 +1004,7 @@
             </tr>
             <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
               <td style="padding-left: 1.5rem;">
-                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
+                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)" hidden>
               </td>
               <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
               <td  *ngIf="isColumnVisible('schedule')">{{trxChild.scheduleType}}</td>
