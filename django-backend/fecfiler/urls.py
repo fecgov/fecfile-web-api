@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^api/v1/', include('fecfiler.sched_F.urls')),
     url(r'^api/v1/', include('fecfiler.sched_H.urls')),
     url(r'^api/v1/', include('fecfiler.sched_L.urls')),
+    url(r'^api/v1/', include('fecfiler.form_1M.urls')),
     #url(r'^api/v1/auth/login$', csrf_exempt(LoginView.as_view()), name='login'),
     #url(r'^api/v1/auth/login$', LoginView.as_view(), name='login'),
     url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
