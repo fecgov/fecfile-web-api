@@ -361,7 +361,7 @@ def preappending_purpose_description(transaction):
                     if child['transactionTypeIdentifier'] in DICT_PURPOSE_DESCRIPTION_VALUES[preappend]:
                         if 'contributionPurposeDescription' in child and child['contributionPurposeDescription'] not in ['',""," "]:
                             child['contributionPurposeDescription'] = preappend + ' ' + child['contributionPurposeDescription']
-                        if 'expenditurePurposeDescription' in transaction and transaction['expenditurePurposeDescription'] not in ['',""," "]:
+                        if 'expenditurePurposeDescription' in child and child['expenditurePurposeDescription'] not in ['',""," "]:
                             child['expenditurePurposeDescription'] = preappend + ' ' + child['expenditurePurposeDescription']
         return transaction
     except Exception as e:
