@@ -1093,6 +1093,9 @@ def put_schedA(datum):
                             child_datum.get("levin_account_id"),
                             child_datum.get("aggregation_ind"),
                         )
+                        update_schedB_aggamt_transactions(
+                            child_datum.get("expenditure_date"), child_datum.get("transaction_type_identifier"), child_datum.get("entity_id"), child_datum.get("cmte_id"), child_datum.get("report_id")
+                        )
                         # put_sql_schedB(datum.get('cmte_id'), datum.get('report_id'), child_line_number, child_transaction_type, child_transaction_id, transaction_id, datum.get('back_ref_sched_name'), entity_id, datum.get('contribution_date'), datum.get('contribution_amount'), '0.00', expenditure_purpose, None, None, None, datum.get('election_code'), datum.get('election_other_description'), datum.get('donor_cmte_id'), None, datum.get('donor_cmte_name'), None, None, None, None, None, None, child_transaction_type_identifier)
                     child_SA_transaction_id = get_child_transaction_schedA(
                         datum.get("cmte_id"), datum.get("report_id"), transaction_id
