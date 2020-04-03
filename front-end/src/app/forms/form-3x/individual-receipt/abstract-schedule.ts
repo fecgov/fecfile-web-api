@@ -3349,6 +3349,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           if(this.transactionType === 'TRIB_REC'
             || this.transactionType === 'PAC_NON_FED_REC'
             || this.transactionType === 'PAC_NON_FED_RET'
+            || this.transactionType === 'ALLOC_EXP'
+            || this.transactionType === 'ALLOC_EXP_CC_PAY'
           ){
             return Observable.of([]);
           }else if(this.transactionType === 'CON_EAR_DEP_MEMO'
