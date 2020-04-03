@@ -360,6 +360,11 @@ export class TransactionSidebarComponent implements OnInit {
             }
           }
         }
+        // for filed reports transactionCategory is undefined
+        // if undefined navigate to receipts tab default
+        if (!transactionCategory) {
+          transactionCategory = 'receipts';
+        }
         this._transactionMessageService.sendLoadDefaultTabMessage({
           step: 'transactions',
           reportId: this.reportId,
