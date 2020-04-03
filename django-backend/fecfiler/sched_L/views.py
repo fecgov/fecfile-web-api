@@ -1131,7 +1131,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-            # print(prev_cvg_end_dt)
+            print("$$$$$$$$prev_end_dt:{}".format(prev_cvg_end_dt))
         with connection.cursor() as cursor:
             if levin_account_id:
                 cursor.execute(

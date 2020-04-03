@@ -40,6 +40,7 @@ from fecfiler.core.carryover_helper import (
     do_h2_carryover,
     do_loan_carryover,
     do_debt_carryover,
+    do_levin_carryover,
 )
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
@@ -1702,6 +1703,7 @@ def reports(request):
                 do_h2_carryover(data.get("cmteid"), data.get("reportid"))
                 do_loan_carryover(data.get("cmteid"), data.get("reportid"))
                 do_debt_carryover(data.get("cmteid"), data.get("reportid"))
+                do_levin_carryover(data.get("cmteid"), data.get("reportid"))
 
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
