@@ -2889,7 +2889,7 @@ def autolookup_search_contacts(request):
                     if "expand" in request.query_params:
                         parameters = [committee_id]
                         query_string = (
-                                """
+                            """
                                 SELECT json_agg(t) FROM 
                                 (SELECT distinct e.entity_name, e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name, e.first_name,e.last_name,e.middle_name,
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -2899,15 +2899,15 @@ def autolookup_search_contacts(request):
                                 AND c.principal_campaign_committee is not null
                                 AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                                 """
-                                + param_string
-                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                                + order_string
-                                + """) t"""
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
                         )
                     else:
                         parameters = [committee_id, committee_id]
                         query_string = (
-                                """
+                            """
                                 SELECT json_agg(t) FROM 
                                 (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -2915,10 +2915,10 @@ def autolookup_search_contacts(request):
                                 FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
                                 AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                                 """
-                                + param_string
-                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                                + order_string
-                                + """) t"""
+                            + param_string
+                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                            + order_string
+                            + """) t"""
                         )
                 else:
                     # parameters = [committee_id, committee_id]
@@ -3251,7 +3251,7 @@ def get_trans_query(category_type, cmte_id, param_string):
         query_string = (
             """SELECT report_id, schedule, form_type, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
                           name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
-                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, 
+                                COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, forceitemizable, 
                                 election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, aggregation_ind, hasChild, istrashable
                             from all_other_transactions_view
                             where cmte_id='"""
@@ -5100,6 +5100,7 @@ def load_loan_debt_summary(period_args):
         FROM   sched_c 
         WHERE  cmte_id = %s 
             AND report_id = %s 
+            AND delete_ind is distinct from 'Y'
             AND transaction_type_identifier IN ( 
                 'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE' ) 
         GROUP  BY transaction_type_identifier 
@@ -5109,8 +5110,9 @@ def load_loan_debt_summary(period_args):
         FROM   sched_d 
         WHERE  cmte_id = %s 
             AND report_id = %s 
+            AND delete_ind is distinct from 'Y'
             AND transaction_type_identifier IN ( 
-                'DEBT_TO_VENDER') 
+                'DEBT_TO_VENDOR', 'DEBT_BY_VENDOR') 
         GROUP  BY transaction_type_identifier 
     """
     _sql_ytd = """
@@ -5118,6 +5120,7 @@ def load_loan_debt_summary(period_args):
             Sum(loan_balance) 
         FROM   sched_c 
         WHERE  cmte_id = %s 
+            AND delete_ind is distinct from 'Y'
             AND loan_incurred_date BETWEEN %s AND %s 
             AND transaction_type_identifier IN ( 
                 'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE' ) 
@@ -5127,9 +5130,10 @@ def load_loan_debt_summary(period_args):
             Sum(balance_at_close) 
         FROM   sched_d 
         WHERE  cmte_id = %s
+            AND delete_ind is distinct from 'Y'
             AND create_date BETWEEN %s AND %s
             AND transaction_type_identifier IN ( 
-                'DEBT_TO_VENDER') 
+                'DEBT_TO_VENDOR', 'DEBT_BY_VENDOR') 
         GROUP  BY transaction_type_identifier 
     """
     try:
@@ -5137,17 +5141,17 @@ def load_loan_debt_summary(period_args):
             # cursor.execute("SELECT line_number, contribution_amount FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'", [cmte_id, report_id])
             cursor.execute(_sql_rep, [cmte_id, report_id] * 2)
             for row in cursor.fetchall():
-                if row[0].endswith("TO_CMTE"):
+                if row[0] in ("LOANS_OWED_TO_CMTE", "DEBT_BY_VENDOR"):
                     loan_debt_dic["DEBTS/LOANS OWED TO COMMITTEE"] += float(row[1])
-                elif row[0].endswith("BY_CMTE"):
+                elif row[0] in ("LOANS_OWED_BY_CMTE", "DEBT_TO_VENDOR"):
                     loan_debt_dic["DEBTS/LOANS OWED BY COMMITTEE"] += float(row[1])
                 else:
                     pass
             cursor.execute(_sql_ytd, [cmte_id, start_dt, end_dt] * 2)
             for row in cursor.fetchall():
-                if row[0].endswith("TO_CMTE"):
+                if row[0] in ("LOANS_OWED_TO_CMTE", "DEBT_BY_VENDOR"):
                     loan_debt_dic["DEBTS/LOANS OWED TO COMMITTEE YTD"] += float(row[1])
-                elif row[0].endswith("BY_CMTE"):
+                elif row[0] in ("LOANS_OWED_BY_CMTE", "DEBT_TO_VENDOR"):
                     loan_debt_dic["DEBTS/LOANS OWED BY COMMITTEE YTD"] += float(row[1])
                 else:
                     pass
@@ -5302,11 +5306,15 @@ def get_cvg_dates(report_id, cmte_id):
 
 
 def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
+    """
+    get cash on hand from last report and previous year
+    """
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         if prev_yr:
             prev_cvg_year = cvg_start_date.year - 1
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
+            cvg_start_date = datetime.date(cvg_start_date.year, 1, 1)
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
         with connection.cursor() as cursor:

@@ -108,6 +108,10 @@ import { SchedEComponent } from './forms/form-3x/sched-e/sched-e/sched-e.compone
 import { HelpComponent } from './help/help.component';
 import { SharedModule } from './shared/shared.module';
 
+// import * as AWS from 'aws-sdk';
+import * as AWS from 'aws-sdk/global';
+import * as S3 from 'aws-sdk/clients/s3';
+
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
     return appConfig.loadAppConfig();

@@ -2506,16 +2506,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * changed (dirty) then don't save and just show parent.
    */
   public saveAndReturnToParent(): void {
-    if(this._cloned) {
-      this._cloned = false;
+    if(this.frmIndividualReceipt.status === 'INVALID') {
+      this.viewTransactions();
+    }else {
+      if(this._cloned) {
+        this._cloned = false;
+      }
+
+      if (!this.frmIndividualReceipt.dirty) {
+        this.clearFormValues();
+        this.returnToParent(ScheduleActions.edit);
+      } else {
+        this._doValidateReceipt(SaveActions.saveForReturnToParent);
+      }
     }
 
-    if (!this.frmIndividualReceipt.dirty) {
-      this.clearFormValues();
-      this.returnToParent(ScheduleActions.edit);
-    } else {
-      this._doValidateReceipt(SaveActions.saveForReturnToParent);
-    }
   }
 
   /**

@@ -76,6 +76,35 @@ list_of_SL_SA_transaction_types = ['LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_O
 
 list_of_SL_SB_transaction_types = ['LEVIN_VOTER_ID', 'LEVIN_GOTV', 'LEVIN_GEN', 'LEVIN_OTH_DISB', 'LEVIN_VOTER_REG']
 
+DICT_PURPOSE_DESCRIPTION_VALUES = {'Convention Account' : ['IND_NP_CONVEN_ACC','PAC_NP_CONVEN_ACC','PARTY_NP_CONVEN_ACC','TRIB_NP_CONVEN_ACC'],
+                                    'Convention Account - JF Memo for' : ['JF_TRAN_NP_CONVEN_IND_MEMO','JF_TRAN_NP_CONVEN_PAC_MEMO','JF_TRAN_NP_CONVEN_TRIB_MEMO'],
+                                    'Credit Card Payment' : ['IE_CC_PAY_MEMO'],
+                                    'Credit Card: See Below' : ['IE_CC_PAY'],
+                                    'Earmark for' : ['PAC_CON_EAR_DEP', 'PAC_CON_EAR_UNDEP'],
+                                    'Earmarked for' : ['CON_EAR_DEP','CON_EAR_UNDEP','CON_EAR_UNDEP_BKP','CON_EAR_UNDEP_BKP'],
+                                    'Earmarked through' : ['EAR_REC', 'EAR_REC_CONVEN_ACC','EAR_REC_HQ_ACC', 'EAR_REC_RECNT_ACC', 'PAC_EAR_REC'],
+                                    'Headquarters Account' : ['IND_NP_HQ_ACC', 'PAC_NP_HQ_ACC', 'PARTY_NP_HQ_ACC', 'TRIB_NP_HQ_ACC'],
+                                    'Headquarters Account - JF Memo for' : ['JF_TRAN_NP_HQ_IND_MEMO', 'JF_TRAN_NP_HQ_PAC_MEMO', 'JF_TRAN_NP_HQ_TRIB_MEMO'],
+                                    'In-kind' : ['IK_REC','IK_TRAN','IK_TRAN_FEA','PAC_IK_BC_OUT','PAC_IK_BC_REC','PAC_IK_REC','PARTY_IK_BC_OUT','PARTY_IK_REC'],
+                                    'JF Memo for' : ['JF_TRAN_IND_MEMO','JF_TRAN_PAC_MEMO','JF_TRAN_PARTY_MEMO','JF_TRAN_TRIB_MEMO'],
+                                    'JF Transfer' : ['JF_TRAN'],
+                                    'JF Transfer Convention Account' : ['JF_TRAN_NP_CONVEN_ACC'],
+                                    'JF Transfer Headquarters Account' : ['JF_TRAN_NP_HQ_ACC'],
+                                    'JF Transfer Recount Account' : ['JF_TRAN_NP_RECNT_ACC'],
+                                    'Loan From Ind' : ['LOAN_FROM_IND'],
+                                    'Non-Contribution Account Receipt' : ['BUS_LAB_NON_CONT_ACC','IND_REC_NON_CONT_ACC','OTH_CMTE_NON_CONT_ACC'],
+                                    'Partnership Memo' : ['LEVIN_PARTN_MEMO', 'PARTN_MEMO'],
+                                    'Payroll: See Below' : ['IE_PMT_TO_PROL'],
+                                    'Recount Account' : ['IND_NP_RECNT_ACC','PAC_NP_RECNT_ACC','PARTY_NP_RECNT_ACC','TRIB_NP_RECNT_ACC'],
+                                    'Recount Account - JF Memo for' : ['JF_TRAN_NP_RECNT_PAC_MEMO','JF_TRAN_NP_RECNT_TRIB_MEMO','JF_TRAN_NP_RECNT_IND_MEMO'],
+                                    'Recount Receipt' : ['IND_RECNT_REC','PAC_RECNT_REC','PARTY_RECNT_REC','TRIB_RECNT_REC'],
+                                    'Reimbursement: See Below' : ['IE_STAF_REIM'],
+                                    'Return/Void' : ['PAC_NON_FED_RET', 'PAC_RET'],
+                                    'See Memos Below' : ['LEVIN_PARTN_REC', 'PARTN_REC'],
+                                    # Removing 'EAR_MEMO' from below as it being populated from front-end
+                                    'Total Earmarked through Conduit' : ['EAR_REC_CONVEN_ACC_MEMO','EAR_REC_HQ_ACC_MEMO','EAR_REC_RECNT_ACC_MEMO','PAC_EAR_MEMO'],
+                                    'Earmarked from' : ['CON_EAR_DEP_MEMO']
+                                    }
 
 logger = logging.getLogger(__name__)
 
@@ -319,6 +348,26 @@ def get_all_child_transaction_identifers(form_type):
                 raise Exception(
                     'The get_all_child_transaction_identifers function is raising the following error:' + str(e))
 
+def preappending_purpose_description(transaction):
+    try:
+        for preappend in DICT_PURPOSE_DESCRIPTION_VALUES:
+            if transaction['transactionTypeIdentifier'] in DICT_PURPOSE_DESCRIPTION_VALUES[preappend]:
+                if 'contributionPurposeDescription' in transaction and transaction['contributionPurposeDescription'] not in ['',""," "]:
+                    transaction['contributionPurposeDescription'] = preappend + ' ' + transaction['contributionPurposeDescription']
+                if 'expenditurePurposeDescription' in transaction and transaction['expenditurePurposeDescription'] not in ['',""," "]:
+                    transaction['expenditurePurposeDescription'] = preappend + ' ' + transaction['expenditurePurposeDescription']
+            if 'child' in transaction:
+                for child in transaction['child']:
+                    if child['transactionTypeIdentifier'] in DICT_PURPOSE_DESCRIPTION_VALUES[preappend]:
+                        if 'contributionPurposeDescription' in child and child['contributionPurposeDescription'] not in ['',""," "]:
+                            child['contributionPurposeDescription'] = preappend + ' ' + child['contributionPurposeDescription']
+                        if 'expenditurePurposeDescription' in transaction and transaction['expenditurePurposeDescription'] not in ['',""," "]:
+                            child['expenditurePurposeDescription'] = preappend + ' ' + child['expenditurePurposeDescription']
+        return transaction
+    except Exception as e:
+        raise Exception(
+            'The preappending_purpose_description function is raising the following error:' + str(e))
+
 @api_view(["POST"])
 def create_json_builders(request):
     try:
@@ -433,7 +482,6 @@ def create_json_builders(request):
                                     parent_transactions.extend(get_transactions(
                                         identifier, report_id, cmte_id, back_ref_tran_id, transaction_id_list))
                         for transaction in parent_transactions:
-                            # print(transaction)
                             if child_identifier_list:
                                 for child_identifier in child_identifier_list:
                                     child_identifier = child_identifier.get(
@@ -448,6 +496,8 @@ def create_json_builders(request):
                                                     child_transactions)
                                             else:
                                                 transaction['child'] = child_transactions
+                            # pre-appending the purpose description
+                            transaction = preappending_purpose_description(transaction)
                             if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
                                 if transaction.get('transactionTypeIdentifier') in list_of_SL_SA_transaction_types:
                                     if 'SL-A' not in output['data']['schedules']:

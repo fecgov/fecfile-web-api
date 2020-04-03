@@ -3,7 +3,16 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.8.
 
 ## Running locally
+
 To run local development environment if Django backend is also running locally at port 8080 run `npm run local`.
+
+## Running locally with key auth to AWS S3
+On Linux set environment variables for keys
+export ACCESS_KEY='YOUR-ACCESS-KEY'
+export SECRET_KEY='YOUR-SECRET-KEY'
+
+Run `ACCESS_KEY=$ACCESS_KEY SECRET_KEY=$SECRET_KEY npm run local` or
+Run `ACCESS_KEY=$ACCESS_KEY SECRET_KEY=$SECRET_KEY npm run local-aot`
 
 ## Development server
 
@@ -39,3 +48,4 @@ To start the server you run the command `npm run json-server`.
   - `sudo sysctl fs.inotify.max_user_watches=524288`
   - `sudo sysctl -p --system`
   - From: https://github.com/angular/angular-cli/issues/2356
+
