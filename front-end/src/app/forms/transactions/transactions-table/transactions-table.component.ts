@@ -1413,6 +1413,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @returns true if Transactions are permitted to be trashed.
    */
+  // TODO: in allTransaction table there are multiple reports
   public checkIfTrashable(): boolean {
     if (!this.transactionsModel) {
       return false;
@@ -1799,6 +1800,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this.setSelectedForMultiplyPages();
       }
+    }
+  }
+
+  /**
+   * enables/disables edit/clone/trash actions on a transaction
+   * @param trx
+   * @return {boolean} true disabled trx action else false
+   */
+  private isDisabled(trx: TransactionModel): boolean {
+    if (trx && trx.reportstatus) {
+    return trx.reportstatus.toUpperCase() === 'FILED';
+    } else {
+      return false;
     }
   }
 }
