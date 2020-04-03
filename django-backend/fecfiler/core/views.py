@@ -362,7 +362,9 @@ def get_report_types(request):
                 if report.get("report_type") == "YE":
                     report["election_state"][0]["dates"][0][
                         "cvg_start_date"
-                    ] = "2019-10-01"
+                    ] = report["election_state"][0]["dates"][0][
+                        "cvg_end_date"
+                    ][:4]+"-10-01"
 
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
