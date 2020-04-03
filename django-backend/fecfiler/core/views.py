@@ -40,6 +40,7 @@ from fecfiler.core.carryover_helper import (
     do_h2_carryover,
     do_loan_carryover,
     do_debt_carryover,
+    do_levin_carryover,
 )
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
@@ -361,7 +362,9 @@ def get_report_types(request):
                 if report.get("report_type") == "YE":
                     report["election_state"][0]["dates"][0][
                         "cvg_start_date"
-                    ] = "2019-10-01"
+                    ] = report["election_state"][0]["dates"][0][
+                        "cvg_end_date"
+                    ][:4]+"-10-01"
 
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
@@ -1702,6 +1705,7 @@ def reports(request):
                 do_h2_carryover(data.get("cmteid"), data.get("reportid"))
                 do_loan_carryover(data.get("cmteid"), data.get("reportid"))
                 do_debt_carryover(data.get("cmteid"), data.get("reportid"))
+                do_levin_carryover(data.get("cmteid"), data.get("reportid"))
 
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:

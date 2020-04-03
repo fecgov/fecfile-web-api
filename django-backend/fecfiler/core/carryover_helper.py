@@ -424,6 +424,67 @@ def do_loan_carryover(cmte_id, report_id):
         raise
 
 
+def do_levin_carryover(cmte_id, report_id):
+    """
+    carryover sched_l item for levin account
+    ending cash_on_hand become the beginning cash_on_hand of current report 
+    """
+    _sql = """
+       insert into public.sched_l(
+					cmte_id, 
+                    report_id,
+                    record_id,
+                    account_name, 
+                    line_number,
+                    transaction_type_identifier, 
+                    transaction_id, 
+                    coh_bop,
+                    coh_cop,
+                    create_date,
+                    cvg_from_date,
+                    cvg_end_date
+					)
+                    SELECT 
+					d.cmte_id, 
+                    %s, 
+                    d.record_id,
+                    d.account_name,
+                    d.line_number,
+                    d.transaction_type_identifier, 
+                    get_next_transaction_id('SL'), 
+                    d.coh_cop,
+                    d.coh_cop,
+                    now(),
+                    r2.cvg_start_date,
+                    r2.cvg_end_date
+            FROM public.sched_l d, public.reports r1, public.reports r2
+            WHERE 
+            d.cmte_id = %s
+            AND d.report_id = r1.report_id
+			AND DATE_PART('day', r2.cvg_start_date::timestamp - r1.cvg_end_date::timestamp) = 1 
+            AND r2.report_id = %s
+            AND d.delete_ind is distinct from 'Y';
+    """
+    # query_back_sql = """
+    # select d.back_ref_transaction_id
+    # """
+    logger.debug("doing levin carryover...")
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (report_id, cmte_id, report_id))
+            if cursor.rowcount == 0:
+                logger.debug("No carryover happens.")
+            else:
+                logger.debug(
+                    "levin acct carryover done with report_id {}".format(report_id)
+                )
+                logger.debug("total carryover levin summary:{}".format(cursor.rowcount))
+                # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
+                logger.debug("carryover done.")
+    except:
+        raise
+
+
 def do_debt_carryover(cmte_id, report_id):
     """
     this is the function to handle debt carryover form one report to next report:
@@ -499,7 +560,7 @@ def do_debt_carryover(cmte_id, report_id):
                 # do_carryover_sc_payments(cmte_id, report_id, cursor.rowcount)
                 logger.debug("carryover done.")
     except:
-        rais
+        raise
 
 
 def carryover_sched_b_payments(cmte_id, report_id, parent_id, current_id):
