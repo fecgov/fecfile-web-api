@@ -803,6 +803,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     //   }
     // }
 
+    else if (this.isFieldName(fieldName, 'expenditure_purpose')) {
+      // Expenditure  description is required for H4/H6
+      if (
+        this.transactionType === 'ALLOC_EXP' ||
+        this.transactionType === 'ALLOC_EXP_CC_PAY' ||
+        this.transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+        this.transactionType === 'ALLOC_EXP_STAF_REIM' ||
+        this.transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+        this.transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+        this.transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+        this.transactionType === 'ALLOC_EXP_VOID' ||
+        this.transactionType === 'ALLOC_FEA_DISB' ||
+        this.transactionType === 'ALLOC_FEA_CC_PAY' ||
+        this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+        this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
+        this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+        this.transactionType === 'ALLOC_FEA_VOID'
+      ) {
+        formValidators.push(Validators.required);
+      }
+    }
+
     if (validators) {
       for (const validation of Object.keys(validators)) {
         if (validation === 'required') {
