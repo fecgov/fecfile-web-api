@@ -16,6 +16,8 @@ from fecfiler.core.report_helper import new_report_date
 # Create your views here.
 logger = logging.getLogger(__name__)
 
+LIST_F1M_COLUMNS = []
+
 """
 ****************************** Helper Functions ****************************************
 """
@@ -78,7 +80,9 @@ def reports_post(request_dict):
 		raise Exception(
 			'The reports_post function is throwing an error: ' + str(e))
 
-
+def reports_clear(request_dict):
+	try:
+	e
 """
 ************************************ API Call ******************************************
 """
@@ -98,17 +102,25 @@ def form1M(request):
 
 			# by affiliation step2 POST
 			if step == 'saveAffiliation':
-				noneCheckMissingParameters(['committee_id'], checking_dict=request.query_params,
-										   value_dict=request.query_params, function_name='form1M-POST: step-2 Affiliation')
-				report_dict = {
-					'report_id': str(next_report_id()),
-					'cmte_id': cmte_id,
-					'form_type': 'F1M',
-					'amend_ind': 'N',
-					'status': 'Saved',
-					'create_date': datetime.datetime.now(),
-					'last_update_date': datetime.datetime.now()
-				}
+				noneCheckMissingParameters(['committee_id'], checking_dict=request.data,
+										   value_dict=request.data, function_name='form1M-POST: step-2 Affiliation')
+				if 'reportId' not in request.data and request.data.get('reportId') not in [None, '', 'null']:
+					report_dict = {
+						'report_id': str(next_report_id()),
+						'cmte_id': cmte_id,
+						'form_type': 'F1M',
+						'amend_ind': 'N',
+						'status': 'Saved',
+						'create_date': datetime.datetime.now(),
+						'last_update_date': datetime.datetime.now()
+					}
+					reports_post(report_dict)
+					report_id = report_dict.get('report_id')
+				else:
+					report_id = request.data.get('reportId')
+
+
+
 				aff_cmte_id = request.data['committee_id']
 			# by qualification step2 POST
 			if step == 'saveCandidate':
