@@ -92,7 +92,10 @@
                       </div>
                       <ng-container *ngIf="!col?.validation?.required
                         && !col?.isReadonly && col?.name !== 'activity_event_identifier'">
-                        (Optional)
+                        <ng-container *ngIf="!(col?.name === 'purpose_description'
+                          && (this.transactionType === 'RET_REC' || this.transactionType === 'PARTY_RET' || this.transactionType === 'PAC_RET'))">
+                          (Optional)
+                        </ng-container>
                       </ng-container>
                     </label>
                     <label
