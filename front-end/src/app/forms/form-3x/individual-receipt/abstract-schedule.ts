@@ -3369,6 +3369,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         }
         if (searchText) {
           if(this.transactionType === 'TRIB_REC'
+            || this.transactionType === 'TRIB_RECNT_REC'
+            || this.transactionType === 'TRIB_NP_RECNT_ACC'
+            || this.transactionType === 'TRIB_NP_HQ_ACC'
+            || this.transactionType === 'TRIB_NP_CONVEN_ACC'
+            || this.transactionType === 'OPEXP_HQ_ACC_TRIB_REF'
+            || this.transactionType === 'OPEXP_CONV_ACC_TRIB_REF'
+            || this.transactionType === 'OTH_DISB_NP_RECNT_TRIB_REF'
             || this.transactionType === 'PAC_NON_FED_REC'
             || this.transactionType === 'PAC_NON_FED_RET'
             || this.transactionType === 'ALLOC_EXP'
