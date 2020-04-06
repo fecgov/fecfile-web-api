@@ -491,7 +491,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         modified = true;
       }
     }
-    filters.fitlerReportTypes = filterReportTypes;
+    filters.filterReportTypes = filterReportTypes;
 
 
     // type/category
@@ -820,8 +820,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             // check for states selected in the filter cache
             // TODO scroll to first check item
             if (this.cachedFilters) {
-              if (this.cachedFilters.fitlerReportTypes) {
-                if (this.cachedFilters.fitlerReportTypes.includes(r.rpt_type)) {
+              if (this.cachedFilters.filterReportTypes) {
+                if (this.cachedFilters.filterReportTypes.includes(r.rpt_type)) {
                   r.selected = true;
                   this.isHideReportTypeFilter = false;
                 } else {

@@ -2,6 +2,7 @@ export class TransactionModel {
   type: string;
   entityId: string;
   entityType: string;
+  formType: string;
   apiCall: string;
   scheduleType: string;
   transactionId: string;
@@ -164,6 +165,7 @@ export class TransactionModel {
     this.originalAmount = transaction.originalAmount;
     this.aggregation_ind = transaction.aggregation_ind;
     this.forceitemizable = transaction.forceitemizable;
+    this.formType = transaction.formType;
 
   }
 }

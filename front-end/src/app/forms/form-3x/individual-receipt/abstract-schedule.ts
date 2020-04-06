@@ -803,6 +803,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     //   }
     // }
 
+    else if (this.isFieldName(fieldName, 'expenditure_purpose')) {
+      // Expenditure  description is required for H4/H6
+      if (
+        this.transactionType === 'ALLOC_EXP' ||
+        this.transactionType === 'ALLOC_EXP_CC_PAY' ||
+        this.transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+        this.transactionType === 'ALLOC_EXP_STAF_REIM' ||
+        this.transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+        this.transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+        this.transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+        this.transactionType === 'ALLOC_EXP_VOID' ||
+        this.transactionType === 'ALLOC_FEA_DISB' ||
+        this.transactionType === 'ALLOC_FEA_CC_PAY' ||
+        this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+        this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
+        this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+        this.transactionType === 'ALLOC_FEA_VOID'
+      ) {
+        formValidators.push(Validators.required);
+      }
+    }
+
     if (validators) {
       for (const validation of Object.keys(validators)) {
         if (validation === 'required') {
@@ -1225,9 +1247,37 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'non_fed_share_amount', false);
               this._formatAmount({ target: { value: res.nonfed_share.toString() } }, 'levin_share', false);
             }
-            if (res.aggregate_amount) {
+            if (res.aggregate_amount !== null) {
+              // forced aggregation
+              totalAmount  = this.convertAmountToNumber(totalAmount);
+              const aggregatedResponse = this.convertAmountToNumber(res.aggregate_amount);
+              let newAggregate: number;
+              if (this.scheduleAction === ScheduleActions.edit) {
+                // get the initial aggregation indicator during load
+                const initialAggregateInd: boolean = this._utilService.aggregateIndToBool(this._transactionToEdit.aggregation_ind);
+                if ( (initialAggregateInd && this.isAggregate) || (!initialAggregateInd && !this.isAggregate)) {
+                  // if initial and current aggregation flags remain the same
+                  // lets patch the response from API
+                  newAggregate = aggregatedResponse;
+                } else if (initialAggregateInd && !this.isAggregate) {
+                  // if initial was aggregated and now unaggregated
+                  // un-aggregate now
+                  newAggregate = aggregatedResponse - totalAmount;
+                } else if (!initialAggregateInd && this.isAggregate) {
+                  // if initial was un-aggregated and now aggregated
+                  // aggregate now
+                  newAggregate = aggregatedResponse + totalAmount;
+                }
+              } else {
+                // if new transaction API responds with aggregate + current amount
+                if (this.isAggregate) {
+                  totalAmount = 0;
+                }
+              newAggregate = res.aggregate_amount - totalAmount;
+              }
+
               this._formatAmount(
-                { target: { value: res.aggregate_amount.toString() } },
+                { target: { value: newAggregate.toString() } },
                 'activity_event_amount_ytd',
                 false
               );
@@ -2478,16 +2528,21 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * changed (dirty) then don't save and just show parent.
    */
   public saveAndReturnToParent(): void {
-    if(this._cloned) {
-      this._cloned = false;
+    if(this.frmIndividualReceipt.status === 'INVALID') {
+      this.viewTransactions();
+    }else {
+      if(this._cloned) {
+        this._cloned = false;
+      }
+
+      if (!this.frmIndividualReceipt.dirty) {
+        this.clearFormValues();
+        this.returnToParent(ScheduleActions.edit);
+      } else {
+        this._doValidateReceipt(SaveActions.saveForReturnToParent);
+      }
     }
 
-    if (!this.frmIndividualReceipt.dirty) {
-      this.clearFormValues();
-      this.returnToParent(ScheduleActions.edit);
-    } else {
-      this._doValidateReceipt(SaveActions.saveForReturnToParent);
-    }
   }
 
   /**
@@ -3313,9 +3368,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.clearOrgData();
         }
         if (searchText) {
-          if(this.transactionType === 'CON_EAR_DEP_MEMO'
+          if(this.transactionType === 'TRIB_REC'
+            || this.transactionType === 'PAC_NON_FED_REC'
+            || this.transactionType === 'PAC_NON_FED_RET'
+            || this.transactionType === 'ALLOC_EXP'
+            || this.transactionType === 'ALLOC_EXP_CC_PAY'
+          ){
+            return Observable.of([]);
+          }else if(this.transactionType === 'CON_EAR_DEP_MEMO'
             || this.transactionType === 'CON_EAR_UNDEP_MEMO'
-            || this.transactionType === 'CONT_TO_CAN') {
+            || this.transactionType === 'CONT_TO_CAN'
+            || this.transactionType === 'CONT_VOID') {
             return this._typeaheadService.getContacts(searchText, 'entity_name', true);
           }else {
             return this._typeaheadService.getContacts(searchText, 'entity_name');
@@ -3846,6 +3909,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                         this.selectedEntityType = this.entityTypes[0];
                       }
                     }
+                  }
+                  if(this.transactionType === 'LEVIN_INDV_REC') {
+                    this.selectedEntityType.entityType = 'IND';
                   }
                   // expecting default entity type to be IND
                   this.toggleValidationIndOrg(this.selectedEntityType.entityType);
@@ -5470,7 +5536,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     return false;
   }
 
-
   private populateSchedFChildData(field: string, receiptObj: any) {
       // Possible issue : Populating data from parent when  sched f child is created can cause in consistencies
       // data from child and parent can be out of sync when the parent is edited
@@ -5581,6 +5646,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     } else {
       dateField = 'contribution_date';
     }
+    // schedule H4/H6
+    if (this.frmIndividualReceipt.controls['incurred_amount'] || this.frmIndividualReceipt.controls['total_amount']) {
+      this.isAggregate = !this.isAggregate;
+      this.forceAggregateSchedH();
+      return;
+    }
     const contributionAmountNum = this._convertFormattedAmountToDecimal(null);
     let transactionDate = null;
     if (this.frmIndividualReceipt.get(dateField)) {
@@ -5609,4 +5680,43 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     }
   }
 
+  /**
+   *  Show/Hide forced aggregation button
+   *  Return true to show else false
+   */
+  public isShowForceAggregate(): boolean {
+    if (this.transactionType) {
+      // exclusion
+      if (this.transactionType.endsWith('CON_EAR_DEP')) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private forceAggregateSchedH() {
+    // find the amount field name
+    let fieldName;
+    if (this.frmIndividualReceipt.controls['incurred_amount']) {
+      fieldName = 'incurred_amount';
+    } else if (this.frmIndividualReceipt.controls['total_amount']) {
+      fieldName = 'total_amount';
+    }
+    if (this.isFieldName(fieldName, 'total_amount') && this.totalAmountReadOnly) {
+      return;
+    }
+
+    // will take care of forced aggregation now
+    if (fieldName === 'total_amount') {
+      this._getFedNonFedPercentage();
+      return;
+    }
+
+    if (fieldName === 'incurred_amount') {
+      // TODO: has nothing to do with aggregation
+      // Verify and remove
+      // this._adjustDebtBalanceAtClose();
+    }
+
+  }
 }

@@ -9,6 +9,7 @@ import { SignAndSubmitComponent } from './partials/sign-and-submit/sign-and-subm
 import { SubTransactionsTableComponent } from './components/sub-transactions-table/sub-transactions-table.component';
 import { UtilService } from './utils/util.service';
 import { OrderByPipe } from 'ngx-pipes';
+import { ModalModule } from 'ngx-bootstrap';
 
 @NgModule({
   imports: [
@@ -29,6 +30,7 @@ import { OrderByPipe } from 'ngx-pipes';
     FormsModule,
     ReactiveFormsModule,
     NgxPaginationModule,
+    ModalModule,
     StepsComponent,
     SignAndSubmitComponent,
     SubTransactionsTableComponent

@@ -44,8 +44,13 @@
     </div>
   </div>
   <div [hidden]="showUpload" class="upload_contacts__progress_container">
-    <ngb-progressbar type="dark" textType="white" animated="true" [value]="foo.progressPercent" showValue="true"
+    <ngb-progressbar type="dark" textType="white" animated="true" [value]="progressPercent" showValue="true"
       height="2rem">
     </ngb-progressbar>
+
+    <!-- <app-progress-bar [progress]="foo"></app-progress-bar> -->
+    <!-- <app-progress-bar [progress]="foo" [progressArray]="fooBar"></app-progress-bar> -->
+    <!-- <app-progress-bar [progressArray]="fooBar"></app-progress-bar> -->
+
   </div>
 </div>

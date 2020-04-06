@@ -159,6 +159,16 @@ export class UtilService {
     }
   }
 
+  /**
+	 * Determine if a String has a value.
+	 *
+	 * @param strg
+	 * @returns {Boolean} true if not an empty string, null or undefined otherwise false.
+	 */
+  public isStringEmpty(strg: string) {
+    return (strg === null || strg === undefined || strg === '');
+  }
+
   public aggregateIndToBool(aggregate_ind: string): boolean {
     if (aggregate_ind == null || aggregate_ind === 'Y') {
       return true;

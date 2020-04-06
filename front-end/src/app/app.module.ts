@@ -101,6 +101,10 @@ import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.
 import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 
+// import * as AWS from 'aws-sdk';
+import * as AWS from 'aws-sdk/global';
+import * as S3 from 'aws-sdk/clients/s3';
+
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
     return appConfig.loadAppConfig();
@@ -206,7 +210,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TooltipModule.forRoot(),
     CollapseModule.forRoot(),
     AngularEditorModule,
-    ModalModule.forRoot(),
+    // ModalModule.forRoot(),
     // NgxPaginationModule,
     NgPipesModule,
     UserIdleModule.forRoot({ idle: 1200, timeout: 120, ping: 500000 })
