@@ -48,6 +48,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   public candOfficeStatesByTransactionType: any;
   public displayCandStateField = false;
   private _minStateSelectionForMultistate = 6;
+  
 
   public supportOpposeTypes = [
     { 'code': 'S', 'description': 'Support' },
@@ -583,10 +584,20 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     return amount.toString().replace(new RegExp(',', 'g'), '');
   }
 
+  public viewTransactions() {
+    this.addSchedESpecificMetadata();
+    super.viewTransactions();
+  }
+
   public saveOnly() {
     this.addSchedESpecificMetadata();
     super.saveOnly();
     this.rollbackIfSaveFailed();
+  }
+
+  public saveOrWarn(){
+    this.addSchedESpecificMetadata();
+    super.saveOrWarn();
   }
 
   public updateOnly() {
@@ -609,6 +620,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     super.returnToParent(scheduleAction);
   }
 
+ 
   private addSchedESpecificMetadata() {
     if(this.hiddenFields && this.electionCode && this.electionYear){
       this._utilService.addOrEditObjectValueInArray(this.hiddenFields, 'hidden','full_election_code', this.electionCode[0] + this.electionYear);
