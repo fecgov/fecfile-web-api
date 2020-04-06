@@ -1,25 +1,19 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
-import { TransactionModel } from '../model/transaction.model';
-import { TransactionsMessageService } from '../service/transactions-message.service';
-import { GetTransactionsResponse, TransactionsService } from '../service/transactions.service';
+import { IndividualReceiptService } from '../../../forms/form-3x/individual-receipt/individual-receipt.service';
+import { TransactionModel } from '../../../forms/transactions/model/transaction.model';
+import { TransactionsMessageService } from '../../../forms/transactions/service/transactions-message.service';
+import { GetTransactionsResponse, TransactionsService } from '../../../forms/transactions/service/transactions.service';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../partials/confirm-modal/confirm-modal.component';
+import { DialogService } from '../../services/DialogService/dialog.service';
 
 /**
  * A component for the Sub (Child) Transactions Table to be used across all forms
  * by transactions with multiple sub (child) transaction funtionality.
  */
 @Component({
-  selector: 'app-sub-transactions-table',
+  selector: 'app-shared-sub-transactions-table',
   templateUrl: './sub-transactions-table.component.html',
   styleUrls: ['./sub-transactions-table.component.scss'],
-  /* animations: [
-    trigger('fadeInOut', [
-      transition(':enter', [style({ opacity: 0 }), animate(500, style({ opacity: 1 }))]),
-      transition(':leave', [animate(0, style({ opacity: 0 }))])
-    ])
-  ] */
 })
 export class SubTransactionsTableComponent implements OnInit, OnChanges {
   @Input()

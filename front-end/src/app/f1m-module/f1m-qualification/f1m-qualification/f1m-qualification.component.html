@@ -1,0 +1,368 @@
+<ng-template #rt let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtOrg let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCommitteeId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCommitteeId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCandidateId let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidateId(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCommitteeName let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCandidate let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadCandidate(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<div class="individual-receipt-container">
+
+  <header>
+    <div class="header-content">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>
+            Form 1M / Notification of Multicandidate Status by Qualification
+          </h1>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <hr />
+      </div>
+    </div>
+  </header>
+
+
+  <ng-container *ngIf="!showPart2">
+    <form [formGroup]="form">
+      <section *ngIf="qualificationData?.candidates?.length < 5">
+        <div class="content">
+          <div class="grid-row">
+            <div class="grid-row__col space-bottom pt-5">
+              <h3>
+                Candidate {{candidateNumber}} Information
+              </h3>
+            </div>
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col space-bottom pt-2">
+              <span>
+                Provide 5 Candidates that the Committee has made contributions to. Candidates added can be seen within
+                the
+                Summary Table below.
+              </span>
+            </div>
+          </div>
+          <div class="row pt-5">
+            <div class="form-group col col-md-3 offset-md-1">
+              <label for="candidate_id">Candidate ID Number
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input">
+                <input type="text" name="candidate_id" [formControlName]="'candidate_id'" class="form-control"
+                  id="candidate_id" aria-label="candidate Id" aria-describedby="candidate_id" required [ngClass]=" form?.get('candidate_id')?.invalid &&
+                                  (form?.touched || form?.dirty)
+                                    ? 'input-field-error'
+                                    : ''" [ngbTypeahead]="searchCandidateId" [focusFirst]=false
+                  [resultTemplate]="rtCandidateId" [inputFormatter]="formatterCandidateId"
+                  (selectItem)="handleSelectedCandidate($event)">
+              </div>
+            </div>
+            <div class="form-group col col-md-3">
+              <label for="cand_last_name">Candidate Last Name
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input">
+                <input type="text" name="cand_last_name" [formControlName]="'cand_last_name'" class="form-control"
+                  id="cand_last_name" aria-label="Candidate Last Name" aria-describedby="cand_last_name" required
+                  [ngClass]=" form?.get('cand_last_name')?.invalid &&
+                                  (form?.touched || form?.dirty)
+                                    ? 'input-field-error'
+                                    : ''" [ngbTypeahead]="searchCandLastName" [focusFirst]=false
+                  [resultTemplate]="rtCandidate" [inputFormatter]="formatterCandLastName"
+                  (selectItem)="handleSelectedCandidate($event)">
+              </div>
+            </div>
+            <div class="form-group col col-md-3">
+              <label for="cand_first_name">Candidate First Name
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input">
+                <input type="text" name="cand_first_name" [formControlName]="'cand_first_name'" class="form-control"
+                  id="cand_first_name" aria-label="Candidate First Name" aria-describedby="cand_first_name" required
+                  [ngClass]=" form?.get('cand_first_name')?.invalid &&
+                                    (form?.touched || form?.dirty)
+                                      ? 'input-field-error'
+                                      : ''" [ngbTypeahead]="searchCandFirstName" [focusFirst]=false
+                  [resultTemplate]="rtCandidate" [inputFormatter]="formatterCandFirstName"
+                  (selectItem)="handleSelectedCandidate($event)">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col col-md-3 offset-md-1">
+              <label for="cand_middle_name">Candidate Middle Name (Optional)
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input">
+                <input type="text" name="cand_middle_name" [formControlName]="'cand_middle_name'" class="form-control"
+                  id="cand_middle_name" aria-label="candidate middle name" aria-describedby="cand_middle_name"
+                  [ngClass]=" form?.get('cand_middle_name')?.invalid &&
+                                    (form?.touched || form?.dirty)
+                                      ? 'input-field-error' : ''">
+              </div>
+            </div>
+            <div class="form-group col col-md-3">
+              <label for="cand_prefix">Prefix (Optional)
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input" style="width:35%">
+                <input type="text" name="cand_prefix" [formControlName]="'cand_prefix'" class="form-control"
+                  id="cand_prefix" aria-label="Candidate Prefix" aria-describedby="cand_prefix" [ngClass]=" form?.get('cand_prefix')?.invalid &&
+                                    (form?.touched || form?.dirty)
+                                      ? 'input-field-error': ''">
+              </div>
+            </div>
+            <div class="form-group col col-md-3">
+              <label for="cand_suffix">Suffix (Optional)
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input" style="width:35%">
+                <input type="text" name="cand_suffix" [formControlName]="'cand_suffix'" class="form-control"
+                  id="cand_suffix" aria-label="Candidate Suffix" aria-describedby="cand_suffix" [ngClass]=" form?.get('cand_suffix')?.invalid &&
+                                      (form?.touched || form?.dirty)
+                                        ? 'input-field-error' : ''">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col col-md-3 offset-md-1">
+              <label for="cand_office">Candidate Office
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <ng-select class="cand-office-select" [formControlName]="'cand_office'" name="cand_office"
+                [items]="candidate_offices" bindValue="code" style="width: 235px;" [ngClass]="
+                          form?.get('cand_office')?.invalid &&
+                          (form.touched || form.dirty)
+                            ? 'forms__select-error'
+                            : ''
+                        " bindLabel="name" required>
+              </ng-select>
+            </div>
+            <div class="form-group col col-md-3">
+              <label for="cand_office_state">Candidate Office State
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <ng-select class="ngselect" [formControlName]="'cand_office_state'" name="cand_office_state"
+                [items]="states" bindValue="code" style="width: 235px;" [ngClass]="
+                          form?.get('cand_office_state')?.invalid &&
+                          (form.touched || form.dirty)
+                            ? 'forms__select-error'
+                            : ''
+                        " bindLabel="name" required>
+              </ng-select>
+            </div>
+            <div class="form-group col col-md-3">
+              <label for="cand_office_district">Candidate Office District
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input" style="width:35%">
+                <input type="text" name="cand_office_district" [formControlName]="'cand_office_district'"
+                  class="form-control" id="cand_office_district" aria-label="Candidate District"
+                  aria-describedby="candidate office district" required [ngClass]=" form?.get('cand_office_district')?.invalid &&
+                                      (form?.touched || form?.dirty)
+                                        ? 'input-field-error' : ''">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col col-md-3 offset-md-1">
+              <label for="contribution_date">Date of Contribution
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input" style="width:75%">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="contribution_dateIcon">
+                    <i class="calendar-icon" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <input type="date" name="contribution_date" [formControlName]="'contribution_date'" class="form-control"
+                  [ngClass]=" form?.get('contribution_date')?.invalid &&
+                                    (form?.touched || form?.dirty)
+                                      ? 'input-field-error'
+                                      : ''" id="contribution_date" aria-label="Enter contribution date"
+                  aria-describedby="contribution_date" required>
+              </div>
+              <div class="text-error text-left"
+                *ngIf="form?.controls?.contribution_date?.errors && form?.controls?.contribution_date?.errors['contributionDateInvalid']">
+                Placeholder error.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section *ngIf="qualificationData?.candidates?.length >= 5">
+        <div class="content">
+          <div class="grid-row">
+            <div class="grid-row__col space-bottom pt-5">
+              <h3>
+                Candidate Information
+              </h3>
+            </div>
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col space-bottom py-2" style="text-align:center;">
+              <span>
+                5 Candidates have been added, click Save & Continue to provide Contribution information.
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="paragraph" *ngIf="qualificationData && qualificationData.candidates.length > 0">
+        <hr/>
+        <app-f1m-candidates-table [candidatesData]="qualificationData.candidates" >
+        </app-f1m-candidates-table>
+      </section>
+    </form>
+  </ng-container>
+  <ng-container *ngIf="showPart2">
+    <form [formGroup]="formPart2">
+      <section *ngIf="qualificationData?.candidates?.length >= 5">
+        <div class="content">
+          <div class="grid-row">
+            <div class="grid-row__col space-bottom pt-5">
+              <h3>
+                Contribution Information
+              </h3>
+            </div>
+          </div>
+          <div class="row pt-5">
+            <div class="form-group col col-md-3 offset-md-1">
+              <label for="registration_date">Date of Original Registration
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input" style="width:75%">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="registration_dateIcon">
+                    <i class="calendar-icon" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <input type="date" name="registration_date" [formControlName]="'registration_date'" class="form-control"
+                  [ngClass]=" formPart2?.get('registration_date')?.invalid &&
+                                          (formPart2?.touched || formPart2?.dirty)
+                                            ? 'input-field-error'
+                                            : ''" id="registration_date" aria-label="Enter original registration date"
+                  aria-describedby="registration_date" required>
+              </div>
+              <div class="text-error text-left"
+                *ngIf="formPart2?.controls?.registration_date?.errors && formPart2?.controls?.registration_date?.errors['registration_date']">
+                Placeholder error.
+              </div>
+            </div>
+            <div class="form-group col col-md-3">
+              <label for="fifty_first_contributor_date">Date of 51st Contributor
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input" style="width:75%">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="fifty_first_contributor_dateIcon">
+                    <i class="calendar-icon" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <input type="date" name="fifty_first_contributor_date" [formControlName]="'fifty_first_contributor_date'" class="form-control"
+                  [ngClass]=" formPart2?.get('fifty_first_contributor_date')?.invalid &&
+                                            (formPart2?.touched || formPart2?.dirty)
+                                              ? 'input-field-error'
+                                              : ''" id="fifty_first_contributor_date"
+                  aria-label="Enter fifty first contributor_date" aria-describedby="fifty_first_contributor_date" required>
+              </div>
+              <div class="text-error text-left"
+                *ngIf="formPart2?.controls?.fifty_first_contributor_date?.errors && formPart2?.controls?.fifty_first_contributor_date?.errors['fifty_first_contributor_date']">
+                Placeholder error.
+              </div>
+            </div>
+            <div class="form-group col col-md-3">
+              <label for="requirements_met_date">Date Committee Met Requirements
+                <button type="button" class="btn btn-info" tabindex="-1" ngbTooltip="{{tooltipPlaceholder}}"
+                  tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="input-group transactions__filter-multi-input" style="width:75%">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="requirements_met_dateIcon">
+                    <i class="calendar-icon" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <input type="date" name="requirements_met_date" [formControlName]="'requirements_met_date'" class="form-control"
+                  [ngClass]=" formPart2?.get('requirements_met_date')?.invalid &&
+                                              (formPart2?.touched || formPart2?.dirty)
+                                                ? 'input-field-error'
+                                                : ''" id="requirements_met_date"
+                  aria-label="Enter date when committee met requirements" aria-describedby="requirements_met_date" required>
+              </div>
+              <div class="text-error text-left"
+                *ngIf="formPart2?.controls?.requirements_met_date?.errors && formPart2?.controls?.requirements_met_date?.errors['requirements_met_date']">
+                Placeholder error.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </form>
+  </ng-container>
+
+</div>

@@ -94,13 +94,10 @@ export const AppRoutes: Routes = [
       { path: 'users', component: UsersComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       { path: 'settings', component: SettingsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       { path: 'contacts', component: ContactsComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
-      // {
-      //   path: 'contacts/import',
-      //   component: ImportContactsComponent,
-      //   pathMatch: 'full',
-      //   canActivate: [CanActivateGuard],
-      //   canDeactivate: [CanDeactivateGuardService]
-      // },
+      {
+        path: 'forms/form/1M',
+        loadChildren: 'src/app/f1m-module/f1m/f1m.module#F1mModule'
+      },
       {
         path: 'import-contacts',
         loadChildren: 'src/app/import-contacts-module/import-contacts.module#ImportContactsModule'
@@ -129,6 +126,7 @@ export const AppRoutes: Routes = [
           }
         ]
       },
+
       {
         path: 'signandSubmit/:form_id',
         component: SignComponent,

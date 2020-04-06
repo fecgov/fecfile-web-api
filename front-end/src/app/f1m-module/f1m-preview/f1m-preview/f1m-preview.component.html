@@ -1,0 +1,194 @@
+<div class="preview-container">
+  <header>
+    <div class="header-container">
+      <h1>
+        Form 1M / Notification of Multicandidate Status by {{type | titlecase}}
+        <span class="header__btns">
+          <button type="button" class="btn btn-validate" (click)="printPreview()">
+            Print Preview
+          </button>
+        </span>
+      </h1>
+    </div>
+  </header>
+  <section *ngIf="type === 'affiliation'">
+    <div class="content">
+      <div class="grid-row py-3">
+        <h3>
+          Committee Information
+        </h3>
+      </div>
+      <div class="grid-row pl-5">
+        <div class="grid-col">
+          <div class="label">
+            Affiliated - Date Form F1 Filled
+          </div>
+          <div class="text">
+            {{affiliationData?.affiliation_date}}
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Affiliated Committee FEC ID
+          </div>
+          <div class="text">
+            {{affiliationData?.committee_id}}
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Affiliated Committee Name
+          </div>
+          <div class="text">
+            {{affiliationData?.committee_name}}
+          </div>
+        </div>
+      </div>
+      <br>
+      <hr>
+      <div class="grid-row py-3 ">
+        <h3>
+          Treasurer Information
+        </h3>
+      </div>
+      <div class="grid-row pl-5">
+        <div class="grid-col">
+          <div class="label">
+            Treasurer Last Name
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerLastName}}
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Treasurer First Name
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerFirstName}}
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Treasurer Middle Name
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerMiddleName}}
+          </div>
+        </div>
+      </div>
+      <div class="grid-row pl-5">
+        <div class="grid-col">
+          <div class="label">
+            Prefix
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerPrefix}}
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Suffix
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerSuffix}}
+          </div>
+        </div>
+      </div>
+    </div> <!-- ./content -->
+  </section>
+  <section *ngIf="type === 'qualification'">
+    <div class="content">
+      <div class="paragraph">
+        <app-f1m-candidates-table [candidatesData]="qualificationData.candidates"
+          *ngIf="qualificationData && qualificationData.candidates.length > 0">
+        </app-f1m-candidates-table>
+      </div>
+    </div> <!-- ./content -->
+    <br><hr/>
+    <div class="content">
+      <div class="grid-row py-3">
+        <h3>
+          Contribution Information
+        </h3>
+      </div>
+      <div class="grid-row pl-5 indented">
+        <div class="grid-col">
+          <div class="label">
+            Date of Original Registration
+          </div>
+          <div class="text">
+            {{qualificationData?.registration_date}} TEST
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Date of 51st Contributor
+          </div>
+          <div class="text">
+            {{qualificationData?.fifty_first_contributor_date}} TEST
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Date Committee Met Requirements
+          </div>
+          <div class="text">
+            {{qualificationData?.requirements_met_date}} TEST
+          </div>
+        </div>
+      </div>
+      <br>
+      <hr>
+      <div class="grid-row py-3 ">
+        <h3>
+          Treasurer Information
+        </h3>
+      </div>
+      <div class="grid-row pl-5 indented">
+        <div class="grid-col">
+          <div class="label">
+            Treasurer Last Name
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerLastName}}
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Treasurer First Name
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerFirstName}}
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Treasurer Middle Name
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerMiddleName}}
+          </div>
+        </div>
+      </div>
+      <div class="grid-row pl-5 indented">
+        <div class="grid-col">
+          <div class="label">
+            Prefix
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerPrefix}}
+          </div>
+        </div>
+        <div class="grid-col">
+          <div class="label">
+            Suffix
+          </div>
+          <div class="text">
+            {{reportInfo.treasurerSuffix}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
