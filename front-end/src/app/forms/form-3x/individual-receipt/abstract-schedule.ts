@@ -3368,6 +3368,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.clearOrgData();
         }
         if (searchText) {
+          /*
           if(this.transactionType === 'TRIB_REC'
             || this.transactionType === 'TRIB_RECNT_REC'
             || this.transactionType === 'TRIB_NP_RECNT_ACC'
@@ -3382,7 +3383,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             || this.transactionType === 'ALLOC_EXP_CC_PAY'
           ){
             return Observable.of([]);
-          }else if(this.transactionType === 'CON_EAR_DEP_MEMO'
+          }else
+          */
+          if(this.transactionType === 'CON_EAR_DEP_MEMO'
             || this.transactionType === 'CON_EAR_UNDEP_MEMO'
             || this.transactionType === 'CONT_TO_CAN'
             || this.transactionType === 'CONT_VOID') {
