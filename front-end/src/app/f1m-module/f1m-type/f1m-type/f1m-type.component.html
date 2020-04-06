@@ -1,0 +1,51 @@
+<div class="form__type-container">
+  <div class="form__type">
+    <form>
+      <header>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12 pt-2">
+            <h1 class="text-left">
+                Form 1M / Notification of Multicandidate Status
+            </h1>
+          </div>
+        </div>
+      </header>
+      <section>
+        <div class="content">
+          <div class="grid-row">
+            <div class="grid-row__col space-bottom pt-5">
+              <h3>
+                Committee Type
+              </h3>
+            </div>
+          </div>
+          <div class="grid-row">
+            <div class="grid-row__col space-bottom pt-5 pl-5">
+              <span>
+                Multicandidate status is established by?
+              </span>
+            </div>
+          </div>
+          <div class="row pt-5">
+            <div class="col-md-2 offset-md-1 ">
+              <button type="button" class="btn btn-outline-dark" (click)="next('affiliation')">
+                  By Affiliation
+              </button>
+            </div>
+              <div class="col-md-2">
+              <button type="button" class="btn btn-outline-dark" (click)="next('qualification')">
+                  By Qualification
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer>
+        <div class="grid-row">
+          <div class="grid-row__col">
+          </div>
+        </div>
+      </footer>
+    </form>
+  </div> <!-- ./form__type -->
+</div> <!-- ./form__type-container -->

@@ -1,18 +1,27 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe, DecimalPipe, DatePipe } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { StepsComponent } from './partials/steps/steps.component';
+import { SignAndSubmitComponent } from './partials/sign-and-submit/sign-and-submit.component';
+import { SubTransactionsTableComponent } from './components/sub-transactions-table/sub-transactions-table.component';
+import { UtilService } from './utils/util.service';
+import { OrderByPipe } from 'ngx-pipes';
 import { ModalModule } from 'ngx-bootstrap';
 
 @NgModule({
   imports: [
     CommonModule,
+    NgbModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   declarations: [
     StepsComponent,
+    SignAndSubmitComponent,
+    SubTransactionsTableComponent
   ],
   exports: [
     CommonModule,
@@ -23,6 +32,15 @@ import { ModalModule } from 'ngx-bootstrap';
     NgxPaginationModule,
     ModalModule,
     StepsComponent,
-  ]
+    SignAndSubmitComponent,
+    SubTransactionsTableComponent
+  ], 
+  providers: [
+    DecimalPipe,
+    DatePipe,
+    UtilService,
+    OrderByPipe,
+    CurrencyPipe
+  ],
 })
 export class SharedModule { }

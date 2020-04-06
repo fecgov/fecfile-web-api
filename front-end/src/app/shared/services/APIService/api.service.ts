@@ -1,13 +1,13 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
-import { SessionService } from '../SessionService/session.service';
-import { AuthService } from '../AuthService/auth.service';
 import { AppConfigService } from '../../../app-config.service';
-import { Posts, Post, Auth } from '../../interfaces/APIService/APIService';
+import { Auth } from '../../interfaces/APIService/APIService';
+import { AuthService } from '../AuthService/auth.service';
+import { SessionService } from '../SessionService/session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +21,7 @@ export class ApiService {
     private _cookieService: CookieService,
     private _appConfigService: AppConfigService
   ) { }
+
 
   /**
    * Logs a user into the API.
@@ -89,4 +90,37 @@ export class ApiService {
         }
       );
   }
+
+  public getStates(): Observable<any>{
+      const token: string = JSON.parse(this._cookieService.get('user'));
+      const url: string = `${environment.apiUrl}/core/get_contacts_dynamic_forms_fields`;
+      let httpOptions =  new HttpHeaders();
+  
+      httpOptions = httpOptions.append('Content-Type', 'application/json');
+      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+  
+      return this._http
+        .get(url,
+          {
+            headers: httpOptions
+          }
+        );
+  }
+
+  public getOfficesSought(): Observable<any>{
+      const token: string = JSON.parse(this._cookieService.get('user'));
+      const url: string = `${environment.apiUrl}/core/get_contacts_dynamic_forms_fields`;
+      let httpOptions =  new HttpHeaders();
+  
+      httpOptions = httpOptions.append('Content-Type', 'application/json');
+      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+  
+      return this._http
+        .get(url,
+          {
+            headers: httpOptions
+          }
+        )
+  }
+
 }

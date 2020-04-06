@@ -3,6 +3,7 @@ import { NgbActiveModal, NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-
 
 export enum ModalHeaderClassEnum {
   infoHeader = 'info-header',
+  infoHeaderDark = 'info-header-dark',
   warningHeader = 'warning-header',
   successHeader = 'success-header',
   errorHeader = 'error-header'
@@ -83,6 +84,8 @@ export class ConfirmModalComponent implements OnInit {
         return {'success-header': true};
       case ModalHeaderClassEnum.infoHeader:
         return {'info-header': true};
+      case ModalHeaderClassEnum.infoHeaderDark:
+        return {'info-header-dark': true};  
       case ModalHeaderClassEnum.warningHeader:
         return {'warning-header': true};
       case ModalHeaderClassEnum.errorHeader:

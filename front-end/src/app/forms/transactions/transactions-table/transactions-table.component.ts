@@ -215,7 +215,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
             this.formType = filters.formType;
           }
         }
-        this.getPage(this.config.currentPage);
+        this.getPage(1);
       });
 
     this.loadDefaultReceiptsTabSubscription = this._transactionsMessageService.getLoadDefaultTabMessage()
