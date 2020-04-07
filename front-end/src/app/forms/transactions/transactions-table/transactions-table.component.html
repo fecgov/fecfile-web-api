@@ -168,7 +168,7 @@
                   </button>
                 </span>
               </div>
-              <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
+              <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -198,15 +198,17 @@
                       </button>
                     </span>
                     <span [title]="!trx.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                      <button *ngIf="trx.iseditable && checkIfTrashable()" class="dropdown-item"
-                        (click)="trashTransaction(trx)">
+                      <button *ngIf="trx.iseditable && checkIfTrashable(trx)" class="dropdown-item"
+                              (click)="trashTransaction(trx)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </span>
                   </div>
                 </div>
               </div>
-              <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
+            <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
+            <!-- trx.reportstatus is filed and isEditable flag is true  the report is amended-->
+              <div *ngIf="_allTransactions  && !trx.iseditable">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                   <i class="ellipsis-icon"></i>
                 </button>
@@ -272,8 +274,8 @@
                       </button>
                     </span>
                     <span [title]="!trxChild.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                      <button [disabled]="!trxChild.iseditable" *ngIf="checkIfTrashable()" class="dropdown-item"
-                        (click)="trashTransaction(trxChild)">
+                      <button [disabled]="!trxChild.iseditable" *ngIf="checkIfTrashable(trx)" class="dropdown-item"
+                              (click)="trashTransaction(trxChild)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </span>
@@ -402,7 +404,7 @@
                     <button class="dropdown-item" (click)="exportAllSelected()">
                       <i class="file-export-icon"></i> Export
                     </button>
-                    <button *ngIf="checkIfTrashable()" 
+                    <button *ngIf="checkIfTrashable()"
                     class="dropdown-item" (click)="trashAllSelected()">
                       <i class="trash-icon"></i> Trash
                     </button>
@@ -462,7 +464,9 @@
                     </button>
                   </span>
                 </div>
-                <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
+                <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
+                <!-- trx.reportstatus is filed and isEditable flag is true  the report is amended-->
+                <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -492,7 +496,7 @@
                         </button>
                       </span>
                       <span [title]="!trx.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                        <button *ngIf="trx.iseditable && checkIfTrashable()"
+                        <button *ngIf="trx.iseditable && checkIfTrashable(trx)"
                         class="dropdown-item"
                           (click)="trashTransaction(trx)">
                           <i class="trash-icon"></i> Trash
@@ -501,7 +505,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
+                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed' && !trx.iseditable">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -561,7 +565,7 @@
                       <button class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="cloneTransaction(trxChild)">
                         <i class="fas fa-copy"></i> Clone
                       </button>
-                      <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                      <button *ngIf="checkIfTrashable(trxChild)" class="dropdown-item" (click)="trashTransaction(trxChild)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </div>
@@ -761,7 +765,9 @@
                     <i class="undo-icon"></i>
                   </button>
                 </div>
-                <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
+                <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
+                <!-- trx.reportstatus is filed and isEditable flag is true  the report is amended-->
+                <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -781,8 +787,8 @@
                         <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
                       </button>
                       <span [title]="!trx.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                          <button *ngIf="trx.iseditable && checkIfTrashable()" class="dropdown-item"
-                            (click)="trashTransaction(trx)">
+                          <button *ngIf="trx.iseditable && checkIfTrashable(trx)" class="dropdown-item"
+                                  (click)="trashTransaction(trx)">
                             <i class="trash-icon"></i> Trash
                           </button>
                       </span>
@@ -795,7 +801,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
+                <div *ngIf="_allTransactions && !trx.iseditable">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -962,7 +968,7 @@
                     </button>
                   </span>
                 </div>
-                <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
+                <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -985,9 +991,9 @@
                       </button>
                       <span [title]="(((trx.scheduleType === 'Schedule H1' || trx.scheduleType === 'Schedule H2') && trx.isTrashable !== undefined)? !trx.isTrashable : !trx.iseditable) 
                       ? 'This transaction cannot be deleted because of a linked transaction.': ''">
-                        <button [disabled]="((trx.scheduleType === 'Schedule H1' || trx.scheduleType === 'Schedule H2') && trx.isTrashable !== undefined) ? !trx.isTrashable : !trx.iseditable" 
-                        *ngIf="checkIfTrashable()" class="dropdown-item"
-                            (click)="trashTransaction(trx)">
+                        <button [disabled]="((trx.scheduleType === 'Schedule H1' || trx.scheduleType === 'Schedule H2') && trx.isTrashable !== undefined) ? !trx.isTrashable : !trx.iseditable"
+                                *ngIf="checkIfTrashable(trx)" class="dropdown-item"
+                                (click)="trashTransaction(trx)">
                             <i class="trash-icon"></i> Trash
                         </button> 
                       </span>
@@ -995,7 +1001,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
+                <div *ngIf="_allTransactions && !trx.iseditable">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -1054,7 +1060,7 @@
                       (click)="cloneTransaction(trxChild)">
                         <i class="fas fa-copy"></i> Clone
                       </button>
-                      <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                      <button *ngIf="checkIfTrashable(trxChild)" class="dropdown-item" (click)="trashTransaction(trxChild)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </div>
