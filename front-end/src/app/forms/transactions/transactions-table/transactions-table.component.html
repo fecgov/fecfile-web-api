@@ -206,7 +206,9 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="_allTransactions && trx.reportstatus === 'Filed' && !trx.iseditable">
+            <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
+            <!-- trx.reportstatus is filed and isEditable flag is true  the report is amended-->
+              <div *ngIf="_allTransactions  && !trx.iseditable">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                   <i class="ellipsis-icon"></i>
                 </button>
@@ -462,6 +464,8 @@
                     </button>
                   </span>
                 </div>
+                <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
+                <!-- trx.reportstatus is filed and isEditable flag is true  the report is amended-->
                 <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
@@ -761,6 +765,8 @@
                     <i class="undo-icon"></i>
                   </button>
                 </div>
+                <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
+                <!-- trx.reportstatus is filed and isEditable flag is true  the report is amended-->
                 <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
