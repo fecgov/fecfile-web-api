@@ -352,9 +352,19 @@ export class CleanContactsComponent implements OnInit {
     }
   }
 
-  public checkLastDupeHeaderOnPage(i: number): boolean {
+  public checkLastDupeHeaderOnPage(i: number, header: any): boolean {
     if ((i + 1) === this.mergePaginateConfig.itemsPerPage) {
       return true;
+    } else {
+      return false;
+    }
+  }
+
+  public checkFirstDupeHeaderOnPage(i: number, header: any): boolean {
+    if (i === 0) {
+      return true;
+    } else {
+      return false;
     }
   }
 

@@ -139,25 +139,25 @@
             *ngFor="let dupeContact of dupeContactHeader | paginate: { itemsPerPage: 2, currentPage: mergePage }; let i = index"
             class="clean_contacts__merge-label">
             <div *ngIf="dupeContact !== duplicatePlaceHolder" class="checkbox">
+              <pagination-template #p="paginationApi" (pageChange)="mergePage = $event">
+              </pagination-template>
+              <span *ngIf="checkFirstDupeHeaderOnPage(i, dupeContact)" role="navigation" aria-label="Pagination">
+                <a *ngIf="!p.isFirstPage()" (click)="p.previous()" tabindex="0" aria-label="Previous page">
+                  <i class="fa fa-angle-double-left"></i>
+                </a>
+              </span>
               <label>
-                <pagination-template #p="paginationApi" (pageChange)="mergePage = $event">
-                </pagination-template>
                 <input [(ngModel)]="dupeContact.selected" (change)="useAllDuplicate($event, dupeContact.seq)"
                   type="checkbox" class="clean_contacts__checkbox">
                 <span class="clean_contacts__checkbox-label">
-                  <span *ngIf="!p.isFirstPage()" role="navigation" aria-label="Pagination">
-                    <a (click)="p.previous()" tabindex="0" aria-label="Previous page">
-                      <i class="fa fa-angle-double-left"></i>
-                    </a>
-                  </span>
                   Duplicate {{dupeContact.seq}} of {{totalDuplicates}}
-                  <span *ngIf="checkLastDupeHeaderOnPage(i)" role="navigation" aria-label="Pagination">
-                    <a *ngIf="!p.isLastPage()" (click)="p.next()" tabindex="0" aria-label="Next page">
-                      <i class="fa fa-angle-double-right"></i>
-                    </a>
-                  </span>
                 </span>
               </label>
+              <span *ngIf="checkLastDupeHeaderOnPage(i, dupeContact)" role="navigation" aria-label="Pagination">
+                <a *ngIf="!p.isLastPage()" (click)="p.next()" tabindex="0" aria-label="Next page">
+                  <i class="fa fa-angle-double-right"></i>
+                </a>
+              </span>
             </div>
           </th>
           <th class="clean_contacts__merge-label">Final</th>
