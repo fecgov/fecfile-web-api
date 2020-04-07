@@ -45,7 +45,13 @@
               <i class="file-import-icon"></i> Import
             </button>
             <button class="dropdown-item" (click)="toggleAggregation()">
-              <i class="calculator-icon" *ngIf="isShowForceAggregate()">{{isAggregate?' Un-Aggregate':' Aggregate'}}</i>
+              <i class="calculator-icon" *ngIf="isShowForceAggregate()"></i> {{isAggregate?' Un-Aggregate':' Aggregate'}}
+            </button>
+            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf="!addByDissemination && (disseminationDate !== null && disseminationDate !== '') && (disbursementDate !== null && disbursementDate !== '')">
+              <i class="calendar-icon" ></i> Add by Dissemination date
+            </button>
+            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf="addByDissemination && (disbursementDate !== null && disbursementDate !== '')">
+              <i class="calendar-icon" ></i> Add by Disbursement date
             </button>
           </div>
         </div>
@@ -354,6 +360,26 @@
                             should fall within {{ coverageStartDate }} and {{ coverageEndDate }} (Coverage Dates of Report). If you
                             need to add a transaction with a date that falls outside of the coverage period for this report,
                             you will need to check the memo code box.
+                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                              coverage period only. -->
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.reportFiled">
+                            The report corresponding to this date is already filed. You must amend the report first.
+                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                              coverage period only. -->
+                          </div>
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.reportNotFound">
+                            The report corresponding to this date is not found.
+                            <!-- Entered date is outside of the report coverage period. Please enter transactions for this
+                              coverage period only. -->
+                          </div>
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.disseminationDateEmpty">
+                            Dissemination date cannot be empty if adding IE by dissemination date. 
                             <!-- Entered date is outside of the report coverage period. Please enter transactions for this
                               coverage period only. -->
                           </div>

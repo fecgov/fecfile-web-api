@@ -195,7 +195,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _http: HttpClient,
     protected _fb: FormBuilder,
     private _formService: FormsService,
-    private _receiptService: IndividualReceiptService,
+    protected _receiptService: IndividualReceiptService,
     private _contactsService: ContactsService,
     protected _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
