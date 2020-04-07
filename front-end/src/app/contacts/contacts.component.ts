@@ -5,8 +5,10 @@ import { ContactsMessageService } from './service/contacts-message.service';
 import { ContactFilterModel } from './model/contacts-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 import { ContactModel } from './model/contacts.model';
+
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { Subject } from 'rxjs';
+
 
 export enum ActiveView {
   contacts = 'contacts',

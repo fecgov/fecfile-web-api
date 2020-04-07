@@ -1,0 +1,172 @@
+@import '../../../shared/scss/global';
+
+.preview-container {
+	hr {
+		margin: 0 auto 5px auto;
+		width: 99%;
+	}	
+	.grid-row {
+		margin-left: 0;
+		margin-right: 0;
+		.grid-row__col {
+			padding-left: 0;
+			padding-right: 0;
+		}
+	}
+	header {    
+	    .header-container {
+	      display: block;
+				width: 100%;
+				border-bottom: 1px solid $bombay;
+				padding-bottom: .75em;
+				margin-bottom: 1em;
+	      .header__text {
+	        display: block;
+	        float: none;
+	        width: 100%;
+	        @include media(tablet) {
+	          display: block;
+	          float: none;
+	          width: 100%;
+	        }
+	        @include media(mediumDesktop) {
+	          float: left;
+	          width: 40%;
+	        }         
+	        @include media(largeDesktop) {
+	          float: left;
+	          width: 40%;
+	        }         
+	      }
+	      .header__btns {
+	        float: right;    
+	        .btn-print-preview {
+	          @extend .btn-secondary-gray;
+	          margin-right: 5px;
+	        }
+	        .btn-validate {
+	          @extend .btn-primary;
+	        }
+	        .btn {
+	          padding-top: 10px;
+	        }
+	      }
+	      @include clearfix();	
+		}
+	}
+	section {
+		.content {
+			.grid-col {
+				display: block;
+				max-width: 100%;
+				padding-left: 10px;
+				width: 100%;				
+				@include media(tablet) {
+					display: block;
+					padding-left: 10px;
+					max-width: 100%;
+					width: 100%;
+				}
+				@include media(mediumDesktop) {
+				    flex: 0 0 33.33333333%;
+				    max-width: 33.33333333%;
+				    min-height: 1px;
+				    padding-left: 0;
+					position: relative;
+					width: 100%;					
+				}         
+				@include media(largeDesktop) {
+				    flex: 0 0 33.33333333%;
+				    max-width: 33.33333333%;
+				    min-height: 1px;
+				    padding-left: 0;
+					position: relative;
+					width: 100%;				    				
+				} 
+				.label {
+					font-family: $mainFontFamily;
+					font-weight: bold;
+					margin: 1em;
+					margin-left: 0;
+				}				
+				.text {
+					font-family: $mainFontFamily;
+					margin-bottom: 1em;
+					margin-right: .75em;
+				}
+			} // .grid-col
+			.grid-row__col {
+				.text-content {
+		          ol,
+		          ul {
+		              display: block;
+		              margin-block-start: 1em;
+		              margin-block-end: 1em;
+		              margin-inline-start: 0px;
+		              margin-inline-end: 0px;
+		              padding-inline-start: 40px;            
+		          }					
+				}			
+			}	
+			.validate__form {
+			&.show-alerts {
+			  display: block;
+			  @include media(tablet) {
+			    display: block;
+			  }
+			  @include media(mediumDesktop) {
+			    display: none;
+			  }         
+			  @include media(largeDesktop) {
+			    display: none;
+			  }           
+			}
+			background-color: $bombay;
+			display: none;
+			height: 80px;
+			margin-top: 10px;
+			width: 100%;
+			@include media(tablet) {
+			  background-color: $bombay;
+			  display: none;
+			  height: 80px;
+			  margin-top: 10px;
+			  width: 100%;        
+			}
+			@include media(mediumDesktop) {
+			  display: none;
+			}         
+			@include media(largeDesktop) {
+			  display: none;
+			}         
+			}
+			.indented{
+				margin-left:5%;
+			}			
+		}
+	}
+}
+footer {
+	.grid-row {
+		.grid-row__col--12 {
+		    .forms__btn-container {
+		      margin: 0 auto;
+		      padding: 0;
+		      width: 100%;
+		    }		
+		}
+	}
+}
+.border-bottom {
+	border-bottom: $bombay;
+	margin-bottom: 1em;
+	padding-bottom: 1em;
+}
+.border-top {
+	border-top: $bombay;
+	margin-top: 1em;
+	padding-top: 1em;
+}
+.space-bottom {
+	padding-bottom: 1em;
+}
