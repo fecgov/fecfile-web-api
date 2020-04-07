@@ -1498,6 +1498,9 @@ def schedA_sql_dict(data):
             data.get("transaction_type_identifier")
         )
 
+        if data.get("transaction_type_identifier") == 'REF_TO_FED_CAN' and data.get("election_year"):
+            datum['election_code'] += data.get("election_year")
+
         if (
             data.get("transaction_type_identifier")
             in TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT.keys()
@@ -2687,6 +2690,7 @@ def trash_restore_transactions(request):
         }
  
     """
+    logger.info("trash_restore_transactions called with {}".format(request.data))
     deleted_transaction_ids = []
     _actions = request.data.get("actions", [])
     for _action in _actions:
@@ -2921,6 +2925,7 @@ def trash_restore_transactions(request):
                         )
                         update_activity_event_amount_ytd_h6(data)
             elif transaction_id[:2] in ("SC", "SD"):
+                logger.debug("trash/restore {}".format(transaction_id))
                 # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D
                 if _delete == "Y" or (transaction_id[:2] == "SC" and _delete != "Y"):
                     _actions.extend(
