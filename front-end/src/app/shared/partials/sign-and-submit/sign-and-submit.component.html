@@ -1,0 +1,206 @@
+<div class="signee-container">
+  <header>
+    <div class="header-container">
+      <h1>
+        {{formTitle}}
+        <span class="header__btns">
+          <button type="button" class="btn btn-validate" (click)="printPreview()">
+            Print Preview
+          </button>
+        </span>
+      </h1>
+    </div>
+  </header>
+  <section>
+    <div class="content">
+      <form [formGroup]="form">
+        <div class="grid-row py-3">
+          <h3>
+            Sign and Submit
+          </h3>
+        </div>
+        <div class="grid-row justify-content-between pl-5 ">
+          <div class="form-group col col-md-5 offset-md-1">
+            <label for="sign">Sign
+              <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+            </label>
+            <div class="input-group transactions__filter-multi-input">
+              <input type="text" name="sign" [formControlName]="'sign'" class="form-control" id="sign" aria-label="Sign"
+                aria-describedby="sign" required [ngClass]=" form.get('sign')?.invalid &&
+                          (form.touched || form.dirty)
+                            ? 'input-field-error'
+                            : ''">
+            </div>
+          </div>
+          <div class="form-group col col-md-3 offset-md-1">
+            <label for="submission_date">Submission Date
+              <button type="button" class="btn btn-info" [ngbTooltip]="tooltipPlaceholder" tooltipClass="form-tooltip">
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+            </label>
+            <div class="input-group transactions__filter-multi-input">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="submission_dateIcon">
+                  <i class="calendar-icon" aria-hidden="true"></i>
+                </span>
+              </div>
+              <input type="date" name="submission_date" [formControlName]="'submission_date'" class="form-control"
+                [ngClass]=" form.get('submission_date')?.invalid &&
+                          (form.touched || form.dirty)
+                            ? 'input-field-error'
+                            : ''" id="submission_date" aria-label="Enter submission date"
+                aria-describedby="submission_date" required>
+            </div>
+            <div class="text-error text-left"
+              *ngIf="form.controls?.submission_date?.errors && form.controls?.submission_date?.errors['contributionDateInvalid']">
+              Placeholder error.
+            </div>
+          </div>
+        </div>
+        <br>
+        <hr>
+        <div class="grid-row justify-content-between pl-5 pt-5">
+          <div class="form-group col col-md-3 offset-md-3">
+            <label for="additionalEmail1">Additional Email 1
+              <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+            </label>
+            <div class="input-group transactions__filter-multi-input">
+              <input type="text" name="additionalEmail1" [formControlName]="'additionalEmail1'" class="form-control"
+                id="additionalEmail1" aria-label="additional Email 1" aria-describedby="additionalEmail1" 
+                [ngClass]=" form.get('additionalEmail1')?.invalid &&
+                          (form.touched || form.dirty)
+                            ? 'input-field-error'
+                            : ''" >
+            </div>
+            <div class="text-error text-left"
+              *ngIf="form.controls?.additionalEmail1?.errors && form.controls?.additionalEmail1?.errors['email']">
+              Must be a valid email address
+            </div>
+            <div class="text-error text-left"
+              *ngIf="form.controls?.confirmAdditionalEmail1?.errors && form.controls?.confirmAdditionalEmail1?.errors['mustMatch']">
+              Emails in both fields must match
+            </div>
+          </div>
+          <div class="form-group col col-md-3">
+            <label for="confirmAdditionalEmail1">Confirm Additional Email 1
+              <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+            </label>
+            <div class="input-group transactions__filter-multi-input">
+              <input type="text" name="confirmAdditionalEmail1" [formControlName]="'confirmAdditionalEmail1'"
+                class="form-control" id="confirmAdditionalEmail1" aria-label="confirm AdditionalEmail 1"
+                aria-describedby="confirmAdditionalEmail1" [ngClass]=" form.get('confirmAdditionalEmail1')?.invalid &&
+                          (form.touched || form.dirty)
+                            ? 'input-field-error'
+                            : ''">
+            </div>
+            <div class="text-error text-left"
+              *ngIf="form.controls?.confirmAdditionalEmail1?.errors && form.controls?.confirmAdditionalEmail1?.errors['email']">
+              Must be a valid email address
+            </div>
+            <div class="text-error text-left"
+              *ngIf="form.controls?.confirmAdditionalEmail1?.errors && form.controls?.confirmAdditionalEmail1?.errors['mustMatch']">
+              Emails in both fields must match
+            </div>
+          </div>
+        </div>
+        <div class="grid-row justify-content-between pl-5">
+          <div class="form-group col col-md-3 offset-md-3">
+            <label for="additionalEmail2">Additional Email 2
+              <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+            </label>
+            <div class="input-group transactions__filter-multi-input">
+              <input type="text" name="additionalEmail2" [formControlName]="'additionalEmail2'" class="form-control"
+                id="additionalEmail2" aria-label="additional Email 2" aria-describedby="additionalEmail2"
+                [ngClass]=" form.get('additionalEmail2')?.invalid &&
+                          (form.touched || form.dirty)
+                            ? 'input-field-error'
+                            : ''">
+            </div>
+            <div class="text-error text-left"
+              *ngIf="form.controls?.additionalEmail2?.errors && form.controls?.additionalEmail2?.errors['email']">
+              Must be a valid email address
+            </div>
+            <div class="text-error text-left"
+              *ngIf="form.controls?.confirmAdditionalEmail2?.errors && form.controls?.confirmAdditionalEmail2?.errors['mustMatch']">
+              Emails in both fields must match
+            </div>
+          </div>
+          <div class="form-group col col-md-3">
+            <label for="confirmAdditionalEmail2">Confirm Additional Email 2
+              <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">Click here for more information</span>
+              </button>
+            </label>
+            <div class="input-group transactions__filter-multi-input">
+              <input type="text" name="confirmAdditionalEmail2" [formControlName]="'confirmAdditionalEmail2'"
+                class="form-control" id="confirmAdditionalEmail2" aria-label="confirm AdditionalEmail 2"
+                aria-describedby="confirmAdditionalEmail2" [ngClass]=" form.get('confirmAdditionalEmail2')?.invalid &&
+                          (form.touched || form.dirty)
+                            ? 'input-field-error'
+                            : ''">
+            </div>
+            <div class="text-error text-left"
+              *ngIf="form.controls?.confirmAdditionalEmail2?.errors && form.controls?.confirmAdditionalEmail2?.errors['email']">
+              Must be a valid email address
+            </div>
+            <div class="text-error text-left"
+              *ngIf="form.controls?.confirmAdditionalEmail2?.errors && form.controls?.confirmAdditionalEmail2?.errors['mustMatch']">
+              Emails in both fields must match
+            </div>
+          </div>
+        </div>
+        <div class="grid-row float-right pt-3">
+          <button type="button" class="btn btn-primary" (click)="updateInfo()">Save</button>
+        </div>
+        <div class="pt-5 mt-3">
+          <hr>
+        </div>
+        <div class="grid-row py-3">
+          <h3>
+            Emails on file
+          </h3>
+        </div>
+        <div class="grid-row justify-content-between pl-5 pt-2">
+          <div class="form-group col offset-md-1">
+            <div *ngFor="let emailOnFile of emailsOnFile">{{emailsOnFile}}</div>
+          </div>
+        </div>
+        <div>
+          <div class="row float-right pl-5">
+            <div class="col">
+              <label for="filingPassword">eFiling Password
+                  <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="input-group transactions__filter-multi-input">
+                  <input type="text" name="filingPassword" [formControlName]="'filingPassword'"
+                    class="form-control" id="filingPassword" aria-label="e filing password"
+                    aria-describedby="filingPassword" required [ngClass]=" form.get('filingPassword')?.invalid &&
+                                (form.touched || form.dirty)
+                                  ? 'input-field-error'
+                                  : ''">
+                </div>
+            </div>
+          </div>
+        </div>
+        
+      </form>
+    </div> <!-- ./content -->
+  </section>
+</div>

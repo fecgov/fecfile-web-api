@@ -135,7 +135,7 @@
         <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
           <tr>
             <td>
-              <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+              <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)">
             </td>
             <td  *ngIf="_allTransactions">{{trx.formType}} - {{trx.reportType}}</td>
             <td  *ngIf="isColumnVisible('type')">{{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
@@ -168,7 +168,7 @@
                   </button>
                 </span>
               </div>
-              <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
+              <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
                   <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -179,7 +179,7 @@
                       <i class="view-icon"></i> View
                     </button>
                     <span [title]="!trx.iseditable ? 'This transaction cannot be edited because it is auto generated.':''">
-                      <button *ngIf="trx.iseditable" class="dropdown-item" [disabled]="!editMode" (click)="editTransaction(trx)">
+                      <button *ngIf="trx.iseditable" class="dropdown-item" [disabled]="isDisabled(trx)" (click)="editTransaction(trx)">
                         <i class="edit-icon"></i> Edit
                       </button>
                     </span>
@@ -193,20 +193,22 @@
                       <i class="fas fa-print"></i> Print
                     </button>
                     <span [title]="!trx.iseditable ? 'This transaction cannot be cloned because it is auto generated.':''">
-                      <button *ngIf="trx.iseditable" class="dropdown-item" [disabled]="!editMode" (click)="cloneTransaction(trx)">
+                      <button *ngIf="trx.iseditable" class="dropdown-item" [disabled]="isDisabled(trx)" (click)="cloneTransaction(trx)">
                         <i class="fas fa-copy"></i> Clone
                       </button>
                     </span>
                     <span [title]="!trx.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                      <button *ngIf="trx.iseditable && checkIfTrashable()" class="dropdown-item"
-                        (click)="trashTransaction(trx)">
+                      <button *ngIf="trx.iseditable && checkIfTrashable(trx)" class="dropdown-item"
+                              (click)="trashTransaction(trx)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </span>
                   </div>
                 </div>
               </div>
-              <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
+            <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
+            <!-- trx.reportstatus is filed and isEditable flag is true  the report is amended-->
+              <div *ngIf="_allTransactions  && !trx.iseditable">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                   <i class="ellipsis-icon"></i>
                 </button>
@@ -215,7 +217,7 @@
           </tr>
           <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
             <td style="padding-left: 1.5rem;">
-              <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
+              <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)" hidden>
             </td>
             <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
             <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
@@ -253,7 +255,7 @@
                   </button>
                   <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
                     <span [title]="!trxChild.iseditable ? 'This transaction cannot be edited because it is auto generated.':''">
-                      <button [disabled]="!trxChild.iseditable" class="dropdown-item" [disabled]="!editMode" (click)="editTransaction(trxChild)">
+                      <button [disabled]="!trxChild.iseditable" class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="editTransaction(trxChild)">
                         <i class="edit-icon"></i> Edit
                       </button>
                     </span>
@@ -267,13 +269,13 @@
                       <i class="fas fa-print"></i> Print
                     </button>
                     <span [title]="!trxChild.iseditable ? 'This transaction cannot be cloned because it is auto generated.':''">
-                      <button [disabled]="!trxChild.iseditable" class="dropdown-item" [disabled]="!editMode" (click)="cloneTransaction(trxChild)">
+                      <button [disabled]="!trxChild.iseditable" class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="cloneTransaction(trxChild)">
                         <i class="fas fa-copy"></i> Clone
                       </button>
                     </span>
                     <span [title]="!trxChild.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                      <button [disabled]="!trxChild.iseditable" *ngIf="checkIfTrashable()" class="dropdown-item"
-                        (click)="trashTransaction(trxChild)">
+                      <button [disabled]="!trxChild.iseditable" *ngIf="checkIfTrashable(trx)" class="dropdown-item"
+                              (click)="trashTransaction(trxChild)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </span>
@@ -402,7 +404,7 @@
                     <button class="dropdown-item" (click)="exportAllSelected()">
                       <i class="file-export-icon"></i> Export
                     </button>
-                    <button *ngIf="checkIfTrashable()" 
+                    <button *ngIf="checkIfTrashable()"
                     class="dropdown-item" (click)="trashAllSelected()">
                       <i class="trash-icon"></i> Trash
                     </button>
@@ -429,7 +431,7 @@
           <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
             <tr>
               <td>
-                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)">
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')">
@@ -462,7 +464,9 @@
                     </button>
                   </span>
                 </div>
-                <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
+                <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
+                <!-- trx.reportstatus is filed and isEditable flag is true  the report is amended-->
+                <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
@@ -473,7 +477,7 @@
                         <i class="view-icon"></i> View
                       </button>
                       <span [title]="!trx.iseditable ? 'This transaction cannot be edited because it is autogenerated.':''">
-                        <button *ngIf="trx.iseditable" class="dropdown-item" [disabled]="!editMode" (click)="editTransaction(trx)">
+                        <button *ngIf="trx.iseditable" class="dropdown-item" [disabled]="isDisabled(trx)" (click)="editTransaction(trx)">
                           <i class="edit-icon"></i> Edit
                         </button>
                       </span>
@@ -487,12 +491,12 @@
                         <i class="fas fa-print"></i> Print
                       </button>
                       <span [title]="!trx.iseditable ? 'This transaction cannot be cloned because it is autogenerated.':''">
-                        <button class="dropdown-item" *ngIf="trx.iseditable" [disabled]="!editMode" (click)="cloneTransaction(trx)">
+                        <button class="dropdown-item" *ngIf="trx.iseditable" [disabled]="isDisabled(trx)" (click)="cloneTransaction(trx)">
                           <i class="fas fa-copy"></i> Clone
                         </button>
                       </span>
                       <span [title]="!trx.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                        <button *ngIf="trx.iseditable && checkIfTrashable()"
+                        <button *ngIf="trx.iseditable && checkIfTrashable(trx)"
                         class="dropdown-item"
                           (click)="trashTransaction(trx)">
                           <i class="trash-icon"></i> Trash
@@ -501,7 +505,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
+                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed' && !trx.iseditable">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -510,7 +514,7 @@
             </tr>
             <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
               <td style="padding-left: 1.5rem;">
-                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
+                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)" hidden>
               </td>
               <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
@@ -549,7 +553,7 @@
                       <button *ngIf="isIKOUT(trx)" class="dropdown-item" (click)="viewTransaction(trx)">
                         <i class="view-icon"></i> View
                       </button>
-                      <button class="dropdown-item" [disabled]="!editMode" (click)="editTransaction(trxChild)">
+                      <button class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="editTransaction(trxChild)">
                         <i class="edit-icon"></i> Edit
                       </button>
                       <button *ngIf="isForceItemizable(trxChild)" class="dropdown-item" (click)="forceItemizationToggle(trxChild)">
@@ -558,10 +562,10 @@
                       <button class="dropdown-item" (click)="printTransaction(trxChild)">
                         <i class="fas fa-print"></i> Print
                       </button>
-                      <button class="dropdown-item" [disabled]="!editMode" (click)="cloneTransaction(trxChild)">
+                      <button class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="cloneTransaction(trxChild)">
                         <i class="fas fa-copy"></i> Clone
                       </button>
-                      <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                      <button *ngIf="checkIfTrashable(trxChild)" class="dropdown-item" (click)="trashTransaction(trxChild)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </div>
@@ -723,7 +727,7 @@
           <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
             <tr>
               <td>
-                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)">
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')">
@@ -761,14 +765,16 @@
                     <i class="undo-icon"></i>
                   </button>
                 </div>
-                <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
+                <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
+                <!-- trx.reportstatus is filed and isEditable flag is true  the report is amended-->
+                <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                      <button class="dropdown-item" [disabled]="!editMode" (click)="editTransaction(trx)">
+                      <button class="dropdown-item" [disabled]="isDisabled(trx)" (click)="editTransaction(trx)">
                         <i class="edit-icon"></i> Edit
                       </button>
                       <button *ngIf="isForceItemizable(trx)" class="dropdown-item" (click)="forceItemizationToggle(trx)">
@@ -781,8 +787,8 @@
                         <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
                       </button>
                       <span [title]="!trx.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                          <button *ngIf="trx.iseditable && checkIfTrashable()" class="dropdown-item"
-                            (click)="trashTransaction(trx)">
+                          <button *ngIf="trx.iseditable && checkIfTrashable(trx)" class="dropdown-item"
+                                  (click)="trashTransaction(trx)">
                             <i class="trash-icon"></i> Trash
                           </button>
                       </span>
@@ -795,7 +801,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
+                <div *ngIf="_allTransactions && !trx.iseditable">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -930,7 +936,7 @@
           <ng-container *ngFor="let trx of transactionsModel | paginate: config; let i = index;">
             <tr>
               <td>
-                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event)">
+                <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)">
               </td>
               <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('schedule')">{{trx.scheduleType}}</td>
@@ -962,14 +968,14 @@
                     </button>
                   </span>
                 </div>
-                <div *ngIf="!_allTransactions || (_allTransactions && trx.reportstatus !== 'Filed')">
+                <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
                     <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                      <button class="dropdown-item" [disabled]="!editMode" (click)="editTransaction(trx)">
+                      <button class="dropdown-item" [disabled]="isDisabled(trx)" (click)="editTransaction(trx)">
                         <i class="edit-icon"></i> Edit
                       </button>
                       <button *ngIf="isForceItemizable(trx)" class="dropdown-item" (click)="forceItemizationToggle(trx)">
@@ -980,14 +986,14 @@
                       </button>
                       <button *ngIf="trx.scheduleType !== 'Schedule H1' && trx.scheduleType !== 'Schedule H2' && 
                                     trx.scheduleType !== 'Schedule H3' && trx.scheduleType !== 'Schedule H5'" 
-                      class="dropdown-item" [disabled]="!editMode" (click)="cloneTransaction(trx)">
+                      class="dropdown-item" [disabled]="isDisabled(trx)" (click)="cloneTransaction(trx)">
                         <i class="fas fa-copy"></i> Clone
                       </button>
                       <span [title]="(((trx.scheduleType === 'Schedule H1' || trx.scheduleType === 'Schedule H2') && trx.isTrashable !== undefined)? !trx.isTrashable : !trx.iseditable) 
                       ? 'This transaction cannot be deleted because of a linked transaction.': ''">
-                        <button [disabled]="((trx.scheduleType === 'Schedule H1' || trx.scheduleType === 'Schedule H2') && trx.isTrashable !== undefined) ? !trx.isTrashable : !trx.iseditable" 
-                        *ngIf="checkIfTrashable()" class="dropdown-item"
-                            (click)="trashTransaction(trx)">
+                        <button [disabled]="((trx.scheduleType === 'Schedule H1' || trx.scheduleType === 'Schedule H2') && trx.isTrashable !== undefined) ? !trx.isTrashable : !trx.iseditable"
+                                *ngIf="checkIfTrashable(trx)" class="dropdown-item"
+                                (click)="trashTransaction(trx)">
                             <i class="trash-icon"></i> Trash
                         </button> 
                       </span>
@@ -995,7 +1001,7 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="_allTransactions && trx.reportstatus === 'Filed'">
+                <div *ngIf="_allTransactions && !trx.iseditable">
                   <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                     <i class="ellipsis-icon"></i>
                   </button>
@@ -1004,7 +1010,7 @@
             </tr>
             <tr [ngbCollapse]="trx.child? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
               <td style="padding-left: 1.5rem;">
-                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event)" hidden>
+                <input [(ngModel)]="trxChild.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)" hidden>
               </td>
               <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
               <td  *ngIf="isColumnVisible('schedule')">{{trxChild.scheduleType}}</td>
@@ -1038,7 +1044,7 @@
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                      <button class="dropdown-item" [disabled]="!editMode" (click)="editTransaction(trxChild)">
+                      <button class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="editTransaction(trxChild)">
                         <i class="edit-icon"></i> Edit
                       </button>
                       <button *ngIf="isForceItemizable(trxChild)" class="dropdown-item" (click)="forceItemizationToggle(trxChild)">
@@ -1050,11 +1056,11 @@
                       <button class="dropdown-item" 
                       *ngIf="trxChild.scheduleType !== 'Schedule H1' && trxChild.scheduleType !== 'Schedule H2' && 
                                     trxChild.scheduleType !== 'Schedule H3' && trxChild.scheduleType !== 'Schedule H5'"
-                              [disabled]="!editMode"
+                              [disabled]="isDisabled(trxChild)"
                       (click)="cloneTransaction(trxChild)">
                         <i class="fas fa-copy"></i> Clone
                       </button>
-                      <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                      <button *ngIf="checkIfTrashable(trxChild)" class="dropdown-item" (click)="trashTransaction(trxChild)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </div>

@@ -30,4 +30,3 @@ urlpatterns = [
         name="force_unaggregate_sb",
     ),
 ]
-

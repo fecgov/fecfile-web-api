@@ -51,6 +51,11 @@ export class FormsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.paramsSubscription = this._activeRoute.params.subscribe(params => {
       this.formType = params.form_id;
+      // if(!this.formType){
+      //   if(this._router.url.startsWith('/forms/form')){
+      //     this.formType = this._router.url.substring(this._router.url.lastIndexOf('/') + 1);
+      //   }
+      // }
     });
   }
 

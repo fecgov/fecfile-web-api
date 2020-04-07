@@ -180,6 +180,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   loadDefaultReceiptsTabSubscription: Subscription;
   routerSubscription: Subscription;
 
+  selectedFromMultiplePages: Array <TransactionModel> = [];
+
   constructor(
     private _transactionsService: TransactionsService,
     private _transactionsMessageService: TransactionsMessageService,
@@ -213,7 +215,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
             this.formType = filters.formType;
           }
         }
-        this.getPage(this.config.currentPage);
+        this.getPage(1);
       });
 
     this.loadDefaultReceiptsTabSubscription = this._transactionsMessageService.getLoadDefaultTabMessage()
@@ -465,6 +467,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
         this.transactionsModel = transactionsModelL;
 
+        this.setSelectedForMultiplyPages();
+
         if (this.clonedTransaction && this.clonedTransaction.hasOwnProperty('transaction_id')) {
           for (
             let transactionModelIndex = 0;
@@ -565,6 +569,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         allTransactions: this._allTransactions
       }
     });
+
+    this.selectedFromMultiplePages = [];
   }
 
   /**
@@ -634,6 +640,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         const transactionsModelL = this._transactionsService.mapFromServerFields(res.transactions);
         this.transactionsModel = transactionsModelL;
+
+        this.setSelectedForMultiplyPages();
 
         // handle non-numeric amounts
         // TODO handle this server side in API
@@ -851,7 +859,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     let unItemizedCount = 0;
     let selectedCount = 0;
     let reportIdSet = new Set();
-    for (const trx of this.transactionsModel) {
+    //for (const trx of this.transactionsModel) {
+    for (const trx of this.selectedFromMultiplePages) {
       if (trx.selected) {
         selectedCount++;
         // remove un-itemized  trxIds here when printing multiple
@@ -915,7 +924,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     let linkedTransactionsArray = [];
     let filedTransactionsArray = [];
     const selectedTransactions: Array<TransactionModel> = [];
-    for (const trx of this.transactionsModel) {
+    //for (const trx of this.transactionsModel) {
+    for (const trx of this.selectedFromMultiplePages) {
       if (trx.selected) {
 
         //this condition only applies to H1 and H2s
@@ -1326,21 +1336,23 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     // on the current page.
 
     this.bulkActionCounter = 0;
-    // for (const t of this.transactionsModel) {
-    //   t.selected = this.allTransactionsSelected;
-    //   if (this.allTransactionsSelected) {
-    //     this.bulkActionCounter++;
-    //   }
-    // }
+    for (const t of this.transactionsModel) {
+       t.selected = this.allTransactionsSelected;
+       if (this.allTransactionsSelected) {
+         this.bulkActionCounter++;
+       }
+    }
 
     // TODO replace this with the commented code above when server pagination is ready.
-    for (let i = this.firstItemOnPage - 1; i <= this.lastItemOnPage - 1; i++) {
-      this.transactionsModel[i].selected = this.allTransactionsSelected;
-      if (this.allTransactionsSelected) {
-        this.bulkActionCounter++;
-      }
-    }
+    //for (let i = this.firstItemOnPage - 1; i <= this.lastItemOnPage - 1; i++) {
+    //  this.transactionsModel[i].selected = this.allTransactionsSelected;
+    //  if (this.allTransactionsSelected) {
+    //    this.bulkActionCounter++;
+    //  }
+    //}
     this.bulkActionDisabled = !this.allTransactionsSelected;
+
+    this.selectedForMultiplyPages();
   }
 
   /**
@@ -1364,20 +1376,32 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @param the event payload from the click
    */
-  public checkForMultiChecked(e: any): void {
+  public checkForMultiChecked(e: any, trx :any): void {
     if (e.target.checked) {
       this.bulkActionCounter++;
+
+      if(this.selectedFromMultiplePages
+        .filter(obj => obj.transactionId === trx.transactionId).length === 0) {
+        this.selectedFromMultiplePages.push(trx);
+      }
+
     } else {
       this.allTransactionsSelected = false;
       if (this.bulkActionCounter > 0) {
         this.bulkActionCounter--;
       }
+
+      this.selectedFromMultiplePages = this.selectedFromMultiplePages
+        .filter(obj => obj.transactionId !== trx.transactionId);
+
     }
 
     // Transaction View shows bulk action when more than 1 checked
     // Recycle Bin shows delete action when 1 or more checked.
     const count = this.isTransactionViewActive() ? 1 : 0;
     this.bulkActionDisabled = this.bulkActionCounter > count ? false : true;
+
+    this.bulkActionDisabled = this.selectedFromMultiplePages.length > 1 ? false : true;
   }
 
   /**
@@ -1389,19 +1413,23 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    *
    * @returns true if Transactions are permitted to be trashed.
    */
-  public checkIfTrashable(): boolean {
+  // TODO: in allTransaction table there are multiple reports
+  public checkIfTrashable(trx: TransactionModel = null): boolean {
     if (!this.transactionsModel) {
       return false;
     }
     if (this.transactionsModel.length === 0) {
       return false;
     }
-    for (const trx of this.transactionsModel) {
-      if (trx.reportstatus.toUpperCase() === 'FILED') {
-        return false;
+    if (trx === null) {
+      for (const trxTrash of this.transactionsModel) {
+        if (trxTrash.reportstatus.toUpperCase() === 'FILED') {
+          return false;
+        }
       }
+    } else {
+      return trx.iseditable;
     }
-    return true;
   }
 
   /**
@@ -1701,10 +1729,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   private isForceItemizable(trx: TransactionModel): boolean {
-    if (!this.editMode) {
+    if (!this.editMode && !this._allTransactions) {
       return false;
     }
     if (trx) {
+      if (trx.reportstatus.toUpperCase() === 'FILED') {
+        return (trx.forceitemizable && trx.iseditable);
+      }
       return trx.forceitemizable;
     } else {
       return false;
@@ -1734,6 +1765,58 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       } else if (trx.itemized === 'FI' || trx.itemized === 'I') {
         return true;
       }
+    } else {
+      return true;
+    }
+  }
+
+  private setSelectedForMultiplyPages() {
+    for (
+      let transactionModelIndex = 0;
+      transactionModelIndex < this.transactionsModel.length;
+      transactionModelIndex++
+    ) {
+      for(const trxMultPages of this.selectedFromMultiplePages) {
+        if(trxMultPages.transactionId === this.transactionsModel[transactionModelIndex].transactionId && trxMultPages.selected)
+        {
+          this.transactionsModel[transactionModelIndex].selected = true;
+        }
+      }
+    }
+
+    this.bulkActionDisabled = this.selectedFromMultiplePages.length > 1 ? false : true;
+  }
+
+  private selectedForMultiplyPages() {
+    for(
+      let transactionModelIndex = 0;
+      transactionModelIndex < this.transactionsModel.length;
+      transactionModelIndex++
+    ) {
+      if(this.allTransactionsSelected) {
+        if(this.selectedFromMultiplePages.filter(obj => obj.transactionId ===
+              this.transactionsModel[transactionModelIndex].transactionId).length === 0)
+        {
+          this.selectedFromMultiplePages.push(this.transactionsModel[transactionModelIndex]);
+        }
+
+      }else {
+        this.selectedFromMultiplePages = this.selectedFromMultiplePages.filter
+          (obj => obj.transactionId !== this.transactionsModel[transactionModelIndex].transactionId);
+
+        this.setSelectedForMultiplyPages();
+      }
+    }
+  }
+
+  /**
+   * enables/disables edit/clone/trash actions on a transaction
+   * @param trx
+   * @return {boolean} true disabled trx action else false
+   */
+  private isDisabled(trx: TransactionModel): boolean {
+    if (trx && trx.reportstatus) {
+    return !trx.iseditable;
     } else {
       return true;
     }

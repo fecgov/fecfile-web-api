@@ -803,6 +803,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     //   }
     // }
 
+    else if (this.isFieldName(fieldName, 'expenditure_purpose')) {
+      // Expenditure  description is required for H4/H6
+      if (
+        this.transactionType === 'ALLOC_EXP' ||
+        this.transactionType === 'ALLOC_EXP_CC_PAY' ||
+        this.transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+        this.transactionType === 'ALLOC_EXP_STAF_REIM' ||
+        this.transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+        this.transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+        this.transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+        this.transactionType === 'ALLOC_EXP_VOID' ||
+        this.transactionType === 'ALLOC_FEA_DISB' ||
+        this.transactionType === 'ALLOC_FEA_CC_PAY' ||
+        this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+        this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
+        this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+        this.transactionType === 'ALLOC_FEA_VOID'
+      ) {
+        formValidators.push(Validators.required);
+      }
+    }
+
     if (validators) {
       for (const validation of Object.keys(validators)) {
         if (validation === 'required') {
@@ -3346,6 +3368,23 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.clearOrgData();
         }
         if (searchText) {
+          /*
+          if(this.transactionType === 'TRIB_REC'
+            || this.transactionType === 'TRIB_RECNT_REC'
+            || this.transactionType === 'TRIB_NP_RECNT_ACC'
+            || this.transactionType === 'TRIB_NP_HQ_ACC'
+            || this.transactionType === 'TRIB_NP_CONVEN_ACC'
+            || this.transactionType === 'OPEXP_HQ_ACC_TRIB_REF'
+            || this.transactionType === 'OPEXP_CONV_ACC_TRIB_REF'
+            || this.transactionType === 'OTH_DISB_NP_RECNT_TRIB_REF'
+            || this.transactionType === 'PAC_NON_FED_REC'
+            || this.transactionType === 'PAC_NON_FED_RET'
+            || this.transactionType === 'ALLOC_EXP'
+            || this.transactionType === 'ALLOC_EXP_CC_PAY'
+          ){
+            return Observable.of([]);
+          }else
+          */
           if(this.transactionType === 'CON_EAR_DEP_MEMO'
             || this.transactionType === 'CON_EAR_UNDEP_MEMO'
             || this.transactionType === 'CONT_TO_CAN'
