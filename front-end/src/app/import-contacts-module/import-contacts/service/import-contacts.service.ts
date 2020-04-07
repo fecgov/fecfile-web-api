@@ -34,7 +34,7 @@ export class ImportContactsService {
     } else {
       // TODO Using mock server data until API is integrated
       return this._http
-        .get('assets/mock-data/import-contacts/duplicates.json', {
+        .get('assets/mock-data/import-contacts/duplicates.1.json', {
           headers: httpOptions,
           params
         })
