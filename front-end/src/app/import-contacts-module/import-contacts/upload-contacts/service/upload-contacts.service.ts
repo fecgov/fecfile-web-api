@@ -34,7 +34,7 @@ export class UploadContactsService {
       AWS.config.getCredentials(function (err) {
         if (err) {
           console.log(err.stack);
-          // credentials not loaded
+          // credentials not loaded test
         } else {
           console.log('AK:', AWS.config.credentials.accessKeyId + 'ayuhahTFysyvsy');
           console.log('SK:', AWS.config.credentials.secretAccessKey + 'uhidijdijdoijd');
