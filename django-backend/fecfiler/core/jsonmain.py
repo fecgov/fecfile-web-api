@@ -352,7 +352,7 @@ def preappending_purpose_description(transaction):
     try:
         for preappend in DICT_PURPOSE_DESCRIPTION_VALUES:
             if transaction['transactionTypeIdentifier'] in DICT_PURPOSE_DESCRIPTION_VALUES[preappend]:
-                if 'contributionPurposeDescription' in transaction:
+                if 'contributionPurposeDescription' in transaction and transaction['contributionPurposeDescription'] not in ['',""," "]:
                     transaction['contributionPurposeDescription'] = preappend + ' ' + transaction['contributionPurposeDescription']
                 if 'expenditurePurposeDescription' in transaction and transaction['expenditurePurposeDescription'] not in ['',""," "]:
                     transaction['expenditurePurposeDescription'] = preappend + ' ' + transaction['expenditurePurposeDescription']
