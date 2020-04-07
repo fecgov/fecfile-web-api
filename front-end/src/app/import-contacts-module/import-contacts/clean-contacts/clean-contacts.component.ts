@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ImportContactsService } from '../service/import-contacts.service';
 import { PaginationInstance } from 'ngx-pagination';
 import { ContactToCleanModel } from './model/contact-to-clean.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UtilService } from 'src/app/shared/utils/util.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { FieldToCleanModel } from './model/field-to-clean.model';
 import { FieldEntryModel } from './model/field-entry.model';
 
@@ -15,15 +15,17 @@ import { FieldEntryModel } from './model/field-entry.model';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CleanContactsComponent implements OnInit {
+export class CleanContactsComponent implements OnInit, OnDestroy {
 
   public contacts: Array<any>;
   public contacts$: Observable<Array<any>>;
 
-  /**
-   * The contact from the table of duplicates to clean.
-   */
-  // public contact: any;
+  // ngx-pagination config for the duplicates table of contacts
+  public maxItemsPerPage = 10;
+  public directionLinks = false;
+  public autoHide = true;
+  public config: PaginationInstance;
+  public numberOfPages = 0;
 
   /**
    * All fields and their values from the user's contact from the file and
@@ -44,14 +46,9 @@ export class CleanContactsComponent implements OnInit {
   public dupeContactHeader: Array<any>;
   public totalDuplicates = 0;
 
-  // ngx-pagination config for the duplicates table of contacts
-  public maxItemsPerPage = 10;
-  public directionLinks = false;
-  public autoHide = true;
-  public config: PaginationInstance;
-  public numberOfPages = 0;
-
   private contactsSubject: BehaviorSubject<Array<any>>;
+  private onDestroy$ = new Subject();
+
   private readonly contactFields = [
     { displayName: 'Last Name', name: 'last_name' },
     { displayName: 'First Name', name: 'first_name' },
@@ -82,14 +79,17 @@ export class CleanContactsComponent implements OnInit {
     };
     this.config = config;
     this.getContacts(1);
-
     this.mergePage = 1;
+  }
+
+  ngOnDestroy(): void {
+    this.onDestroy$.next(true);
+    this.contactsSubject.next([]);
   }
 
   public getContacts(page: number) {
     this.config.currentPage = page;
-    this._importContactsService.getDuplicates(page).subscribe((res: any) => {
-      // this.contacts = res.duplicates; // this us for default change detection strategy.
+    this._importContactsService.getDuplicates(page).takeUntil(this.onDestroy$).subscribe((res: any) => {
       this.contactsSubject.next(res.duplicates);
       this.config.totalItems = res.totalCount ? res.totalCount : 0;
       this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
