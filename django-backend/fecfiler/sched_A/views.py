@@ -1497,7 +1497,9 @@ def schedA_sql_dict(data):
         datum["line_number"], datum["transaction_type"] = get_line_number_trans_type(
             data.get("transaction_type_identifier")
         )
-
+        # Adding election year to election code for 'REF_TO_FED_CAN'
+        if data.get("transaction_type_identifier") == 'REF_TO_FED_CAN' and data.get("election_year"):
+            datum['election_code'] += data.get("election_year")
         if (
             data.get("transaction_type_identifier")
             in TWO_TRANSACTIONS_ONE_SCREEN_SA_SA_TRANSTYPE_DICT.keys()
