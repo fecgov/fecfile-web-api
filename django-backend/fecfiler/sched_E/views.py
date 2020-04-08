@@ -1220,6 +1220,9 @@ def schedE(request):
             else:
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
+            #also check if an 'override' report_id present, and if so, use that instead. 
+            if(request.data.get("associated_report_id") and check_null_value(request.data.get("associated_report_id"))):
+                report_id = request.data.get("associated_report_id")
             # datum = schedE_sql_dict(request.data)
             datum = request.data.copy()
             datum["report_id"] = report_id

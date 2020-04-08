@@ -1,10 +1,12 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ImportContactsService } from '../service/import-contacts.service';
 import { PaginationInstance } from 'ngx-pagination';
 import { ContactToCleanModel } from './model/contact-to-clean.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { UtilService } from 'src/app/shared/utils/util.service';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { FieldToCleanModel } from './model/field-to-clean.model';
+import { FieldEntryModel } from './model/field-entry.model';
 
 @Component({
   selector: 'app-clean-contacts',
@@ -13,23 +15,40 @@ import { BehaviorSubject, Observable } from 'rxjs';
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CleanContactsComponent implements OnInit {
+export class CleanContactsComponent implements OnInit, OnDestroy {
 
-  // public contacts: Array<ContactModel>;
   public contacts: Array<any>;
   public contacts$: Observable<Array<any>>;
-  public contactToClean: Array<ContactToCleanModel>;
-  public existingEntryHead: any;
-  public newEntryHead: any;
 
-  // ngx-pagination config
+  // ngx-pagination config for the duplicates table of contacts
   public maxItemsPerPage = 10;
   public directionLinks = false;
   public autoHide = true;
   public config: PaginationInstance;
   public numberOfPages = 0;
 
+  /**
+   * All fields and their values from the user's contact from the file and
+   * all potential duplicates.
+   */
+  public fieldsToClean: Array<FieldToCleanModel>;
+
+  public readonly duplicatePlaceHolder = 'dupe placeholder';
+
+  public mergePage: number;
+  public mergePaginateConfig: PaginationInstance = {
+    id: 'merge_dupes',
+    itemsPerPage: 2,
+    currentPage: this.mergePage
+  };
+
+  public userContactHeader: any;
+  public dupeContactHeader: Array<any>;
+  public totalDuplicates = 0;
+
   private contactsSubject: BehaviorSubject<Array<any>>;
+  private onDestroy$ = new Subject();
+
   private readonly contactFields = [
     { displayName: 'Last Name', name: 'last_name' },
     { displayName: 'First Name', name: 'first_name' },
@@ -59,25 +78,18 @@ export class CleanContactsComponent implements OnInit {
       currentPage: 1
     };
     this.config = config;
-    this.initMergeHeaders();
     this.getContacts(1);
+    this.mergePage = 1;
   }
 
-  private initMergeHeaders() {
-    this.existingEntryHead = {
-      selected: false,
-      disabled: false
-    };
-    this.newEntryHead = {
-      selected: false,
-      disabled: false
-    };
+  ngOnDestroy(): void {
+    this.onDestroy$.next(true);
+    this.contactsSubject.next([]);
   }
 
   public getContacts(page: number) {
     this.config.currentPage = page;
-    this._importContactsService.getDuplicates(page).subscribe((res: any) => {
-      // this.contacts = res.duplicates; // this us for default change detection strategy.
+    this._importContactsService.getDuplicates(page).takeUntil(this.onDestroy$).subscribe((res: any) => {
       this.contactsSubject.next(res.duplicates);
       this.config.totalItems = res.totalCount ? res.totalCount : 0;
       this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;
@@ -90,54 +102,21 @@ export class CleanContactsComponent implements OnInit {
     this._modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static' });
   }
 
-  private prepareContactToClean(contact: any) {
-    this.contactToClean = [];
-    this.initMergeHeaders();
-    for (const field of this.contactFields) {
-      const model = new ContactToCleanModel();
-      model.displayName = field.displayName;
-      model.name = field.name;
-      model.existingEntry = {
-        value: contact[field.name],
-        selected: false,
-        disabled: false
-      };
-      let newEntryVal = null;
-      if (contact.userContact) {
-        newEntryVal = contact.userContact[field.name];
-      }
-      const originallyEmpty = this.isStringEmpty(newEntryVal);
-      model.newEntry = {
-        value: newEntryVal,
-        selected: false,
-        disabled: false,
-        originallyEmpty: originallyEmpty
-      };
-      model.finalEntry = null;
-      this.contactToClean.push(model);
-    }
-  }
-
   /**
-   * Return true if merge is valid.  All fields must be selected from existing or new contact.
+   * Determine if pagination should be shown.
    */
-  public checkMergeValid(): boolean {
-    if (this.contactToClean) {
-      for (const field of this.contactToClean) {
-        if (field.existingEntry.selected === false &&
-          field.newEntry.selected === false) {
-          return false;
-        }
-      }
-      return true;
-    } else {
+  public showPagination(): boolean {
+    if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
     }
+    // otherwise, no show.
+    return false;
   }
 
-  ///////////////////
-  // merge methods
-  ///////////////////
+
+  ////////////////////////
+  // merge modal methods
+  ////////////////////////
 
   public cancelMerge(modal: any): void {
     modal.close('close it');
@@ -159,9 +138,9 @@ export class CleanContactsComponent implements OnInit {
     this._modalService.open(modal, { centered: true, backdrop: 'static' });
   }
 
-  ///////////////////
-  // import methods
-  ///////////////////
+  /////////////////////////
+  // import import methods
+  /////////////////////////
 
   public confirmFinalizeImport(modal: any) {
     // const contact0 = this.contacts[0];
@@ -179,82 +158,185 @@ export class CleanContactsComponent implements OnInit {
     // TODO call API to save imported data for the file ID.
   }
 
+  // TODO consider putting merge modal methods in another plain old class (not a component)
+  // for code separation.
+
+  // Clean single contact methods start here
+  // Clean single contact methods start here
+  // Clean single contact methods start here
+
+
+  private prepareContactToClean(contact: any) {
+
+    // fill in placeholders for duplicates allowing for equal slots
+    // for duplicate paginate.
+
+    if (contact.potentialDupes) {
+      if (Array.isArray(contact.potentialDupes)) {
+        const remainder = contact.potentialDupes.length % this.mergePaginateConfig.itemsPerPage;
+        if (remainder !== 0) {
+          contact.potentialDupes.push(this.duplicatePlaceHolder);
+        }
+      }
+    }
+
+    this.mergePage = 1;
+    this.fieldsToClean = [];
+    this.initMergeHeaders(contact);
+    for (const field of this.contactFields) {
+
+      const model = new FieldToCleanModel();
+      model.displayName = field.displayName;
+      model.name = field.name;
+
+      const userField = new FieldEntryModel();
+      userField.value = contact[field.name];
+      userField.originallyEmpty = this.isStringEmpty(userField.value);
+      model.userField = userField;
+
+      const dupes = new Array<FieldEntryModel>();
+      for (const dupe of contact.potentialDupes) {
+        if (dupe !== this.duplicatePlaceHolder) {
+          const dupeField = new FieldEntryModel();
+          dupeField.value = dupe[field.name];
+          dupeField.originallyEmpty = this.isStringEmpty(dupeField.value);
+          dupes.push(dupeField);
+        } else {
+          const dupeField = new FieldEntryModel();
+          dupeField.value = dupe;
+          dupes.push(dupeField);
+        }
+      }
+      model.dupeFields = dupes;
+      model.finalField = null;
+      this.fieldsToClean.push(model);
+    }
+  }
+
+  private createHeader(): any {
+    return {
+      selected: false,
+      disabled: false
+    };
+  }
+
+  private initMergeHeaders(contact: any) {
+    this.userContactHeader = this.createHeader();
+
+    this.totalDuplicates = 0;
+    this.dupeContactHeader = [];
+    for (const dupe of contact.potentialDupes) {
+      if (dupe !== this.duplicatePlaceHolder) {
+        const header = this.createHeader();
+        header.seq = dupe.seq;
+        this.dupeContactHeader.push(header);
+        this.totalDuplicates++;
+      } else {
+        this.dupeContactHeader.push(dupe);
+      }
+    }
+  }
+
   /**
-   * Determine if pagination should be shown.
+   * Return true if merge is valid.  All fields must be selected from existing or new contact.
    */
-  public showPagination(): boolean {
-    if (this.config.totalItems > this.config.itemsPerPage) {
+  public checkMergeValid(): boolean {
+    if (this.fieldsToClean) {
+      for (const field of this.fieldsToClean) {
+        let dupeFieldSelected = false;
+        for (const dupe of field.dupeFields) {
+          if (dupe.selected) {
+            dupeFieldSelected = true;
+          }
+        }
+        if (field.userField.selected === false &&
+          dupeFieldSelected === false) {
+          return false;
+        }
+      }
+      return true;
+    } else {
       return true;
     }
-    // otherwise, no show.
-    return false;
   }
 
-  public useAllExistingEntry($event: any) {
-    if ($event.target.checked === true) {
-      this.newEntryHead.disabled = true;
-      for (const field of this.contactToClean) {
-        field.existingEntry.selected = true;
-        field.existingEntry.disabled = false;
-        field.newEntry.disabled = true;
-        field.newEntry.selected = false;
-        field.finalEntry = field.existingEntry.value;
+  public useAllDuplicate($event: any, i: number) {
+
+    // clear out any previously checked fields
+    i--;
+    for (const field of this.fieldsToClean) {
+      field.userField.selected = false;
+      for (const dupe of field.dupeFields) {
+        dupe.selected = false;
       }
-    } else if ($event.target.checked === false) {
-      this.newEntryHead.disabled = false;
-      for (const field of this.contactToClean) {
-        field.existingEntry.selected = false;
-        field.newEntry.disabled = false;
-        if (field.newEntry.selected) {
-          field.finalEntry = field.newEntry.value;
-        } else {
-          field.finalEntry = null;
+      field.finalField = null;
+    }
+    if ($event.target.checked === true) {
+      // uncheck all but the select duplicate header
+      for (const dupeHeader of this.dupeContactHeader) {
+        if (dupeHeader !== this.duplicatePlaceHolder) {
+          dupeHeader.selected = false;
         }
       }
+      this.userContactHeader.selected = false;
+      this.dupeContactHeader[i].selected = true;
+
+      for (const field of this.fieldsToClean) {
+        field.dupeFields[i].selected = true;
+        field.finalField = field.dupeFields[i].value;
+      }
+    } else {
+      for (const field of this.fieldsToClean) {
+        field.dupeFields[i].selected = false;
+      }
     }
   }
 
-  public useAllNewEntry($event: any) {
-    if ($event.target.checked === true) {
-      this.existingEntryHead.disabled = true;
-      for (const field of this.contactToClean) {
-        field.newEntry.selected = true;
-        field.newEntry.disabled = false;
-        field.existingEntry.disabled = true;
-        field.existingEntry.selected = false;
-        field.finalEntry = field.newEntry.value;
+  public useAllUserContact($event: any) {
+
+    // clear out any previously checked fields
+    for (const field of this.fieldsToClean) {
+      for (const dupe of field.dupeFields) {
+        dupe.selected = false;
       }
-    } else if ($event.target.checked === false) {
-      this.existingEntryHead.disabled = false;
-      for (const field of this.contactToClean) {
-        field.newEntry.selected = false;
-        field.existingEntry.disabled = false;
-        if (field.existingEntry.selected) {
-          field.finalEntry = field.existingEntry.value;
-        } else {
-          field.finalEntry = null;
+      field.finalField = null;
+    }
+
+    // toggle user fields selected/not-selected
+    if ($event.target.checked === true) {
+      for (const field of this.fieldsToClean) {
+        field.userField.selected = true;
+        field.finalField = field.userField.value;
+      }
+      // uncheck any duplicate headers checked
+      for (const dupeHeader of this.dupeContactHeader) {
+        if (dupeHeader !== this.duplicatePlaceHolder) {
+          dupeHeader.selected = false;
         }
       }
+
+    } else {
+      for (const field of this.fieldsToClean) {
+        field.userField.selected = false;
+      }
     }
   }
 
-  public newFieldSelectedChange($event: any, field: ContactToCleanModel) {
-    if ($event.target.checked === true) {
-      field.existingEntry.disabled = true;
-      field.finalEntry = field.newEntry.value;
-    } else {
-      field.existingEntry.disabled = false;
-      field.finalEntry = null;
-    }
-  }
+  public fieldSelectedChange($event: any, field: FieldToCleanModel) {
 
-  public existingFieldSelectedChange($event: any, field: ContactToCleanModel) {
-    if ($event.target.checked === true) {
-      field.newEntry.disabled = true;
-      field.finalEntry = field.existingEntry.value;
-    } else {
-      field.newEntry.disabled = false;
-      field.finalEntry = null;
+    let final = '';
+    if (field.userField.selected) {
+      final = field.userField.value;
+    }
+    for (const dupe of field.dupeFields) {
+      if (dupe.selected) {
+        if (this.isStringEmpty(final)) {
+          final += dupe.value;
+        } else {
+          final += ` / ${dupe.value}`;
+        }
+      }
+      field.finalField = final;
     }
   }
 
@@ -262,11 +344,27 @@ export class CleanContactsComponent implements OnInit {
     return this._utilService.isStringEmpty(val);
   }
 
-  public applyUserEditToFinal($event: any, field: ContactToCleanModel): void {
-    if (field.newEntry.originallyEmpty) {
-      if (field.newEntry.selected) {
-        field.finalEntry = $event.target.value;
+  public applyUserEditToFinal($event: any, edittedField: FieldEntryModel, fieldToClean: FieldToCleanModel): void {
+    if (edittedField.originallyEmpty) {
+      if (edittedField.selected) {
+        fieldToClean.finalField = $event.target.value;
       }
+    }
+  }
+
+  public checkLastDupeHeaderOnPage(i: number, header: any): boolean {
+    if ((i + 1) === this.mergePaginateConfig.itemsPerPage) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public checkFirstDupeHeaderOnPage(i: number, header: any): boolean {
+    if (i === 0) {
+      return true;
+    } else {
+      return false;
     }
   }
 

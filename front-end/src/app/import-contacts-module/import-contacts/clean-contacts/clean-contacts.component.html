@@ -129,51 +129,68 @@
           <th class="clean_contacts__merge-label">
             <div class="checkbox">
               <label>
-                <input [(ngModel)]="existingEntryHead.selected" (change)="useAllExistingEntry($event)" type="checkbox"
-                  class="clean_contacts__checkbox" [disabled]="existingEntryHead.disabled">
-                <span class="clean_contacts__checkbox-label">Existing Entry</span>
+                <input [(ngModel)]="userContactHeader.selected" (change)="useAllUserContact($event)" type="checkbox"
+                  class="clean_contacts__checkbox">
+                <span class="clean_contacts__checkbox-label">Your Contact</span>
               </label>
             </div>
           </th>
-          <th class="clean_contacts__merge-label">
-            <div class="checkbox">
+          <th
+            *ngFor="let dupeContact of dupeContactHeader | paginate: { itemsPerPage: 2, currentPage: mergePage }; let i = index"
+            class="clean_contacts__merge-label">
+            <div *ngIf="dupeContact !== duplicatePlaceHolder" class="checkbox">
+              <pagination-template #p="paginationApi" (pageChange)="mergePage = $event">
+              </pagination-template>
+              <span *ngIf="checkFirstDupeHeaderOnPage(i, dupeContact)" role="navigation" aria-label="Pagination">
+                <a *ngIf="!p.isFirstPage()" (click)="p.previous()" tabindex="0" aria-label="Previous page">
+                  <i class="fa fa-angle-double-left"></i>
+                </a>
+              </span>
               <label>
-                <input [(ngModel)]="newEntryHead.selected" (change)="useAllNewEntry($event)" type="checkbox"
-                  class="clean_contacts__checkbox" [disabled]="newEntryHead.disabled">
-                <span class="clean_contacts__checkbox-label">New Entry</span>
+                <input [(ngModel)]="dupeContact.selected" (change)="useAllDuplicate($event, dupeContact.seq)"
+                  type="checkbox" class="clean_contacts__checkbox">
+                <span class="clean_contacts__checkbox-label">
+                  Duplicate {{dupeContact.seq}} of {{totalDuplicates}}
+                </span>
               </label>
+              <span *ngIf="checkLastDupeHeaderOnPage(i, dupeContact)" role="navigation" aria-label="Pagination">
+                <a *ngIf="!p.isLastPage()" (click)="p.next()" tabindex="0" aria-label="Next page">
+                  <i class="fa fa-angle-double-right"></i>
+                </a>
+              </span>
             </div>
           </th>
-          <th class="clean_contacts__merge-label">Final Entry</th>
+          <th class="clean_contacts__merge-label">Final</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let field of contactToClean; let i = index;">
+        <tr *ngFor="let field of fieldsToClean; let i = index;">
           <td class="clean_contacts__display-name">{{field.displayName}}</td>
           <td class="text-center">
             <div class="checkbox">
               <label>
-                <input type="checkbox" class="clean_contacts__checkbox" [disabled]="field.existingEntry.disabled"
-                  [(ngModel)]="field.existingEntry.selected" (change)="existingFieldSelectedChange($event, field)">
-                <span>{{field.existingEntry.value}}</span>
+                <input type="checkbox" class="clean_contacts__checkbox" [disabled]="field.userField.disabled"
+                  [(ngModel)]="field.userField.selected" (change)="fieldSelectedChange($event, field)">
+                <span>{{field.userField.value}}</span>
               </label>
             </div>
           </td>
-          <td class="text-center">
-            <div class="checkbox">
+          <td *ngFor="let dupeField of field.dupeFields | paginate: { itemsPerPage: 2, currentPage: mergePage }"
+            class="text-center">
+            <div *ngIf="dupeField.value !== duplicatePlaceHolder" class="checkbox">
               <label>
-                <input type="checkbox" [ngClass]="!field.newEntry.originallyEmpty 
+                <input type="checkbox" [ngClass]="!dupeField.originallyEmpty 
                         ? 'clean_contacts__checkbox' 
-                        : 'clean_contacts__checkbox-missing-val'" [disabled]="field.newEntry.disabled"
-                  [(ngModel)]="field.newEntry.selected" (change)="newFieldSelectedChange($event, field)">
-                <span *ngIf="!field.newEntry.originallyEmpty">{{field.newEntry.value}}</span>
-                <input *ngIf="field.newEntry.originallyEmpty" type="text" name="prop_{{i}}"
-                  [(ngModel)]="field.newEntry.value" (keyup)="applyUserEditToFinal($event, field)"
-                  class="form-control clean_contacts__missing-field" aria-label="Missing Value">
+                        : 'clean_contacts__checkbox-missing-val'" [disabled]="dupeField.disabled"
+                  [(ngModel)]="dupeField.selected" (change)="fieldSelectedChange($event, field)">
+                <span *ngIf="!dupeField.originallyEmpty">{{dupeField.value}}</span>
+                <input *ngIf="dupeField.originallyEmpty" type="text" name="prop_{{i}}" [(ngModel)]="dupeField.value"
+                  (keyup)="applyUserEditToFinal($event, dupeField, field)"
+                  class="form-control clean_contacts__missing-field text-center" aria-label="Missing Value">
               </label>
             </div>
           </td>
-          <td class="text-center">{{field.finalEntry}}</td>
+          <td class="text-center">{{field.finalField}}</td>
         </tr>
       </tbody>
     </table>
