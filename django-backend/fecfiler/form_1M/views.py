@@ -10,6 +10,7 @@ import logging
 from django.db import connection
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.http import JsonResponse
 from functools import wraps
 
 from fecfiler.core.report_helper import new_report_date
@@ -32,24 +33,28 @@ DICT_F1M_COLUMNS_MAP_INPUT = {
 """
 
 def noneCheckMissingParameters(parameter_name_list, checking_dict=None, value_dict=None, function_name="blank"):
-	missing_list = []
-	none_list = []
-	error_string = ""
-	for item in parameter_name_list:
-		if checking_dict is not None and item not in checking_dict:
-			missing_list.append(item)
-		if value_dict is not None and value_dict.get(item) in [None, '', " ", 'null']:
-			if item not in missing_list:
-				none_list.append(item)
-	if missing_list:
-		error_string = 'The following parameters: ' + \
-			','.join(missing_list) + ' are missing in function: ' + \
-			function_name + '.'
-	if none_list:
-		error_string += ' The ' + function_name + ' function has parameters: ' + \
-			','.join(none_list) + ' are defined as None/blank.'
-	if missing_list or none_list:
-		raise Exception(error_string)
+	try:
+		missing_list = []
+		none_list = []
+		error_string = ""
+		for item in parameter_name_list:
+			if checking_dict is not None and item not in checking_dict:
+				missing_list.append(item)
+			if value_dict is not None and value_dict.get(item) in [None, '', " ", 'null']:
+				if item not in missing_list:
+					none_list.append(item)
+		if missing_list:
+			error_string = 'The following parameters: ' + \
+				','.join(missing_list) + ' are missing in function: ' + \
+				function_name + '.'
+		if none_list:
+			error_string += ' The ' + function_name + ' function has parameters: ' + \
+				','.join(none_list) + ' are defined as None/blank.'
+		if missing_list or none_list:
+			raise Exception(error_string)
+	except Exception as e:
+		raise Exception(
+			'The noneCheckMissingParameters function is throwing an error: ' + str(e))
 
 def f1m_sql_dict(request):
 	try:
@@ -86,35 +91,45 @@ def check_columns_f1M(step):
 
 def post_sql(request_dict, table, error_function):
 	try:
+		request_dict['create_date'] = datetime.datetime.now()
+		request_dict['last_update_date'] = datetime.datetime.now()
 		noneCheckMissingParameters(['report_id', 'cmte_id'], checking_dict=request_dict,
 								   value_dict=request_dict, function_name=table+'-POST')
+		value_list = []
+		key_string = ""
+		param_string = ""
+		print(request_dict)
 		for key, value in request_dict.items():
-			key_list = key_list.append(key)
-			value_list = value_list.append(value)
+			key_string += key+", "
+			param_string += "%s, "
+			value_list.append(value)
 		with connection.cursor() as cursor:
-			sql = "INSERT INTO public.{}(".format(table) + ','.join(
-				key_list) + ") VALUES (" + ','.join(value_list) + ")"
-			cursor.execute(sql)
+			sql = """INSERT INTO public.{}({}) VALUES ({})""".format(table, key_string[:-2], param_string[:-2])
+			print(sql)
+			cursor.execute(sql,value_list)
 			logger.debug(table + " POST")
 			logger.debug(cursor.query)
 			if cursor.rowcount == 0:
 				raise Exception('Failed to insert data into {} table.'.format(table))
 	except Exception as e:
 		raise Exception(
-			'The post_sql function for table : {} is throwing an error in the function {}: '.format(error_function, table) + str(e))
+			'The post_sql function for table : {} is throwing an error in the function {}: '.format(table, error_function) + str(e))
 
 def put_sql(request_dict, table, error_function="blank"):
 	try:
+		request_dict['last_update_date'] = datetime.datetime.now()
 		param_string = ""
 		noneCheckMissingParameters(['report_id', 'cmte_id'], checking_dict=request_dict,
 								   value_dict=request_dict, function_name=table+'-PUT')
-		for key, value in request_dict.items() and key not in ['report_id', 'cmte_id']:
-			param_string += key + "=%s, "
-			value_list = value_list.append(value)
+		value_list = []
+		for key, value in request_dict.items():
+			if key not in ['report_id', 'cmte_id']:
+				param_string += key + "=%s, "
+				value_list.append(value)
 		with connection.cursor() as cursor:
-			sql = "UPDATE public.{} SET " + param_string[:-2] + """ WHERE 
-				cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y'"""
-			value_list.extend([cmte_id, report_id])
+			sql = """UPDATE public.{} SET {} WHERE cmte_id = %s AND report_id = %s 
+				AND delete_ind IS DISTINCT FROM 'Y'""".format(table, param_string[:-2])
+			value_list.extend([request_dict['cmte_id'], request_dict['report_id']])
 			cursor.execute(sql,value_list)
 			logger.debug(table + " PUT")
 			logger.debug(cursor.query)
@@ -122,7 +137,7 @@ def put_sql(request_dict, table, error_function="blank"):
 				raise Exception('Failed to update data into {} table.'.format(table))
 	except Exception as e:
 		raise Exception(
-			'The put_sql function for table : {} is throwing an error in the function {}: '.format(error_function, table) + str(e))
+			'The put_sql function for table : {} is throwing an error in the function {}: '.format(table, error_function, ) + str(e))
 
 """
 ***************************** WRAPPER FUNCTIONS **************************************
@@ -193,9 +208,7 @@ def reports_post(request):
 			'cmte_id': request.user.username,
 			'form_type': 'F1M',
 			'amend_ind': 'N',
-			'status': 'Saved',
-			'create_date': datetime.datetime.now(),
-			'last_update_date': datetime.datetime.now()
+			'status': 'Saved'
 		}
 		post_sql(report_dict, "reports", "reports_post")
 		report_id = report_dict.get('report_id')
@@ -235,9 +248,9 @@ def get_sql_candidate(candidate_id):
 			cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""",format(sql),[candidate_id])
 			logger.debug("CANDIDATE TABLE")
 			logger.debug(cursor.query)
-			output_dict = cursor.fetchone()
+			output_dict = cursor.fetchone()[0]
 			if output_dict:
-				return output_dict[0][0]
+				return output_dict[0]
 			else:
 				raise Exception('The candidateId: {} does not exist in candidate table.'.format(candidate_id))
 	except Exception as e:
@@ -268,7 +281,7 @@ def f1M_est_status(cmte_id, report_id):
 		with connection.cursor() as cursor:
 			_sql = """SELECT est_status FROM public.form_1m WHERE 
 			cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y'"""
-			cursor.excute(_sql,[cmte_id, report_id])
+			cursor.execute(_sql,[cmte_id, report_id])
 			est_status = cursor.fetchone()
 			if est_status:
 				return est_status[0]
@@ -295,10 +308,12 @@ def get_sql_f1m(request_dict):
 	try:
 		param_string = ""
 		noneCheckMissingParameters(['report_id', 'cmte_id'], checking_dict=request_dict,
-								   value_dict=request_dict, function_name=table+'-PUT')
-		for key, value in request_dict.items() and key in ['report_id', 'cmte_id']:
-			param_string += "m." + key + "=%s AND "
-			value_list = value_list.append(value)
+								   value_dict=request_dict, function_name='get_sql_f1m')
+		value_list =[]
+		for key, value in request_dict.items():
+			if key in ['report_id', 'cmte_id']:
+				param_string += "m." + key + "=%s AND "
+				value_list.append(value)
 		with connection.cursor() as cursor:
 			"""
 			id, report_id, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, can1_con, 
@@ -317,31 +332,32 @@ def get_sql_f1m(request_dict):
 	        	e.suffix AS "sign_suffix", m.sign_date AS "submission_date", rp.email_1, rp.email_2,
 	        	rp.additional_email_1, rp.additional_email_2
 				FROM public.form_1m m 
-				WHERE {} m.delete_ind IS DISTINCT FROM 'Y' 
-				UNION public.reports rp WHERE m.report_id=rp.report_id AND m.cmte_id=rp.cmte_id
+				JOIN public.reports rp ON m.report_id=rp.report_id AND m.cmte_id=rp.cmte_id
 				AND rp.delete_ind IS DISTINCT FROM 'Y' 
-				UNION public.entity e WHERE e.entity_id = m.sign_id""".format(param_string)
-			cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""",format(sql),value_list)
-			logger.debug(table + " GET")
+				LEFT JOIN public.entity e ON e.entity_id = m.sign_id
+				WHERE {} m.delete_ind IS DISTINCT FROM 'Y' """.format(param_string)
+			cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql),value_list)
+			logger.debug("get_sql_f1m")
 			logger.debug(cursor.query)
-			output_dict = cursor.fetchone()
+			output_dict = cursor.fetchone()[0]
 			if output_dict:
-				output_dict = output_dict[0][0]
+				output_dict = output_dict[0]
 				output_dict = get_candidate_details(output_dict)
+				return output_dict
 			else:				
 				raise Exception("""This report Id: {} for committee Id: {} 
 					does not exist in forms_1m table""".format(request_dict['report_id'], 
 						request_dict['cmte_id']))
 	except Exception as e:
 		raise Exception(
-			'The get_sql_f1m function for table : {} is throwing an error in the function {}: '.format(error_function, table) + str(e))
+			'The get_sql_f1m function is throwing an error: '+ str(e))
 
 """
 ************************************ API Call ******************************************
 """
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
-@report_last_update_date
+# @report_last_update_date
 def form1M(request):
 	cmte_id = request.user.username
 	report_flag = False
@@ -349,7 +365,7 @@ def form1M(request):
 	************************************ POST Call - form 1M ******************************************
 	"""
 	if request.method == "POST":
-		try:
+		# try:
 			noneCheckMissingParameters(['step'], checking_dict=request.query_params,
 									   value_dict=request.query_params, function_name='form1M-POST')
 			step = request.query_params['step']
@@ -360,14 +376,14 @@ def form1M(request):
 										   value_dict=request.data, function_name='form1M-POST: step-2 Affiliation')
 				request_dict = f1m_sql_dict(request)
 				request_dict['est_status'] = 'A'
-				if 'reportId' not in request.data and request.data.get('reportId') not in [None, '', 'null']:
+				if 'reportId' in request.data and request.data.get('reportId') not in [None, '', 'null']:
+					request_dict['report_id'] = check_report_id_status(cmte_id, request.data.get('reportId'))
+					check_clear_establishment_status(cmte_id, request_dict['report_id'], 'Q')
+					put_sql(request_dict, "form_1m", "form1m-PUT")
+				else:
 					request_dict['report_id'] = reports_post(request)
 					report_flag = True
 					post_sql(request_dict, "form_1m", "form1m-POST")
-				else:
-					request_dict['report_id'] = check_report_id_status(request.data.get('reportId'), cmte_id)
-					check_clear_establishment_status(cmte_id, request_dict['report_id'], 'Q')
-					put_sql(request_dict, "form_1m", "form1m-POST")
 				output_dict = get_sql_f1m(request_dict)
 
 			# by qualification step2 POST
@@ -382,9 +398,10 @@ def form1M(request):
 				# both step4 POST
 			if step == 'submit':
 				print()
-		except Exception as e:
-			logger.debug(e)
-			return Response("The form1M API - POST is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+			return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
+		# except Exception as e:
+		# 	logger.debug(e)
+		# 	return Response("The form1M API - POST is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
 	"""
 	************************************ PUT Call - form 1M ******************************************
