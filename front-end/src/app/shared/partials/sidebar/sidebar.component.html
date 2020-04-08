@@ -89,11 +89,11 @@
             </li>
           </ul>
         </div>
-         <div class="sidebar__nav--header">
+        <div class="sidebar__nav--header">
           <div class="sidebar-form-icon">
             <i class="file-copy-icon" aria-hidden="true"></i>
           </div>
-          <div class="header-text">
+          <div class="header-text" (click)="toggleFormNav('other-forms')">
            Other Forms
           </div>
           <button
@@ -103,7 +103,7 @@
           >
             <i
               aria-hidden="true"
-              [ngClass]="{'down-arrow-icon': otherFormsHidden === false, 'up-arrow-icon': otherFormsHidden === true}"
+              [ngClass]="{'down-arrow-icon': otherFormsHidden === true, 'up-arrow-icon': otherFormsHidden === false}"
             ></i>
             <span class="sr-only">Click to hide Other Forms</span>
           </button>

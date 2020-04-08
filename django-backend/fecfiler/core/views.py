@@ -40,6 +40,7 @@ from fecfiler.core.carryover_helper import (
     do_h2_carryover,
     do_loan_carryover,
     do_debt_carryover,
+    do_levin_carryover,
 )
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
@@ -361,7 +362,9 @@ def get_report_types(request):
                 if report.get("report_type") == "YE":
                     report["election_state"][0]["dates"][0][
                         "cvg_start_date"
-                    ] = "2019-10-01"
+                    ] = report["election_state"][0]["dates"][0][
+                        "cvg_end_date"
+                    ][:4]+"-10-01"
 
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
@@ -1702,6 +1705,7 @@ def reports(request):
                 do_h2_carryover(data.get("cmteid"), data.get("reportid"))
                 do_loan_carryover(data.get("cmteid"), data.get("reportid"))
                 do_debt_carryover(data.get("cmteid"), data.get("reportid"))
+                do_levin_carryover(data.get("cmteid"), data.get("reportid"))
 
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
@@ -2780,6 +2784,7 @@ def autolookup_search_contacts(request):
 
     try:
         committee_id = request.user.username
+        global_search_id = 'C00000000'
         param_string = ""
         order_string = ""
         search_string = ""
@@ -2805,7 +2810,12 @@ def autolookup_search_contacts(request):
                 order_string = "e." + str(key)
                 param_string = " AND LOWER(e." + str(key) + ") LIKE LOWER(%s)"
                 if "cmte_id" in request.query_params:
-                    parameters = [committee_id, committee_id]
+                    # Checking for global search flag, by default search is global.
+                    # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
+                    # search in FEC database
+                    if "global_search" in request.query_params and request.query_params.get("global_search").upper() == "OFF":
+                        global_search_id = ''
+                    parameters = [global_search_id, committee_id, committee_id]
                     if "expand" in request.query_params:
                         query_string = (
                             """
@@ -2815,7 +2825,7 @@ def autolookup_search_contacts(request):
                             e.last_update_date
                             FROM public.entity e, public.entity c WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
                             AND c.principal_campaign_committee is not null
-                            AND e.cmte_id in ('C00000000', %s) 
+                            AND e.cmte_id in (%s, %s) 
                             AND substr(e.ref_cand_cmte_id,1,1)='C'
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
@@ -2831,7 +2841,7 @@ def autolookup_search_contacts(request):
                             (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                             e.last_update_date
-                            FROM public.entity e WHERE e.cmte_id in ('C00000000', %s) 
+                            FROM public.entity e WHERE e.cmte_id in (%s, %s) 
                             AND substr(e.ref_cand_cmte_id,1,1)='C'
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
@@ -2846,8 +2856,13 @@ def autolookup_search_contacts(request):
                     or "cand_last_name" in request.query_params
                     or "payee_cmte_id" in request.query_params
                 ):
+                    # Checking for global search flag, by default search is global.
+                    # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
+                    # search in FEC database
+                    if "global_search" in request.query_params and request.query_params.get("global_search").upper() == "OFF":
+                        global_search_id = ''
                     if "expand" in request.query_params:
-                        parameters = [committee_id, committee_id]
+                        parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
                             """
                             SELECT json_agg(t) FROM 
@@ -2857,7 +2872,7 @@ def autolookup_search_contacts(request):
                             e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
                             FROM public.entity e , public.entity c WHERE c.ref_cand_cmte_id = e.principal_campaign_committee
                             AND e.principal_campaign_committee is not null
-                            AND e.cmte_id in ('C00000000', %s) 
+                            AND e.cmte_id in (%s, %s) 
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                             """
@@ -2868,7 +2883,7 @@ def autolookup_search_contacts(request):
                         )
 
                     else:
-                        parameters = [committee_id, committee_id]
+                        parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
                             """
                             SELECT json_agg(t) FROM 
@@ -2876,7 +2891,7 @@ def autolookup_search_contacts(request):
                             e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
                             e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
                             e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
-                            FROM public.entity e WHERE e.cmte_id in ('C00000000', %s) 
+                            FROM public.entity e WHERE e.cmte_id in (%s, %s) 
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                             """
@@ -2886,6 +2901,11 @@ def autolookup_search_contacts(request):
                             + """) t"""
                         )
                 elif "entity_name" in request.query_params:
+                    # Checking for global search flag, by default search is global.
+                    # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
+                    # search in FEC database
+                    if "global_search" in request.query_params and request.query_params.get("global_search").upper() == "OFF":
+                        global_search_id = ''
                     if "expand" in request.query_params:
                         parameters = [committee_id]
                         query_string = (
@@ -2905,14 +2925,14 @@ def autolookup_search_contacts(request):
                             + """) t"""
                         )
                     else:
-                        parameters = [committee_id, committee_id]
+                        parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
                             """
                                 SELECT json_agg(t) FROM 
                                 (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                                 e.last_update_date
-                                FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                                FROM public.entity e WHERE e.cmte_id in (%s, %s)
                                 AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                                 """
                             + param_string
@@ -2922,6 +2942,11 @@ def autolookup_search_contacts(request):
                         )
                 else:
                     # parameters = [committee_id, committee_id]
+                    # Checking for global search flag, by default search is global.
+                    # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
+                    # search in FEC database
+                    if "global_search" in request.query_params and request.query_params.get("global_search").upper() == "OFF":
+                        global_search_id = ''
                     if "expand" in request.query_params:
 
                         parameters = [committee_id]
@@ -2957,14 +2982,14 @@ def autolookup_search_contacts(request):
                         )
                         # pass
                     else:
-                        parameters = [committee_id, committee_id]
+                        parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
                             """
                             SELECT json_agg(t) FROM 
                             (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                             e.last_update_date
-                            FROM public.entity e WHERE e.cmte_id in (%s, 'C00000000')
+                            FROM public.entity e WHERE e.cmte_id in (%s, %s)
                             AND e.entity_type in ('IND','ORG') 
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """

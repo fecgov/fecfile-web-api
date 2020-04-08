@@ -1,25 +1,10 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-  ElementRef,
-  ViewChildren,
-  QueryList,
-  OnChanges
-, ChangeDetectionStrategy } from '@angular/core';
-import { TransactionsService, GetTransactionsResponse } from '../service/transactions.service';
-import { TransactionsMessageService } from '../service/transactions-message.service';
-import { TransactionModel } from '../model/transaction.model';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import {
-  ConfirmModalComponent,
-  ModalHeaderClassEnum
-} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { TransactionModel } from '../model/transaction.model';
+import { TransactionsMessageService } from '../service/transactions-message.service';
+import { GetTransactionsResponse, TransactionsService } from '../service/transactions.service';
 
 /**
  * A component for the Sub (Child) Transactions Table to be used across all forms
