@@ -3416,7 +3416,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             || this.transactionType === 'ALLOC_EXP'
             || this.transactionType === 'ALLOC_EXP_CC_PAY'
           ){
-            return Observable.of([]);
+            return this._typeaheadService.getContacts(searchText, 'entity_name', false, 'OFF');
           }else if(this.transactionType === 'CON_EAR_DEP_MEMO'
             || this.transactionType === 'CON_EAR_UNDEP_MEMO'
             || this.transactionType === 'CONT_TO_CAN'

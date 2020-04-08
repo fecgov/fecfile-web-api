@@ -126,15 +126,11 @@ def do_pac_h1_carryover(cmte_id, report_id):
         do carryover
     else:
         no carryover
+    after carryover, the carryover h1 will become child of the parent h1
 
     outstanding h1: non-parent h1(back_ref_transaction_id is null)
     also, need to check report date and only do forward carryover
     """
-    # count_sql = """
-    # select count(*) from public sched_h1
-    # where cmte_id = %s and report_id = %s
-    # and delete_ind is distinct from 'Y'
-    # """
     carryover_sql = """
     INSERT INTO sched_h1 
             (cmte_id, 
@@ -192,22 +188,18 @@ def do_pac_h1_carryover(cmte_id, report_id):
     """
     try:
         with connection.cursor() as cursor:
-            # cursor.execute(count_sql, (report_id, cmte_id, report_id, cmte_id))
-            # if cursor.rowcount == 0:
             cursor.execute(carryover_sql, (report_id, cmte_id, report_id, cmte_id))
             logger.debug(
                 "pac h1 carryover done, carryover items:{}".format(cursor.rowcount)
             )
-
-            # if cursor.rowcount != 1:
-            #         raise Exception('error on h1 carryover.')
     except:
         raise
 
 
+# this one is deprecated
 def do_h1_carryover(cmte_id, report_id):
     """
-    doing h1 carryover
+    doing h1 carryover: deprecated
     """
     logger.debug(
         "doing h1 caryover with cmte_id {} and report_id {}".format(cmte_id, report_id)
@@ -244,7 +236,7 @@ def do_h2_carryover(cmte_id, report_id):
     this is the function to handle h2 carryover form one report to next report:
     1. load all h2 items with distinct event names from last report
     2. update all records with new transaction_id, new report_id
-    3. set ration code to 's' - same as previously
+    3. set ratio code to 's' - same as previously
     4. copy all other fields
     """
     _sql = """
