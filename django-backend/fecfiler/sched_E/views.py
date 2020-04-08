@@ -169,7 +169,8 @@ def schedE_sql_dict(data):
         "cand_office_state",
         "cand_office_district",
         "cand_election_year",
-        "aggregation_ind"
+        "aggregation_ind",
+        "associatedbydissemination"
     ]
     try:
         datum = {k: v for k, v in data.items() if k in valid_fields}
@@ -324,6 +325,7 @@ def put_sql_schedE(data):
         memo_text= %s,
         line_number= %s,
         aggregation_ind = %s,
+        associatedbydissemination = %s,
         last_update_date= %s
     WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
     AND delete_ind is distinct from 'Y';
@@ -357,6 +359,7 @@ def put_sql_schedE(data):
         data.get("memo_text"),
         data.get("line_number"),
         data.get("aggregation_ind"),
+        data.get("associatedbydissemination"),
         datetime.datetime.now(),
         data.get("transaction_id"),
         data.get("report_id"),
@@ -848,11 +851,12 @@ def post_sql_schedE(data):
             memo_text,
             line_number,
             aggregation_ind,
+            associatedbydissemination,
             create_date
             )
         VALUES ({})
         """.format(
-            ",".join(["%s"] * 33)
+            ",".join(["%s"] * 34)
         )
         _v = (
             data.get("cmte_id"),
@@ -887,6 +891,7 @@ def post_sql_schedE(data):
             data.get("memo_text"),
             data.get("line_number"),
             data.get("aggregation_ind"),
+            data.get("associatedbydissemination"),
             datetime.datetime.now(),
         )
         logger.debug("sql:{}".format(_sql))
@@ -916,6 +921,8 @@ def get_schedE(data):
         if forms_obj:
             for SE in forms_obj:
                 SE["election_other_description"] = SE.get("election_other_desc")
+                if SE["associatedbydissemination"]:
+                    SE["associated_report_id"] = SE["report_id"]
                 child_SE = get_list_schedE(
                     SE["report_id"], SE["cmte_id"], SE["transaction_id"], True
                 )
@@ -1063,6 +1070,7 @@ def get_list_schedE(report_id, cmte_id, transaction_id, is_back_ref=False):
             memo_text,
             line_number,
             aggregation_ind,
+            associatedbydissemination,
             create_date, 
             last_update_date
             FROM public.sched_e
@@ -1212,6 +1220,7 @@ def schedE(request):
     if request.method == "POST":
         try:
             cmte_id = request.user.username
+            associatedbydissemination = False
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -1223,10 +1232,12 @@ def schedE(request):
             #also check if an 'override' report_id present, and if so, use that instead. 
             if(request.data.get("associated_report_id") and check_null_value(request.data.get("associated_report_id"))):
                 report_id = request.data.get("associated_report_id")
+                associatedbydissemination = True
             # datum = schedE_sql_dict(request.data)
             datum = request.data.copy()
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
+            datum["associatedbydissemination"] = associatedbydissemination
             if datum["transaction_type_identifier"] == "IE_MULTI":
                 if "memo_text" in datum:
                     datum["memo_text"] = (
@@ -1325,6 +1336,7 @@ def schedE(request):
     elif request.method == "PUT":
         try:
             datum = schedE_sql_dict(request.data)
+            associatedbydissemination = False
 
             if datum["transaction_type_identifier"] == "IE_MULTI":
                 if "memo_text" in datum:
@@ -1356,8 +1368,13 @@ def schedE(request):
                 report_id = "0"
             else:
                 report_id = check_report_id(request.data.get("report_id"))
+            #also check if an 'override' report_id present, and if so, use that instead. 
+            if(request.data.get("associated_report_id") and check_null_value(request.data.get("associated_report_id"))):
+                report_id = request.data.get("associated_report_id")
+                associatedbydissemination = True
             datum["report_id"] = report_id
             datum["cmte_id"] = request.user.username
+            datum["associatedbydissemination"] = associatedbydissemination
 
             data = put_schedE(datum)
             output = get_schedE(data)
