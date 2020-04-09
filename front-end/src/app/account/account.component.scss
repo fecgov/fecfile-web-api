@@ -155,4 +155,30 @@ margin-top:10px;
 
 @include form-btns();
 
-  
+.dropdown-toggle:after {
+    border: none;
+}
+
+.btn-left {
+	margin-right: 20px;
+}
+
+.dropdown-menu {
+	min-width: 0px !important;
+	&.show {
+	  .dropdown-item {
+		&:focus,
+		&:hover,
+		&:active,
+		&:visited {
+		  background-color: $white;
+		  color: $black;
+		  cursor: pointer;
+		  outline: none;
+		}
+		&:hover {
+		  text-decoration: underline;
+		}
+	  }
+	}
+  } 

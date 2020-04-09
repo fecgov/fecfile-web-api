@@ -298,6 +298,7 @@ def put_sql_schedE(data):
     _sql = """
     UPDATE public.sched_e
     SET transaction_type_identifier= %s,
+        report_id= %s,
         back_ref_transaction_id= %s,
         back_ref_sched_name= %s,
         payee_entity_id= %s,
@@ -327,11 +328,12 @@ def put_sql_schedE(data):
         aggregation_ind = %s,
         associatedbydissemination = %s,
         last_update_date= %s
-    WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s 
+    WHERE transaction_id = %s AND cmte_id = %s 
     AND delete_ind is distinct from 'Y';
     """
     _v = (
         data.get("transaction_type_identifier"),
+        data.get("report_id"),
         data.get("back_ref_transaction_id"),
         data.get("back_ref_sched_name"),
         data.get("payee_entity_id"),
@@ -362,7 +364,7 @@ def put_sql_schedE(data):
         data.get("associatedbydissemination"),
         datetime.datetime.now(),
         data.get("transaction_id"),
-        data.get("report_id"),
+        # data.get("report_id"),
         data.get("cmte_id"),
     )
     do_transaction(_sql, _v)
@@ -1074,14 +1076,17 @@ def get_list_schedE(report_id, cmte_id, transaction_id, is_back_ref=False):
             create_date, 
             last_update_date
             FROM public.sched_e
-            WHERE report_id = %s AND cmte_id = %s 
+            WHERE 
+            
+            cmte_id = %s 
             AND delete_ind is distinct from 'Y'
             """
             if is_back_ref:
-                _sql = _sql + """ AND back_ref_transaction_id = %s) t"""
+                _sql = _sql + """ AND report_id = %s AND  back_ref_transaction_id = %s) t"""
+                cursor.execute(_sql, (cmte_id, report_id, transaction_id))
             else:
                 _sql = _sql + """ AND transaction_id = %s) t"""
-            cursor.execute(_sql, (report_id, cmte_id, transaction_id))
+                cursor.execute(_sql, (cmte_id, transaction_id))
             schedE_list = cursor.fetchone()[0]
             if schedE_list is None and not is_back_ref:
                 raise NoOPError(

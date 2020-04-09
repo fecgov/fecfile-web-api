@@ -360,11 +360,10 @@ def get_report_types(request):
             reports = forms_obj.get("report_type")
             for report in reports:
                 if report.get("report_type") == "YE":
-                    report["election_state"][0]["dates"][0][
-                        "cvg_start_date"
-                    ] = report["election_state"][0]["dates"][0][
-                        "cvg_end_date"
-                    ][:4]+"-10-01"
+                    report["election_state"][0]["dates"][0]["cvg_start_date"] = (
+                        report["election_state"][0]["dates"][0]["cvg_end_date"][:4]
+                        + "-10-01"
+                    )
 
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
@@ -2784,7 +2783,7 @@ def autolookup_search_contacts(request):
 
     try:
         committee_id = request.user.username
-        global_search_id = 'C00000000'
+        global_search_id = "C00000000"
         param_string = ""
         order_string = ""
         search_string = ""
@@ -2813,8 +2812,11 @@ def autolookup_search_contacts(request):
                     # Checking for global search flag, by default search is global.
                     # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
                     # search in FEC database
-                    if "global_search" in request.query_params and request.query_params.get("global_search").upper() == "OFF":
-                        global_search_id = ''
+                    if (
+                        "global_search" in request.query_params
+                        and request.query_params.get("global_search").upper() == "OFF"
+                    ):
+                        global_search_id = ""
                     parameters = [global_search_id, committee_id, committee_id]
                     if "expand" in request.query_params:
                         query_string = (
@@ -2859,8 +2861,11 @@ def autolookup_search_contacts(request):
                     # Checking for global search flag, by default search is global.
                     # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
                     # search in FEC database
-                    if "global_search" in request.query_params and request.query_params.get("global_search").upper() == "OFF":
-                        global_search_id = ''
+                    if (
+                        "global_search" in request.query_params
+                        and request.query_params.get("global_search").upper() == "OFF"
+                    ):
+                        global_search_id = ""
                     if "expand" in request.query_params:
                         parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
@@ -2904,8 +2909,11 @@ def autolookup_search_contacts(request):
                     # Checking for global search flag, by default search is global.
                     # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
                     # search in FEC database
-                    if "global_search" in request.query_params and request.query_params.get("global_search").upper() == "OFF":
-                        global_search_id = ''
+                    if (
+                        "global_search" in request.query_params
+                        and request.query_params.get("global_search").upper() == "OFF"
+                    ):
+                        global_search_id = ""
                     if "expand" in request.query_params:
                         parameters = [committee_id]
                         query_string = (
@@ -2945,8 +2953,11 @@ def autolookup_search_contacts(request):
                     # Checking for global search flag, by default search is global.
                     # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
                     # search in FEC database
-                    if "global_search" in request.query_params and request.query_params.get("global_search").upper() == "OFF":
-                        global_search_id = ''
+                    if (
+                        "global_search" in request.query_params
+                        and request.query_params.get("global_search").upper() == "OFF"
+                    ):
+                        global_search_id = ""
                     if "expand" in request.query_params:
 
                         parameters = [committee_id]
@@ -3895,18 +3906,23 @@ def get_all_transactions(request):
                         if transaction.get("memo_code") != "X":
                             total_amount += transaction.get("transaction_amount", 0.0)
                         # if transaction.get('transaction_type_identifier') in NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER:
-                        #     transaction['isEditable'] = False
+                        #     transaction['isEditable'] = Falseet
+
                         if (
                             transaction.get("back_ref_transaction_id") is not None
                             and transaction.get("back_ref_transaction_id")
                             in transaction_dict
                         ):
-                            parent = transaction_dict.get(
-                                transaction.get("back_ref_transaction_id")
-                            )
-                            if "child" not in parent:
-                                parent["child"] = []
-                            parent["child"].append(transaction)
+                            if not transaction.get("transaction_type_identifier") in [
+                                "ALLOC_H1",
+                                "ALLOC_H2_RATIO",
+                            ]:
+                                parent = transaction_dict.get(
+                                    transaction.get("back_ref_transaction_id")
+                                )
+                                if "child" not in parent:
+                                    parent["child"] = []
+                                parent["child"].append(transaction)
                         else:
                             output_list.append(transaction)
             else:
@@ -8131,7 +8147,6 @@ def clone_a_transaction(request):
         if not cursor.rowcount:
             raise Exception("transaction clone error")
 
-
         # exclude_list = []
         # if transaction_id.startswith('SA'):
         #     exclude_list = ['contribution_date', 'contribution_amount']
@@ -8174,6 +8189,7 @@ GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TE
 ********************************************************************************************************************************
 """
 
+
 def get_reports_data(report_id):
     try:
         query_string = """SELECT * FROM public.reports WHERE report_id = %s AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL """
@@ -8204,7 +8220,6 @@ def get_reports_data(report_id):
 #             cursor.execute(sql,dict_data)
 #     except Exception:
 #         raise
-
 
 
 def create_amended(reportid):
@@ -8282,7 +8297,6 @@ def get_report_ids(cmte_id, from_date):
 
 
 @api_view(["POST"])
-
 def create_amended_reports(request):
 
     try:
@@ -8326,7 +8340,6 @@ def create_amended_reports(request):
             "Create amended report API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
-
 
 
 def none_text_to_none(text):
@@ -8753,7 +8766,7 @@ def levin_deletable(cmte_id, levin_account_id):
     SELECT count(*) FROM sched_l
     WHERE cmte_id = %s 
     AND record_id = %s
-    and delete_ind is dsitinct from 'Y'
+    and delete_ind is distinct from 'Y'
     """
     try:
         with connection.cursor() as cursor:
