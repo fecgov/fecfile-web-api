@@ -1414,19 +1414,22 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @returns true if Transactions are permitted to be trashed.
    */
   // TODO: in allTransaction table there are multiple reports
-  public checkIfTrashable(): boolean {
+  public checkIfTrashable(trx: TransactionModel = null): boolean {
     if (!this.transactionsModel) {
       return false;
     }
     if (this.transactionsModel.length === 0) {
       return false;
     }
-    for (const trx of this.transactionsModel) {
-      if (trx.reportstatus.toUpperCase() === 'FILED') {
-        return false;
+    if (trx === null) {
+      for (const trxTrash of this.transactionsModel) {
+        if (trxTrash.reportstatus.toUpperCase() === 'FILED') {
+          return false;
+        }
       }
+    } else {
+      return trx.iseditable;
     }
-    return true;
   }
 
   /**
@@ -1726,10 +1729,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   private isForceItemizable(trx: TransactionModel): boolean {
-    if (!this.editMode) {
+    if (!this.editMode && !this._allTransactions) {
       return false;
     }
     if (trx) {
+      if (trx.reportstatus.toUpperCase() === 'FILED') {
+        return (trx.forceitemizable && trx.iseditable);
+      }
       return trx.forceitemizable;
     } else {
       return false;
@@ -1810,9 +1816,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    */
   private isDisabled(trx: TransactionModel): boolean {
     if (trx && trx.reportstatus) {
-    return trx.reportstatus.toUpperCase() === 'FILED';
+    return !trx.iseditable;
     } else {
-      return false;
+      return true;
     }
   }
 }

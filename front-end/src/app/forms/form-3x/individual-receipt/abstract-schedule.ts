@@ -195,7 +195,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     private _http: HttpClient,
     protected _fb: FormBuilder,
     private _formService: FormsService,
-    private _receiptService: IndividualReceiptService,
+    protected _receiptService: IndividualReceiptService,
     private _contactsService: ContactsService,
     protected _activatedRoute: ActivatedRoute,
     private _config: NgbTooltipConfig,
@@ -977,14 +977,51 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           // store the validators in a class variable array, add this function to the array, and set the
           // controls's setValidator() using the full array.  Or just get the validations from the
           // dynamic form fields again in this.formFields[].
-          const employerControl = this.frmIndividualReceipt.get('employer');
-          employerControl.setValidators([validateAggregate(val, true, 'employer')]);
-          employerControl.updateValueAndValidity();
 
-          const occupationControl = this.frmIndividualReceipt.get('occupation');
-          occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
-          occupationControl.updateValueAndValidity();
+          if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['entity_type'] && this.frmIndividualReceipt.controls['entity_type'].value === 'IND'){
+            const employerControl = this.frmIndividualReceipt.get('employer');
+            employerControl.setValidators([validateAggregate(val, true, 'employer')]);
+            employerControl.updateValueAndValidity();
+  
+            const occupationControl = this.frmIndividualReceipt.get('occupation');
+            occupationControl.setValidators([validateAggregate(val, true, 'occupation')]);
+            occupationControl.updateValueAndValidity();
+          }
         });
+
+
+        //also update employer and occupation validations whenever entity_type changes, since these validations
+        //are only required for entity_type === 'IND'
+      if(this.frmIndividualReceipt.get('entity_type') !== null){
+        this.frmIndividualReceipt.get('entity_type').valueChanges.takeUntil(this.onDestroy$)
+        .subscribe(val => {
+          if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['entity_type']){
+            if(this.frmIndividualReceipt.controls['entity_type'].value === 'ORG'){
+              const employerControl = this.frmIndividualReceipt.get('employer');
+              employerControl.clearValidators();
+              employerControl.updateValueAndValidity();
+    
+              const occupationControl = this.frmIndividualReceipt.get('occupation');
+              occupationControl.clearValidators();
+              occupationControl.updateValueAndValidity();
+            }
+            else if(this.frmIndividualReceipt.controls['entity_type'].value === 'IND'){
+  
+              //if ind, then check apply validators based on contribution_aggregate value
+              if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_aggregate'] && this.frmIndividualReceipt.controls['contribution_aggregate'].value){
+                const employerControl = this.frmIndividualReceipt.get('employer');
+                employerControl.setValidators([validateAggregate(this.frmIndividualReceipt.controls['contribution_aggregate'].value, true, 'employer')]);
+                employerControl.updateValueAndValidity();
+      
+                const occupationControl = this.frmIndividualReceipt.get('occupation');
+                occupationControl.setValidators([validateAggregate(this.frmIndividualReceipt.controls['contribution_aggregate'].value, true, 'occupation')]);
+                occupationControl.updateValueAndValidity();
+              }
+            } 
+          }
+          
+        });
+      }
     } else if (this.frmIndividualReceipt.get('expenditure_amount') != null) {
       this.frmIndividualReceipt.get('expenditure_amount').valueChanges.takeUntil(this.onDestroy$)
         .subscribe(value => {
@@ -2499,7 +2536,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       Object.keys(this.frmIndividualReceipt.controls).forEach(key => {
         if (this.frmIndividualReceipt.get(key).invalid) {
           invalid.push(key);
-          //console.log('invalid form field on submit = ' + key);
+          console.error('invalid form field on submit = ' + key);
         }
       });
 
@@ -3368,7 +3405,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           this.clearOrgData();
         }
         if (searchText) {
-          /*
           if(this.transactionType === 'TRIB_REC'
             || this.transactionType === 'TRIB_RECNT_REC'
             || this.transactionType === 'TRIB_NP_RECNT_ACC'
@@ -3382,10 +3418,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             || this.transactionType === 'ALLOC_EXP'
             || this.transactionType === 'ALLOC_EXP_CC_PAY'
           ){
-            return Observable.of([]);
-          }else
-          */
-          if(this.transactionType === 'CON_EAR_DEP_MEMO'
+            return this._typeaheadService.getContacts(searchText, 'entity_name', false, 'OFF');
+          }else if(this.transactionType === 'CON_EAR_DEP_MEMO'
             || this.transactionType === 'CON_EAR_UNDEP_MEMO'
             || this.transactionType === 'CONT_TO_CAN'
             || this.transactionType === 'CONT_VOID') {
