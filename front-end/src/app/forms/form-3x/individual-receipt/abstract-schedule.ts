@@ -992,34 +992,36 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
         //also update employer and occupation validations whenever entity_type changes, since these validations
         //are only required for entity_type === 'IND'
-      this.frmIndividualReceipt.get('entity_type').valueChanges.takeUntil(this.onDestroy$)
-      .subscribe(val => {
-        if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['entity_type']){
-          if(this.frmIndividualReceipt.controls['entity_type'].value === 'ORG'){
-            const employerControl = this.frmIndividualReceipt.get('employer');
-            employerControl.clearValidators();
-            employerControl.updateValueAndValidity();
-  
-            const occupationControl = this.frmIndividualReceipt.get('occupation');
-            occupationControl.clearValidators();
-            occupationControl.updateValueAndValidity();
-          }
-          else if(this.frmIndividualReceipt.controls['entity_type'].value === 'IND'){
-
-            //if ind, then check apply validators based on contribution_aggregate value
-            if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_aggregate'] && this.frmIndividualReceipt.controls['contribution_aggregate'].value){
+      if(this.frmIndividualReceipt.get('entity_type') !== null){
+        this.frmIndividualReceipt.get('entity_type').valueChanges.takeUntil(this.onDestroy$)
+        .subscribe(val => {
+          if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['entity_type']){
+            if(this.frmIndividualReceipt.controls['entity_type'].value === 'ORG'){
               const employerControl = this.frmIndividualReceipt.get('employer');
-              employerControl.setValidators([validateAggregate(this.frmIndividualReceipt.controls['contribution_aggregate'].value, true, 'employer')]);
+              employerControl.clearValidators();
               employerControl.updateValueAndValidity();
     
               const occupationControl = this.frmIndividualReceipt.get('occupation');
-              occupationControl.setValidators([validateAggregate(this.frmIndividualReceipt.controls['contribution_aggregate'].value, true, 'occupation')]);
+              occupationControl.clearValidators();
               occupationControl.updateValueAndValidity();
             }
-          } 
-        }
-        
-      })
+            else if(this.frmIndividualReceipt.controls['entity_type'].value === 'IND'){
+  
+              //if ind, then check apply validators based on contribution_aggregate value
+              if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_aggregate'] && this.frmIndividualReceipt.controls['contribution_aggregate'].value){
+                const employerControl = this.frmIndividualReceipt.get('employer');
+                employerControl.setValidators([validateAggregate(this.frmIndividualReceipt.controls['contribution_aggregate'].value, true, 'employer')]);
+                employerControl.updateValueAndValidity();
+      
+                const occupationControl = this.frmIndividualReceipt.get('occupation');
+                occupationControl.setValidators([validateAggregate(this.frmIndividualReceipt.controls['contribution_aggregate'].value, true, 'occupation')]);
+                occupationControl.updateValueAndValidity();
+              }
+            } 
+          }
+          
+        });
+      }
     } else if (this.frmIndividualReceipt.get('expenditure_amount') != null) {
       this.frmIndividualReceipt.get('expenditure_amount').valueChanges.takeUntil(this.onDestroy$)
         .subscribe(value => {
@@ -2534,7 +2536,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       Object.keys(this.frmIndividualReceipt.controls).forEach(key => {
         if (this.frmIndividualReceipt.get(key).invalid) {
           invalid.push(key);
-          console.log('invalid form field on submit = ' + key);
+          console.error('invalid form field on submit = ' + key);
         }
       });
 
