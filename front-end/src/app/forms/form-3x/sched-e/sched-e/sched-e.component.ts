@@ -373,7 +373,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
 
   private handleTransactionIfAssociatedByDisseminationDate(trx:any) {
-    if(trx && trx.associatedByDissemination){
+    if(trx && trx.associatedbydissemination){
       this.toggleDissemination();
     }
   }
