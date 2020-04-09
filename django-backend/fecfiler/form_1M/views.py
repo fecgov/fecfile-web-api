@@ -230,7 +230,7 @@ def get_candidate_details(request_dict):
 				candidate_dict = get_sql_candidate(candidate_id)
 				candidate_dict['contribution_date'] = request_dict.get(column_name[:-2]+'con')
 				candidate_dict['candidate_number'] = i
-				output_list.append[candidate_dict]
+				output_list.append(candidate_dict)
 			del request_dict[column_name]
 			del request_dict[column_name[:-2]+'con']
 		request_dict['candidates'] = output_list
@@ -245,7 +245,7 @@ def get_sql_candidate(candidate_id):
 		cand_prefix, cand_suffix, cand_office, cand_office_state, cand_office_district 
 		FROM public.candidate_master WHERE cand_id=%s"""
 		with connection.cursor() as cursor:
-			cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""",format(sql),[candidate_id])
+			cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql),[candidate_id])
 			logger.debug("CANDIDATE TABLE")
 			logger.debug(cursor.query)
 			output_dict = cursor.fetchone()[0]
