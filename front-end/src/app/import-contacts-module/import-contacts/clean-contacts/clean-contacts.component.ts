@@ -322,7 +322,7 @@ export class CleanContactsComponent implements OnInit, OnDestroy {
     }
   }
 
-  public fieldSelectedChange($event: any, field: FieldToCleanModel) {
+  public fieldSelectedChange(field: FieldToCleanModel) {
 
     let final = '';
     if (field.userField.selected) {
@@ -344,10 +344,10 @@ export class CleanContactsComponent implements OnInit, OnDestroy {
     return this._utilService.isStringEmpty(val);
   }
 
-  public applyUserEditToFinal($event: any, edittedField: FieldEntryModel, fieldToClean: FieldToCleanModel): void {
+  public applyUserEditToFinal(edittedField: FieldEntryModel, fieldToClean: FieldToCleanModel): void {
     if (edittedField.originallyEmpty) {
       if (edittedField.selected) {
-        fieldToClean.finalField = $event.target.value;
+        this.fieldSelectedChange(fieldToClean);
       }
     }
   }
