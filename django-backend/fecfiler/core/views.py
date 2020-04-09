@@ -3906,18 +3906,23 @@ def get_all_transactions(request):
                         if transaction.get("memo_code") != "X":
                             total_amount += transaction.get("transaction_amount", 0.0)
                         # if transaction.get('transaction_type_identifier') in NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER:
-                        #     transaction['isEditable'] = False
+                        #     transaction['isEditable'] = Falseet
+
                         if (
                             transaction.get("back_ref_transaction_id") is not None
                             and transaction.get("back_ref_transaction_id")
                             in transaction_dict
                         ):
-                            parent = transaction_dict.get(
-                                transaction.get("back_ref_transaction_id")
-                            )
-                            if "child" not in parent:
-                                parent["child"] = []
-                            parent["child"].append(transaction)
+                            if not transaction.get("transaction_type_identifier") in [
+                                "ALLOC_H1",
+                                "ALLOC_H2_RATIO",
+                            ]:
+                                parent = transaction_dict.get(
+                                    transaction.get("back_ref_transaction_id")
+                                )
+                                if "child" not in parent:
+                                    parent["child"] = []
+                                parent["child"].append(transaction)
                         else:
                             output_list.append(transaction)
             else:
