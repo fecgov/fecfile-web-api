@@ -2818,6 +2818,8 @@ def autolookup_search_contacts(request):
                     ):
                         global_search_id = ""
                     parameters = [global_search_id, committee_id, committee_id]
+                    # Modified expand parameter query to do left join so that entity would show up
+                    # irrespective of principal campaign committee
                     if "expand" in request.query_params:
                         query_string = (
                             """
@@ -2825,10 +2827,9 @@ def autolookup_search_contacts(request):
                             (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                             e.last_update_date
-                            FROM public.entity e, public.entity c WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
-                            AND c.principal_campaign_committee is not null
-                            AND e.cmte_id in (%s, %s) 
-                            AND substr(e.ref_cand_cmte_id,1,1)='C'
+                            FROM public.entity e left join public.entity c ON e.ref_cand_cmte_id = c.principal_campaign_committee 
+                            WHERE e.cmte_id in (%s, %s) 
+                            AND substr(e.ref_cand_cmte_id,1,1)='C' 
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
                             + param_string
@@ -2866,6 +2867,8 @@ def autolookup_search_contacts(request):
                         and request.query_params.get("global_search").upper() == "OFF"
                     ):
                         global_search_id = ""
+                    # Modified expand parameter query to do left join so that entity would show up
+                    # irrespective of principal campaign committee
                     if "expand" in request.query_params:
                         parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
@@ -2875,10 +2878,9 @@ def autolookup_search_contacts(request):
                             e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
                             e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
                             e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
-                            FROM public.entity e , public.entity c WHERE c.ref_cand_cmte_id = e.principal_campaign_committee
-                            AND e.principal_campaign_committee is not null
-                            AND e.cmte_id in (%s, %s) 
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            FROM public.entity e left join public.entity c  ON c.ref_cand_cmte_id = e.principal_campaign_committee  
+                            WHERE e.cmte_id in (%s, %s) 
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s) 
                             AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                             """
                             + param_string
@@ -2915,16 +2917,15 @@ def autolookup_search_contacts(request):
                     ):
                         global_search_id = ""
                     if "expand" in request.query_params:
-                        parameters = [committee_id]
+                        parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
                             """
                                 SELECT json_agg(t) FROM 
                                 (SELECT distinct e.entity_name, e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name, e.first_name,e.last_name,e.middle_name,
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                                 e.last_update_date
-                                FROM public.entity e, public.entity c 
-                                WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
-                                AND c.principal_campaign_committee is not null
+                                FROM public.entity e left join public.entity c ON  e.ref_cand_cmte_id = c.principal_campaign_committee 
+                                WHERE e.cmte_id in (%s, %s) 
                                 AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                                 """
                             + param_string
