@@ -21,7 +21,7 @@
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="contacts__btn-container">
-              <button *ngIf="isContactViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
+              <button *ngIf="isContactViewActive() && !_authService.isReadOnly()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
                 (click)="AddContacts()">
                 <i class="fas fa-plus-circle"></i>
                 Add New
@@ -36,10 +36,11 @@
                 <i class="trash-icon"></i>
                 Recycle Bin
               </button>
-              <button *ngIf="isContactViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
-                (click)="doImport()">
-                <i class="file-import-icon"></i>
-                Import
+              <button *ngIf="isContactViewActive() && !_authService.isReadOnly()"
+                      class="btn btn-primary btn-left contacts__trx-btn" type="button"
+                      (click)="doImport()">
+                      <i class="file-import-icon"></i>
+                      Import
               </button>
               <button *ngIf="isContactViewActive()" class="btn btn-primary btn-left contacts__trx-btn" type="button"
                 (click)="showFilters()">
@@ -275,7 +276,7 @@
       >
       </app-contacts-edit>-->
 
-      <addnew_contacts *ngIf="isEditViewActive()" [formOptionsVisible]=false [selectedOptions]=null
+      <addnew_contacts *ngIf="isEditViewActive() &&!_authService.isReadOnly()" [formOptionsVisible]=false [selectedOptions]=null
         [transactionTypeText]="" [transactionType]="" [scheduleAction]="view" [transactionToEdit]="transactionToEdit"
         (status)="onNotify($event)">
       </addnew_contacts>

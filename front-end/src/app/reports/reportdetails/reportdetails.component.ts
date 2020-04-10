@@ -18,6 +18,7 @@ import { reportModel } from '../model/report.model';
 import { ReportsService } from '../service/report.service';
 import { ReportFilterModel } from '../model/report-filter.model';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { AuthService} from '../../shared/services/AuthService/auth.service';
 import {
   form99,
   form3XReport,
@@ -140,6 +141,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _router: Router,
     private _reportTypeService: ReportTypeService,
     private _formsService: FormsService,
+    private authService: AuthService,
   ) {
     this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();

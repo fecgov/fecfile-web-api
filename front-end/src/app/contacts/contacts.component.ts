@@ -5,10 +5,10 @@ import { ContactsMessageService } from './service/contacts-message.service';
 import { ContactFilterModel } from './model/contacts-filter.model';
 import { Subscription } from 'rxjs/Subscription';
 import { ContactModel } from './model/contacts.model';
+import { AuthService} from '../shared/services/AuthService/auth.service';
 
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { Subject } from 'rxjs';
-
 
 export enum ActiveView {
   contacts = 'contacts',
@@ -92,6 +92,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
     private _contactsMessageService: ContactsMessageService,
     private _router: Router,
     private _messageService: MessageService,
+    private _authService: AuthService
   ) {
     this.applyFiltersSubscription = this._contactsMessageService.getApplyFiltersMessage()
       .subscribe(

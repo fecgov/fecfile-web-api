@@ -31,6 +31,7 @@ import { ContactsComponent } from './contacts/contacts.component';
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
 import { HelpComponent } from './help/help.component';
 // import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
+import {Roles} from './shared/enums/Roles';
 
 export const AppRoutes: Routes = [
   {
@@ -107,7 +108,10 @@ export const AppRoutes: Routes = [
         component: AddNewContactComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
-        canDeactivate: [CanDeactivateGuardService]
+        canDeactivate: [CanDeactivateGuardService],
+        data: {
+          role: [Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'forms/form/:form_id',
@@ -132,7 +136,10 @@ export const AppRoutes: Routes = [
         component: SignComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
-        canDeactivate: [CanDeactivateGuardService]
+        canDeactivate: [CanDeactivateGuardService],
+        data: {
+          role: [Roles.Admin]
+        }
       },
       { path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
       {

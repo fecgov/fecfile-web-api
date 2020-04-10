@@ -18,6 +18,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { CashOnHandModel } from '../../transactions/model/cashOnHand.model';
 import { TransactionsMessageService } from './../../transactions/service/transactions-message.service';
+import { AuthService } from '../../../shared/services/AuthService/auth.service';
 
 const transactionCategoryOptions = [];
 
@@ -70,7 +71,8 @@ export class TransactionSidebarComponent implements OnInit {
     private _formsService: FormsService,
     private _dialogService: DialogService,
     private _typeaheadService: TypeaheadService,
-    private _transactionMessageService: TransactionsMessageService
+    private _transactionMessageService: TransactionsMessageService,
+    private _authService: AuthService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -286,6 +288,9 @@ export class TransactionSidebarComponent implements OnInit {
    * @param      {Object}  e  The event object.
    */
   public selectItem(transactionCategoryValue: string): void {
+    if (this._authService.isReadOnly()) {
+      return;
+    }
     if (this.editMode) {
       this.itemSelected = transactionCategoryValue;
 
