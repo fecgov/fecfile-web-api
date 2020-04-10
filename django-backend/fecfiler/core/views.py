@@ -5537,7 +5537,11 @@ def getthirdnavamounts(cmte_id, report_id):
         #     cursor.execute(l_sql, _values)
         #     print(cursor.query)
         #     amounts.append(cursor.fetchone()[0])
-        return amounts[0], amounts[1], amounts[0] - amounts[1] + amounts[2] - amounts[3]
+
+        # quick uopdate for FNE-2207: exlude debts from COH calculation
+        return amounts[0], amounts[1], amounts[0] - amounts[1]
+
+        # return amounts[0], amounts[1], amounts[0] - amounts[1] + amounts[2] - amounts[3]
     except Exception as e:
         raise Exception("The getthirdnavamounts function is throwing an error" + str(e))
 
