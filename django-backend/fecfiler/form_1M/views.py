@@ -287,11 +287,11 @@ def next_report_id():
 		raise Exception(
 			'The get_next_report_id function is throwing an error: ' + str(e))
 
-def check_report_id_status(cmte_id, report_id, check_delete_flag=True):
+def check_report_id_status(cmte_id, report_id, delete_flag=True, submit_flag=True):
 	try:
 		if report_id not in [None, '', " ", 'null']:
 
-			if check_delete_flag:
+			if delete_flag:
 				param_string = "AND delete_ind IS DISTINCT FROM 'Y'"
 			else:
 				param_string = ""
@@ -306,7 +306,7 @@ def check_report_id_status(cmte_id, report_id, check_delete_flag=True):
 				else:
 					report_status = cursor.fetchone()[0]
 					logger.debug("REPORT status: " + report_status)
-					if report_status not in ['Saved', '', None, " "]:
+					if report_status not in ['Saved', '', None, " "] and submit_flag:
 						raise Exception("""The report Id: {0} for committee Id: {1}
 							is already submitted.""".format(report_id, cmte_id))
 		else:
@@ -769,7 +769,7 @@ def form1M(request):
 			noneCheckMissingParameters(['reportId'], checking_dict=request.data,
 				   value_dict=request.data, function_name='form1M-GET')
 			request_dict = f1m_sql_dict(cmte_id, step, request.data)
-			check_report_id_status(cmte_id, request_dict['report_id'], False)
+			check_report_id_status(cmte_id, request_dict['report_id'], delete_flag=False, submit_flag=False)
 			output_dict = get_sql_f1m(request_dict, True)
 			return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
 		except Exception as e:
