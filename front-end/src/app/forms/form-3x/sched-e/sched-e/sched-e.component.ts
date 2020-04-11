@@ -40,6 +40,8 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   @Input() transactionDataForChild: any;
   @Input() parentTransactionModel: any;
 
+  public addByDissemination : boolean = false;
+
   public hideCandidateState = false;
   public coverageStartDate = '';
   public coverageEndDate = '';
@@ -151,6 +153,19 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     return null;
   }
 
+  get disseminationDate(){
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.get('dissemination_date')) {
+      return this.frmIndividualReceipt.get('dissemination_date').value;
+    }
+    return null;
+  }
+
+  get disbursementDate(){
+    if (this.frmIndividualReceipt && this.frmIndividualReceipt.get('disbursement_date')) {
+      return this.frmIndividualReceipt.get('disbursement_date').value;
+    }
+    return null;
+  }
 
 /*   public ngOnChanges(changes: SimpleChanges) {
     this.formType = '3X';
@@ -175,11 +190,59 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   }
 
-  
-
   public ngOnDestroy(): void {
     this._schedEonDestroy$.next(true);
     super.ngOnDestroy();
+  }
+
+  public toggleDissemination(){
+    if(!this.addByDissemination){
+      this.addIeByDissemination();
+    }
+    else{
+      this.addIeByDisbursement();
+    }
+    this.addByDissemination = !this.addByDissemination;
+  }
+
+  public addIeByDissemination() {
+    //remove validation on disbursement date
+    this.frmIndividualReceipt.controls['disbursement_date'].clearValidators();
+    this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
+
+    this._receiptService.getReportIdByTransactionDate(this._utilService.formatDate(this.disseminationDate)).subscribe(res => {
+      if (res) {
+        if (res.reportId) {
+          if (res.status && res.status !== 'Filed') {
+            let elementName = 'associated_report_id';
+              let field = this.hiddenFields.find(element => element.name === elementName);
+              if (field) {
+                field.value = res.reportId.toString();
+              }
+              else {
+                this.hiddenFields.push({ type: 'hidden', name: elementName, value: res.reportId.toString() });
+              }
+          }
+          else if (res.status && res.status === 'Filed') {
+            this.frmIndividualReceipt.controls['dissemination_date'].setErrors({ reportFiled: true });
+          }
+        }
+        else {
+          this.frmIndividualReceipt.controls['dissemination_date'].setErrors({ reportNotFound: true });
+        }
+      }
+    })
+  } 
+
+  public addIeByDisbursement() {
+
+    this.frmIndividualReceipt.controls['disbursement_date'].clearValidators();
+    this.frmIndividualReceipt.controls['disbursement_date'].setValidators([Validators.required, this._contributionDateValidator.contributionDate(this.coverageStartDate, this.coverageEndDate)]);
+    this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
+
+    this.frmIndividualReceipt.controls['dissemination_date'].setErrors(null);
+    let elementName = 'associated_report_id';
+    this.hiddenFields = this.hiddenFields.filter(element => element.name !== elementName);
   }
 
   /**Add any child specific initializations, validators here */
@@ -190,13 +253,11 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       } else {
         this.frmIndividualReceipt.controls['disbursement_date'].setValidators([this._contributionDateValidator.contributionDate(this.coverageStartDate, this.coverageEndDate), Validators.required]);
       }
-      // this.frmIndividualReceipt.controls['disbursement_date'].setValidators([Validators.required]);
       this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
     }
 
     if (this.frmIndividualReceipt.controls['election_other_description']) {
       this.frmIndividualReceipt.controls['election_other_description'].clearValidators();
-      // this.frmIndividualReceipt.controls['election_other_description'].setValidators[();
       this.frmIndividualReceipt.controls['election_other_description'].updateValueAndValidity();
     }
 
@@ -305,6 +366,15 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     if (this.hiddenFields && this.hiddenFields.length > 0) {
       this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','completing_entity_id',trx.completing_entity_id);
       this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','payee_entity_id',trx.payee_entity_id);
+    }
+
+    this.handleTransactionIfAssociatedByDisseminationDate(trx);
+  }
+
+
+  private handleTransactionIfAssociatedByDisseminationDate(trx:any) {
+    if(trx && trx.associatedbydissemination){
+      this.toggleDissemination();
     }
   }
 
@@ -551,23 +621,37 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
   public dateChange(fieldName: string) {
 
-    //Remove valdiations from the other date field if one is present
-    if (fieldName === 'disbursement_date' && this.frmIndividualReceipt.controls[fieldName] && this.frmIndividualReceipt.controls[fieldName].value) {
-      this.frmIndividualReceipt.controls['dissemination_date'].clearValidators();
-      this.frmIndividualReceipt.controls['dissemination_date'].updateValueAndValidity();
-    }
-    else if (fieldName === 'dissemination_date' && this.frmIndividualReceipt.controls[fieldName] && this.frmIndividualReceipt.controls[fieldName].value) {
-      this.frmIndividualReceipt.controls['disbursement_date'].clearValidators();
-      this.frmIndividualReceipt.controls['disbursement_date'].setValidators([this._contributionDateValidator.contributionDate(this.coverageStartDate, this.coverageEndDate)]);
-      this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
-    }
-    else if ((this.frmIndividualReceipt.controls['dissemination_date'] && this.frmIndividualReceipt.controls['disbursement_date']) &&
-     (!this.frmIndividualReceipt.controls['dissemination_date'].value && !this.frmIndividualReceipt.controls['disbursement_date'].value)) {
-      this.frmIndividualReceipt.controls['disbursement_date'].setValidators([this._contributionDateValidator.contributionDate(this.coverageStartDate, this.coverageEndDate), Validators.required]);
-      this.frmIndividualReceipt.controls['dissemination_date'].setValidators([Validators.required]);
-      this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
-      this.frmIndividualReceipt.controls['dissemination_date'].updateValueAndValidity();
+      //Remove valdiations from the other date field if one is present
+      if (fieldName === 'disbursement_date' && this.frmIndividualReceipt.controls[fieldName] && this.frmIndividualReceipt.controls[fieldName].value) {
+        this.frmIndividualReceipt.controls['dissemination_date'].clearValidators();
+        this.frmIndividualReceipt.controls['dissemination_date'].updateValueAndValidity();
+      }
+      else if (fieldName === 'dissemination_date' && this.frmIndividualReceipt.controls[fieldName] && this.frmIndividualReceipt.controls[fieldName].value) {
+        this.frmIndividualReceipt.controls['disbursement_date'].clearValidators();
+        this.frmIndividualReceipt.controls['disbursement_date'].setValidators([this._contributionDateValidator.contributionDate(this.coverageStartDate, this.coverageEndDate)]);
+        this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
+      }
+      else if ((this.frmIndividualReceipt.controls['dissemination_date'] && this.frmIndividualReceipt.controls['disbursement_date']) &&
+       (!this.frmIndividualReceipt.controls['dissemination_date'].value && !this.frmIndividualReceipt.controls['disbursement_date'].value)) {
+        this.frmIndividualReceipt.controls['disbursement_date'].setValidators([this._contributionDateValidator.contributionDate(this.coverageStartDate, this.coverageEndDate), Validators.required]);
+        this.frmIndividualReceipt.controls['dissemination_date'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
+        this.frmIndividualReceipt.controls['dissemination_date'].updateValueAndValidity();
+  
+      }
 
+    if(this.addByDissemination){
+      if(!this.disseminationDate || !this.disbursementDate){
+        if(!this.disseminationDate){
+          this.frmIndividualReceipt.controls['dissemination_date'].setErrors({ dateEmpty: true });
+        }
+        if(!this.disbursementDate){
+          this.frmIndividualReceipt.controls['disbursement_date'].setErrors({ dateEmpty: true });
+        }
+      }
+      else{
+        this.addIeByDissemination();
+      }
     }
   }
 
