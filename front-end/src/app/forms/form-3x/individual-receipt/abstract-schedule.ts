@@ -483,18 +483,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     if (this.checkComponent(changes)) {
       if (this.editMode) {
-        this._reportsService.getCoverageDates(this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
-          this.cvgStartDate = this._utilService.formatDate(res.cvg_start_date);
-          this.cvgEndDate = this._utilService.formatDate(res.cvg_end_date);
-          this._prepareForm();
-          // added check to avoid script error
-          if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
-            this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-              this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
-              Validators.required
-            ]);
+        if(this._activatedRoute.snapshot.queryParams.reportId){
+          if(this.formType !== '24'){
+            this._reportsService.getCoverageDates(this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
+              this.cvgStartDate = this._utilService.formatDate(res.cvg_start_date);
+              this.cvgEndDate = this._utilService.formatDate(res.cvg_end_date);
+              this._prepareForm();
+              // added check to avoid script error
+              if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
+                this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+                  this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+                  Validators.required
+                ]);
+              }
+            });
+          } else{
+            this._prepareForm();
           }
-        });
+        }
       } else {
         this._dialogService
           .confirm(

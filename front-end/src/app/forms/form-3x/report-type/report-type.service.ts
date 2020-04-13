@@ -61,112 +61,115 @@ export class ReportTypeService {
 
     formData.append('form_type', `F${formType}`);
 
-    if (form3xReportType.hasOwnProperty('reportType')) {
-      formData.append('report_type', form3xReportType.reportType);
-    } else if (form3xReportType.hasOwnProperty('reporttype')) {
-      formData.append('report_type', form3xReportType.reporttype);
-    }
+    if(form3xReportType){
 
-    if (form3xReportType.hasOwnProperty('cvgStartDate')) {
-      formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
-    } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
-      formData.append('cvg_start_dt', form3xReportType.cvgstartdate);
-    }
-
-    if (form3xReportType.hasOwnProperty('cvgEndDate')) {
-      formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
-    } else if (form3xReportType.hasOwnProperty('cvgenddate')) {
-      formData.append('cvg_end_dt', form3xReportType.cvgenddate);
-    }
-
-    if (form3xReportType.hasOwnProperty('dueDate')) {
-      formData.append('due_dt', form3xReportType.dueDate);
-    } else if (form3xReportType.hasOwnProperty('duedate')) {
-      formData.append('due_dt', form3xReportType.duedate);
-    }
-
-    if (form3xReportType.hasOwnProperty('amend_Indicator')) {
-      if (typeof form3xReportType.amend_Indicator === 'string') {
-        if (form3xReportType.amend_Indicator.length >= 1) {
-          formData.append('amend_ind', form3xReportType.amend_Indicator);
-        } else {
-          formData.append('amend_ind', 'N');
-        }
+      if (form3xReportType.hasOwnProperty('reportType')) {
+        formData.append('report_type', form3xReportType.reportType);
+      } else if (form3xReportType.hasOwnProperty('reporttype')) {
+        formData.append('report_type', form3xReportType.reporttype);
       }
-    } else {
-      formData.append('amend_ind', 'N');
-    }
-
-    if (form3xReportType.hasOwnProperty('coh_bop')) {
-      if (typeof form3xReportType.coh_bop === 'string') {
-        if (form3xReportType.coh_bop.length >= 1) {
-          formData.append('coh_bop', form3xReportType.coh_bop);
+  
+      if (form3xReportType.hasOwnProperty('cvgStartDate')) {
+        formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
+      } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
+        formData.append('cvg_start_dt', form3xReportType.cvgstartdate);
+      }
+  
+      if (form3xReportType.hasOwnProperty('cvgEndDate')) {
+        formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
+      } else if (form3xReportType.hasOwnProperty('cvgenddate')) {
+        formData.append('cvg_end_dt', form3xReportType.cvgenddate);
+      }
+  
+      if (form3xReportType.hasOwnProperty('dueDate')) {
+        formData.append('due_dt', form3xReportType.dueDate);
+      } else if (form3xReportType.hasOwnProperty('duedate')) {
+        formData.append('due_dt', form3xReportType.duedate);
+      }
+  
+      if (form3xReportType.hasOwnProperty('amend_Indicator')) {
+        if (typeof form3xReportType.amend_Indicator === 'string') {
+          if (form3xReportType.amend_Indicator.length >= 1) {
+            formData.append('amend_ind', form3xReportType.amend_Indicator);
+          } else {
+            formData.append('amend_ind', 'N');
+          }
+        }
+      } else {
+        formData.append('amend_ind', 'N');
+      }
+  
+      if (form3xReportType.hasOwnProperty('coh_bop')) {
+        if (typeof form3xReportType.coh_bop === 'string') {
+          if (form3xReportType.coh_bop.length >= 1) {
+            formData.append('coh_bop', form3xReportType.coh_bop);
+          }
+        } else {
+          formData.append('coh_bop', '0');
         }
       } else {
         formData.append('coh_bop', '0');
       }
-    } else {
-      formData.append('coh_bop', '0');
-    }
-
-    if (typeof form3xReportType.electionCode === 'string') {
-      if (form3xReportType.electionCode.length >= 1) {
-        formData.append('election_code', form3xReportType.electionCode);
+  
+      if (typeof form3xReportType.electionCode === 'string') {
+        if (form3xReportType.electionCode.length >= 1) {
+          formData.append('election_code', form3xReportType.electionCode);
+        }
       }
-    }
-
-    if (form3xReportType.election_date !== null) {
-      if (typeof form3xReportType.election_date === 'string') {
-        if (form3xReportType.election_date.length >= 1) {
-          formData.append('date_of_election', this._datePipe.transform(form3xReportType.election_date, 'MM/dd/yyyy'));
+  
+      if (form3xReportType.election_date !== null) {
+        if (typeof form3xReportType.election_date === 'string') {
+          if (form3xReportType.election_date.length >= 1) {
+            formData.append('date_of_election', this._datePipe.transform(form3xReportType.election_date, 'MM/dd/yyyy'));
+          }
+        }
+      }
+  
+      if (form3xReportType.election_state !== null) {
+        if (typeof form3xReportType.election_state === 'string') {
+          if (form3xReportType.election_state.length >= 1) {
+            formData.append('state_of_election', form3xReportType.election_state);
+          }
+        }
+      }
+  
+      if (form3xReportType.email1 !== null) {
+        if (typeof form3xReportType.email1 === 'string') {
+          if (form3xReportType.email1.length >= 1) {
+            formData.append('email_1', form3xReportType.email1);
+          }
+        }
+      }
+  
+      if (form3xReportType.email2 !== null) {
+        if (typeof form3xReportType.email2 === 'string') {
+          if (form3xReportType.email2.length >= 1) {
+            formData.append('email_2', form3xReportType.email2);
+          }
+        }
+      }
+  
+      if (form3xReportType.additionalEmail1 !== null) {
+        if (typeof form3xReportType.additionalEmail1 === 'string') {
+          if (form3xReportType.additionalEmail1.length >= 1) {
+            formData.append('additional_email_1', form3xReportType.additionalEmail1);
+          }
+        }
+      }
+  
+      if (form3xReportType.additionalEmail2 !== null) {
+        if (typeof form3xReportType.additionalEmail2 === 'string') {
+          if (form3xReportType.additionalEmail2.length >= 1) {
+            formData.append('additional_email_2', form3xReportType.additionalEmail2);
+          }
         }
       }
     }
-
-    if (form3xReportType.election_state !== null) {
-      if (typeof form3xReportType.election_state === 'string') {
-        if (form3xReportType.election_state.length >= 1) {
-          formData.append('state_of_election', form3xReportType.election_state);
-        }
-      }
-    }
-
+    
     if (access_type === 'Saved') {
       formData.append('status', 'Saved');
     } else if (access_type === 'Submitted') {
       formData.append('status', 'Submitted');
-    }
-
-    if (form3xReportType.email1 !== null) {
-      if (typeof form3xReportType.email1 === 'string') {
-        if (form3xReportType.email1.length >= 1) {
-          formData.append('email_1', form3xReportType.email1);
-        }
-      }
-    }
-
-    if (form3xReportType.email2 !== null) {
-      if (typeof form3xReportType.email2 === 'string') {
-        if (form3xReportType.email2.length >= 1) {
-          formData.append('email_2', form3xReportType.email2);
-        }
-      }
-    }
-
-    if (form3xReportType.additionalEmail1 !== null) {
-      if (typeof form3xReportType.additionalEmail1 === 'string') {
-        if (form3xReportType.additionalEmail1.length >= 1) {
-          formData.append('additional_email_1', form3xReportType.additionalEmail1);
-        }
-      }
-    }
-
-    if (form3xReportType.additionalEmail2 !== null) {
-      if (typeof form3xReportType.additionalEmail2 === 'string') {
-        if (form3xReportType.additionalEmail2.length >= 1) {
-          formData.append('additional_email_2', form3xReportType.additionalEmail2);
-        }
-      }
     }
 
     return this._http
@@ -224,150 +227,153 @@ export class ReportTypeService {
     //console.log('signandSaveSubmitReport access_type you reached here = ', access_type);
     formData.append('form_type', `F${formType}`);
 
-    if (form3xReportType.hasOwnProperty('reportid')) {
-      formData.append('report_id', form3xReportType.reportid);
-    } else if (form3xReportType.hasOwnProperty('reportId')) {
-      formData.append('report_id', form3xReportType.reportId);
-    }
+    if(form3xReportType){
 
-    if (form3xReportType.hasOwnProperty('reportType')) {
-      formData.append('report_type', form3xReportType.reportType);
-    } else if (form3xReportType.hasOwnProperty('reporttype')) {
-      formData.append('report_type', form3xReportType.reporttype);
-    }
-
-    if (form3xReportType.hasOwnProperty('cvgStartDate')) {
-      formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgStartDate, 'MM/dd/yyyy'));
-    } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
-      formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgstartdate, 'MM/dd/yyyy'));
-    }
-
-    if (form3xReportType.hasOwnProperty('cvgEndDate')) {
-      formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgEndDate, 'MM/dd/yyyy'));
-    } else if (form3xReportType.hasOwnProperty('cvgenddate')) {
-      formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgenddate, 'MM/dd/yyyy'));
-    }
-
-    if (form3xReportType.hasOwnProperty('dueDate')) {
-      if (form3xReportType.dueDate !== null) {
-        formData.append('due_dt', this._datePipe.transform(form3xReportType.dueDate, 'MM/dd/yyyy'));
-      } else {
-        formData.append('due_dt', null);
+      if (form3xReportType.hasOwnProperty('reportid')) {
+        formData.append('report_id', form3xReportType.reportid);
+      } else if (form3xReportType.hasOwnProperty('reportId')) {
+        formData.append('report_id', form3xReportType.reportId);
       }
-    } else if (form3xReportType.hasOwnProperty('duedate')) {
-      if (form3xReportType.duedate !== null) {
-        formData.append('due_dt', this._datePipe.transform(form3xReportType.duedate, 'MM/dd/yyyy'));
-      } else {
-        formData.append('due_dt', null);
+  
+      if (form3xReportType.hasOwnProperty('reportType')) {
+        formData.append('report_type', form3xReportType.reportType);
+      } else if (form3xReportType.hasOwnProperty('reporttype')) {
+        formData.append('report_type', form3xReportType.reporttype);
       }
-    }
-
-    //console.log('signandSaveSubmitReport access_type you reached here1 = ', access_type);
-
-    if (form3xReportType.hasOwnProperty('amend_Indicator')) {
-      if (typeof form3xReportType.amend_Indicator === 'string') {
-        if (form3xReportType.amend_Indicator.length >= 1) {
-          formData.append('amend_ind', form3xReportType.amend_Indicator);
+  
+      if (form3xReportType.hasOwnProperty('cvgStartDate')) {
+        formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgStartDate, 'MM/dd/yyyy'));
+      } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
+        formData.append('cvg_start_dt', this._datePipe.transform(form3xReportType.cvgstartdate, 'MM/dd/yyyy'));
+      }
+  
+      if (form3xReportType.hasOwnProperty('cvgEndDate')) {
+        formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgEndDate, 'MM/dd/yyyy'));
+      } else if (form3xReportType.hasOwnProperty('cvgenddate')) {
+        formData.append('cvg_end_dt', this._datePipe.transform(form3xReportType.cvgenddate, 'MM/dd/yyyy'));
+      }
+  
+      if (form3xReportType.hasOwnProperty('dueDate')) {
+        if (form3xReportType.dueDate !== null) {
+          formData.append('due_dt', this._datePipe.transform(form3xReportType.dueDate, 'MM/dd/yyyy'));
         } else {
-          formData.append('amend_ind', 'N');
+          formData.append('due_dt', null);
+        }
+      } else if (form3xReportType.hasOwnProperty('duedate')) {
+        if (form3xReportType.duedate !== null) {
+          formData.append('due_dt', this._datePipe.transform(form3xReportType.duedate, 'MM/dd/yyyy'));
+        } else {
+          formData.append('due_dt', null);
         }
       }
-    } else {
-      formData.append('amend_ind', 'N');
-    }
-
-    if (form3xReportType.hasOwnProperty('coh_bop')) {
-      if (typeof form3xReportType.coh_bop === 'string') {
-        if (form3xReportType.coh_bop.length >= 1) {
-          formData.append('coh_bop', form3xReportType.coh_bop);
+  
+      //console.log('signandSaveSubmitReport access_type you reached here1 = ', access_type);
+  
+      if (form3xReportType.hasOwnProperty('amend_Indicator')) {
+        if (typeof form3xReportType.amend_Indicator === 'string') {
+          if (form3xReportType.amend_Indicator.length >= 1) {
+            formData.append('amend_ind', form3xReportType.amend_Indicator);
+          } else {
+            formData.append('amend_ind', 'N');
+          }
+        }
+      } else {
+        formData.append('amend_ind', 'N');
+      }
+  
+      if (form3xReportType.hasOwnProperty('coh_bop')) {
+        if (typeof form3xReportType.coh_bop === 'string') {
+          if (form3xReportType.coh_bop.length >= 1) {
+            formData.append('coh_bop', form3xReportType.coh_bop);
+          }
+        } else {
+          formData.append('coh_bop', '0');
         }
       } else {
         formData.append('coh_bop', '0');
       }
-    } else {
-      formData.append('coh_bop', '0');
-    }
-
-    if (form3xReportType.hasOwnProperty('electionCode')) {
-      if (typeof form3xReportType.electionCode === 'string') {
-        if (form3xReportType.electionCode.length >= 1) {
-          formData.append('election_code', form3xReportType.electionCode);
+  
+      if (form3xReportType.hasOwnProperty('electionCode')) {
+        if (typeof form3xReportType.electionCode === 'string') {
+          if (form3xReportType.electionCode.length >= 1) {
+            formData.append('election_code', form3xReportType.electionCode);
+          }
+        }
+      } else if (form3xReportType.hasOwnProperty('electioncode')) {
+        if (typeof form3xReportType.electionCode === 'string') {
+          if (form3xReportType.electionCode.length >= 1) {
+            formData.append('election_code', form3xReportType.electionCode);
+          }
         }
       }
-    } else if (form3xReportType.hasOwnProperty('electioncode')) {
-      if (typeof form3xReportType.electionCode === 'string') {
-        if (form3xReportType.electionCode.length >= 1) {
-          formData.append('election_code', form3xReportType.electionCode);
+  
+      if (form3xReportType.election_date !== null) {
+        if (typeof form3xReportType.election_date === 'string') {
+          if (form3xReportType.election_date.length >= 1) {
+            formData.append('date_of_election', form3xReportType.election_date);
+          }
+        }
+      }
+  
+      if (form3xReportType.election_state !== null) {
+        if (typeof form3xReportType.election_state === 'string') {
+          if (form3xReportType.election_state.length >= 1) {
+            formData.append('state_of_election', form3xReportType.election_state);
+          }
+        }
+      }
+  
+      //console.log(' access_type =', access_type);
+  
+      if (form3xReportType.email1 !== null) {
+        if (typeof form3xReportType.email1 === 'string') {
+          if (form3xReportType.email1.length >= 1) {
+            formData.append('email_1', form3xReportType.email1);
+          }
+        }
+      }
+  
+      if (form3xReportType.email2 !== null) {
+        if (typeof form3xReportType.email2 === 'string') {
+          if (form3xReportType.email2.length >= 1) {
+            formData.append('email_2', form3xReportType.email2);
+          }
+        }
+      }
+  
+      if (form3xReportType.hasOwnProperty('additionalEmail1')) {
+        if (typeof form3xReportType.additionalEmail1 === 'string') {
+          if (form3xReportType.additionalEmail1.length >= 1) {
+            formData.append('additional_email_1', form3xReportType.additionalEmail1);
+          }
+        }
+      } else if (form3xReportType.hasOwnProperty('additionalemail1')) {
+        if (typeof form3xReportType.additionalemail1 === 'string') {
+          if (form3xReportType.additionalemail1.length >= 1) {
+            formData.append('additional_email_1', form3xReportType.additionalemail1);
+          }
+        }
+      }
+  
+      if (form3xReportType.hasOwnProperty('additionalEmail2')) {
+        if (typeof form3xReportType.additionalEmail2 === 'string') {
+          if (form3xReportType.additionalEmail2.length >= 1) {
+            formData.append('additional_email_2', form3xReportType.additionalEmail2);
+          }
+        }
+      } else if (form3xReportType.hasOwnProperty('additionalemail2')) {
+        if (typeof form3xReportType.additionalemail2 === 'string') {
+          if (form3xReportType.additionalemail2.length >= 1) {
+            formData.append('additional_email_2', form3xReportType.additionalemail2);
+          }
         }
       }
     }
-
-    if (form3xReportType.election_date !== null) {
-      if (typeof form3xReportType.election_date === 'string') {
-        if (form3xReportType.election_date.length >= 1) {
-          formData.append('date_of_election', form3xReportType.election_date);
-        }
-      }
-    }
-
-    if (form3xReportType.election_state !== null) {
-      if (typeof form3xReportType.election_state === 'string') {
-        if (form3xReportType.election_state.length >= 1) {
-          formData.append('state_of_election', form3xReportType.election_state);
-        }
-      }
-    }
-
-    //console.log(' access_type =', access_type);
 
     if (access_type === 'Saved') {
       formData.append('status', 'Saved');
     } else if (access_type === 'Submitted') {
       formData.append('status', 'Submitted');
-    }
-
-    if (form3xReportType.email1 !== null) {
-      if (typeof form3xReportType.email1 === 'string') {
-        if (form3xReportType.email1.length >= 1) {
-          formData.append('email_1', form3xReportType.email1);
-        }
-      }
-    }
-
-    if (form3xReportType.email2 !== null) {
-      if (typeof form3xReportType.email2 === 'string') {
-        if (form3xReportType.email2.length >= 1) {
-          formData.append('email_2', form3xReportType.email2);
-        }
-      }
-    }
-
-    if (form3xReportType.hasOwnProperty('additionalEmail1')) {
-      if (typeof form3xReportType.additionalEmail1 === 'string') {
-        if (form3xReportType.additionalEmail1.length >= 1) {
-          formData.append('additional_email_1', form3xReportType.additionalEmail1);
-        }
-      }
-    } else if (form3xReportType.hasOwnProperty('additionalemail1')) {
-      if (typeof form3xReportType.additionalemail1 === 'string') {
-        if (form3xReportType.additionalemail1.length >= 1) {
-          formData.append('additional_email_1', form3xReportType.additionalemail1);
-        }
-      }
-    }
-
-    if (form3xReportType.hasOwnProperty('additionalEmail2')) {
-      if (typeof form3xReportType.additionalEmail2 === 'string') {
-        if (form3xReportType.additionalEmail2.length >= 1) {
-          formData.append('additional_email_2', form3xReportType.additionalEmail2);
-        }
-      }
-    } else if (form3xReportType.hasOwnProperty('additionalemail2')) {
-      if (typeof form3xReportType.additionalemail2 === 'string') {
-        if (form3xReportType.additionalemail2.length >= 1) {
-          formData.append('additional_email_2', form3xReportType.additionalemail2);
-        }
-      }
     }
 
     //console.log('signandSaveSubmitReport formData = ', formData);
