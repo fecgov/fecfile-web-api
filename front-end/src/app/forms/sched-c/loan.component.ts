@@ -482,7 +482,20 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       switchMap(searchText => {
         if (searchText) {
           let result = this._typeaheadService.getContacts(searchText, 'last_name');
-          result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+
+          let hasValue = false;
+          result.pipe(map(contacts => {
+            if(Array.isArray(contacts)) {
+              if(contacts.length !== 0) {
+                hasValue = true;
+              }
+            }
+          }));
+
+          if(hasValue) {
+            result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+          }
+
           return result;
         } else {
           return Observable.of([]);
@@ -500,7 +513,20 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       switchMap(searchText => {
         if (searchText) {
           let result = this._typeaheadService.getContacts(searchText, 'first_name');
-          result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+
+          let hasValue = false;
+          result.pipe(map(contacts => {
+            if(Array.isArray(contacts)) {
+              if(contacts.length !== 0) {
+                hasValue = true;
+              }
+            }
+          }));
+
+          if(hasValue) {
+            result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+          }
+
           return result;
         } else {
           return Observable.of([]);
@@ -550,7 +576,20 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       switchMap(searchText => {
         if (searchText) {
           let result = this._typeaheadService.getContacts(searchText, 'entity_name');
-          result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+
+          let hasValue = false;
+          result.pipe(map(contacts => {
+            if(Array.isArray(contacts)) {
+              if(contacts.length !== 0) {
+                hasValue = true;
+              }
+            }
+          }));
+
+          if(hasValue) {
+            result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+          }
+
           return result;
         } else {
           return Observable.of([]);

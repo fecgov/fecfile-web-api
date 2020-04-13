@@ -259,7 +259,14 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         res.forEach(element => {
           //set name
           if (element.entity_type === 'IND') {
-            element.name = `${element.last_name}, ${element.first_name}`;
+
+            const lastName = element.last_name ? element.last_name.trim() : '';
+            const firstName = element.first_name ? element.first_name.trim() : '';
+            const middleName = element.middle_name ? ', ' + element.middle_name.trim() : '';
+            const suffix = element.suffix ? ', ' + element.suffix.trim() : '';
+            const prefix = element.prefix ? ', ' + element.prefix.trim() : '';
+
+            element.name = `${lastName}, ${firstName}` + `${middleName}` + `${prefix}` + `${suffix}`;
           } else if (element.entity_type === 'ORG') {
             element.name = element.entity_name;
           }

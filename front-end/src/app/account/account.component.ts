@@ -73,7 +73,6 @@ export class AccountComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(){
     this.onDestroy$.next(true);
-    this.levinsSubscription.unsubscribe();
   }
 
 
