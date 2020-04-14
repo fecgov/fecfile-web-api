@@ -203,6 +203,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.addIeByDisbursement();
     }
     this.addByDissemination = !this.addByDissemination;
+    this.frmIndividualReceipt.markAsDirty();
   }
 
   public addIeByDissemination() {

@@ -649,10 +649,10 @@ def form1M(request):
 			# both step4 POST
 			elif step == 'submit':
 				noneCheckMissingParameters(['sign', 'submission_date', 'reportId', 
-					'Password'], 
+					'filingPassword'], 
 					checking_dict=request.data, value_dict=request.data, 
 					function_name='form1M-POST: step-4 SUBMIT')
-				password = request.data['Password']
+				password = request.data['filingPassword']
 				password_authenticate(cmte_id, password)
 				request_dict = f1m_sql_dict(cmte_id, step, request.data)
 				check_report_id_status(cmte_id, request_dict['report_id'])
