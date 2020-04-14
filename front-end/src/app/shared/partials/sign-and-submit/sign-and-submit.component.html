@@ -163,8 +163,14 @@
             </div>
           </div>
         </div>
-        <div class="grid-row float-right pt-3">
+        <div class="grid-row float-right pt-3 pr-3">
           <button type="button" class="btn btn-primary" (click)="updateInfo()">Save</button>
+        </div>
+        <div class="grid-row float-right pr-3 mt-3" *ngIf="saveSuccessful">
+            <div class="alert alert-success">
+                <strong>Your request was successfully saved</strong>
+                <div></div>
+            </div>
         </div>
         <div class="pt-5 mt-3">
           <hr>
@@ -176,7 +182,7 @@
         </div>
         <div class="grid-row justify-content-between pl-5 pt-2">
           <div class="form-group col offset-md-1">
-            <div *ngFor="let emailOnFile of emailsOnFile">{{emailsOnFile}}</div>
+            <div *ngFor="let emailOnFile of emailsOnFile">{{emailOnFile}}</div>
           </div>
         </div>
         <div>
