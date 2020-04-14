@@ -191,6 +191,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   //there is no unsubscribe() for activateRoute . 
   private onDestroy$ = new Subject();
 
+  public priviousTransactionType = '';
+  public currentTransactionType = '';
+
   constructor(
     private _http: HttpClient,
     protected _fb: FormBuilder,
@@ -514,6 +517,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             }
           });
       }
+    }
+
+    if (changes && changes.transactionType) {
+      this.priviousTransactionType = changes.transactionType.previousValue;
+      this.currentTransactionType = changes.transactionType.currentValue;
     }
   }
   checkComponent(changes: SimpleChanges): boolean {
@@ -5409,7 +5417,16 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         ) {
           this.returnToParent(this.editScheduleAction);
         } else {
-          this.viewTransactions();
+          //this.viewTransactions();
+          if(!this.priviousTransactionType) {
+            this.viewTransactions();
+          }else {
+            if(this.currentTransactionType.endsWith('MEMO')) {
+              this.returnToParent(this.editScheduleAction);
+            }else {
+              this.viewTransactions();
+            }
+          }
         }
       }
     });
@@ -5430,46 +5447,50 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public goH4OrH6Summary(transactionType: string) {
-    if (
-      transactionType === 'ALLOC_EXP' ||
-      transactionType === 'ALLOC_EXP_CC_PAY' ||
-      transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
-      transactionType === 'ALLOC_EXP_STAF_REIM' ||
-      transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
-      transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
-      transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
-      transactionType === 'ALLOC_EXP_VOID'
-    ) {
-      const emitObj: any = {
-        form: this.frmIndividualReceipt,
-        direction: 'next',
-        step: 'step_3',
-        previousStep: 'step_2',
-        transactionType: 'ALLOC_H4_SUM',
-        action: ScheduleActions.add,
-        transactionTypeText: 'H4 Transaction List'
-      };
-      this.status.emit(emitObj);
-    }
+    if(!this.priviousTransactionType || this.priviousTransactionType.endsWith('MEMO')) {
+      this.viewTransactions();
+    }else {
+      if (
+        transactionType === 'ALLOC_EXP' ||
+        transactionType === 'ALLOC_EXP_CC_PAY' ||
+        transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
+        transactionType === 'ALLOC_EXP_STAF_REIM' ||
+        transactionType === 'ALLOC_EXP_STAF_REIM_MEMO' ||
+        transactionType === 'ALLOC_EXP_PMT_TO_PROL' ||
+        transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO' ||
+        transactionType === 'ALLOC_EXP_VOID'
+      ) {
+        const emitObj: any = {
+          form: this.frmIndividualReceipt,
+          direction: 'next',
+          step: 'step_3',
+          previousStep: 'step_2',
+          transactionType: 'ALLOC_H4_SUM',
+          action: ScheduleActions.add,
+          transactionTypeText: 'H4 Transaction List'
+        };
+        this.status.emit(emitObj);
+      }
 
-    if (
-      transactionType === 'ALLOC_FEA_DISB' ||
-      transactionType === 'ALLOC_FEA_CC_PAY' ||
-      transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
-      transactionType === 'ALLOC_FEA_STAF_REIM' ||
-      transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
-      transactionType === 'ALLOC_FEA_VOID'
-    ) {
-      const emitObj: any = {
-        form: this.frmIndividualReceipt,
-        direction: 'next',
-        step: 'step_3',
-        previousStep: 'step_2',
-        transactionType: 'ALLOC_H6_SUM',
-        action: ScheduleActions.add,
-        transactionTypeText: 'H6 Transaction List'
-      };
-      this.status.emit(emitObj);
+      if (
+        transactionType === 'ALLOC_FEA_DISB' ||
+        transactionType === 'ALLOC_FEA_CC_PAY' ||
+        transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
+        transactionType === 'ALLOC_FEA_STAF_REIM' ||
+        transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
+        transactionType === 'ALLOC_FEA_VOID'
+      ) {
+        const emitObj: any = {
+          form: this.frmIndividualReceipt,
+          direction: 'next',
+          step: 'step_3',
+          previousStep: 'step_2',
+          transactionType: 'ALLOC_H6_SUM',
+          action: ScheduleActions.add,
+          transactionTypeText: 'H6 Transaction List'
+        };
+        this.status.emit(emitObj);
+      }
     }
   }
 
@@ -5762,5 +5783,17 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       // this._adjustDebtBalanceAtClose();
     }
 
+  }
+
+  public cancelEditEarMarkTrx() {
+    if(!this.priviousTransactionType) {
+      this.viewTransactions();
+    }else {
+      if(this.currentTransactionType.endsWith('MEMO')) {
+        this.saveAndReturnToParent();
+      }else {
+        this.saveForEditEarmark();
+      }
+    }
   }
 }
