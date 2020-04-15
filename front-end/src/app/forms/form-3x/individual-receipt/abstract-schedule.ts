@@ -2007,8 +2007,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   /**
    * Vaidates the form on submit.
+   * @param saveAction - determines which saveAction flow it is
+   * @param navigateToViewTransactions - boolean flag to determine whether to navigate to transactions table after save sucessfully completes or not
+   * @param printAfterSave - boolean flag to determine whether to print the currently being saved transaction after saving.
+   *                       - this is used when printing a single transaction from form entry screen. Printing should actually save the current form
+   *                       - and then if this flag is true, print the transaction. 
    */
-  private _doValidateReceipt(saveAction: SaveActions, navigateToViewTransactions = false): Observable<any> {
+  private _doValidateReceipt(saveAction: SaveActions, navigateToViewTransactions = false, printAfterSave = false): Observable<any> {
     // TODO because parent is saved automatically when user clicks add child, we
     // may not want to save it if unchanged.  Check form status for untouched.
 
@@ -2205,6 +2210,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.scheduleAction === ScheduleActions.addSubTransaction
       ) {
         receiptObj.back_ref_transaction_id = this._parentTransactionModel.transactionId;
+      } 
+      //else block is added for printing scenario from form entry screen for memos and child transactions
+      //since printing the transaction "saves" it and changes the schedule action from add to edit. there fore
+      //above block of code would not work since the schedule actio would not be addSubTransaction anymore
+      else if(this.scheduleAction === ScheduleActions.edit && this._transactionToEdit && this._transactionToEdit.backRefTransactionId){
+        receiptObj.back_ref_transaction_id = this._transactionToEdit.backRefTransactionId;
       }
 
       if (this.reattributionTransactionId) {
@@ -2246,7 +2257,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._rollbackAfterUnsuccessfulSave = false;
       this._receiptService.saveSchedule(this.formType, this.scheduleAction, reportId).subscribe(res => {
         if (res) {
-          this._transactionToEdit = null;
 
           const reportId = this._receiptService.getReportIdFromStorage(this.formType);
           this._reportsService
@@ -2290,24 +2300,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
           // Replace this with clearFormValues() if possible or break it into
           // 2 methods so 1 may be called here so as not to miss init vars.
-          this._formSubmitted = true;
-          this.memoCode = false;
-          this.memoCodeChild = false;
-          this.frmIndividualReceipt.reset();
-          this._prepopulateDefaultPurposeText();
-          this._setMemoCodeForForm();
-          this._selectedEntity = null;
-          this._selectedChangeWarn = null;
-          this._selectedEntityChild = null;
-          this._selectedChangeWarnChild = null;
-          this._selectedCandidate = null;
-          this._selectedCandidateChangeWarn = null;
-          this._selectedCandidateChild = null;
-          this._selectedCandidateChangeWarnChild = null;
-          this._isShowWarn = true;
-          this.activityEventNames = null;
-          this.reattributionTransactionId = null;
-          this.redesignationTransactionId = null;
+          
+          //only reset form if saving is NOT because of a print action.
+          if(!printAfterSave){
+            this.resetFormAttributes();
+          }
+          //if saving because of a print action, schedule action needs to be changed from add to edit for the next time.
+          //also save the current POST response's metadata into the _transactionToEdit object for 'edit' flow
+          else{
+            if(!this._transactionToEdit){
+              this._transactionToEdit = new TransactionModel({});
+              this._transactionsService.mapSchedDatabaseRowToModel(this._transactionToEdit,res);
+            }
+            this.scheduleAction = ScheduleActions.edit;
+          }
           // Replace this with clearFormValues() if possible - END
 
           localStorage.removeItem(`form_${this.formType}_receipt`);
@@ -2501,26 +2507,35 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               }
             }
 
-            let resetParentId = true;
-            if (this.subTransactionInfo) {
-              if (this.subTransactionInfo.isParent === false) {
-                resetParentId = false;
+            if(!printAfterSave){
+              let resetParentId = true;
+              if (this.subTransactionInfo) {
+                if (this.subTransactionInfo.isParent === false) {
+                  resetParentId = false;
+                }
               }
-            }
-            if (resetParentId) {
-              this._parentTransactionModel = null;
-              this.subTransactions = [];
+              if (resetParentId) {
+                this._parentTransactionModel = null;
+                this.subTransactions = [];
+              }
             }
           }
           // setting default action to add/addSub when we save transaction
-          // as it should not be for edit after save.
-          if (!this.isEarmark()) {
-            if (this._isSubOfParent()) {
-              this.scheduleAction = ScheduleActions.addSubTransaction;
-            } else {
-              this.scheduleAction = ScheduleActions.add;
+          // as it should not be for edit after save. (unless save is happening through print, 
+          // in which case it should stay on the same screen)
+          if(!printAfterSave){
+            if (!this.isEarmark()) {
+              if (this._isSubOfParent()) {
+                this.scheduleAction = ScheduleActions.addSubTransaction;
+              } else {
+                this.scheduleAction = ScheduleActions.add;
+              }
             }
           }
+        }
+        //if save is happening due to a print action, then print the transaction as well after save. 
+        if(printAfterSave){
+          this._reportTypeService.printPreview('individual_receipt', this.formType,res.transaction_id,res.report_id);
         }
       }, error => {
         this._rollbackAfterUnsuccessfulSave = true;
@@ -2543,6 +2558,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return Observable.of('invalid');
     }
   }
+  private resetFormAttributes() {
+    this._transactionToEdit = null;
+    this._formSubmitted = true;
+    this.memoCode = false;
+    this.memoCodeChild = false;
+    this.frmIndividualReceipt.reset();
+    this._prepopulateDefaultPurposeText();
+    this._setMemoCodeForForm();
+    this._selectedEntity = null;
+    this._selectedChangeWarn = null;
+    this._selectedEntityChild = null;
+    this._selectedChangeWarnChild = null;
+    this._selectedCandidate = null;
+    this._selectedCandidateChangeWarn = null;
+    this._selectedCandidateChild = null;
+    this._selectedCandidateChangeWarnChild = null;
+    this._isShowWarn = true;
+    this.activityEventNames = null;
+    this.reattributionTransactionId = null;
+    this.redesignationTransactionId = null;
+  }
+
   _prepopulateDefaultPurposeText() {
     const purposeFormField = this.findFormFieldContaining('purpose');
     if (purposeFormField && purposeFormField.preText && purposeFormField.value && purposeFormField.preText === purposeFormField.value) {
@@ -2943,6 +2980,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         transactionCategory: this._transactionCategory
       }
     });
+  }
+
+  /**
+   * This method should be used to print the current transaction from form entry screen. 
+   * It should first save the current transaction if form is valid and based on the printAfterSave
+   * flag, should print the transaction as well. 
+   */
+  public printCurrentTransaction(): void{
+    this._doValidateReceipt(SaveActions.saveOnly,false,true);
   }
 
   public printPreview(): void {
