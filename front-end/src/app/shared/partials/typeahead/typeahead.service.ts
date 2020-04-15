@@ -23,7 +23,7 @@ export class TypeaheadService {
    *  Possible fields are 'entity_name', 'first_name', 'last_name'.
    *
    */
-  public getContacts(searchString: string, fieldName: string, expand?: boolean): Observable<any> {
+  public getContacts(searchString: string, fieldName: string, expand?: boolean, global_search?: string): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/core/autolookup_search_contacts';
     let httpOptions = new HttpHeaders();
@@ -66,6 +66,10 @@ export class TypeaheadService {
 
     if(expand) {
       params = params.append('expand', 'true');
+    }
+
+    if(global_search) {
+      params = params.append('global_search', global_search);
     }
 
     return this._http.get(`${environment.apiUrl}${url}`, {

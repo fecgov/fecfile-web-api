@@ -10,8 +10,9 @@ import { ChangeDetectionStrategy, Component, OnInit, Input } from '@angular/core
 export class F1mPreviewComponent implements OnInit {
 
   @Input() reportId: string;
-  @Input() affiliationData :any
-  @Input() qualificationData :any
+  @Input() affiliationData :any;
+  @Input() qualificationData :any;
+  @Input() treasurerData: any;
   @Input() type: string;
   
   public reportInfo: any;
@@ -21,9 +22,6 @@ export class F1mPreviewComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this._f1mService.getReportInfo().subscribe(response => {
-      this.reportInfo = response;
-    })
   }
 
   public printPreview(){

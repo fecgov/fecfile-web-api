@@ -350,7 +350,10 @@
 		<h3>Committee Levin Accounts</h3>
 		<form action="">
 			<label for="levin_acct_name">
-				add new levin account:</label>
+				<ng-container *ngIf="levinAction === 'add'"> Add New </ng-container>
+				<ng-container *ngIf="levinAction === 'edit'"> Edit </ng-container>
+				Levin Account:
+			</label>
 			<div class="input-group">
 				<!-- <div class="form-group"> -->
 
@@ -361,10 +364,20 @@
 				<!-- <div class="grid-row">
 			<div class="grid-row__col grid-row__col--12">
 				<div class="forms__btn-container"> -->
-				<span class="input-group-button">
-					<button type="submit" class="btn btn-secondary" (click)="saveLevinAccount(levin_name)">
-						Add and Save
-					</button>
+				<span class="input-group-button right">
+					<ng-container *ngIf="levinAction === 'add'">
+						<button type="submit" class="btn btn-secondary" (click)="saveLevinAccount(levin_name)">
+							Add and Save
+						</button>
+					</ng-container>
+					<ng-container *ngIf="levinAction === 'edit'">
+						<button type="submit" class="btn btn-previous btn-left" (click)="cancelEditLevinAccount()">
+							Cancel
+						</button>
+						<button type="submit" class="btn btn-secondary btn-right" (click)="saveEdit(levin_name)">
+							Save
+						</button>
+					</ng-container>
 				</span>
 			</div>
 			<!-- </div>
@@ -372,12 +385,49 @@
 		</div> -->
 		</form>
 
-		<div class="grid-row" id="levin_accounts_list">
+		<!-- div class="grid-row" id="levin_accounts_list">
 			<ul class="list-group">
 				<li *ngFor="let levin_acct of levin_accounts" class="list-group-item">
 					{{levin_acct.levin_account_name}}
 				</li>
-			</ul>
-		</div>
+			</ul-->
+
+			<table class="table table-striped table-hover table__sortable">
+				<thead>
+				  <tr>
+					<th>
+						Levin Account Name
+					</th>
+					<th></th>
+				  </tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let levin_acct of levin_accounts">
+						<td width="90%">
+							{{levin_acct.levin_account_name}}
+						</td>
+						<td class="bulk_action" width="10%">
+							<div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+							  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+								<i class="fas fa-ellipsis-h"></i>
+							  </button>
+
+							  <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
+								<button class="dropdown-item" (click)="editLevinAccount(levin_acct)">
+								  <i class="fas fa-edit"></i>
+								  Edit
+								</button>
+								<button class="dropdown-item" (click)="trashLevinAccount(levin_acct)">
+								  <i class="fas fa-trash"></i>
+								  Trash
+								</button>
+							  </div>
+							</div>
+						  </td>
+					</tr>
+				</tbody>
+			</table>
+
+		<!-- /div -->
 	</section>
 </div>
