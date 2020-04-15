@@ -1,39 +1,31 @@
-import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
-import { Component, OnInit, OnDestroy, OnChanges, Output, EventEmitter, Input, SimpleChanges, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
-import { IndividualReceiptComponent } from '../form-3x/individual-receipt/individual-receipt.component';
-import { FormBuilder, FormGroup, FormControl, NgForm, Validators } from '@angular/forms';
-import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
-import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
-import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { UtilService } from 'src/app/shared/utils/util.service';
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { ReportTypeService } from '../form-3x/report-type/report-type.service';
+import { Subscription } from 'rxjs';
+import { ContactsService } from 'src/app/contacts/service/contacts.service';
+import { ReportsService } from 'src/app/reports/service/report.service';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { F3xMessageService } from '../form-3x/service/f3x-message.service';
-import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
-import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
-import { TransactionsService, GetTransactionsResponse } from '../transactions/service/transactions.service';
-import { HttpClient } from '@angular/common/http';
+import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
-import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
+import { ContributionDateValidator } from 'src/app/shared/utils/forms/validation/contribution-date.validator';
+import { UtilService } from 'src/app/shared/utils/util.service';
 import { AbstractSchedule } from '../form-3x/individual-receipt/abstract-schedule';
-import { ReportsService } from 'src/app/reports/service/report.service';
-import { TransactionModel } from '../transactions/model/transaction.model';
-import { Observable, Subscription } from 'rxjs';
-import { style, animate, transition, trigger } from '@angular/animations';
-import { PaginationInstance } from 'ngx-pagination';
-import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
-import { TableService } from 'src/app/shared/services/TableService/table.service';
-import { SchedH4Service } from './sched-h4.service';
-import { SchedH4Model } from './sched-h4.model';
 import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstract-schedule-parent.enum';
-import {
-  ConfirmModalComponent,
-  ModalHeaderClassEnum
-} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
+import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
+import { ReportTypeService } from '../form-3x/report-type/report-type.service';
+import { F3xMessageService } from '../form-3x/service/f3x-message.service';
+import { TransactionModel } from '../transactions/model/transaction.model';
+import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
+import { GetTransactionsResponse, TransactionsService } from '../transactions/service/transactions.service';
+import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
+import { SchedH4Model } from './sched-h4.model';
+import { SchedH4Service } from './sched-h4.service';
 
 @Component({
   selector: 'app-sched-h4',
@@ -463,6 +455,6 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
   public printTransaction(trx: any): void {
     this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
   }
-  
+
 }
 

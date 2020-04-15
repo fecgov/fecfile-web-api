@@ -3424,6 +3424,7 @@ def get_schedH4(data):
         # TODO: temp change, need to reove this code when h4, h6 schedma updated
         for obj in forms_obj:
             obj["expenditure_purpose"] = obj.get("purpose", "")
+            obj["api_call"] = '/sh4/schedH4'
             child_data = get_sched_h4_child_transactions(
                 obj.get("report_id"), obj.get("cmte_id"), obj.get("transaction_id")
             )
@@ -4892,6 +4893,7 @@ def get_schedH6(data):
 
         # TODO: need to remove this when db correction done
         for obj in forms_obj:
+            obj["api_call"]="/sh6/schedH6"
             obj["fed_share_amount"] = obj.get("federal_share")
             obj["non_fed_share_amount"] = obj.get("levin_share")
             obj["total_amount"] = obj.get("total_fed_levin_amount")
