@@ -8,6 +8,8 @@ export const environment = {
   apiUrl: 'http://35.172.199.97/api/v1',
   appTitle: 'FECfile',
   validateSuccess: 'All required fields have passed validation.',
+  awsRegion: 'us-east-1',
+  awsIdentityPoolId: 'us-east-1:f0f414b2-8e9f-4488-9cc1-34a5918a1a1d',
   ACCESS_KEY: process.env.ACCESS_KEY,
   SECRET_KEY: process.env.SECRET_KEY
 };
