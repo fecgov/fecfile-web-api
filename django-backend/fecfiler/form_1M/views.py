@@ -915,17 +915,18 @@ def get_committee_met_req_date(request):
 			f1m.can5_con, f1.sub_date FROM public.form_1m f1m
 			LEFT JOIN public.form_1 f1 ON f1.comid = f1m.cmte_id 
 			WHERE f1m.cmte_id = %s AND f1m.report_id = %s AND f1m.delete_ind IS
-			DISTINCT FROM 'Y'"""
+			DISTINCT FROM 'Y' ORDER BY f1.repid LIMIT 1"""
 		with connection.cursor() as cursor:
 			cursor.execute(sql,[cmte_id, request.data['reportId']])
 			logger.debug("get_committee_met_req_date")
 			logger.debug(cursor.query)
-			output_tuple = cursor.fetchall()[0]
-			if output_tuple:
-				output_list = list(filter(None, output_tuple))
+			output_list = cursor.fetchall()
+			print(output_list)
+			if output_list:
+				output_list = list(filter(None, output_list[0]))
 			else:
-				raise Exception("""This committee doesnot have entries in form_1 table. 
-					Kindly check with DB admin. committeeId: {}""".format(cmte_id))
+				raise Exception("""The reportId: {} does not exist in form 1m table 
+					for committeeId: {}""".format(request.data['reportId'],cmte_id))
 		fifty_date = request.data['fifty_first_contributor_date']
 		output_list.append(datetime.datetime.strptime(fifty_date, '%Y-%m-%d').date())
 		print(output_list)
