@@ -24,7 +24,7 @@
             </div>
             <div
               class="text-error text-center"
-              *ngIf="
+              *ngIf=" formType === '3X' &&
                 (frmReportType.dirty || frmReportType.touched) &&
                 !optionFailed &&
                 (!fromDateSelected || !toDateSelected)

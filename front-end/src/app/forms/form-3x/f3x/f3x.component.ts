@@ -76,6 +76,7 @@ export class F3xComponent implements OnInit, OnDestroy {
   private _reportId: any;
   public loanPaymentScheduleAction: ScheduleActions;
   private showPart2: boolean;
+  public transactionCategoriesMainData: any;
 
   private onDestroy$ = new Subject();
   transactionData: any;
@@ -157,6 +158,7 @@ export class F3xComponent implements OnInit, OnDestroy {
 
     this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
       if (res) {
+        this.transactionCategoriesMainData = res;
         this.transactionCategories = res.data.transactionCategories;
       }
     });
