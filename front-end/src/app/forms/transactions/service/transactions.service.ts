@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable , ChangeDetectionStrategy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
@@ -374,6 +374,8 @@ export class TransactionsService {
 
   public mapSchedDatabaseRowToModel(model: TransactionModel, row: any) {
     // TODO add full field mapping if needed in the future.
+    model.apiCall = row.api_call;
+    model.backRefTransactionId = row.back_ref_transaction_id;
     model.transactionId = row.transaction_id;
     model.reportId = row.report_id;
     model.date = row.contribution_date;

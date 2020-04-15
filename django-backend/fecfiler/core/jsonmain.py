@@ -353,15 +353,23 @@ def preappending_purpose_description(transaction):
         for preappend in DICT_PURPOSE_DESCRIPTION_VALUES:
             if transaction['transactionTypeIdentifier'] in DICT_PURPOSE_DESCRIPTION_VALUES[preappend]:
                 if 'contributionPurposeDescription' in transaction:
+                    if transaction['contributionPurposeDescription'] in [None, "null", "NULL"]:
+                        transaction['contributionPurposeDescription'] = ""
                     transaction['contributionPurposeDescription'] = preappend + ' ' + transaction['contributionPurposeDescription']
                 if 'expenditurePurposeDescription' in transaction:
+                    if transaction['expenditurePurposeDescription'] in [None, "null", "NULL"]:
+                        transaction['expenditurePurposeDescription'] = ""
                     transaction['expenditurePurposeDescription'] = preappend + ' ' + transaction['expenditurePurposeDescription']
             if 'child' in transaction:
                 for child in transaction['child']:
                     if child['transactionTypeIdentifier'] in DICT_PURPOSE_DESCRIPTION_VALUES[preappend]:
                         if 'contributionPurposeDescription' in child:
+                            if child['contributionPurposeDescription'] in [None, "null", "NULL"]:
+                                child['contributionPurposeDescription'] = ""
                             child['contributionPurposeDescription'] = preappend + ' ' + child['contributionPurposeDescription']
                         if 'expenditurePurposeDescription' in child:
+                            if child['expenditurePurposeDescription'] in [None, "null", "NULL"]:
+                                child['expenditurePurposeDescription'] = ""
                             child['expenditurePurposeDescription'] = preappend + ' ' + child['expenditurePurposeDescription']
         return transaction
     except Exception as e:

@@ -11,84 +11,52 @@ import * as AWS from 'aws-sdk/global';
 })
 export class UploadContactsService {
 
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient) {
 
+    // AWS.config.region = 'us-east-1';
+    // AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    //   IdentityPoolId: 'us-east-1:f0f414b2-8e9f-4488-9cc1-34a5918a1a1d',
+    // });
+
+    AWS.config.region = environment.awsRegion;
+    AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: environment.awsIdentityPoolId,
+    });
+    this.bucket = new S3({});
+  }
+
+  private bucket: S3;
 
   /**
    * Upload the file to AWS S3 bucket.
    */
   public uploadFile(file: File) {
 
-    const ENV = environment;
-    let bucket: S3;
-    if (ENV.name === 'local') {
-      bucket = new S3(
-        {
-          accessKeyId: ENV.ACCESS_KEY,
-          secretAccessKey: ENV.SECRET_KEY,
-          region: 'us-east-1'
-        }
-      );
-    } else {
+    // const bucket = new S3(
+    //     {
+    //       accessKeyId: ENV.ACCESS_KEY,
+    //       secretAccessKey: ENV.SECRET_KEY,
+    //       region: 'us-east-1'
+    //     }
+    // );
 
-      AWS.config.getCredentials(function (err) {
-        if (err) {
-          console.log(err.stack);
-          // credentials not loaded test
-        } else {
-          console.log('AK:', AWS.config.credentials.accessKeyId + 'ayuhahTFysyvsy');
-          console.log('SK:', AWS.config.credentials.secretAccessKey + 'uhidijdijdoijd');
+    const contentType = file.type;
+    const params = {
+      Bucket: 'fecfile-filing-frontend',
+      Key: file.name,
+      Body: file,
+      ACL: 'public-read',
+      ContentType: contentType
+    };
+    this.bucket.upload(params, function (err: any, data: any) {
+      if (err) {
+        console.log('There was an error uploading your file: ', err);
+        return false;
+      }
+      console.log('Successfully uploaded file.', data);
+      return true;
+    });
 
-          bucket = new S3(
-            {
-              accessKeyId: AWS.config.credentials.accessKeyId,
-              secretAccessKey: AWS.config.credentials.secretAccessKey,
-              region: 'us-east-1'
-            }
-          );
-
-          const contentType = file.type;
-          const params = {
-            Bucket: 'fecfile-filing-frontend',
-            Key: file.name,
-            Body: file,
-            ACL: 'public-read',
-            ContentType: contentType
-          };
-          bucket.upload(params, function (err2, data) {
-            if (err2) {
-              console.log('There was an error uploading your file: ', err2);
-              return false;
-            }
-            console.log('Successfully uploaded file.', data);
-            return true;
-          });
-        }
-      });
-
-      // bucket = new S3(
-      //   {
-      //     region: 'us-east-1'
-      //   }
-      // );
-    }
-
-    // const contentType = file.type;
-    // const params = {
-    //   Bucket: 'fecfile-filing-frontend',
-    //   Key: file.name,
-    //   Body: file,
-    //   ACL: 'public-read',
-    //   ContentType: contentType
-    // };
-    // bucket.upload(params, function (err, data) {
-    //   if (err) {
-    //     console.log('There was an error uploading your file: ', err);
-    //     return false;
-    //   }
-    //   console.log('Successfully uploaded file.', data);
-    //   return true;
-    // });
 
     // TODO keep this until sure we don't need progress update realtime
     // for upload progress

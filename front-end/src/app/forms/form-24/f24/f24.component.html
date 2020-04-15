@@ -1,0 +1,94 @@
+<div class="forms__wizard">
+  <div *ngIf="step !== 'step_1' && step !== 'step_6'" class="form__sidebar">
+    <div [hidden]="step !== 'step_1'" *ngIf=" !allTransactions">
+      <report-type-sidebar title="Report Coverage Dates" (status)="onNotify($event)" [selectedReport]="selectedReport"
+        [specialReports]="specialReports" [regularReports]="regularReports">
+      </report-type-sidebar>
+    </div>
+    <div *ngIf="
+        step === 'step_2' ||
+        step === 'step_3' ||
+        step === 'financial_summary' ||
+        step === 'transactions' ||
+        step === 'reports' ||
+        step === 'step_4' ||
+        step === 'loansummary' ||
+        step === 'loan' ||
+        step === 'loanpayment'
+      ">
+      <transaction-sidebar [step]="step" title="Transaction Categories" [transactionCategories]="transactionCategories"
+        (status)="onNotify($event)" [hidden]="isShowFilters" *ngIf="!allTransactions" [formType]="formType" 
+        [transactionCategoriesMainData]="transactionCategoriesMainData">
+      </transaction-sidebar>
+      <app-transactions-filter [hidden]="!allTransactions && !isShowFilters" title="Filters" [formType]="formType">
+      </app-transactions-filter>
+    </div>
+  </div>
+  <div class="form__container" [ngClass]="{
+      'show-alerts': showValidateBar === true,
+      'hide-alerts': step === 'step_6'
+    }">
+    <div class="form__steps" *ngIf="!allTransactions">
+      <app-steps [steps]="[
+          { text: 'Report', step: 'step_1', edit: editMode },
+          { text: 'Type', step: 'step_2', edit: editMode },
+          { text: 'Form', step: 'step_3', edit: editMode, transactionCategory: transactionCategory },
+          { text: 'Preview', step: 'step_4', edit: editMode },
+          { text: 'Sign', step: 'step_5', edit: editMode },
+          { text: 'Submit', step: 'step_6', edit: editMode }
+        ]" [current_step]="currentStep">
+      </app-steps>
+    </div>
+    <div class="form__content">
+      <div *ngIf="step === 'financial_summary'">
+        <f3x-financial-summary> </f3x-financial-summary>
+      </div>
+      <div class="form__step" [hidden]="step !== 'step_1'">
+        <form-report-type (status)="onNotify($event)"
+          [reportType]="reportType" [reportsLoading]="reportsLoading"
+           [committeeReportTypes]="reportTypes"
+          [selectedReportInfo]="selectedReportInfo" [formType] = "formType">
+        </form-report-type>
+      </div>
+
+      <div class="form__step" [hidden]="step !== 'step_2'">
+        <f3x-transaction-type (status)="onNotify($event)" [transactionCategory]="transactionCategory"
+          [transactionCategories]="transactionCategories">
+        </f3x-transaction-type>
+      </div>
+
+      <div class="form__step" [hidden]="step !== 'step_3'">
+        <div >
+          <app-sched-e *ngIf="scheduleType === 'sched_e'" [transactionData]="transactionData"
+            [transactionDataForChild]="transactionDataForChild" [parentTransactionModel]="parentTransactionModel"
+            [mainTransactionTypeText]="mainTransactionTypeText" [transactionTypeText]="transactionTypeText"
+            [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
+            (status)="onNotify($event)">
+          </app-sched-e>
+        </div>
+      </div>
+
+      <div class="form__step" [hidden]="step !== 'step_4'">
+        <f3x-preview></f3x-preview>
+      </div>
+
+      <div class="form__step" [hidden]="step !== 'step_5'">
+        <f3x-sign></f3x-sign>
+      </div>
+
+      <div class="form__step" [hidden]="step !== 'step_6'">
+        <app-submit></app-submit>
+      </div>
+
+      <div class="form_step" [hidden]="step !== 'transactions' && step !== 'reports'">
+        <app-transactions (sidebarSwitch)="switchSidebar($event)" (showTransaction)="onNotify($event)">
+        </app-transactions>
+      </div>
+      <div class="form_step" [hidden]="step !== 'loanreceipt'">
+        <app-loanreceipt> </app-loanreceipt>
+      </div>
+    </div>
+  </div>
+  <!-- ./form__container -->
+</div>
+<!-- ./forms__wizard -->

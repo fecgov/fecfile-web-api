@@ -41,7 +41,7 @@
             <span class="sr-only">Click for more options</span>
           </button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
+            <button class="dropdown-item" (click)="printCurrentTransaction()"><i class="print-icon"></i> Print</button>
             <button class="dropdown-item" (click)="ImportTransactions()">
               <i class="file-import-icon" ></i> Import
             </button>
@@ -611,7 +611,7 @@
                 </ng-template>
 
                 <ng-template #editEarMarkTrx>
-                  <button class="btn btn-previous btn-left" type="button" (click)="viewTransactions()">
+                  <button class="btn btn-previous btn-left" type="button" (click)="cancelEditEarMarkTrx()">
                     Cancel
                   </button>
                   <button *ngIf="subTransactionInfo?.isParent" class="btn btn-primary btn-right"

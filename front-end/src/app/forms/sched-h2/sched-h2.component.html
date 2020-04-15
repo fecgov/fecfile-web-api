@@ -34,7 +34,7 @@
             <span class="sr-only">Click for more options</span>
           </button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
+            <button class="dropdown-item" (click)="printTransaction()"><i class="print-icon"></i> Print</button>
             <button class="dropdown-item">
               <i class="file-import-icon" (click)="ImportTransactions()"></i> Import
             </button>
@@ -210,7 +210,7 @@
                 Federal:
               </div>
               <input
-                class="form-control"
+                class="form-control col-md-3"
                 type="text"
                 formControlName="federal_percent"
                 [maxlength]="5"
@@ -240,7 +240,7 @@
                 Nonfederal:
               </div>
               <input
-                class="form-control"
+                class="form-control col-md-3"
                 type="text"
                 formControlName="non_federal_percent"
                 [maxlength]="5"

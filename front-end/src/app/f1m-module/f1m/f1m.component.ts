@@ -1,3 +1,5 @@
+import { SignAndSubmitComponent } from './../../shared/partials/sign-and-submit/sign-and-submit.component';
+import { ScheduleActions } from './../../forms/form-3x/individual-receipt/schedule-actions.enum';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { F1mQualificationComponent } from './../f1m-qualification/f1m-qualification/f1m-qualification.component';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
@@ -16,16 +18,21 @@ export class F1mComponent implements OnInit {
 
   @ViewChild(F1mAffiliationComponent) affiliationComp : F1mAffiliationComponent;
   @ViewChild(F1mQualificationComponent) qualificationComp : F1mQualificationComponent;
+  @ViewChild(SignAndSubmitComponent) signAndSubmitComp : SignAndSubmitComponent;
 
   public currentStep: string = 'step_1';
   public step: string = 'step_1';
   public type: any;
   public partyType : string = '';
+  public scheduleAction = ScheduleActions.add;
 
   public editMode = 'false';
   public reportId = "";
   public step2data: any;
   public candidateNumber = 1;
+  public treasurerData: any = {};
+  public affiliationData: any = {};
+  public emailsOnFile:any = []; 
 
   public qualificationData={
     type:'qualification',
@@ -74,8 +81,14 @@ export class F1mComponent implements OnInit {
     if(this.type === 'affiliation'){
       // if(this.f1mAffiliationComp.form.valid){
         this.step2data = this.affiliationComp.form.value;
-        this._f1mService.saveForm(null).subscribe(res => {
+        // this.step2data.step = this.step;
+        console.log(this.step2data);
+        this._f1mService.saveForm(this.step2data, this.scheduleAction, 'saveAffiliation').subscribe(res => {
           this.reportId = res.reportId;
+          this.setTreasurerInfo(res);
+          this.setAffiliationInfo(res);
+          this.emailsOnFile.push(res.email_1);
+          this.emailsOnFile.push(res.email_2);
           this.next();
         });
       // }
@@ -86,7 +99,7 @@ export class F1mComponent implements OnInit {
         if(this.qualificationData.candidates.length < 5){
           this.step2data = this.qualificationComp.form.value;
           console.log(this.step2data);
-          this._f1mService.saveForm(null).subscribe(res => {
+          this._f1mService.saveForm(this.step2data, this.scheduleAction, 'saveQualification').subscribe(res => {
             this.qualificationData.candidates.push(this.step2data);
             this.reportId = res.reportId;
             this.continueToPart2();
@@ -99,13 +112,29 @@ export class F1mComponent implements OnInit {
         }
       }
       else{
-        this._f1mService.saveForm(null).subscribe(res => {
+        this._f1mService.saveForm(null,null,null).subscribe(res => {
           this.reportId = res.reportId;
           this.next();
         });
       }
       // }
     }
+  }
+
+
+
+  private setAffiliationInfo(res: any) {
+    this.affiliationData.affiliation_date = res.affiliation_date;
+    this.affiliationData.committee_id = res.committee_id;
+    this.affiliationData.committee_name = res.committee_name;
+  }
+
+  private setTreasurerInfo(res: any) {
+    this.treasurerData.treasurer_first_name = res.treasurer_first_name;
+    this.treasurerData.treasurer_last_name = res.treasurer_last_name;
+    this.treasurerData.treasurer_middle_name = res.treasurer_middle_name;
+    this.treasurerData.treasurer_prefix = res.treasurer_prefix;
+    this.treasurerData.treasurer_suffix = res.treasurer_suffix;
   }
 
   public continueToPart2(){
@@ -130,7 +159,11 @@ export class F1mComponent implements OnInit {
       )
         .then(res => {
           if (res === 'okay') {
-          
+            let saveObj = this.signAndSubmitComp.form.value;
+            saveObj.reportId = this.reportId ;
+            this._f1mService.saveForm(saveObj,this.scheduleAction, 'submit').subscribe(res =>{
+              alert('Successfully submitted');
+            })
           }
           
         });

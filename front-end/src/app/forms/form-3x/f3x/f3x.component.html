@@ -18,7 +18,9 @@
         step === 'loanpayment'
       ">
       <transaction-sidebar [step]="step" title="Transaction Categories" [transactionCategories]="transactionCategories"
-        (status)="onNotify($event)" [hidden]="isShowFilters" *ngIf="!allTransactions">
+        (status)="onNotify($event)" [hidden]="isShowFilters" *ngIf="!allTransactions" [transactionCategoriesMainData]="transactionCategoriesMainData"
+        [formType]="formType"
+        >
       </transaction-sidebar>
       <app-transactions-filter [hidden]="!allTransactions && !isShowFilters" title="Filters" [formType]="formType">
       </app-transactions-filter>
@@ -44,11 +46,11 @@
         <f3x-financial-summary> </f3x-financial-summary>
       </div>
       <div class="form__step" [hidden]="step !== 'step_1'">
-        <f3x-report-type [formRadioOptionsVisible]="formRadioOptionsVisible" (status)="onNotify($event)"
+        <form-report-type [formRadioOptionsVisible]="formRadioOptionsVisible" (status)="onNotify($event)"
           [reportType]="reportType" [reportsLoading]="reportsLoading"
           [coverageDateNotSelected]="coverageDateNotSelected" [committeeReportTypes]="reportTypes"
-          [selectedReportInfo]="selectedReportInfo">
-        </f3x-report-type>
+          [selectedReportInfo]="selectedReportInfo" [formType]="formType">
+        </form-report-type>
       </div>
 
       <div class="form__step" [hidden]="step !== 'step_2'">
