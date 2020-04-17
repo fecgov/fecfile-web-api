@@ -992,7 +992,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           // controls's setValidator() using the full array.  Or just get the validations from the
           // dynamic form fields again in this.formFields[].
 
-          if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['entity_type'] && this.frmIndividualReceipt.controls['entity_type'].value === 'IND'){
+          if(this.frmIndividualReceipt && this.selectedEntityType && this.selectedEntityType.entityType === 'IND'){
             const employerControl = this.frmIndividualReceipt.get('employer');
             employerControl.setValidators([validateAggregate(val, true, 'employer')]);
             employerControl.updateValueAndValidity();
@@ -2296,27 +2296,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             '.2-2'
           );
 
-          if (this.frmIndividualReceipt.contains('contribution_aggregate')) {
-            this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
-          }
-
-          if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
-            const contributionAggregateValueChild: string = this._decimalPipe.transform(
-              this._contributionAggregateValueChild,
-              '.2-2'
-            );
-            if (this.frmIndividualReceipt.contains('child*contribution_aggregate')) {
-              this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
-                contributionAggregateValueChild
-              );
-            }
-          }
+          
 
           // Replace this with clearFormValues() if possible or break it into
           // 2 methods so 1 may be called here so as not to miss init vars.
           
           //only reset form if saving is NOT because of a print action.
           if(!printAfterSave){
+            if (this.frmIndividualReceipt.contains('contribution_aggregate')) {
+              this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
+            }
+  
+            if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
+              const contributionAggregateValueChild: string = this._decimalPipe.transform(
+                this._contributionAggregateValueChild,
+                '.2-2'
+              );
+              if (this.frmIndividualReceipt.contains('child*contribution_aggregate')) {
+                this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
+                  contributionAggregateValueChild
+                );
+              }
+            }
             this.resetFormAttributes();
           }
           //if saving because of a print action, schedule action needs to be changed from add to edit for the next time.
