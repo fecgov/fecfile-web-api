@@ -103,7 +103,7 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {'Convention Account' : ['IND_NP_CONVEN_ACC','
                                     'See Memos Below' : ['LEVIN_PARTN_REC', 'PARTN_REC'],
                                     # Removing 'EAR_MEMO' from below as it being populated from front-end
                                     'Total Earmarked through Conduit' : ['EAR_REC_CONVEN_ACC_MEMO','EAR_REC_HQ_ACC_MEMO','EAR_REC_RECNT_ACC_MEMO','PAC_EAR_MEMO'],
-                                    'Earmarked from' : ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO']
+                                    'Earmarked from' : ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO']
                                     }
 
 logger = logging.getLogger(__name__)
@@ -352,16 +352,24 @@ def preappending_purpose_description(transaction):
     try:
         for preappend in DICT_PURPOSE_DESCRIPTION_VALUES:
             if transaction['transactionTypeIdentifier'] in DICT_PURPOSE_DESCRIPTION_VALUES[preappend]:
-                if 'contributionPurposeDescription' in transaction and transaction['contributionPurposeDescription'] not in ['',""," "]:
+                if 'contributionPurposeDescription' in transaction:
+                    if transaction['contributionPurposeDescription'] in [None, "null", "NULL"]:
+                        transaction['contributionPurposeDescription'] = ""
                     transaction['contributionPurposeDescription'] = preappend + ' ' + transaction['contributionPurposeDescription']
-                if 'expenditurePurposeDescription' in transaction and transaction['expenditurePurposeDescription'] not in ['',""," "]:
+                if 'expenditurePurposeDescription' in transaction:
+                    if transaction['expenditurePurposeDescription'] in [None, "null", "NULL"]:
+                        transaction['expenditurePurposeDescription'] = ""
                     transaction['expenditurePurposeDescription'] = preappend + ' ' + transaction['expenditurePurposeDescription']
             if 'child' in transaction:
                 for child in transaction['child']:
                     if child['transactionTypeIdentifier'] in DICT_PURPOSE_DESCRIPTION_VALUES[preappend]:
-                        if 'contributionPurposeDescription' in child and child['contributionPurposeDescription'] not in ['',""," "]:
+                        if 'contributionPurposeDescription' in child:
+                            if child['contributionPurposeDescription'] in [None, "null", "NULL"]:
+                                child['contributionPurposeDescription'] = ""
                             child['contributionPurposeDescription'] = preappend + ' ' + child['contributionPurposeDescription']
-                        if 'expenditurePurposeDescription' in child and child['expenditurePurposeDescription'] not in ['',""," "]:
+                        if 'expenditurePurposeDescription' in child:
+                            if child['expenditurePurposeDescription'] in [None, "null", "NULL"]:
+                                child['expenditurePurposeDescription'] = ""
                             child['expenditurePurposeDescription'] = preappend + ' ' + child['expenditurePurposeDescription']
         return transaction
     except Exception as e:

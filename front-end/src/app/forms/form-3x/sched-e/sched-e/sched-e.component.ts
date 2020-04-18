@@ -167,26 +167,23 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     return null;
   }
 
-/*   public ngOnChanges(changes: SimpleChanges) {
-    this.formType = '3X';
-    super.ngOnChanges(changes);
-  } */
-
 
   public ngOnInit() {
     this.loaded = false;
     this.formFieldsPrePopulated = true;
-    this.formType = '3X';
+    this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this._parentTransactionModel = this.parentTransactionModel;
     super.ngOnInit();
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedEComponent;
     this._reportId = this._activatedRoute.snapshot.queryParams.reportId;
-    this._reportsService.getCoverageDates(this._reportId).subscribe(res => {
-      if (res) {
-        this.coverageStartDate = this._utilService.formatDate(res.cvg_start_date);
-        this.coverageEndDate = this._utilService.formatDate(res.cvg_end_date);
-      }
-    })
+    if(this._reportId){
+      this._reportsService.getCoverageDates(this._reportId).subscribe(res => {
+        if (res) {
+          this.coverageStartDate = this._utilService.formatDate(res.cvg_start_date);
+          this.coverageEndDate = this._utilService.formatDate(res.cvg_end_date);
+        }
+      });
+    }
 
   }
 
@@ -203,6 +200,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this.addIeByDisbursement();
     }
     this.addByDissemination = !this.addByDissemination;
+    this.frmIndividualReceipt.markAsDirty();
   }
 
   public addIeByDissemination() {
@@ -373,7 +371,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
 
 
   private handleTransactionIfAssociatedByDisseminationDate(trx:any) {
-    if(trx && trx.associatedByDissemination){
+    if(trx && trx.associatedbydissemination){
       this.toggleDissemination();
     }
   }

@@ -170,7 +170,7 @@
             <div class="checkbox">
               <label>
                 <input type="checkbox" class="clean_contacts__checkbox" [disabled]="field.userField.disabled"
-                  [(ngModel)]="field.userField.selected" (change)="fieldSelectedChange($event, field)">
+                  [(ngModel)]="field.userField.selected" (change)="fieldSelectedChange(field)">
                 <span>{{field.userField.value}}</span>
               </label>
             </div>
@@ -182,10 +182,10 @@
                 <input type="checkbox" [ngClass]="!dupeField.originallyEmpty 
                         ? 'clean_contacts__checkbox' 
                         : 'clean_contacts__checkbox-missing-val'" [disabled]="dupeField.disabled"
-                  [(ngModel)]="dupeField.selected" (change)="fieldSelectedChange($event, field)">
+                  [(ngModel)]="dupeField.selected" (change)="fieldSelectedChange(field)">
                 <span *ngIf="!dupeField.originallyEmpty">{{dupeField.value}}</span>
                 <input *ngIf="dupeField.originallyEmpty" type="text" name="prop_{{i}}" [(ngModel)]="dupeField.value"
-                  (keyup)="applyUserEditToFinal($event, dupeField, field)"
+                  (keyup)="applyUserEditToFinal(dupeField, field)"
                   class="form-control clean_contacts__missing-field text-center" aria-label="Missing Value">
               </label>
             </div>

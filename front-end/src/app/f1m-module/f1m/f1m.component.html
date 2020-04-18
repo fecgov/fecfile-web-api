@@ -25,11 +25,20 @@
         </app-f1m-qualification>
       </div>
       <div class="form__content tight_box pl-4" *ngIf="step === 'step_3'">
-        <app-f1m-preview [reportId]="reportId" [affiliationData]="affiliationData" [qualificationData]="qualificationData" [type]="type">
+        <app-f1m-preview 
+          [reportId]="reportId" 
+          [affiliationData]="affiliationData" 
+          [qualificationData]="qualificationData" 
+          [type]="type" 
+          [treasurerData]="treasurerData"
+          >
         </app-f1m-preview>
       </div>
       <div class="form__content tight_box pl-4" *ngIf="step === 'step_4'">
-        <app-sign-and-submit [formTitle]="'Form 1M / By Affiliation'">
+        <app-sign-and-submit [formTitle]="'Form 1M / By Affiliation'"
+          [reportId]="reportId"
+          [emailsOnFile]="emailsOnFile"
+        >
 
         </app-sign-and-submit>
       </div>

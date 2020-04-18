@@ -51,6 +51,10 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
   private onDestroy$ = new Subject();
   reportId: any;
 
+  adSelected = false;
+  gvSelected = false;
+  pcSelected = false;
+
   constructor(
     private _http: HttpClient,
     private _activatedRoute: ActivatedRoute,
@@ -187,6 +191,18 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
       if (f.value.applied_activity3) {
         h1_obj['public_communications'] = true;
       }
+
+      if (this.scheduleAction === ScheduleActions.add) {
+        if(this.adSelected) {
+          h1_obj['administrative'] = false;
+        }
+        if(this.gvSelected) {
+          h1_obj['generic_voter_drive'] = false;
+        }
+        if(this.pcSelected) {
+          h1_obj['public_communications'] = false;
+        }
+      }
     } else {
       if (f.value.h1_election_year_options === '1') {
         h1_obj['federal_percent'] = '0.28';
@@ -259,11 +275,11 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
       this.getH1PacSubscription = this.getH1Pac().subscribe(
         res => {
           if (res && this.isPac()) {
-            if (res.administrative === 1 && !item.administrative) { this.h1PacADDisabled = true };
+            if (res.administrative !== 0 && !item.administrative) { this.h1PacADDisabled = true };
 
-            if (res.generic_voter_drive === 1 && !item.generic_voter_drive) { this.h1PacGVDisabled = true };
+            if (res.generic_voter_drive !== 0 && !item.generic_voter_drive) { this.h1PacGVDisabled = true };
 
-            if (res.public_communications === 1 && !item.public_communications) { this.h1PacPCDisabled = true };
+            if (res.public_communications !== 0 && !item.public_communications) { this.h1PacPCDisabled = true };
           }
         }
       )
@@ -425,25 +441,37 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
       this.getH1PacSubscription = this.getH1Pac().subscribe(
         res => {
           if (res && this.isPac()) {
-            if (res.administrative === 1) {
+            if (res.administrative !== 0) {
               this.form.control.patchValue({ applied_activity1: 'administrative' }, { onlySelf: true });
               this.getH1PacADDisable = true;
+              this.adSelected = true;
+              if (this.scheduleAction === ScheduleActions.add) {
+                this.h1PacADDisabled = true;
+              }
             } else {
               this.form.control.patchValue({ applied_activity1: '' }, { onlySelf: true });
               this.getH1PacADDisable = false;
             }
 
-            if (res.generic_voter_drive === 1) {
+            if (res.generic_voter_drive !== 0) {
               this.form.control.patchValue({ applied_activity2: 'generic_voter_drive' }, { onlySelf: true });
               this.getH1PacGVDisable = true;
+              this.gvSelected = true;
+              if (this.scheduleAction === ScheduleActions.add) {
+                this.h1PacGVDisabled = true;
+              }
             } else {
               this.form.control.patchValue({ applied_activity2: '' }, { onlySelf: true });
               this.getH1PacGVDisable = false;
             }
 
-            if (res.public_communications === 1) {
+            if (res.public_communications !== 0) {
               this.form.control.patchValue({ applied_activity3: 'public_communications' }, { onlySelf: true });
               this.getH1PacPCDisable = true;
+              this.pcSelected = true;
+              if (this.scheduleAction === ScheduleActions.add) {
+                this.h1PacPCDisabled = true;
+              }
             } else {
               this.form.control.patchValue({ applied_activity3: '' }, { onlySelf: true });
               this.getH1PacPCDisable = false;

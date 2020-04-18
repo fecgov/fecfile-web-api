@@ -838,7 +838,8 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(FEA_CC_STRING)
                 file.close()
 
-                List_SB_similar_FEA_CC_MEMO = ['FEA_CC_PAY_MEMO', 'FEA_STAF_REIM', 'FEA_STAF_REIM_MEMO', 'FEA_PAY_TO_PROL_VOID', 'FEA_100PCT_DEBT_PAY']
+                List_SB_similar_FEA_CC_MEMO = ['FEA_CC_PAY_MEMO', 'FEA_STAF_REIM', 'FEA_STAF_REIM_MEMO', 'FEA_PAY_TO_PROL_VOID', 'FEA_100PCT_DEBT_PAY', 
+                    'PAC_CON_EAR_DEP_MEMO']
 
                 FEA_CC_MEMO_STRING = ""
                 for tran in List_SB_similar_FEA_CC_MEMO:

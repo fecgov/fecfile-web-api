@@ -1,27 +1,13 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewEncapsulation
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
-import { Subscription, Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
-import {
-  ConfirmModalComponent,
-  ModalHeaderClassEnum
-} from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TypeaheadService } from 'src/app/shared/partials/typeahead/typeahead.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { FormsService } from 'src/app/shared/services/FormsService/forms.service';
@@ -304,12 +290,12 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.cloned = false;
   }
 
-  public saveAndAddMore(): void {
+  public saveAndAddMore(printAfterSave = false): void {
     this.isSubmit = true;
-    this.doValidate();
+    this.doValidate(printAfterSave);
   }
 
-  public doValidate() {
+  public doValidate(printAfterSave = false) {
     if (this.schedH2.status === 'VALID') {
       //this.schedH2.patchValue({ fundraising: this.schedH2.get('select_activity_function').value === 'f' ? true : false }, { onlySelf: true });
       //this.schedH2.patchValue({ direct_cand_support: this.schedH2.get('select_activity_function').value === 'd' ? true : false }, { onlySelf: true });
@@ -337,8 +323,17 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       //if(this.schedH2.status === 'VALID') {
       //&& (this.schedH2.get('federal_percent').value + this.schedH2.get('non_federal_percent').value) === 100) {
 
-      this.saveH2Ratio(serializedForm, this.scheduleAction);
-      this.schedH2.reset();
+      this.saveH2Ratio(serializedForm, this.scheduleAction, printAfterSave);
+
+      //only reset form if save is happening NOT because of a print action
+      if(!printAfterSave){
+        this.schedH2.reset();
+      }
+      //if save is happening because of a print action, then change schedule action to edit for next 'save' action, 
+      //since form will not be reset and user can click 'Save' again. 
+      else{
+        this.scheduleAction = ScheduleActions.edit;
+      }
       this.isSubmit = false;
       localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
     } else {
@@ -358,10 +353,14 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     });
   }
 
-  public saveH2Ratio(ratio: any, scheduleAction) {
+  public saveH2Ratio(ratio: any, scheduleAction, printAfterSave = false) {
     this._schedH2Service.saveH2Ratio(ratio, scheduleAction).subscribe(res => {
       if (res) {
         this.saveHRes = res;
+        this.transaction_id = res.transaction_id;
+        if(printAfterSave){
+          this._reportTypeService.printPreview('transaction_table_screen', '3X', res.transaction_id);
+        }
       }
     });
   }
@@ -642,7 +641,18 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     }
   }
 
-  public printTransaction(trx: any): void {
-    this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
+  /**
+   * 
+   * @param trx - individual transaction
+   * If trx is present with a valid transactionId, print that transaction, 
+   * Otherwise save the current transaction first and then print it by passing saveAfterPrint = true
+   */
+  public printTransaction(trx: any = null): void {
+    if(trx && trx.transaction_id){
+      this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
+    }
+    else{
+      this.saveAndAddMore(true);
+    }
   }
 }

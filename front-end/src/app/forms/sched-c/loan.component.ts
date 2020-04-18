@@ -335,14 +335,16 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     /*    this is just a flag to distinguish what caused the loadDynamicFormFields() method to be invoked,
     as it can be invoked during initial form population during edit or during change event
     on ngselect  */
-    this.typeChangeEventOccured = true;
-    this.entityType = entityOption.code;
-    this.frmLoan.patchValue({ entity_type: entityOption.code }, { onlySelf: true });
-    if (this.scheduleAction === ScheduleActions.edit) {
-      this._prePopulateFormForEdit(this.transactionDetail);
-    }
-    else {
-      this.loadDynamiceFormFields();
+    if(entityOption !== undefined) {
+      this.typeChangeEventOccured = true;
+      this.entityType = entityOption.code;
+      this.frmLoan.patchValue({ entity_type: entityOption.code }, { onlySelf: true });
+      if (this.scheduleAction === ScheduleActions.edit) {
+        this._prePopulateFormForEdit(this.transactionDetail);
+      }
+      else {
+        this.loadDynamiceFormFields();
+      }
     }
   }
 
@@ -481,9 +483,30 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       distinctUntilChanged(),
       switchMap(searchText => {
         if (searchText) {
+          /*
           let result = this._typeaheadService.getContacts(searchText, 'last_name');
-          result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+
+          let hasValue = false;
+          result.pipe(map(contacts => {
+            if(Array.isArray(contacts)) {
+              if(contacts.length !== 0) {
+                hasValue = true;
+              }
+            }
+          }));
+
+          if(hasValue) {
+            result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+          }
+
           return result;
+          */
+         return this._typeaheadService.getContacts(searchText, 'last_name')
+          .map(contacts => {
+            let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
+            return (f.length > 0) ? f : null;
+          });
+
         } else {
           return Observable.of([]);
         }
@@ -499,9 +522,29 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       distinctUntilChanged(),
       switchMap(searchText => {
         if (searchText) {
+          /*
           let result = this._typeaheadService.getContacts(searchText, 'first_name');
-          result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+
+          let hasValue = false;
+          result.pipe(map(contacts => {
+            if(Array.isArray(contacts)) {
+              if(contacts.length !== 0) {
+                hasValue = true;
+              }
+            }
+          }));
+
+          if(hasValue) {
+            result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+          }
+
           return result;
+          */
+         return this._typeaheadService.getContacts(searchText, 'first_name')
+          .map(contacts => {
+            let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
+            return (f.length > 0) ? f : null;
+          });
         } else {
           return Observable.of([]);
         }
@@ -549,9 +592,30 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       distinctUntilChanged(),
       switchMap(searchText => {
         if (searchText) {
+          /*
           let result = this._typeaheadService.getContacts(searchText, 'entity_name');
-          result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+
+          let hasValue = false;
+          result.pipe(map(contacts => {
+            if(Array.isArray(contacts)) {
+              if(contacts.length !== 0) {
+                hasValue = true;
+              }
+            }
+          }));
+
+          if(hasValue) {
+            result = result.pipe(map(contacts => contacts.filter(element => element.entity_type === 'IND' || element.entity_type === 'ORG')));
+          }
+
           return result;
+          */
+
+          return this._typeaheadService.getContacts(searchText, 'entity_name')
+            .map(contacts => {
+              let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
+              return (f.length > 0) ? f : null;
+            });
         } else {
           return Observable.of([]);
         }

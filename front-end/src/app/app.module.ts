@@ -9,7 +9,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ArchwizardModule } from 'angular-archwizard';
 import { AngularFileUploaderModule } from 'angular-file-uploader';
 import { UserIdleModule } from 'angular-user-idle';
-import { ModalModule } from 'ngx-bootstrap';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { CookieService } from 'ngx-cookie-service';
@@ -28,6 +27,7 @@ import { ContactsFilterComponent } from './contacts/filter/contacts-filter.compo
 import { ContactsFilterTypeComponent } from './contacts/filter/filter-type/contacts-filter-type.component';
 import { ContributorsComponent } from './contributors/contributors.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { F24Component } from './forms/form-24/f24/f24.component';
 import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
 import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
 import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
@@ -191,6 +191,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     SchedEComponent,
     SchedFCoreComponent,
     HelpComponent,
+    F24Component,
     
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
@@ -213,7 +214,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     // ModalModule.forRoot(),
     // NgxPaginationModule,
     NgPipesModule,
-    UserIdleModule.forRoot({ idle: 1200, timeout: 120, ping: 500000 })
+    UserIdleModule.forRoot({ idle: 780, timeout: 120, ping: 500000 })
   ],
   providers: [
     CookieService,

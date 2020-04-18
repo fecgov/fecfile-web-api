@@ -1121,6 +1121,12 @@ def load_report_receipts_summary(cmte_id, report_id, levin_account_id=None):
 
 
 def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
+    """
+    getting cash on hand at the beginning:
+    it is loadind the closing coh value from the sched_l 
+    1. from previous report, report-based
+    2. last report from previous year, year-based
+    """
     try:
         logger.debug("****loading coh beginning data...")
         # if levin_account_id:
@@ -1131,7 +1137,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
             prev_cvg_end_dt = datetime.date(prev_cvg_year, 12, 31)
         else:
             prev_cvg_end_dt = cvg_start_date - datetime.timedelta(days=1)
-            print("$$$$$$$$prev_end_dt:{}".format(prev_cvg_end_dt))
+            # print("$$$$$$$$prev_end_dt:{}".format(prev_cvg_end_dt))
         with connection.cursor() as cursor:
             if levin_account_id:
                 cursor.execute(
