@@ -31,9 +31,11 @@ class AccountManager(BaseUserManager):
 class Account(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=9, unique=True)
-    #first_name = models.CharField(max_length=40, blank=True)
-    #last_name = models.CharField(max_length=40, blank=True)
+    first_name = models.CharField(max_length=40, blank=True)
+    last_name = models.CharField(max_length=40, blank=True)
+    role = models.CharField(max_length=40, blank=True)
     tagline = models.CharField(max_length=140, blank=True)
+    delete_ind = models.CharField(max_length=1, blank=False, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_staff = models.BooleanField(_('staff status'), default=False,
@@ -46,6 +48,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     class Meta:
+        unique_together = (('username', 'email'),)
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
