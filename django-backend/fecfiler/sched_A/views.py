@@ -2987,7 +2987,7 @@ def get_report_id_from_date(request):
             cursor.execute(
                 """SELECT json_agg(t) FROM (SELECT report_id AS "reportId", CASE WHEN(status IS NULL 
                     OR status::text = 'Saved'::text) THEN 'Saved'
-                    ELSE 'Filed' END AS status FROM public.reports WHERE cmte_id=%s AND %s>=cvg_start_date
+                    ELSE 'Filed' END AS status FROM public.reports WHERE form_type = 'F3X' AND cmte_id=%s AND %s>=cvg_start_date
                     AND %s<=cvg_end_date AND delete_ind IS DISTINCT FROM 'Y' ORDER BY amend_ind ASC, amend_number DESC
                     LIMIT 1) t""",
                 [cmte_id, transaction_date, transaction_date],

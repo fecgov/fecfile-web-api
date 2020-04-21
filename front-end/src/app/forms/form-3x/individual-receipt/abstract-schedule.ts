@@ -1,3 +1,4 @@
+import { entityTypes } from './entity-types-json';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
@@ -185,7 +186,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     "COEXP_PMT_PROL_MEMO",
     "COEXP_PARTY_DEBT"
   ];
-  private staticEntityTypes =  [{entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: false}, {entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: true}];
+  private staticEntityTypes =  [{entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: false}, {entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: false}];
   
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
   //there is no unsubscribe() for activateRoute . 
@@ -486,18 +487,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     if (this.checkComponent(changes)) {
       if (this.editMode) {
-        this._reportsService.getCoverageDates(this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
-          this.cvgStartDate = this._utilService.formatDate(res.cvg_start_date);
-          this.cvgEndDate = this._utilService.formatDate(res.cvg_end_date);
-          this._prepareForm();
-          // added check to avoid script error
-          if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
-            this.frmIndividualReceipt.controls['contribution_date'].setValidators([
-              this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
-              Validators.required
-            ]);
+        if(this._activatedRoute.snapshot.queryParams.reportId){
+          if(this.formType !== '24'){
+            this._reportsService.getCoverageDates(this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
+              this.cvgStartDate = this._utilService.formatDate(res.cvg_start_date);
+              this.cvgEndDate = this._utilService.formatDate(res.cvg_end_date);
+              this._prepareForm();
+              // added check to avoid script error
+              if (this.frmIndividualReceipt && this.frmIndividualReceipt.controls['contribution_date']) {
+                this.frmIndividualReceipt.controls['contribution_date'].setValidators([
+                  this._contributionDateValidator.contributionDate(this.cvgStartDate, this.cvgEndDate),
+                  Validators.required
+                ]);
+              }
+            });
+          } else{
+            this._prepareForm();
           }
-        });
+        }
       } else {
         this._dialogService
           .confirm(
@@ -986,7 +993,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           // controls's setValidator() using the full array.  Or just get the validations from the
           // dynamic form fields again in this.formFields[].
 
-          if(this.frmIndividualReceipt && this.frmIndividualReceipt.controls['entity_type'] && this.frmIndividualReceipt.controls['entity_type'].value === 'IND'){
+          if(this.frmIndividualReceipt && this.selectedEntityType && this.selectedEntityType.entityType === 'IND'){
             const employerControl = this.frmIndividualReceipt.get('employer');
             employerControl.setValidators([validateAggregate(val, true, 'employer')]);
             employerControl.updateValueAndValidity();
@@ -2015,8 +2022,13 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   /**
    * Vaidates the form on submit.
+   * @param saveAction - determines which saveAction flow it is
+   * @param navigateToViewTransactions - boolean flag to determine whether to navigate to transactions table after save sucessfully completes or not
+   * @param printAfterSave - boolean flag to determine whether to print the currently being saved transaction after saving.
+   *                       - this is used when printing a single transaction from form entry screen. Printing should actually save the current form
+   *                       - and then if this flag is true, print the transaction. 
    */
-  private _doValidateReceipt(saveAction: SaveActions, navigateToViewTransactions = false): Observable<any> {
+  private _doValidateReceipt(saveAction: SaveActions, navigateToViewTransactions = false, printAfterSave = false): Observable<any> {
     // TODO because parent is saved automatically when user clicks add child, we
     // may not want to save it if unchanged.  Check form status for untouched.
 
@@ -2213,6 +2225,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.scheduleAction === ScheduleActions.addSubTransaction
       ) {
         receiptObj.back_ref_transaction_id = this._parentTransactionModel.transactionId;
+      } 
+      //else block is added for printing scenario from form entry screen for memos and child transactions
+      //since printing the transaction "saves" it and changes the schedule action from add to edit. there fore
+      //above block of code would not work since the schedule actio would not be addSubTransaction anymore
+      else if(this.scheduleAction === ScheduleActions.edit && this._transactionToEdit && this._transactionToEdit.backRefTransactionId){
+        receiptObj.back_ref_transaction_id = this._transactionToEdit.backRefTransactionId;
       }
 
       if (this.reattributionTransactionId) {
@@ -2254,7 +2272,6 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       this._rollbackAfterUnsuccessfulSave = false;
       this._receiptService.saveSchedule(this.formType, this.scheduleAction, reportId).subscribe(res => {
         if (res) {
-          this._transactionToEdit = null;
 
           const reportId = this._receiptService.getReportIdFromStorage(this.formType);
           this._reportsService
@@ -2280,42 +2297,39 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             '.2-2'
           );
 
-          if (this.frmIndividualReceipt.contains('contribution_aggregate')) {
-            this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
-          }
-
-          if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
-            const contributionAggregateValueChild: string = this._decimalPipe.transform(
-              this._contributionAggregateValueChild,
-              '.2-2'
-            );
-            if (this.frmIndividualReceipt.contains('child*contribution_aggregate')) {
-              this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
-                contributionAggregateValueChild
-              );
-            }
-          }
+          
 
           // Replace this with clearFormValues() if possible or break it into
           // 2 methods so 1 may be called here so as not to miss init vars.
-          this._formSubmitted = true;
-          this.memoCode = false;
-          this.memoCodeChild = false;
-          this.frmIndividualReceipt.reset();
-          this._prepopulateDefaultPurposeText();
-          this._setMemoCodeForForm();
-          this._selectedEntity = null;
-          this._selectedChangeWarn = null;
-          this._selectedEntityChild = null;
-          this._selectedChangeWarnChild = null;
-          this._selectedCandidate = null;
-          this._selectedCandidateChangeWarn = null;
-          this._selectedCandidateChild = null;
-          this._selectedCandidateChangeWarnChild = null;
-          this._isShowWarn = true;
-          this.activityEventNames = null;
-          this.reattributionTransactionId = null;
-          this.redesignationTransactionId = null;
+          
+          //only reset form if saving is NOT because of a print action.
+          if(!printAfterSave){
+            if (this.frmIndividualReceipt.contains('contribution_aggregate')) {
+              this.frmIndividualReceipt.controls['contribution_aggregate'].setValue(contributionAggregateValue);
+            }
+  
+            if (this.frmIndividualReceipt.controls['child*contribution_aggregate']) {
+              const contributionAggregateValueChild: string = this._decimalPipe.transform(
+                this._contributionAggregateValueChild,
+                '.2-2'
+              );
+              if (this.frmIndividualReceipt.contains('child*contribution_aggregate')) {
+                this.frmIndividualReceipt.controls['child*contribution_aggregate'].setValue(
+                  contributionAggregateValueChild
+                );
+              }
+            }
+            this.resetFormAttributes();
+          }
+          //if saving because of a print action, schedule action needs to be changed from add to edit for the next time.
+          //also save the current POST response's metadata into the _transactionToEdit object for 'edit' flow
+          else{
+            if(!this._transactionToEdit){
+              this._transactionToEdit = new TransactionModel({});
+              this._transactionsService.mapSchedDatabaseRowToModel(this._transactionToEdit,res);
+            }
+            this.scheduleAction = ScheduleActions.edit;
+          }
           // Replace this with clearFormValues() if possible - END
 
           localStorage.removeItem(`form_${this.formType}_receipt`);
@@ -2509,26 +2523,35 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
               }
             }
 
-            let resetParentId = true;
-            if (this.subTransactionInfo) {
-              if (this.subTransactionInfo.isParent === false) {
-                resetParentId = false;
+            if(!printAfterSave){
+              let resetParentId = true;
+              if (this.subTransactionInfo) {
+                if (this.subTransactionInfo.isParent === false) {
+                  resetParentId = false;
+                }
               }
-            }
-            if (resetParentId) {
-              this._parentTransactionModel = null;
-              this.subTransactions = [];
+              if (resetParentId) {
+                this._parentTransactionModel = null;
+                this.subTransactions = [];
+              }
             }
           }
           // setting default action to add/addSub when we save transaction
-          // as it should not be for edit after save.
-          if (!this.isEarmark()) {
-            if (this._isSubOfParent()) {
-              this.scheduleAction = ScheduleActions.addSubTransaction;
-            } else {
-              this.scheduleAction = ScheduleActions.add;
+          // as it should not be for edit after save. (unless save is happening through print, 
+          // in which case it should stay on the same screen)
+          if(!printAfterSave){
+            if (!this.isEarmark()) {
+              if (this._isSubOfParent()) {
+                this.scheduleAction = ScheduleActions.addSubTransaction;
+              } else {
+                this.scheduleAction = ScheduleActions.add;
+              }
             }
           }
+        }
+        //if save is happening due to a print action, then print the transaction as well after save. 
+        if(printAfterSave){
+          this._reportTypeService.printPreview('individual_receipt', this.formType,res.transaction_id,res.report_id);
         }
       }, error => {
         this._rollbackAfterUnsuccessfulSave = true;
@@ -2551,6 +2574,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       return Observable.of('invalid');
     }
   }
+  private resetFormAttributes() {
+    this._transactionToEdit = null;
+    this._formSubmitted = true;
+    this.memoCode = false;
+    this.memoCodeChild = false;
+    this.frmIndividualReceipt.reset();
+    this._prepopulateDefaultPurposeText();
+    this._setMemoCodeForForm();
+    this._selectedEntity = null;
+    this._selectedChangeWarn = null;
+    this._selectedEntityChild = null;
+    this._selectedChangeWarnChild = null;
+    this._selectedCandidate = null;
+    this._selectedCandidateChangeWarn = null;
+    this._selectedCandidateChild = null;
+    this._selectedCandidateChangeWarnChild = null;
+    this._isShowWarn = true;
+    this.activityEventNames = null;
+    this.reattributionTransactionId = null;
+    this.redesignationTransactionId = null;
+  }
+
   _prepopulateDefaultPurposeText() {
     const purposeFormField = this.findFormFieldContaining('purpose');
     if (purposeFormField && purposeFormField.preText && purposeFormField.value && purposeFormField.preText === purposeFormField.value) {
@@ -2951,6 +2996,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         transactionCategory: this._transactionCategory
       }
     });
+  }
+
+  /**
+   * This method should be used to print the current transaction from form entry screen. 
+   * It should first save the current transaction if form is valid and based on the printAfterSave
+   * flag, should print the transaction as well. 
+   */
+  public printCurrentTransaction(): void{
+    this._doValidateReceipt(SaveActions.saveOnly,false,true);
   }
 
   public printPreview(): void {
@@ -3423,8 +3477,75 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             || this.transactionType === 'OTH_DISB_NP_RECNT_TRIB_REF'
             || this.transactionType === 'PAC_NON_FED_REC'
             || this.transactionType === 'PAC_NON_FED_RET'
+            //|| this.transactionType === 'ALLOC_EXP'
+            //|| this.transactionType === 'ALLOC_EXP_CC_PAY'
+
+            || this.transactionType === 'PARTN_REC'
+            || this.transactionType === 'BUS_LAB_NON_CONT_ACC'
+            || this.transactionType === 'OTH_REC'
+
             || this.transactionType === 'ALLOC_EXP'
             || this.transactionType === 'ALLOC_EXP_CC_PAY'
+            || this.transactionType === 'ALLOC_EXP_CC_PAY_MEMO'
+            || this.transactionType === 'ALLOC_EXP_STAF_REIM'
+            || this.transactionType === 'ALLOC_EXP_STAF_REIM_MEMO'
+            || this.transactionType === 'ALLOC_EXP_PMT_TO_PROL'
+            || this.transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO'
+            || this.transactionType === 'ALLOC_EXP_VOID'
+
+            || this.transactionType === 'ALLOC_FEA_DISB'
+            || this.transactionType === 'ALLOC_FEA_CC_PAY'
+            || this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO'
+            || this.transactionType === 'ALLOC_FEA_STAF_REIM'
+            || this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO'
+            || this.transactionType === 'ALLOC_FEA_VOID'
+
+            || this.transactionType === 'LEVIN_VOTER_REG'
+            || this.transactionType === 'LEVIN_VOTER_ID'
+            || this.transactionType === 'LEVIN_GOTV'
+            || this.transactionType === 'LEVIN_GEN'
+            || this.transactionType === 'LEVIN_OTH_DISB'
+
+            || this.transactionType === 'LEVIN_ORG_REC'
+            || this.transactionType === 'LEVIN_PARTN_REC'
+            || this.transactionType === 'LEVIN_NON_FED_REC'
+            || this.transactionType === 'LEVIN_TRIB_REC'
+            || this.transactionType === 'LEVIN_OTH_REC'
+
+            || this.transactionType === 'OPEXP'
+            || this.transactionType === 'OPEXP_CC_PAY'
+            || this.transactionType === 'OPEXP_STAF_REIM'
+            || this.transactionType === 'OPEXP_PMT_TO_PROL'
+            || this.transactionType === 'OPEXP_VOID'
+
+            || this.transactionType === 'IE'
+            || this.transactionType === 'IE_MULTI'
+            || this.transactionType === 'IE_CC_PAY'
+            || this.transactionType === 'IE_STAF_REIM'
+            || this.transactionType === 'IE_PMT_TO_PROL'
+            || this.transactionType === 'IE_VOID'
+
+            || this.transactionType === 'OTH_DISB'
+            || this.transactionType === 'OTH_DISB_CC_PAY'
+            || this.transactionType === 'OTH_DISB_STAF_REIM'
+            || this.transactionType === 'OTH_DISB_PMT_TO_PROL'
+            || this.transactionType === 'OTH_DISB_RECNT'
+            || this.transactionType === 'OTH_DISB_NP_RECNT_ACC'
+            || this.transactionType === 'OTH_DISB_VOID'
+            || this.transactionType === 'OPEXP_HQ_ACC_OP_EXP_NP'
+            || this.transactionType === 'OPEXP_CONV_ACC_OP_EXP_NP'
+            || this.transactionType === 'OPEXP_HQ_ACC_TRIB_REF'
+            || this.transactionType === 'OPEXP_CONV_ACC_TRIB_REF'
+            || this.transactionType === 'OTH_DISB_NP_RECNT_TRIB_REF'
+
+            || this.transactionType === 'FEA_100PCT_PAY'
+            || this.transactionType === 'FEA_CC_PAY'
+            || this.transactionType === 'FEA_STAF_REIM'
+            || this.transactionType === 'FEA_PAY_TO_PROL'
+            || this.transactionType === 'ALLOC_FEA_VOID'
+
+            || this.transactionType === 'DEBT_BY_VENDOR'
+            || this.transactionType === 'DEBT_TO_VENDOR'
           ){
             return this._typeaheadService.getContacts(searchText, 'entity_name', false, 'OFF');
           }else if(this.transactionType === 'CON_EAR_DEP_MEMO'
@@ -3943,6 +4064,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   res.data.entityTypes = this.entityTypes;
                   if(!res.data.entityTypes || res.data.entityTypes.length === 0){
                     res.data.entityTypes = this.staticEntityTypes;
+
+                    //also need to choose which option should be selected by default based on the form fields present
+                    //for now logic being used is if the formFields has 'entity_name' field present, its a org, otherwise its ind
+                    // this.applyDefaultEntity();
+                    this.applyDefaultEntity(res);
                   }
                 }
                 if (Array.isArray(res.data.entityTypes)) {
@@ -4011,6 +4137,35 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.sendPopulateMessageIfApplicable();
       });
 
+  }
+
+  /**
+   * This method is being used as a patch fix until API is fixed to return default/selected entity type array
+   * @param res 
+   */
+  private applyDefaultEntity(res: any) {
+    let defaultEntityisOrg: boolean = false;
+    if (this.findFormField('entity_name')) {
+      defaultEntityisOrg = true;
+    }
+    res.data.entityTypes.forEach(element => {
+      if (element.entityType === 'ORG') {
+        if (defaultEntityisOrg) {
+          element.selected = true;
+        }
+        else {
+          element.selected = false;
+        }
+      }
+      else if (element.entityType === 'IND') {
+        if (defaultEntityisOrg) {
+          element.selected = false;
+        }
+        else {
+          element.selected = true;
+        }
+      }
+    });
   }
 
   private populateDataForSchedHSubTransaction(schedHSubTran: boolean) {

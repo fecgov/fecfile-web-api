@@ -106,7 +106,7 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
   }
 
   public ngOnInit() {
-    this.formType = '3X';
+    this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.abstractScheduleComponent = AbstractScheduleParentEnum.schedMainComponent;
     localStorage.removeItem(`form_${this.formType}_saved`);
     super.ngOnInit();
@@ -114,7 +114,7 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
 
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
-    this.formType = '3X';
+    this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     if (this.mainTransactionTypeText === 'Loans and Debts') {
       this.mainTransactionTypeText = 'Debts';
     }

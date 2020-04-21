@@ -4,7 +4,7 @@
     <!-- <ng-container *ngIf="step === 'step_2' || step === 'step_3'"> -->
     <hr />
 
-    <div class="search">
+    <div class="search" *ngIf="formType !== '24'">
       <button class="fa fa-search" (click)="selectedTypeAheadValue(itemSelected)"></button>
       <ng-template #rt let-r="result" let-t="term">
         {{ r.text }}
@@ -78,7 +78,7 @@
     </ng-container> -->
   </section>
   <footer>
-    <div class="form-sidebar__item">
+    <div class="form-sidebar__item" *ngIf="formType !== '24'">
       <div class="form-sidebar-item__text">
         Cash on Hand
       </div>
@@ -95,7 +95,7 @@
           >
             All Transactions
           </button>
-          <button style="align-self:stretch;" type="button" class="btn btn-secondary-gray" (click)="viewSummary()">
+          <button style="align-self:stretch;" type="button" class="btn btn-secondary-gray" (click)="viewSummary()" *ngIf="formType !== '24'">
             Summary
           </button>
           <!-- [routerLink]="['/forms/form/', '3X']"

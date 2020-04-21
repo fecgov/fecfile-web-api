@@ -803,3 +803,136 @@ def form1M(request):
 """
 ************************************** END OF FORM 1M API Call *********************************************
 """
+def noneCheckTrueorFalse(parameter, check_dict):
+	try:
+		if parameter in check_dict and check_dict[parameter] not in [None, '', " ", 'null']:
+			return True
+		else:
+			return False
+	except Exception as e:
+		logger.debug(e)
+		return Response("The noneCheckTrueorFalse is throwing an error: " + str(e), 
+			status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_details(request):
+	try:
+		cmte_id =  request.user.username
+		noneCheckMissingParameters(['type'], 
+				checking_dict=request.query_params,value_dict=request.query_params, 
+				function_name='get_details')
+		type = request.query_params['type'].lower()
+		if type == 'committee':
+			if noneCheckTrueorFalse('committee_id', request.query_params):
+				param_string = """cmte_id ILIKE '{}%'""".format(
+					request.query_params['committee_id'].lower())
+			elif noneCheckTrueorFalse('committee_name', request.query_params):
+				param_string = """cmte_name ILIKE '{}%'""".format(
+					request.query_params['committee_name'].lower())
+			else:
+				raise Exception("""For committee type, only committee_id, 
+					committee_name are valid parameters""")
+			sql = """SELECT cmte_id AS "committee_id", cmte_name AS "committee_name" 
+				FROM public.committee_master WHERE {} 
+				ORDER BY cmte_name ASC""".format(param_string)
+		elif type == 'candidate':
+			if noneCheckTrueorFalse('candidate_id', request.query_params):
+				param_string = """cand_id ILIKE '{}%'""".format(
+					request.query_params['candidate_id'].lower())
+			elif noneCheckTrueorFalse('cand_last_name', request.query_params):
+				param_string = """cand_last_name ILIKE '{}%'""".format(
+					request.query_params['cand_last_name'].lower())
+			elif noneCheckTrueorFalse('cand_first_name', request.query_params):
+				param_string = """cand_first_name ILIKE '{}%'""".format(
+					request.query_params['cand_first_name'].lower())
+			else:
+				raise Exception("""For candidate type, only candidate_id, cand_last_name, 
+					cand_first_name are valid parameters""")
+			sql = """SELECT cand_id AS "candidate_id", cand_last_name, cand_first_name, 
+				cand_middle_name, cand_prefix, cand_suffix, cand_office, cand_office_state, 
+				cand_office_district FROM public.candidate_master WHERE {} 
+				ORDER BY cand_last_name ASC, cand_first_name ASC""".format(param_string)
+		elif type == 'treasurer':
+			if noneCheckTrueorFalse('treasurer', request.query_params):
+				param_string = """(treasurer_last_name ILIKE '{0}%' OR
+				treasurer_first_name ILIKE '{0}%') AND cmte_id='{1}'""".format(
+					request.query_params['treasurer'].lower(), cmte_id)
+			else:
+				raise Exception("""For treasurer type, only treasurer is 
+					valid parameters""")
+			sql = """SELECT treasurer_last_name, treasurer_first_name, treasurer_middle_name, 
+				treasurer_prefix, treasurer_suffix FROM public.committee_master 
+				WHERE {}""".format(param_string)
+		else:
+			raise Exception("""type parameter can have only these values : 'committee', 
+				'candidate', 'treasurer'""")
+		with connection.cursor() as cursor:
+			cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql))
+			logger.debug("get_details")
+			logger.debug(cursor.query)
+			output_dict = cursor.fetchone()[0]
+			if output_dict:
+				print(output_dict)
+			else:
+				output_dict = []
+		return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
+	except Exception as e:
+		logger.debug(e)
+		return Response("The get_details API is throwing an error: " + str(e), 
+			status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_original_registration_date(request):
+	try:
+		cmte_id = request.user.username
+		sql="""SELECT sub_date AS "registration_date" FROM public.form_1 
+			WHERE comid = %s ORDER BY repid LIMIT 1"""
+		with connection.cursor() as cursor:
+			cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql), [cmte_id])
+			logger.debug("get_original_registration")
+			logger.debug(cursor.query)
+			output_dict = cursor.fetchone()[0]
+			if output_dict:
+				output_dict = output_dict[0]
+			else:
+				raise Exception("""This committee doesnot have entries in form_1 table. 
+					Kindly check with DB admin. committeeId: {}""".format(cmte_id))
+		return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
+	except Exception as e:
+		logger.debug(e)
+		return Response("The get_original_registration API is throwing an error: " + str(e), 
+			status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_committee_met_req_date(request):
+	try:
+		cmte_id = request.user.username
+		print(request.query_params)
+		noneCheckMissingParameters(['reportId', 'fifty_first_contributor_date'], 
+				checking_dict=request.data,value_dict=request.data, 
+				function_name='get_committee_met_req_date')
+		sql = """SELECT f1m.can1_con, f1m.can2_con, f1m.can3_con, f1m.can4_con, 
+			f1m.can5_con, f1.sub_date FROM public.form_1m f1m
+			LEFT JOIN public.form_1 f1 ON f1.comid = f1m.cmte_id 
+			WHERE f1m.cmte_id = %s AND f1m.report_id = %s AND f1m.delete_ind IS
+			DISTINCT FROM 'Y' ORDER BY f1.repid LIMIT 1"""
+		with connection.cursor() as cursor:
+			cursor.execute(sql,[cmte_id, request.data['reportId']])
+			logger.debug("get_committee_met_req_date")
+			logger.debug(cursor.query)
+			output_list = cursor.fetchall()
+			print(output_list)
+			if output_list:
+				output_list = list(filter(None, output_list[0]))
+			else:
+				raise Exception("""The reportId: {} does not exist in form 1m table 
+					for committeeId: {}""".format(request.data['reportId'],cmte_id))
+		fifty_date = request.data['fifty_first_contributor_date']
+		output_list.append(datetime.datetime.strptime(fifty_date, '%Y-%m-%d').date())
+		print(output_list)
+		output = {'requirements_met_date': max(output_list)}
+		return JsonResponse(output, status=status.HTTP_200_OK, safe=False)
+	except Exception as e:
+		logger.debug(e)
+		return Response("The get_committee_met_req_date API is throwing an error: " + str(e), 
+			status=status.HTTP_400_BAD_REQUEST)

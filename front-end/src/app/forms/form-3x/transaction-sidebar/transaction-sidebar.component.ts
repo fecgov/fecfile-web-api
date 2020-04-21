@@ -31,7 +31,9 @@ const transactionCategoryOptions = [];
 export class TransactionSidebarComponent implements OnInit {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
   @Input() transactionCategories: any = [];
+  @Input() transactionsCategoriesMainData : any;
   @Input() step: string = '';
+  @Input() formType:string = '';
 
   public editMode: boolean;
   public itemSelected: string = '';
@@ -96,7 +98,8 @@ export class TransactionSidebarComponent implements OnInit {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
-    this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
+    if(this.transactionsCategoriesMainData) {
+      let res = this.transactionsCategoriesMainData;
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
         this.cashOnHand = res.data.cashOnHand;
@@ -127,7 +130,7 @@ export class TransactionSidebarComponent implements OnInit {
           }
         }
       }
-    });
+    }
   }
 
   ngDoCheck(): void {

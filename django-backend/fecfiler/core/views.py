@@ -5390,7 +5390,8 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id):
                 """SELECT COALESCE(t1.coh_cop, 0) FROM public.form_3x t1 
                 WHERE t1.cmte_id = %s AND t1.report_id = (SELECT r.report_id FROM public.reports r 
                 WHERE r.cmte_id = %s AND r.cvg_end_date < %s AND r.delete_ind IS DISTINCT FROM 'Y' 
-                ORDER BY r.cvg_end_date DESC
+                AND r.form_type = 'F3X' ORDER BY r.cvg_end_date DESC, r.amend_ind ASC, 
+                r.amend_number DESC
                 LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'""",
                 [cmte_id, cmte_id, cvg_start_date],
             )
@@ -5540,9 +5541,9 @@ def getthirdnavamounts(cmte_id, report_id):
         #     amounts.append(cursor.fetchone()[0])
 
         # quick uopdate for FNE-2207: exlude debts from COH calculation
-        return amounts[0], amounts[1], amounts[0] - amounts[1]
+        # return amounts[0], amounts[1], amounts[0] - amounts[1]
 
-        # return amounts[0], amounts[1], amounts[0] - amounts[1] + amounts[2] - amounts[3]
+        return amounts[0], amounts[1], amounts[0] - amounts[1] + amounts[2] - amounts[3]
     except Exception as e:
         raise Exception("The getthirdnavamounts function is throwing an error" + str(e))
 

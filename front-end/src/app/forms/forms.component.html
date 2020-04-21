@@ -7,6 +7,9 @@
     <div *ngIf="formType === '3X'">
     	<app-f3x [jumpToTransaction]="jumpToTransaction"></app-f3x>
     </div>
+    <div *ngIf="formType === '24'">
+    	<app-f24 [jumpToTransaction]="jumpToTransaction"></app-f24>
+    </div>
     <div class="forms__wizard" *ngIf="formType === 'global'">
       <div class="form__sidebar">
         <app-transactions-filter title="Filters" [formType]="formType"></app-transactions-filter>
