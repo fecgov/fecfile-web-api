@@ -19,12 +19,14 @@ export class CanActivateGuard implements CanActivate {
     const isSignedIn = this.auth.isSignedIn();
     let amIAllowed: boolean = false;
     if (isSignedIn) {
+      // array from router data
       const whoIsAllowed = route.data.role;
+      // array from auth service
       const whoAmI = this.auth.getUserRole();
 
       if (whoIsAllowed) {
           for (const role of whoIsAllowed) {
-            if (role === whoAmI) {
+            if (whoAmI.includes(role)) {
               amIAllowed = true;
             }
           }

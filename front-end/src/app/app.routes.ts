@@ -138,7 +138,7 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],
         data: {
-          role: [Roles.Admin]
+          role: [Roles.CommitteeAdmin, Roles.Upload]
         }
       },
       { path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },

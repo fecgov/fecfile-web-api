@@ -107,11 +107,11 @@
       </div>
       <ng-container *ngIf="step !== 'step_3'">
         <div class="btn-row signAndSubmit">
-          <button *ngIf="_authService.isAdmin()"
+          <button *ngIf="_authService.isCommitteeAdmin() || _authService.isUploader()"
             id="sidebar_signBtn"
             type="button"
             class="btn btn-secondary"
-            [disabled]="!editMode"
+            [disabled]="isFiled"
             [routerLink]="['/signandSubmit', '3X']"
             [queryParams]="{ edit: editMode }"
           >

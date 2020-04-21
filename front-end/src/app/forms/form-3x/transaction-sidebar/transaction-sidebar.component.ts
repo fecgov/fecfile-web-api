@@ -35,6 +35,7 @@ export class TransactionSidebarComponent implements OnInit {
   @Input() step: string = '';
 
   public editMode: boolean;
+  public isFiled: boolean;
   public itemSelected: string = '';
   public typeaheadValue: string = '';
   public receiptsTotal: number = 0.0;
@@ -97,6 +98,14 @@ export class TransactionSidebarComponent implements OnInit {
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
+    // edit mode is set based on the action performed on the report
+    // Edit mode does not say if its filed or saved
+    // on ViewReport isFiled is passed in query params from report details component
+    if (typeof this._activatedRoute.snapshot.queryParams.isFiled !== 'undefined') {
+      this.isFiled = this._activatedRoute.snapshot.queryParams.isFiled === 'true' ? true : false;
+    } else {
+      this.isFiled = this.editMode;
+    }
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
     this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
       if (res) {
