@@ -1,3 +1,4 @@
+import { entityTypes } from './entity-types-json';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
@@ -185,7 +186,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     "COEXP_PMT_PROL_MEMO",
     "COEXP_PARTY_DEBT"
   ];
-  private staticEntityTypes =  [{entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: false}, {entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: true}];
+  private staticEntityTypes =  [{entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: false}, {entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: false}];
   
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
   //there is no unsubscribe() for activateRoute . 
@@ -3996,6 +3997,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   res.data.entityTypes = this.entityTypes;
                   if(!res.data.entityTypes || res.data.entityTypes.length === 0){
                     res.data.entityTypes = this.staticEntityTypes;
+
+                    //also need to choose which option should be selected by default based on the form fields present
+                    //for now logic being used is if the formFields has 'entity_name' field present, its a org, otherwise its ind
+                    // this.applyDefaultEntity();
+                    this.applyDefaultEntity(res);
                   }
                 }
                 if (Array.isArray(res.data.entityTypes)) {
@@ -4064,6 +4070,35 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.sendPopulateMessageIfApplicable();
       });
 
+  }
+
+  /**
+   * This method is being used as a patch fix until API is fixed to return default/selected entity type array
+   * @param res 
+   */
+  private applyDefaultEntity(res: any) {
+    let defaultEntityisOrg: boolean = false;
+    if (this.findFormField('entity_name')) {
+      defaultEntityisOrg = true;
+    }
+    res.data.entityTypes.forEach(element => {
+      if (element.entityType === 'ORG') {
+        if (defaultEntityisOrg) {
+          element.selected = true;
+        }
+        else {
+          element.selected = false;
+        }
+      }
+      else if (element.entityType === 'IND') {
+        if (defaultEntityisOrg) {
+          element.selected = false;
+        }
+        else {
+          element.selected = true;
+        }
+      }
+    });
   }
 
   private populateDataForSchedHSubTransaction(schedHSubTran: boolean) {
