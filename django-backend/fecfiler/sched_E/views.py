@@ -26,6 +26,7 @@ from fecfiler.core.views import (
     put_entities,
     remove_entities,
     undo_delete_entities,
+    update_F3X
 )
 from fecfiler.sched_A.views import (
     get_next_transaction_id,
@@ -225,7 +226,7 @@ def get_existing_expenditure_amount(cmte_id, transaction_id):
     except:
         raise
 
-
+@update_F3X
 @new_report_date
 def put_schedE(data):
     """
@@ -698,7 +699,7 @@ def put_completing_entities(data):
     logger.debug("put_auth_entity with data:{}".format(comp_data))
     return put_entities(comp_data)
 
-
+@update_F3X
 @new_report_date
 def post_schedE(data):
     """

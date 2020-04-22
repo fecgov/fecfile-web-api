@@ -29,6 +29,7 @@ from fecfiler.core.views import (
     undo_delete_entities,
     save_cand_entity,
     superceded_report_id_list,
+    update_F3X
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -719,7 +720,7 @@ def put_cand_entity(data):
     """
     return save_cand_entity(data)
 
-
+@update_F3X
 @new_report_date
 def post_schedB(datum):
     """
@@ -985,7 +986,7 @@ def get_existing_expenditure(cmte_id, transaction_id):
     except:
         raise
 
-
+@update_F3X
 @new_report_date
 def put_schedB(datum):
     """
