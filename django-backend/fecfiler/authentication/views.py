@@ -323,7 +323,8 @@ def manage_user(request):
                 raise Exception("Committe id is missing from request data")
 
             datum = get_users_list(cmte_id)
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            json_result = {'users': datum}
+            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)
             forms_obj = []
