@@ -463,3 +463,59 @@ def validate_input_data(request, val, data):
     else:
         raise Exception("Missing Input: {} is mandatory", val)
     return data
+
+
+def get_toggle_status(data):
+    try:
+        with connection.cursor() as cursor:
+            # check if user already exist
+            _sql = """Select is_active from public.authentication_account WHERE username = %s AND id = %s AND delete_ind !='Y' """
+            cursor.execute(_sql, [data.get("username"), data.get("id")])
+            current_status = cursor.fetchone()[0]
+            if current_status is None:
+                raise NoOPError(
+                    "No status set for id:{}. Can't toggle it. ".format(data.get("id"))
+                )
+            else:
+                if current_status:
+                    return False
+                else:
+                    return True
+    except Exception as e:
+        logger.debug("Exception occurred while toggling status", str(e))
+        raise e
+
+
+def update_toggle_status(status, data):
+    try:
+        with connection.cursor() as cursor:
+            # check if user already exist
+            _sql = """UPDATE public.authentication_account SET is_active = %s WHERE username = %s AND id = %s AND delete_ind !='Y' """
+            cursor.execute(_sql, [status, data.get("username"), data.get("id")])
+
+            if cursor.rowcount != 1:
+                raise NoOPError(
+                    "failed to toggle status for id:{}. ".format(data.get("id"))
+                )
+            return cursor.rowcount
+    except Exception as e:
+        logger.debug("Exception occurred while toggling status", str(e))
+        raise e
+
+
+@api_view(["PUT"])
+def toggle_user(request):
+    if request.method == "PUT":
+        try:
+            username = request.user.username
+            if len(username) > 9:
+                cmte_id = username[0:9]
+            data = {"username": username, "id": request.data.get("id")}
+            toggle_status = get_toggle_status(data)
+            rows = update_toggle_status(toggle_status, data)
+            output = get_users_list(cmte_id)
+            json_result = {'users': output, "rows_updated": rows}
+            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            logger.debug("exception occured while toggling status", str(e))
+            raise e
