@@ -156,7 +156,7 @@ def delete_manage_user(data):
         with connection.cursor() as cursor:
             _sql = """UPDATE public.authentication_account
                         SET delete_ind = 'Y' 
-                        WHERE id = %s AND username = %s
+                        WHERE id = %s AND cmtee_id = %s
                     """
             _v = (data.get("user_id"), data.get("cmte_id"))
             cursor.execute(_sql, _v)
@@ -287,7 +287,7 @@ def add_new_user(data, cmte_id):
 def put_sql_user(data):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET delete_ind = 'N', role = %s,is_active = %s,first_name = %s,last_name = %s,email = %s,username = %s WHERE id = %s AND username = %s AND delete_ind != 'Y'"""
+            _sql = """UPDATE public.authentication_account SET delete_ind = 'N', role = %s,is_active = %s,first_name = %s,last_name = %s,email = %s,username = %s WHERE id = %s AND cmtee_id = %s AND delete_ind != 'Y'"""
             _v = (
                 data.get("role"),
                 data.get("is_active"),
@@ -296,7 +296,7 @@ def put_sql_user(data):
                 data.get("email"),
                 data.get("new_user_name"),
                 data.get("id"),
-                data.get("user_name"),
+                data.get("cmte_id"),
             )
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
@@ -308,10 +308,27 @@ def put_sql_user(data):
         raise e
 
 
+def get_current_email(data):
+    try:
+        with connection.cursor() as cursor:
+            # check if user already exist
+            _sql = """Select email from public.authentication_account WHERE id = %s AND cmtee_id = %s AND delete_ind !='Y' """
+            cursor.execute(_sql, [data.get("id"), data.get("cmte_id")])
+            email = cursor.fetchone()[0]
+
+            return email
+    except Exception as e:
+        logger.debug("Exception occurred while toggling status", str(e))
+        raise e
+
+
 def update_user(data):
     try:
         logger.debug("update user record with {}".format(data))
-        user_already_exist = check_user_present(data)
+        user_already_exist = False
+        email = get_current_email(data)
+        if email != data.get("email"):
+            user_already_exist = check_user_present(data)
         if not user_already_exist:
             rows = put_sql_user(data)
         else:
@@ -372,7 +389,8 @@ def manage_user(request):
     elif request.method == "DELETE":
         try:
             cmte_id = request.user.username
-
+            if len(cmte_id) > 9:
+                cmte_id = cmte_id[0:9]
             data = {"cmte_id": cmte_id}
             if "id" in request.data and check_null_value(
                     request.data.get("id")
@@ -387,13 +405,13 @@ def manage_user(request):
             else:
                 msg = "The User ID: {} has not been successfully deleted." \
                       "No matching record was found."
-            return Response(msg.format(data.get("user_id")),
-                            status=status.HTTP_204_NO_CONTENT,
-                            )
+            return JsonResponse(msg.format(data.get("user_id")),
+                                status=status.HTTP_204_NO_CONTENT,
+                                safe=False)
         except Exception as e:
-            return Response(
+            return JsonResponse(
                 "The Manage User API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_400_BAD_REQUEST, safe=False
             )
     elif request.method == "POST":
         try:
@@ -427,14 +445,17 @@ def manage_user(request):
         try:
             cmte_id = request.user.username
             if len(cmte_id) > 9:
+                old_email = cmte_id[9:]
                 cmte_id = cmte_id[0:9]
                 username = cmte_id + request.data.get("email")
             else:
                 username = cmte_id
-            data = {"cmte_id": cmte_id, "user_name": request.user.username, "new_user_name": username}
+            data = {"cmte_id": cmte_id, "user_name": request.user.username}
             fields = user_data_dict()
             fields.append("id")
             data = validate(data, fields, request)
+            data["new_user_name"] = username
+            data["old_email"] = old_email
             rows = update_user(data)
             output = get_users_list(cmte_id)
             json_result = {'users': output, "rows_updated": rows}
@@ -469,8 +490,8 @@ def get_toggle_status(data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """Select is_active from public.authentication_account WHERE username = %s AND id = %s AND delete_ind !='Y' """
-            cursor.execute(_sql, [data.get("username"), data.get("id")])
+            _sql = """Select is_active from public.authentication_account WHERE id = %s AND cmtee_id = %s AND delete_ind !='Y' """
+            cursor.execute(_sql, [data.get("id"), data.get("cmte_id")])
             current_status = cursor.fetchone()[0]
             if current_status is None:
                 raise NoOPError(
@@ -490,8 +511,8 @@ def update_toggle_status(status, data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """UPDATE public.authentication_account SET is_active = %s WHERE username = %s AND id = %s AND delete_ind !='Y' """
-            cursor.execute(_sql, [status, data.get("username"), data.get("id")])
+            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' """
+            cursor.execute(_sql, [status, data.get("id")])
 
             if cursor.rowcount != 1:
                 raise NoOPError(
@@ -510,7 +531,8 @@ def toggle_user(request):
             username = request.user.username
             if len(username) > 9:
                 cmte_id = username[0:9]
-            data = {"username": username, "id": request.data.get("id")}
+            data = {"username": username, "id": request.data.get("id"),
+                    "cmte_id": cmte_id}
             toggle_status = get_toggle_status(data)
             rows = update_toggle_status(toggle_status, data)
             output = get_users_list(cmte_id)
