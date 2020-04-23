@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { CsvConverterService } from '../service/csv-converter.service';
 import * as XLSX from 'xlsx';
-import { timer, interval, Observable } from 'rxjs';
+import { timer, interval, Observable, Subject } from 'rxjs';
 import { takeUntil, finalize } from 'rxjs/operators';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { UploadContactsService } from './service/upload-contacts.service';
@@ -14,7 +14,7 @@ import { UtilService } from 'src/app/shared/utils/util.service';
   styleUrls: ['./upload-contacts.component.scss'],
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UploadContactsComponent implements OnInit {
+export class UploadContactsComponent implements OnInit, OnDestroy {
 
   @ViewChild('selectFileInput')
   public selectFileInput: ElementRef;
@@ -26,8 +26,9 @@ export class UploadContactsComponent implements OnInit {
   public userContactFields: Array<string>;
   public showUpload: boolean;
   public progressPercent: number;
-  public foo = { progressPercent: 0 };
-  // public fooBar = [];
+
+  private onDestroy$ = new Subject();
+
 
   constructor(
     private csvConverterService: CsvConverterService,
@@ -35,11 +36,14 @@ export class UploadContactsComponent implements OnInit {
     private utilService: UtilService
   ) { }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.showUpload = true;
     this.progressPercent = 0;
-    this.foo = { progressPercent: 0 };
-    // this.fooBar = [0];
+    this.getProgress();
+  }
+
+  public ngOnDestroy() {
+    this.onDestroy$.next();
   }
 
   /**
@@ -48,15 +52,14 @@ export class UploadContactsComponent implements OnInit {
    * @param event the drop event
    */
   public drop(event: any) {
-    // TODO put this in a service for extracting files on drop event.
-
     event.preventDefault();
     const items = event.dataTransfer.items;
 
-    // TODO change to only permit 1 file.
-    // Add validation error if more than 1 dropped.
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
+    // TODO Add validation error if more than 1 dropped.
+    if (items.length > 1) {
+      return;
+    } else if (items.length === 1) {
+      const item = items[0];
       if (item.kind === 'file') {
         const entry = item.webkitGetAsEntry();
         this.scanFiles(entry);
@@ -93,23 +96,25 @@ export class UploadContactsComponent implements OnInit {
     const fileExtention = this.getFileExtention(file.name);
     switch (fileExtention) {
       case 'json':
-        this.handleJsonImport(file);
+        // this._handleJsonImport_DEPRECATED(file);
+        this._uploadJson(file);
         break;
       case 'csv':
-        this.handleCsvImport(file);
+        // this._handleCsvImport_DEPRECATED(file);
+        this._uploadCsv(file);
         break;
       case 'xls':
-        this.handleXlsImport(file);
+        // this._handleXlsImport_DEPRECATED(file);
         break;
       case 'xlsx':
-        this.handleXlsImport(file);
+        // this._handleXlsImport_DEPRECATED(file);
         break;
       default:
       // console.log('invalid file extention for import contacts ' + fileExtention);
     }
   }
 
-  private handleJsonImport(file: File) {
+  private _handleJsonImport_DEPRECATED(file: File) {
     const fileReader = new FileReader();
     fileReader.onload = (e) => {
       const json = fileReader.result;
@@ -119,7 +124,7 @@ export class UploadContactsComponent implements OnInit {
     fileReader.readAsText(file);
   }
 
-  private handleCsvImport(file: File) {
+  private _handleCsvImport_DEPRECATED(file: File) {
     const fileReader = new FileReader();
     fileReader.onload = (e) => {
       const csvText: string | ArrayBuffer = fileReader.result;
@@ -132,7 +137,7 @@ export class UploadContactsComponent implements OnInit {
     fileReader.readAsText(file);
   }
 
-  private handleXlsImport(file: File) {
+  private _handleXlsImport_DEPRECATED(file: File) {
     const fileReader = new FileReader();
     fileReader.onload = (e) => {
 
@@ -180,48 +185,45 @@ export class UploadContactsComponent implements OnInit {
 
   public fileSelected() {
     this.progressPercent = 0;
-    this.foo.progressPercent = 0;
     this.showUpload = false;
-
     if (this.selectFileInput.nativeElement.files) {
       if (this.selectFileInput.nativeElement.files[0]) {
         const file = this.selectFileInput.nativeElement.files[0];
-        // this.uploadContactsService.uploadFile(file).subscribe((res: any) => {
-        //   const userCols = res;
-        // });
-        this.uploadContactsService.uploadFile(file);
-      }
-    }
-
-    // For development of the progress bar for file upload, this code is
-    // simulating a long file upload time.  The file to be uploaded in production
-    // may be a big as 10-20 GB.
-
-    const fakeUploadTime = 4000;
-    const fakeUploadInterval = fakeUploadTime / 4; // 2000 and 4 will = 500 milliseconds
-
-    // emit value every interval to increase percent done
-    const source = interval(fakeUploadInterval);
-    // after fakeUploadTime has passed, read the file client side.  This will be server side
-    // read in the future.
-    const timer$ = timer(fakeUploadTime).pipe(finalize(() => {
-      this.progressPercent = 100;
-      this.foo.progressPercent = 100;
-      const files = this.selectFileInput.nativeElement.files;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
         this.handleFileType(file);
       }
-    }));
-    // when timer emits after 5s, complete source
-    const example = source.pipe(takeUntil(timer$));
-    // sub to observable emitted by the interval.
-    const subscribe = example
-      .subscribe(val => {
-        const percentageIncrease = (fakeUploadInterval) * 100 / fakeUploadTime;
-        this.progressPercent = this.progressPercent + percentageIncrease;
-        this.foo.progressPercent = this.foo.progressPercent + percentageIncrease;
+    }
+  }
+
+  private _uploadCsv(file: File) {
+    this.uploadContactsService.uploadFile(file).takeUntil(this.onDestroy$)
+      .subscribe((data: any) => {
+        // console.log('data', data);
+        this.uploadContactsService.readCsvFileHeader(file).subscribe((headerFields: Array<string>) => {
+          this.userContactFields = headerFields;
+          setTimeout(() => {
+            this.emitUserContacts();
+          }, 1000);
+        });
       });
+  }
+
+  private _uploadJson(file: File) {
+    this.uploadContactsService.uploadFile(file).takeUntil(this.onDestroy$)
+      .subscribe((data: any) => {
+        // console.log('data', data);
+        this.uploadContactsService.readJsonFilePropertyNames(file).subscribe((headerFields: Array<string>) => {
+          this.userContactFields = headerFields;
+          setTimeout(() => {
+            this.emitUserContacts();
+          }, 1000);
+        });
+      });
+  }
+
+  public getProgress() {
+    this.uploadContactsService.getProgressPercent().takeUntil(this.onDestroy$).subscribe((percent: number) => {
+      this.progressPercent = percent;
+    });
   }
 
   /**
@@ -294,7 +296,7 @@ export class UploadContactsComponent implements OnInit {
    */
   public emitUserContacts(): void {
     this.userContactsEmitter.emit({
-      userContacts: this.userContacts,
+      // userContacts: this.userContacts,
       userContactFields: this.userContactFields
     });
   }

@@ -4,6 +4,11 @@ import { environment } from 'src/environments/environment';
 
 import * as S3 from 'aws-sdk/clients/s3';
 import * as AWS from 'aws-sdk/global';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { AWSError } from 'aws-sdk/global';
+import { ManagedUpload, SelectObjectContentEventStream } from 'aws-sdk/clients/s3';
+import { StreamingEventStream } from 'aws-sdk/lib/event-stream/event-stream';
+import { ERROR_COMPONENT_TYPE } from '@angular/compiler';
 
 
 @Injectable({
@@ -11,12 +16,11 @@ import * as AWS from 'aws-sdk/global';
 })
 export class UploadContactsService {
 
+  /**
+   * Constructor will obtain credentials for AWS S3 Bucket.
+   * @param _http
+   */
   constructor(private _http: HttpClient) {
-
-    // AWS.config.region = 'us-east-1';
-    // AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-    //   IdentityPoolId: 'us-east-1:f0f414b2-8e9f-4488-9cc1-34a5918a1a1d',
-    // });
 
     AWS.config.region = environment.awsRegion;
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
@@ -25,50 +29,233 @@ export class UploadContactsService {
     this.bucket = new S3({});
   }
 
+  public progressPercent: number;
+  public progressPercentSubject = new BehaviorSubject<number>(this.progressPercent);
+
   private bucket: S3;
+  private readonly bucketName = 'fecfile-filing-frontend';
 
   /**
    * Upload the file to AWS S3 bucket.
    */
-  public uploadFile(file: File) {
+  public uploadFile(file: File): Observable<any> {
 
-    // const bucket = new S3(
-    //     {
-    //       accessKeyId: ENV.ACCESS_KEY,
-    //       secretAccessKey: ENV.SECRET_KEY,
-    //       region: 'us-east-1'
-    //     }
-    // );
-
-    const contentType = file.type;
+    this.progressPercent = 0;
     const params = {
-      Bucket: 'fecfile-filing-frontend',
+      Bucket: this.bucketName,
       Key: file.name,
       Body: file,
       ACL: 'public-read',
-      ContentType: contentType
+      ContentType: file.type
     };
-    this.bucket.upload(params, function (err: any, data: any) {
-      if (err) {
-        console.log('There was an error uploading your file: ', err);
-        return false;
-      }
-      console.log('Successfully uploaded file.', data);
-      return true;
+
+    // Bind the function to the 'this' for this component as it will
+    // be called from a callback function where its 'this' is not the component this.
+    const _setPercentage = this._setPercentage.bind(this);
+    // const listObjects = this.listObjects.bind(this);
+    // const getObject = this.getObject.bind(this);
+    // const _readFileHeader = this._readFileHeader.bind(this);
+
+    return Observable.create(observer => {
+      this.bucket.upload(params).on('httpUploadProgress', function (evt: S3.ManagedUpload.Progress) {
+        // console.log(evt.loaded + ' of ' + evt.total + ' Bytes');
+        const progressPercent = Math.trunc((evt.loaded / evt.total) * 100);
+        // console.log('progressPercent = ' + progressPercent);
+        // this.progressPercentSubject.next(this.progressPercent);
+        _setPercentage(progressPercent);
+      }).send(function (err: AWSError, data: ManagedUpload.SendData) {
+        if (err) {
+          console.log('There was an error uploading your file: ', err);
+          _setPercentage(0);
+          // return false;
+          // return Observable.of(false);
+          observer.next(err);
+          observer.complete();
+        }
+        console.log('Successfully uploaded file.', data);
+        _setPercentage(100);
+        // return Observable.of(_readFileHeader(file));
+        // _readFileHeader(file);
+        // return true;
+        observer.next(data);
+        observer.complete();
+
+        // getObject(file);
+        // listObjects();
+
+      });
     });
+  }
 
+  /**
+   * Inform client of progress of file upload.
+   * 
+   * @param progressPercent
+   */
+  private _setPercentage(progressPercent: number) {
+    this.progressPercentSubject.next(progressPercent);
+  }
 
-    // TODO keep this until sure we don't need progress update realtime
-    // for upload progress
-    // bucket.upload(params).on('httpUploadProgress', function (evt) {
-    //   console.log(evt.loaded + ' of ' + evt.total + ' Bytes');
-    // }).send(function (err, data) {
-    //   if (err) {
-    //     console.log('There was an error uploading your file: ', err);
-    //     return false;
-    //   }
-    //   console.log('Successfully uploaded file.', data);
-    //   return true;
+  /**
+   * Provide an observable for client to subscribe for file upload progress updates.
+   */
+  public getProgressPercent(): Observable<any> {
+    return this.progressPercentSubject.asObservable();
+  }
+
+  /**
+   * Read the CSV file header record uploaded to AWS.
+   * 
+   * @param file
+   * @returns an Observable containing an array of the header fields names.
+   */
+  public readCsvFileHeader(file: File): Observable<any> {
+
+    let headerFields = [];
+
+    const params = {
+      Bucket: this.bucketName,
+      Key: file.name,
+      ExpressionType: 'SQL',
+      Expression: 'select * from s3object s limit 1',
+      InputSerialization: {
+        CSV: {
+          FileHeaderInfo: 'NONE'
+        }
+      },
+      OutputSerialization: {
+        CSV: {
+          FieldDelimiter: ',',
+          RecordDelimiter: '\n'
+        },
+      }
+    };
+
+    return Observable.create(observer => {
+      this.bucket.selectObjectContent(params, function (err, data) {
+        if (err) {
+          observer.next(ERROR_COMPONENT_TYPE);
+          observer.complete();
+        }
+        const events: SelectObjectContentEventStream = data.Payload;
+        if (Array.isArray(events)) {
+          for (const event of events) {
+            // Check the top-level field to determine which event this is.
+            if (event.Records) {
+              // console.log('Records:', event.Records.Payload.toString());
+              const headerRecord = event.Records.Payload.toString();
+              headerFields = headerRecord.split(',');
+              // handle Records event
+            } else if (event.Stats) {
+              // handle Stats event
+              // console.log(`Stats Processed ${event.Stats.Details.BytesProcessed} bytes`);
+            } else if (event.Progress) {
+              // handle Progress event
+              // console.log('Progress:');
+            } else if (event.Cont) {
+              // handle Cont event
+              // console.log('Cont:');
+            } else if (event.End) {
+              // handle End event
+              // console.log('End:');
+            }
+          }
+        }
+        observer.next(headerFields);
+        observer.complete();
+      });
+    });
+  }
+
+  /**
+   * Read the JSON file uploaded to AWS and get property names.
+   *
+   * @param file
+   * @returns an Observable containing an array of the header fields names.
+   */
+  public readJsonFilePropertyNames(file: File): Observable<any> {
+
+    const headerFields = [];
+
+    const params = {
+      Bucket: this.bucketName,
+      Key: file.name,
+      ExpressionType: 'SQL',
+      Expression: 'select s[0] from s3object s',
+      InputSerialization: {
+        JSON: {
+          Type: 'LINES'
+        }
+      },
+      OutputSerialization: {
+        JSON: {
+          RecordDelimiter: '\n'
+        }
+      }
+    };
+
+    return Observable.create(observer => {
+      this.bucket.selectObjectContent(params, function (err, data) {
+        if (err) {
+          observer.next(ERROR_COMPONENT_TYPE);
+          observer.complete();
+          return;
+        }
+        const events: SelectObjectContentEventStream = data.Payload;
+        if (Array.isArray(events)) {
+          for (const event of events) {
+            // Check the top-level field to determine which event this is.
+            if (event.Records) {
+              const jsonString = event.Records.Payload.toString();
+              // console.log('JSON Obj:', jsonString);
+              const json = JSON.parse(jsonString);
+              Object.keys(json._1).forEach(key => {
+                headerFields.push(key);
+              });
+            }
+          }
+        }
+        observer.next(headerFields);
+        observer.complete();
+      });
+    });
+  }
+
+  // public listObjects(): Observable<any> {
+  public listObjects() {
+
+    const params = {
+      Bucket: this.bucketName,
+      MaxKeys: 20
+    };
+
+    // return Observable.create(observer => {
+    this.bucket.listObjectsV2(params, function (err, data) {
+      if (err) {
+        console.log(err, err.stack);
+      } else {
+        console.log(data);
+      }
+    });
     // });
   }
+
+  public getObject(file: File) {
+
+    const params = {
+      Bucket: this.bucketName,
+      Key: file.name
+    };
+
+    // return Observable.create(observer => {
+    this.bucket.getObject(params, function (err, data) {
+      if (err) {
+        console.log(err, err.stack);
+      } else {
+        console.log(data);
+      }
+    });
+    // });
+  }
+
 }

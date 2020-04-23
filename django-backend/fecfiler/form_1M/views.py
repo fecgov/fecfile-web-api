@@ -223,7 +223,7 @@ def report_last_update_date(func):
         logger.debug("update report last_update_date after {}".format(func.__name__))
         logger.debug(res)
         report_id = res[1].get("reportId")
-        renew_report_update_date(report_id)
+        update_report_update_date(report_id)
         logger.debug("report date updated")
         return res
     return wrapper
@@ -255,7 +255,7 @@ def committee_master_get(request_dict):
 ****************************** Reports Table ******************************************
 """
 
-def renew_report_update_date(report_id):
+def update_report_update_date(report_id):
     """
     a helper function to update last update date on report 
     when a transaction is added to deleted
