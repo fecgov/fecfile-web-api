@@ -27,6 +27,7 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
     check_calendar_year,
+    update_F3X
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -1992,7 +1993,7 @@ def update_h3_total_amount(data):
     _v = [back_ref_transaction_id] * 3
     do_transaction(_sql, _v)
 
-
+@update_F3X
 @new_report_date
 def put_schedH3(data):
     """
@@ -2070,7 +2071,7 @@ def validate_sh3_data(data):
     if not data.get("total_amount_transferred"):
         data["total_amount_transferred"] = 0
 
-
+@update_F3X
 @new_report_date
 def post_schedH3(data):
     """
@@ -2971,7 +2972,7 @@ def get_existing_h4_total(cmte_id, transaction_id):
     except:
         raise
 
-
+@update_F3X
 @new_report_date
 def put_schedH4(data):
     """
@@ -3285,7 +3286,7 @@ def update_activity_event_amount_ytd(data):
             + str(e)
         )
 
-
+@update_F3X
 @new_report_date
 def post_schedH4(data):
     """
@@ -3787,7 +3788,7 @@ def update_h5_total_amount(data):
     _v = [back_ref_transaction_id] * 3
     do_transaction(_sql, _v)
 
-
+@update_F3X
 @new_report_date
 def put_schedH5(data):
     """
@@ -3865,7 +3866,7 @@ def validate_sh5_data(data):
     """
     check_mandatory_fields_SH5(data)
 
-
+@update_F3X
 @new_report_date
 def post_schedH5(data):
     """
@@ -4532,7 +4533,7 @@ def get_existing_h6_total(cmte_id, transaction_id):
     except:
         raise
 
-
+@update_F3X
 @new_report_date
 def put_schedH6(data):
     """
@@ -4816,7 +4817,7 @@ def update_activity_event_amount_ytd_h6(data):
             + str(e)
         )
 
-
+@update_F3X
 @new_report_date
 def post_schedH6(data):
     """

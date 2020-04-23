@@ -12,6 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
 import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-sched-h1',
@@ -63,6 +64,7 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     private _schedHService: SchedHServiceService,
     private _individualReceiptService: IndividualReceiptService,
     private _transactionsMessageService: TransactionsMessageService,
+    protected _decimalPipe: DecimalPipe,
   ) {
     //console.log('h1 constructor ...');
     this.populateFormForEdit = this._schedHMessageServiceService.
@@ -266,8 +268,8 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     this.checkH1PacDisabled();
 
     if (this.isPac()) {
-      this.form.control.patchValue({ federal_share: item.federal_percent * 100 }, { onlySelf: true });
-      this.form.control.patchValue({ nonfederal_share: item.non_federal_percent * 100 }, { onlySelf: true });
+      this.form.control.patchValue({ federal_share: this._decimalPipe.transform(item.federal_percent * 100, '2.0') }, { onlySelf: true });
+      this.form.control.patchValue({ nonfederal_share: this._decimalPipe.transform(item.non_federal_percent * 100, '2.0') }, { onlySelf: true });
       this.form.control.patchValue({ applied_activity1: item.administrative }, { onlySelf: true });
       this.form.control.patchValue({ applied_activity2: item.generic_voter_drive }, { onlySelf: true });
       this.form.control.patchValue({ applied_activity3: item.public_communications }, { onlySelf: true });
