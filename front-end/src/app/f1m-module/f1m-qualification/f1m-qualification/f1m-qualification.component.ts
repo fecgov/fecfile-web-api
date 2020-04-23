@@ -1,6 +1,8 @@
+import { ScheduleActions } from 'src/app/forms/form-3x/individual-receipt/schedule-actions.enum';
+import { F1mService } from './../../f1m/f1m-services/f1m.service';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { ApiService } from './../../../shared/services/APIService/api.service';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation, Input, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation, Input, OnDestroy, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, Subject } from 'rxjs';
@@ -15,9 +17,13 @@ import { TypeaheadService } from '../../../shared/partials/typeahead/typeahead.s
   encapsulation: ViewEncapsulation.None
 })
 export class F1mQualificationComponent implements  OnInit , OnDestroy{
-
+  
+  
   @Input() candidateNumber:number;
   @Input() qualificationData: any;
+  @Input() reportId: string;
+
+  @Output() addCandidateEvent: EventEmitter<any> = new EventEmitter();
 
   private onDestroy$ = new Subject();
   
@@ -30,18 +36,19 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
   public width = '23px';
   public tooltipPlaceholder = 'Placeholder text';
   public showPart2:boolean = false;
+  public isEditCandidateMode: boolean = false;
+
 
   public candidate_offices=[];
   public states=[];
-
-  
 
   constructor(
     private _fb: FormBuilder,
     private _typeaheadService: TypeaheadService,
     private _apiService: ApiService,
-    private _cd: ChangeDetectorRef,
-    private _messageService: MessageService
+    public cd: ChangeDetectorRef,
+    private _messageService: MessageService,
+    private _f1mService: F1mService
   ) { 
       this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(message =>{
         if(message && message.formType === 'f1m-qualification' && message.action ==='resetAndIncrement'){
@@ -49,7 +56,14 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
         }
         else if(message && message.formType === 'f1m-qualification' && message.action === 'showPart2'){
           this.showPart2 = true;
-          this._cd.detectChanges();
+          this.setRegistrationDate();
+          this.cd.detectChanges();
+        }
+        else if(message && message.formType === 'f1m-qualification' && message.action === 'editCandidate'){
+          this.editCandidate(message.candidate);
+        }
+        else if(message && message.formType === 'f1m-qualification' && message.action === 'trashCandidate'){
+          this.trashCandidate(message.candidate);
         }
       })
 
@@ -62,7 +76,8 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
     this.initiFormPart2();
   }
 
-  public ngOnDestroy(){
+  ngOnDestroy(){
+    this._messageService.clearMessage();
     this.onDestroy$.next(true);
   }
 
@@ -71,7 +86,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
     this._apiService.getStates().subscribe((resp : any) => {
       if(resp && resp.data && resp.data.states){
         this.states = resp.data.states;
-        this._cd.detectChanges();
+        this.cd.detectChanges();
       }
     });
   }
@@ -80,19 +95,63 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
     this._apiService.getOfficesSought().subscribe((resp : any)=>{
       if(resp && resp.data && resp.data.officeSought){
         this.candidate_offices = resp.data.officeSought;
-        this._cd.detectChanges();
+        this.cd.detectChanges();
       }
     });       
   }
 
+  public addCandidate(){
+    if(this.isEditCandidateMode){
+      this.addCandidateEvent.emit({action:'update'});
+    }
+    else{
+      this.addCandidateEvent.emit({action:'create'});
+    }
+  }
+
+  public editCandidate(candidate: any) {
+    this.isEditCandidateMode = true;
+    this.cd.detectChanges();
+    this.populateCandidateData(candidate);
+    this.cd.detectChanges();
+  }
+
+  public trashCandidate(candidate: any) {
+    // this._f1mService.trashCandidate
+    // this.isEditCandidateMode = true;
+    // this.cd.detectChanges();
+    // this.populateCandidateData(candidate);
+    // this.cd.detectChanges();
+  }
+
+  private populateCandidateData(candidate: any) {
+    this.form.patchValue({ candidate_id: candidate.candidate_id }, { onlySelf: true });
+    this.form.patchValue({ cand_last_name: candidate.cand_last_name }, { onlySelf: true });
+    this.form.patchValue({ cand_first_name: candidate.cand_first_name }, { onlySelf: true });
+    this.form.patchValue({ cand_middle_name: candidate.cand_middle_name }, { onlySelf: true });
+    this.form.patchValue({ cand_prefix: candidate.cand_prefix }, { onlySelf: true });
+    this.form.patchValue({ cand_suffix: candidate.cand_suffix }, { onlySelf: true });
+    this.form.patchValue({ cand_office: candidate.cand_office }, { onlySelf: true });
+    this.form.patchValue({ cand_office_state: candidate.cand_office_state }, { onlySelf: true });
+    this.form.patchValue({ cand_office_district: candidate.cand_office_district }, { onlySelf: true });
+    this.form.patchValue({ contribution_date: candidate.contribution_date }, { onlySelf: true });
+    this.form.patchValue({ candidate_number: candidate.candidate_number }, { onlySelf: true });
+  }
+
   private resetFormAndIncrementCandidate() {
-    this.form.reset();
+    // this.form.reset();
     this.candidateNumber++;
-    this.form.patchValue({candidate_number:this.candidateNumber},{onlySelf:true});
+    this.form.patchValue({candidate_number:this.candidateNumber.toString()},{onlySelf:true});
   }
 
   public isShowChildTransactions(){
     return true;
+  }
+
+  public dateChanged(dateType: string){
+    if(dateType === 'fifty_first_contributor_date'){
+      this.setRequirementsMetDate()
+    }
   }
 
   public initForm() {
@@ -107,19 +166,41 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
       cand_office_state: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       cand_office_district: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       contribution_date: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
-      candidate_number: new FormControl(this.candidateNumber)
+      candidate_number: new FormControl(this.candidateNumber.toString())
     });
   }
 
   initiFormPart2() {
     this.formPart2 = this._fb.group({
-      registration_date: new FormControl(null, [Validators.required]),
+      registration_date: new FormControl({value:null, disabled:true}, [Validators.required]),
       fifty_first_contributor_date: new FormControl(null, [Validators.required]),
-      requirements_met_date: new FormControl(null, [Validators.required])
+      requirements_met_date: new FormControl({value:null, disabled:true}, [Validators.required])
     });
   }
 
 
+  private setRequirementsMetDate() {
+    this._f1mService.getDates('get_cmte_met_req_date', this.reportId ,this.formPart2.value.fifty_first_contributor_date).subscribe(res => {
+      if(this.formPart2){
+        this.formPart2.patchValue({requirements_met_date:res.requirements_met_date},{onlySelf:true});
+      }
+    });
+  }
+
+
+  private setRegistrationDate() {
+    this._f1mService.getDates('get_original_reg_date').subscribe(res => {
+      if(this.formPart2){
+        this.formPart2.patchValue({registration_date:res.registration_date},{onlySelf:true});
+        this.cd.detectChanges();
+      }
+    });
+  }
+
+  public cancel(){
+    this.form.reset();
+    this.isEditCandidateMode = false;
+  }
 
   /**
    * Search for entities when Candidate ID input value changes.

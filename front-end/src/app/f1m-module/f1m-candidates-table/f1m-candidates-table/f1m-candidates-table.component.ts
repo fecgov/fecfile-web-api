@@ -1,3 +1,4 @@
+import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
@@ -8,10 +9,27 @@ import { Component, OnInit, Input } from '@angular/core';
 export class F1mCandidatesTableComponent implements OnInit {
 
   @Input() candidatesData :any;
+  @Input() step: string;
   
-  constructor() { }
+  constructor(public _messageService: MessageService) { }
 
   ngOnInit() {
+  }
+
+  public editCandidate(candidate:any){
+    this._messageService.sendMessage({
+      formType : 'f1m-qualification', 
+      action : 'editCandidate',
+      candidate
+    })
+  }
+
+  public trashCandidate(candidate:any){
+    this._messageService.sendMessage({
+      formType : 'f1m-qualification', 
+      action : 'trashCandidate',
+      candidate
+    })
   }
 
 }

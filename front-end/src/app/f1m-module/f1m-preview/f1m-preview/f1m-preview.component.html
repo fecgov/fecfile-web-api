@@ -100,7 +100,7 @@
   <section *ngIf="type === 'qualification'">
     <div class="content">
       <div class="paragraph">
-        <app-f1m-candidates-table [candidatesData]="qualificationData.candidates"
+        <app-f1m-candidates-table [candidatesData]="qualificationData.candidates" [step]="step"
           *ngIf="qualificationData && qualificationData.candidates.length > 0">
         </app-f1m-candidates-table>
       </div>
@@ -118,7 +118,7 @@
             Date of Original Registration
           </div>
           <div class="text">
-            {{qualificationData?.registration_date}} TEST
+            {{qualificationData?.registration_date}}
           </div>
         </div>
         <div class="grid-col">
@@ -126,7 +126,7 @@
             Date of 51st Contributor
           </div>
           <div class="text">
-            {{qualificationData?.fifty_first_contributor_date}} TEST
+            {{qualificationData?.fifty_first_contributor_date}}
           </div>
         </div>
         <div class="grid-col">
@@ -134,7 +134,7 @@
             Date Committee Met Requirements
           </div>
           <div class="text">
-            {{qualificationData?.requirements_met_date}} TEST
+            {{qualificationData?.requirements_met_date}}
           </div>
         </div>
       </div>
@@ -151,7 +151,7 @@
             Treasurer Last Name
           </div>
           <div class="text">
-            {{reportInfo.treasurerLastName}}
+            {{treasurerData.treasurer_last_name}}
           </div>
         </div>
         <div class="grid-col">
@@ -159,7 +159,7 @@
             Treasurer First Name
           </div>
           <div class="text">
-            {{reportInfo.treasurerFirstName}}
+            {{treasurerData.treasurer_first_name}}
           </div>
         </div>
         <div class="grid-col">
@@ -167,7 +167,7 @@
             Treasurer Middle Name
           </div>
           <div class="text">
-            {{reportInfo.treasurerMiddleName}}
+            {{treasurerData.treasurer_middle_name}}
           </div>
         </div>
       </div>
@@ -177,7 +177,7 @@
             Prefix
           </div>
           <div class="text">
-            {{reportInfo.treasurerPrefix}}
+            {{treasurerData.treasurer_prefix}}
           </div>
         </div>
         <div class="grid-col">
@@ -185,7 +185,7 @@
             Suffix
           </div>
           <div class="text">
-            {{reportInfo.treasurerSuffix}}
+            {{treasurerData.treasurer_suffix}}
           </div>
         </div>
       </div>

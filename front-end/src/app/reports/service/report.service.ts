@@ -416,18 +416,24 @@ export class ReportsService {
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
     let url: string = '';
+    
+    params = params.append('reportid', report_id);
 
     if (form_type === 'F99') {
       url = '/f99/get_f99_report_info';
     } else if (form_type === 'F3X') {
       url = '/core/get_report_info';
+    } else if(form_type === 'F1M'){
+      url = '/f1M/form1M'
+      params = params.delete('reportid');
+      params=params.append('reportId', report_id);
     }
+
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     //params = params.append('committeeid', committee_id);
-    params = params.append('reportid', report_id);
 
     if (form_type === 'F99') {
       return this._http.get(`${environment.apiUrl}${url}`, {

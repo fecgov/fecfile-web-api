@@ -1,3 +1,4 @@
+import { TitleCasePipe } from '@angular/common';
 import { F1mCandidatesTableComponent } from './../f1m-candidates-table/f1m-candidates-table/f1m-candidates-table.component';
 import { NgModule } from '@angular/core';
 import { SharedModule } from '../../shared/shared.module';
@@ -21,6 +22,7 @@ import { F1mComponent } from './f1m.component';
     F1mPreviewComponent,
     F1mQualificationComponent,
     F1mCandidatesTableComponent
-  ]
+  ], 
+  providers: [TitleCasePipe]
 })
 export class F1mModule { }

@@ -14,6 +14,7 @@ export class F1mPreviewComponent implements OnInit {
   @Input() qualificationData :any;
   @Input() treasurerData: any;
   @Input() type: string;
+  @Input() step: string;
   
   public reportInfo: any;
 
