@@ -5466,7 +5466,6 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
             else:
                 result = cursor.fetchone()
                 coh_cop = result[0]
-
         return coh_cop
     except Exception as e:
         raise Exception(
@@ -9795,7 +9794,7 @@ def update_f3x_coh_cop_subsequent_report(report_id, cmte_id):
         report_id_list = get_report_ids(cmte_id, cvg_start_date, False, False)
         for report in report_id_list:
             coh_bop = prev_cash_on_hand_cop_3rd_nav(report, cmte_id)
-            coh_begin_yr = prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, True)
+            coh_begin_yr = prev_cash_on_hand_cop_3rd_nav(report, cmte_id, True)
             _sql = """UPDATE public.form_3x SET coh_cop = coh_cop-coh_bop+%s, coh_bop = %s,
                     coh_coy = coh_coy-coh_begin_calendar_yr+%s, coh_begin_calendar_yr = %s
                     WHERE cmte_id=%s and report_id=%s"""
