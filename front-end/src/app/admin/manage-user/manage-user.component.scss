@@ -1,9 +1,24 @@
 @import "src/app/shared/scss/global";
 
 .manage-users-container {
-  background: url("../../../assets/img/fec-logo-5opac.png") no-repeat;
+  background: url("../../../assets/img/fec-logo-5opac.png") no-repeat center;
   background-size: 60%;
+  .manage-users {
+    .table {
+      margin: 25px auto;
+      width: 60% !important;
+      background-color: #f1f1f1;
+      border-collapse: collapse;
 
+      td ,th {
+        border: 2px solid #797979;
+        text-align: center;
+      }
+    }
+    .fas:hover {
+      color: $blueZodiac;
+    }
+  }
   .committee-info {
     h4, h3 {
       display: inline;

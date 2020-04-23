@@ -43,26 +43,26 @@
                 <div class="row">
                     <div class="col col-md-2">
                         <label>
-                            <input formControlName="role-ind"
-                                   name="role-ind"
+                            <input formControlName="role_ind"
                                    id="role-admin"
-                                   type="radio">
+                                   type="radio"
+                                   value="ADMIN">
                             Admin</label>
                     </div>
                     <div class="col col-md-2">
                         <label>
-                            <input formControlName="role-ind"
-                                   name="role-ind"
+                            <input formControlName="role_ind"
                                    id="role-entry"
-                                   type="radio">
+                                   type="radio"
+                                   value="ENTRY">
                             Entry</label>
                     </div>
                     <div class="col col-md-2">
                         <label>
-                            <input formControlName="role-ind"
-                                   name="role-ind"
+                            <input formControlName="role_ind"
                                    id="role-read-only"
-                                   type="radio">
+                                   type="radio"
+                                   value="READ ONLY">
                             Read Only</label>
                     </div>
                 </div>
@@ -81,19 +81,19 @@
                             <table class="basic-info">
                                 <tr>
                                     <td class="label-info"><label>Last Name</label></td>
-                                    <td class="user-text"><input placeholder="Enter Last Name" type="text"></td>
+                                    <td class="user-text"><input formControlName="last_name" placeholder="Enter Last Name" type="text"></td>
                                 </tr>
                                 <tr>
                                     <td><label>First Name</label></td>
-                                    <td><input placeholder="Enter First Name" type="text"></td>
+                                    <td><input formControlName="first_name" placeholder="Enter First Name" type="text"></td>
                                 </tr>
                                 <tr>
                                     <td><label>Contact Number</label></td>
-                                    <td><input placeholder="Enter Phone Number" type="text"></td>
+                                    <td><input formControlName="phone_number" placeholder="Enter Phone Number" type="text"></td>
                                 </tr>
                                 <tr>
                                     <td><label>Email Address</label></td>
-                                    <td><input placeholder="Enter Email Address" type="text"></td>
+                                    <td><input formControlName="email" placeholder="Enter Email Address" type="text"></td>
                                 </tr>
                             </table>
                         </td>
@@ -119,11 +119,11 @@
             </table>
 
             <div style="padding-left: 35px;">
-                <button
+                <button (click)="addUser()"
                     class="btn btn-primary">
-                    Add User
+                   {{!isEdit ? 'Add User' : 'Save'}}
                 </button> &nbsp;
-                <button
+                <button  (click)="clearForm()"
                     class="btn btn-secondary-dark-gray">
                     Clear Form
                  </button>
@@ -139,8 +139,22 @@
         <th>First Name <i class="fas fa-sort"></i></th>
         <th>Email Address <i class="fas fa-sort"></i></th>
         <th>Role <i class="fas fa-sort"></i></th>
-        <th>Action <i class="fas fa-sort"></i></th>
+        <th>Status <i class="fas fa-sort"></i></th>
+        <th>Action</th>
         </thead>
+        <tbody>
+        <tr *ngFor="let user of users">
+            <td>{{user.lastName}}</td>
+            <td>{{user.firstName}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.role}}</td>
+            <td>{{user.status ? 'Active':'Inactive'}}</td>
+            <td>
+                <i class="fas fa-edit fa-2x" (click)="editUser(user)"></i>  &nbsp;
+                <i [ngClass]="getStatusClass(user.status)" (click)="toggleStatus(user)"></i> &nbsp;
+                <i class="fas fa-times-circle fa-2x" (click)="deleteUser(user)"></i> </td>
+        </tr>
+        </tbody>
     </table>
     </div>
 </div>
