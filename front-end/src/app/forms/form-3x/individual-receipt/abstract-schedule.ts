@@ -3520,7 +3520,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
             || this.transactionType === 'IE'
             || this.transactionType === 'IE_MULTI'
+            || this.transactionType === 'IE_STAF_REIM_MEMO'
             || this.transactionType === 'IE_CC_PAY'
+            || this.transactionType === 'IE_CC_PAY_MEMO'
             || this.transactionType === 'IE_STAF_REIM'
             || this.transactionType === 'IE_PMT_TO_PROL'
             || this.transactionType === 'IE_VOID'
@@ -3542,7 +3544,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             || this.transactionType === 'FEA_CC_PAY'
             || this.transactionType === 'FEA_STAF_REIM'
             || this.transactionType === 'FEA_PAY_TO_PROL'
-            || this.transactionType === 'ALLOC_FEA_VOID'
+            || this.transactionType === 'FEA_VOID'
 
             || this.transactionType === 'DEBT_BY_VENDOR'
             || this.transactionType === 'DEBT_TO_VENDOR'
