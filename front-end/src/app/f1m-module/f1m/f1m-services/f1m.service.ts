@@ -61,6 +61,25 @@ export class F1mService {
       } 
     }
 
+
+    public getDates(dateType:string, reportId:string = null, fifty_first_contributor_date: string = null) : Observable<any>{
+      const token: string = JSON.parse(this._cookieService.get('user'));
+      let url: string = '/f1M/' + dateType;
+      let httpOptions = new HttpHeaders();
+      let data :any = {};
+      if(dateType === 'get_cmte_met_req_date' && reportId && fifty_first_contributor_date){
+        data.reportId = reportId;
+        data.fifty_first_contributor_date = fifty_first_contributor_date;
+      }
+
+      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+      
+        return this._http
+          .post(`${environment.apiUrl}${url}`,data ,{
+            headers: httpOptions,
+          })
+    }
+
 }
 
 
