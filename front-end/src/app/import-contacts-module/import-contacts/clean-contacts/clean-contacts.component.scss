@@ -6,20 +6,19 @@
   .clean_contacts__table-inner {
     overflow-x: auto;
     overflow-y: visible;
-    width: 100%;
-    max-width: 1420px;
-    margin-left: 67px;
+    max-width: 96%; /* 1420px; */
+    margin-left: 4% /* 67px; */;
 
     table {
       table-layout: fixed;
       th {
-        width: 200px;
+        width: 10em; /* 150px; */
         height: 2.5em;
       }
       .hard_left {
         position: absolute;
         left: 0; 
-        width: 35px;
+        width: 2%; /* 35px */;
       }
       td {
         vertical-align: middle;
