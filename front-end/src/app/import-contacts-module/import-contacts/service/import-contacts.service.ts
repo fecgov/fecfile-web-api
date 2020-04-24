@@ -10,7 +10,7 @@ export class ImportContactsService {
 
   constructor(private _http: HttpClient) { }
 
-  public getDuplicates(page: number) {
+  public validateContacts(page: number) {
     let httpOptions = new HttpHeaders();
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     const params = new HttpParams();
@@ -34,7 +34,8 @@ export class ImportContactsService {
     } else {
       // TODO Using mock server data until API is integrated
       return this._http
-        .get('assets/mock-data/import-contacts/duplicates.1.json', {
+        // .get('assets/mock-data/import-contacts/duplicates.2.json', {
+        .get('assets/mock-data/import-contacts/duplicates.2.json', {
           headers: httpOptions,
           params
         })
