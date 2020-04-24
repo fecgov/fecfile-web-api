@@ -1,6 +1,8 @@
 import json
 import datetime
 import logging
+import warnings
+from calendar import timegm
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
@@ -11,6 +13,7 @@ from rest_framework import permissions, viewsets, status, views, generics
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
+from rest_framework_jwt.compat import get_username_field, get_username
 
 from .models import Account
 import re
@@ -23,7 +26,7 @@ from rest_framework_jwt.settings import api_settings
 from ..core.transaction_util import do_transaction
 from ..core.views import check_null_value, NoOPError
 
-jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+#jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
@@ -42,9 +45,8 @@ def jwt_response_payload_handler(token, user=None, request=None):
 
     return {
         'token': token,
-        'user': user.role
+        #'user': AccountSerializer(user, context={'request':request}).data
     }
-
 
 # payload = jwt_response_payload_handler(user)
 # token = jwt_encode_handler(payload)
@@ -89,7 +91,7 @@ class LoginView(views.APIView):
         password = data.get('password', None)
         email = data.get('email', None)
         # import ipdb; ipdb.set_trace()
-        account = authenticate(request=request, username=username, password=password)
+        account = authenticate(request=request, username=username, password=password, email=email)
 
         # fail, bad login info
         if account is None:
@@ -132,7 +134,7 @@ def get_users_list(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from manage user table
-            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' order by id) t"""
+            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' order by id) t"""
             cursor.execute(_sql, [cmte_id])
             user_list = cursor.fetchall()
             if user_list is None:
@@ -175,7 +177,8 @@ def user_data_dict():
         "last_name",
         "email",
         "role",
-        "is_active"
+        "is_active",
+        "contact"
     ]
     return valid_fields
 
@@ -253,8 +256,8 @@ def add_new_user(data, cmte_id):
         with connection.cursor() as cursor:
             # Insert data into manage user table
             cursor.execute(
-                """INSERT INTO public.authentication_account (id,password, last_login, is_superuser, tagline, created_at, updated_at, is_staff, date_joined,username, first_name, last_name, email, role, is_active,cmtee_id, delete_ind)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """INSERT INTO public.authentication_account (id,password, last_login, is_superuser, tagline, created_at, updated_at, is_staff, date_joined,username, first_name, last_name, email, contact, role, is_active,cmtee_id, delete_ind)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 """,
                 [
                     user_id,
@@ -270,6 +273,7 @@ def add_new_user(data, cmte_id):
                     data.get("first_name"),
                     data.get("last_name"),
                     data.get("email"),
+                    data.get("contact"),
                     (data.get("role")).upper(),
                     (data.get("is_active")),
                     cmte_id,
@@ -287,13 +291,14 @@ def add_new_user(data, cmte_id):
 def put_sql_user(data):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET delete_ind = 'N', role = %s,is_active = %s,first_name = %s,last_name = %s,email = %s,username = %s WHERE id = %s AND cmtee_id = %s AND delete_ind != 'Y'"""
+            _sql = """UPDATE public.authentication_account SET delete_ind = 'N', role = %s,is_active = %s,first_name = %s,last_name = %s,email = %s,contact = %s,username = %s WHERE id = %s AND cmtee_id = %s AND delete_ind != 'Y'"""
             _v = (
                 data.get("role"),
                 data.get("is_active"),
                 data.get("first_name"),
                 data.get("last_name"),
                 data.get("email"),
+                data.get("contact"),
                 data.get("new_user_name"),
                 data.get("id"),
                 data.get("cmte_id"),
@@ -372,7 +377,7 @@ def manage_user(request):
                 raise Exception("Committe id is missing from request data")
 
             datum = get_users_list(cmte_id)
-            json_result = {'users': datum}
+            json_result = {'users': datum, 'rows': len(datum)}
             return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)

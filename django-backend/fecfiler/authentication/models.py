@@ -32,6 +32,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=100, unique=True)
     cmtee_id = models.CharField(max_length=9)
+    contact = models.CharField(max_length=10)
     first_name = models.CharField(max_length=40, blank=True)
     last_name = models.CharField(max_length=40, blank=True)
     role = models.CharField(max_length=40, blank=True)
