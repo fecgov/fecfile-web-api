@@ -1223,6 +1223,7 @@ def post_reports(data, reportid=None):
                         data.get("cvg_end_dt"),
                         data.get("coh_bop"),
                     )
+                    function_to_call_wrapper_update_F3X(report_id, data.get("cmte_id"))
                     # print('here3')
                 # print('here3.5')
                 output = get_reports(data)
@@ -8342,7 +8343,7 @@ def get_reports_data(report_id):
 #     except Exception:
 #         raise
 
-@update_F3X
+
 def create_amended(reportid):
     try:
         data_dict = get_reports_data(reportid)
@@ -8388,25 +8389,6 @@ def create_amended(reportid):
                         """UPDATE public.reports SET previous_report_id = %s WHERE report_id = %s """,
                         [reportid, created_data["reportid"]],
                     )
-                # Insert data into Form 3X table
-                if created_data["form_type"] == "F3X":
-                    # print('here1')
-                    # check_mandatory_fields_form3x(data)
-                    # print('here2')
-                    post_sql_form3x(
-                        created_data["reportid"],
-                        created_data["cmteid"],
-                        created_data["formtype"],
-                        data["amend_ind"],
-                        created_data["reporttype"],
-                        created_data.get("election_code"),
-                        created_data.get("date_of_election"),
-                        created_data.get("state_of_election"),
-                        data["cvg_start_dt"],
-                        data["cvg_end_dt"],
-                        created_data.get("coh_bop"),
-                    )
-
                 return data
 
         else:
@@ -9793,18 +9775,19 @@ def update_f3x_coh_cop_subsequent_report(report_id, cmte_id):
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         report_id_list = get_report_ids(cmte_id, cvg_start_date, False, False)
         for report in report_id_list:
-            coh_bop = prev_cash_on_hand_cop_3rd_nav(report, cmte_id)
-            coh_begin_yr = prev_cash_on_hand_cop_3rd_nav(report, cmte_id, True)
-            _sql = """UPDATE public.form_3x SET coh_cop = coh_cop-coh_bop+%s, coh_bop = %s,
-                    coh_coy = coh_coy-coh_begin_calendar_yr+%s, coh_begin_calendar_yr = %s
-                    WHERE cmte_id=%s and report_id=%s"""
-            values = [str(coh_bop), str(coh_bop), str(coh_begin_yr), 
-                str(coh_begin_yr), cmte_id, report]
-            with connection.cursor() as cursor:
-                cursor.execute(_sql, values)
-                # print("update_f3x_coh_cop_subsequent_report")
-                # print(cursor.query)
-                if cursor.rowcount == 0:
+            if update_f3x_details(report, cmte_id) != "Success":
+            # coh_bop = prev_cash_on_hand_cop_3rd_nav(report, cmte_id)
+            # coh_begin_yr = prev_cash_on_hand_cop_3rd_nav(report, cmte_id, True)
+            # _sql = """UPDATE public.form_3x SET coh_cop = coh_cop-coh_bop+%s, coh_bop = %s,
+            #         coh_coy = coh_coy-coh_begin_calendar_yr+%s, coh_begin_calendar_yr = %s
+            #         WHERE cmte_id=%s and report_id=%s"""
+            # values = [str(coh_bop), str(coh_bop), str(coh_begin_yr), 
+            #     str(coh_begin_yr), cmte_id, report]
+            # with connection.cursor() as cursor:
+            #     cursor.execute(_sql, values)
+            #     # print("update_f3x_coh_cop_subsequent_report")
+            #     # print(cursor.query)
+                # if cursor.rowcount == 0:
                     output_string += "," + report
         return output_string
 
@@ -9959,7 +9942,7 @@ def put_F3X(report_id, cmte_id, request_dict):
             if cursor.rowcount == 0:
                 return "Failed to update F3X: " + report_id
             else:
-                return "Sucess"
+                return "Success"
     except Exception as e:
         raise Exception(
             "The put_F3X function is throwing an exception: " + str(e)
@@ -9983,3 +9966,8 @@ def get_year_reports(cmte_id, report_id):
     except Exception as e:
         print(e)
         return data_ids
+
+@update_F3X
+def function_to_call_wrapper_update_F3X(report_id, cmte_id):
+    return {"report_id" : report_id,
+            "cmte_id" : cmte_id}
