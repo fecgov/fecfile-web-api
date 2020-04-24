@@ -1,6 +1,30 @@
 @import '../../../shared/scss/global';
 
 .clean_contacts__container {
+  position: relative;
+
+  .clean_contacts__table-inner {
+    overflow-x: auto;
+    overflow-y: visible;
+    max-width: 96%; /* 1420px; */
+    margin-left: 4% /* 67px; */;
+
+    table {
+      table-layout: fixed;
+      th {
+        width: 10em; /* 150px; */
+        height: 2.5em;
+      }
+      .hard_left {
+        position: absolute;
+        left: 0; 
+        width: 2%; /* 35px */;
+      }
+      td {
+        vertical-align: middle;
+      }
+    }
+  }
 
   .clean_contacts__heading {
       padding: .5em 0;
