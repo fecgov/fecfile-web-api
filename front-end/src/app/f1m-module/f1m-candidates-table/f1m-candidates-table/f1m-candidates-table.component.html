@@ -14,42 +14,37 @@
         <tr>
           <th>
             Name
-            <i class="fa fa-sort" aria-hidden="false"></i>
           </th>
           <th>
             Office Sought
-            <i class="fa fa-sort" aria-hidden="false"></i>
           </th>
           <th>
             State
-            <i class="fa fa-sort" aria-hidden="false"></i>
           </th>
           <th>
             District
-            <i class="fa fa-sort" aria-hidden="false"></i>
           </th>
           <th>
             Date
-            <i class="fa fa-sort" aria-hidden="false"></i>
           </th>
-          <th></th>
+          <th *ngIf="step !== 'step_3'"></th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let trx of candidatesData">
-          <td>{{ trx.cand_first_name }} {{ trx.cand_last_name }} </td>
-          <td>{{ trx.cand_office }}</td>
-          <td>{{ trx.cand_office_state }}</td>
-          <td>{{ trx.cand_office_district }}</td>
-          <td>{{ trx.contribution_date }}</td>
-          <td>
+        <tr *ngFor="let candidate of candidatesData">
+          <td>{{ candidate.cand_first_name }} {{ candidate.cand_last_name }} </td>
+          <td>{{ candidate.cand_office }}</td>
+          <td>{{ candidate.cand_office_state }}</td>
+          <td>{{ candidate.cand_office_district }}</td>
+          <td>{{ candidate.contribution_date }}</td>
+          <td *ngIf="step !== 'step_3'">
             <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
               <button class="btn btn-sm btn-primary" ngbDropdownToggle>
                 <i class="ellipsis-icon"></i>
               </button>
               <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                <button class="dropdown-item" (click)="editTransaction(trx)"><i class="edit-icon"></i> Edit</button>
-                <button class="dropdown-item" (click)="trashTransaction(trx)"><i class="trash-icon"></i> Trash</button>
+                <button class="dropdown-item" (click)="editCandidate(candidate)"><i class="edit-icon"></i> Edit</button>
+                <button class="dropdown-item" (click)="trashCandidate(candidate)"><i class="trash-icon"></i> Trash</button>
               </div>
             </div>
           </td>

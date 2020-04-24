@@ -197,7 +197,8 @@
                 <div class="input-group transactions__filter-multi-input">
                   <input type="text" name="filingPassword" [formControlName]="'filingPassword'"
                     class="form-control" id="filingPassword" aria-label="e filing password"
-                    aria-describedby="filingPassword" required [ngClass]=" form.get('filingPassword')?.invalid &&
+                    
+                    aria-describedby="filingPassword" [ngClass]=" form.get('filingPassword')?.invalid &&
                                 (form.touched || form.dirty)
                                   ? 'input-field-error'
                                   : ''">
