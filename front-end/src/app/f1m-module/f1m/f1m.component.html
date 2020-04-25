@@ -18,12 +18,12 @@
         <app-f1m-type (changeStep)="changeStep($event)"></app-f1m-type>
       </div>
       <div class="form__content tight_box pl-4" [hidden]="step !== 'step_2'">
-        <app-f1m-affiliation *ngIf="type === 'affiliation'"></app-f1m-affiliation>
+        <app-f1m-affiliation [scheduleAction]="scheduleAction" *ngIf="type === 'affiliation'"></app-f1m-affiliation>
       </div>
       <div class="form__content tight_box pl-4" [hidden]="step !== 'step_2'">
         <app-f1m-qualification  *ngIf="type === 'qualification'"
         [candidateNumber]="candidateNumber" [qualificationData]="qualificationData" [reportId]="reportId"
-        (addCandidateEvent) = "saveAndContinue($event)"
+        (addCandidateEvent) = "saveAndContinue($event)" [scheduleAction]="scheduleAction"
         >
         </app-f1m-qualification>
       </div>
@@ -48,21 +48,25 @@
 
         </app-sign-and-submit>
       </div>
+      <div class="form__content tight_box pl-4" [hidden]="step !== 'step_5'">
+        <app-submit [FEC_Id]="filingId"></app-submit>
+      </div>
     </section>
   </div> <!-- ./form__container -->
 </div> <!-- ./forms__wizard -->
 <footer>
   <div class="row pl-2 py-2">
     <div class="forms__btn-container">
-      <button id="previous" class="btn btn-previous btn-left" *ngIf="step !== 'step_1'"
+      <button id="previous" class="btn btn-previous btn-left" *ngIf="step !== 'step_1' && step !== 'step_5'"
         (click)="previous()">Previous</button>
-      <button id="saveAndContinue" *ngIf="type === 'qualification' ? step === 'step_2' && qualificationData?.candidates?.length >=5 : step === 'step_2'" class="btn btn-primary btn-right"
+      <button id="saveAndContinue" *ngIf="(type === 'qualification' ? step === 'step_2' && qualificationData?.candidates?.length >=5 : step === 'step_2') && scheduleAction !== 'view'" class="btn btn-primary btn-right"
         (click)="saveAndContinue()">Save &amp; Continue </button>
-      <button id="skip" *ngIf="step === 'step_2' && partyType === 'PTY'"  class="btn btn-previous btn-right mr-3"
+      <button id="skip" *ngIf="(step === 'step_2' && type === 'qualification' && qualificationComp && !qualificationComp.showPart2 && partyType === 'PTY') && scheduleAction !== 'view'"  class="btn btn-previous btn-right mr-3"
         (click)="skip()">Skip</button>
-      <button id="signAndsubmit" *ngIf="step === 'step_3'" class="btn btn-primary btn-right"
+      <button id="signAndsubmit" *ngIf="step === 'step_3' && scheduleAction !== 'view'" class="btn btn-primary btn-right"
         (click)="signAndSubmit()">Sign &amp; Submit </button>
-      <button id="submit" *ngIf="step === 'step_4'" class="btn btn-primary btn-right" (click)="submit()">Submit</button>
+      <button id="submit" *ngIf="step === 'step_4' && scheduleAction !== 'view'" class="btn btn-primary btn-right" (click)="submit()">Submit</button>
+      <button id="next" *ngIf="scheduleAction === 'view' && step !== 'step_4' && step !== 'step_5'" class="btn btn-primary btn-right" (click)="next()">Next</button>
     </div>
   </div>
 </footer>

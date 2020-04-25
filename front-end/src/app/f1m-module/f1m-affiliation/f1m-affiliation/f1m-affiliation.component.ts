@@ -1,7 +1,9 @@
-import { ChangeDetectionStrategy, Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
+import { MessageService } from 'src/app/shared/services/MessageService/message.service';
+import { ScheduleActions } from 'src/app/forms/form-3x/individual-receipt/schedule-actions.enum';
+import { ChangeDetectionStrategy, Component, OnInit, Input, ChangeDetectorRef, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { TypeaheadService } from './../../../shared/partials/typeahead/typeahead.service';
 
@@ -11,26 +13,44 @@ import { TypeaheadService } from './../../../shared/partials/typeahead/typeahead
   styleUrls: ['./f1m-affiliation.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class F1mAffiliationComponent implements OnInit {
+export class F1mAffiliationComponent implements OnInit, OnDestroy {
 
+  @Input() scheduleAction: ScheduleActions;
   public form: FormGroup;
   public tooltipPlaceholder = "Placeholder text";
+  public disableEdit : boolean = false;
+
+  private onDestroy$ = new Subject();
 
   constructor(
     private _fb: FormBuilder,
     private _typeaheadService: TypeaheadService, 
-    public cd: ChangeDetectorRef
-  ) { }
+    public cd: ChangeDetectorRef,
+    private _messageService: MessageService
+  ) {
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(message =>{
+      if(message && message.action ==='disableFields'){
+        if(this.form){
+          this.form.disable();
+        }
+      }
+    });
+   }
 
   ngOnInit() {
+    this.disableEdit = this.scheduleAction === ScheduleActions.view ? true : false;
     this.initForm();
   }
-  
+
+  ngOnDestroy(){
+    this.onDestroy$.next(true);
+  }
+
   public initForm() {
     this.form = this._fb.group({
-      affiliation_date: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
-      committee_id: new FormControl(null, [Validators.required, Validators.maxLength(9)]),
-      committee_name: new FormControl(null, [Validators.required, Validators.maxLength(100)])
+      affiliation_date: new FormControl({value:null,disabled:this.disableEdit}, [Validators.required, Validators.maxLength(100)]),
+      committee_id: new FormControl({value:null,disabled:this.disableEdit}, [Validators.required, Validators.maxLength(9)]),
+      committee_name: new FormControl({value:null,disabled:this.disableEdit}, [Validators.required, Validators.maxLength(100)])
     });
   }
 

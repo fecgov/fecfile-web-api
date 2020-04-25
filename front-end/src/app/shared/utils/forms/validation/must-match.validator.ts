@@ -18,10 +18,23 @@ import { FormGroup } from '@angular/forms';
         }
 
         // set error on matchingControl if validation fails
-        if (control.value && control.value !== matchingControl.value) {
+
+        let controlStr = control.value;
+        let matchingControlStr = matchingControl.value;
+
+        if(controlStr === null){
+            controlStr = '';
+        }
+
+        if(matchingControlStr === null){
+            matchingControlStr = '';
+        }
+
+        if (controlStr.toString().toLowerCase() !== matchingControlStr.toString().toLowerCase()) {
             matchingControl.setErrors({ mustMatch: true });
         } else {
             matchingControl.setErrors(null);
         }
+
     }
   }

@@ -80,9 +80,7 @@ import { HeaderComponent } from './shared/partials/header/header.component';
 import { PreviewComponent } from './shared/partials/preview/preview.component';
 import { SidebarComponent } from './shared/partials/sidebar/sidebar.component';
 import { SignComponent } from './shared/partials/sign/sign.component';
-import { SubmitComponent } from './shared/partials/submit/submit.component';
 import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
-import { ValidateComponent } from './shared/partials/validate/validate.component';
 import { FilterPipe } from './shared/pipes/filter/filter.pipe';
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
 import { SafeHTMLPipe } from './shared/pipes/safeHTML/safe-html.pipe';
@@ -101,9 +99,6 @@ import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.
 import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 
-// import * as AWS from 'aws-sdk';
-import * as AWS from 'aws-sdk/global';
-import * as S3 from 'aws-sdk/clients/s3';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -136,10 +131,9 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TypeComponent,
     ReasonComponent,
     PreviewComponent,
-    ValidateComponent,
+    // ValidateComponent,
     SignComponent,
     TypeaheadComponent,
-    SubmitComponent,
     AccountComponent,
     UsersComponent,
     SettingsComponent,
