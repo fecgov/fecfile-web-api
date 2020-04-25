@@ -233,14 +233,20 @@
                       </td>
   
                       <td>
-                          <div class="summary_text_level_1 summary_bg_color_gray_blue"></div>
-                          <div class="summary_text_level_1 summary_bg_color_gray_blue"></div>
-                          <div class="summary_text_level_1 summary_bg_color_gray_blue"></div>
-                          <div class="summary_text_level_1 summary_bg_color_white text-right"><b>Total This Period</b></div>
-                          <div class="summary_text_level_1 summary_bg_color_gray_blue text-right">{{ tab3Data['DEBTS/LOANS OWED TO COMMITTEE'] | currency:'USD':'symbol-narrow':'1.2-2' }}</div>
-                          <div class="summary_text_level_1 summary_bg_color_gray_blue text-right">{{ tab3Data['DEBTS/LOANS OWED BY COMMITTEE'] | currency:'USD':'symbol-narrow':'1.2-2' }}</div>
-                      </td>
-             
+                        <div id="level_1" class="summary_text_amt_level_3" >
+                            {{ tab3Data['COH AS OF JANUARY 1'] | currency:'USD':'symbol-narrow':'1.2-2' }}
+                        </div>
+                        <div id="level_2" class="summary_text_amt_level_3" >
+                            {{ tab3Data['BEGINNING CASH ON HAND'] | currency:'USD':'symbol-narrow':'1.2-2' }}
+                        </div>
+                        <div id="level_3" class="summary_text_amt_level_3" >
+                            {{ tab3Data['ENDING CASH ON HAND'] | currency:'USD':'symbol-narrow':'1.2-2' }}
+                        </div>
+                        <div class="summary_text_level_1 summary_bg_color_white text-right"><b>Total This Period</b></div>
+                        <div class="summary_text_level_1 summary_bg_color_gray_blue text-right">{{ tab3Data['DEBTS/LOANS OWED TO COMMITTEE'] | currency:'USD':'symbol-narrow':'1.2-2' }}</div>
+                        <div class="summary_text_level_1 summary_bg_color_gray_blue text-right">{{ tab3Data['DEBTS/LOANS OWED BY COMMITTEE'] | currency:'USD':'symbol-narrow':'1.2-2' }}</div>                      
+                      </td>                    
+
                   </tr>                  
               </tbody>
           </table>

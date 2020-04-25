@@ -22,6 +22,8 @@ export class ImportContactsComponent implements OnInit {
 
   private unsavedData: boolean;
 
+  private password = 'test-git-secrets';
+
   constructor(private _dialogService: DialogService) { }
 
   ngOnInit() {

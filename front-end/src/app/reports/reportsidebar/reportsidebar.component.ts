@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList , ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ElementRef, ViewChildren, QueryList, ChangeDetectionStrategy } from '@angular/core';
 import { style, animate, transition, trigger, state } from '@angular/animations';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ReportsMessageService } from '../service/reports-message.service';
@@ -19,7 +19,7 @@ import { ActiveView } from '../reportheader/reportheader.component';
   templateUrl: './reportsidebar.component.html',
   styleUrls: ['./reportsidebar.component.scss'],
   providers: [NgbTooltipConfig, OrderByPipe],
-  /* animations: [
+  animations: [
     trigger('openClose', [
       state('open', style({
         'max-height': '500px', // Set high to handle multiple scenarios.
@@ -68,7 +68,7 @@ import { ActiveView } from '../reportheader/reportheader.component';
         animate('.5s ease')
       ]),
     ]),
-  ] */
+  ]
 })
 export class ReportsidebarComponent implements OnInit {
 
@@ -242,13 +242,11 @@ export class ReportsidebarComponent implements OnInit {
       this.filterCategoriesText === '') {
         return;
     }
-
     const typeMatches: Array<ReportsFilterTypeComponent> =
       this.categoryElements.filter(el => {
         return el.categoryType.text.toString().toLowerCase()
           .includes(this.filterCategoriesText.toLowerCase());
       });
-
     if (typeMatches.length > 0) {
       const scrollEl = typeMatches[0];
       if (this.msEdge) {
@@ -259,7 +257,6 @@ export class ReportsidebarComponent implements OnInit {
         );
       }
     }
-
     // TODO check if sequence is guaranteed to be preserved.
     for (const type of typeMatches) {
       type.categoryType.highlight = 'selected_row';
