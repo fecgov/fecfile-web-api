@@ -197,4 +197,9 @@ urlpatterns = [
         views.get_coverage_dates,
         name="get_coverage_dates",
     ),
+    url(
+        r"^core/get_treasurer_info$",
+        views.get_treasurer_info,
+        name="get_treasurer_info",
+    ),
 ]

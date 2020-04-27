@@ -645,11 +645,10 @@ def check_list_cvg_dates(args):
                 "SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC",
                 [cmte_id, form_type],
             )
-
             if len(args) == 4:
                 for row in cursor.fetchall():
                     if not (row[1] is None or row[2] is None):
-                        if cvg_end_dt <= row[2] and cvg_start_dt >= row[1]:
+                        if cvg_start_dt <= row[2] and row[1] <= cvg_end_dt:
                             forms_obj.append(
                                 {
                                     "report_id": row[0],
@@ -674,7 +673,6 @@ def check_list_cvg_dates(args):
                                     "report_type": row[3],
                                 }
                             )
-
         return forms_obj
     except Exception:
         raise
@@ -6767,14 +6765,14 @@ def prepare_json_builders_data(request):
         # commented by Mahendra 10052019
         # return Response({'Response':'Success'}, status=status_value)
 
-        with connection.cursor() as cursor:
-            # query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
-            # cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
-            update_query = (
-                """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
-                % (update_str, cmte_id, report_id)
-            )
-            cursor.execute(update_query)
+        # with connection.cursor() as cursor:
+        #     # query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
+        #     # cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
+        #     update_query = (
+        #         """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
+        #         % (update_str, cmte_id, report_id)
+        #     )
+        #     cursor.execute(update_query)
             # print("Updated on Database ---- yoyooooo")
         return Response({"Response": "Success"}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -9971,3 +9969,26 @@ def get_year_reports(cmte_id, report_id):
 def function_to_call_wrapper_update_F3X(report_id, cmte_id):
     return {"report_id" : report_id,
             "cmte_id" : cmte_id}
+
+@api_view(['GET'])
+def get_treasurer_info(request):
+  try:
+      cmte_id = request.user.username
+      _sql = """SELECT com_name AS "committeeName", 
+                concat_ws(', ', com_str1, com_str2, com_city, com_state, com_zip) AS "address",
+                ttitle AS "treasurerTitle",
+                concat_ws(' ', t_prefix, t_fname, t_mname, t_lname, t_suffix) AS "treasurerName",
+                tphone AS "treasurerPhone", url AS "website", fax, email
+                FROM public.form_1 WHERE comid=%s ORDER BY sub_date DESC, create_date DESC 
+                LIMIT 1"""
+      with connection.cursor() as cursor:
+          cursor.execute("""SELECT json_agg(t) FROM ({}) t""".format(_sql), [cmte_id])
+          output_dict = cursor.fetchone()[0]
+          if output_dict:
+              output_dict = output_dict[0]
+          else:
+              output_dict = {}
+      return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
+  except Exception as e:
+      return Response('The get_treasurer_info API is throwing the following error: ' +str(e),
+          status=status.HTTP_400_BAD_REQUEST)

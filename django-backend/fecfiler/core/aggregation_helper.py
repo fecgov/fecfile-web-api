@@ -109,12 +109,6 @@ ITEMIZATION_TRANSACTION_TYPE_IDENTIFIER_LIST = [
     "RET_REC",
     "BC_TO_IND",
     "BC_TO_UNKN",
-    "LEVIN_PARTN_MEMO",
-    "LEVIN_TRIB_REC",
-    "LEVIN_PARTN_REC",
-    "LEVIN_ORG_REC",
-    "LEVIN_INDV_REC",
-    "LEVIN_NON_FED_REC",
     "PAC_NON_FED_RET",
     "PAC_NON_FED_REC",
 ]
@@ -306,7 +300,7 @@ def list_all_transactions_entity_la(
 
 
 def put_sql_agg_amount_schedA(
-    cmte_id, transaction_id, aggregate_amount, itemized_ind, line_number
+    cmte_id, transaction_id, aggregate_amount, itemized_ind
 ):
     """
     update aggregate amount
@@ -317,13 +311,12 @@ def put_sql_agg_amount_schedA(
                 """
                 UPDATE public.sched_a 
                 SET aggregate_amt = %s,
-                    itemized_ind = %s,
-                    line_number = %s
+                    itemized_ind = %s
                 WHERE transaction_id = %s 
                 AND cmte_id = %s 
                 AND delete_ind is distinct from 'Y'
                 """,
-                [aggregate_amount, itemized_ind, line_number, transaction_id, cmte_id],
+                [aggregate_amount, itemized_ind, transaction_id, cmte_id],
             )
             if cursor.rowcount == 0:
                 raise Exception(
@@ -395,10 +388,8 @@ def update_aggregate_la(datum):
                 if not transaction[9] == "N":
                     aggregate_amount += transaction[0]
                     if aggregate_amount <= itemization_value:
-                        output_line_number = "11AII"
                         itemized_ind = "U"
                     else:
-                        output_line_number = "11AI"
                         itemized_ind = "I"
 
                 # if transaction[7] != None or (
@@ -413,7 +404,6 @@ def update_aggregate_la(datum):
                         transaction_id,
                         aggregate_amount,
                         itemized_ind,
-                        output_line_number,
                     )
 
                     # child_SA_transaction_list = get_list_agg_child_schedA(report_id, cmte_id, transaction[1])
@@ -536,10 +526,8 @@ def update_aggregate_lb(datum):
                 else:
                     if aggregate_amount <= 200:
                         itemized_ind = "U"
-                        line_number = "11AII"
                     else:
                         itemzied_ind = "I"
-                        line_number = "11AI"
 
                 # if transaction[7] != None or (
                 #     transaction[7] == None and transaction[6] != "X"
@@ -552,9 +540,7 @@ def update_aggregate_lb(datum):
                         cmte_id,
                         transaction_id,
                         aggregate_amount,
-                        itemized_ind,
-                        line_number,
-                    )
+                        itemized_ind                    )
 
                     # child_SA_transaction_list = get_list_agg_child_schedA(report_id, cmte_id, transaction[1])
                     # for child_SA_transaction in child_SA_transaction_list:
@@ -1741,7 +1727,7 @@ def update_linenumber_aggamt_transactions_SA(
                         put_sql_agg_amount_schedA(
                             cmte_id,
                             child_SA_transaction.get("transaction_id"),
-                            aggregate_amount,
+                            aggregate_amount
                         )
                 # Updating aggregate amount to child auto generate sched B transactions
                 if child_flag_SB:
@@ -1988,7 +1974,7 @@ def put_sql_agg_amount_schedB(cmte_id, transaction_id, aggregate_amount):
 
 
 def put_sql_agg_amount_LB(
-    cmte_id, transaction_id, aggregate_amount, itemized_ind, line_number
+    cmte_id, transaction_id, aggregate_amount, itemized_ind
 ):
     """
     update aggregate amount
@@ -1999,13 +1985,12 @@ def put_sql_agg_amount_LB(
                 """
                 UPDATE public.sched_b 
                 SET aggregate_amt = %s,
-                    itemized_ind = %s,
-                    line_number = %s
+                    itemized_ind = %s
                 WHERE transaction_id = %s 
                 AND cmte_id = %s 
                 AND delete_ind is distinct from 'Y'
                 """,
-                [aggregate_amount, itemized_ind, line_number, transaction_id, cmte_id],
+                [aggregate_amount, itemized_ind, transaction_id, cmte_id],
             )
             if cursor.rowcount == 0:
                 raise Exception(
