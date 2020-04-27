@@ -177,7 +177,6 @@ def user_data_dict():
         "last_name",
         "email",
         "role",
-        "is_active",
         "contact"
     ]
     return valid_fields
@@ -275,7 +274,7 @@ def add_new_user(data, cmte_id):
                     data.get("email"),
                     data.get("contact"),
                     (data.get("role")).upper(),
-                    (data.get("is_active")),
+                    "true",
                     cmte_id,
                     'N'
                 ],
@@ -294,7 +293,7 @@ def put_sql_user(data):
             _sql = """UPDATE public.authentication_account SET delete_ind = 'N', role = %s,is_active = %s,first_name = %s,last_name = %s,email = %s,contact = %s,username = %s WHERE id = %s AND cmtee_id = %s AND delete_ind != 'Y'"""
             _v = (
                 data.get("role"),
-                data.get("is_active"),
+                "true",
                 data.get("first_name"),
                 data.get("last_name"),
                 data.get("email"),
@@ -353,7 +352,7 @@ def check_custom_validations(email, status, role):
         check_email_validation(email)
         if status in ["null", "NULL"]:
             raise Exception("Status value should be either ACTIVE or INACTIVE")
-        if role.upper() not in ["ADMIN", "READ-ONLY", "UPLOADER"]:
+        if role.upper() not in ["ADMIN", "READ_ONLY", "UPLOADER", "FILER"]:
             raise Exception("Role should be ADMIN, READ-ONLY, UPLOADER")
     except Exception as e:
         logger.debug("Custom validation failed")
