@@ -37,6 +37,7 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
     superceded_report_id_list,
+    update_F3X
 )
 from fecfiler.sched_A.views import (
     get_list_child_schedA,
@@ -313,7 +314,7 @@ def initial_loan(transaction_id):
             return True
         return False
 
-
+@update_F3X
 @new_report_date
 def put_schedC(data):
     """
@@ -698,7 +699,7 @@ def remove_schedC(data):
     except:
         raise
 
-
+@update_F3X
 @new_report_date
 def post_schedC(data):
     """

@@ -38,7 +38,7 @@
 
   <ng-container *ngIf="!showPart2">
     <form [formGroup]="form">
-      <section *ngIf="qualificationData?.candidates?.length < 5">
+      <section *ngIf="qualificationData?.candidates?.length < 5 || isEditCandidateMode">
         <div class="content">
           <div class="grid-row">
             <div class="grid-row__col space-bottom pt-5">
@@ -242,9 +242,17 @@
               </div>
             </div>
           </div>
+          <div class="row candidate-footer">
+            <div class="form-group col offset-md-1">
+              <button *ngIf="qualificationData?.candidates?.length < 5 || isEditCandidateMode" class="btn btn-previous btn-left" (click)="cancel()">Cancel</button>
+            </div>
+            <div class="form-group col">
+              <button *ngIf="qualificationData?.candidates?.length < 5 || isEditCandidateMode" class="btn btn-primary btn-right" (click)="addCandidate()">Save Candidate</button>
+            </div>
+          </div>
         </div>
       </section>
-      <section *ngIf="qualificationData?.candidates?.length >= 5">
+      <section *ngIf="qualificationData?.candidates?.length >= 5 && !isEditCandidateMode">
         <div class="content">
           <div class="grid-row">
             <div class="grid-row__col space-bottom pt-5">
@@ -256,13 +264,13 @@
           <div class="grid-row">
             <div class="grid-row__col space-bottom py-2" style="text-align:center;">
               <span>
-                5 Candidates have been added, click Save & Continue to provide Contribution information.
+                5 Candidates have been added, click Save & Continue to provide contribution information.
               </span>
             </div>
           </div>
         </div>
       </section>
-      <section class="paragraph" *ngIf="qualificationData && qualificationData.candidates.length > 0">
+      <section class="paragraph" *ngIf="qualificationData && qualificationData.candidates && qualificationData.candidates.length > 0">
         <hr/>
         <app-f1m-candidates-table [candidatesData]="qualificationData.candidates" >
         </app-f1m-candidates-table>
@@ -326,7 +334,8 @@
                                             (formPart2?.touched || formPart2?.dirty)
                                               ? 'input-field-error'
                                               : ''" id="fifty_first_contributor_date"
-                  aria-label="Enter fifty first contributor_date" aria-describedby="fifty_first_contributor_date" required>
+                  aria-label="Enter fifty first contributor_date" aria-describedby="fifty_first_contributor_date" required
+                  (change)="dateChanged('fifty_first_contributor_date')">
               </div>
               <div class="text-error text-left"
                 *ngIf="formPart2?.controls?.fifty_first_contributor_date?.errors && formPart2?.controls?.fifty_first_contributor_date?.errors['fifty_first_contributor_date']">

@@ -280,12 +280,12 @@
                   <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                     Previous
                   </button>
-                  <a class="btn btn-primary btn-right" (click)="returnToSum()">
+                  <button class="btn btn-secondary btn-right" type="button" (click)="saveAndAddMore()">
+                    Save &amp; Add Transaction
+                  </button>
+                  <a class="btn btn-previous btn-right" (click)="returnToSum()">
                     Summary
                   </a>
-                  <button class="btn btn-previous btn-right" type="button" (click)="saveAndAddMore()">
-                    Add
-                  </button>
                 </div>
                 <div *ngIf="scheduleAction === editScheduleAction">
                   <button class="btn btn-previous btn-left" type="button" (click)="cancelReturnToSum()">

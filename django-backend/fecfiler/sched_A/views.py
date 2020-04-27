@@ -29,6 +29,8 @@ from fecfiler.core.views import (
     undo_delete_entities,
     superceded_report_id_list,
     get_sched_h_transaction_table,
+    update_F3X,
+    function_to_call_wrapper_update_F3X
 )
 
 from fecfiler.core.transaction_util import (
@@ -732,7 +734,7 @@ def get_in_kind_entity_name(entity_data):
 **************************************************** API FUNCTIONS - SCHED A TRANSACTION *************************************************************
 """
 
-
+@update_F3X
 @new_report_date
 def post_schedA(datum):
     """save sched_a item and the associated entities."""
@@ -965,7 +967,7 @@ def get_schedA(data):
     except:
         raise
 
-
+@update_F3X
 @new_earmarkout_expenditure_amount
 @new_memo_contribution_amount
 @new_report_date
@@ -2953,6 +2955,8 @@ def trash_restore_transactions(request):
         # update report last_update_date
         renew_report_update_date(report_id)
 
+        function_to_call_wrapper_update_F3X(report_id, cmte_id)
+
         # except Exception as e:
         #     return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
         #         status=status.HTTP_400_BAD_REQUEST)
@@ -2988,7 +2992,7 @@ def get_report_id_from_date(request):
                 """SELECT json_agg(t) FROM (SELECT report_id AS "reportId", CASE WHEN(status IS NULL 
                     OR status::text = 'Saved'::text) THEN 'Saved'
                     ELSE 'Filed' END AS status FROM public.reports WHERE form_type = 'F3X' AND cmte_id=%s AND %s>=cvg_start_date
-                    AND %s<=cvg_end_date AND delete_ind IS DISTINCT FROM 'Y' ORDER BY amend_ind ASC, amend_number DESC
+                    AND %s<=cvg_end_date AND delete_ind IS DISTINCT FROM 'Y' AND superceded_report_id IS NULL
                     LIMIT 1) t""",
                 [cmte_id, transaction_date, transaction_date],
             )

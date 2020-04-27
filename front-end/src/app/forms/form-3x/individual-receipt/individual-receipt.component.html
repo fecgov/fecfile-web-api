@@ -647,7 +647,7 @@
                     Return to {{ subTransactionInfo.transactionTypeDescription }}
                   </a>
                   <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="(frmIndividualReceipt.dirty) ? saveOrWarn() : viewTransactions()">
-                    View Transactions
+                    Save &amp; View Transactions
                   </a>
                 </ng-template>
               </div>
@@ -689,7 +689,7 @@
                       Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}
                     </a>
                     <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="(frmIndividualReceipt.dirty) ? saveOrWarn() : viewTransactions()">
-                      View Transactions
+                      Save &amp; View Transactions
                     </a>
                   </div>
                   <div *ngIf="isShedH4OrH6TransactionType(transactionType)">
@@ -697,11 +697,11 @@
                       (click)="previousStep()">
                       Previous
                     </button>
-                    <button class="btn btn-primary btn-right" (click)="saveForReturnToSummary()">
-                      Summary
+                    <button class="btn btn-secondary btn-right" (click)="saveOnly()">
+                      Save &amp; Add Transaction
                     </button>
-                    <button class="btn btn-previous btn-right" (click)="saveOnly()">
-                      Save and Add
+                    <button class="btn btn-previous btn-right" (click)="saveForReturnToSummary()">
+                      Summary
                     </button>
                   </div>
                 </ng-template>

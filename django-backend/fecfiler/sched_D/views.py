@@ -37,6 +37,7 @@ from fecfiler.core.views import (
     put_entities,
     remove_entities,
     undo_delete_entities,
+    update_F3X
 )
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.core.report_helper import new_report_date
@@ -350,7 +351,7 @@ def valid_transaction_amounts(data):
         float(incurred_amount) - float(payment_amount)
     ) == float(balance_at_close)
 
-
+@update_F3X
 @new_report_date
 def put_schedD(datum):
     """update sched_d item
@@ -554,7 +555,7 @@ def validate_sd_data(data):
     check_mandatory_fields_SD(data)
     # validate_transaction_type(data)
 
-
+@update_F3X
 @new_report_date
 def post_schedD(datum):
     """save sched_d item and the associated entities."""

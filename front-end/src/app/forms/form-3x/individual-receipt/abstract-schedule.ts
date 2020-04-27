@@ -1,3 +1,4 @@
+import { entityTypes } from './entity-types-json';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
@@ -185,7 +186,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     "COEXP_PMT_PROL_MEMO",
     "COEXP_PARTY_DEBT"
   ];
-  private staticEntityTypes =  [{entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: false}, {entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: true}];
+  private staticEntityTypes =  [{entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: false}, {entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: false}];
   
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
   //there is no unsubscribe() for activateRoute . 
@@ -3476,8 +3477,77 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             || this.transactionType === 'OTH_DISB_NP_RECNT_TRIB_REF'
             || this.transactionType === 'PAC_NON_FED_REC'
             || this.transactionType === 'PAC_NON_FED_RET'
+            //|| this.transactionType === 'ALLOC_EXP'
+            //|| this.transactionType === 'ALLOC_EXP_CC_PAY'
+
+            || this.transactionType === 'PARTN_REC'
+            || this.transactionType === 'BUS_LAB_NON_CONT_ACC'
+            || this.transactionType === 'OTH_REC'
+
             || this.transactionType === 'ALLOC_EXP'
             || this.transactionType === 'ALLOC_EXP_CC_PAY'
+            || this.transactionType === 'ALLOC_EXP_CC_PAY_MEMO'
+            || this.transactionType === 'ALLOC_EXP_STAF_REIM'
+            || this.transactionType === 'ALLOC_EXP_STAF_REIM_MEMO'
+            || this.transactionType === 'ALLOC_EXP_PMT_TO_PROL'
+            || this.transactionType === 'ALLOC_EXP_PMT_TO_PROL_MEMO'
+            || this.transactionType === 'ALLOC_EXP_VOID'
+
+            || this.transactionType === 'ALLOC_FEA_DISB'
+            || this.transactionType === 'ALLOC_FEA_CC_PAY'
+            || this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO'
+            || this.transactionType === 'ALLOC_FEA_STAF_REIM'
+            || this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO'
+            || this.transactionType === 'ALLOC_FEA_VOID'
+
+            || this.transactionType === 'LEVIN_VOTER_REG'
+            || this.transactionType === 'LEVIN_VOTER_ID'
+            || this.transactionType === 'LEVIN_GOTV'
+            || this.transactionType === 'LEVIN_GEN'
+            || this.transactionType === 'LEVIN_OTH_DISB'
+
+            || this.transactionType === 'LEVIN_ORG_REC'
+            || this.transactionType === 'LEVIN_PARTN_REC'
+            || this.transactionType === 'LEVIN_NON_FED_REC'
+            || this.transactionType === 'LEVIN_TRIB_REC'
+            || this.transactionType === 'LEVIN_OTH_REC'
+
+            || this.transactionType === 'OPEXP'
+            || this.transactionType === 'OPEXP_CC_PAY'
+            || this.transactionType === 'OPEXP_STAF_REIM'
+            || this.transactionType === 'OPEXP_PMT_TO_PROL'
+            || this.transactionType === 'OPEXP_VOID'
+
+            || this.transactionType === 'IE'
+            || this.transactionType === 'IE_MULTI'
+            || this.transactionType === 'IE_STAF_REIM_MEMO'
+            || this.transactionType === 'IE_CC_PAY'
+            || this.transactionType === 'IE_CC_PAY_MEMO'
+            || this.transactionType === 'IE_STAF_REIM'
+            || this.transactionType === 'IE_PMT_TO_PROL'
+            || this.transactionType === 'IE_VOID'
+
+            || this.transactionType === 'OTH_DISB'
+            || this.transactionType === 'OTH_DISB_CC_PAY'
+            || this.transactionType === 'OTH_DISB_STAF_REIM'
+            || this.transactionType === 'OTH_DISB_PMT_TO_PROL'
+            || this.transactionType === 'OTH_DISB_RECNT'
+            || this.transactionType === 'OTH_DISB_NP_RECNT_ACC'
+            || this.transactionType === 'OTH_DISB_VOID'
+            || this.transactionType === 'OPEXP_HQ_ACC_OP_EXP_NP'
+            || this.transactionType === 'OPEXP_CONV_ACC_OP_EXP_NP'
+            || this.transactionType === 'OPEXP_HQ_ACC_TRIB_REF'
+            || this.transactionType === 'OPEXP_CONV_ACC_TRIB_REF'
+            || this.transactionType === 'OTH_DISB_NP_RECNT_TRIB_REF'
+
+            || this.transactionType === 'FEA_100PCT_PAY'
+            || this.transactionType === 'FEA_CC_PAY'
+            || this.transactionType === 'FEA_STAF_REIM'
+            || this.transactionType === 'FEA_PAY_TO_PROL'
+            || this.transactionType === 'FEA_VOID'
+
+            || this.transactionType === 'DEBT_BY_VENDOR'
+            || this.transactionType === 'DEBT_TO_VENDOR'
           ){
             return this._typeaheadService.getContacts(searchText, 'entity_name', false, 'OFF');
           }else if(this.transactionType === 'CON_EAR_DEP_MEMO'
@@ -3996,6 +4066,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                   res.data.entityTypes = this.entityTypes;
                   if(!res.data.entityTypes || res.data.entityTypes.length === 0){
                     res.data.entityTypes = this.staticEntityTypes;
+
+                    //also need to choose which option should be selected by default based on the form fields present
+                    //for now logic being used is if the formFields has 'entity_name' field present, its a org, otherwise its ind
+                    // this.applyDefaultEntity();
+                    this.applyDefaultEntity(res);
                   }
                 }
                 if (Array.isArray(res.data.entityTypes)) {
@@ -4064,6 +4139,35 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.sendPopulateMessageIfApplicable();
       });
 
+  }
+
+  /**
+   * This method is being used as a patch fix until API is fixed to return default/selected entity type array
+   * @param res 
+   */
+  private applyDefaultEntity(res: any) {
+    let defaultEntityisOrg: boolean = false;
+    if (this.findFormField('entity_name')) {
+      defaultEntityisOrg = true;
+    }
+    res.data.entityTypes.forEach(element => {
+      if (element.entityType === 'ORG') {
+        if (defaultEntityisOrg) {
+          element.selected = true;
+        }
+        else {
+          element.selected = false;
+        }
+      }
+      else if (element.entityType === 'IND') {
+        if (defaultEntityisOrg) {
+          element.selected = false;
+        }
+        else {
+          element.selected = true;
+        }
+      }
+    });
   }
 
   private populateDataForSchedHSubTransaction(schedHSubTran: boolean) {

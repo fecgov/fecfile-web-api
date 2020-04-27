@@ -14,30 +14,36 @@
       </div>
     </header>
     <section>
-      <div class="form__content tight_box pl-4" *ngIf="step === 'step_1'">
+      <div class="form__content tight_box pl-4" [hidden]="step !== 'step_1'">
         <app-f1m-type (changeStep)="changeStep($event)"></app-f1m-type>
       </div>
-      <div class="form__content tight_box pl-4" *ngIf="step === 'step_2'">
+      <div class="form__content tight_box pl-4" [hidden]="step !== 'step_2'">
         <app-f1m-affiliation *ngIf="type === 'affiliation'"></app-f1m-affiliation>
       </div>
-      <div class="form__content tight_box pl-4" *ngIf="step === 'step_2'">
-        <app-f1m-qualification [candidateNumber]="candidateNumber" [qualificationData]="qualificationData" *ngIf="type === 'qualification'">
+      <div class="form__content tight_box pl-4" [hidden]="step !== 'step_2'">
+        <app-f1m-qualification  *ngIf="type === 'qualification'"
+        [candidateNumber]="candidateNumber" [qualificationData]="qualificationData" [reportId]="reportId"
+        (addCandidateEvent) = "saveAndContinue($event)"
+        >
         </app-f1m-qualification>
       </div>
-      <div class="form__content tight_box pl-4" *ngIf="step === 'step_3'">
+      <div class="form__content tight_box pl-4" [hidden]="step !== 'step_3'">
         <app-f1m-preview 
           [reportId]="reportId" 
           [affiliationData]="affiliationData" 
           [qualificationData]="qualificationData" 
           [type]="type" 
           [treasurerData]="treasurerData"
+          [step]="step"
           >
         </app-f1m-preview>
       </div>
-      <div class="form__content tight_box pl-4" *ngIf="step === 'step_4'">
-        <app-sign-and-submit [formTitle]="'Form 1M / By Affiliation'"
+      <div class="form__content tight_box pl-4" [hidden]="step !== 'step_4'">
+        <app-sign-and-submit [formTitle]="'Form 1M / By ' + type | titlecase"
           [reportId]="reportId"
           [emailsOnFile]="emailsOnFile"
+          [scheduleAction]="scheduleAction"
+          [formData]="signAndSubmitData"
         >
 
         </app-sign-and-submit>
@@ -50,7 +56,7 @@
     <div class="forms__btn-container">
       <button id="previous" class="btn btn-previous btn-left" *ngIf="step !== 'step_1'"
         (click)="previous()">Previous</button>
-      <button id="saveAndContinue" *ngIf="step === 'step_2'" class="btn btn-primary btn-right"
+      <button id="saveAndContinue" *ngIf="type === 'qualification' ? step === 'step_2' && qualificationData?.candidates?.length >=5 : step === 'step_2'" class="btn btn-primary btn-right"
         (click)="saveAndContinue()">Save &amp; Continue </button>
       <button id="skip" *ngIf="step === 'step_2' && partyType === 'PTY'"  class="btn btn-previous btn-right mr-3"
         (click)="skip()">Skip</button>

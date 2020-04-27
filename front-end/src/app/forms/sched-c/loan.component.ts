@@ -1,3 +1,4 @@
+import { IndividualReceiptService } from './../form-3x/individual-receipt/individual-receipt.service';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -98,7 +99,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     private _transactionsMessageService: TransactionsMessageService,
     private _contributionDateValidator: ContributionDateValidator,
     private _f3xMessageService: F3xMessageService,
-    private _activatedRoute: ActivatedRoute
+    private _activatedRoute: ActivatedRoute, 
+    private _indReceiptService: IndividualReceiptService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -988,6 +990,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         .saveSched_C(this.scheduleAction, this._transactionTypeIdentifier, LoanObj.entity_type, this.reportId)
         .subscribe(res => {
           if (res) {
+
+            this.updateThirdNavAmounts(res);
             //console.log('_LoansService.saveContact res', res);
             this.frmLoan.reset();
             this._selectedEntity = null;
@@ -1026,6 +1030,16 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 
+
+  private updateThirdNavAmounts(res: any) {
+    this._indReceiptService.getSchedule(this.formType, res).subscribe(resp => {
+      const message: any = {
+        formType: this.formType,
+        totals: resp
+      };
+      this._messageService.sendMessage(message);
+    });
+  }
 
   private _gotoSummary() {
     const summaryEmitObj: any = {

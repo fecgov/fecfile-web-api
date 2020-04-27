@@ -26,6 +26,7 @@ from fecfiler.core.views import (
     put_entities,
     remove_entities,
     undo_delete_entities,
+    update_F3X
 )
 from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent, get_line_number_trans_type
 from fecfiler.sched_A.views import get_next_transaction_id
@@ -194,7 +195,7 @@ def get_existing_expenditure_amount(cmte_id, transaction_id):
     except:
         raise
 
-
+@update_F3X
 @new_report_date
 def put_schedF(data):
     """
@@ -346,7 +347,7 @@ def validate_sF_data(data):
     """
     check_mandatory_fields_SF(data)
 
-
+@update_F3X
 @new_report_date
 def post_schedF(data):
     """
