@@ -517,7 +517,7 @@ def update_toggle_status(status, data):
         with connection.cursor() as cursor:
             # check if user already exist
             _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' """
-            cursor.execute(_sql, [status, data.get("id")])
+            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id")])
 
             if cursor.rowcount != 1:
                 raise NoOPError(
