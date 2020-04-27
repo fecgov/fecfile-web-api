@@ -244,16 +244,6 @@
         </ng-container>
       </div>
 
-      <div *ngIf="scheduleAction !== editScheduleAction" class="grid-row">
-        <div class="grid-row__col grid-row__col--12">
-          <div class="forms__btn-container">
-            <button class="btn btn-primary btn-right" type="button" [disabled]="saveAndAddDisabled"
-              (click)="saveAddMore()">
-              Save & Add
-            </button>
-          </div>
-        </div>
-      </div>
     </section>
 
     <footer *ngIf="transactionType === 'ALLOC_H5_RATIO'">
@@ -267,7 +257,7 @@
                 </button>
                 <button class="btn btn-secondary btn-right" type="button" [disabled]="saveAndAddDisabled"
                   (click)="saveAddMore()">
-                  Save & Add
+                  Save &amp; Add Transaction
                 </button>
                 <a class="btn btn-previous btn-right" (click)="goSummary()">
                   Summary
@@ -278,7 +268,7 @@
                   Cancel
                 </button>
                 <button class="btn btn-secondary btn-right" type="button" (click)="saveEdit()">
-                  Save & Add
+                  Save
                 </button>
               </div>
             </div>

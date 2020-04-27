@@ -6,14 +6,6 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 To run local development environment if Django backend is also running locally at port 8080 run `npm run local`.
 
-## Running locally with key auth to AWS S3
-On Linux set environment variables for keys
-export ACCESS_KEY='YOUR-ACCESS-KEY'
-export SECRET_KEY='YOUR-SECRET-KEY'
-
-Run `ACCESS_KEY=$ACCESS_KEY SECRET_KEY=$SECRET_KEY npm run local` or
-Run `ACCESS_KEY=$ACCESS_KEY SECRET_KEY=$SECRET_KEY npm run local-aot`
-
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.

@@ -766,10 +766,10 @@ def form1M(request):
 	if request.method == "GET":
 		try:
 			step = "None"
-			noneCheckMissingParameters(['reportId'], checking_dict=request.data,
-				   value_dict=request.data, function_name='form1M-GET')
-			request_dict = f1m_sql_dict(cmte_id, step, request.data)
-			check_report_id_status(cmte_id, request_dict['report_id'], delete_flag=False, submit_flag=False)
+			noneCheckMissingParameters(['reportId'], checking_dict=request.query_params,
+				   value_dict=request.query_params, function_name='form1M-GET')
+			request_dict = f1m_sql_dict(cmte_id, step, request.query_params)
+			check_report_id_status(cmte_id, request.query_params['reportId'], delete_flag=False, submit_flag=False)
 			output_dict = get_sql_f1m(request_dict, True)
 			return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
 		except Exception as e:
@@ -881,7 +881,7 @@ def get_details(request):
 		return Response("The get_details API is throwing an error: " + str(e), 
 			status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def get_original_registration_date(request):
 	try:
 		cmte_id = request.user.username
@@ -903,7 +903,7 @@ def get_original_registration_date(request):
 		return Response("The get_original_registration API is throwing an error: " + str(e), 
 			status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def get_committee_met_req_date(request):
 	try:
 		cmte_id = request.user.username

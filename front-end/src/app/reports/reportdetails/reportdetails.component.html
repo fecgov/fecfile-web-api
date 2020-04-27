@@ -157,7 +157,7 @@
                     </div>
                 </td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">
-                    {{report.form_type !== 'F99'? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
+                    {{(report.form_type !== 'F99' && report.form_type !== 'F1M')? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
                 </td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
                 <td *ngIf="isColumnVisible('filed_date')">

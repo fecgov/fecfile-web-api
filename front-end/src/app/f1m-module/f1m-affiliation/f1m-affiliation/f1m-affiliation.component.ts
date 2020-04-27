@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Input, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { Observable } from 'rxjs';
@@ -18,7 +18,8 @@ export class F1mAffiliationComponent implements OnInit {
 
   constructor(
     private _fb: FormBuilder,
-    private _typeaheadService: TypeaheadService
+    private _typeaheadService: TypeaheadService, 
+    public cd: ChangeDetectorRef
   ) { }
 
   ngOnInit() {
