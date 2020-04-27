@@ -1,3 +1,4 @@
+import { IndividualReceiptService } from './../individual-receipt/individual-receipt.service';
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -66,7 +67,8 @@ export class ReportTypeComponent implements OnInit {
     private _dialogService: DialogService,
     private _datePipe: DatePipe,
     private  _reportService: ReportsService,
-    private  _transactionsMessageService: TransactionsMessageService
+    private  _transactionsMessageService: TransactionsMessageService, 
+    private _indReceiptService: IndividualReceiptService
   ) {}
 
   ngOnInit(): void {
@@ -526,6 +528,9 @@ export class ReportTypeComponent implements OnInit {
           return 0;
           // }
         }
+
+        this.updateThirdNavAmounts(res);
+        
         this.status.emit({
           form: this.frmReportType,
           direction: 'next',
@@ -535,6 +540,16 @@ export class ReportTypeComponent implements OnInit {
       }
     });
     return 0;
+  }
+
+  private updateThirdNavAmounts(res: any) {
+    this._indReceiptService.getSchedule(this.formType, res).subscribe(resp => {
+      const message: any = {
+        formType: this.formType,
+        totals: resp
+      };
+      this._messageService.sendMessage(message);
+    });
   }
 
   /**

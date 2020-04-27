@@ -1,3 +1,5 @@
+import { ValidateComponent } from './partials/validate/validate.component';
+import { SubmitComponent } from './partials/submit/submit.component';
 import { NgModule } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe, DatePipe } from '@angular/common';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -21,7 +23,9 @@ import { ModalModule } from 'ngx-bootstrap';
   declarations: [
     StepsComponent,
     SignAndSubmitComponent,
-    SubTransactionsTableComponent
+    SubTransactionsTableComponent,
+    SubmitComponent,
+    ValidateComponent
   ],
   exports: [
     CommonModule,
@@ -33,7 +37,8 @@ import { ModalModule } from 'ngx-bootstrap';
     ModalModule,
     StepsComponent,
     SignAndSubmitComponent,
-    SubTransactionsTableComponent
+    SubTransactionsTableComponent, 
+    SubmitComponent
   ], 
   providers: [
     DecimalPipe,
