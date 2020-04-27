@@ -6765,14 +6765,14 @@ def prepare_json_builders_data(request):
         # commented by Mahendra 10052019
         # return Response({'Response':'Success'}, status=status_value)
 
-        with connection.cursor() as cursor:
-            # query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
-            # cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
-            update_query = (
-                """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
-                % (update_str, cmte_id, report_id)
-            )
-            cursor.execute(update_query)
+        # with connection.cursor() as cursor:
+        #     # query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
+        #     # cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
+        #     update_query = (
+        #         """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
+        #         % (update_str, cmte_id, report_id)
+        #     )
+        #     cursor.execute(update_query)
             # print("Updated on Database ---- yoyooooo")
         return Response({"Response": "Success"}, status=status.HTTP_200_OK)
     except Exception as e:
