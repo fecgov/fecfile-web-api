@@ -4281,9 +4281,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
+    /*
     if (item) {
       this.toggleValidationIndOrg(item.group);
     }
+    */
   }
 
   /**
