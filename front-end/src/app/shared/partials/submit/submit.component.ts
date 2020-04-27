@@ -1,13 +1,10 @@
-import { Component, OnInit, ViewEncapsulation, Input, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { environment } from '../../../../environments/environment';
-import { MessageService } from '../../services/MessageService/message.service';
-import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
+import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { interval, Subscription } from 'rxjs';
-import { FormsService } from '../../services/FormsService/forms.service';
+import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
 import { DialogService } from '../../services/DialogService/dialog.service';
-import { ConfirmModalComponent, ModalHeaderClassEnum } from '../confirm-modal/confirm-modal.component';
-import { FormsComponent } from 'src/app/forms/forms.component';
+import { FormsService } from '../../services/FormsService/forms.service';
+import { MessageService } from '../../services/MessageService/message.service';
 
 @Component({
   selector: 'app-submit',
@@ -32,7 +29,6 @@ export class SubmitComponent implements OnInit, OnDestroy {
     private _reportTypeService: ReportTypeService,
     private _dialogService: DialogService,
     private _formsService: FormsService,
-    private _formsComponent: FormsComponent
   ) {}
 
   ngOnInit() {
@@ -98,7 +94,6 @@ export class SubmitComponent implements OnInit, OnDestroy {
     //if (!this.checkStatus) {
       this._router.navigateByUrl('dashboard');
     //} else {
-    //  this._formsComponent.canDeactivate();
     //}
   }
 

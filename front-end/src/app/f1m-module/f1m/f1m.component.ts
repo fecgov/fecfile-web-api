@@ -30,6 +30,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   public partyType : string = '';
   public scheduleAction = ScheduleActions.add;
   public signAndSubmitData : any = null;
+  public filingId : string = '######';
 
   public editMode = 'false';
   public reportId = "";
@@ -61,7 +62,7 @@ export class F1mComponent implements OnInit, OnDestroy {
       this._reportsService.getReportInfo('F1M', this._activatedRoute.snapshot.queryParams.reportId)
       .subscribe((res: any) => {
         this.type = res.establishmentType === 'A' ? 'affiliation' : 'qualification'
-        this.step = 'step_2';
+        this.step = this._activatedRoute.snapshot.queryParams.edit ? this._activatedRoute.snapshot.queryParams.step : 'step_2';
         this.scheduleAction = ScheduleActions.edit;
         this.reportId = res.reportId;
         this.refreshScreen();
@@ -72,9 +73,19 @@ export class F1mComponent implements OnInit, OnDestroy {
           this.populateQualificationData(res);
         }
         this.populateSignAndSubmitData(res);
+        
+        if(this._activatedRoute.snapshot.queryParams.viewOnly && this._activatedRoute.snapshot.queryParams.viewOnly === 'true'){
+          this.scheduleAction = ScheduleActions.view;
+          this.updateQueryParams();
+          this.setAffiliationInfo(res);
+          this.setQualificationInfo(res);
+          this.setTreasurerAndEmails(res);
+          this._messageService.sendMessage({action:'disableFields'});
+        }
         this.refreshScreen();
       })
     }
+    
   }
   
 
@@ -107,6 +118,8 @@ export class F1mComponent implements OnInit, OnDestroy {
       additionalEmail2: res.additional_email_1,
       confirmAdditionalEmail2: res.additional_email_2,
     }
+    this.refreshScreen();
+    this.signAndSubmitComp.populateForm();
   }
 
   
@@ -115,8 +128,8 @@ export class F1mComponent implements OnInit, OnDestroy {
   }
 
   public getPartyType() {
-    if(window.localStorage.committeeDetails){
-      const committeeData = JSON.parse(window.localStorage.committeeDetails);
+    if(window.localStorage.committee_details){
+      const committeeData = JSON.parse(window.localStorage.committee_details);
       if(committeeData){
         this.partyType = committeeData.cmte_type_category;
       }
@@ -139,29 +152,26 @@ export class F1mComponent implements OnInit, OnDestroy {
     this._cd.detectChanges();
   }
 
+  public skip(){
+    this._f1mService.saveForm(null,this.scheduleAction, 'saveQualification').subscribe(res =>{
+      this.reportId = res.reportId;
+      this.updateQueryParams();
+      this.continueToPart2();
+    });
+  }
+
   public saveAndContinue(action:any) {
     if(this.type === 'affiliation'){
       this.saveAffiliationData();
     }
     else if(this.type === 'qualification'){
-      
-        if(!this.qualificationComp.showPart2){
-          if(this.qualificationComp.form.valid){
-            this.saveCurrentCandidate(action);
-          }
-          else{
-            this.qualificationComp.form.markAsDirty();
-          }
-        }
-        else{
-          if(this.qualificationComp.formPart2.valid){
-            this.saveDates();
-          }
-          else{
-            this.qualificationComp.formPart2.markAsDirty();
-          }
-        }
+      if(!this.qualificationComp.showPart2){
+        this.saveCurrentCandidate(action);
       }
+      else{
+        this.saveDates();
+      }
+    }
   }
   
   private saveAffiliationData() {
@@ -181,33 +191,43 @@ export class F1mComponent implements OnInit, OnDestroy {
   }
 
   private saveDates() {
-    this.step2data = this.qualificationComp.formPart2.getRawValue(); //.getRawValue() is used instead of .value to include disabled fields too
-    this.step2data.reportId = this.reportId;
-    this._f1mService.saveForm(this.step2data, this.scheduleAction, 'saveDates').subscribe(res => {
-      this.reportId = res.reportId;
-      this.setQualificationInfo(res);
-      this.setTreasurerAndEmails(res);
-      this.next();
-    });
+    if(this.qualificationComp.formPart2.valid){
+      this.step2data = this.qualificationComp.formPart2.getRawValue(); //.getRawValue() is used instead of .value to include disabled fields too
+      this.step2data.reportId = this.reportId;
+      this._f1mService.saveForm(this.step2data, this.scheduleAction, 'saveDates').subscribe(res => {
+        this.reportId = res.reportId;
+        this.setQualificationInfo(res);
+        this.setTreasurerAndEmails(res);
+        this.next();
+      });
+    }
+    else{
+      this.qualificationComp.formPart2.markAsDirty();
+    }
   }
 
   private saveCurrentCandidate(action:any) {
     
     if (this.qualificationData.candidates.length < 5 || (action && action.action === 'update')) {
-      this.step2data = this.qualificationComp.form.value;
-      if (this.reportId) {
-        this.step2data.reportId = this.reportId;
+      if(this.qualificationComp.form.valid){
+        this.step2data = this.qualificationComp.form.value;
+        if (this.reportId) {
+          this.step2data.reportId = this.reportId;
+        }
+        this.step2data.candidate_number = this.step2data.candidate_number.toString();
+        let saveCandScheduleAction = action.action === 'update' ? ScheduleActions.edit : ScheduleActions.add;
+        this._f1mService.saveForm(this.step2data, saveCandScheduleAction, 'saveCandidate').subscribe(res => {
+          this.qualificationData.candidates = res.candidates;
+          this.reportId = res.reportId;
+          this.updateQueryParams();
+          this._messageService.sendMessage({ formType: 'f1m-qualification', action: 'resetAndIncrement' });
+          this.refreshQualificationChildComponent();
+          this.refreshScreen();
+        });
       }
-      this.step2data.candidate_number = this.step2data.candidate_number.toString();
-      let saveCandScheduleAction = action.action === 'update' ? ScheduleActions.edit : ScheduleActions.add;
-      this._f1mService.saveForm(this.step2data, saveCandScheduleAction, 'saveCandidate').subscribe(res => {
-        this.qualificationData.candidates = res.candidates;
-        this.reportId = res.reportId;
-        this.updateQueryParams();
-        this._messageService.sendMessage({ formType: 'f1m-qualification', action: 'resetAndIncrement' });
-        this.refreshQualificationChildComponent();
-        this.refreshScreen();
-      });
+      else {
+        this.qualificationComp.form.markAsDirty()
+      }
     }
     else {
       this._messageService.sendMessage({ formType: 'f1m-qualification', action: 'showPart2' });
@@ -285,8 +305,10 @@ export class F1mComponent implements OnInit, OnDestroy {
           if (res === 'okay') {
             let saveObj = this.signAndSubmitComp.form.value;
             saveObj.reportId = this.reportId ;
-            this._f1mService.saveForm(saveObj,this.scheduleAction, 'submit').subscribe(res =>{
-              alert('Successfully submitted');
+            this._f1mService.saveForm(saveObj,ScheduleActions.add, 'submit').subscribe(res =>{
+              this.filingId = res.fecFilingId;
+              this.step = 'step_5';
+              this.refreshScreen();
             })
           }
           

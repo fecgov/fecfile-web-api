@@ -850,6 +850,11 @@ public printReport(report: reportModel): void{
           this._router.navigate(['/signandSubmit/3X'], { queryParams: { step: 'step_4' } });
 
       }, 1500);
+    } else if(report.form_type === 'F1M'){
+      const formType = '1M';
+        this._router.navigate([`/forms/form/${formType}`], {
+          queryParams: { step: 'step_4', edit: true, reportId: report.report_id}
+        });
     }
     
   }
@@ -963,6 +968,12 @@ public printReport(report: reportModel): void{
             });
           }
       }, 1500);
+    }
+    else if(report.form_type === 'F1M'){
+      const formType = '1M';
+        this._router.navigate([`/forms/form/${formType}`], {
+          queryParams: { step: 'step_2', edit: false, viewOnly:true, reportId: report.report_id}
+        });
     }
   }
 
