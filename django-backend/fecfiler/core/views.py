@@ -5388,11 +5388,15 @@ def COH_cop(coh_bop, period_receipt, period_disbursement):
         raise Exception("The COH_cop function is throwing an error: " + str(e))
 
 
-def get_cvg_dates(report_id, cmte_id):
+def get_cvg_dates(report_id, cmte_id, include_deleted=False):
     try:
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT cvg_start_date, cvg_end_date from public.reports where cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'",
+            if include_deleted:
+                param_string = ""                    
+            else:
+                param_string = "AND delete_ind is distinct from 'Y'"
+            cursor.execute( 
+                "SELECT cvg_start_date, cvg_end_date from public.reports where cmte_id = %s AND report_id = %s {}".format(param_string),
                 [cmte_id, report_id],
             )
             if cursor.rowcount == 0:
@@ -9770,7 +9774,7 @@ def get_original_amount_by_redesignation_id(transaction_id):
 def update_f3x_coh_cop_subsequent_report(report_id, cmte_id):
     try:
         output_string = ""
-        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id,True)
         report_id_list = get_report_ids(cmte_id, cvg_start_date, False, False)
         for report in report_id_list:
             if update_f3x_details(report, cmte_id) != "Success":
