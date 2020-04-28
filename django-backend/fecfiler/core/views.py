@@ -9969,26 +9969,3 @@ def get_year_reports(cmte_id, report_id):
 def function_to_call_wrapper_update_F3X(report_id, cmte_id):
     return {"report_id" : report_id,
             "cmte_id" : cmte_id}
-
-@api_view(['GET'])
-def get_treasurer_info(request):
-  try:
-      cmte_id = request.user.username
-      _sql = """SELECT com_name AS "committeeName", 
-                concat_ws(', ', com_str1, com_str2, com_city, com_state, com_zip) AS "address",
-                ttitle AS "treasurerTitle",
-                concat_ws(' ', t_prefix, t_fname, t_mname, t_lname, t_suffix) AS "treasurerName",
-                tphone AS "treasurerPhone", url AS "website", fax, email
-                FROM public.form_1 WHERE comid=%s ORDER BY sub_date DESC, create_date DESC 
-                LIMIT 1"""
-      with connection.cursor() as cursor:
-          cursor.execute("""SELECT json_agg(t) FROM ({}) t""".format(_sql), [cmte_id])
-          output_dict = cursor.fetchone()[0]
-          if output_dict:
-              output_dict = output_dict[0]
-          else:
-              output_dict = {}
-      return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
-  except Exception as e:
-      return Response('The get_treasurer_info API is throwing the following error: ' +str(e),
-          status=status.HTTP_400_BAD_REQUEST)
