@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, ValidationErrors, Validators} from '@angular/forms';
 import {UserModel} from './model/user.model';
-import {ManageUserService} from './service/manage-user.service';
+import {ManageUserService} from './service/manage-user-service/manage-user.service';
 import {DialogService} from '../../shared/services/DialogService/dialog.service';
 import {ConfirmModalComponent, ModalHeaderClassEnum} from '../../shared/partials/confirm-modal/confirm-modal.component';
+import {SortService} from './service/sort-service/sort.service';
 
 export const roleDesc = {
   read_only: 'Can only view data, and cannot perform any other functions.',
@@ -15,23 +16,24 @@ export const roleDesc = {
 @Component({
   selector: 'app-manage-user',
   templateUrl: './manage-user.component.html',
-  styleUrls: ['./manage-user.component.scss']
+  styleUrls: ['./manage-user.component.scss'],
+  providers: [SortService]
 })
 
 export class ManageUserComponent implements OnInit {
-  website: string = '';
-  treasurerName: string = '';
-  treasurerEmail: string = '';
-  treasurerTel: string = '';
-  treasurerFax: string = '';
+  website = '';
+  treasurerName = '';
+  treasurerEmail = '';
+  treasurerTel = '';
+  treasurerFax = '';
 
-  asstTreasurerName: string = '';
-  asstTreasurerEmail: string = '';
-  asstTreasurerTel: string = '';
-  asstTreasurerFax: string = '';
+  asstTreasurerName = '';
+  asstTreasurerEmail = '';
+  asstTreasurerTel = '';
+  asstTreasurerFax = '';
   frmAddUser: FormGroup;
   users: Array<UserModel>;
-  isEdit: boolean = false;
+  isEdit = false;
   currentEditUser: UserModel;
   _roleDesc = roleDesc;
   constructor(
@@ -69,7 +71,7 @@ export class ManageUserComponent implements OnInit {
     if (this.isEdit) {
     // do a put call
       const formData: any = {};
-      for(const field in this.frmAddUser.controls) {
+      for (const field in this.frmAddUser.controls) {
         formData[field] = this.frmAddUser.get(field).value;
       }
       const isActive = this.currentEditUser.isActive;
@@ -95,7 +97,7 @@ export class ManageUserComponent implements OnInit {
       });
     } else {
       const formData: any = {};
-      for(const field in this.frmAddUser.controls) {
+      for (const field in this.frmAddUser.controls) {
         formData[field] = this.frmAddUser.get(field).value;
       }
       // Account should be inactive by default
@@ -194,5 +196,38 @@ export class ManageUserComponent implements OnInit {
       return Object(this._roleDesc)[roleRe];
     }
     return '';
+  }
+
+  onSorted($event: any) {
+    // TODO: revist sorting
+    const sortColumn = $event.sortColumn;
+    const sortDirection = $event.sortDirection;
+    let sortedUsers;
+    // if (columnName === 'lastName') {
+    //   if (sortDirection === 'asc') {
+    //     sortedUsers = this.users.sort((a, b) => a.lastName < b.lastName ? -1 : a.lastName > b.lastName ? 1 : 0);
+    //   } else {
+    //     sortedUsers = this.users.sort((a, b) => a.lastName < b.lastName ? -1 : a.lastName > b.lastName ? 1 : 0);
+    //   }
+    // }
+    this.users = this.users.sort((a, b) => {
+      if (sortDirection === 'desc') {
+        if (a[sortColumn] < b[sortColumn]) {
+          return -1;
+        }
+        if (a[sortColumn] > b[sortColumn]) {
+          return 1;
+        }
+        return 0;
+      } else {
+        if (a[sortColumn] > b[sortColumn]) {
+          return -1;
+        }
+        if (a[sortColumn] < b[sortColumn]) {
+          return 1;
+        }
+        return 0;
+      }
+    });
   }
 }

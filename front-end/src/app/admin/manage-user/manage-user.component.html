@@ -154,13 +154,13 @@
     <hr>
     <div class="manage-users">
         <h2>Manage Existing Users</h2>
-    <table class="table table-bordered sort-true" style="width:80%">
+    <table sortable-table (sorted)="onSorted($event)" class="table table-bordered sort-true" style="width:80%">
         <thead>
-        <th sortable-column="lastName">Last Name <i class="fas fa-sort"></i></th>
-        <th sortable-column="firstName">First Name <i class="fas fa-sort"></i></th>
-        <th sortable-column="email">Email Address <i class="fas fa-sort"></i></th>
-        <th sortable-column="role">Role <i class="fas fa-sort"></i></th>
-        <th sortable-column="isActive">Status <i class="fas fa-sort"></i></th>
+        <th sortable-column="lastName">Last Name</th>
+        <th sortable-column="firstName">First Name</th>
+        <th sortable-column="email">Email Address</th>
+        <th sortable-column="role">Role</th>
+        <th sortable-column="isActive">Status</th>
         <th>Action</th>
         </thead>
         <tbody>
