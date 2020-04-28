@@ -43,7 +43,7 @@
                 <div class="row">
                     <div class="col col-md-2">
                         <label>
-                            <input formControlName="role_ind"
+                            <input formControlName="role"
                                    id="role-admin"
                                    type="radio"
                                    value="ADMIN">
@@ -51,7 +51,7 @@
                     </div>
                     <div class="col col-md-2">
                         <label>
-                            <input formControlName="role_ind"
+                            <input formControlName="role"
                                    id="role-entry"
                                    type="radio"
                                    value="ENTRY">
@@ -59,15 +59,25 @@
                     </div>
                     <div class="col col-md-2">
                         <label>
-                            <input formControlName="role_ind"
+                            <input formControlName="role"
+                                   id="role-uploader"
+                                   type="radio"
+                                   value="UPLOADER">
+                            Uploader</label>
+                    </div>
+                    <div class="col col-md-2">
+                        <label>
+                            <input formControlName="role"
                                    id="role-read-only"
                                    type="radio"
-                                   value="READ ONLY">
+                                   value="READ-ONLY">
                             Read Only</label>
                     </div>
                 </div>
             </div>
-
+            <span *ngIf="frmAddUser.get('role').valid">
+                {{getSelectedRole()}}
+            </span>
             <table class="user-input table table-borderless">
                 <thead>
                 <tr>
@@ -81,7 +91,15 @@
                             <table class="basic-info">
                                 <tr>
                                     <td class="label-info"><label>Last Name</label></td>
-                                    <td class="user-text"><input formControlName="last_name" placeholder="Enter Last Name" type="text"></td>
+                                    <td class="user-text">
+                                        <input formControlName="last_name"
+                                               placeholder="Enter Last Name"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('last_name')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><label>First Name</label></td>
@@ -89,7 +107,7 @@
                                 </tr>
                                 <tr>
                                     <td><label>Contact Number</label></td>
-                                    <td><input formControlName="phone_number" placeholder="Enter Phone Number" type="text"></td>
+                                    <td><input formControlName="contact" placeholder="Enter Phone Number" type="text"></td>
                                 </tr>
                                 <tr>
                                     <td><label>Email Address</label></td>
@@ -100,17 +118,20 @@
                         <td class="role-desc" >
                             <b>Administrator</b>
                                 <ul>
-                                    <li>Has full access.</li>
+                                    <li>{{_roleDesc.admin}}</li>
                                 </ul>
                             <b>Entry</b>
                             <ul>
-                                 <li>Has access to enter, edit and delete information, but cannot upload reports or create other
-                                    users.</li>
+                                 <li>{{_roleDesc.entry}}</li>
+                            </ul>
+                            <b>Uploader</b>
+                            <ul>
+                                <li>{{_roleDesc.uploader}}</li>
                             </ul>
                             <b>Read Only</b>
                             <ul>
                                <li>
-                                    Can only view data, and cannot perform any other functions.
+                                   {{_roleDesc.read_only}}
                                 </li>
                             </ul>
                         </td>
@@ -135,11 +156,11 @@
         <h2>Manage Existing Users</h2>
     <table class="table table-bordered sort-true" style="width:80%">
         <thead>
-        <th>Last Name <i class="fas fa-sort"></i></th>
-        <th>First Name <i class="fas fa-sort"></i></th>
-        <th>Email Address <i class="fas fa-sort"></i></th>
-        <th>Role <i class="fas fa-sort"></i></th>
-        <th>Status <i class="fas fa-sort"></i></th>
+        <th sortable-column="lastName">Last Name <i class="fas fa-sort"></i></th>
+        <th sortable-column="firstName">First Name <i class="fas fa-sort"></i></th>
+        <th sortable-column="email">Email Address <i class="fas fa-sort"></i></th>
+        <th sortable-column="role">Role <i class="fas fa-sort"></i></th>
+        <th sortable-column="isActive">Status <i class="fas fa-sort"></i></th>
         <th>Action</th>
         </thead>
         <tbody>

@@ -5,6 +5,8 @@ export class UserModel {
     role: string;
     status: boolean;
     id: number;
+    contact: string;
+    isActive: boolean;
 
     constructor(user: any) {
         this.firstName = user.first_name ? user.first_name : '';
@@ -13,5 +15,7 @@ export class UserModel {
         this.role = user.role ? user.role : '';
         this.status = user.is_active ? true : false;
         this.id = user.id ? user.id : 0;
+        this.contact = user.contact ? user.contact : '';
+        this.isActive = user.is_active ? true : false;
     }
 }

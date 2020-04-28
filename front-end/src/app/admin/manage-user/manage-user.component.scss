@@ -3,6 +3,7 @@
 .manage-users-container {
   background: url("../../../assets/img/fec-logo-5opac.png") no-repeat center;
   background-size: 60%;
+  font-family: $mainFontFamily;
   .manage-users {
     .table {
       margin: 25px auto;
@@ -32,7 +33,13 @@
       input {
         outline: 0;
         border-width: 0 0 2px;
+        .input-field-error
+        {
+          border:1px solid #f00;
+        }
       }
+
+
     }
 
 

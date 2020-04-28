@@ -1,13 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, ValidationErrors, Validators} from '@angular/forms';
 import {UserModel} from './model/user.model';
 import {ManageUserService} from './service/manage-user.service';
+import {DialogService} from '../../shared/services/DialogService/dialog.service';
+import {ConfirmModalComponent, ModalHeaderClassEnum} from '../../shared/partials/confirm-modal/confirm-modal.component';
+
+export const roleDesc = {
+  read_only: 'Can only view data, and cannot perform any other functions.',
+  admin : 'Has all the access except managing users and Uploading',
+  uploader : 'Can only view data, and upload',
+  entry : 'Has access to enter, edit and delete information, but cannot upload reports or create other users.'
+};
 
 @Component({
   selector: 'app-manage-user',
   templateUrl: './manage-user.component.html',
   styleUrls: ['./manage-user.component.scss']
 })
+
 export class ManageUserComponent implements OnInit {
   website: string = '';
   treasurerName: string = '';
@@ -22,12 +32,18 @@ export class ManageUserComponent implements OnInit {
   frmAddUser: FormGroup;
   users: Array<UserModel>;
   isEdit: boolean = false;
-  constructor(private _fb: FormBuilder, private _userService: ManageUserService) {
+  currentEditUser: UserModel;
+  _roleDesc = roleDesc;
+  constructor(
+      private _fb: FormBuilder,
+      private _userService: ManageUserService,
+      private _dialogService: DialogService,
+      ) {
     this.frmAddUser = _fb.group({
-      role_ind: ['', Validators.required],
+      role: ['', Validators.required],
       first_name: ['', Validators.required],
       last_name: ['', Validators.required],
-      phone_number: ['', [Validators.required, Validators.minLength(10)]],
+      contact: ['', [Validators.required, Validators.minLength(10)]],
       email: ['', [Validators.required, Validators.email]]
     });
   }
@@ -43,10 +59,67 @@ export class ManageUserComponent implements OnInit {
   }
 
   addUser() {
-    if (this.isEdit) {
-      //do a put call
+    this.getFormValidationErrors();
+    if (!this.frmAddUser.valid) {
+      return;
     } else {
-      // do a post
+      this.frmAddUser.markAsTouched();
+      this.frmAddUser.markAsDirty();
+    }
+    if (this.isEdit) {
+    // do a put call
+      const formData: any = {};
+      for(const field in this.frmAddUser.controls) {
+        formData[field] = this.frmAddUser.get(field).value;
+      }
+      const isActive = this.currentEditUser.isActive;
+      const id = this.currentEditUser.id;
+      formData['is_active'] = isActive;
+      formData['id'] = id;
+      this._userService.saveUser(formData, false).subscribe(res => {
+        if (res) {
+          console.log('SAVE SUCCESSFUL');
+          this._dialogService.confirm(
+              'The user has been updated successfully',
+              ConfirmModalComponent,
+              'User Updated',
+              false,
+              ModalHeaderClassEnum.successHeader);
+          // reset form
+          this.frmAddUser.reset();
+          //refresh users list
+          this.users = this.mapFromUserFields(res.users);
+        }
+      }, error => {
+        console.log(error);
+      });
+    } else {
+      const formData: any = {};
+      for(const field in this.frmAddUser.controls) {
+        formData[field] = this.frmAddUser.get(field).value;
+      }
+      // Account should be inactive by default
+      // Backend should do email verification and make it active
+      // TODO: Should not require to post is_active on creation
+      formData['is_active'] = false;
+      this._userService.saveUser(formData, true).subscribe(res => {
+        if (res) {
+          console.log('SAVE SUCCESSFUL');
+          this._dialogService.confirm(
+              'The user has been added successfully',
+              ConfirmModalComponent,
+              'User Added',
+              false,
+              ModalHeaderClassEnum.successHeader);
+          // reset form
+          this.frmAddUser.reset();
+          //refresh users list
+          this.users = this.mapFromUserFields(res.users);
+        }
+      },
+          error => {
+            console.log(error);
+          });
     }
   }
 
@@ -56,10 +129,19 @@ export class ManageUserComponent implements OnInit {
     this.frmAddUser.patchValue({ 'first_name': user.firstName }, { onlySelf: true });
     this.frmAddUser.patchValue({ 'last_name': user.lastName }, { onlySelf: true });
     this.frmAddUser.patchValue({ 'email': user.email }, { onlySelf: true });
-    this.frmAddUser.patchValue({ 'phone_number': 'test' }, { onlySelf: true });
+    this.frmAddUser.patchValue({ 'contact': user.contact }, { onlySelf: true });
+    this.frmAddUser.patchValue({'role': user.role}, {onlySelf: true});
+    this.currentEditUser = user;
   }
 
   toggleStatus(user: UserModel) {
+    const id = user.id;
+
+    this._userService.toggleUser(id).subscribe(res => {
+      if (res) {
+        this.users = this.mapFromUserFields(res.users);
+      }
+    });
   }
 
   clearForm() {
@@ -68,7 +150,13 @@ export class ManageUserComponent implements OnInit {
   }
 
   deleteUser(user: UserModel) {
-    alert('User deleted');
+    const id = user.id;
+    const index = this.users.indexOf(user);
+   this._userService.deleteUser(id).subscribe( res => {
+     if (res) {
+       this.users.splice(index, 1);
+     }
+   });
   }
 
   getStatusClass(status: boolean): string {
@@ -87,5 +175,24 @@ export class ManageUserComponent implements OnInit {
     }
     return userArray;
   }
+  protected getFormValidationErrors() {
+    Object.keys(this.frmAddUser.controls).forEach(key => {
+      const controlErrors: ValidationErrors = this.frmAddUser.get(key).errors;
+      if (controlErrors != null) {
+        Object.keys(controlErrors).forEach(keyError => {
+          console.error('Key control: ' + key + ', keyError: ' + keyError + ', err value: ', controlErrors[keyError]);
+        });
+      }
+    });
+  }
 
+  getSelectedRole(): string {
+    if (this.frmAddUser.get('role').valid) {
+      const role = this.frmAddUser.get('role').value.toLowerCase();
+      const re = /\-/gi;
+      const roleRe = role.replace(re, '_');
+      return Object(this._roleDesc)[roleRe];
+    }
+    return '';
+  }
 }
