@@ -645,11 +645,10 @@ def check_list_cvg_dates(args):
                 "SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC",
                 [cmte_id, form_type],
             )
-
             if len(args) == 4:
                 for row in cursor.fetchall():
                     if not (row[1] is None or row[2] is None):
-                        if cvg_end_dt <= row[2] and cvg_start_dt >= row[1]:
+                        if cvg_start_dt <= row[2] and row[1] <= cvg_end_dt:
                             forms_obj.append(
                                 {
                                     "report_id": row[0],
@@ -674,7 +673,6 @@ def check_list_cvg_dates(args):
                                     "report_type": row[3],
                                 }
                             )
-
         return forms_obj
     except Exception:
         raise
@@ -5390,11 +5388,15 @@ def COH_cop(coh_bop, period_receipt, period_disbursement):
         raise Exception("The COH_cop function is throwing an error: " + str(e))
 
 
-def get_cvg_dates(report_id, cmte_id):
+def get_cvg_dates(report_id, cmte_id, include_deleted=False):
     try:
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT cvg_start_date, cvg_end_date from public.reports where cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'",
+            if include_deleted:
+                param_string = ""                    
+            else:
+                param_string = "AND delete_ind is distinct from 'Y'"
+            cursor.execute( 
+                "SELECT cvg_start_date, cvg_end_date from public.reports where cmte_id = %s AND report_id = %s {}".format(param_string),
                 [cmte_id, report_id],
             )
             if cursor.rowcount == 0:
@@ -6767,14 +6769,14 @@ def prepare_json_builders_data(request):
         # commented by Mahendra 10052019
         # return Response({'Response':'Success'}, status=status_value)
 
-        with connection.cursor() as cursor:
-            # query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
-            # cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
-            update_query = (
-                """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
-                % (update_str, cmte_id, report_id)
-            )
-            cursor.execute(update_query)
+        # with connection.cursor() as cursor:
+        #     # query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
+        #     # cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
+        #     update_query = (
+        #         """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
+        #         % (update_str, cmte_id, report_id)
+        #     )
+        #     cursor.execute(update_query)
             # print("Updated on Database ---- yoyooooo")
         return Response({"Response": "Success"}, status=status.HTTP_200_OK)
     except Exception as e:
@@ -9772,7 +9774,7 @@ def get_original_amount_by_redesignation_id(transaction_id):
 def update_f3x_coh_cop_subsequent_report(report_id, cmte_id):
     try:
         output_string = ""
-        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id,True)
         report_id_list = get_report_ids(cmte_id, cvg_start_date, False, False)
         for report in report_id_list:
             if update_f3x_details(report, cmte_id) != "Success":
