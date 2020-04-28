@@ -410,7 +410,7 @@ def manage_user(request):
                 msg = "The User ID: {} has not been successfully deleted." \
                       "No matching record was found."
             return JsonResponse(msg.format(data.get("user_id")),
-                                status=status.HTTP_204_NO_CONTENT,
+                                status=status.HTTP_200_OK,
                                 safe=False)
         except Exception as e:
             return JsonResponse(
