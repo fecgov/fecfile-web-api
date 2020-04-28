@@ -198,34 +198,39 @@ export class ManageUserComponent implements OnInit {
     return '';
   }
 
+  /**
+   *  Locally sort users based on column name and sort order
+   *  Takes the Sorted event and sort the array desc or asc
+   *  isActive element is boolean and hence we cannot use toLowerCase() on those elements
+   *  toLowerCase() prevents sorting of case sensitive data
+   *  @param $event
+   */
   onSorted($event: any) {
-    // TODO: revist sorting
     const sortColumn = $event.sortColumn;
     const sortDirection = $event.sortDirection;
-    let sortedUsers;
-    // if (columnName === 'lastName') {
-    //   if (sortDirection === 'asc') {
-    //     sortedUsers = this.users.sort((a, b) => a.lastName < b.lastName ? -1 : a.lastName > b.lastName ? 1 : 0);
-    //   } else {
-    //     sortedUsers = this.users.sort((a, b) => a.lastName < b.lastName ? -1 : a.lastName > b.lastName ? 1 : 0);
-    //   }
-    // }
-    this.users = this.users.sort((a, b) => {
+
+    if (sortColumn === 'isActive') {
+      this.users.sort((a, b) => {
+        if (sortDirection === 'desc') {
+          if (a[sortColumn] < b[sortColumn]) { return -1; }
+          if (a[sortColumn] > b[sortColumn]) { return 1; }
+          return 0;
+        } else {
+          if (a[sortColumn] > b[sortColumn]) { return -1; }
+          if (a[sortColumn] < b[sortColumn]) { return 1; }
+          return 0;
+        }
+      });
+      return;
+    }
+    this.users.sort((a, b) => {
       if (sortDirection === 'desc') {
-        if (a[sortColumn] < b[sortColumn]) {
-          return -1;
-        }
-        if (a[sortColumn] > b[sortColumn]) {
-          return 1;
-        }
+        if (a[sortColumn].toLowerCase() < b[sortColumn].toLowerCase()) { return -1; }
+        if (a[sortColumn].toLowerCase() > b[sortColumn].toLowerCase()) { return 1; }
         return 0;
       } else {
-        if (a[sortColumn] > b[sortColumn]) {
-          return -1;
-        }
-        if (a[sortColumn] < b[sortColumn]) {
-          return 1;
-        }
+        if (a[sortColumn].toLowerCase() > b[sortColumn].toLowerCase()) { return -1; }
+        if (a[sortColumn].toLowerCase() < b[sortColumn].toLowerCase()) { return 1; }
         return 0;
       }
     });
