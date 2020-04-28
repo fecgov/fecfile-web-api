@@ -350,9 +350,7 @@ def update_user(data):
 def check_custom_validations(email, status, role):
     try:
         check_email_validation(email)
-        if status in ["null", "NULL"]:
-            raise Exception("Status value should be either ACTIVE or INACTIVE")
-        if role.upper() not in ["ADMIN", "READ_ONLY", "UPLOADER", "FILER"]:
+        if role.upper() not in ["ADMIN", "READ_ONLY", "UPLOADER", "ENTRY"]:
             raise Exception("Role should be ADMIN, READ-ONLY, UPLOADER")
     except Exception as e:
         logger.debug("Custom validation failed")
@@ -475,7 +473,7 @@ def manage_user(request):
 def validate(data, fields, request):
     for val in fields:
         data = validate_input_data(request, val, data)
-    check_custom_validations(data.get("email"), data.get("is_active"), data.get("role"))
+    check_custom_validations(data.get("email"), data.get("role"))
     logger.debug("manage user- all input data is valid")
     return data
 
