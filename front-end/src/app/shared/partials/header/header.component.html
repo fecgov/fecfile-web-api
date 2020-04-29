@@ -44,10 +44,10 @@
             <a class="dropdown-item" draggable="false" (click)="viewAllTransactions()">
               All Transactions
             </a>
-            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_transactions']">
+            <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/tools_import_transactions']">
               Import Transactions
             </a>
-            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_import_names']">
+            <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/tools_import_names']">
               Import Names
             </a>
 
@@ -55,7 +55,7 @@
               Export Names
             </a>
 
-            <a class="dropdown-item" draggable="false" [routerLink]="['/tools_merge_names']">
+            <a *ngIf="!_authService.isReadOnly()" class="dropdown-item" draggable="false" [routerLink]="['/tools_merge_names']">
               Merge Names
             </a>
             <a class="dropdown-item" draggable="false" [routerLink]="['/tools_create_backup']">

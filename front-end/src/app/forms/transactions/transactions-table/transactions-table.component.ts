@@ -20,6 +20,7 @@ import { TransactionModel } from '../model/transaction.model';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { GetTransactionsResponse, TransactionsService } from '../service/transactions.service';
 import { ActiveView } from '../transactions.component';
+import { AuthService} from '../../../shared/services/AuthService/auth.service';
 
 const transactionCategoryOptions = [];
 
@@ -193,6 +194,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _activatedRoute: ActivatedRoute,
     private _receiptService: IndividualReceiptService,
     private _transactionTypeService: TransactionTypeService,
+    private _authService: AuthService,
   ) {
 
     const paginateConfig: PaginationInstance = {

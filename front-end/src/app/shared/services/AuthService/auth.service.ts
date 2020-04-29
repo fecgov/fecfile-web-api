@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
-import { CookieService } from 'ngx-cookie-service';
-import { SessionService } from '../SessionService/session.service';
+import {Injectable} from '@angular/core';
+import {CookieService} from 'ngx-cookie-service';
+import {SessionService} from '../SessionService/session.service';
+import * as jwt_decode from 'jwt-decode';
+import {Roles} from '../../enums/Roles';
 
 @Injectable({
   providedIn: 'root'
@@ -45,4 +47,60 @@ export class AuthService {
 
     this._cookieService.set('user', JSON.stringify(accessToken));
   }
+
+  public getUserRole(): any {
+    const sessionData = this._session.getSession();
+    if (sessionData) {
+      // TODO: return actual user role from JWT when implemented
+      // for now C00415992 is Entry
+      // for  now C00111476 is Readonly
+      const decodedAccessToken = jwt_decode(sessionData);
+      if ( decodedAccessToken.username === 'C00415992') {
+        return Roles.Entry;
+      } else if (decodedAccessToken.username === 'C00111476') {
+        return [Roles.ReadOnly];
+      } else if (decodedAccessToken.username === 'C00690099') {
+        return [Roles.Upload, Roles.ReadOnly];
+      }
+      return [Roles.Admin];
+    } else {
+      return [Roles.Admin];
+    }
+  }
+
+  public isReadOnly(): boolean {
+    const sessionData = this._session.getSession();
+    if (sessionData) {
+      // for now C00111476 is Readonly
+      const decodedAccessToken = jwt_decode(sessionData);
+      if (decodedAccessToken.username === 'C00111476' || decodedAccessToken.username === 'C00690099') {
+        return true;
+      }
+      return false;
+    }
+    }
+  public isUploader(): boolean {
+    const sessionData = this._session.getSession();
+    if (sessionData) {
+      // for now C00111476 is Readonly
+      const decodedAccessToken = jwt_decode(sessionData);
+      if (decodedAccessToken.username === 'C00690099') {
+        return true;
+      }
+      return false;
+    }
+  }
+
+    public isCommitteeAdmin(): boolean {
+      const sessionData = this._session.getSession();
+      if (sessionData) {
+        const decodedAccessToken = jwt_decode(sessionData);
+        if (decodedAccessToken.username === 'C00111476' ||
+            decodedAccessToken.username === 'C00415992' ) {
+          return false;
+        }
+      }
+      // All other committeeIds are Admin for now
+      return true;
+    }
 }

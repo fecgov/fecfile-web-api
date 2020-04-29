@@ -15,11 +15,37 @@ export class CanActivateGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean> | Promise<boolean> | boolean {
-    if (!this.auth.isSignedIn()) {
+
+    const isSignedIn = this.auth.isSignedIn();
+    let amIAllowed: boolean = false;
+    if (isSignedIn) {
+      // array from router data
+      const whoIsAllowed = route.data.role;
+      // array from auth service
+      const whoAmI = this.auth.getUserRole();
+
+      if (whoIsAllowed) {
+          for (const role of whoIsAllowed) {
+            if (whoAmI.includes(role)) {
+              amIAllowed = true;
+            }
+          }
+          // TODO: check where to as per requirement?
+          if (!amIAllowed) {
+            // unauthorized
+            this.router.navigate(['dashboard']);
+          }
+          return amIAllowed;
+      } else {
+        return true;
+      }
+    } else {
       this.router.navigate(['']);
       return false;
     }
-    return true;
+
+
+
   }
 
 }
