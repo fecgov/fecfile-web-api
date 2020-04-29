@@ -1,17 +1,26 @@
 {
-  "validation_errors": [],
   "duplicates": [
     {
+      "committee_id": "C98765431",
+      "entity_type": "Individual",
+      "entity_name": "",
       "first_name": "Larry",
       "last_name": "Smith",
-      "entity_name": "Truimph Corp.",
+      "middle_name": "",
+      "prefix": "Mr.",
+      "suffix": "II",
       "street1": "198 Greenway Drive",
-      "street2": "",
+      "street2": "#45",
       "city": "Houston",
       "state": "TX",
       "zip": "77023",
       "employer": "DataCom",
       "occupation": "Programmer",
+      "candidate_id": "H98765431",
+      "office_sought": "House",
+      "office_state": "VA",
+      "district": "35",
+      "multi_candidate_cmte_status": "1",
       "potentialDupes": [
         {
           "seq": 1,
@@ -24,7 +33,8 @@
           "state": "TX",
           "zip": "77023",
           "employer": "Programmer",
-          "occupation": "Datacom"
+          "occupation": "Datacom",
+          "candidateId": "H98765431"
         },
         {
           "seq": 2,
@@ -37,7 +47,8 @@
           "state": "TX",
           "zip": "77023",
           "employer": "",
-          "occupation": ""
+          "occupation": "",
+          "candidateId": ""
         },
         {
           "seq": 3,
@@ -50,7 +61,8 @@
           "state": "TX",
           "zip": "77023",
           "employer": "",
-          "occupation": ""
+          "occupation": "",
+          "candidateId": ""
         },
         {
           "seq": 4,
@@ -63,7 +75,8 @@
           "state": "TX",
           "zip": "77023",
           "employer": "",
-          "occupation": ""
+          "occupation": "",
+          "candidateId": ""
         },
         {
           "seq": 5,
@@ -76,7 +89,8 @@
           "state": "TX",
           "zip": "77023-0000",
           "employer": "",
-          "occupation": ""
+          "occupation": "",
+          "candidateId": ""
         }
       ]
     },
@@ -91,6 +105,7 @@
       "zip": "90069",
       "employer": "Mercury Films",
       "occupation": "Producer",
+      "candidateId": "H98765431",
       "potentialDupes": [
         {
           "seq": 1,
@@ -103,7 +118,8 @@
           "state": "CA",
           "zip": "90069",
           "employer": "Mercury Films",
-          "occupation": "Producer"
+          "occupation": "Producer",
+          "candidateId": "H98765431"
         }
       ]
     },
@@ -118,6 +134,7 @@
       "zip": "91723",
       "employer": "Self",
       "occupation": "Guitarist",
+      "candidateId": "H98765431",
       "potentialDupes": [
         {
           "seq": 1,
@@ -130,7 +147,8 @@
           "state": "CA",
           "zip": "91723",
           "employer": "Self-Employed",
-          "occupation": "Guitarist"
+          "occupation": "Guitarist",
+          "candidateId": "H98765431"
         }
       ]
     },
@@ -145,6 +163,7 @@
       "zip": "75208",
       "employer": "Delmar",
       "occupation": "Expo Coordinator",
+      "candidateId": "H98765431",
       "potentialDupes": [
         {
           "seq": 1,
@@ -157,7 +176,8 @@
           "state": "TX",
           "zip": "75208",
           "employer": "Delmar",
-          "occupation": "Expo Coordinator"
+          "occupation": "Expo Coordinator",
+          "candidateId": "H98765431"
         }
       ]
     },
@@ -172,6 +192,7 @@
       "zip": "67788",
       "employer": "Strong Arm Tech",
       "occupation": "Business Dev",
+      "candidateId": "H98765431",
       "potentialDupes": [
         {
           "seq": 1,
@@ -184,7 +205,8 @@
           "state": "MA",
           "zip": "67788",
           "employer": "Strong Arm Tech",
-          "occupation": "Business Dev"
+          "occupation": "Business Dev",
+          "candidateId": "H98765431"
         }
       ]
     },
@@ -199,6 +221,7 @@
       "zip": "22206",
       "employer": "Empire",
       "occupation": "Analyst",
+      "candidateId": "H98765431",
       "potentialDupes": [
         {
           "seq": 1,
@@ -211,7 +234,8 @@
           "state": "VA",
           "zip": "22206",
           "employer": "Empire",
-          "occupation": "Analyst"
+          "occupation": "Analyst",
+          "candidateId": "H98765431"
         }
       ]
     },
@@ -226,6 +250,7 @@
       "zip": "22206",
       "employer": "Kronos",
       "occupation": "Developer",
+      "candidateId": "H98765431",
       "potentialDupes": [
         {
           "seq": 1,
@@ -238,7 +263,8 @@
           "state": "TX",
           "zip": "22206",
           "employer": "Kronos",
-          "occupation": "Developer"
+          "occupation": "Developer",
+          "candidateId": "H98765431"
         }
       ]
     }

@@ -77,7 +77,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
       currentPage: 1
     };
     this.config = config;
-    this.validateContacts(1);
+    this.checkDuplicates(1);
     this.mergePage = 1;
   }
 
@@ -86,9 +86,9 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
     this.contactsSubject.unsubscribe();
   }
 
-  public validateContacts(page: number) {
+  public checkDuplicates(page: number) {
     this.config.currentPage = page;
-    this._importContactsService.validateContacts(page).takeUntil(this.onDestroy$).subscribe((res: any) => {
+    this._importContactsService.checkDuplicates(page).takeUntil(this.onDestroy$).subscribe((res: any) => {
       this.contactsSubject.next(res.duplicates);
       this.config.totalItems = res.totalCount ? res.totalCount : 0;
       this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;

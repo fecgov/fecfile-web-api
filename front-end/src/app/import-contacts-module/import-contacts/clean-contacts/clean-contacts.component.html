@@ -1,4 +1,6 @@
-<div *ngIf="showErrors$ | async">Validation Errors
-</div>
-
+<app-error-contacts *ngIf="showErrors$ | async"></app-error-contacts>
 <app-duplicate-contacts *ngIf="showDuplicates$ | async"></app-duplicate-contacts>
+
+<!-- 
+<app-error-contacts></app-error-contacts>
+<app-duplicate-contacts></app-duplicate-contacts> -->

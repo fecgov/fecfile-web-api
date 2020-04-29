@@ -21,7 +21,6 @@
             <th>Middle Name</th>
             <th>Prefix</th>
             <th>Suffix</th>
-            <th>Organization</th>
             <th>Address 1</th>
             <th>Address 2</th>
             <th>City</th>
@@ -44,27 +43,26 @@
                   <i class="edit-broom"></i>
                 </button>
               </td>
-              <td>C98765431</td>
-              <td>IND</td>
-              <td>Committee Name/Organization</td>
-              <td>{{contact.first_name}}</td>
-              <td>{{contact.last_name}}</td>
-              <td>{{contact.middle_name}}</td>
+              <td>{{contact.committeeId}}</td>
+              <td>{{contact.type}}</td>
+              <td>{{contact.name}}</td>
+              <td>{{contact.firstName}}</td>
+              <td>{{contact.lastName}}</td>
+              <td>{{contact.middleName}}</td>
               <td>{{contact.prefix}}</td>
               <td>{{contact.suffix}}</td>
-              <td>{{contact.entity_name}}</td>
-              <td>{{contact.street1}}</td>
+              <td>{{contact.street}}</td>
               <td>{{contact.street2}}</td>
               <td>{{contact.city}}</td>
               <td>{{contact.state}}</td>
               <td>{{contact.zip}}</td>
               <td>{{contact.employer}}</td>
               <td>{{contact.occupation}}</td>
-              <td>H98765431</td>
-              <td>House</td>
-              <td>AK</td>
-              <td>35</td>
-              <td>1</td>
+              <td>{{contact.candidateId}}</td>
+              <td>{{contact.officeSought}}</td>
+              <td>{{contact.officeState}}</td>
+              <td>{{contact.district}}</td>
+              <td>{{contact.multiCandidateCmteStatus}}</td>
             </tr>
           </ng-container>
         </tbody>
@@ -73,7 +71,7 @@
   </div>
   <hr />
   <div *ngIf="showPagination()" class="d-flex justify-content-center clean_contacts__table-pagination-container">
-    <pagination-controls [id]="config.id" (pageChange)="getContacts($event)">
+    <pagination-controls [id]="config.id" (pageChange)="checkDuplicates($event)">
     </pagination-controls>
   </div>
   <div class="row">
