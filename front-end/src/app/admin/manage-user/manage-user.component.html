@@ -4,31 +4,29 @@
         <h2>Your Committee Information</h2><br>
         <div class="row">
             <div class="col-md-3">
-                <h4>Roger Smith for Congress</h4><br>
-                19093 West Broad Street <br>
-                Richmond, VA 23229<br>
+                <h4>{{accounts.committeename}}</h4><br>
+                {{accounts.street1}} <br>
+                <span *ngIf="accounts.street2">{{accounts.street2}} <br></span>
+                {{accounts.city + ' ' + accounts.state + ' ' + accounts.zipcode}}<br>
             </div>
             <div class="col-md-3">
-                <h4> Treasurer:</h4> {{treasurerName}} Alice Whitney <br>
-                <h4>Email: </h4> {{treasurerEmail}} alice.whitney@rogerforcongress.org<br>
+                <h4> Treasurer:</h4> {{accounts.treasurerfirstname + ' ' + accounts.treasurerlastname}}<br>
             </div>
             <div class="col-md-3">
-                <h4>Telephone:</h4> {{treasurerTel}}(804) 294-2944<br>
-                <h4> Facsimile: </h4>{{treasurerFax}}(804) 294-2945<br>
+                <h4> Email 1:</h4> {{accounts.email_on_file}}<br>
+                <h4> Email 2: </h4>{{accounts.email_on_file1 ? accounts.email_on_file1 : 'NA'}}<br>
             </div>
         </div>
         <br>
         <div class="row">
             <div class="col-md-3">
-                <h4>Website :</h4> {{website}} RogerForCongress.org
+                <h4>Website :</h4> {{accounts.website}}
             </div>
             <div class="col-md-3">
-                <h4>Asst. Treasurer:</h4> {{asstTreasurerName}} James Madison <br>
-                <h4>Email:</h4>{{asstTreasurerEmail}} jim.madison@rogerforcongress.org
+                <h4>Telephone:</h4> {{accounts.phone_number? phoneNumber(accounts.phone_number): ' NA'}}
             </div>
             <div class="col-md-3">
-                <h4>Telephone:</h4> {{asstTreasurerTel}}(804) 294-2944<br>
-                <h4> Facsimile: </h4>{{asstTreasurerFax}}(804) 294-2945<br>
+                <h4> Facsimile: </h4>{{accounts.fax? phoneNumber(accounts.fax) :  'NA'}}<br>
             </div>
         </div>
     </div>
@@ -38,7 +36,7 @@
         <form [formGroup]="frmAddUser">
             <div class="form-group radio">
                 <div class="col ">
-                    <h3>Role</h3>
+                    <h3>Role</h3> <br>
                 </div>
                 <div class="row">
                     <div class="col col-md-2">
@@ -173,7 +171,8 @@
             <td>
                 <i class="fas fa-edit fa-2x" (click)="editUser(user)"></i>  &nbsp;
                 <i [ngClass]="getStatusClass(user.status)" (click)="toggleStatus(user)"></i> &nbsp;
-                <i class="fas fa-times-circle fa-2x" (click)="deleteUser(user)"></i> </td>
+                <i class="fas fa-times-circle fa-2x" (click)="deleteUser(user)"></i>
+            </td>
         </tr>
         </tbody>
     </table>

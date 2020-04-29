@@ -108,4 +108,16 @@ export class ManageUserService {
                 );
         }
     }
+
+    getTreasurerInfo(): Observable<any> {
+        const token: string = JSON.parse(this._cookieService.get('user'));
+        const url = `${environment.apiUrl}/core/get_committee_details`;
+        let httpOptions = new HttpHeaders();
+
+        httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+        httpOptions = httpOptions.append('Content-Type', 'application/json');
+        return this._http.get(url, {
+            headers: httpOptions,
+        });
+    }
 }

@@ -5,6 +5,7 @@ import {ManageUserService} from './service/manage-user-service/manage-user.servi
 import {DialogService} from '../../shared/services/DialogService/dialog.service';
 import {ConfirmModalComponent, ModalHeaderClassEnum} from '../../shared/partials/confirm-modal/confirm-modal.component';
 import {SortService} from './service/sort-service/sort.service';
+import {IAccount} from '../../account/account';
 
 export const roleDesc = {
   read_only: 'Can only view data, and cannot perform any other functions.',
@@ -36,11 +37,13 @@ export class ManageUserComponent implements OnInit {
   isEdit = false;
   currentEditUser: UserModel;
   _roleDesc = roleDesc;
+  accounts: IAccount;
+
   constructor(
       private _fb: FormBuilder,
       private _userService: ManageUserService,
       private _dialogService: DialogService,
-      ) {
+  ) {
     this.frmAddUser = _fb.group({
       role: ['', Validators.required],
       first_name: ['', Validators.required],
@@ -58,6 +61,11 @@ export class ManageUserComponent implements OnInit {
           }
         }
     );
+    this._userService.getTreasurerInfo().subscribe(res => {
+      if (res) {
+        this.accounts = <IAccount>res;
+      }
+    });
   }
 
   addUser() {
@@ -69,7 +77,7 @@ export class ManageUserComponent implements OnInit {
       this.frmAddUser.markAsDirty();
     }
     if (this.isEdit) {
-    // do a put call
+      // do a put call
       const formData: any = {};
       for (const field in this.frmAddUser.controls) {
         formData[field] = this.frmAddUser.get(field).value;
@@ -105,20 +113,20 @@ export class ManageUserComponent implements OnInit {
       // TODO: Should not require to post is_active on creation
       formData['is_active'] = false;
       this._userService.saveUser(formData, true).subscribe(res => {
-        if (res) {
-          console.log('SAVE SUCCESSFUL');
-          this._dialogService.confirm(
-              'The user has been added successfully',
-              ConfirmModalComponent,
-              'User Added',
-              false,
-              ModalHeaderClassEnum.successHeader);
-          // reset form
-          this.frmAddUser.reset();
-          //refresh users list
-          this.users = this.mapFromUserFields(res.users);
-        }
-      },
+            if (res) {
+              console.log('SAVE SUCCESSFUL');
+              this._dialogService.confirm(
+                  'The user has been added successfully',
+                  ConfirmModalComponent,
+                  'User Added',
+                  false,
+                  ModalHeaderClassEnum.successHeader);
+              // reset form
+              this.frmAddUser.reset();
+              //refresh users list
+              this.users = this.mapFromUserFields(res.users);
+            }
+          },
           error => {
             console.log(error);
           });
@@ -128,10 +136,10 @@ export class ManageUserComponent implements OnInit {
   editUser(user: UserModel) {
     this.frmAddUser.reset();
     this.isEdit = true;
-    this.frmAddUser.patchValue({ 'first_name': user.firstName }, { onlySelf: true });
-    this.frmAddUser.patchValue({ 'last_name': user.lastName }, { onlySelf: true });
-    this.frmAddUser.patchValue({ 'email': user.email }, { onlySelf: true });
-    this.frmAddUser.patchValue({ 'contact': user.contact }, { onlySelf: true });
+    this.frmAddUser.patchValue({'first_name': user.firstName}, {onlySelf: true});
+    this.frmAddUser.patchValue({'last_name': user.lastName}, {onlySelf: true});
+    this.frmAddUser.patchValue({'email': user.email}, {onlySelf: true});
+    this.frmAddUser.patchValue({'contact': user.contact}, {onlySelf: true});
     this.frmAddUser.patchValue({'role': user.role}, {onlySelf: true});
     this.currentEditUser = user;
   }
@@ -154,11 +162,11 @@ export class ManageUserComponent implements OnInit {
   deleteUser(user: UserModel) {
     const id = user.id;
     const index = this.users.indexOf(user);
-   this._userService.deleteUser(id).subscribe( res => {
-     if (res) {
-       this.users.splice(index, 1);
-     }
-   });
+    this._userService.deleteUser(id).subscribe(res => {
+      if (res) {
+        this.users.splice(index, 1);
+      }
+    });
   }
 
   getStatusClass(status: boolean): string {
@@ -177,6 +185,7 @@ export class ManageUserComponent implements OnInit {
     }
     return userArray;
   }
+
   protected getFormValidationErrors() {
     Object.keys(this.frmAddUser.controls).forEach(key => {
       const controlErrors: ValidationErrors = this.frmAddUser.get(key).errors;
@@ -212,12 +221,20 @@ export class ManageUserComponent implements OnInit {
     if (sortColumn === 'isActive') {
       this.users.sort((a, b) => {
         if (sortDirection === 'desc') {
-          if (a[sortColumn] < b[sortColumn]) { return -1; }
-          if (a[sortColumn] > b[sortColumn]) { return 1; }
+          if (a[sortColumn] < b[sortColumn]) {
+            return -1;
+          }
+          if (a[sortColumn] > b[sortColumn]) {
+            return 1;
+          }
           return 0;
         } else {
-          if (a[sortColumn] > b[sortColumn]) { return -1; }
-          if (a[sortColumn] < b[sortColumn]) { return 1; }
+          if (a[sortColumn] > b[sortColumn]) {
+            return -1;
+          }
+          if (a[sortColumn] < b[sortColumn]) {
+            return 1;
+          }
           return 0;
         }
       });
@@ -225,14 +242,26 @@ export class ManageUserComponent implements OnInit {
     }
     this.users.sort((a, b) => {
       if (sortDirection === 'desc') {
-        if (a[sortColumn].toLowerCase() < b[sortColumn].toLowerCase()) { return -1; }
-        if (a[sortColumn].toLowerCase() > b[sortColumn].toLowerCase()) { return 1; }
+        if (a[sortColumn].toLowerCase() < b[sortColumn].toLowerCase()) {
+          return -1;
+        }
+        if (a[sortColumn].toLowerCase() > b[sortColumn].toLowerCase()) {
+          return 1;
+        }
         return 0;
       } else {
-        if (a[sortColumn].toLowerCase() > b[sortColumn].toLowerCase()) { return -1; }
-        if (a[sortColumn].toLowerCase() < b[sortColumn].toLowerCase()) { return 1; }
+        if (a[sortColumn].toLowerCase() > b[sortColumn].toLowerCase()) {
+          return -1;
+        }
+        if (a[sortColumn].toLowerCase() < b[sortColumn].toLowerCase()) {
+          return 1;
+        }
         return 0;
       }
     });
+  }
+
+  private phoneNumber(phoneNumber: string): string {
+    return phoneNumber.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
   }
 }
