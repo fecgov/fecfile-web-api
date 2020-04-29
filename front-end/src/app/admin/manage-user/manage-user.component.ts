@@ -22,16 +22,6 @@ export const roleDesc = {
 })
 
 export class ManageUserComponent implements OnInit {
-  website = '';
-  treasurerName = '';
-  treasurerEmail = '';
-  treasurerTel = '';
-  treasurerFax = '';
-
-  asstTreasurerName = '';
-  asstTreasurerEmail = '';
-  asstTreasurerTel = '';
-  asstTreasurerFax = '';
   frmAddUser: FormGroup;
   users: Array<UserModel>;
   isEdit = false;
@@ -88,7 +78,6 @@ export class ManageUserComponent implements OnInit {
       formData['id'] = id;
       this._userService.saveUser(formData, false).subscribe(res => {
         if (res) {
-          console.log('SAVE SUCCESSFUL');
           this._dialogService.confirm(
               'The user has been updated successfully',
               ConfirmModalComponent,
@@ -97,7 +86,7 @@ export class ManageUserComponent implements OnInit {
               ModalHeaderClassEnum.successHeader);
           // reset form
           this.frmAddUser.reset();
-          //refresh users list
+          // refresh users list
           this.users = this.mapFromUserFields(res.users);
         }
       }, error => {
@@ -114,7 +103,6 @@ export class ManageUserComponent implements OnInit {
       formData['is_active'] = false;
       this._userService.saveUser(formData, true).subscribe(res => {
             if (res) {
-              console.log('SAVE SUCCESSFUL');
               this._dialogService.confirm(
                   'The user has been added successfully',
                   ConfirmModalComponent,

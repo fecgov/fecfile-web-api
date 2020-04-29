@@ -88,18 +88,22 @@
           </button>
           <div class="secondary-dropdown-menu profile" aria-labelledby="dropdownProfile" ngbDropdownMenu>
             <a class="dropdown-item" draggable="false" [routerLink]="['/account']">
+              <i class="fas fa-user"></i>
               Account
             </a>
-            <a class="dropdown-item" draggable="false" [routerLink]="['/users']">
-              Users
-            </a>
+<!--            <a class="dropdown-item" draggable="false" [routerLink]="['/users']">-->
+<!--              Users-->
+<!--            </a>-->
             <a class="dropdown-item" draggable="false" [routerLink]="['/manage_users']">
+              <i class="fas fa-user-plus"></i>
               Add User
             </a>
             <a class="dropdown-item" draggable="false" [routerLink]="['/settings']">
+              <i class="fas fa-user-cog"></i>
               Settings
             </a>
             <a class="dropdown-item" draggable="false" [routerLink]="['/logout']">
+              <i class="fas fa-power-off"></i>
               Logout
             </a>
           </div>
