@@ -45,6 +45,9 @@
           <div class="error__email-id" *ngIf="frm.get('emailId').hasError('required')">
             Please enter Email ID.
           </div>
+          <div class="error__email-id" *ngIf="frm.get('emailId').hasError('email')">
+            Invalid Email Format.
+          </div>
         </div>
       </div>
       </div>

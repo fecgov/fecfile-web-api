@@ -43,13 +43,13 @@ export class LoginComponent implements OnInit {
     this.frm = _fb.group({
       commiteeId: ['', Validators.required],
       loginPassword: ['', Validators.required],
-      emailId: ['', Validators.required]
+      emailId: ['', [Validators.required, Validators.email]]
     });
     this._subscription =
       this._messageService
         .getMessage()
         .subscribe(res => {
-          if(typeof res.loggedOut !== 'undefined') {
+          if (typeof res.loggedOut !== 'undefined') {
             this.loggedOut = res;
           }
         });
