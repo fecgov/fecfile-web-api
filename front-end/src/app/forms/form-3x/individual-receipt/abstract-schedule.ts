@@ -4281,9 +4281,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
+    /*
     if (item) {
       this.toggleValidationIndOrg(item.group);
     }
+    */
   }
 
   /**
@@ -4697,6 +4699,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       this.isAggregate = true;
                     } else {
                       this.isAggregate = false;
+                    }
+                  }
+                  if (prop === 'itemized_ind') {
+                    if(trx[prop] === 'U') {
+                      this.transactionTypeText += "(Optional)";
+
+                      if (this.frmIndividualReceipt.controls['street_1']) {
+                        this.frmIndividualReceipt.controls['street_1'].setValidators([Validators.nullValidator]);
+                        this.frmIndividualReceipt.controls['street_1'].updateValueAndValidity();
+                      }
+                      if (this.frmIndividualReceipt.controls['city']) {
+                        this.frmIndividualReceipt.controls['city'].setValidators([Validators.nullValidator]);
+                        this.frmIndividualReceipt.controls['city'].updateValueAndValidity();
+                      }
+                      if (this.frmIndividualReceipt.controls['state']) {
+                        this.frmIndividualReceipt.controls['state'].setValidators([Validators.nullValidator]);
+                        this.frmIndividualReceipt.controls['state'].updateValueAndValidity();
+                      }
+                      if (this.frmIndividualReceipt.controls['zip_code']) {
+                        this.frmIndividualReceipt.controls['zip_code'].setValidators([Validators.nullValidator]);
+                        this.frmIndividualReceipt.controls['zip_code'].updateValueAndValidity();
+                      }
                     }
                   }
                 }

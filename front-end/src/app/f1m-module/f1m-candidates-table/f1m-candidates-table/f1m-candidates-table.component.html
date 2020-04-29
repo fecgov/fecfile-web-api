@@ -39,10 +39,10 @@
           <td>{{ candidate.contribution_date }}</td>
           <td *ngIf="step !== 'step_3'">
             <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-              <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+              <button class="btn btn-sm btn-primary" ngbDropdownToggle (click)="checkIfEditMode()">
                 <i class="ellipsis-icon"></i>
               </button>
-              <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+              <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu >
                 <button class="dropdown-item" (click)="editCandidate(candidate)"><i class="edit-icon"></i> Edit</button>
                 <button class="dropdown-item" (click)="trashCandidate(candidate)"><i class="trash-icon"></i> Trash</button>
               </div>

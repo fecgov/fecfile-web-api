@@ -272,14 +272,14 @@
       </section>
       <section class="paragraph" *ngIf="qualificationData && qualificationData.candidates && qualificationData.candidates.length > 0">
         <hr/>
-        <app-f1m-candidates-table [candidatesData]="qualificationData.candidates" >
+        <app-f1m-candidates-table [candidatesData]="qualificationData.candidates" [scheduleAction]="scheduleAction">
         </app-f1m-candidates-table>
       </section>
     </form>
   </ng-container>
   <ng-container *ngIf="showPart2">
     <form [formGroup]="formPart2">
-      <section *ngIf="qualificationData?.candidates?.length >= 5">
+      <section>
         <div class="content">
           <div class="grid-row">
             <div class="grid-row__col space-bottom pt-5">

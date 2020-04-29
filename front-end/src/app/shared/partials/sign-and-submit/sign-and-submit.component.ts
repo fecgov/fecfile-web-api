@@ -1,3 +1,4 @@
+import { MessageService } from './../../services/MessageService/message.service';
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -20,6 +21,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy {
   @Input() reportId: string; 
   @Input() scheduleAction: ScheduleActions;
   @Input() formData: any;
+
   
   public form: FormGroup;
   public tooltipPlaceholder : string = 'Placeholder text';
@@ -31,10 +33,19 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy {
     public _config: NgbTooltipConfig,
     private _fb: FormBuilder, 
     private _f1mService: F1mService,
-    private _cd: ChangeDetectorRef
+    private _cd: ChangeDetectorRef,
+    private _messageService:MessageService
     ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
+
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(message =>{
+      if(message && message.action ==='disableFields'){
+        if(this.form){
+          this.form.disable();
+        }
+      }
+    });
    }
 
   ngOnInit() {
@@ -65,7 +76,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy {
     alert('Not implemented yet');
   }
 
-  private populateForm() {
+  public populateForm() {
     this.form.patchValue({sign: this.formData.sign},{onlySelf:true});
     this.form.patchValue({submission_date: this.formData.submission_date},{onlySelf:true});
     this.form.patchValue({additionalEmail1: this.formData.additionalEmail1},{onlySelf:true});

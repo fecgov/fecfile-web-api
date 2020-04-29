@@ -1,13 +1,13 @@
-import { ScheduleActions } from 'src/app/forms/form-3x/individual-receipt/schedule-actions.enum';
-import { F1mService } from './../../f1m/f1m-services/f1m.service';
-import { MessageService } from 'src/app/shared/services/MessageService/message.service';
-import { ApiService } from './../../../shared/services/APIService/api.service';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewEncapsulation, Input, OnDestroy, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
 import { Observable, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { TypeaheadService } from '../../../shared/partials/typeahead/typeahead.service';
+import { ScheduleActions } from './../../../forms/form-3x/individual-receipt/schedule-actions.enum';
+import { ApiService } from './../../../shared/services/APIService/api.service';
+import { F1mService } from './../../f1m/f1m-services/f1m.service';
 
 @Component({
   selector: 'app-f1m-qualification',
@@ -22,7 +22,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
   @Input() candidateNumber:number;
   @Input() qualificationData: any;
   @Input() reportId: string;
-
+  @Input() scheduleAction:ScheduleActions
   @Output() addCandidateEvent: EventEmitter<any> = new EventEmitter();
 
   private onDestroy$ = new Subject();
@@ -65,8 +65,13 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
         else if(message && message.formType === 'f1m-qualification' && message.action === 'trashCandidate'){
           this.trashCandidate(message.candidate);
         }
-      })
-
+        else if(message && message.action ==='disableFields'){
+          if(this.form){
+            this.form.disable();
+            this.formPart2.disable();
+          }
+        }
+      });
   }
 
   public ngOnInit() {
@@ -139,7 +144,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
   }
 
   private resetFormAndIncrementCandidate() {
-    // this.form.reset();
+    this.form.reset();
     this.candidateNumber++;
     this.form.patchValue({candidate_number:this.candidateNumber.toString()},{onlySelf:true});
   }
@@ -152,6 +157,28 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
     if(dateType === 'fifty_first_contributor_date'){
       this.setRequirementsMetDate()
     }
+  }
+
+  /**
+   * This method should get the next available candidate_number based on the current candidates in the array
+   * This is used in case if there are any gaps in candidate numbers due to deletion of a candidate from 
+   * middle of the array
+   * 
+   */
+  public getNextCandidateNumber(): number{
+    let counter:number = 1;
+    if(this.qualificationData.candidates && this.qualificationData.candidates.length > 0){
+      this.qualificationData.candidates.sort((a,b) => a.candidate_number > b.candidate_number ? 1 : -1);
+      this.qualificationData.candidates.array.forEach(candidate => {
+        if(Number(candidate.candidate_number) === counter){
+          counter++;
+        }
+        else{
+          return counter;
+        }
+      });
+    }
+    return counter;
   }
 
   public initForm() {

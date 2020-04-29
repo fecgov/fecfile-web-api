@@ -29,7 +29,8 @@ from fecfiler.core.views import (
     undo_delete_entities,
     superceded_report_id_list,
     get_sched_h_transaction_table,
-    update_F3X
+    update_F3X,
+    function_to_call_wrapper_update_F3X
 )
 
 from fecfiler.core.transaction_util import (
@@ -3013,7 +3014,3 @@ def get_report_id_from_date(request):
 END - get_report_id_from_date API - SCHED_A APP (MOVED FROM CORE APP)
 ******************************************************************************************************************************
 """
-@update_F3X
-def function_to_call_wrapper_update_F3X(report_id, cmte_id):
-    return {"report_id" : report_id,
-            "cmte_id" : cmte_id}
