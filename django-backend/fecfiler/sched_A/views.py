@@ -29,7 +29,9 @@ from fecfiler.core.views import (
     undo_delete_entities,
     superceded_report_id_list,
     get_sched_h_transaction_table,
+    get_comittee_id,
     update_F3X
+
 )
 
 from fecfiler.core.transaction_util import (
@@ -1929,7 +1931,7 @@ def schedA(request):
                         "reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution"
                     )
             validate_sa_data(request.data)
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             report_id = check_report_id(request.data.get("report_id"))
             # To check if the report id exists in reports table
             form_type = find_form_type(report_id, cmte_id)
@@ -1965,7 +1967,7 @@ def schedA(request):
             REQ_ELECTION_YR = request.query_params.get("election_year")
 
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -2036,7 +2038,7 @@ def schedA(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
             # To check if the report id exists in reports table
             form_type = find_form_type(report_id, datum.get("cmte_id"))
             # updating data for reattribution fields
@@ -2074,7 +2076,7 @@ def schedA(request):
             REQ_ELECTION_YR = request.query_params.get("election_year")
 
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -2138,7 +2140,7 @@ def force_itemize_sa(request):
     """
     # if request.method == "GET":
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -2162,7 +2164,7 @@ def force_unitemize_sa(request):
     """
     # if request.method == "GET":
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -2186,7 +2188,7 @@ def force_aggregate_sa(request):
     """
     # if request.method == "GET":
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -2218,7 +2220,7 @@ def force_unaggregate_sa(request):
     """
     # if request.method == "GET":
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -2249,7 +2251,7 @@ def contribution_aggregate(request):
     if request.method == "GET":
         try:
             check_mandatory_fields_SA(request.query_params, MANDATORY_FIELDS_AGGREGATE)
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             # if not('report_id' in request.query_params):
             #     raise Exception('Missing Input: Report_id is mandatory')
             # # handling null,none value of report_id
@@ -2696,7 +2698,7 @@ def trash_restore_transactions(request):
     for _action in _actions:
         report_id = _action.get("report_id", "")
         transaction_id = _action.get("transaction_id", "")
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         action = _action.get("action", "")
         _delete = "Y" if action == "trash" else ""
@@ -2985,7 +2987,7 @@ USED IN REATTRIBUTION REPORT ID GENERATION
 def get_report_id_from_date(request):
     try:
         transaction_date = date_format(request.query_params.get("transaction_date"))
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT json_agg(t) FROM (SELECT report_id AS "reportId", CASE WHEN(status IS NULL 

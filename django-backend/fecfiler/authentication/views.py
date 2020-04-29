@@ -24,7 +24,7 @@ from fecfiler.forms.models import Committee
 from rest_framework_jwt.settings import api_settings
 
 from ..core.transaction_util import do_transaction
-from ..core.views import check_null_value, NoOPError
+from ..core.views import check_null_value, NoOPError, get_comittee_id, get_email
 
 #jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
@@ -45,7 +45,6 @@ def jwt_response_payload_handler(token, user=None, request=None):
 
     return {
         'token': token,
-        #'user': AccountSerializer(user, context={'request':request}).data
     }
 
 # payload = jwt_response_payload_handler(user)
@@ -367,9 +366,7 @@ def check_email_validation(email):
 def manage_user(request):
     if request.method == "GET":
         try:
-            cmte_id = request.user.username
-            if len(cmte_id) > 9:
-                cmte_id = cmte_id[0:9]
+            cmte_id = get_comittee_id(request.user.username)
             if not check_null_value(cmte_id):
                 raise Exception("Committe id is missing from request data")
 
@@ -390,9 +387,7 @@ def manage_user(request):
             )
     elif request.method == "DELETE":
         try:
-            cmte_id = request.user.username
-            if len(cmte_id) > 9:
-                cmte_id = cmte_id[0:9]
+            cmte_id = get_comittee_id(request.user.username)
             data = {"cmte_id": cmte_id}
             if "id" in request.data and check_null_value(
                     request.data.get("id")
@@ -417,12 +412,7 @@ def manage_user(request):
             )
     elif request.method == "POST":
         try:
-            cmte_id = request.user.username
-            if len(cmte_id) > 9:
-                cmte_id = cmte_id[0:9]
-            else:
-                username = cmte_id + request.data.get("email")
-
+            cmte_id = get_comittee_id(request.user.username)
             data = {"cmte_id": cmte_id}
 
             fields = user_data_dict()
@@ -445,14 +435,11 @@ def manage_user(request):
 
     elif request.method == "PUT":
         try:
-            cmte_id = request.user.username
-            if len(cmte_id) > 9:
-                old_email = cmte_id[9:]
-                cmte_id = cmte_id[0:9]
-                username = cmte_id + request.data.get("email")
-            else:
-                username = cmte_id
-            data = {"cmte_id": cmte_id, "user_name": request.user.username}
+            old_email = get_email(request.user.username)
+            cmte_id = get_comittee_id(request.user.username)
+            username = cmte_id + request.data.get("email")
+
+            data = {"cmte_id": cmte_id, "user_name": get_comittee_id(request.user.username)}
             fields = user_data_dict()
             fields.append("id")
             data = validate(data, fields, request)
@@ -532,7 +519,7 @@ def toggle_user(request):
         try:
             username = request.user.username
             if len(username) > 9:
-                cmte_id = username[0:9]
+                cmte_id = get_comittee_id(request.user.username)
             data = {"username": username, "id": request.data.get("id"),
                     "cmte_id": cmte_id}
             toggle_status = get_toggle_status(data)
