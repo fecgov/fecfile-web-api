@@ -241,3 +241,7 @@
 .alert-danger .alert-link {
   color: #843534;
 }
+
+input.filingPassword[readonly] {
+  background-color: white;
+}

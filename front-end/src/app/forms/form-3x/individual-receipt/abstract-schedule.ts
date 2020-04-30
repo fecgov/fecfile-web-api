@@ -2274,11 +2274,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (res) {
 
           const reportId = this._receiptService.getReportIdFromStorage(this.formType);
-          this._reportsService
-            .updateReportDate(new reportModel({ report_id: reportId }))
-            .subscribe((resUpdateReportDate: any) => {
-              //console.log(resUpdateReportDate);
-            });
+          // this._reportsService
+          //   .updateReportDate(new reportModel({ report_id: reportId }))
+          //   .subscribe((resUpdateReportDate: any) => {
+          //     //console.log(resUpdateReportDate);
+          //   });
           this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
             const message: any = {
               formType: this.formType,
