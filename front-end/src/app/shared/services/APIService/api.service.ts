@@ -31,11 +31,12 @@ export class ApiService {
    *
    * @return     {Observable}  The JSON web token response.
    */
-  public signIn(email: string, username: string, password: string): Observable<any> {
-      // TODO: Allow post using existing API for now 03/09/20
+  public signIn(email: string, cmteId: string, password: string): Observable<any> {
+
+    // Django uses cmteId+email as unique username
+    const username = cmteId + email;
     return this._http
       .post<Auth>(`${this._appConfigService.getConfig().apiUrl}/token/obtain`, {
-        email,
         username,
         password
       })
