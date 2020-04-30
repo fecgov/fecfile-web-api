@@ -1,3 +1,6 @@
+<ng-template #rt let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
 <div class="signee-container">
   <header>
     <div class="header-container">
@@ -20,7 +23,7 @@
           </h3>
         </div>
         <div class="grid-row justify-content-between pl-5 ">
-          <div class="form-group col col-md-5 offset-md-1">
+          <div class="form-group col col-md-6 offset-md-1">
             <label for="sign">Sign
               <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
                 <i class="info-icon" aria-hidden="true"></i>
@@ -32,7 +35,11 @@
                 aria-describedby="sign" required [ngClass]=" form.get('sign')?.invalid &&
                           (form.touched || form.dirty)
                             ? 'input-field-error'
-                            : ''">
+                            : ''"
+                [ngbTypeahead]="searchLastName" [focusFirst]=false
+                [resultTemplate]="rt" [inputFormatter]="formatterLastName"
+                (selectItem)="handleSelectedIndividual($event)"
+                            >
             </div>
           </div>
           <div class="form-group col col-md-3 offset-md-1">
@@ -61,10 +68,22 @@
             </div>
           </div>
         </div>
-        <br>
-        <hr>
-        <div class="grid-row justify-content-between pl-5 pt-5">
-          <div class="form-group col col-md-3 offset-md-3">
+        <div class="grid-row py-3">
+          <h3>
+            Emails on file
+          </h3>
+        </div>
+        <div class="grid-row justify-content-between pl-5 pt-2">
+          <div class="form-group col offset-md-1">
+            <div *ngFor="let emailOnFile of emailsOnFile">{{emailOnFile}}</div>
+          </div>
+        </div>
+        <div class="grid-row pl-5 pt-3">
+          <div class="form-group col offset-md-1">Would you like the confirmation email to be sent to additional email addresses?</div>
+        </div>
+        <div class="grid-row pl-5 pt-3" style="width:93%">
+          
+          <div class="form-group col col-md-3 offset-md-1">
             <label for="additionalEmail1">Additional Email 1
               <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
                 <i class="info-icon" aria-hidden="true"></i>
@@ -113,8 +132,8 @@
             </div>
           </div>
         </div>
-        <div class="grid-row justify-content-between pl-5">
-          <div class="form-group col col-md-3 offset-md-3">
+        <div class="grid-row pl-5" style="width:93%">
+          <div class="form-group col col-md-3 offset-md-1">
             <label for="additionalEmail2">Additional Email 2
               <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
                 <i class="info-icon" aria-hidden="true"></i>
@@ -163,7 +182,7 @@
             </div>
           </div>
         </div>
-        <div class="grid-row float-right pt-3 pr-3" *ngIf="scheduleAction !== 'view'">
+        <div class="grid-row float-right pt-3 pr-3" *ngIf="false">
           <button type="button" class="btn btn-primary" (click)="updateInfo()">Save</button>
         </div>
         <div class="grid-row float-right pr-3 mt-3" *ngIf="saveSuccessful">
@@ -172,21 +191,19 @@
                 <div></div>
             </div>
         </div>
-        <div class="pt-5 mt-3">
-          <hr>
-        </div>
-        <div class="grid-row py-3">
-          <h3>
-            Emails on file
-          </h3>
-        </div>
-        <div class="grid-row justify-content-between pl-5 pt-2">
-          <div class="form-group col offset-md-1">
-            <div *ngFor="let emailOnFile of emailsOnFile">{{emailOnFile}}</div>
-          </div>
-        </div>
         <div>
           <div class="row float-right pl-5">
+            <div class="col">
+              <label for="filingPassword">Username (Optional)
+                  <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="input-group transactions__filter-multi-input">
+                    <input type="text" class="form-control" id="fakeUserName" aria-hidden="true" [(ngModel)]="username"  [ngModelOptions]="{standalone: true}" (blur)="usernameOnBlur()">
+                </div>
+            </div>
             <div class="col">
               <label for="filingPassword">eFiling Password
                   <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
@@ -195,9 +212,10 @@
                   </button>
                 </label>
                 <div class="input-group transactions__filter-multi-input">
-                  <input type="text" name="filingPassword" [formControlName]="'filingPassword'"
-                    class="form-control" id="filingPassword" aria-label="e filing password"
-                    
+                  <input type="password" name="filingPassword" [formControlName]="'filingPassword'"
+                    class="form-control filingPassword" id="filingPassword" aria-label="e filing password"
+                    autocomplete="false"
+                    readonly="" onfocus="this.removeAttribute('readonly');"
                     aria-describedby="filingPassword" [ngClass]=" form.get('filingPassword')?.invalid &&
                                 (form.touched || form.dirty)
                                   ? 'input-field-error'

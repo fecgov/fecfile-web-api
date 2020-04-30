@@ -32,7 +32,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   public signAndSubmitData : any = null;
   public filingId : string = '######';
 
-  public editMode = 'false';
+  public editMode = false;
   public reportId = "";
   public step2data: any;
   public candidateNumber = 1;
@@ -61,15 +61,18 @@ export class F1mComponent implements OnInit, OnDestroy {
     if(this._activatedRoute.snapshot.queryParams.edit){
       this._reportsService.getReportInfo('F1M', this._activatedRoute.snapshot.queryParams.reportId)
       .subscribe((res: any) => {
+        this.editMode = true;
         this.type = res.establishmentType === 'A' ? 'affiliation' : 'qualification'
         this.step = this._activatedRoute.snapshot.queryParams.edit ? this._activatedRoute.snapshot.queryParams.step : 'step_2';
         this.scheduleAction = ScheduleActions.edit;
         this.reportId = res.reportId;
         this.refreshScreen();
         if(this.type === 'affiliation'){
+          this.affiliationData = res;
           this.populateAffiliationData(res);
         }
         else if(this.type === 'qualification'){
+          this.qualificationData = res;
           this.populateQualificationData(res);
         }
         this.populateSignAndSubmitData(res);
@@ -83,6 +86,8 @@ export class F1mComponent implements OnInit, OnDestroy {
           this._messageService.sendMessage({action:'disableFields'});
         }
         this.refreshScreen();
+
+        this.validateForm();
       })
     }
     
@@ -153,11 +158,68 @@ export class F1mComponent implements OnInit, OnDestroy {
   }
 
   public skip(){
-    this._f1mService.saveForm(null,this.scheduleAction, 'saveQualification').subscribe(res =>{
-      this.reportId = res.reportId;
-      this.updateQueryParams();
-      this.continueToPart2();
-    });
+    if(!this.reportId){
+      this._f1mService.saveForm(null,this.scheduleAction, 'saveQualification').subscribe(res =>{
+        this.reportId = res.reportId;
+        this.updateQueryParams();
+        this.continueToPart2();
+      });
+    }
+    else{
+        this.continueToPart2();
+    }
+  }
+
+/*   public showSaveAndContinueButton(){
+    if(this.type === 'qualification'){
+      if(this.partyType === 'PTY'){
+        if(this.step === 'step_2' && this.qualificationData && this.qualificationData.candidates.length === 5){
+          return true;
+        }
+        return false;
+      }else{
+        if(this.qualificationData && this.qualificationData.candidates){
+          return this.step === 'step_2' && this.qualificationData.candidates.length ===5;
+        }
+        return false;
+      }
+    }
+    return this.step === 'step_2';
+  } */
+
+  public showSaveAndContinueButton(){
+    if(this.step === 'step_2'){
+      if(this.type === 'qualification'){
+        if(this.partyType === 'PTY'){
+          if(this.qualificationComp && !this.qualificationComp.showPart2){
+            return this.qualificationData && this.qualificationData.candidates && this.qualificationData.candidates.length === 5;
+          }
+            return true;
+        }
+          return this.qualificationData && this.qualificationData.candidates && this.qualificationData.candidates.length === 5;
+      }
+        return true;
+    }
+      return false;
+  }
+
+  public showPreviousButton(){
+    if(this.step === 'step_1' || this.step === 'step_5'){
+      return false;
+    }
+    else if(this.step === 'step_2'){
+      if(this.type === 'qualification'){
+        if(this.qualificationComp && this.qualificationComp.showPart2){
+          return true;
+        }
+        else if(this.qualificationComp  && !this.qualificationComp.showPart2){
+          return !this.editMode;
+        }
+        return true;
+      }
+        return !this.editMode;
+      }
+    return true;
   }
 
   public saveAndContinue(action:any) {
@@ -259,6 +321,10 @@ export class F1mComponent implements OnInit, OnDestroy {
   private refreshAffiliationChildComponent() {
     this.affiliationComp.cd.detectChanges();
   }
+
+   private refreshSignAndSubmitChildComponent() {
+    this.signAndSubmitComp._cd.detectChanges();
+  } 
 
   private setAffiliationInfo(res: any) {
     this.affiliationData.affiliation_date = res.affiliation_date;
@@ -367,6 +433,65 @@ export class F1mComponent implements OnInit, OnDestroy {
         break;
       default:
         break;
+    }
+    this.refreshScreen();
+  }
+
+  private validateForm(){
+    if(this.type === 'affiliation'){
+      this.validateAffiliationForm();
+    }
+    else if(this.type === 'qualification'){
+      this.validateQualificationForm();
+    }
+    this.refreshAllComponents();
+  }
+
+
+  private validateAffiliationForm() {
+    if(!this.affiliationComp.form.valid){
+      this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: 
+        {
+          step: 'step_2', 
+          reportId:this._activatedRoute.snapshot.queryParams.reportId,
+          edit:this._activatedRoute.snapshot.queryParams.edit
+      }});
+    }
+  }
+  
+  private validateQualificationForm() {
+    if(!this.qualificationComp.form.valid || this.qualificationComp.qualificationData.candidates.length < 5){
+      this.qualificationComp.showPart2 = false;
+      this.step='step_2';
+      this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: 
+        {
+          step: this.step, 
+          reportId:this._activatedRoute.snapshot.queryParams.reportId,
+          edit:this._activatedRoute.snapshot.queryParams.edit
+      }});
+      
+    }
+    else if(this.qualificationComp.formPart2.valid){
+      this.qualificationComp.showPart2 = true;
+      this.step='step_2';
+      this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: 
+        {
+          step: this.step, 
+          reportId:this._activatedRoute.snapshot.queryParams.reportId,
+          edit:this._activatedRoute.snapshot.queryParams.edit
+      }});
+    }
+  }
+
+  refreshAllComponents(){
+    if(this.affiliationComp){
+      this.refreshAffiliationChildComponent();
+    }
+    if(this.qualificationComp){
+      this.refreshQualificationChildComponent();
+    }
+    if(this.signAndSubmitComp){
+      this.refreshSignAndSubmitChildComponent();
     }
     this.refreshScreen();
   }

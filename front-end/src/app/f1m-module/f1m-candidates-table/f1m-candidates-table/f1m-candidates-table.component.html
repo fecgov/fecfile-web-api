@@ -36,7 +36,7 @@
           <td>{{ candidate.cand_office }}</td>
           <td>{{ candidate.cand_office_state }}</td>
           <td>{{ candidate.cand_office_district }}</td>
-          <td>{{ candidate.contribution_date }}</td>
+          <td>{{ candidate.contribution_date | date: 'MM/dd/yyyy'}}</td>
           <td *ngIf="step !== 'step_3'">
             <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
               <button class="btn btn-sm btn-primary" ngbDropdownToggle (click)="checkIfEditMode()">
