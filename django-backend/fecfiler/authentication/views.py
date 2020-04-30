@@ -133,7 +133,7 @@ def get_users_list(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from manage user table
-            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' order by id) t"""
+            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND role != 'TREASURER' order by id) t"""
             cursor.execute(_sql, [cmte_id])
             user_list = cursor.fetchall()
             if user_list is None:
@@ -158,6 +158,7 @@ def delete_manage_user(data):
             _sql = """UPDATE public.authentication_account
                         SET delete_ind = 'Y' 
                         WHERE id = %s AND cmtee_id = %s
+                        AND role != 'TREASURER'
                     """
             _v = (data.get("user_id"), data.get("cmte_id"))
             cursor.execute(_sql, _v)
@@ -346,11 +347,11 @@ def update_user(data):
     return rows
 
 
-def check_custom_validations(email, status, role):
+def check_custom_validations(email, role):
     try:
         check_email_validation(email)
-        if role.upper() not in ["ADMIN", "READ_ONLY", "UPLOADER", "ENTRY"]:
-            raise Exception("Role should be ADMIN, READ-ONLY, UPLOADER")
+        if role.upper() not in ["ADMIN","READONLY", "UPLOADER", "ENTRY"]:
+            raise Exception("Role should be ADMIN,READONLY, UPLOADER, ENTRY")
     except Exception as e:
         logger.debug("Custom validation failed")
         raise e
@@ -500,7 +501,7 @@ def update_toggle_status(status, data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' """
+            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND role != 'TREASURER' """
             cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id")])
 
             if cursor.rowcount != 1:
