@@ -51,56 +51,50 @@ export class AuthService {
   public getUserRole(): any {
     const sessionData = this._session.getSession();
     if (sessionData) {
-      // TODO: return actual user role from JWT when implemented
-      // for now C00415992 is Entry
-      // for  now C00111476 is Readonly
       const decodedAccessToken = jwt_decode(sessionData);
-      if ( decodedAccessToken.username === 'C00415992') {
-        return Roles.Entry;
-      } else if (decodedAccessToken.username === 'C00111476') {
-        return [Roles.ReadOnly];
-      } else if (decodedAccessToken.username === 'C00690099') {
-        return [Roles.Upload, Roles.ReadOnly];
-      }
-      return [Roles.Admin];
-    } else {
-      return [Roles.Admin];
+      return decodedAccessToken.role;
     }
+    this.destroySession();
   }
 
   public isReadOnly(): boolean {
     const sessionData = this._session.getSession();
     if (sessionData) {
-      // for now C00111476 is Readonly
       const decodedAccessToken = jwt_decode(sessionData);
-      if (decodedAccessToken.username === 'C00111476' || decodedAccessToken.username === 'C00690099') {
+      if (decodedAccessToken.role === Roles.Upload || decodedAccessToken.role === Roles.ReadOnly) {
         return true;
       }
       return false;
     }
-    }
+    this.destroySession();
+  }
   public isUploader(): boolean {
     const sessionData = this._session.getSession();
     if (sessionData) {
-      // for now C00111476 is Readonly
       const decodedAccessToken = jwt_decode(sessionData);
-      if (decodedAccessToken.username === 'C00690099') {
+      if (decodedAccessToken.role === Roles.Upload) {
         return true;
       }
       return false;
     }
+   this.destroySession();
   }
 
     public isCommitteeAdmin(): boolean {
       const sessionData = this._session.getSession();
       if (sessionData) {
         const decodedAccessToken = jwt_decode(sessionData);
-        if (decodedAccessToken.username === 'C00111476' ||
-            decodedAccessToken.username === 'C00415992' ) {
+        if (decodedAccessToken.role === Roles.CommitteeAdmin) {
+          return true;
+        } else {
           return false;
         }
       }
-      // All other committeeIds are Admin for now
-      return true;
+      this.destroySession();
     }
+
+  private destroySession() {
+    console.error('Session not found !!!');
+    this._session.destroy();
+  }
 }

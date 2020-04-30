@@ -26,7 +26,7 @@ export class CanActivateGuard implements CanActivate {
 
       if (whoIsAllowed) {
           for (const role of whoIsAllowed) {
-            if (whoAmI.includes(role)) {
+            if (whoAmI === role) {
               amIAllowed = true;
             }
           }
