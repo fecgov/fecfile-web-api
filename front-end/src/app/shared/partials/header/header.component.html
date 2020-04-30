@@ -94,7 +94,7 @@
 <!--            <a class="dropdown-item" draggable="false" [routerLink]="['/users']">-->
 <!--              Users-->
 <!--            </a>-->
-            <a class="dropdown-item" draggable="false" [routerLink]="['/manage_users']">
+            <a *ngIf="_authService.isCommitteeAdmin()" class="dropdown-item" draggable="false" [routerLink]="['/manage_users']">
               <i class="fas fa-user-plus"></i>
               Add User
             </a>

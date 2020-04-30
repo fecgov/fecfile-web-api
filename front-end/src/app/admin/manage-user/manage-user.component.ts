@@ -8,8 +8,8 @@ import {SortService} from './service/sort-service/sort.service';
 import {IAccount} from '../../account/account';
 
 export const roleDesc = {
-  read_only: 'Can only view data, and cannot perform any other functions.',
-  admin : 'Has all the access except managing users and Uploading',
+  readonly: 'Can only view data, and cannot perform any other functions.',
+  admin : 'Has all the access except managing users',
   uploader : 'Can only view data, and upload',
   entry : 'Has access to enter, edit and delete information, but cannot upload reports or create other users.'
 };
@@ -88,6 +88,7 @@ export class ManageUserComponent implements OnInit {
           this.frmAddUser.reset();
           // refresh users list
           this.users = this.mapFromUserFields(res.users);
+          this.isEdit = false;
         }
       }, error => {
         console.log(error);
@@ -113,6 +114,7 @@ export class ManageUserComponent implements OnInit {
               this.frmAddUser.reset();
               //refresh users list
               this.users = this.mapFromUserFields(res.users);
+              this.isEdit = false;
             }
           },
           error => {

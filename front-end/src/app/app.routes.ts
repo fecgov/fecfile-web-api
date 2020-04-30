@@ -61,13 +61,19 @@ export const AppRoutes: Routes = [
         path: 'tools_import_transactions',
         component: ToolsImportTransactionsComponent,
         pathMatch: 'full',
-        canActivate: [CanActivateGuard]
+        canActivate: [CanActivateGuard],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'tools_import_names',
         component: ToolsImportNamesComponent,
         pathMatch: 'full',
-        canActivate: [CanActivateGuard]
+        canActivate: [CanActivateGuard],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'tools_export_names',
@@ -79,7 +85,10 @@ export const AppRoutes: Routes = [
         path: 'tools_merge_names',
         component: ToolsMergeNamesComponent,
         pathMatch: 'full',
-        canActivate: [CanActivateGuard]
+        canActivate: [CanActivateGuard],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'tools_create_backup',
@@ -96,7 +105,10 @@ export const AppRoutes: Routes = [
       },
       {
         path: 'import-contacts',
-        loadChildren: 'src/app/import-contacts-module/import-contacts.module#ImportContactsModule'
+        loadChildren: 'src/app/import-contacts-module/import-contacts.module#ImportContactsModule',
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'addContact',
@@ -136,7 +148,12 @@ export const AppRoutes: Routes = [
           role: [Roles.CommitteeAdmin, Roles.Upload]
         }
       },
-      { path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+      {
+        path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Upload]
+        }
+      },
       {
         path: 'forms/form/edit/:form_id/:report_id',
         component: IndividualReceiptComponent,
@@ -144,7 +161,7 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Upload, Roles.Admin]
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Upload]
         }
       },
       { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
