@@ -4,29 +4,29 @@
         <h2>Your Committee Information</h2><br>
         <div class="row">
             <div class="col-md-3">
-                <h4>{{accounts.committeename}}</h4><br>
-                {{accounts.street1}} <br>
-                <span *ngIf="accounts.street2">{{accounts.street2}} <br></span>
-                {{accounts.city + ' ' + accounts.state + ' ' + accounts.zipcode}}<br>
+                <h4>{{accounts?.committeename}}</h4><br>
+                {{accounts?.street1}} <br>
+                <span *ngIf="accounts?.street2">{{accounts?.street2}} <br></span>
+                {{accounts?.city + ' ' + accounts?.state + ' ' + accounts?.zipcode}}<br>
             </div>
             <div class="col-md-3">
-                <h4> Treasurer:</h4> {{accounts.treasurerfirstname + ' ' + accounts.treasurerlastname}}<br>
+                <h4> Treasurer:</h4> {{accounts?.treasurerfirstname + ' ' + accounts?.treasurerlastname}}<br>
             </div>
             <div class="col-md-3">
-                <h4> Email 1:</h4> {{accounts.email_on_file}}<br>
-                <h4> Email 2: </h4>{{accounts.email_on_file1 ? accounts.email_on_file1 : 'NA'}}<br>
+                <h4> Email 1:</h4> {{accounts?.email_on_file ? accounts.email_on_file : 'NA'}}<br>
+                <h4> Email 2: </h4>{{accounts?.email_on_file1 ? accounts.email_on_file1 : 'NA'}}<br>
             </div>
         </div>
         <br>
         <div class="row">
             <div class="col-md-3">
-                <h4>Website :</h4> {{accounts.website}}
+                <h4>Website :</h4> {{accounts?.website ? accounts.website: 'NA'}}
             </div>
             <div class="col-md-3">
-                <h4>Telephone:</h4> {{accounts.phone_number? phoneNumber(accounts.phone_number): ' NA'}}
+                <h4>Telephone:</h4> {{accounts?.phone_number? phoneNumber(accounts?.phone_number): ' NA'}}
             </div>
             <div class="col-md-3">
-                <h4> Facsimile: </h4>{{accounts.fax? phoneNumber(accounts.fax) :  'NA'}}<br>
+                <h4> Facsimile: </h4>{{accounts?.fax? phoneNumber(accounts?.fax) :  'NA'}}<br>
             </div>
         </div>
     </div>
