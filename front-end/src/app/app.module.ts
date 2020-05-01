@@ -67,7 +67,6 @@ import { TransactionsTableComponent } from './forms/transactions/transactions-ta
 import { TrashConfirmComponent1 } from './forms/transactions/transactions-table/trash-confirm/trash-confirm.component';
 import { TransactionsComponent } from './forms/transactions/transactions.component';
 import { HelpComponent } from './help/help.component';
-import { LoginComponent } from './login/login.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
 import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
@@ -99,6 +98,11 @@ import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.
 import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 
+// import * as AWS from 'aws-sdk';
+import * as AWS from 'aws-sdk/global';
+import * as S3 from 'aws-sdk/clients/s3';
+import {AppMainLoginModule} from './app-main-login/app-main-login.module';
+import {AdminModule} from './admin/admin.module';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -109,7 +113,6 @@ const appInitializerFn = (appConfig: AppConfigService) => {
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
     DashboardComponent,
     ProfileComponent,
     HeaderComponent,
@@ -186,11 +189,12 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     SchedFCoreComponent,
     HelpComponent,
     F24Component,
-    
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
     SharedModule,
+    AdminModule,
+    AppMainLoginModule,
     BrowserModule,
     // NgSelectModule,
     // FormsModule,

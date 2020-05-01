@@ -14,6 +14,8 @@ from django.http import JsonResponse
 from functools import wraps
 
 # Create your views here.
+from fecfiler.core.views import get_comittee_id
+
 logger = logging.getLogger(__name__)
 
 LIST_F1M_COLUMNS = ['report_id', 'est_status', 'cmte_id', 'aff_cmte_id', 'aff_date', 
@@ -319,7 +321,7 @@ def report_post(request):
 	try:
 		report_dict = {
 			'report_id': str(next_report_id()),
-			'cmte_id': request.user.username,
+			'cmte_id': get_comittee_id(request.user.username),
 			'form_type': 'F1M',
 			'amend_ind': 'N',
 			'status': 'Saved'
@@ -435,7 +437,7 @@ def step4_reports_put(request, submit_flag=False):
 		else:
 			report_dict['additional_email_2'] = None
 		if report_dict:
-			report_dict['cmte_id'] = request.user.username
+			report_dict['cmte_id'] = get_comittee_id(request.user.username)
 			report_dict['report_id'] = request.data['reportId']
 			previous_report_dict = report_get(report_dict)
 			report_flag = report_put(report_dict)
@@ -569,7 +571,7 @@ def f1m_remove(request_dict):
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def form1M(request):
-	cmte_id = request.user.username
+	cmte_id = get_comittee_id(request.user.username)
 	report_flag = False
 	f1m_flag = False
 	previous_report_dict = None
@@ -817,7 +819,7 @@ def noneCheckTrueorFalse(parameter, check_dict):
 @api_view(['GET'])
 def get_details(request):
 	try:
-		cmte_id =  request.user.username
+		cmte_id =  get_comittee_id(request.user.username)
 		noneCheckMissingParameters(['type'], 
 				checking_dict=request.query_params,value_dict=request.query_params, 
 				function_name='get_details')
@@ -884,7 +886,7 @@ def get_details(request):
 @api_view(['GET', 'POST'])
 def get_original_registration_date(request):
 	try:
-		cmte_id = request.user.username
+		cmte_id = get_comittee_id(request.user.username)
 		sql="""SELECT sub_date AS "registration_date" FROM public.form_1 
 			WHERE comid = %s ORDER BY repid LIMIT 1"""
 		with connection.cursor() as cursor:
@@ -906,7 +908,7 @@ def get_original_registration_date(request):
 @api_view(['GET', 'POST'])
 def get_committee_met_req_date(request):
 	try:
-		cmte_id = request.user.username
+		cmte_id = get_comittee_id(request.user.username)
 		print(request.query_params)
 		noneCheckMissingParameters(['reportId', 'fifty_first_contributor_date'], 
 				checking_dict=request.data,value_dict=request.data, 

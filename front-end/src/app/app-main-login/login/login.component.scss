@@ -1,7 +1,7 @@
-@import '../shared/scss/global';
+@import 'src/app/shared/scss/global';
 
 .login {    
-    background-image: url("../../assets/img/fec-logo-5opac.png");
+    background-image: url("../../../assets/img/fec-logo-5opac.png");
     background-color: #cccccc;
     height: 100%;   
     padding-top: 15px;
@@ -31,7 +31,7 @@
     font-weight: 900;
     font-size: 100px;
     letter-spacing:-7.8px;
-  } 
+  }
   .or-padding {
     //padding-left: 5px;
     //padding-right: 5px;
@@ -152,7 +152,8 @@
           padding-right: 15px;
         }
         .error__committee-id,
-        .error__password-error {
+        .error__password-error,
+        .error__email-id {
           @extend .text-error;          
         }
         .login__btn {

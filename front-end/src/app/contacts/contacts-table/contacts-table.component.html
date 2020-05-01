@@ -67,7 +67,7 @@
           <div  *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary contacts__bulk_action_btn" 
               (click)="deleteRecyleBin()"
-              [disabled]="bulkActionDisabled">
+              [disabled]="bulkActionDisabled || !_authService.isReadOnly()">
               <i class="trash-icon"></i>
             </button>
           </div>          
@@ -98,7 +98,7 @@
         </td>-->
         <td>
           <div  *ngIf="isRecycleBinViewActive()">
-            <button class="btn btn-sm btn-primary" (click)="restoreContact(cnt)">
+            <button *ngIf="!_authService.isReadOnly()" class="btn btn-sm btn-primary" (click)="restoreContact(cnt)">
               <i class="undo-icon"></i>
             </button>
           </div>
@@ -108,13 +108,13 @@
               <i class="ellipsis-icon"></i>
             </button>
             <div id="contacts__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-              <button class="dropdown-item" (click)="editContact(cnt)">
+              <button *ngIf="!_authService.isReadOnly()" class="dropdown-item" (click)="editContact(cnt)">
                 <i class="edit-icon"></i> Edit
               </button>
               <button class="dropdown-item" (click)="viewActivity(cnt)">
                 <i class="view-icon"></i> View Activity
               </button>
-              <button *ngIf="cnt.activeTransactionsCnt == 0" class="dropdown-item" (click)="trashContact(cnt)">
+              <button *ngIf="cnt.activeTransactionsCnt == 0 && !_authService.isReadOnly()" class="dropdown-item" (click)="trashContact(cnt)">
                 <i class="trash-icon"></i> Trash
               </button>
             </div>

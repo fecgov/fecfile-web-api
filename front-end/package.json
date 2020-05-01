@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "local": "ng serve --configuration=local",
+    "local_memory": "node --max_old_space_size=3072 ./node_modules/@angular/cli/bin/ng serve --configuration=local",
     "local_aot": "ng serve --configuration=local --aot",
     "local_aot_memory": "node --max_old_space_size=3072 ./node_modules/@angular/cli/bin/ng serve --configuration=local --aot",
     "build": "ng build",

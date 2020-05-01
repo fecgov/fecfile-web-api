@@ -7,6 +7,7 @@ import { FormsService } from '../../services/FormsService/forms.service';
 import { MessageService } from '../../services/MessageService/message.service';
 import { Icommittee_forms } from '../../interfaces/FormsService/FormsService';
 import { Subject } from 'rxjs';
+import { AuthService } from '../../services/AuthService/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -43,7 +44,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _formService: FormsService,
-    private _config: NgbTooltipConfig
+    private _config: NgbTooltipConfig,
+    private _authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -152,7 +154,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
    * @param      {String}  form    The form
    */
   public formSelected(form: string): void {
-
+    if (this._authService.isReadOnly()) {
+      return;
+    }
     this.routerEventsSubscription = this._router
       .events
       .subscribe(val => {

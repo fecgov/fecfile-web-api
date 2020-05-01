@@ -25,8 +25,11 @@ from fecfiler.core.views import (
     post_entities,
     put_entities,
     remove_entities,
+
     undo_delete_entities,
+    get_comittee_id,
     update_F3X
+
 )
 from fecfiler.core.transaction_util import transaction_exists, update_sched_d_parent, get_line_number_trans_type
 from fecfiler.sched_A.views import get_next_transaction_id
@@ -704,7 +707,7 @@ def schedF(request):
 
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -741,7 +744,7 @@ def schedF(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -773,7 +776,7 @@ def schedF(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
@@ -828,7 +831,7 @@ def schedF(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
@@ -863,7 +866,7 @@ TO GET THE AGGREGATE FOR EXPENDITURE AMOUNT FOR CANDIDATE PER GENERAL ELECTION
 def get_aggregate_general_elec_exp(request):
     try:
         aggregate_amount = 0.0
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         mandatory_fields = ["beneficiary_cand_id", "expenditure_date"]
         for field in mandatory_fields:
             if request.query_params.get(field) in [None, "", "", " ", "Null", "None"]:
@@ -1150,7 +1153,7 @@ def force_aggregate_sf(request):
     2. re-do entity-based aggregation on sf
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -1178,7 +1181,7 @@ def force_unaggregate_sf(request):
     2. re-do entity-based aggregation on sf
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
