@@ -36,8 +36,11 @@ from fecfiler.core.views import (
     put_entities,
     remove_entities,
     undo_delete_entities,
+
     superceded_report_id_list,
+    get_comittee_id,
     update_F3X
+
 )
 from fecfiler.sched_A.views import (
     get_list_child_schedA,
@@ -1105,7 +1108,7 @@ def schedC(request):
     if request.method == "POST":
         logger.debug("POST request received.")
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -1142,7 +1145,7 @@ def schedC(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -1174,7 +1177,7 @@ def schedC(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
             #     data['report_id'] = check_report_id(
             #         request.data.get('report_id'))
@@ -1220,7 +1223,7 @@ def schedC(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
             if "prefix" in request.data:
                 datum["preffix"] = request.data.get("prefix")
 
@@ -1268,7 +1271,7 @@ def get_outstanding_loans(request):
     valid_transaction_types = ["LOANS_OWED_BY_CMTE", "LOANS_OWED_TO_CMTE"]
     logger.debug("POST request received.")
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         if not report_id:
             raise Exception("report_id is required.")
@@ -1416,7 +1419,7 @@ def get_outstanding_loans_old(request):
     valid_transaction_types = ["LOANS_OWED_BY_CMTE", "LOANS_OWED_TO_CMTE"]
     logger.debug("POST request received.")
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         if not report_id:
             raise Exception("report_id is required.")
@@ -2224,7 +2227,7 @@ def schedC1(request):
     # create new sched_c1 transaction
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -2263,7 +2266,7 @@ def schedC1(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -2295,7 +2298,7 @@ def schedC1(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
             #     data['report_id'] = check_report_id(
             #         request.data.get('report_id'))
@@ -2341,7 +2344,7 @@ def schedC1(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
             if "prefix" in request.data:
                 datum["preffix"] = request.data.get("prefix")
 
@@ -2726,7 +2729,7 @@ def schedC2(request):
     # create new sched_c2 transaction
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -2766,7 +2769,7 @@ def schedC2(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -2798,7 +2801,7 @@ def schedC2(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             # if 'report_id' in request.data and check_null_value(request.data.get('report_id')):
             #     data['report_id'] = check_report_id(
             #         request.data.get('report_id'))
@@ -2845,7 +2848,7 @@ def schedC2(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
             if "prefix" in request.data:
                 datum["preffix"] = request.data.get("prefix")
 
@@ -2883,7 +2886,7 @@ def get_endorser_summary(request):
     """
     logger.debug("GET request received for endorser summary.")
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         if "transaction_id" in request.query_params and check_null_value(
             request.query_params.get("transaction_id")
         ):

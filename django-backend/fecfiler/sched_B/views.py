@@ -29,7 +29,9 @@ from fecfiler.core.views import (
     undo_delete_entities,
     save_cand_entity,
     superceded_report_id_list,
+    get_comittee_id,
     update_F3X
+
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -1791,7 +1793,7 @@ def force_aggregate_sb(request):
     """
     # if request.method == "GET":
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -1825,7 +1827,7 @@ def force_itemize_unitemize(request, itemize=None):
     helper function to itemize/un-itemize a transaction
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -1891,7 +1893,7 @@ def force_itemize_sb(request):
     return force_itemize_unitemize(request, itemize="FI")
     # # if request.method == "GET":
     # try:
-    #     cmte_id = request.user.username
+    #     cmte_id = get_comittee_id(request.user.username)
     #     report_id = request.data.get("report_id")
     #     transaction_id = request.data.get("transaction_id")
     #     if not transaction_id:
@@ -1917,7 +1919,7 @@ def force_unaggregate_sb(request):
     """
     # if request.method == "GET":
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -1969,7 +1971,7 @@ def schedB(request):
                     raise Exception(
                         "redesignation_report_id parameter is missing. Kindly provide this id to continue redesignation"
                     )
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             if not ("transaction_type_identifier" in request.data):
@@ -2051,7 +2053,7 @@ def schedB(request):
             REQT_ELECTION_YR = request.query_params.get("election_year")
 
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -2129,7 +2131,7 @@ def schedB(request):
             datum["back_ref_transaction_id"] = request.data.get(
                 "back_ref_transaction_id"
             )
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
 
             if "entity_id" in request.data and check_null_value(
                 request.data.get("entity_id")
@@ -2170,7 +2172,7 @@ def schedB(request):
     if request.method == "DELETE":
 
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):

@@ -13,7 +13,7 @@ from rest_framework_swagger.views import get_swagger_view
 schema_view = get_swagger_view(title='FEC-Filer API')
 
 router = routers.SimpleRouter()
-router.register(r'accounts', AccountViewSet)
+router.register(r'accounts', AccountViewSet, basename='Accounts')
 #router.register(r'posts', PostViewSet)
 
 accounts_router = routers.NestedSimpleRouter(
@@ -40,10 +40,11 @@ urlpatterns = [
     url(r'^api/v1/', include('fecfiler.sched_H.urls')),
     url(r'^api/v1/', include('fecfiler.sched_L.urls')),
     url(r'^api/v1/', include('fecfiler.form_1M.urls')),
+    url(r'^api/v1/', include('fecfiler.authentication.urls')),
     #url(r'^api/v1/auth/login$', csrf_exempt(LoginView.as_view()), name='login'),
     #url(r'^api/v1/auth/login$', LoginView.as_view(), name='login'),
-    url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
     #url(r'^api/docs/', include('rest_framework_swagger.urls')),
+    url(r'^api/v1/auth/logout/$', LogoutView.as_view(), name='logout'),
     url(r'^api/docs$', schema_view),
     url(r'^api/v1/token/obtain$', obtain_jwt_token),
     url(r'^api/v1/token/refresh$', refresh_jwt_token),
