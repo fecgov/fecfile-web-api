@@ -14,7 +14,7 @@ export class ImportContactsService {
 
   constructor(private _http: HttpClient) { }
 
-  public checkDuplicates(page: number) {
+  public checkDuplicates(page: number): Observable<any> {
     let httpOptions = new HttpHeaders();
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     const params = new HttpParams();
@@ -54,7 +54,7 @@ export class ImportContactsService {
     }
   }
 
-  public validateContacts(page: number) {
+  public validateContacts(page: number): Observable<any> {
     let httpOptions = new HttpHeaders();
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     const params = new HttpParams();

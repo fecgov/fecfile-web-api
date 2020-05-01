@@ -49,16 +49,26 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject();
 
   private readonly contactFields = [
-    { displayName: 'Last Name', name: 'last_name' },
-    { displayName: 'First Name', name: 'first_name' },
-    { displayName: 'Organization', name: 'entity_name' },
-    { displayName: 'Address 1', name: 'street1' },
+    { displayName: 'Committee ID', name: 'committeeId' },
+    { displayName: 'Type', name: 'type' },
+    { displayName: 'Committee Name/Organization', name: 'name' },
+    { displayName: 'First Name', name: 'firstName' },
+    { displayName: 'Last Name', name: 'lastName' },
+    { displayName: 'Middle Name', name: 'middleName' },
+    { displayName: 'Prefix', name: 'prefix' },
+    { displayName: 'Suffix', name: 'suffix' },
+    { displayName: 'Address 1', name: 'street' },
     { displayName: 'Address 2', name: 'street2' },
     { displayName: 'City', name: 'city' },
     { displayName: 'State', name: 'state' },
     { displayName: 'Zip Code', name: 'zip' },
+    { displayName: 'Employer', name: 'employer' },
     { displayName: 'Occupation', name: 'occupation' },
-    { displayName: 'Employer', name: 'employer' }
+    { displayName: 'Candidate ID', name: 'candidateId' },
+    { displayName: 'Candidate Office', name: 'officeSought' },
+    { displayName: 'Candidate State', name: 'officeState' },
+    { displayName: 'Candidate District', name: 'district' },
+    { displayName: 'Multi-Candidate Committee Status', name: 'multiCandidateCmteStatus' }
   ];
 
   constructor(
@@ -138,7 +148,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
   }
 
   /////////////////////////
-  // import import methods
+  // import modal methods
   /////////////////////////
 
   public confirmFinalizeImport(modal: any) {

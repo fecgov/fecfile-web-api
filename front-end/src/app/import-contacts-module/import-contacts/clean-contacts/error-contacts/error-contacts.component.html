@@ -1,10 +1,10 @@
 <div class="error_contacts__container">
   <p>
-    The list below are Contacts missing required fields. Add the required fields where missing or Delete
-    Contacts from the import.
+    The list below are Contacts with invalid or missing fields. Correct the fields in error by
+    selecting the Edit option from the dropdown or Trash to exclude the Contact from the import.
   </p>
   <h2 class="error_contacts__heading">
-    Missing Field Entries
+    Invalid Field Entries
   </h2>
   <div class="error_contacts__table-container">
     <div class="error_contacts__table-inner">
@@ -42,10 +42,12 @@
                   <button class="btn btn-sm btn-primary action_button" ngbDropdownToggle>
                     <i class="ellipsis-icon"></i>
                   </button>
-                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                    <button class="dropdown-item" (click)="editContact(contact, i)"><i class="edit-icon"></i>
+                  <div class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="editContact(contact, i, editContactsModal)">
+                      <i class="edit-icon"></i>
                       Edit</button>
-                    <button class="dropdown-item" (click)="trashContact(contact, i)"><i class="trash-icon"></i>
+                    <button class="dropdown-item" (click)="trashContact(contact, i)">
+                      <i class="trash-icon"></i>
                       Trash</button>
                   </div>
                 </div>
@@ -124,7 +126,7 @@
   <div class="row">
     <div class="col col-md-5">
       <button class="btn btn-secondary btn-left error_contacts__begin-import"
-        (click)="confirmFinalizeImport(finalizeImportModal)">
+        (click)="confirmDeleteAll(deleteAllModal)">
         Delete Errors & Continue
       </button>
     </div>
@@ -135,3 +137,48 @@
     </div>
   </div>
 </div>
+
+<ng-template #editContactsModal let-modal>
+  <div class="modal-header" id="error_contacts__pin-modal-header">
+    <h1 class="modal-title pull-left">Edit Contact</h1>
+    <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelEdit(modal)">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>
+      Edit fields in error - Verbiage to be supplied by FEC.
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="saveContact(modal)">
+      Save
+    </button>
+    <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray" (click)="cancelEdit(modal)">
+      Cancel
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #deleteAllModal let-modal>
+  <div class="modal-header" id="error_contacts__pin-modal-header">
+    <h2 class="modal-title pull-left">Delete All Errors</h2>
+    <button aria-label="Close" class="close btn btn-link" type="button" (click)="cancelDeleteAll(modal)">
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>
+      By continuing to delete all errors, entries with missing fields
+      will not be imported to the system. Would you like to continue?
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary btn-modal-footer btn-right" (click)="deleteAll(modal)">
+      Delete Errors
+    </button>
+    <button type="button" class="btn btn-modal-footer btn-right btn-secondary-gray" (click)="cancelDeleteAll(modal)">
+      Cancel
+    </button>
+  </div>
+</ng-template>

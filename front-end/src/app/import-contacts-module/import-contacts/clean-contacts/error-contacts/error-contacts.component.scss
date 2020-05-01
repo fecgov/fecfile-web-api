@@ -71,4 +71,16 @@
   }
 }
 
+.modal {
+  .modal-lg, .modal-xl {
+    max-width: 95%;
+  }
+  #error_contacts__pin-modal-header {
+    background-color: $primaryBlue;
+    color: $white;
+    span {
+      color: $white;
+    }
+  }
+}
 

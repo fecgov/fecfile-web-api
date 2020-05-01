@@ -1,15 +1,15 @@
 {
-  "validation_errors": [
+  "validation_errors__": [
     {
       "committee_id": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "entity_type": {
         "value": null,
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "first_name": {
         "value": "Larry",
@@ -88,27 +88,27 @@
       "committee_id": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "entity_type": {
         "value": null,
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "first_name": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "last_name": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "middle_name": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "prefix": {
         "value": "56",
@@ -123,12 +123,12 @@
       "entity_name": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "street1": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "street2": {
         "value": ">>>",
@@ -138,7 +138,7 @@
       "city": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "state": {
         "value": "VV",
@@ -153,17 +153,17 @@
       "employer": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "occupation": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "candidate_id": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "office_sought": {
         "value": "Office",
@@ -173,7 +173,7 @@
       "office_state": {
         "value": "",
         "is_error": true,
-        "error_message": "Required"
+        "error_message": "This is a required field"
       },
       "district": {
         "value": "AA",
