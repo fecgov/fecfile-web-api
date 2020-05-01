@@ -24,10 +24,10 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
 
   constructor(
     private _messageService: MessageService,
-    private _authService: AuthService,
     private _formService: FormsService,
     private _dialogService: DialogService,
-    private _router: Router
+    private _router: Router,
+    public _authService: AuthService
   ) {}
 
   ngOnInit(): void {

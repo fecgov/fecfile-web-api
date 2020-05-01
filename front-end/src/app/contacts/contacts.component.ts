@@ -92,7 +92,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
     private _contactsMessageService: ContactsMessageService,
     private _router: Router,
     private _messageService: MessageService,
-    private _authService: AuthService
+    public _authService: AuthService
   ) {
     this.applyFiltersSubscription = this._contactsMessageService.getApplyFiltersMessage()
       .subscribe(
