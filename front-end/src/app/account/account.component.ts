@@ -42,7 +42,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     private _http: HttpClient,
     private _cookieService: CookieService,
     private _dialogService: DialogService,
-    private _authService: AuthService,
+    public _authService: AuthService,
   ) {
     this.getLevinAccounts().takeUntil(this.onDestroy$).subscribe(res => {
       //console.log(res);
