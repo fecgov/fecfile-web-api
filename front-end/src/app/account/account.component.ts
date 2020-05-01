@@ -14,6 +14,7 @@ import {
   ConfirmModalComponent,
   ModalHeaderClassEnum
 } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {AuthService} from '../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-account',
@@ -41,6 +42,7 @@ export class AccountComponent implements OnInit, OnDestroy {
     private _http: HttpClient,
     private _cookieService: CookieService,
     private _dialogService: DialogService,
+    private _authService: AuthService,
   ) {
     this.getLevinAccounts().takeUntil(this.onDestroy$).subscribe(res => {
       //console.log(res);
