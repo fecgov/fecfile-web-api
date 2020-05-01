@@ -10,29 +10,22 @@ import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 
 @Injectable()
-export class AccountService{
-    private AccountData: IAccount;
-
+export class AccountService {
     constructor(
         private _http: HttpClient,
         private _cookieService: CookieService
       ) { }
-    
-    getAccounts(): Observable<any>
-    {
-        let token: string = JSON.parse(this._cookieService.get('user'));
+
+    getAccounts(): Observable<any> {
+        const token: string = JSON.parse(this._cookieService.get('user'));
         let httpOptions =  new HttpHeaders();
-        /*let params = new HttpParams();*/
-        let url: string = '';
-        
-        url = '/core/get_committee_details';    
-                
+
+        const url = '/core/get_committee_details';
 
         httpOptions = httpOptions.append('Content-Type', 'application/json');
         httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-        //console.log(`${environment.apiUrl}${url}`);
-        
+
         return this._http
         .get(
         `${environment.apiUrl}${url}`,
@@ -41,6 +34,5 @@ export class AccountService{
         }
       );
 
-       
    }
 }

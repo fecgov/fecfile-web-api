@@ -4,7 +4,8 @@
     <!-- <ng-container *ngIf="step === 'step_2' || step === 'step_3'"> -->
     <hr />
 
-    <div class="search" *ngIf="formType !== '24'">
+    <div *ngIf="!_authService.isReadOnly() && formType !== '24'" class="search">
+
       <button class="fa fa-search" (click)="selectedTypeAheadValue(itemSelected)"></button>
       <ng-template #rt let-r="result" let-t="term">
         {{ r.text }}
@@ -35,7 +36,10 @@
         (click)="selectItem(categoryType?.value)"
       >
         <div class="float-left">
-          <button type="button" id="{{ categoryType?.text }}" class="btn btn-link" value="{{ categoryType?.value }}">
+          <button type="button" id="{{ categoryType?.text }}"
+                  class="btn btn-link"
+                  value="{{ categoryType?.value }}"
+                  [disabled]="_authService.isReadOnly()">
             <i class="plus-icon" aria-hidden="true"></i>
             {{ categoryType?.text }}
           </button>
@@ -104,11 +108,11 @@
       </div>
       <ng-container *ngIf="step !== 'step_3'">
         <div class="btn-row signAndSubmit">
-          <button
+          <button *ngIf="_authService.isCommitteeAdmin() || _authService.isUploader() || _authService.isAdmin()"
             id="sidebar_signBtn"
             type="button"
             class="btn btn-secondary"
-            [disabled]="!editMode"
+            [disabled]="isFiled"
             [routerLink]="['/signandSubmit', '3X']"
             [queryParams]="{ edit: editMode }"
           >

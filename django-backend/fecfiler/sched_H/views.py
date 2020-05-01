@@ -26,8 +26,11 @@ from fecfiler.core.views import (
     put_entities,
     remove_entities,
     undo_delete_entities,
+
     check_calendar_year,
+    get_comittee_id,
     update_F3X
+
 )
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
@@ -486,7 +489,7 @@ def schedH1(request):
 
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -534,7 +537,7 @@ def schedH1(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -566,7 +569,7 @@ def schedH1(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
@@ -596,7 +599,7 @@ def schedH1(request):
 
     elif request.method == "PUT":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             datum = schedH1_sql_dict(request.data)
             if "transaction_id" in request.data and check_null_value(
                 request.data.get("transaction_id")
@@ -656,7 +659,7 @@ def validate_h1_h2_exist(request):
 
     logger.debug("validate h1/h2 exist with request:{}".format(request.query_params))
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         cmte_type_category = request.query_params.get("cmte_type_category")
         calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
@@ -794,7 +797,7 @@ def validate_pac_h1(request):
     api to validate h1 status
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         event_types = [
             "administrative",  # TODO: need to fix this typo
@@ -866,7 +869,7 @@ def get_fed_nonfed_share(request):
 
     logger.debug("get_fed_nonfed_share with request:{}".format(request.query_params))
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         transaction_id = request.query_params.get("transaction_id")
 
@@ -1117,7 +1120,7 @@ def get_h1_percentage(request):
     """
     logger.debug("get_h1_percentage with request:{}".format(request.query_params))
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         # if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
         # raise Exception ('Missing Input: report_id is mandatory')
@@ -1487,7 +1490,7 @@ def get_h2_type_events(request):
     fundraising) to populate events dropdown list
     """
     logger.debug("get_h2_type_events with request:{}".format(request.query_params))
-    cmte_id = request.user.username
+    cmte_id = get_comittee_id(request.user.username)
     event_type = request.query_params.get("activity_event_type").strip()
     report_id = request.query_params.get("report_id").strip()
     if event_type not in ["fundraising", "direct_cand_support"]:
@@ -1707,7 +1710,7 @@ def get_h2_summary_table(request):
             ) t;
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         # logger.debug('checking if it is a new report')
         # if is_new_report(report_id, cmte_id):
@@ -1789,7 +1792,7 @@ def schedH2(request):
 
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -1824,7 +1827,7 @@ def schedH2(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -1856,7 +1859,7 @@ def schedH2(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
@@ -1903,7 +1906,7 @@ def schedH2(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
 
             data = put_schedH2(datum)
             return JsonResponse(data, status=status.HTTP_201_CREATED)
@@ -2379,7 +2382,7 @@ def get_sched_h3_breakdown(request):
     # AND delete_ind is distinct from 'Y') t
     # """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         if not ("report_id" in request.query_params):
             raise Exception("Missing Input: Report_id is mandatory")
         # handling null,none value of report_id
@@ -2461,7 +2464,7 @@ def get_h3_account_names(request):
     """
     try:
         logger.debug("get_h3_account_names...")
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
@@ -2509,7 +2512,7 @@ def get_h3_summary(request):
     """
     try:
         logger.debug("get_h3_summary...")
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
@@ -2573,7 +2576,7 @@ def get_h3_total_amount(request):
     # TODO: this api need to be updated to calcuate a aggreaget amount
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         logger.debug("get_h3_total_amount with request:{}".format(request.query_params))
         if "activity_event_name" in request.query_params:
@@ -2631,7 +2634,7 @@ def get_h3_aggregate_amount(request):
     # TODO: this api need to be updated to calcuate a aggreaget amount
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         parent_id = request.query_params.get("parent_id")
         logger.debug("get_h3_total_amount with request:{}".format(request.query_params))
@@ -2689,7 +2692,7 @@ def schedH3(request):
     if request.method == "POST":
         try:
             logger.debug("POST a h3 with data:{}".format(request.data))
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -2749,7 +2752,7 @@ def schedH3(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -2785,7 +2788,7 @@ def schedH3(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
@@ -2832,7 +2835,7 @@ def schedH3(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
@@ -3571,7 +3574,7 @@ def schedH4(request):
 
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -3609,7 +3612,7 @@ def schedH4(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -3641,7 +3644,7 @@ def schedH4(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
@@ -3688,7 +3691,7 @@ def schedH4(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
@@ -4151,7 +4154,7 @@ def get_h5_summary(request):
     # TODO: what is gonna happen when people click edit button? 
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
 
@@ -4222,7 +4225,7 @@ def get_sched_h5_breakdown(request):
     ) t
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         if not ("report_id" in request.query_params):
             raise Exception("Missing Input: Report_id is mandatory")
         # handling null,none value of report_id
@@ -4254,7 +4257,7 @@ def schedH5(request):
 
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -4314,7 +4317,7 @@ def schedH5(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -4346,7 +4349,7 @@ def schedH5(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
@@ -4393,7 +4396,7 @@ def schedH5(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
@@ -5042,7 +5045,7 @@ def schedH6(request):
 
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
             # handling null,none value of report_id
@@ -5078,7 +5081,7 @@ def schedH6(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             # make sure we get query parameters from both
             # request.data.update(request.query_params)
             if "report_id" in request.query_params and check_null_value(
@@ -5112,7 +5115,7 @@ def schedH6(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
@@ -5159,7 +5162,7 @@ def schedH6(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
