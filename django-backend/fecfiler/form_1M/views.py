@@ -472,6 +472,7 @@ def submit_f1m_report(request):
 		report_dict= {'status' : "Submitted"}
 		report_dict['cmte_id'] = request.user.username
 		report_dict['report_id'] = request.data['reportId']
+		report_dict['filed_date'] = datetime.datetime.now()
 		return report_put(report_dict)
 	except Exception as e:
 		raise Exception(
