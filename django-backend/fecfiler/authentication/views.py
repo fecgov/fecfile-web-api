@@ -15,6 +15,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework_jwt.compat import get_username_field, get_username
 
+from .authorization import is_not_treasurer
 from .models import Account
 import re
 from .permissions import IsAccountOwner
@@ -365,6 +366,9 @@ def check_email_validation(email):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def manage_user(request):
+
+    is_not_treasurer(request)
+
     if request.method == "GET":
         try:
             cmte_id = get_comittee_id(request.user.username)
@@ -516,6 +520,9 @@ def update_toggle_status(status, data):
 
 @api_view(["PUT"])
 def toggle_user(request):
+
+    is_not_treasurer(request)
+
     if request.method == "PUT":
         try:
             username = request.user.username

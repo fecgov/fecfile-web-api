@@ -15,6 +15,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from fecfiler.authentication.authorization import is_read_only, is_read_only_or_filer_reports
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
@@ -705,6 +706,8 @@ def delete_schedF(data):
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedF(request):
 
+    is_read_only_or_filer_reports(request)
+
     if request.method == "POST":
         try:
             cmte_id = get_comittee_id(request.user.username)
@@ -1152,6 +1155,7 @@ def force_aggregate_sf(request):
     1. set aggregate_ind = 'Y'
     2. re-do entity-based aggregation on sf
     """
+    is_read_only_or_filer_reports(request)
     try:
         cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
@@ -1180,6 +1184,8 @@ def force_unaggregate_sf(request):
     1. set aggregate_ind = 'N'
     2. re-do entity-based aggregation on sf
     """
+    is_read_only_or_filer_reports(request)
+
     try:
         cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
