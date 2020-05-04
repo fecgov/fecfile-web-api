@@ -5478,35 +5478,66 @@ GET THIRD NAVIGATION TRANSACTION TYPES VALUES API - CORE APP - SPRINT 13 - FNE 1
 ******************************************************************************************************************************
 """
 
-
-def loansanddebts(report_id, cmte_id):
+def loansanddebts(report_list, cmte_id):
     try:
         loans_sc_sql = """SELECT ((SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
         WHERE transaction_type_identifier = 'LOANS_OWED_BY_CMTE' AND memo_code IS NULL 
-        AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y') - 
-        (SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
-        WHERE transaction_type_identifier = 'LOANS_OWED_TO_CMTE' AND memo_code IS NULL 
-        AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y')) AS loans"""
-
-        error_message_sc = "The loans sql is throwing an error for sched_c table: "
-
-        loans_sd_sql = """SELECT ((SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
-        WHERE transaction_type_identifier = 'DEBT_TO_VENDOR' AND cmte_id = %s AND report_id = %s 
-        AND delete_ind is distinct from 'Y') -
+        AND cmte_id = %s AND report_id in ('{0}') AND delete_ind is distinct from 'Y') 
+        +
         (SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
-        WHERE transaction_type_identifier = 'DEBT_BY_VENDOR' AND cmte_id = %s AND report_id = %s 
-        AND delete_ind is distinct from 'Y')) AS debts"""
+        WHERE transaction_type_identifier = 'DEBT_TO_VENDOR' AND cmte_id = %s AND report_id in ('{0}') 
+        AND delete_ind is distinct from 'Y')) AS by_cmte""".format("', '".join(report_list))
 
-        error_message_sd = "The debts sql is throwing an error for sched_d table: "
+        error_message_sc = "The by_cmte sql is throwing an error: "
 
-        value_list = [cmte_id, report_id, cmte_id, report_id]
-        output = (
+        loans_sd_sql = """SELECT ((SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
+        WHERE transaction_type_identifier = 'LOANS_OWED_TO_CMTE' AND memo_code IS NULL 
+        AND cmte_id = %s AND report_id in ('{0}') AND delete_ind is distinct from 'Y')
+        +
+        (SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
+        WHERE transaction_type_identifier = 'DEBT_BY_VENDOR' AND cmte_id = %s AND report_id in ('{0}')
+        AND delete_ind is distinct from 'Y')) AS to_cmte""".format("', '".join(report_list))
+
+        error_message_sd = "The to_cmte sql is throwing an error: "
+
+        value_list = [cmte_id, cmte_id]
+        output = [
                 loans_sql(loans_sc_sql, value_list, error_message_sc)[0]
-                + loans_sql(loans_sd_sql, value_list, error_message_sd)[0]
-        )
+                ,loans_sql(loans_sd_sql, value_list, error_message_sd)[0]
+        ]
+        print(output)
         return output
     except Exception as e:
         raise Exception("The loansanddebts function is throwing an error" + str(e))
+
+# def loansanddebts(report_id, cmte_id):
+#     try:
+#         loans_sc_sql = """SELECT ((SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
+#         WHERE transaction_type_identifier = 'LOANS_OWED_BY_CMTE' AND memo_code IS NULL 
+#         AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y') - 
+#         (SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
+#         WHERE transaction_type_identifier = 'LOANS_OWED_TO_CMTE' AND memo_code IS NULL 
+#         AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y')) AS loans"""
+
+#         error_message_sc = "The loans sql is throwing an error for sched_c table: "
+
+#         loans_sd_sql = """SELECT ((SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
+#         WHERE transaction_type_identifier = 'DEBT_TO_VENDOR' AND cmte_id = %s AND report_id = %s 
+#         AND delete_ind is distinct from 'Y') -
+#         (SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
+#         WHERE transaction_type_identifier = 'DEBT_BY_VENDOR' AND cmte_id = %s AND report_id = %s 
+#         AND delete_ind is distinct from 'Y')) AS debts"""
+
+#         error_message_sd = "The debts sql is throwing an error for sched_d table: "
+
+#         value_list = [cmte_id, report_id, cmte_id, report_id]
+#         output = (
+#                 loans_sql(loans_sc_sql, value_list, error_message_sc)[0]
+#                 + loans_sql(loans_sd_sql, value_list, error_message_sd)[0]
+#         )
+#         return output
+#     except Exception as e:
+#         raise Exception("The loansanddebts function is throwing an error" + str(e))
 
 
 def getthirdnavamounts(cmte_id, report_id):
@@ -5614,7 +5645,12 @@ def get_thirdNavigationTransactionTypes(request):
         # period_receipt, period_disbursement, report_balance = getthirdnavamounts(
         #     cmte_id, report_id
         # )
-        loans_and_debts = loansanddebts(report_id, cmte_id)
+
+        # report_list = superceded_report_id_list(report_id)
+        # print(report_list)
+        # loans_and_debts = loansanddebts(report_list, cmte_id)
+
+        # loans_and_debts = loansanddebts(report_id, cmte_id)
 
         # coh_bop = prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id)
         # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
@@ -5627,10 +5663,18 @@ def get_thirdNavigationTransactionTypes(request):
         #                 'Others': 0,
         #                 'COH': coh_cop}
 
+        # forms_obj = {
+        #     "Receipts": output_dict['ttl_receipts_sum_page_per'],
+        #     "Disbursements": output_dict['ttl_disb_sum_page_per'],
+        #     "Loans/Debts": loans_and_debts[0]-loans_and_debts[1],
+        #     "Others": 0,
+        #     "COH": output_dict['coh_cop'],
+        # }
+
         forms_obj = {
             "Receipts": output_dict['ttl_receipts_sum_page_per'],
             "Disbursements": output_dict['ttl_disb_sum_page_per'],
-            "Loans/Debts": loans_and_debts,
+            "Loans/Debts": output_dict['debts_owed_by_cmte'] - output_dict['debts_owed_to_cmte'],
             "Others": 0,
             "COH": output_dict['coh_cop'],
         }
@@ -9774,27 +9818,29 @@ def update_f3x_details(report_id, cmte_id):
         ytd_result_dict = F3X_values(cmte_id, ytd_report_list, True)
         output_dict = {**result_dict, **ytd_result_dict}
 
-        sd_line_number_list = ["10", "9"]
-        for sd_line in sd_line_number_list:
-            # _sql_sched_d = """SELECT COALESCE(SUM(COALESCE(beginning_balance,0.0)+COALESCE(incurred_amount,0.0)),0.0)
-            #                   FROM public.sched_d WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
-            #                   AND cmte_id = %s AND report_id = %s """
-            _sql_sched_d = """ SELECT COALESCE((
-                            (SELECT COALESCE(SUM(beginning_balance),0.0) FROM public.sched_d 
-                            WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
-                            AND cmte_id = %s AND report_id = %s AND back_ref_transaction_id IS NULL) + 
-                            (SELECT COALESCE(SUM(incurred_amount),0.0) FROM public.sched_d 
-                            WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
-                            AND cmte_id = %s AND report_id = %s)),0.0)"""
-            _sd_values = [sd_line, cmte_id, report_id, sd_line, cmte_id, report_id]
+        # sd_line_number_list = ["10", "9"]
+        # for sd_line in sd_line_number_list:
+        #     # _sql_sched_d = """SELECT COALESCE(SUM(COALESCE(beginning_balance,0.0)+COALESCE(incurred_amount,0.0)),0.0)
+        #     #                   FROM public.sched_d WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
+        #     #                   AND cmte_id = %s AND report_id = %s """
+        #     _sql_sched_d = """ SELECT COALESCE((
+        #                     (SELECT COALESCE(SUM(beginning_balance),0.0) FROM public.sched_d 
+        #                     WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
+        #                     AND cmte_id = %s AND report_id = %s AND back_ref_transaction_id IS NULL) + 
+        #                     (SELECT COALESCE(SUM(incurred_amount),0.0) FROM public.sched_d 
+        #                     WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
+        #                     AND cmte_id = %s AND report_id = %s)),0.0)"""
+        #     _sd_values = [sd_line, cmte_id, report_id, sd_line, cmte_id, report_id]
 
-            with connection.cursor() as cursor:
-                cursor.execute(_sql_sched_d, _sd_values)
-                if sd_line == "10":
-                    output_dict['debts_owed_by_cmte'] = cursor.fetchone()[0]
-                else:
-                    output_dict['debts_owed_to_cmte'] = cursor.fetchone()[0]
-
+        #     with connection.cursor() as cursor:
+        #         cursor.execute(_sql_sched_d, _sd_values)
+        #         if sd_line == "10":
+        #             output_dict['debts_owed_by_cmte'] = cursor.fetchone()[0]
+        #         else:
+        #             output_dict['debts_owed_to_cmte'] = cursor.fetchone()[0]
+        debts_and_loans = loansanddebts(report_list, cmte_id)
+        output_dict['debts_owed_by_cmte'] = debts_and_loans[0]
+        output_dict['debts_owed_to_cmte'] = debts_and_loans[1]
         output_dict['coh_bop'] = prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id)
         output_dict['coh_begin_calendar_yr'] = prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, True)
         output_dict['ttl_receipts_sum_page_per'] = output_dict[f3x_col_line_dict['19'][0]]
@@ -9802,11 +9848,9 @@ def update_f3x_details(report_id, cmte_id):
         output_dict['ttl_receipts_sum_page_ytd'] = output_dict[f3x_col_line_dict['19'][3]]
         output_dict['ttl_disb_sum_page_ytd'] = output_dict[f3x_col_line_dict['31'][3]]
         output_dict['coh_cop'] = (output_dict['coh_bop'] + output_dict['ttl_receipts_sum_page_per'] - 
-            output_dict['ttl_disb_sum_page_per'] + output_dict['debts_owed_by_cmte'] - 
-            output_dict['debts_owed_to_cmte'])
+            output_dict['ttl_disb_sum_page_per'])
         output_dict['coh_coy'] = (output_dict['coh_begin_calendar_yr'] + output_dict['ttl_receipts_sum_page_ytd'] - 
-            output_dict['ttl_disb_sum_page_ytd'] + output_dict['debts_owed_by_cmte'] - 
-            output_dict['debts_owed_to_cmte'])
+            output_dict['ttl_disb_sum_page_ytd'])
         return put_F3X(report_id, cmte_id, output_dict)
 
     except Exception as e:
