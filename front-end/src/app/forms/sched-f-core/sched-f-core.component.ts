@@ -24,6 +24,7 @@ import { AbstractScheduleParentEnum } from '../form-3x/individual-receipt/abstra
 import { schedFstaticFormFields } from '../sched-f/static-form-fields.json';
 import {Observable, Subscription} from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import {AuthService} from '../../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-sched-f-core',
@@ -69,8 +70,9 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
     _transactionsMessageService: TransactionsMessageService,
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
-    _reportsService: ReportsService, 
-    _schedHMessageServiceService:SchedHMessageServiceService
+    _reportsService: ReportsService,
+    _schedHMessageServiceService: SchedHMessageServiceService,
+    _authService: AuthService,
   ) {
     super(
       _http,
@@ -92,8 +94,9 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService, 
-      _schedHMessageServiceService
+      _reportsService,
+      _schedHMessageServiceService,
+       _authService,
     );
     this.routesSubscription = _activatedRoute.queryParams.subscribe(p => {
       this.cloned = p.cloned ? true : false;

@@ -255,7 +255,7 @@
                 <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                   Previous
                 </button>
-                <button class="btn btn-secondary btn-right" type="button" [disabled]="saveAndAddDisabled"
+                <button *ngIf="scheduleAction !== viewScheduleAction" class="btn btn-secondary btn-right" type="button" [disabled]="saveAndAddDisabled"
                   (click)="saveAddMore()">
                   Save &amp; Add Transaction
                 </button>
