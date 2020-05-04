@@ -1,36 +1,32 @@
-import { RouterModule, Routes } from '@angular/router';
-import { ModuleWithProviders } from '@angular/core';
-import { CanActivateGuard } from './shared/utils/can-activate/can-activate.guard';
-import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
-import { LoginComponent } from './login/login.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProfileComponent } from './profile/profile.component';
-import { ToolsComponent } from './tools/tools.component';
-import { ReportsComponent } from './reports/reports.component';
-import { ContributorsComponent } from './contributors/contributors.component';
-import { FormsComponent } from './forms/forms.component';
-import { AccountComponent } from './account/account.component';
-import { UsersComponent } from './users/users.component';
-import { SettingsComponent } from './settings/settings.component';
-import { AppLayoutComponent } from './app-layout/app-layout.component';
+import {RouterModule, Routes} from '@angular/router';
+import {CanActivateGuard} from './shared/utils/can-activate/can-activate.guard';
+import {CanDeactivateGuardService} from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
+import {LoginComponent} from './app-main-login/login/login.component';
+import {DashboardComponent} from './dashboard/dashboard.component';
+import {ProfileComponent} from './profile/profile.component';
+import {ToolsComponent} from './tools/tools.component';
+import {FormsComponent} from './forms/forms.component';
+import {AccountComponent} from './account/account.component';
+import {UsersComponent} from './users/users.component';
+import {SettingsComponent} from './settings/settings.component';
+import {AppLayoutComponent} from './app-layout/app-layout.component';
 
-import { ToolsImportTransactionsComponent } from './tools-import-transactions/tools-import-transactions.component';
-import { ToolsImportNamesComponent } from './tools-import-names/tools-import-names.component';
-import { ToolsExportNamesComponent } from './tools-export-names/tools-export-names.component';
-import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.component';
-import { ToolsCreateBackupComponent } from './tools-create-backup/tools-create-backup.component';
-import { TransactionsComponent } from './forms/transactions/transactions.component';
-import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
-
-import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
-import { ReportheaderComponent } from './reports/reportheader/reportheader.component';
-import { ReportdetailsComponent } from './reports/reportdetails/reportdetails.component';
-import { SignComponent } from './shared/partials/sign/sign.component';
-import { SubmitComponent } from './shared/partials/submit/submit.component';
-import { ContactsComponent } from './contacts/contacts.component';
-import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
-import { HelpComponent } from './help/help.component';
+import {ToolsImportTransactionsComponent} from './tools-import-transactions/tools-import-transactions.component';
+import {ToolsImportNamesComponent} from './tools-import-names/tools-import-names.component';
+import {ToolsExportNamesComponent} from './tools-export-names/tools-export-names.component';
+import {ToolsMergeNamesComponent} from './tools-merge-names/tools-merge-names.component';
+import {ToolsCreateBackupComponent} from './tools-create-backup/tools-create-backup.component';
+import {IndividualReceiptComponent} from './forms/form-3x/individual-receipt/individual-receipt.component';
+import {ReportheaderComponent} from './reports/reportheader/reportheader.component';
+import {ReportdetailsComponent} from './reports/reportdetails/reportdetails.component';
+import {SignComponent} from './shared/partials/sign/sign.component';
+import {SubmitComponent} from './shared/partials/submit/submit.component';
+import {ContactsComponent} from './contacts/contacts.component';
+import {AddNewContactComponent} from './contacts/addnew/addnew_contacts.component';
+import {HelpComponent} from './help/help.component';
 // import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
+import {ManageUserComponent} from './admin/manage-user/manage-user.component';
+import {Roles} from './shared/enums/Roles';
 
 export const AppRoutes: Routes = [
   {
@@ -65,13 +61,19 @@ export const AppRoutes: Routes = [
         path: 'tools_import_transactions',
         component: ToolsImportTransactionsComponent,
         pathMatch: 'full',
-        canActivate: [CanActivateGuard]
+        canActivate: [CanActivateGuard],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'tools_import_names',
         component: ToolsImportNamesComponent,
         pathMatch: 'full',
-        canActivate: [CanActivateGuard]
+        canActivate: [CanActivateGuard],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'tools_export_names',
@@ -83,7 +85,10 @@ export const AppRoutes: Routes = [
         path: 'tools_merge_names',
         component: ToolsMergeNamesComponent,
         pathMatch: 'full',
-        canActivate: [CanActivateGuard]
+        canActivate: [CanActivateGuard],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'tools_create_backup',
@@ -100,14 +105,20 @@ export const AppRoutes: Routes = [
       },
       {
         path: 'import-contacts',
-        loadChildren: 'src/app/import-contacts-module/import-contacts.module#ImportContactsModule'
+        loadChildren: 'src/app/import-contacts-module/import-contacts.module#ImportContactsModule',
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'addContact',
         component: AddNewContactComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
-        canDeactivate: [CanDeactivateGuardService]
+        canDeactivate: [CanDeactivateGuardService],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+        }
       },
       {
         path: 'forms/form/:form_id',
@@ -132,17 +143,38 @@ export const AppRoutes: Routes = [
         component: SignComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
-        canDeactivate: [CanDeactivateGuardService]
+        canDeactivate: [CanDeactivateGuardService],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Upload]
+        }
       },
-      { path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+      {
+        path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Upload]
+        }
+      },
       {
         path: 'forms/form/edit/:form_id/:report_id',
         component: IndividualReceiptComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
-        canDeactivate: [CanDeactivateGuardService]
+        canDeactivate: [CanDeactivateGuardService],
+        data: {
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Upload]
+        }
       },
-      { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] }
+      { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+      {
+        path: 'manage_users',
+        component: ManageUserComponent,
+        pathMatch: 'full',
+        canActivate: [CanActivateGuard],
+        canDeactivate: [CanDeactivateGuardService],
+        data: {
+          role: [Roles.CommitteeAdmin]
+        }
+      },
     ]
   },
   { path: '**', redirectTo: '' }

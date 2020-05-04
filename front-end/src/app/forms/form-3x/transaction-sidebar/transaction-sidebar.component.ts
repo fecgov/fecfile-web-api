@@ -18,6 +18,7 @@ import { FormsService } from '../../../shared/services/FormsService/forms.servic
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { CashOnHandModel } from '../../transactions/model/cashOnHand.model';
 import { TransactionsMessageService } from './../../transactions/service/transactions-message.service';
+import { AuthService } from '../../../shared/services/AuthService/auth.service';
 
 const transactionCategoryOptions = [];
 
@@ -36,6 +37,7 @@ export class TransactionSidebarComponent implements OnInit {
   @Input() formType:string = '';
 
   public editMode: boolean;
+  public isFiled: boolean;
   public itemSelected: string = '';
   public typeaheadValue: string = '';
   public receiptsTotal: number = 0.0;
@@ -72,7 +74,8 @@ export class TransactionSidebarComponent implements OnInit {
     private _formsService: FormsService,
     private _dialogService: DialogService,
     private _typeaheadService: TypeaheadService,
-    private _transactionMessageService: TransactionsMessageService
+    private _transactionMessageService: TransactionsMessageService,
+    private _authService: AuthService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -97,6 +100,14 @@ export class TransactionSidebarComponent implements OnInit {
   ngOnInit(): void {
     this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
+    // edit mode is set based on the action performed on the report
+    // Edit mode does not say if its filed or saved
+    // on ViewReport isFiled is passed in query params from report details component
+    if (typeof this._activatedRoute.snapshot.queryParams.isFiled !== 'undefined') {
+      this.isFiled = this._activatedRoute.snapshot.queryParams.isFiled === 'true' ? true : false;
+    } else {
+      this.isFiled = this.editMode;
+    }
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
     this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
     if (res) {
@@ -288,6 +299,9 @@ export class TransactionSidebarComponent implements OnInit {
    * @param      {Object}  e  The event object.
    */
   public selectItem(transactionCategoryValue: string): void {
+    if (this._authService.isReadOnly()) {
+      return;
+    }
     if (this.editMode) {
       this.itemSelected = transactionCategoryValue;
 

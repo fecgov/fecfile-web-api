@@ -5,8 +5,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
-import { ApiService } from '../shared/services/APIService/api.service';
-import { AuthService } from '../shared/services/AuthService/auth.service';
+import { ApiService } from '../../shared/services/APIService/api.service';
+import { AuthService } from '../../shared/services/AuthService/auth.service';
 import { LoginComponent } from './login.component';
 
 class MockAuthService extends AuthService {
