@@ -24,32 +24,32 @@ from django.conf import settings
 import re
 import csv
 from django.core.paginator import Paginator
-from fecfiler.core.views import (get_list_entity, NoOPError, get_cvg_dates)
+from fecfiler.core.views import (get_list_entity, NoOPError, get_cvg_dates, get_comittee_id)
 
 conn = boto.connect_s3()
 
 # Dictionary mapping form type value to form type in forms_and_schedules table
 FORMTYPE_FORM_DICT = {
-        'F3X': 'form_3x'
+    'F3X': 'form_3x'
 }
 
 # Dictionary mapping schedules to schedule codes in forms_and_schedules table
 SCHED_SCHED_CODES_DICT = {
-        'sched_a': 'SA',
-        'sched_b': 'SB',
-        'sched_c': 'SC',
-        # 'sched_c1': 'SC1',
-        # 'sched_c2': 'SC2',
-        'sched_d': 'SD',
-        'sched_e': 'SE',
-        'sched_f': 'SF',
-        'sched_h1': 'SH',
-        'sched_h2': 'SH',
-        'sched_h3': 'SH',
-        'sched_h4': 'SH',
-        'sched_h5': 'SH',
-        'sched_h6': 'SH',
-        'sched_l': 'SL',
+    'sched_a': 'SA',
+    'sched_b': 'SB',
+    'sched_c': 'SC',
+    # 'sched_c1': 'SC1',
+    # 'sched_c2': 'SC2',
+    'sched_d': 'SD',
+    'sched_e': 'SE',
+    'sched_f': 'SF',
+    'sched_h1': 'SH',
+    'sched_h2': 'SH',
+    'sched_h3': 'SH',
+    'sched_h4': 'SH',
+    'sched_h5': 'SH',
+    'sched_h6': 'SH',
+    'sched_l': 'SL',
 
 }
 # Dictionary that maps form type to the schedules that it should include
@@ -70,43 +70,53 @@ SCHED_SCHED_CODES_DICT = {
 EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST = ['11AII']
 
 # List of all sched D transction type identifiers. This has no back_ref_transaction_id column so modifying SQL based on this list
-list_of_transaction_types_with_no_back_ref = ['DEBT_TO_VENDOR', 'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE', 'ALLOC_H1', 'ALLOC_H2_RATIO', 'TRAN_FROM_NON_FED_ACC', 'TRAN_FROM_LEVIN_ACC', 'SCHED_L_SUM']
+list_of_transaction_types_with_no_back_ref = ['DEBT_TO_VENDOR', 'LOANS_OWED_TO_CMTE', 'LOANS_OWED_BY_CMTE', 'ALLOC_H1',
+                                              'ALLOC_H2_RATIO', 'TRAN_FROM_NON_FED_ACC', 'TRAN_FROM_LEVIN_ACC',
+                                              'SCHED_L_SUM']
 
-list_of_SL_SA_transaction_types = ['LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC', 'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC']
+list_of_SL_SA_transaction_types = ['LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_ORG_REC', 'LEVIN_INDV_REC',
+                                   'LEVIN_NON_FED_REC', 'LEVIN_OTH_REC', 'LEVIN_PAC_REC']
 
 list_of_SL_SB_transaction_types = ['LEVIN_VOTER_ID', 'LEVIN_GOTV', 'LEVIN_GEN', 'LEVIN_OTH_DISB', 'LEVIN_VOTER_REG']
 
-DICT_PURPOSE_DESCRIPTION_VALUES = {'Convention Account' : ['IND_NP_CONVEN_ACC','PAC_NP_CONVEN_ACC','PARTY_NP_CONVEN_ACC','TRIB_NP_CONVEN_ACC'],
-                                    'Convention Account - JF Memo for' : ['JF_TRAN_NP_CONVEN_IND_MEMO','JF_TRAN_NP_CONVEN_PAC_MEMO','JF_TRAN_NP_CONVEN_TRIB_MEMO'],
-                                    'Credit Card Payment' : ['IE_CC_PAY_MEMO'],
-                                    'Credit Card: See Below' : ['IE_CC_PAY'],
-                                    'Earmark for' : ['PAC_CON_EAR_DEP', 'PAC_CON_EAR_UNDEP'],
-                                    'Earmarked for' : ['CON_EAR_DEP','CON_EAR_UNDEP','CON_EAR_UNDEP_BKP','CON_EAR_UNDEP_BKP'],
-                                    'Earmarked through' : ['EAR_REC', 'EAR_REC_CONVEN_ACC','EAR_REC_HQ_ACC', 'EAR_REC_RECNT_ACC', 'PAC_EAR_REC'],
-                                    'Headquarters Account' : ['IND_NP_HQ_ACC', 'PAC_NP_HQ_ACC', 'PARTY_NP_HQ_ACC', 'TRIB_NP_HQ_ACC'],
-                                    'Headquarters Account - JF Memo for' : ['JF_TRAN_NP_HQ_IND_MEMO', 'JF_TRAN_NP_HQ_PAC_MEMO', 'JF_TRAN_NP_HQ_TRIB_MEMO'],
-                                    'In-kind' : ['IK_REC','IK_TRAN','IK_TRAN_FEA','PAC_IK_BC_OUT','PAC_IK_BC_REC','PAC_IK_REC','PARTY_IK_BC_OUT','PARTY_IK_REC'],
-                                    'JF Memo for' : ['JF_TRAN_IND_MEMO','JF_TRAN_PAC_MEMO','JF_TRAN_PARTY_MEMO','JF_TRAN_TRIB_MEMO'],
-                                    'JF Transfer' : ['JF_TRAN'],
-                                    'JF Transfer Convention Account' : ['JF_TRAN_NP_CONVEN_ACC'],
-                                    'JF Transfer Headquarters Account' : ['JF_TRAN_NP_HQ_ACC'],
-                                    'JF Transfer Recount Account' : ['JF_TRAN_NP_RECNT_ACC'],
-                                    'Loan From Ind' : ['LOAN_FROM_IND'],
-                                    'Non-Contribution Account Receipt' : ['BUS_LAB_NON_CONT_ACC','IND_REC_NON_CONT_ACC','OTH_CMTE_NON_CONT_ACC'],
-                                    'Partnership Memo' : ['LEVIN_PARTN_MEMO', 'PARTN_MEMO'],
-                                    'Payroll: See Below' : ['IE_PMT_TO_PROL'],
-                                    'Recount Account' : ['IND_NP_RECNT_ACC','PAC_NP_RECNT_ACC','PARTY_NP_RECNT_ACC','TRIB_NP_RECNT_ACC'],
-                                    'Recount Account - JF Memo for' : ['JF_TRAN_NP_RECNT_PAC_MEMO','JF_TRAN_NP_RECNT_TRIB_MEMO','JF_TRAN_NP_RECNT_IND_MEMO'],
-                                    'Recount Receipt' : ['IND_RECNT_REC','PAC_RECNT_REC','PARTY_RECNT_REC','TRIB_RECNT_REC'],
-                                    'Reimbursement: See Below' : ['IE_STAF_REIM'],
-                                    'Return/Void' : ['PAC_NON_FED_RET', 'PAC_RET'],
-                                    'See Memos Below' : ['LEVIN_PARTN_REC', 'PARTN_REC'],
-                                    # Removing 'EAR_MEMO' from below as it being populated from front-end
-                                    'Total Earmarked through Conduit' : ['EAR_REC_CONVEN_ACC_MEMO','EAR_REC_HQ_ACC_MEMO','EAR_REC_RECNT_ACC_MEMO','PAC_EAR_MEMO'],
-                                    'Earmarked from' : ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO']
-                                    }
+DICT_PURPOSE_DESCRIPTION_VALUES = {
+    'Convention Account': ['IND_NP_CONVEN_ACC', 'PAC_NP_CONVEN_ACC', 'PARTY_NP_CONVEN_ACC', 'TRIB_NP_CONVEN_ACC'],
+    'Convention Account - JF Memo for': ['JF_TRAN_NP_CONVEN_IND_MEMO', 'JF_TRAN_NP_CONVEN_PAC_MEMO',
+                                         'JF_TRAN_NP_CONVEN_TRIB_MEMO'],
+    'Credit Card Payment': ['IE_CC_PAY_MEMO'],
+    'Credit Card: See Below': ['IE_CC_PAY'],
+    'Earmark for': ['PAC_CON_EAR_DEP', 'PAC_CON_EAR_UNDEP'],
+    'Earmarked for': ['CON_EAR_DEP', 'CON_EAR_UNDEP', 'CON_EAR_UNDEP_BKP', 'CON_EAR_UNDEP_BKP'],
+    'Earmarked through': ['EAR_REC', 'EAR_REC_CONVEN_ACC', 'EAR_REC_HQ_ACC', 'EAR_REC_RECNT_ACC', 'PAC_EAR_REC'],
+    'Headquarters Account': ['IND_NP_HQ_ACC', 'PAC_NP_HQ_ACC', 'PARTY_NP_HQ_ACC', 'TRIB_NP_HQ_ACC'],
+    'Headquarters Account - JF Memo for': ['JF_TRAN_NP_HQ_IND_MEMO', 'JF_TRAN_NP_HQ_PAC_MEMO',
+                                           'JF_TRAN_NP_HQ_TRIB_MEMO'],
+    'In-kind': ['IK_REC', 'IK_TRAN', 'IK_TRAN_FEA', 'PAC_IK_BC_OUT', 'PAC_IK_BC_REC', 'PAC_IK_REC', 'PARTY_IK_BC_OUT',
+                'PARTY_IK_REC'],
+    'JF Memo for': ['JF_TRAN_IND_MEMO', 'JF_TRAN_PAC_MEMO', 'JF_TRAN_PARTY_MEMO', 'JF_TRAN_TRIB_MEMO'],
+    'JF Transfer': ['JF_TRAN'],
+    'JF Transfer Convention Account': ['JF_TRAN_NP_CONVEN_ACC'],
+    'JF Transfer Headquarters Account': ['JF_TRAN_NP_HQ_ACC'],
+    'JF Transfer Recount Account': ['JF_TRAN_NP_RECNT_ACC'],
+    'Loan From Ind': ['LOAN_FROM_IND'],
+    'Non-Contribution Account Receipt': ['BUS_LAB_NON_CONT_ACC', 'IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC'],
+    'Partnership Memo': ['LEVIN_PARTN_MEMO', 'PARTN_MEMO'],
+    'Payroll: See Below': ['IE_PMT_TO_PROL'],
+    'Recount Account': ['IND_NP_RECNT_ACC', 'PAC_NP_RECNT_ACC', 'PARTY_NP_RECNT_ACC', 'TRIB_NP_RECNT_ACC'],
+    'Recount Account - JF Memo for': ['JF_TRAN_NP_RECNT_PAC_MEMO', 'JF_TRAN_NP_RECNT_TRIB_MEMO',
+                                      'JF_TRAN_NP_RECNT_IND_MEMO'],
+    'Recount Receipt': ['IND_RECNT_REC', 'PAC_RECNT_REC', 'PARTY_RECNT_REC', 'TRIB_RECNT_REC'],
+    'Reimbursement: See Below': ['IE_STAF_REIM'],
+    'Return/Void': ['PAC_NON_FED_RET', 'PAC_RET'],
+    'See Memos Below': ['LEVIN_PARTN_REC', 'PARTN_REC'],
+    # Removing 'EAR_MEMO' from below as it being populated from front-end
+    'Total Earmarked through Conduit': ['EAR_REC_CONVEN_ACC_MEMO', 'EAR_REC_HQ_ACC_MEMO', 'EAR_REC_RECNT_ACC_MEMO',
+                                        'PAC_EAR_MEMO'],
+    'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO']
+    }
 
 logger = logging.getLogger(__name__)
+
 
 def get_header_details():
     return {
@@ -128,10 +138,10 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
             if result is None:
                 # TO Handle zero transactions in sched_a or sched_b for a specific transaction_type_identifer using this condition
                 if empty_list_flag:
-                        return []
+                    return []
                 else:
                     raise NoOPError('No results are found in ' + error_string +
-                        ' Table. Input received:{}'.format(','.join(query_values_list)))
+                                    ' Table. Input received:{}'.format(','.join(query_values_list)))
             else:
                 # print(result)
                 return result
@@ -163,7 +173,9 @@ def get_data_details(report_id, cmte_id):
                                 FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'"""
         values_3 = [report_id, cmte_id]
         string_3 = "Reports"
-        return {**json_query(query_1, values_1, string_1, False)[0], **json_query(query_2, values_2, string_2, False)[0], **json_query(query_3, values_3, string_3, False)[0]}
+        return {**json_query(query_1, values_1, string_1, False)[0],
+                **json_query(query_2, values_2, string_2, False)[0],
+                **json_query(query_3, values_3, string_3, False)[0]}
 
     except Exception:
         raise
@@ -254,14 +266,14 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
                             "tran_query_string", False)[0]
         query = output.get('query_string')
         if transaction_id_list:
-                query = query + " AND transaction_id in ('{}')".format(
-                        "', '".join(transaction_id_list))
+            query = query + " AND transaction_id in ('{}')".format(
+                "', '".join(transaction_id_list))
         # Addressing no back_ref_transaction_id column in sched_D
         if identifier in list_of_transaction_types_with_no_back_ref:
             query_values_list = [report_id, cmte_id]
         else:
             query_values_list = [report_id, cmte_id,
-                back_ref_transaction_id, back_ref_transaction_id]
+                                 back_ref_transaction_id, back_ref_transaction_id]
         error_string = identifier + ". Get all transactions"
         # print(query)
         # print(query_values_list)
@@ -269,12 +281,14 @@ def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, tr
     except Exception:
         raise
 
+
 def get_back_ref_transaction_ids(DB_table, identifier, report_id, cmte_id, transaction_id_list):
     try:
         output = []
         query = """SELECT DISTINCT(back_ref_transaction_id) FROM {} 
             WHERE transaction_type_identifier = %s AND report_id = %s AND cmte_id = %s
-            AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(DB_table, "', '".join(transaction_id_list))
+            AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(DB_table,
+                                                                                       "', '".join(transaction_id_list))
         query_values_list = [identifier, report_id, cmte_id]
         results = json_query(query, query_values_list, DB_table, True)
         for result in results:
@@ -285,68 +299,73 @@ def get_back_ref_transaction_ids(DB_table, identifier, report_id, cmte_id, trans
 
 
 def get_transaction_type_identifier(DB_table, report_id, cmte_id, transaction_id_list):
-        try:
-                if transaction_id_list:
-                    # Addressing no back_ref_transaction_id column in sched_D
-                    # if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
-                    query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
-                        DB_table, "', '".join(transaction_id_list))
-                    # else:
-                    #     query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
-                    #         DB_table, "', '".join(transaction_id_list))
-                else:
-                    # Addressing no back_ref_transaction_id column in sched_D
-                    if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
-                        query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(DB_table)
-                    else:
-                        query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(DB_table)
-                query_values_list = [report_id, cmte_id]
-                result = json_query(query, query_values_list, DB_table, True)
-                # print(result)
-                return result
-        except Exception as e:
-                raise Exception(
-                    'The get_transaction_type_identifier function is raising the following error: ' + str(e))
+    try:
+        if transaction_id_list:
+            # Addressing no back_ref_transaction_id column in sched_D
+            # if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3", "public.sched_h5", "public.sched_l"]:
+            query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND delete_ind is distinct from 'Y'""".format(
+                DB_table, "', '".join(transaction_id_list))
+            # else:
+            #     query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND transaction_id in ('{}') AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
+            #         DB_table, "', '".join(transaction_id_list))
+        else:
+            # Addressing no back_ref_transaction_id column in sched_D
+            if DB_table in ["public.sched_d", "public.sched_c", "public.sched_h1", "public.sched_h2", "public.sched_h3",
+                            "public.sched_h5", "public.sched_l"]:
+                query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""".format(
+                    DB_table)
+            else:
+                query = """SELECT DISTINCT(transaction_type_identifier) FROM {} WHERE report_id = %s AND cmte_id = %s AND back_ref_transaction_id is NULL AND delete_ind is distinct from 'Y'""".format(
+                    DB_table)
+        query_values_list = [report_id, cmte_id]
+        result = json_query(query, query_values_list, DB_table, True)
+        # print(result)
+        return result
+    except Exception as e:
+        raise Exception(
+            'The get_transaction_type_identifier function is raising the following error: ' + str(e))
 
 
 def get_schedules_for_form_type(form_type):
-        try:
-                query = """SELECT DISTINCT(sched_type) FROM public.forms_and_schedules WHERE form_type = %s AND json_builder_flag IS TRUE"""
-                query_values_list = [form_type]
-                error_string = "forms_and_schedules"
-                result = json_query(query, query_values_list, error_string, False)
-                # print(result)
-                return result
-        except Exception as e:
-                raise Exception(
-                    'The get_schedules_for_form_type function is raising the following error: ' + str(e))
+    try:
+        query = """SELECT DISTINCT(sched_type) FROM public.forms_and_schedules WHERE form_type = %s AND json_builder_flag IS TRUE"""
+        query_values_list = [form_type]
+        error_string = "forms_and_schedules"
+        result = json_query(query, query_values_list, error_string, False)
+        # print(result)
+        return result
+    except Exception as e:
+        raise Exception(
+            'The get_schedules_for_form_type function is raising the following error: ' + str(e))
 
 
 def get_child_identifer(identifier, form_type):
-        try:
-              query = """SELECT c.tran_identifier FROM ref_transaction_types p LEFT JOIN ref_transaction_types c ON c.parent_tran_id=p.ref_tran_id WHERE p.tran_identifier = %s AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
-              query_values_list = [identifier, form_type]
-              error_string = "ref_transaction_types"
-              result = json_query(query, query_values_list, error_string, True)
-              # print(result)
-              return result
-        except Exception as e:
-                raise Exception(
-                    'The get_child_identifer function is raising the following error:' + str(e))
+    try:
+        query = """SELECT c.tran_identifier FROM ref_transaction_types p LEFT JOIN ref_transaction_types c ON c.parent_tran_id=p.ref_tran_id WHERE p.tran_identifier = %s AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
+        query_values_list = [identifier, form_type]
+        error_string = "ref_transaction_types"
+        result = json_query(query, query_values_list, error_string, True)
+        # print(result)
+        return result
+    except Exception as e:
+        raise Exception(
+            'The get_child_identifer function is raising the following error:' + str(e))
+
 
 def get_all_child_transaction_identifers(form_type):
-        try:
-              output = []
-              query = """SELECT p.tran_identifier FROM ref_transaction_types p WHERE p.parent_tran_id IS NOT NULL AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
-              query_values_list = [form_type]
-              error_string = "ref_transaction_types"
-              results = json_query(query, query_values_list, error_string, True)
-              for result in results:
-                  output.append(result['tran_identifier'])
-              return output
-        except Exception as e:
-                raise Exception(
-                    'The get_all_child_transaction_identifers function is raising the following error:' + str(e))
+    try:
+        output = []
+        query = """SELECT p.tran_identifier FROM ref_transaction_types p WHERE p.parent_tran_id IS NOT NULL AND p.form_type = %s ORDER BY p.line_num,p.ref_tran_id"""
+        query_values_list = [form_type]
+        error_string = "ref_transaction_types"
+        results = json_query(query, query_values_list, error_string, True)
+        for result in results:
+            output.append(result['tran_identifier'])
+        return output
+    except Exception as e:
+        raise Exception(
+            'The get_all_child_transaction_identifers function is raising the following error:' + str(e))
+
 
 def preappending_purpose_description(transaction):
     try:
@@ -355,26 +374,31 @@ def preappending_purpose_description(transaction):
                 if 'contributionPurposeDescription' in transaction:
                     if transaction['contributionPurposeDescription'] in [None, "null", "NULL"]:
                         transaction['contributionPurposeDescription'] = ""
-                    transaction['contributionPurposeDescription'] = preappend + ' ' + transaction['contributionPurposeDescription']
+                    transaction['contributionPurposeDescription'] = preappend + ' ' + transaction[
+                        'contributionPurposeDescription']
                 if 'expenditurePurposeDescription' in transaction:
                     if transaction['expenditurePurposeDescription'] in [None, "null", "NULL"]:
                         transaction['expenditurePurposeDescription'] = ""
-                    transaction['expenditurePurposeDescription'] = preappend + ' ' + transaction['expenditurePurposeDescription']
+                    transaction['expenditurePurposeDescription'] = preappend + ' ' + transaction[
+                        'expenditurePurposeDescription']
             if 'child' in transaction:
                 for child in transaction['child']:
                     if child['transactionTypeIdentifier'] in DICT_PURPOSE_DESCRIPTION_VALUES[preappend]:
                         if 'contributionPurposeDescription' in child:
                             if child['contributionPurposeDescription'] in [None, "null", "NULL"]:
                                 child['contributionPurposeDescription'] = ""
-                            child['contributionPurposeDescription'] = preappend + ' ' + child['contributionPurposeDescription']
+                            child['contributionPurposeDescription'] = preappend + ' ' + child[
+                                'contributionPurposeDescription']
                         if 'expenditurePurposeDescription' in child:
                             if child['expenditurePurposeDescription'] in [None, "null", "NULL"]:
                                 child['expenditurePurposeDescription'] = ""
-                            child['expenditurePurposeDescription'] = preappend + ' ' + child['expenditurePurposeDescription']
+                            child['expenditurePurposeDescription'] = preappend + ' ' + child[
+                                'expenditurePurposeDescription']
         return transaction
     except Exception as e:
         raise Exception(
             'The preappending_purpose_description function is raising the following error:' + str(e))
+
 
 @api_view(["POST"])
 def create_json_builders(request):
@@ -382,7 +406,7 @@ def create_json_builders(request):
         # import ipdb;ipdb.set_trace()
         # print("request",request)
         logger.debug('create json builder with {}'.format(request))
-        MANDATORY_INPUTS = ['report_id', 'call_from'] 
+        MANDATORY_INPUTS = ['report_id', 'call_from']
         error_string = ""
         output = {}
         transaction_flag = False
@@ -392,20 +416,20 @@ def create_json_builders(request):
         committeeId = request.data.get('committeeId')
         password = request.data.get('password')
         formType = request.data.get('formType')
-        newAmendIndicator =  request.data.get('newAmendIndicator')
-        report_id =  request.data.get('report_id')
-        reportSequence =  request.data.get('reportSequence')
-        emailAddress1 =  request.data.get('emailAddress1')
-        reportType =  request.data.get('reportType')
-        coverageStartDate =  request.data.get('coverageStartDate')
-        coverageEndDate =  request.data.get('coverageEndDate')
-        originalFECId =  request.data.get('originalFECId')
-        backDoorCode =  request.data.get('backDoorCode')
-        emailAddress2 =  request.data.get('emailAddress2')
-        wait =  request.data.get('wait')
+        newAmendIndicator = request.data.get('newAmendIndicator')
+        report_id = request.data.get('report_id')
+        reportSequence = request.data.get('reportSequence')
+        emailAddress1 = request.data.get('emailAddress1')
+        reportType = request.data.get('reportType')
+        coverageStartDate = request.data.get('coverageStartDate')
+        coverageEndDate = request.data.get('coverageEndDate')
+        originalFECId = request.data.get('originalFECId')
+        backDoorCode = request.data.get('backDoorCode')
+        emailAddress2 = request.data.get('emailAddress2')
+        wait = request.data.get('wait')
 
         # Handling Mandatory Inputs required
-        
+
         for field in MANDATORY_INPUTS:
             if field not in request.data or request.data.get(field) in [None, 'null', '', ""]:
                 error_string += ','.join(field)
@@ -413,9 +437,10 @@ def create_json_builders(request):
             raise Exception(
                 'The following inputs are mandatory for this API: ' + error_string)
         # Assiging data passed through request
-        #report_id = request.data.get('report_id')
+        # report_id = request.data.get('report_id')
         call_from = request.data.get('call_from')
-        cmte_id = request.user.username
+
+        cmte_id = get_comittee_id(request.user.username)
         # Checking for transaction ids in the request
         if 'transaction_id' in request.data and request.data.get('transaction_id'):
             transaction_flag = True
@@ -433,13 +458,16 @@ def create_json_builders(request):
         # Figuring out what schedules are to be checked for the form type
         schedule_name_list = get_schedules_for_form_type(full_form_type)
         # List of all the child transactions that need back_ref_transaction_id
-        ALL_CHILD_TRANSACTION_TYPES_LIST = get_all_child_transaction_identifers(form_type) 
+        ALL_CHILD_TRANSACTION_TYPES_LIST = get_all_child_transaction_identifers(form_type)
 
         # *******************************TEMPORARY MODIFICATION FTO CHECK ONLY SCHED A AND SCHED B TABLES************************************
         schedule_name_list = [
-            {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_c'}, {'sched_type': 'sched_d'}, {'sched_type': 'sched_e'}, 
-            {'sched_type': 'sched_f'}, {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'}, {'sched_type': 'sched_c1'}, 
-            {'sched_type': 'sched_c2'}, {'sched_type': 'sched_h1'}, {'sched_type': 'sched_h2'}, {'sched_type': 'sched_h3'}, {'sched_type': 'sched_h5'},
+            {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_c'}, {'sched_type': 'sched_d'},
+            {'sched_type': 'sched_e'},
+            {'sched_type': 'sched_f'}, {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'},
+            {'sched_type': 'sched_c1'},
+            {'sched_type': 'sched_c2'}, {'sched_type': 'sched_h1'}, {'sched_type': 'sched_h2'},
+            {'sched_type': 'sched_h3'}, {'sched_type': 'sched_h5'},
             {'sched_type': 'sched_l'}]
         # Adding Summary data to output based on form type
         if form_type == 'F3X' and (not transaction_flag):
@@ -468,10 +496,10 @@ def create_json_builders(request):
                         #     child_identifier_list = []
                         # else:
                         child_identifier_list = get_child_identifer(
-                                identifier, form_type)
+                            identifier, form_type)
                         # print('**********child identifer list')
                         # print(child_identifier_list)
-                                # ********************************************
+                        # ********************************************
                         # SQL QUERY to get all transactions of the specific identifier
                         if identifier not in ALL_CHILD_TRANSACTION_TYPES_LIST:
                             # print('*****')
@@ -518,8 +546,8 @@ def create_json_builders(request):
                                 else:
                                     output['data']['schedules'][schedule].append(transaction)
         up_datetime = datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
-        tmp_filename = cmte_id + '_' + str(report_id)+'_'+str(up_datetime)+'.json'
-        tmp_path = '/tmp/'+tmp_filename
+        tmp_filename = cmte_id + '_' + str(report_id) + '_' + str(up_datetime) + '.json'
+        tmp_path = '/tmp/' + tmp_filename
         json.dump(output, open(tmp_path, 'w'), indent=4)
 
         # Transfering the local json file to S3 bucket
@@ -560,14 +588,14 @@ def create_json_builders(request):
             # print("file_obj = ", file_obj)
 
             add_log(report_id,
-                cmte_id, 
-                4,
-                " create_json_builders calling data Validatior with data_obj", 
-                json.dumps(data_obj), 
-                '',
-                '', 
-                '' 
-                ) 
+                    cmte_id,
+                    4,
+                    " create_json_builders calling data Validatior with data_obj",
+                    json.dumps(data_obj),
+                    '',
+                    '',
+                    ''
+                    )
 
             resp = requests.post("http://" + settings.DATA_RECEIVE_API_URL +
                                  "/v1/upload_filing", data=data_obj, files=file_obj)
@@ -580,22 +608,24 @@ def create_json_builders(request):
     except Exception as e:
         return Response("The create_json_builders is throwing an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
 
+
 '''
 message_type,
  1-FATAL, 2-ERROR, 3-WARN, 4-INFO, 5-DEBUG, 6-TRACE
 '''
-def add_log(reportid, 
-            cmte_id, 
-            message_type, 
-            message_text, 
-            response_json, 
-            error_code, 
-            error_json, 
+
+
+def add_log(reportid,
+            cmte_id,
+            message_type,
+            message_text,
+            response_json,
+            error_code,
+            error_json,
             app_error,
             host_name=os.uname()[1],
             process_name="create_json_builders"):
-
-     with connection.cursor() as cursor:
+    with connection.cursor() as cursor:
         cursor.execute("""INSERT INTO public.upload_logs(
                                         report_id, 
                                         cmte_id, 
@@ -608,5 +638,5 @@ def add_log(reportid,
                                         app_error, 
                                         host_name)
                             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                                        [reportid, cmte_id, process_name, message_type, message_text, response_json, error_code, error_json, app_error, host_name])
-
+                       [reportid, cmte_id, process_name, message_type, message_text, response_json, error_code,
+                        error_json, app_error, host_name])

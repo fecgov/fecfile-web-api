@@ -200,12 +200,11 @@ def update_F3X(func):
 
 @api_view(["GET"])
 def get_filed_report_types(request):
-
     # Fields for identifying the committee type and committee design and filter the forms category
 
     try:
         # import ipdb;ipdb.set_trace()
-        comm_id = request.user.username
+        comm_id = get_comittee_id(request.user.username)
 
         # forms_obj = [obj.__dict__ for obj in Cmte_Report_Types_View.objects.raw("select report_type,rpt_type_desc,regular_special_report_ind,rpt_type_info, cvg_start_date,
         # cvg_end_date,due_date from public.cmte_report_types_view where cmte_id='" + comm_id + "' order by rpt_type_order")]
@@ -263,15 +262,14 @@ GET TRANSACTION CATEGORIES API- CORE APP - SPRINT 6 - FNE 528 - BY PRAVEEN JINKA
 
 @api_view(["GET"])
 def get_transaction_categories(request):
-
     try:
         with connection.cursor() as cursor:
             forms_obj = {}
             form_type = request.query_params.get("form_type")
 
             if (
-                "cmte_type_category" in request.query_params
-                and request.query_params.get("cmte_type_category")
+                    "cmte_type_category" in request.query_params
+                    and request.query_params.get("cmte_type_category")
             ):
                 cmte_type_category = request.query_params.get("cmte_type_category")
             else:
@@ -333,7 +331,6 @@ GET TRANSACTION TYPES API- CORE APP - FNE 1477, FNE1497 - BY ZOBAIR SALEEM
 
 @api_view(["GET"])
 def get_transaction_types(request):
-
     try:
         with connection.cursor() as cursor:
             forms_obj = {}
@@ -378,13 +375,12 @@ GET REPORT TYPES API- CORE APP - SPRINT 6 - FNE 471 - BY PRAVEEN JINKA
 
 @api_view(["GET"])
 def get_report_types(request):
-
     try:
         with connection.cursor() as cursor:
 
             # report_year = datetime.datetime.now().strftime('%Y')
             forms_obj = {}
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             form_type = request.query_params.get("form_type")
             cursor.execute(
                 "select report_types_json From public.report_type_and_due_dates_view where cmte_id = %s and form_type = %s",
@@ -416,8 +412,8 @@ def get_report_types(request):
             for report in reports:
                 if report.get("report_type") == "YE":
                     report["election_state"][0]["dates"][0]["cvg_start_date"] = (
-                        report["election_state"][0]["dates"][0]["cvg_end_date"][:4]
-                        + "-10-01"
+                            report["election_state"][0]["dates"][0]["cvg_end_date"][:4]
+                            + "-10-01"
                     )
 
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
@@ -434,7 +430,7 @@ def get_filed_form_types(request):
     Fields for identifying the committee type and committee design and filter the forms category 
     """
     try:
-        comm_id = request.user.username
+        comm_id = get_comittee_id(request.user.username)
 
         # forms_obj = [obj.__dict__ for obj in RefFormTypes.objects.raw("select  rctf.category,rft.form_type,rft.form_description,rft.form_tooltip,rft.form_pdf_url from ref_form_types rft join ref_cmte_type_vs_forms rctf on rft.form_type=rctf.form_type where rctf.cmte_type='" + cmte_type + "' and rctf.cmte_dsgn='" + cmte_dsgn +  "'")]
         forms_obj = [
@@ -472,11 +468,11 @@ GET DYNAMIC FORM FIELDS API- CORE APP - SPRINT 7 - FNE 526 - BY PRAVEEN JINKA
 @api_view(["GET"])
 def get_dynamic_forms_fields(request):
     # try:
-    cmte_id = request.user.username
+    cmte_id = get_comittee_id(request.user.username)
     form_type = request.query_params.get("form_type")
     transaction_type = request.query_params.get("transaction_type")
     if "reportId" in request.query_params and request.query_params.get(
-        "reportId"
+            "reportId"
     ) not in ("", "", None, " ", "None", "null"):
         report_id = request.query_params.get("reportId")
     else:
@@ -606,7 +602,6 @@ REPORTS API- CORE APP - SPRINT 7 - FNE 555 - BY PRAVEEN JINKA
 
 
 def check_form_type(form_type):
-
     form_list = ["F3X"]
 
     if not (form_type in form_list):
@@ -618,7 +613,6 @@ def check_form_type(form_type):
 
 
 def check_form_data(field, data):
-
     try:
         if field in data:
             if not data.get(field) in [None, "null", "", ""]:
@@ -632,7 +626,6 @@ def check_form_data(field, data):
 
 
 def check_list_cvg_dates(args):
-
     try:
         cmte_id = args[0]
         form_type = args[1]
@@ -645,11 +638,10 @@ def check_list_cvg_dates(args):
                 "SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC",
                 [cmte_id, form_type],
             )
-
             if len(args) == 4:
                 for row in cursor.fetchall():
                     if not (row[1] is None or row[2] is None):
-                        if cvg_end_dt <= row[2] and cvg_start_dt >= row[1]:
+                        if cvg_start_dt <= row[2] and row[1] <= cvg_end_dt:
                             forms_obj.append(
                                 {
                                     "report_id": row[0],
@@ -674,7 +666,6 @@ def check_list_cvg_dates(args):
                                     "report_type": row[3],
                                 }
                             )
-
         return forms_obj
     except Exception:
         raise
@@ -696,6 +687,21 @@ def check_null_value(check_value):
         return False
     # else:
     return True
+
+
+def get_comittee_id(username):
+    cmte_id = ""
+    if len(username) > 9:
+        cmte_id = username[0:9]
+
+    return cmte_id
+
+def get_email(username):
+    email = ""
+    if len(username) > 9:
+        email = username[9:]
+
+    return email
 
 
 def check_email(email):
@@ -763,7 +769,6 @@ def check_mandatory_fields_form3x(data):
 
 
 def get_next_report_id():
-
     try:
         with connection.cursor() as cursor:
             cursor.execute("""SELECT nextval('report_id_seq')""")
@@ -776,7 +781,6 @@ def get_next_report_id():
 
 
 def get_prev_report_id(report_id):
-
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT setval('report_id_seq', %s, false)", [report_id])
@@ -785,7 +789,6 @@ def get_prev_report_id(report_id):
 
 
 def check_report_id(report_id):
-
     try:
         check_report_id = int(report_id)
         return report_id
@@ -803,22 +806,21 @@ def check_report_id(report_id):
 
 
 def post_sql_report(
-    report_id,
-    cmte_id,
-    form_type,
-    amend_ind,
-    amend_number,
-    report_type,
-    cvg_start_date,
-    cvg_end_date,
-    due_date,
-    status,
-    email_1,
-    email_2,
-    additional_email_1,
-    additional_email_2,
+        report_id,
+        cmte_id,
+        form_type,
+        amend_ind,
+        amend_number,
+        report_type,
+        cvg_start_date,
+        cvg_end_date,
+        due_date,
+        status,
+        email_1,
+        email_2,
+        additional_email_1,
+        additional_email_2,
 ):
-
     try:
         with connection.cursor() as cursor:
             # INSERT row into Reports table
@@ -847,7 +849,6 @@ def post_sql_report(
 
 
 def get_list_all_report(cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # GET all rows from Reports table
@@ -891,7 +892,6 @@ def get_list_all_report(cmte_id):
 
 
 def get_list_report(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
 
@@ -917,19 +917,18 @@ def get_list_report(report_id, cmte_id):
 
 
 def put_sql_report(
-    report_type,
-    cvg_start_dt,
-    cvg_end_dt,
-    due_date,
-    email_1,
-    email_2,
-    additional_email_1,
-    additional_email_2,
-    status,
-    report_id,
-    cmte_id,
+        report_type,
+        cvg_start_dt,
+        cvg_end_dt,
+        due_date,
+        email_1,
+        email_2,
+        additional_email_1,
+        additional_email_2,
+        status,
+        report_id,
+        cmte_id,
 ):
-
     try:
         with connection.cursor() as cursor:
             # UPDATE row into Reports table
@@ -987,7 +986,6 @@ def put_sql_report(
 
 
 def delete_sql_report(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
 
@@ -1008,7 +1006,6 @@ def delete_sql_report(report_id, cmte_id):
 
 
 def undo_delete_sql_report(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
 
@@ -1029,7 +1026,6 @@ def undo_delete_sql_report(report_id, cmte_id):
 
 
 def remove_sql_report(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # DELETE row into Reports table
@@ -1047,19 +1043,18 @@ def remove_sql_report(report_id, cmte_id):
 
 
 def post_sql_form3x(
-    report_id,
-    cmte_id,
-    form_type,
-    amend_ind,
-    report_type,
-    election_code,
-    date_of_election,
-    state_of_election,
-    cvg_start_dt,
-    cvg_end_dt,
-    coh_bop,
+        report_id,
+        cmte_id,
+        form_type,
+        amend_ind,
+        report_type,
+        election_code,
+        date_of_election,
+        state_of_election,
+        cvg_start_dt,
+        cvg_end_dt,
+        coh_bop,
 ):
-
     try:
         with connection.cursor() as cursor:
             # Insert data into Form 3X table
@@ -1089,17 +1084,16 @@ def post_sql_form3x(
 
 
 def put_sql_form3x(
-    report_type,
-    election_code,
-    date_of_election,
-    state_of_election,
-    cvg_start_dt,
-    cvg_end_dt,
-    coh_bop,
-    report_id,
-    cmte_id,
+        report_type,
+        election_code,
+        date_of_election,
+        state_of_election,
+        cvg_start_dt,
+        cvg_end_dt,
+        coh_bop,
+        report_id,
+        cmte_id,
 ):
-
     try:
         with connection.cursor() as cursor:
             # UPDATE row into Form 3X table
@@ -1130,7 +1124,6 @@ def put_sql_form3x(
 
 
 def delete_sql_form3x(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
 
@@ -1450,8 +1443,8 @@ def reposit_f3x_data(cmte_id, report_id):
                 table_name=transaction_table, _select=select_str
             )
             clone_sql = (
-                clone_sql
-                + """ WHERE cmte_id = %s and report_id = %s and delete_ind is distinct from 'Y';"""
+                    clone_sql
+                    + """ WHERE cmte_id = %s and report_id = %s and delete_ind is distinct from 'Y';"""
             )
             logger.debug("clone transaction with sql:{}".format(clone_sql))
 
@@ -1578,7 +1571,7 @@ def submit_report(request):
     # print(request.data)
     # print(request.query_params)
     SUBMIT_STATUS = "Submitted"
-    cmte_id = request.user.username
+    cmte_id = get_comittee_id(request.user.username)
     if "report_id" in request.query_params:
         report_id = request.query_params.get("report_id")
         form_tp = request.query_params.get("form_type")
@@ -1599,31 +1592,31 @@ def submit_report(request):
 
     if form_tp == "F3X":
         _sql_update = (
-            """
+                """
             UPDATE {}""".format(
-                update_tbl
-            )
-            + """
+                    update_tbl
+                )
+                + """
             SET filed_date = %s, status = %s, fec_id = %s"""
-            + """
+                + """
             WHERE {} = %s
             """.format(
-                f_id
-            )
+            f_id
+        )
         )
     elif form_tp == "F99":
         _sql_update = (
-            """
+                """
             UPDATE {}""".format(
-                update_tbl
-            )
-            + """
+                    update_tbl
+                )
+                + """
             SET is_submitted = true, updated_at = %s, status = %s, fec_id = %s"""
-            + """
+                + """
             WHERE {} = %s
             """.format(
-                f_id
-            )
+            f_id
+        )
         )
     else:
         raise Exception("Error: invalid form type.")
@@ -1694,25 +1687,24 @@ def submit_report(request):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def reports(request):
-
     if request.method == "POST":
         try:
             if "amend_ind" in request.data and check_null_value(
-                request.data.get("amend_ind")
+                    request.data.get("amend_ind")
             ):
                 amend_ind = request.data.get("amend_ind")
             else:
                 amend_ind = "N"
 
             if "election_code" in request.data and check_null_value(
-                request.data.get("election_code")
+                    request.data.get("election_code")
             ):
                 election_code = request.data.get("election_code")
             else:
                 election_code = None
 
             if "status" in request.data and check_null_value(
-                request.data.get("status")
+                    request.data.get("status")
             ):
                 f_status = request.data.get("status")
             else:
@@ -1739,7 +1731,7 @@ def reports(request):
                 additional_email_2 = None
 
             datum = {
-                "cmte_id": request.user.username,
+                "cmte_id": get_comittee_id(request.user.username),
                 "form_type": request.data.get("form_type", None),
                 "amend_ind": amend_ind,
                 "report_type": request.data.get("report_type", None),
@@ -1787,7 +1779,7 @@ def reports(request):
 
     if request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params:
                 data["report_id"] = request.query_params.get("report_id")
             forms_obj = get_reports(data)
@@ -1847,7 +1839,7 @@ def reports(request):
 
             datum = {
                 "report_id": request.data.get("report_id"),
-                "cmte_id": request.user.username,
+                "cmte_id": get_comittee_id(request.user.username),
                 "form_type": request.data.get("form_type"),
                 "report_type": request.data.get("report_type"),
                 "date_of_election": date_format(request.data.get("date_of_election")),
@@ -1894,7 +1886,7 @@ def reports(request):
 
         try:
             data = {
-                "cmte_id": request.user.username,
+                "cmte_id": get_comittee_id(request.user.username),
                 "report_id": request.query_params.get("report_id"),
                 "form_type": request.query_params.get("form_type"),
             }
@@ -1931,7 +1923,6 @@ ENTITIES API- CORE APP - SPRINT 7 - FNE 553 - BY PRAVEEN JINKA
 
 
 def check_entity_type(entity_type):
-
     entity_type_list = ["CAN", "CCM", "COM", "IND", "ORG", "PAC", "PTY", "FEC"]
     if not (entity_type in entity_type_list):
         raise Exception(
@@ -1943,7 +1934,6 @@ def check_entity_type(entity_type):
 
 
 def get_next_entity_id(entity_type):
-
     try:
         with connection.cursor() as cursor:
             cursor.execute("""SELECT public.get_next_entity_id(%s)""", [entity_type])
@@ -1955,7 +1945,6 @@ def get_next_entity_id(entity_type):
 
 
 def check_entity_id(entity_id):
-
     entity_type = entity_id[0:3]
     try:
         check_entity_type(entity_type)
@@ -2016,30 +2005,29 @@ def check_mandatory_fields_entity(data):
 
 
 def post_sql_entity(
-    entity_id,
-    entity_type,
-    cmte_id,
-    entity_name,
-    first_name,
-    last_name,
-    middle_name,
-    preffix,
-    suffix,
-    street_1,
-    street_2,
-    city,
-    state,
-    zip_code,
-    occupation,
-    employer,
-    ref_cand_cmte_id,
-    cand_office,
-    cand_office_state,
-    cand_office_district,
-    cand_election_year,
-    phone_number,
+        entity_id,
+        entity_type,
+        cmte_id,
+        entity_name,
+        first_name,
+        last_name,
+        middle_name,
+        preffix,
+        suffix,
+        street_1,
+        street_2,
+        city,
+        state,
+        zip_code,
+        occupation,
+        employer,
+        ref_cand_cmte_id,
+        cand_office,
+        cand_office_state,
+        cand_office_district,
+        cand_election_year,
+        phone_number,
 ):
-
     try:
         with connection.cursor() as cursor:
 
@@ -2154,7 +2142,6 @@ def get_list_entity(entity_id, cmte_id):
 
 
 def get_list_all_entity(cmte_id):
-
     try:
         query_string = """
         SELECT 
@@ -2203,30 +2190,29 @@ def get_list_all_entity(cmte_id):
 
 
 def put_sql_entity(
-    entity_type,
-    entity_name,
-    first_name,
-    last_name,
-    middle_name,
-    preffix,
-    suffix,
-    street_1,
-    street_2,
-    city,
-    state,
-    zip_code,
-    occupation,
-    employer,
-    ref_cand_cmte_id,
-    entity_id,
-    cand_office,
-    cand_office_state,
-    cand_office_district,
-    cand_election_year,
-    phone_number,
-    cmte_id,
+        entity_type,
+        entity_name,
+        first_name,
+        last_name,
+        middle_name,
+        preffix,
+        suffix,
+        street_1,
+        street_2,
+        city,
+        state,
+        zip_code,
+        occupation,
+        employer,
+        ref_cand_cmte_id,
+        entity_id,
+        cand_office,
+        cand_office_state,
+        cand_office_district,
+        cand_election_year,
+        phone_number,
+        cmte_id,
 ):
-
     try:
         with connection.cursor() as cursor:
             # Put data into Entity table
@@ -2295,7 +2281,6 @@ def put_sql_entity(
 
 
 def delete_sql_entity(entity_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # UPDATE delete_ind flag to Y in DB
@@ -2322,7 +2307,6 @@ def delete_sql_entity(entity_id, cmte_id):
 
 
 def undo_delete_sql_entity(entity_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # UPDATE delete_ind flag to Y in DB
@@ -2348,7 +2332,6 @@ def undo_delete_sql_entity(entity_id, cmte_id):
 
 
 def remove_sql_entity(entity_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # DELETE row from entity table
@@ -2374,7 +2357,6 @@ def remove_sql_entity(entity_id, cmte_id):
 
 
 def post_entities(data):
-
     try:
         check_mandatory_fields_entity(data)
         if data.get("prefix"):
@@ -2415,7 +2397,6 @@ def post_entities(data):
 
 
 def get_entities(data):
-
     try:
         cmte_id = data.get("cmte_id")
         entity_flag = False
@@ -2478,7 +2459,6 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
 
 # TODO: need to dsicuss if we need to handle clone-and-update scenario
 def put_entities(data):
-
     try:
         check_mandatory_fields_entity(data)
         if data.get("prefix"):
@@ -2564,7 +2544,6 @@ def put_entities(data):
 
 
 def delete_entities(data):
-
     try:
         cmte_id = data.get("cmte_id")
         entity_id = data.get("entity_id")
@@ -2576,7 +2555,6 @@ def delete_entities(data):
 
 
 def undo_delete_entities(data):
-
     try:
         cmte_id = data.get("cmte_id")
         entity_id = data.get("entity_id")
@@ -2588,7 +2566,6 @@ def undo_delete_entities(data):
 
 
 def remove_entities(data):
-
     try:
         cmte_id = data.get("cmte_id")
         entity_id = data.get("entity_id")
@@ -2606,13 +2583,12 @@ def remove_entities(data):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def entities(request):
-
     # insert a new record for reports table
     if request.method == "POST":
         try:
             datum = {
                 "entity_type": request.data.get("entity_type"),
-                "cmte_id": request.user.username,
+                "cmte_id": get_comittee_id(request.user.username),
                 "entity_name": request.data.get("entity_name"),
                 "first_name": request.data.get("first_name"),
                 "last_name": request.data.get("last_name"),
@@ -2647,7 +2623,7 @@ def entities(request):
     if request.method == "GET":
 
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "entity_id" in request.query_params:
                 data["entity_id"] = request.query_params.get("entity_id")
 
@@ -2675,7 +2651,7 @@ def entities(request):
             datum = {
                 "entity_id": request.data.get("entity_id"),
                 "entity_type": request.data.get("entity_type"),
-                "cmte_id": request.user.username,
+                "cmte_id": get_comittee_id(request.user.username),
                 "entity_name": request.data.get("entity_name"),
                 "first_name": request.data.get("first_name"),
                 "last_name": request.data.get("last_name"),
@@ -2713,7 +2689,7 @@ def entities(request):
         try:
             data = {
                 "entity_id": request.query_params.get("entity_id"),
-                "cmte_id": request.user.username,
+                "cmte_id": get_comittee_id(request.user.username),
             }
             delete_entities(data)
             return Response(
@@ -2771,7 +2747,7 @@ def autolookup_expand(request):
             and e.delete_ind is distinct from 'Y'
             and e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
             """
-            parameters = [cmte_id, request.user.username]
+            parameters = [cmte_id, get_comittee_id(request.user.username)]
         if "cand_id" in request.query_params:
             cand_id = request.query_params.get("cand_id")
             _sql = """
@@ -2842,7 +2818,7 @@ def autolookup_search_contacts(request):
     }
 
     try:
-        committee_id = request.user.username
+        committee_id = get_comittee_id(request.user.username)
         global_search_id = "C00000000"
         param_string = ""
         order_string = ""
@@ -2873,8 +2849,8 @@ def autolookup_search_contacts(request):
                     # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
                     # search in FEC database
                     if (
-                        "global_search" in request.query_params
-                        and request.query_params.get("global_search").upper() == "OFF"
+                            "global_search" in request.query_params
+                            and request.query_params.get("global_search").upper() == "OFF"
                     ):
                         global_search_id = ""
                     parameters = [global_search_id, committee_id, committee_id]
@@ -2882,7 +2858,7 @@ def autolookup_search_contacts(request):
                     # irrespective of principal campaign committee
                     if "expand" in request.query_params:
                         query_string = (
-                            """
+                                """
                             SELECT json_agg(t) FROM 
                             (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -2892,14 +2868,14 @@ def autolookup_search_contacts(request):
                             AND substr(e.ref_cand_cmte_id,1,1)='C' 
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
-                            + param_string
-                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                            + order_string
-                            + """) t"""
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
                         )
                     else:
                         query_string = (
-                            """
+                                """
                             SELECT json_agg(t) FROM 
                             (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -2908,23 +2884,23 @@ def autolookup_search_contacts(request):
                             AND substr(e.ref_cand_cmte_id,1,1)='C'
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
-                            + param_string
-                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                            + order_string
-                            + """) t"""
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
                         )
                 elif (
-                    "cand_id" in request.query_params
-                    or "cand_first_name" in request.query_params
-                    or "cand_last_name" in request.query_params
-                    or "payee_cmte_id" in request.query_params
+                        "cand_id" in request.query_params
+                        or "cand_first_name" in request.query_params
+                        or "cand_last_name" in request.query_params
+                        or "payee_cmte_id" in request.query_params
                 ):
                     # Checking for global search flag, by default search is global.
                     # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
                     # search in FEC database
                     if (
-                        "global_search" in request.query_params
-                        and request.query_params.get("global_search").upper() == "OFF"
+                            "global_search" in request.query_params
+                            and request.query_params.get("global_search").upper() == "OFF"
                     ):
                         global_search_id = ""
                     # Modified expand parameter query to do left join so that entity would show up
@@ -2932,7 +2908,7 @@ def autolookup_search_contacts(request):
                     if "expand" in request.query_params:
                         parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
-                            """
+                                """
                             SELECT json_agg(t) FROM 
                             (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
                             e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
@@ -2943,16 +2919,16 @@ def autolookup_search_contacts(request):
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s) 
                             AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                             """
-                            + param_string
-                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                            + order_string
-                            + """) t"""
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
                         )
 
                     else:
                         parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
-                            """
+                                """
                             SELECT json_agg(t) FROM 
                             (SELECT e.ref_cand_cmte_id as beneficiary_cand_id,e.entity_id as beneficiary_cand_entity_id,e.preffix as cand_prefix,e.last_name as cand_last_name,
                             e.first_name as cand_first_name,e.middle_name as cand_middle_name,e.suffix as cand_suffix,e.entity_id,e.entity_type,e.street_1,e.street_2,
@@ -2962,24 +2938,24 @@ def autolookup_search_contacts(request):
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                             """
-                            + param_string
-                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                            + order_string
-                            + """) t"""
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
                         )
                 elif "entity_name" in request.query_params:
                     # Checking for global search flag, by default search is global.
                     # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
                     # search in FEC database
                     if (
-                        "global_search" in request.query_params
-                        and request.query_params.get("global_search").upper() == "OFF"
+                            "global_search" in request.query_params
+                            and request.query_params.get("global_search").upper() == "OFF"
                     ):
                         global_search_id = ""
                     if "expand" in request.query_params:
                         parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
-                            """
+                                """
                                 SELECT json_agg(t) FROM 
                                 (SELECT distinct e.entity_name, e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name, e.first_name,e.last_name,e.middle_name,
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -2988,15 +2964,15 @@ def autolookup_search_contacts(request):
                                 WHERE e.cmte_id in (%s, %s) 
                                 AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                                 """
-                            + param_string
-                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                            + order_string
-                            + """) t"""
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
                         )
                     else:
                         parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
-                            """
+                                """
                                 SELECT json_agg(t) FROM 
                                 (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -3004,10 +2980,10 @@ def autolookup_search_contacts(request):
                                 FROM public.entity e WHERE e.cmte_id in (%s, %s)
                                 AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                                 """
-                            + param_string
-                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                            + order_string
-                            + """) t"""
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
                         )
                 else:
                     # parameters = [committee_id, committee_id]
@@ -3015,15 +2991,15 @@ def autolookup_search_contacts(request):
                     # Expecting "global_search" parameter from front-end to be "OFF" when Auto lookup should not
                     # search in FEC database
                     if (
-                        "global_search" in request.query_params
-                        and request.query_params.get("global_search").upper() == "OFF"
+                            "global_search" in request.query_params
+                            and request.query_params.get("global_search").upper() == "OFF"
                     ):
                         global_search_id = ""
                     if "expand" in request.query_params:
 
                         parameters = [committee_id]
                         query_string = (
-                            """
+                                """
                             SELECT json_agg(t) FROM 
                             (SELECT distinct e.entity_name, e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name, e.first_name,e.last_name,e.middle_name,
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -3034,29 +3010,29 @@ def autolookup_search_contacts(request):
                             AND c.principal_campaign_committee is not null
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
-                            # query_string = (
-                            #     """
-                            #     SELECT json_agg(t) FROM
-                            #     (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
-                            #     e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
-                            #     e.last_update_date
-                            #     FROM public.entity e, public.entity c
-                            #     WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
-                            #     AND e.entity_type in ('IND','ORG')
-                            #     AND c.principal_campaign_committee is not null
-                            #     AND e.cmte_id in (%s, 'C00000000')
-                            #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
-                            #     """
-                            + param_string
-                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                            + order_string
-                            + """) t"""
+                                # query_string = (
+                                #     """
+                                #     SELECT json_agg(t) FROM
+                                #     (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
+                                #     e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
+                                #     e.last_update_date
+                                #     FROM public.entity e, public.entity c
+                                #     WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
+                                #     AND e.entity_type in ('IND','ORG')
+                                #     AND c.principal_campaign_committee is not null
+                                #     AND e.cmte_id in (%s, 'C00000000')
+                                #     AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                                #     """
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
                         )
                         # pass
                     else:
                         parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
-                            """
+                                """
                             SELECT json_agg(t) FROM 
                             (SELECT e.ref_cand_cmte_id as cmte_id,e.entity_id,e.entity_type,e.entity_name as cmte_name,e.entity_name,e.first_name,e.last_name,e.middle_name,
                             e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
@@ -3065,10 +3041,10 @@ def autolookup_search_contacts(request):
                             AND e.entity_type in ('IND','ORG') 
                             AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
                             """
-                            + param_string
-                            + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
-                            + order_string
-                            + """) t"""
+                                + param_string
+                                + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
+                                + order_string
+                                + """) t"""
                         )
 
                 parameters.append(value + "%")
@@ -3110,7 +3086,7 @@ def create_json_file(request):
         # print("request.data['committeeid']= ", request.data['committeeid'])
         # print("request.data['reportid']", request.data['reportid'])
 
-        # comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, is_submitted=True).last()
+        # comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username), is_submitted=True).last()
         # comm_info = CommitteeInfo.objects.get(committeeid=request.data['committeeid'], id=request.data['reportid'])
         # print(CommitteeInfo)
         comm_info = CommitteeInfo.objects.filter(
@@ -3164,7 +3140,7 @@ def create_json_file(request):
             url = k.generate_url(expires_in=0, query_auth=False).replace(":443", "")
 
             tmp_filename = (
-                "/tmp/" + comm_info.committeeid + "_" + str(comm_info.id) + "_f99.json"
+                    "/tmp/" + comm_info.committeeid + "_" + str(comm_info.id) + "_f99.json"
             )
             # tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'
             vdata = {}
@@ -3210,10 +3186,10 @@ def create_json_file(request):
                 filename = comm_info.file.name
                 # print(filename)
                 myurl = (
-                    "https://{}.s3.amazonaws.com/media/".format(
-                        settings.AWS_STORAGE_BUCKET_NAME
-                    )
-                    + filename
+                        "https://{}.s3.amazonaws.com/media/".format(
+                            settings.AWS_STORAGE_BUCKET_NAME
+                        )
+                        + filename
                 )
                 # myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
                 # print(myurl)
@@ -3316,59 +3292,58 @@ TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FN
 
 
 def get_trans_query(category_type, cmte_id, param_string):
-
     if category_type == "disbursements_tran":
         query_string = (
-            """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+                """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
                                 election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isredesignatable, "isRedesignation" 
                                 from all_disbursements_transactions_view
                             where cmte_id='"""
-            + cmte_id
-            + """' """
-            + param_string
-            + """ """
+                + cmte_id
+                + """' """
+                + param_string
+                + """ """
         )
 
     elif category_type == "loans_tran":
         query_string = (
-            """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
+                """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
                           purpose_description, loan_amount, loan_payment_to_date, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
                           loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild 
                           from all_loans_debts_transactions_view
                             where cmte_id='"""
-            + cmte_id
-            + """' """
-            + param_string
-            + """ """
+                + cmte_id
+                + """' """
+                + param_string
+                + """ """
         )
 
     elif category_type == "other_tran":
         query_string = (
-            """SELECT report_id, schedule, form_type, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
+                """SELECT report_id, schedule, form_type, report_type, reportStatus, activity_event_identifier, transaction_type, transaction_type_desc, transaction_id, back_ref_transaction_id, api_call, 
                           name, street_1, street_2, city, state, zip_code, transaction_date, COALESCE(transaction_amount, 0.0) AS transaction_amount, 
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, forceitemizable, 
                                 election_code, election_other_description, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, aggregation_ind, hasChild, istrashable
                             from all_other_transactions_view
                             where cmte_id='"""
-            + cmte_id
-            + """' """
-            + param_string
-            + """ """
+                + cmte_id
+                + """' """
+                + param_string
+                + """ """
         )
     else:
         query_string = (
-            """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
+                """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
                                 transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isreattributable, "isReattribution" 
                                 from all_receipts_transactions_view
                             where cmte_id='"""
-            + cmte_id
-            + """' """
-            + param_string
-            + """ """
+                + cmte_id
+                + """' """
+                + param_string
+                + """ """
         )
     return query_string
 
@@ -3384,61 +3359,61 @@ def filter_get_all_trans(request, param_string):
         param_string = param_string + " AND transaction_type_desc In " + cat_tuple
     if filt_dict.get("filterDateFrom") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND transaction_date >= '"
-            + filt_dict["filterDateFrom"]
-            + "'"
+                param_string
+                + " AND transaction_date >= '"
+                + filt_dict["filterDateFrom"]
+                + "'"
         )
     if filt_dict.get("filterDateTo") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND transaction_date <= '"
-            + filt_dict["filterDateTo"]
-            + "'"
+                param_string
+                + " AND transaction_date <= '"
+                + filt_dict["filterDateTo"]
+                + "'"
         )
     # The below code was added by Praveen. This is added to reuse this function in get_all_trashed_transactions API.
     if filt_dict.get("filterDeletedDateFrom") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND date(last_update_date) >= '"
-            + filt_dict["filterDeletedDateFrom"]
-            + "'"
+                param_string
+                + " AND date(last_update_date) >= '"
+                + filt_dict["filterDeletedDateFrom"]
+                + "'"
         )
     if filt_dict.get("filterDeletedDateTo") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND date(last_update_date) <= '"
-            + filt_dict["filterDeletedDateTo"]
-            + "'"
+                param_string
+                + " AND date(last_update_date) <= '"
+                + filt_dict["filterDeletedDateTo"]
+                + "'"
         )
     # End of Addition
     if filt_dict.get("filterAmountMin") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND transaction_amount >= '"
-            + str(filt_dict["filterAmountMin"])
-            + "'"
+                param_string
+                + " AND transaction_amount >= '"
+                + str(filt_dict["filterAmountMin"])
+                + "'"
         )
     if filt_dict.get("filterAmountMax") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND transaction_amount <= '"
-            + str(filt_dict["filterAmountMax"])
-            + "'"
+                param_string
+                + " AND transaction_amount <= '"
+                + str(filt_dict["filterAmountMax"])
+                + "'"
         )
     if filt_dict.get("filterAggregateAmountMin") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND aggregate_amt >= '"
-            + str(filt_dict["filterAggregateAmountMin"])
-            + "'"
+                param_string
+                + " AND aggregate_amt >= '"
+                + str(filt_dict["filterAggregateAmountMin"])
+                + "'"
         )
     if filt_dict.get("filterAggregateAmountMax") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND aggregate_amt <= '"
-            + str(filt_dict["filterAggregateAmountMax"])
-            + "'"
+                param_string
+                + " AND aggregate_amt <= '"
+                + str(filt_dict["filterAggregateAmountMax"])
+                + "'"
         )
     if filt_dict.get("filterStates"):
         state_tuple = "('" + "','".join(filt_dict["filterStates"]) + "')"
@@ -3451,17 +3426,17 @@ def filter_get_all_trans(request, param_string):
         param_string = param_string + " AND election_code In " + election_tuple
     if filt_dict.get("filterElectionYearFrom") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND election_year >= '"
-            + filt_dict["filterElectionYearFrom"]
-            + "'"
+                param_string
+                + " AND election_year >= '"
+                + filt_dict["filterElectionYearFrom"]
+                + "'"
         )
     if filt_dict.get("filterElectionYearTo") not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND election_year <= '"
-            + filt_dict["filterElectionYearTo"]
-            + "'"
+                param_string
+                + " AND election_year <= '"
+                + filt_dict["filterElectionYearTo"]
+                + "'"
         )
     if filt_dict.get("filterReportTypes"):
         reportTypes_tuple = "('" + "','".join(filt_dict["filterReportTypes"]) + "')"
@@ -3472,56 +3447,56 @@ def filter_get_all_trans(request, param_string):
         "null",
     ]:
         param_string = (
-            param_string
-            + " AND loan_amount >= '"
-            + str(filt_dict["filterLoanAmountMin"])
-            + "'"
+                param_string
+                + " AND loan_amount >= '"
+                + str(filt_dict["filterLoanAmountMin"])
+                + "'"
         )
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMax") not in [
         None,
         "null",
     ]:
         param_string = (
-            param_string
-            + " AND loan_amount <= '"
-            + str(filt_dict["filterLoanAmountMax"])
-            + "'"
+                param_string
+                + " AND loan_amount <= '"
+                + str(filt_dict["filterLoanAmountMax"])
+                + "'"
         )
     if ctgry_type == "loans_tran" and filt_dict.get(
-        "filterLoanClosingBalanceMin"
+            "filterLoanClosingBalanceMin"
     ) not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND loan_closing_balance >= '"
-            + str(filt_dict["filterLoanClosingBalanceMin"])
-            + "'"
+                param_string
+                + " AND loan_closing_balance >= '"
+                + str(filt_dict["filterLoanClosingBalanceMin"])
+                + "'"
         )
     if ctgry_type == "loans_tran" and filt_dict.get(
-        "filterLoanClosingBalanceMax"
+            "filterLoanClosingBalanceMax"
     ) not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND loan_closing_balance <= '"
-            + str(filt_dict["filterLoanClosingBalanceMax"])
-            + "'"
+                param_string
+                + " AND loan_closing_balance <= '"
+                + str(filt_dict["filterLoanClosingBalanceMax"])
+                + "'"
         )
     if ctgry_type == "loans_tran" and filt_dict.get(
-        "filterDebtBeginningBalanceMin"
+            "filterDebtBeginningBalanceMin"
     ) not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND loan_beginning_balance >= '"
-            + str(filt_dict["filterDebtBeginningBalanceMin"])
-            + "'"
+                param_string
+                + " AND loan_beginning_balance >= '"
+                + str(filt_dict["filterDebtBeginningBalanceMin"])
+                + "'"
         )
     if ctgry_type == "loans_tran" and filt_dict.get(
-        "filterDebtBeginningBalanceMax"
+            "filterDebtBeginningBalanceMax"
     ) not in [None, "null"]:
         param_string = (
-            param_string
-            + " AND loan_beginning_balance <= '"
-            + str(filt_dict["filterDebtBeginningBalanceMax"])
-            + "'"
+                param_string
+                + " AND loan_beginning_balance <= '"
+                + str(filt_dict["filterDebtBeginningBalanceMax"])
+                + "'"
         )
     # print(param_string)
     return param_string
@@ -3679,14 +3654,14 @@ def get_all_transactions(request):
     try:
         # print("request.data: ", request.data)
         logger.debug("get_all_transactions with {}".format(request.data))
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         ctgry_type = request.data.get("category_type")
         param_string = ""
         page_num = int(request.data.get("page", 1))
         descending = request.data.get("descending", "false")
         if not (
-            "sortColumnName" in request.data
-            and check_null_value(request.data.get("sortColumnName"))
+                "sortColumnName" in request.data
+                and check_null_value(request.data.get("sortColumnName"))
         ):
             sortcolumn = "name"
         elif request.data.get("sortColumnName") == "default":
@@ -3737,21 +3712,21 @@ def get_all_transactions(request):
             for key in search_keys:
                 if not param_string:
                     param_string = (
-                        param_string
-                        + " AND (CAST("
-                        + key
-                        + " as CHAR(100)) ILIKE '%"
-                        + str(search_string)
-                        + "%'"
+                            param_string
+                            + " AND (CAST("
+                            + key
+                            + " as CHAR(100)) ILIKE '%"
+                            + str(search_string)
+                            + "%'"
                     )
                 else:
                     param_string = (
-                        param_string
-                        + " OR CAST("
-                        + key
-                        + " as CHAR(100)) ILIKE '%"
-                        + str(search_string)
-                        + "%'"
+                            param_string
+                            + " OR CAST("
+                            + key
+                            + " as CHAR(100)) ILIKE '%"
+                            + str(search_string)
+                            + "%'"
                     )
             param_string = param_string + " )"
         keywords_string = ""
@@ -3763,38 +3738,38 @@ def get_all_transactions(request):
                     elif "'" in word:
                         if not keywords_string:
                             keywords_string = (
-                                keywords_string
-                                + " AND ( CAST("
-                                + key
-                                + " as CHAR(100)) = "
-                                + str(word)
+                                    keywords_string
+                                    + " AND ( CAST("
+                                    + key
+                                    + " as CHAR(100)) = "
+                                    + str(word)
                             )
                         else:
                             keywords_string = (
-                                keywords_string
-                                + " OR CAST("
-                                + key
-                                + " as CHAR(100)) = "
-                                + str(word)
+                                    keywords_string
+                                    + " OR CAST("
+                                    + key
+                                    + " as CHAR(100)) = "
+                                    + str(word)
                             )
                     else:
                         if not keywords_string:
                             keywords_string = (
-                                keywords_string
-                                + " AND ( CAST("
-                                + key
-                                + " as CHAR(100)) ILIKE '%"
-                                + str(word)
-                                + "%'"
+                                    keywords_string
+                                    + " AND ( CAST("
+                                    + key
+                                    + " as CHAR(100)) ILIKE '%"
+                                    + str(word)
+                                    + "%'"
                             )
                         else:
                             keywords_string = (
-                                keywords_string
-                                + " OR CAST("
-                                + key
-                                + " as CHAR(100)) ILIKE '%"
-                                + str(word)
-                                + "%'"
+                                    keywords_string
+                                    + " OR CAST("
+                                    + key
+                                    + " as CHAR(100)) ILIKE '%"
+                                    + str(word)
+                                    + "%'"
                             )
             keywords_string = keywords_string + " )"
         param_string = param_string + keywords_string
@@ -3823,8 +3798,8 @@ def get_all_transactions(request):
                 if cmte_type(cmte_id) == "PTY":
                     logger.debug("pty cmte all_other transactions")
                     param_string = (
-                        param_string
-                        + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
+                            param_string
+                            + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
                                                     OR 
                                                     (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
                                                     OR
@@ -3837,15 +3812,15 @@ def get_all_transactions(request):
                                                     FROM   public.sched_h3 h3
                                                     WHERE  h3.report_id = '{0}'
                                                     AND h3.cmte_id = '{1}')))""".format(
-                            request.data.get("reportid"), cmte_id
-                        )
+                        request.data.get("reportid"), cmte_id
+                    )
                     )
                 else:
                     # for PAC, h1 and h2 will show up only when there are transactions tied to it
                     logger.debug("pac cmte all_other transactions")
                     param_string = (
-                        param_string
-                        + """AND (((transaction_table = 'sched_h3' or transaction_table = 'sched_h4') AND report_id = '{0}')
+                            param_string
+                            + """AND (((transaction_table = 'sched_h3' or transaction_table = 'sched_h4') AND report_id = '{0}')
                                                     OR
                                                     (transaction_table = 'sched_h1' AND report_id = '{0}' AND back_ref_transaction_id is null)
                                                     OR
@@ -3878,14 +3853,14 @@ def get_all_transactions(request):
                                                     WHERE  h3.report_id = '{0}'
                                                     AND h3.delete_ind is distinct from 'Y'
                                                     AND h3.cmte_id = '{1}')))""".format(
-                            request.data.get("reportid"), cmte_id
-                        )
+                        request.data.get("reportid"), cmte_id
+                    )
                     )
 
         # To determine if we are searching for regular or trashed transactions
         if (
-            "trashed_flag" in request.data
-            and str(request.data.get("trashed_flag")).lower() == "true"
+                "trashed_flag" in request.data
+                and str(request.data.get("trashed_flag")).lower() == "true"
         ):
             param_string += " AND delete_ind = 'Y'"
         else:
@@ -3895,7 +3870,7 @@ def get_all_transactions(request):
         memo_code_d = filters_post.get("filterMemoCode", False)
         if str(memo_code_d).lower() == "true":
             param_string = (
-                param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
+                    param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
             )
 
         trans_query_string = get_trans_query(ctgry_type, cmte_id, param_string)
@@ -3903,17 +3878,17 @@ def get_all_transactions(request):
         # transactions ordering ASC or DESC
         if ctgry_type == "loans_tran":
             trans_query_string = (
-                trans_query_string
-                + """ ORDER BY {} {}, loan_incurred_date  ASC, create_date ASC""".format(
-                    sortcolumn, descending
-                )
+                    trans_query_string
+                    + """ ORDER BY {} {}, loan_incurred_date  ASC, create_date ASC""".format(
+                sortcolumn, descending
+            )
             )
         else:
             trans_query_string = (
-                trans_query_string
-                + """ ORDER BY {} {}, transaction_date  ASC, create_date ASC""".format(
-                    sortcolumn, descending
-                )
+                    trans_query_string
+                    + """ ORDER BY {} {}, transaction_date  ASC, create_date ASC""".format(
+                sortcolumn, descending
+            )
             )
 
         output_list = []
@@ -3972,9 +3947,9 @@ def get_all_transactions(request):
                         #     transaction['isEditable'] = Falseet
 
                         if (
-                            transaction.get("back_ref_transaction_id") is not None
-                            and transaction.get("back_ref_transaction_id")
-                            in transaction_dict
+                                transaction.get("back_ref_transaction_id") is not None
+                                and transaction.get("back_ref_transaction_id")
+                                in transaction_dict
                         ):
                             if not transaction.get("transaction_type_identifier") in [
                                 "ALLOC_H1",
@@ -4029,7 +4004,6 @@ STATE API- CORE APP - SPRINT 9 - FNE ??? - BY PRAVEEN JINKA
 
 @api_view(["GET"])
 def state(request):
-
     try:
         with connection.cursor() as cursor:
             forms_obj = {}
@@ -4069,13 +4043,13 @@ REWRITTEN TO MATCH GET ALL TRANSACTIONS API - CORE APP - SPRINT 16 - FNE 74/4 - 
 @api_view(["POST"])
 def get_all_trashed_transactions(request):
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         param_string = ""
         page_num = int(request.data.get("page", 1))
         descending = request.data.get("descending", "false")
         if not (
-            "sortColumnName" in request.data
-            and check_null_value(request.data.get("sortColumnName"))
+                "sortColumnName" in request.data
+                and check_null_value(request.data.get("sortColumnName"))
         ):
             sortcolumn = "default"
         else:
@@ -4124,21 +4098,21 @@ def get_all_trashed_transactions(request):
             for key in search_keys:
                 if not param_string:
                     param_string = (
-                        param_string
-                        + " AND ( CAST("
-                        + key
-                        + " as CHAR(100)) ILIKE '%"
-                        + str(search_string)
-                        + "%'"
+                            param_string
+                            + " AND ( CAST("
+                            + key
+                            + " as CHAR(100)) ILIKE '%"
+                            + str(search_string)
+                            + "%'"
                     )
                 else:
                     param_string = (
-                        param_string
-                        + " OR CAST("
-                        + key
-                        + " as CHAR(100)) ILIKE '%"
-                        + str(search_string)
-                        + "%'"
+                            param_string
+                            + " OR CAST("
+                            + key
+                            + " as CHAR(100)) ILIKE '%"
+                            + str(search_string)
+                            + "%'"
                     )
             param_string = param_string + " )"
         keywords_string = ""
@@ -4150,38 +4124,38 @@ def get_all_trashed_transactions(request):
                     elif "'" in word:
                         if not keywords_string:
                             keywords_string = (
-                                keywords_string
-                                + " AND ( CAST("
-                                + key
-                                + " as CHAR(100)) = "
-                                + str(word)
+                                    keywords_string
+                                    + " AND ( CAST("
+                                    + key
+                                    + " as CHAR(100)) = "
+                                    + str(word)
                             )
                         else:
                             keywords_string = (
-                                keywords_string
-                                + " OR CAST("
-                                + key
-                                + " as CHAR(100)) = "
-                                + str(word)
+                                    keywords_string
+                                    + " OR CAST("
+                                    + key
+                                    + " as CHAR(100)) = "
+                                    + str(word)
                             )
                     else:
                         if not keywords_string:
                             keywords_string = (
-                                keywords_string
-                                + " AND ( CAST("
-                                + key
-                                + " as CHAR(100)) ILIKE '%"
-                                + str(word)
-                                + "%'"
+                                    keywords_string
+                                    + " AND ( CAST("
+                                    + key
+                                    + " as CHAR(100)) ILIKE '%"
+                                    + str(word)
+                                    + "%'"
                             )
                         else:
                             keywords_string = (
-                                keywords_string
-                                + " OR CAST("
-                                + key
-                                + " as CHAR(100)) ILIKE '%"
-                                + str(word)
-                                + "%'"
+                                    keywords_string
+                                    + " OR CAST("
+                                    + key
+                                    + " as CHAR(100)) ILIKE '%"
+                                    + str(word)
+                                    + "%'"
                             )
             keywords_string = keywords_string + " )"
         param_string = param_string + keywords_string
@@ -4193,14 +4167,14 @@ def get_all_trashed_transactions(request):
             param_string = param_string + " AND memo_code IS NOT NULL"
 
         trans_query_string = (
-            """SELECT transaction_type as "transactionTypeId", transaction_type_desc as "type", transaction_id as "transactionId", name, street_1 as "street", street_2 as "street2", city, state, zip_code as "zip", transaction_date as "date", date(last_update_date) as "deletedDate", COALESCE(transaction_amount,0) as "amount", COALESCE(aggregate_amt,0) as "aggregate", purpose_description as "purposeDescription", occupation as "contributorOccupation", employer as "contributorEmployer", memo_code as "memoCode", memo_text as "memoText", itemized, transaction_type_identifier, entity_id from all_transactions_view
+                """SELECT transaction_type as "transactionTypeId", transaction_type_desc as "type", transaction_id as "transactionId", name, street_1 as "street", street_2 as "street2", city, state, zip_code as "zip", transaction_date as "date", date(last_update_date) as "deletedDate", COALESCE(transaction_amount,0) as "amount", COALESCE(aggregate_amt,0) as "aggregate", purpose_description as "purposeDescription", occupation as "contributorOccupation", employer as "contributorEmployer", memo_code as "memoCode", memo_text as "memoText", itemized, transaction_type_identifier, entity_id from all_transactions_view
                                     where cmte_id='"""
-            + cmte_id
-            + """' AND report_id="""
-            + str(report_id)
-            + """ """
-            + param_string
-            + """ AND delete_ind = 'Y'"""
+                + cmte_id
+                + """' AND report_id="""
+                + str(report_id)
+                + """ """
+                + param_string
+                + """ AND delete_ind = 'Y'"""
         )
 
         if sortcolumn and sortcolumn != "default":
@@ -4230,15 +4204,15 @@ def get_all_trashed_transactions(request):
             else:
                 sorttablecolumn = "name ASC, transaction_date"
             trans_query_string = (
-                trans_query_string
-                + """ ORDER BY """
-                + sorttablecolumn
-                + """ """
-                + descending
+                    trans_query_string
+                    + """ ORDER BY """
+                    + sorttablecolumn
+                    + """ """
+                    + descending
             )
         elif sortcolumn == "default":
             trans_query_string = (
-                trans_query_string + """ ORDER BY name ASC, transaction_date ASC"""
+                    trans_query_string + """ ORDER BY name ASC, transaction_date ASC"""
             )
         with connection.cursor() as cursor:
             cursor.execute(
@@ -4335,7 +4309,7 @@ def get_list_report_data(report_id, cmte_id):
 @api_view(["POST"])
 def delete_trashed_transactions(request):
     try:
-        committeeid = request.user.username
+        committeeid = get_comittee_id(request.user.username)
         row_count = 0
         for _action in request.data.get("actions", []):
             # report_id = _action.get('report_id', '')
@@ -4398,7 +4372,6 @@ DISBURSEMENT FUNCTIONALITY ADDED - SPRINT 13 - FNE 1094 - BY PRAVEEN JINKA
 
 
 def check_calendar_year(calendar_year):
-
     try:
         if not (len(calendar_year) == 4 and calendar_year.isdigit()):
             raise Exception(
@@ -4424,7 +4397,7 @@ def loans_sql(sql, value_list, error_message):
 
 
 def period_receipts_for_summary_table_sql(
-    calendar_start_dt, calendar_end_dt, cmte_id, report_id
+        calendar_start_dt, calendar_end_dt, cmte_id, report_id
 ):
     """
     return line number, contribution_amount of each transaction and calendar_year sum of all contribution_amount
@@ -4470,7 +4443,7 @@ def period_receipts_for_summary_table_sql(
 
 
 def period_disbursements_for_summary_table_sql(
-    calendar_start_dt, calendar_end_dt, cmte_id, report_id
+        calendar_start_dt, calendar_end_dt, cmte_id, report_id
 ):
     """
     helper function on querying report-wise and ytd total amount for sched_b
@@ -4725,6 +4698,8 @@ def summary_disbursements_for_sumamry_table(request_dict):
         #     + XXX_amount_ytd
         # )
 
+
+
         # XXXII_amount = XXXI_amount - XXIAII_amount - XXXAII_amount
         # XXXII_amount_ytd = XXXI_amount_ytd - XXIAII_amount_ytd - XXXAII_amount_ytd
 
@@ -4881,7 +4856,6 @@ def summary_disbursements_for_sumamry_table(request_dict):
         return summary_disbursement_list
     except Exception as e:
         raise Exception("The summary_receipts API is throwing the error: " + str(e))
-
 
 def summary_receipts_for_sumamry_table(request_dict):
     try:
@@ -5050,7 +5024,6 @@ def summary_receipts_for_sumamry_table(request_dict):
         #     + XVII_amount_ytd
         #     + XVIII_amount_ytd
         # )
-
         # XX_amount = XIX_amount - XVIII_amount
         # XX_amount_ytd = XIX_amount_ytd - XVIII_amount_ytd
 
@@ -5270,17 +5243,17 @@ def load_loan_debt_summary(request_dict):
 def get_summary_table(request):
     logger.debug("get_summary_table with request:{}".format(request.query_params))
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         if not (
-            "report_id" in request.query_params
-            and check_null_value(request.query_params.get("report_id"))
+                "report_id" in request.query_params
+                and check_null_value(request.query_params.get("report_id"))
         ):
             raise Exception("Missing Input: report_id is mandatory")
 
         if not (
-            "calendar_year" in request.query_params
-            and check_null_value(request.query_params.get("calendar_year"))
+                "calendar_year" in request.query_params
+                and check_null_value(request.query_params.get("calendar_year"))
         ):
             raise Exception("Missing Input: calendar_year is mandatory")
 
@@ -5390,11 +5363,15 @@ def COH_cop(coh_bop, period_receipt, period_disbursement):
         raise Exception("The COH_cop function is throwing an error: " + str(e))
 
 
-def get_cvg_dates(report_id, cmte_id):
+def get_cvg_dates(report_id, cmte_id, include_deleted=False):
     try:
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT cvg_start_date, cvg_end_date from public.reports where cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y'",
+            if include_deleted:
+                param_string = ""                    
+            else:
+                param_string = "AND delete_ind is distinct from 'Y'"
+            cursor.execute( 
+                "SELECT cvg_start_date, cvg_end_date from public.reports where cmte_id = %s AND report_id = %s {}".format(param_string),
                 [cmte_id, report_id],
             )
             if cursor.rowcount == 0:
@@ -5477,7 +5454,7 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
 # @api_view(['GET'])
 # def get_thirdNavigationCOH(request):
 #     try:
-#         cmte_id = request.user.username
+#         cmte_id = get_comittee_id(request.user.username)
 
 #         if not('report_id' in request.query_params and check_null_value(request.query_params.get('report_id'))):
 #             raise Exception ('Missing Input: report_id is mandatory')
@@ -5524,8 +5501,8 @@ def loansanddebts(report_id, cmte_id):
 
         value_list = [cmte_id, report_id, cmte_id, report_id]
         output = (
-            loans_sql(loans_sc_sql, value_list, error_message_sc)[0]
-            + loans_sql(loans_sd_sql, value_list, error_message_sd)[0]
+                loans_sql(loans_sc_sql, value_list, error_message_sc)[0]
+                + loans_sql(loans_sd_sql, value_list, error_message_sd)[0]
         )
         return output
     except Exception as e:
@@ -5617,11 +5594,11 @@ def getthirdnavamounts(cmte_id, report_id):
 @api_view(["GET"])
 def get_thirdNavigationTransactionTypes(request):
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         if not (
-            "report_id" in request.query_params
-            and check_null_value(request.query_params.get("report_id"))
+                "report_id" in request.query_params
+                and check_null_value(request.query_params.get("report_id"))
         ):
             raise Exception("Missing Input: Report_id is mandatory")
         report_id = check_report_id(request.query_params.get("report_id"))
@@ -5726,7 +5703,7 @@ def get_ReportTypes(request):
     Fields for identifying the committee type and committee design and filter the forms category 
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         forms_obj = []
         with connection.cursor() as cursor:
             cursor.execute(
@@ -5754,7 +5731,7 @@ def get_ReportTypes(request):
 def get_FormTypes(request):
     try:
         forms_obj = []
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT json_agg(t) FROM (select  distinct form_type from my_forms_view where cmte_id = %s order by form_type ) t",
@@ -5782,7 +5759,7 @@ def get_FormTypes(request):
 @api_view(["GET"])
 def get_Statuss(request):
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         data = """{
                     "data": [{
@@ -5825,7 +5802,7 @@ def get_Statuss(request):
 @api_view(["GET"])
 def get_AmendmentIndicators(request):
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         data = """{
                     "data":  [{
@@ -5867,7 +5844,7 @@ def get_AmendmentIndicators(request):
 @api_view(["GET"])
 def get_ItemizationIndicators(request):
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         data = """{
                     "data":  [{
@@ -5951,13 +5928,13 @@ def get_report_info(request):
     """
     Get report details
     """
-    cmte_id = request.user.username
+    cmte_id = get_comittee_id(request.user.username)
     report_id = request.query_params.get("reportid")
     # print("cmte_id", cmte_id)
     # print("report_id", report_id)
     try:
         if "reportid" in request.query_params and (
-            not request.query_params.get("reportid") == ""
+                not request.query_params.get("reportid") == ""
         ):
             # print("you are here1")
             if int(request.query_params.get("reportid")) >= 1:
@@ -6005,7 +5982,7 @@ END - Report info api - CORE APP
 
 @api_view(["GET"])
 def print_preview_pdf(request):
-    cmte_id = request.user.username
+    cmte_id = get_comittee_id(request.user.username)
     report_id = request.data.get("reportid")
 
     try:
@@ -6058,7 +6035,7 @@ def contactsTable(request):
 
         if request.method == "POST":
             # print("request.data: ", request.data)
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             param_string = ""
             page_num = int(request.data.get("page", 1))
             descending = request.data.get("descending", "false")
@@ -6111,21 +6088,21 @@ def contactsTable(request):
                 for key in search_keys:
                     if not param_string:
                         param_string = (
-                            param_string
-                            + " AND (CAST("
-                            + key
-                            + " as CHAR(100)) ILIKE '%"
-                            + str(search_string)
-                            + "%'"
+                                param_string
+                                + " AND (CAST("
+                                + key
+                                + " as CHAR(100)) ILIKE '%"
+                                + str(search_string)
+                                + "%'"
                         )
                     else:
                         param_string = (
-                            param_string
-                            + " OR CAST("
-                            + key
-                            + " as CHAR(100)) ILIKE '%"
-                            + str(search_string)
-                            + "%'"
+                                param_string
+                                + " OR CAST("
+                                + key
+                                + " as CHAR(100)) ILIKE '%"
+                                + str(search_string)
+                                + "%'"
                         )
                 param_string = param_string + " )"
             keywords_string = ""
@@ -6137,58 +6114,58 @@ def contactsTable(request):
                         elif "'" in word:
                             if not keywords_string:
                                 keywords_string = (
-                                    keywords_string
-                                    + " AND ( CAST("
-                                    + key
-                                    + " as CHAR(100)) = "
-                                    + str(word)
+                                        keywords_string
+                                        + " AND ( CAST("
+                                        + key
+                                        + " as CHAR(100)) = "
+                                        + str(word)
                                 )
                             else:
                                 keywords_string = (
-                                    keywords_string
-                                    + " OR CAST("
-                                    + key
-                                    + " as CHAR(100)) = "
-                                    + str(word)
+                                        keywords_string
+                                        + " OR CAST("
+                                        + key
+                                        + " as CHAR(100)) = "
+                                        + str(word)
                                 )
                         else:
                             if not keywords_string:
                                 keywords_string = (
-                                    keywords_string
-                                    + " AND ( CAST("
-                                    + key
-                                    + " as CHAR(100)) ILIKE '%"
-                                    + str(word)
-                                    + "%'"
+                                        keywords_string
+                                        + " AND ( CAST("
+                                        + key
+                                        + " as CHAR(100)) ILIKE '%"
+                                        + str(word)
+                                        + "%'"
                                 )
                             else:
                                 keywords_string = (
-                                    keywords_string
-                                    + " OR CAST("
-                                    + key
-                                    + " as CHAR(100)) ILIKE '%"
-                                    + str(word)
-                                    + "%'"
+                                        keywords_string
+                                        + " OR CAST("
+                                        + key
+                                        + " as CHAR(100)) ILIKE '%"
+                                        + str(word)
+                                        + "%'"
                                 )
                 keywords_string = keywords_string + " )"
             param_string = param_string + keywords_string
 
             trans_query_string = (
-                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
+                    """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
                                         where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='"""
-                + cmte_id
-                + """' """
-                + param_string
+                    + cmte_id
+                    + """' """
+                    + param_string
             )
             # print("contacts trans_query_string: ",trans_query_string)
             # import ipdb;ipdb.set_trace()
             if sortcolumn and sortcolumn != "default":
                 trans_query_string = (
-                    trans_query_string
-                    + """ ORDER BY """
-                    + sortcolumn
-                    + """ """
-                    + descending
+                        trans_query_string
+                        + """ ORDER BY """
+                        + sortcolumn
+                        + """ """
+                        + descending
                 )
             elif sortcolumn == "default":
                 trans_query_string = trans_query_string + """ ORDER BY name ASC"""
@@ -6244,7 +6221,7 @@ def get_loan_debt_summary(request):
     api query parameters: cmet_id + report_id
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = check_report_id(request.data.get("report_id"))
         _sql = """
         SELECT Sum(t._sum) 
@@ -6383,7 +6360,7 @@ def prepare_json_builders_data(request):
     try:
         # print("request.data: ", request.data)
         # commented by Mahendra 10052019
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         param_string = ""
         report_id = request.data.get("report_id")
         sched_a_line_sum = {}
@@ -6771,8 +6748,8 @@ def prepare_json_builders_data(request):
             # query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
             # cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
             update_query = (
-                """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
-                % (update_str, cmte_id, report_id)
+                    """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
+                    % (update_str, cmte_id, report_id)
             )
             cursor.execute(update_query)
             # print("Updated on Database ---- yoyooooo")
@@ -6793,13 +6770,12 @@ GET CONTACT DYNAMIC FORM FIELDS API- CORE APP - SPRINT 18 - FNE 503 - BY MAHENDR
 
 @api_view(["GET"])
 def get_contacts_dynamic_forms_fields(request):
-
     try:
 
         with open(
-            os.path.dirname(__file__) + "/contacts_fields.json",
-            encoding="utf-8",
-            errors="ignore",
+                os.path.dirname(__file__) + "/contacts_fields.json",
+                encoding="utf-8",
+                errors="ignore",
         ) as contacts_json_file:
             data_obj = json.load(contacts_json_file)
 
@@ -6828,7 +6804,7 @@ def get_contacts_dynamic_forms_fields(request):
 # def get_filler_transaction_type(request):
 #     try:
 #         # print("request.data: ", request.data)
-#         #cmte_id = request.user.username
+#         #cmte_id = get_comittee_id(request.user.username)
 #         param_string = ""
 
 #         search_string = request.data.get('search')
@@ -6868,7 +6844,7 @@ def get_contacts_dynamic_forms_fields(request):
 @api_view(["GET"])
 def get_entityTypes(request):
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         data = """{
                     "data":  [
@@ -7091,9 +7067,9 @@ def contacts(request):
 
     if request.method == "POST":
         try:
-            # cmte_id = request.user.username
+            # cmte_id = get_comittee_id(request.user.username)
             datum = contact_sql_dict(request.data)
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
             # datum['cmte_id'] = cmte_id
             post_contact(datum)
             # commented by Mahendra 10052019
@@ -7113,7 +7089,7 @@ def contacts(request):
     if request.method == "GET":
 
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params:
                 data["report_id"] = request.query_params.get("report_id")
             output = get_contact(data)
@@ -7131,7 +7107,7 @@ def contacts(request):
     if request.method == "PUT":
         try:
             datum = contact_entity_dict(request.data)
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
             # datum['cmte_id'] = cmte_id
             put_contact_data(datum)
             print("datum", datum)
@@ -7153,9 +7129,9 @@ def contacts(request):
     if request.method == "DELETE":
 
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "id" in request.query_params and check_null_value(
-                request.query_params.get("id")
+                    request.query_params.get("id")
             ):
                 data["id"] = request.query_params.get("id")
             else:
@@ -7217,9 +7193,8 @@ def get_contact(data):
 
 
 def get_list_contact(
-    cmte_id, entity_id=None, name_select_flag=False, entity_name_flag=False
+        cmte_id, entity_id=None, name_select_flag=False, entity_name_flag=False
 ):
-
     try:
         with connection.cursor() as cursor:
             # This Flag seperates whether I need only entity name or first_name, last_name
@@ -7283,11 +7258,11 @@ def get_list_contact(
 def is_null(check_value, check_field=""):
     # if phone_nmumber is numeric field so pass 0 as default
     if check_field == "phone_number" and (
-        check_value == None or check_value in ["null", " ", "", "none", "Null", "None"]
+            check_value == None or check_value in ["null", " ", "", "none", "Null", "None"]
     ):
         return None
     elif check_field == "cand_election_year" and (
-        check_value == None or check_value in ["null", " ", "", "none", "Null", "None"]
+            check_value == None or check_value in ["null", " ", "", "none", "Null", "None"]
     ):
         return None
     elif check_value == None or check_value in ["null", " ", "", "none", "Null"]:
@@ -7341,7 +7316,7 @@ def get_reporttype(cmte_id, report_id):
 def delete_trashed_reports(request):
     try:
         """api for trash and restore report. """
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         # commented by Mahendra 10052019
         # print("trash_restore_report cmte_id = ", cmte_id)
         # print("delete_trashed_reports  request.data =", request.data.get('actions', []))
@@ -7491,7 +7466,7 @@ def get_all_trashed_reports(request):
     """
     if request.method == "GET":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             viewtype = request.query_params.get("view")
             reportid = request.query_params.get("reportId")
             # commented by Mahendra 10052019
@@ -7720,7 +7695,7 @@ def trash_restore_sql_report(cmte_id, report_id, _delete="Y"):
 @api_view(["PUT"])
 def trash_restore_report(request):
     """api for trash and restore report. """
-    cmte_id = request.user.username
+    cmte_id = get_comittee_id(request.user.username)
     # commented by Mahendra 10052019
     # print("trash_restore_report  request.data =", request.data.get('actions', []))
     for _action in request.data.get("actions", []):
@@ -7759,7 +7734,7 @@ def trash_restore_report(request):
 def delete_trashed_contacts(request):
     try:
         """api for trash and restore contact. """
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         # commented by Mahendra 10052019
         # print("trash_restore_contact cmte_id = ", cmte_id)
         # print("delete_trashed_contacts  request.data =", request.data.get('actions', []))
@@ -7768,7 +7743,7 @@ def delete_trashed_contacts(request):
             entity_id = _action.get("id", "")
             list_entity_ids = list_entity_ids + str(entity_id) + "','"
         # print("delete_trashed_contacts list_entity_ids before substring", list_entity_ids)
-        entity_ids = list_entity_ids[0 : len(list_entity_ids) - 2]
+        entity_ids = list_entity_ids[0: len(list_entity_ids) - 2]
         # print("delete_trashed_contacts list_entity_ids", entity_ids)
         with connection.cursor() as cursor:
             cursor.execute(
@@ -7798,7 +7773,7 @@ def get_all_trashed_contacts(request):
     if request.method == "POST":
         try:
             # print("request.data: ", request.data)
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             param_string = ""
             page_num = int(request.data.get("page", 1))
             descending = request.data.get("descending", "false")
@@ -7851,21 +7826,21 @@ def get_all_trashed_contacts(request):
                 for key in search_keys:
                     if not param_string:
                         param_string = (
-                            param_string
-                            + " AND (CAST("
-                            + key
-                            + " as CHAR(100)) ILIKE '%"
-                            + str(search_string)
-                            + "%'"
+                                param_string
+                                + " AND (CAST("
+                                + key
+                                + " as CHAR(100)) ILIKE '%"
+                                + str(search_string)
+                                + "%'"
                         )
                     else:
                         param_string = (
-                            param_string
-                            + " OR CAST("
-                            + key
-                            + " as CHAR(100)) ILIKE '%"
-                            + str(search_string)
-                            + "%'"
+                                param_string
+                                + " OR CAST("
+                                + key
+                                + " as CHAR(100)) ILIKE '%"
+                                + str(search_string)
+                                + "%'"
                         )
                 param_string = param_string + " )"
             keywords_string = ""
@@ -7877,38 +7852,38 @@ def get_all_trashed_contacts(request):
                         elif "'" in word:
                             if not keywords_string:
                                 keywords_string = (
-                                    keywords_string
-                                    + " AND ( CAST("
-                                    + key
-                                    + " as CHAR(100)) = "
-                                    + str(word)
+                                        keywords_string
+                                        + " AND ( CAST("
+                                        + key
+                                        + " as CHAR(100)) = "
+                                        + str(word)
                                 )
                             else:
                                 keywords_string = (
-                                    keywords_string
-                                    + " OR CAST("
-                                    + key
-                                    + " as CHAR(100)) = "
-                                    + str(word)
+                                        keywords_string
+                                        + " OR CAST("
+                                        + key
+                                        + " as CHAR(100)) = "
+                                        + str(word)
                                 )
                         else:
                             if not keywords_string:
                                 keywords_string = (
-                                    keywords_string
-                                    + " AND ( CAST("
-                                    + key
-                                    + " as CHAR(100)) ILIKE '%"
-                                    + str(word)
-                                    + "%'"
+                                        keywords_string
+                                        + " AND ( CAST("
+                                        + key
+                                        + " as CHAR(100)) ILIKE '%"
+                                        + str(word)
+                                        + "%'"
                                 )
                             else:
                                 keywords_string = (
-                                    keywords_string
-                                    + " OR CAST("
-                                    + key
-                                    + " as CHAR(100)) ILIKE '%"
-                                    + str(word)
-                                    + "%'"
+                                        keywords_string
+                                        + " OR CAST("
+                                        + key
+                                        + " as CHAR(100)) ILIKE '%"
+                                        + str(word)
+                                        + "%'"
                                 )
                 keywords_string = keywords_string + " )"
             param_string = param_string + keywords_string
@@ -7922,20 +7897,20 @@ def get_all_trashed_contacts(request):
             # import ipdb;ipdb.set_trace()
 
             trans_query_string = (
-                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
+                    """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
                     where  deletedFlag = 'Y' AND cmte_id='"""
-                + cmte_id
-                + """' """
-                + param_string
+                    + cmte_id
+                    + """' """
+                    + param_string
             )
 
             if sortcolumn and sortcolumn != "default":
                 trans_query_string = (
-                    trans_query_string
-                    + """ ORDER BY """
-                    + sortcolumn
-                    + """ """
-                    + descending
+                        trans_query_string
+                        + """ ORDER BY """
+                        + sortcolumn
+                        + """ """
+                        + descending
                 )
             elif sortcolumn == "default":
                 trans_query_string = trans_query_string + """ ORDER BY name ASC"""
@@ -8003,7 +7978,7 @@ def trash_restore_sql_contact(cmte_id, entity_id, _delete="Y"):
 @api_view(["PUT"])
 def trash_restore_contact(request):
     """api for trash and restore contact. """
-    cmte_id = request.user.username
+    cmte_id = get_comittee_id(request.user.username)
     # commented by Mahendra 10052019
     # print("trash_restore_contact  request.data =", request.data.get('actions', []))
     result = ""
@@ -8171,7 +8146,7 @@ def clone_a_transaction(request):
         "SE": "sched_e",
         "SF": "sched_f",
     }
-    # cmte_id = request.user.username
+    # cmte_id = get_comittee_id(request.user.username)
     transaction_id = request.data.get("transaction_id")
     if not transaction_id:
         raise Exception("Error: transaction_id is required for this api.")
@@ -8221,9 +8196,9 @@ def clone_a_transaction(request):
             select_str = select_str.replace("contribution_date", "'" + _today + "'")
             select_str = select_str.replace("contribution_amount", "'" + "0.00" + "'")
         if (
-            transaction_id.startswith("SB")
-            or transaction_id.startswith("LB")
-            or transaction_id.startswith("SF")
+                transaction_id.startswith("SB")
+                or transaction_id.startswith("LB")
+                or transaction_id.startswith("SF")
         ):
             select_str = select_str.replace("expenditure_date", "'" + _today + "'")
             select_str = select_str.replace("expenditure_amount", "'" + "0.00" + "'")
@@ -8283,13 +8258,13 @@ def clone_a_transaction(request):
         )
 
         load_sql = (
-            """SELECT json_agg(t) 
+                """SELECT json_agg(t) 
         FROM ("""
-            + load_sql
-            + """WHERE transaction_id = '{}' ) t
+                + load_sql
+                + """WHERE transaction_id = '{}' ) t
         """.format(
-                new_tran_id
-            )
+            new_tran_id
+        )
         )
         logger.debug("load_sql:{}".format(load_sql))
         cursor.execute(load_sql)
@@ -8428,11 +8403,10 @@ def get_report_ids(cmte_id, from_date, submit_flag=True, including=True):
 
 @api_view(["POST"])
 def create_amended_reports(request):
-
     try:
         if request.method == "POST":
             reportid = request.POST.get("report_id")
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
 
             val_data = get_reports_data(reportid)
 
@@ -8744,7 +8718,7 @@ def duplicate_address(cmte_id, data):
         )
         combined_dataframe = combined_dataframe[
             combined_dataframe.Score >= moderation_score
-        ]
+            ]
         if combined_dataframe.empty:
             return []
         else:
@@ -8759,7 +8733,7 @@ def duplicate_address(cmte_id, data):
 @api_view(["POST"])
 def check_duplicate_address(request):
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         address = duplicate_address(cmte_id, request.data)
         if address:
             status_code = "FAIL"
@@ -8915,7 +8889,7 @@ def levin_accounts(request):
     """
     if request.method == "GET":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             levin_account_id = request.query_params.get("levin_account_id")
             if not levin_account_id:
                 forms_obj = get_levin_accounts(cmte_id)
@@ -8940,7 +8914,7 @@ def levin_accounts(request):
 
     elif request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
 
             if not "levin_account_name" in request.data:
                 raise Exception("levin account name is required.")
@@ -8961,7 +8935,7 @@ def levin_accounts(request):
 
     elif request.method == "PUT":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             levin_account_name = request.data.get("levin_account_name")
             levin_account_id = request.data.get("levin_account_id")
             put_levin_account(cmte_id, levin_account_id, levin_account_name)
@@ -8975,7 +8949,7 @@ def levin_accounts(request):
             )
     elif request.method == "DELETE":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             levin_account_id = request.query_params.get("levin_account_id")
             if not levin_account_id:
                 raise Exception("a valid levin account id is required.")
@@ -9004,7 +8978,7 @@ def new_report_update_date(request):
     logger.debug("request for update report last_update_date:")
     try:
         if request.method == "PUT":
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             logger.debug("cmte id:{}".format(cmte_id))
             if not request.data.get("report_id"):
                 raise Exception("Error: report_id is required for this api.")
@@ -9040,9 +9014,8 @@ GET REPORT STATUS SPRINT-23 - FNE 1064 - BY MAHENDRA MARATHE
 
 @api_view(["GET"])
 def get_report_status(request):
-
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         form_type = request.query_params.get("form_type")
 
@@ -9093,13 +9066,12 @@ GET LOAN ENDORSER DYNAMIC FORM FIELDS API- CORE APP - SPRINT 23 - FNE 1502 - BY 
 
 @api_view(["GET"])
 def get_sched_c_endorser_dynamic_forms_fields(request):
-
     try:
 
         with open(
-            os.path.dirname(__file__) + "/loan_endorser_fields.json",
-            encoding="utf-8",
-            errors="ignore",
+                os.path.dirname(__file__) + "/loan_endorser_fields.json",
+                encoding="utf-8",
+                errors="ignore",
         ) as loan_endorser_json_file:
             data_obj = json.load(loan_endorser_json_file)
 
@@ -9127,13 +9099,12 @@ GET LOAN  DYNAMIC FORM FIELDS API- CORE APP - SPRINT 23 - FNE 1501 - BY MAHENDRA
 
 @api_view(["GET"])
 def get_sched_c_loan_dynamic_forms_fields(request):
-
     try:
         print("get_sched_c_loan_dynamic_forms_fields called...")
         with open(
-            os.path.dirname(__file__) + "/loan_fields.json",
-            encoding="utf-8",
-            errors="ignore",
+                os.path.dirname(__file__) + "/loan_fields.json",
+                encoding="utf-8",
+                errors="ignore",
         ) as loans_json_file:
             data_obj = json.load(loans_json_file)
 
@@ -9161,13 +9132,12 @@ GET LOAN REPAYMENT DYNAMIC FORM FIELDS API- CORE APP - SPRINT 23 - FNE 1503 - BY
 
 @api_view(["GET"])
 def get_sched_c_loanPayment_dynamic_forms_fields(request):
-
     try:
 
         with open(
-            os.path.dirname(__file__) + "/loan_endorser_fields.json",
-            encoding="utf-8",
-            errors="ignore",
+                os.path.dirname(__file__) + "/loan_endorser_fields.json",
+                encoding="utf-8",
+                errors="ignore",
         ) as loan_repayment_json_file:
             data_obj = json.load(loan_repayment_json_file)
 
@@ -9195,9 +9165,8 @@ GET COVERAGE DATES BASED ON A REPORT ID - BY ZOBAIR SALEEM
 
 @api_view(["GET"])
 def get_coverage_dates(request):
-
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
 
         with connection.cursor() as cursor:
@@ -9350,13 +9319,13 @@ def get_sl_unitem_aggregate(report_id, cmte_id, prev_yr, levin_accnt_name):
 
 
 def get_sl_line_sum_value(
-    line_number,
-    levin_accnt_name,
-    formula,
-    sched_la_line_sum_dict,
-    cmte_id,
-    report_id,
-    prev_yr=None,
+        line_number,
+        levin_accnt_name,
+        formula,
+        sched_la_line_sum_dict,
+        cmte_id,
+        report_id,
+        prev_yr=None,
 ):
     # print(line_number, levin_accnt_name, formula, sched_la_line_sum_dict, cmte_id, report_id, prev_yr,'paramss')
 
@@ -9385,7 +9354,6 @@ def get_sl_line_sum_value(
         return val, levin_accnt_name
 
     if formula == "":
-
         val += (
             sched_la_line_sum_dict.get(line_number, 0)[0]
             if sched_la_line_sum_dict.get(line_number, 0)
@@ -9404,22 +9372,22 @@ def get_sl_line_sum_value(
 
             cl_n = formula_split[0].replace(" ", "")
             val += (
-                get_sl_line_sum_value(
-                    cl_n.split("-")[0],
-                    levin_accnt_name,
-                    "",
-                    sched_la_line_sum_dict,
-                    cmte_id,
-                    report_id,
-                )[0]
-                - get_sl_line_sum_value(
-                    cl_n.split("-")[1],
-                    levin_accnt_name,
-                    "",
-                    sched_la_line_sum_dict,
-                    cmte_id,
-                    report_id,
-                )[0]
+                    get_sl_line_sum_value(
+                        cl_n.split("-")[0],
+                        levin_accnt_name,
+                        "",
+                        sched_la_line_sum_dict,
+                        cmte_id,
+                        report_id,
+                    )[0]
+                    - get_sl_line_sum_value(
+                cl_n.split("-")[1],
+                levin_accnt_name,
+                "",
+                sched_la_line_sum_dict,
+                cmte_id,
+                report_id,
+            )[0]
             )
         else:
 
@@ -9434,22 +9402,22 @@ def get_sl_line_sum_value(
         for cl_n in formula_split:
             if "-" in cl_n:
                 val += (
-                    get_sl_line_sum_value(
-                        cl_n.split("-")[0],
-                        levin_accnt_name,
-                        "",
-                        sched_la_line_sum_dict,
-                        cmte_id,
-                        report_id,
-                    )
-                    - get_sl_line_sum_value(
-                        cl_n.split("-")[1],
-                        levin_accnt_name,
-                        "",
-                        sched_la_line_sum_dict,
-                        cmte_id,
-                        report_id,
-                    )[0]
+                        get_sl_line_sum_value(
+                            cl_n.split("-")[0],
+                            levin_accnt_name,
+                            "",
+                            sched_la_line_sum_dict,
+                            cmte_id,
+                            report_id,
+                        )
+                        - get_sl_line_sum_value(
+                    cl_n.split("-")[1],
+                    levin_accnt_name,
+                    "",
+                    sched_la_line_sum_dict,
+                    cmte_id,
+                    report_id,
+                )[0]
                 )
             else:
 
@@ -9481,7 +9449,7 @@ def get_sl_line_sum_value(
 def prepare_Schedl_summary_data(request):
     try:
         # import ipdb;ipdb.set_trace()
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         param_string = ""
         report_id = request.data.get("report_id")
         sched_la_line_sum = {}
@@ -9739,8 +9707,8 @@ def prepare_Schedl_summary_data(request):
         update_str = update_str[:-1]
         with connection.cursor() as cursor:
             update_query = (
-                """update public.sched_l set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
-                % (update_str, cmte_id, report_id)
+                    """update public.sched_l set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
+                    % (update_str, cmte_id, report_id)
             )
             cursor.execute(update_query)
         return Response({"Response": "Success"}, status=status.HTTP_200_OK)
@@ -9752,7 +9720,6 @@ def prepare_Schedl_summary_data(request):
 
 
 def get_original_amount_by_redesignation_id(transaction_id):
-
     try:
         with connection.cursor() as cursor:
             if transaction_id:
@@ -9772,7 +9739,7 @@ def get_original_amount_by_redesignation_id(transaction_id):
 def update_f3x_coh_cop_subsequent_report(report_id, cmte_id):
     try:
         output_string = ""
-        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id,True)
         report_id_list = get_report_ids(cmte_id, cvg_start_date, False, False)
         for report in report_id_list:
             if update_f3x_details(report, cmte_id) != "Success":

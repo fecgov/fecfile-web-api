@@ -14,6 +14,8 @@ from django.http import JsonResponse
 from functools import wraps
 
 # Create your views here.
+from fecfiler.core.views import get_comittee_id
+
 logger = logging.getLogger(__name__)
 
 LIST_F1M_COLUMNS = ['report_id', 'est_status', 'cmte_id', 'aff_cmte_id', 'aff_date', 
@@ -67,7 +69,7 @@ def noneCheckMissingParameters(parameter_name_list, checking_dict=None,
 				function_name + '.'
 		if none_list:
 			error_string += ' The ' + function_name + ' function has parameters: ' + \
-				','.join(none_list) + ' are defined as None/blank.'
+				','.join(none_list) + ' defined as None/blank.'
 		if missing_list or none_list:
 			raise Exception(error_string)
 	except Exception as e:
@@ -90,10 +92,9 @@ def f1m_sql_dict(cmte_id, step, request_dict):
 
 def check_columns_f1M(step):
 	try:
-		print(step)
 		if step == 'saveAffiliation':
 			key_list = ['report_id', 'aff_cmte_id', 'aff_date']
-		elif step == 'saveCandidate':
+		elif step == 'saveCandidate' or step == 'saveQualification':
 			key_list = ['report_id']
 		elif step == 'saveDates':
 			key_list = ['report_id', 'date_51', 'orig_date', 'metreq_date']
@@ -127,7 +128,6 @@ def post_sql(request_dict, table, error_function):
 		value_list = []
 		key_string = ""
 		param_string = ""
-		print(request_dict)
 		for key, value in request_dict.items():
 			key_string += key+", "
 			param_string += "%s, "
@@ -135,7 +135,6 @@ def post_sql(request_dict, table, error_function):
 		with connection.cursor() as cursor:
 			sql = """INSERT INTO public.{}({}) VALUES ({})""".format(table, 
 					key_string[:-2], param_string[:-2])
-			print(sql)
 			cursor.execute(sql,value_list)
 			logger.debug(table + " POST")
 			logger.debug(cursor.query)
@@ -212,6 +211,18 @@ def remove_sql(request_dict, table, error_function="blank"):
 			"""The remove_sql function for table : {} is throwing an error in the 
 			function {}: """.format(table, error_function) + str(e))
 
+def check_candidate_number(candidate_number):
+	try:
+		if 1 <= int(candidate_number) <= 5:
+			return candidate_number
+		else:
+			raise Exception("""The candidate number can only be in between and including 
+				1 and 5. Input received: {}""".format(candidate_number))
+
+	except Exception as e:
+		raise Exception(
+			"""The check_candidate_number function is 
+			throwing an error : """.format(candidate_number) + str(e))
 """
 ***************************** WRAPPER FUNCTIONS **************************************
 """
@@ -250,6 +261,20 @@ def committee_master_get(request_dict):
 	except Exception as e:
 		raise Exception("""The committee_master_get function is 
 			throwing an error: """ + str(e))
+
+def get_cmte_type(cmte_id):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT cmte_type_category FROM public.committee_master 
+            	WHERE cmte_id=%s""", [cmte_id])
+            cmte_type_tuple = cursor.fetchone()
+            if cmte_type_tuple:
+                return cmte_type_tuple[0]
+            else:
+                raise Exception("""The cmte_id: {} does not exist in committee master 
+                	table.""".format(cmte_id))
+    except Exception as err:
+        raise Exception(f"The cmte_type function is throwing an error: {err}")
 
 """
 ****************************** Reports Table ******************************************
@@ -319,7 +344,7 @@ def report_post(request):
 	try:
 		report_dict = {
 			'report_id': str(next_report_id()),
-			'cmte_id': request.user.username,
+			'cmte_id': get_comittee_id(request.user.username),
 			'form_type': 'F1M',
 			'amend_ind': 'N',
 			'status': 'Saved'
@@ -421,11 +446,9 @@ def get_sql_candidate(candidate_id):
 ************************************ Helper Functions ******************************************
 """
 
-def step4_reports_put(request, submit_flag=False):
+def step4_reports_put(request):
 	try:
 		report_dict = {}
-		if submit_flag:
-			report_dict['status'] = "Submitted"
 		if 'additionalEmail1' in request.data and request.data['additionalEmail1'] not in [None, '', " ", 'null']:
 			report_dict['additional_email_1'] = request.data['additionalEmail1']
 		else:
@@ -435,7 +458,7 @@ def step4_reports_put(request, submit_flag=False):
 		else:
 			report_dict['additional_email_2'] = None
 		if report_dict:
-			report_dict['cmte_id'] = request.user.username
+			report_dict['cmte_id'] = get_comittee_id(request.user.username)
 			report_dict['report_id'] = request.data['reportId']
 			previous_report_dict = report_get(report_dict)
 			report_flag = report_put(report_dict)
@@ -446,6 +469,15 @@ def step4_reports_put(request, submit_flag=False):
 		raise Exception(
 			'The step4_reports_put function is throwing an error: ' + str(e))
 
+def submit_f1m_report(request):
+	try:
+		report_dict= {'status' : "Submitted"}
+		report_dict['cmte_id'] = request.user.username
+		report_dict['report_id'] = request.data['reportId']
+		return report_put(report_dict)
+	except Exception as e:
+		raise Exception(
+			'The submit_report function is throwing an error: ' + str(e))
 """
 ************************************ Form 1M Functions ******************************************
 """
@@ -525,6 +557,36 @@ def get_sql_f1m(request_dict, complete=False):
 		raise Exception(
 			'The get_sql_f1m function is throwing an error: '+ str(e))
 
+def validate_before_submit(request_dict):
+	try:
+		if request_dict['establishmentType'] == "A":
+			noneCheckMissingParameters(['reportId', 'cmte_id', 'committee_id', 
+				'affiliation_date', 'sign_id', 'submission_date'], 
+				checking_dict=request_dict, value_dict=request_dict, 
+				function_name='validate_before_submit')
+		elif request_dict['establishmentType'] == "Q":
+			cmte_type = get_cmte_type(request_dict['cmte_id'])
+			if  cmte_type == "PAC":
+				noneCheckMissingParameters(['reportId', 'cmte_id', 
+					'fifty_first_contributor_date', 'registration_date', 
+					'requirements_met_date', 'sign_id', 'submission_date'
+					'can1_id', 'can1_con', 'can2_id', 'can2_con', 'can3_id', 
+					'can3_con', 'can4_id', 'can4_con', 'can5_id'], 
+					checking_dict=request_dict, value_dict=request_dict, 
+					function_name='validate_before_submit')
+			else:
+				noneCheckMissingParameters(['reportId', 'cmte_id', 
+					'fifty_first_contributor_date', 'registration_date', 
+					'requirements_met_date', 'sign_id', 'submission_date'], 
+					checking_dict=request_dict, value_dict=request_dict, 
+					function_name='validate_before_submit')
+		else:
+			raise Exception("""The establishment status is not correctly defined. 
+				options allowed are 'A' and 'Q'. Data stored: {}""".format(
+					request_dict['establishmentType']))
+	except Exception as e:
+		raise 
+
 """
 ************************************ Form 1M CRUD Functions ******************************************
 """
@@ -569,7 +631,7 @@ def f1m_remove(request_dict):
 
 @api_view(['POST', 'GET', 'DELETE', 'PUT'])
 def form1M(request):
-	cmte_id = request.user.username
+	cmte_id = get_comittee_id(request.user.username)
 	report_flag = False
 	f1m_flag = False
 	previous_report_dict = None
@@ -598,13 +660,26 @@ def form1M(request):
 					report_flag, request_dict['report_id'] = report_post(request)
 					f1m_flag, output_dict = f1m_post(request_dict)
 
+			# by qualification step2 POST - skipping candidates
+			elif step == 'saveQualification':
+				request_dict = f1m_sql_dict(cmte_id, step, request.data)
+				request_dict['est_status'] = 'Q'
+				if 'report_id' in request_dict:
+					check_report_id_status(cmte_id, request_dict['report_id'])
+					previous_f1m_dict = get_sql_f1m(request_dict)
+					check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
+					f1m_flag, output_dict = f1m_put(request_dict)
+				else:
+					report_flag, request_dict['report_id'] = report_post(request)
+					f1m_flag, output_dict = f1m_post(request_dict)
+
 			# by qualification step2 POST
 			elif step == 'saveCandidate':
 				noneCheckMissingParameters(['candidate_id', 'contribution_date', 
 					'candidate_number'], 
 					checking_dict=request.data, value_dict=request.data, 
 					function_name='form1M-POST: step-2 Qualification')
-				candidate_number = request.data['candidate_number']
+				candidate_number = check_candidate_number(request.data['candidate_number'])
 				request_dict = f1m_sql_dict(cmte_id, step, request.data)
 				column_name = 'can'+candidate_number+'_id'
 				request_dict[column_name] = request.data['candidate_id']
@@ -658,7 +733,9 @@ def form1M(request):
 				check_report_id_status(cmte_id, request_dict['report_id'])
 				previous_f1m_dict = get_sql_f1m(request_dict)
 				f1m_flag, output_dict = f1m_put(request_dict)
-				report_flag, previous_report_dict = step4_reports_put(request, True)
+				report_flag, previous_report_dict = step4_reports_put(request)
+				validate_before_submit(output_dict)
+				submit_flag = submit_f1m_report(request)
 			else:
 				raise Exception("""Kindly provide a valid value for 'step' parameter.
 				Input received: {}""".format(step))
@@ -708,7 +785,7 @@ def form1M(request):
 					function_name='form1M-PUT: step-2 Qualification')
 				request_dict = f1m_sql_dict(cmte_id, step, request.data)
 				check_report_id_status(cmte_id, request_dict['report_id'])
-				candidate_number = request.data['candidate_number']
+				candidate_number = check_candidate_number(request.data['candidate_number'])
 				column_name = 'can'+candidate_number+'_id'
 				request_dict[column_name] = request.data['candidate_id']
 				request_dict[column_name[:-2]+'con'] = request.data['contribution_date']
@@ -817,7 +894,7 @@ def noneCheckTrueorFalse(parameter, check_dict):
 @api_view(['GET'])
 def get_details(request):
 	try:
-		cmte_id =  request.user.username
+		cmte_id =  get_comittee_id(request.user.username)
 		noneCheckMissingParameters(['type'], 
 				checking_dict=request.query_params,value_dict=request.query_params, 
 				function_name='get_details')
@@ -871,9 +948,7 @@ def get_details(request):
 			logger.debug("get_details")
 			logger.debug(cursor.query)
 			output_dict = cursor.fetchone()[0]
-			if output_dict:
-				print(output_dict)
-			else:
+			if not output_dict:
 				output_dict = []
 		return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
 	except Exception as e:
@@ -884,7 +959,7 @@ def get_details(request):
 @api_view(['GET', 'POST'])
 def get_original_registration_date(request):
 	try:
-		cmte_id = request.user.username
+		cmte_id = get_comittee_id(request.user.username)
 		sql="""SELECT sub_date AS "registration_date" FROM public.form_1 
 			WHERE comid = %s ORDER BY repid LIMIT 1"""
 		with connection.cursor() as cursor:
@@ -906,7 +981,7 @@ def get_original_registration_date(request):
 @api_view(['GET', 'POST'])
 def get_committee_met_req_date(request):
 	try:
-		cmte_id = request.user.username
+		cmte_id = get_comittee_id(request.user.username)
 		print(request.query_params)
 		noneCheckMissingParameters(['reportId', 'fifty_first_contributor_date'], 
 				checking_dict=request.data,value_dict=request.data, 
@@ -921,7 +996,6 @@ def get_committee_met_req_date(request):
 			logger.debug("get_committee_met_req_date")
 			logger.debug(cursor.query)
 			output_list = cursor.fetchall()
-			print(output_list)
 			if output_list:
 				output_list = list(filter(None, output_list[0]))
 			else:
@@ -929,10 +1003,32 @@ def get_committee_met_req_date(request):
 					for committeeId: {}""".format(request.data['reportId'],cmte_id))
 		fifty_date = request.data['fifty_first_contributor_date']
 		output_list.append(datetime.datetime.strptime(fifty_date, '%Y-%m-%d').date())
-		print(output_list)
 		output = {'requirements_met_date': max(output_list)}
 		return JsonResponse(output, status=status.HTTP_200_OK, safe=False)
 	except Exception as e:
 		logger.debug(e)
 		return Response("The get_committee_met_req_date API is throwing an error: " + str(e), 
+			status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def delete_candidate_f1m(request):
+	try:
+		cmte_id = request.user.username
+		noneCheckMissingParameters(['reportId',	'candidate_number'], 
+			checking_dict=request.query_params, value_dict=request.query_params, 
+			function_name='delete_candidate_f1m')
+		request_dict = {}
+		report_id = request.query_params['reportId']
+		check_report_id_status(cmte_id, report_id)
+		request_dict['cmte_id'] = cmte_id
+		request_dict['report_id'] = report_id
+		candidate_number = check_candidate_number(request.query_params['candidate_number'])
+		request_dict['can'+candidate_number+'_id'] = None
+		request_dict['can'+candidate_number+'_con'] = None
+		put_sql(request_dict, "form_1m", "delete_candidate_f1m")
+		output_dict = get_sql_f1m(request_dict)
+		return JsonResponse(output_dict, status=status.HTTP_201_CREATED, safe=False)
+	except Exception as e:
+		logger.debug(e)
+		return Response("The delete_candidate_f1m API is throwing an error: " + str(e), 
 			status=status.HTTP_400_BAD_REQUEST)

@@ -25,8 +25,11 @@ from fecfiler.core.views import (
     post_entities,
     put_entities,
     remove_entities,
+
     undo_delete_entities,
+    get_comittee_id,
     update_F3X
+
 )
 from fecfiler.sched_A.views import (
     get_next_transaction_id,
@@ -415,7 +418,7 @@ def get_sched_e_ytd_amount(request):
         need election_code, so_cand_state and so_cand_dsitrict
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         cand_office = request.query_params.get("cand_office")
         if not cand_office:
             raise Exception("so_cand_office is required for this api.")
@@ -1174,7 +1177,7 @@ def force_aggregate_se(request):
     2. re-do entity-based aggregation on se
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -1200,7 +1203,7 @@ def force_unaggregate_se(request):
     2. re-do entity-based aggregation on se
     """
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         report_id = request.data.get("report_id")
         transaction_id = request.data.get("transaction_id")
         if not transaction_id:
@@ -1225,7 +1228,7 @@ def schedE(request):
     """
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             associatedbydissemination = False
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
@@ -1279,7 +1282,7 @@ def schedE(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -1311,7 +1314,7 @@ def schedE(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
@@ -1379,7 +1382,7 @@ def schedE(request):
                 report_id = request.data.get("associated_report_id")
                 associatedbydissemination = True
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
             datum["associatedbydissemination"] = associatedbydissemination
 
             data = put_schedE(datum)

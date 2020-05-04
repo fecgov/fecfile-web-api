@@ -4281,9 +4281,58 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
 
+    if(item.entityType === 'IND') {
+      let val = this.frmIndividualReceipt.get('entity_name').value;
+      if(typeof val === 'object') {
+        val = val.entity_name;
+      }
+
+      const nameArray = val.split(',');
+
+      const firstName = nameArray[1] ? nameArray[1].trim() : '';
+      const lastName = nameArray[0] ? nameArray[0].trim() : '';
+      const middleName = nameArray[2] ? nameArray[2].trim() : '';
+      const prefix = nameArray[3] ? nameArray[3].trim() : '';
+      const suffix = nameArray[4] ? nameArray[4].trim() : '';
+
+      this.frmIndividualReceipt.patchValue({ first_name: firstName }, { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ last_name: lastName }, { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ middle_name: middleName }, { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ prefix: prefix }, { onlySelf: true });
+      this.frmIndividualReceipt.patchValue({ suffix: suffix }, { onlySelf: true });
+
+    }else if(item.entityType === 'ORG') {
+      let val = this.frmIndividualReceipt.get('last_name').value;
+
+      let firstName = '';
+      let lastName = '';
+      let middleName = '';
+      let prefix = '';
+      let suffix = '';
+
+      if(typeof val === 'object') {
+        firstName = val.first_name;
+        lastName = val.last_name;
+        middleName = val.middle_name;
+        prefix = val.prefix;
+        suffix = val.suffix;
+      }else {
+        firstName = this.frmIndividualReceipt.get('first_name').value;
+        lastName = this.frmIndividualReceipt.get('last_name').value;
+        middleName = this.frmIndividualReceipt.get('middle_name').value;
+        prefix = this.frmIndividualReceipt.get('prefix').value;
+        suffix = this.frmIndividualReceipt.get('last_nasuffixme').value;
+      }
+
+      this.frmIndividualReceipt.patchValue(
+        { entity_name: lastName + ', ' + firstName + ', ' + middleName + ', ' + prefix + ', ' + suffix }, { onlySelf: true });
+    }
+
+    /*
     if (item) {
       this.toggleValidationIndOrg(item.group);
     }
+    */
   }
 
   /**
@@ -4697,6 +4746,28 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                       this.isAggregate = true;
                     } else {
                       this.isAggregate = false;
+                    }
+                  }
+                  if (prop === 'itemized_ind') {
+                    if(trx[prop] === 'U') {
+                      this.transactionTypeText += "(Optional)";
+
+                      if (this.frmIndividualReceipt.controls['street_1']) {
+                        this.frmIndividualReceipt.controls['street_1'].setValidators([Validators.nullValidator]);
+                        this.frmIndividualReceipt.controls['street_1'].updateValueAndValidity();
+                      }
+                      if (this.frmIndividualReceipt.controls['city']) {
+                        this.frmIndividualReceipt.controls['city'].setValidators([Validators.nullValidator]);
+                        this.frmIndividualReceipt.controls['city'].updateValueAndValidity();
+                      }
+                      if (this.frmIndividualReceipt.controls['state']) {
+                        this.frmIndividualReceipt.controls['state'].setValidators([Validators.nullValidator]);
+                        this.frmIndividualReceipt.controls['state'].updateValueAndValidity();
+                      }
+                      if (this.frmIndividualReceipt.controls['zip_code']) {
+                        this.frmIndividualReceipt.controls['zip_code'].setValidators([Validators.nullValidator]);
+                        this.frmIndividualReceipt.controls['zip_code'].updateValueAndValidity();
+                      }
                     }
                   }
                 }

@@ -163,7 +163,7 @@
             </div>
           </div>
         </div>
-        <div class="grid-row float-right pt-3 pr-3">
+        <div class="grid-row float-right pt-3 pr-3" *ngIf="scheduleAction !== 'view'">
           <button type="button" class="btn btn-primary" (click)="updateInfo()">Save</button>
         </div>
         <div class="grid-row float-right pr-3 mt-3" *ngIf="saveSuccessful">

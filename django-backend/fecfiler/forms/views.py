@@ -31,7 +31,8 @@ import urllib
 from django.db import connection
 import boto
 from boto.s3.key import Key
-from fecfiler.core.views import NoOPError, get_levin_accounts
+from fecfiler.core.views import NoOPError, get_levin_accounts, get_comittee_id
+
 #import datetime as dt
 
 # API view functionality for GET DELETE and PUT
@@ -127,7 +128,7 @@ def print_f99_info(request):
     
     try: 
         # fetch last comm_info object created that is not submitted, else return None
-        comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username,  is_submitted=False).last() #,)
+        comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username),  is_submitted=False).last() #,)
 
     except CommitteeInfo.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND) #status=status.HTTP_404_NOT_FOUND)
@@ -168,7 +169,7 @@ def fetch_f99_info(request):
     #import ipdb; ipdb.set_trace()
     try:
         # fetch last comm_info object created that is not submitted, else return None
-        comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username,  is_submitted=False).last() #,)
+        comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username),  is_submitted=False).last() #,)
     except CommitteeInfo.DoesNotExist:
         return Response({}) #status=status.HTTP_404_NOT_FOUND)
 
@@ -236,7 +237,7 @@ def create_f99_info(request):
         #import ipdb; ipdb.set_trace()
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
 
-        #if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == request.user.username):
+        #if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == get_comittee_id(request.user.username)):
             #logger.debug("FEC Error 001:is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data")
             #return Response({"FEC Error 001":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)
         # just making sure that committeeid is not updated by mistake
@@ -421,7 +422,7 @@ def update_f99_info(request, print_flag=False):
         #import ipdb; ipdb.set_trace()
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
 
-        if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == request.user.username):
+        if not(incoming_data['is_submitted'] in['False',False,'false'] and incoming_data['committeeid'] == get_comittee_id(request.user.username)):
             return Response({"error":"is_submitted and committeeid field changes are restricted for this api call. Please use the submit api to finalize and submit the data"}, status=status.HTTP_400_BAD_REQUEST)
         # just making sure that committeeid is not updated by mistake
 
@@ -483,7 +484,7 @@ def submit_comm_info(request):
         # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
 
         #not(request.data['is_submitted'] in['True',True,'true'] and
-        #if not incoming_data['committeeid'] == request.user.username:
+        #if not incoming_data['committeeid'] == get_comittee_id(request.user.username):
             #return Response({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
         # just making sure that committeeid is not updated by mistake
         try:
@@ -518,7 +519,7 @@ def submit_comm_info(request):
     #import ipdb; ipdb.set_trace()
     if request.method == 'POST':
         try:
-            comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
+            comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username)).last()
             #print(comm_info.pk)
             if comm_info:
                 comm_info.is_submitted = True
@@ -549,7 +550,7 @@ def submit_comm_info(request):
 #     if request.method == 'POST':
 #         try:
 #             #import ipdb; ipdb.set_trace()
-#             comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username).last()
+#             comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username)).last()
 #             if comm_info:
 
 #                 comm_info.is_submitted=True
@@ -610,10 +611,6 @@ def create_json_file(request):
 
 """
 
-
-
-
-
 @api_view(['GET'])
 def get_f99_reasons(request):
     """
@@ -630,14 +627,19 @@ def get_f99_reasons(request):
 @api_view(['GET'])
 def get_committee_details(request):
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
         with connection.cursor() as cursor:
             # GET all rows from committee table
-            query_string = """SELECT cmte_id AS "committeeid", cmte_name AS "committeename", street_1 AS "street1", street_2 AS "street2", city, state, zip_code AS "zipcode", 
-                                cmte_email_1 AS "email_on_file", cmte_email_2 AS "email_on_file_1", phone_number, cmte_type, cmte_dsgn, cmte_filing_freq, cmte_filed_type, 
-                                treasurer_last_name AS "treasurerlastname", treasurer_first_name AS "treasurerfirstname", treasurer_middle_name AS "treasurermiddlename", 
-                                treasurer_prefix AS "treasurerprefix", treasurer_suffix AS "treasurersuffix", create_date AS "created_at", cmte_type_category
-                                FROM public.committee_master WHERE cmte_id = %s ORDER BY create_date"""
+            query_string = """SELECT cm.cmte_id AS "committeeid", cm.cmte_name AS "committeename", cm.street_1 AS "street1", cm.street_2 AS "street2", 
+                cm.city, cm.state, cm.zip_code AS "zipcode", 
+                cm.cmte_email_1 AS "email_on_file", cm.cmte_email_2 AS "email_on_file_1", cm.phone_number, cm.cmte_type, cm.cmte_dsgn, 
+                cm.cmte_filing_freq, cm.cmte_filed_type, 
+                cm.treasurer_last_name AS "treasurerlastname", cm.treasurer_first_name AS "treasurerfirstname", cm.treasurer_middle_name AS "treasurermiddlename", 
+                cm.treasurer_prefix AS "treasurerprefix", cm.treasurer_suffix AS "treasurersuffix", cm.create_date AS "created_at", cm.cmte_type_category, f1.fax, 
+                f1.tphone as "treasurerphone", f1.url as "website"
+                FROM public.committee_master cm
+                LEFT JOIN public.form_1 f1 ON f1.comid=cmte_id
+                WHERE cm.cmte_id = %s ORDER BY cm.create_date, f1.sub_date DESC, f1.create_date DESC LIMIT 1"""
             cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
             modified_output = cursor.fetchone()[0]
         if modified_output is None:
@@ -681,7 +683,7 @@ def get_committee(request):
     fields for auto populating the data for creating the comm_info object
     """
     try:
-        comm = Committee.objects.filter(committeeid=request.user.username).last()
+        comm = Committee.objects.filter(committeeid=get_comittee_id(request.user.username)).last()
     except Committee.DoesNotExist:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
@@ -697,7 +699,7 @@ def get_signee(request):
     Gets the signee for the commitee .
     """
     try:
-        comm = Committee.objects.filter(committeeid=request.user.username).last()
+        comm = Committee.objects.filter(committeeid=get_comittee_id(request.user.username)).last()
     except Committee.DoesNotExist:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
@@ -865,8 +867,8 @@ def get_rad_analyst_info(request):
     if request.method == 'GET':
         try:
             #import ipdb; ipdb.set_trace();
-            if request.user.username:
-                ab = requests.get('https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=50nTHLLMcu3XSSzLnB0hax2Jg5LFniladU5Yf25j&committee_id=' + request.user.username + '&sort_hide_null=false&sort_null_only=false')
+            if get_comittee_id(request.user.username):
+                ab = requests.get('https://api.open.fec.gov/v1/rad-analyst/?page=1&per_page=20&api_key=50nTHLLMcu3XSSzLnB0hax2Jg5LFniladU5Yf25j&committee_id=' + get_comittee_id(request.user.username) + '&sort_hide_null=false&sort_null_only=false')
                 return JsonResponse({"response":ab.json()['results']})
             else:
                 return JsonResponse({"ERROR":"You must be logged in  for this operation."})
@@ -880,7 +882,7 @@ def get_form99list(request):
     """
     if request.method == 'GET':
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             viewtype = request.query_params.get('view')
             reportid = request.query_params.get('reportId')
 
@@ -1133,7 +1135,7 @@ def get_comm_lookup(request):
     try:
         import ipdb; ipdb.set_trace()
 
-        comm = CommitteeLookup.objects.get(cmte_id=request.user.username)
+        comm = CommitteeLookup.objects.get(cmte_id=get_comittee_id(request.user.username))
     except CommitteeLookup.DoesNotExist:
         return Response({}, status=status.HTTP_404_NOT_FOUND)
 
@@ -1149,7 +1151,7 @@ def get_filed_form_types(request):
     #Fields for identifying the committee type and committee design and filter the forms category 
     
     try:
-        comm_id = request.user.username
+        comm_id = get_comittee_id(request.user.username)
         
         #forms_obj = [obj.__dict__ for obj in RefFormTypes.objects.raw("select  rctf.category,rft.form_type,rft.form_description,rft.form_tooltip,rft.form_pdf_url from ref_form_types rft join ref_cmte_type_vs_forms rctf on rft.form_type=rctf.form_type where rctf.cmte_type='" + cmte_type + "' and rctf.cmte_dsgn='" + cmte_dsgn +  "'")]
         forms_obj = [obj.__dict__ for obj in My_Forms_View.objects.raw("select * from my_forms_view where cmte_id='"  + comm_id + "' order by category,form_type")]
@@ -1171,7 +1173,7 @@ def get_report_types_(request):
     #fields fordentifying the committee type and committee design and filter the forms category 
     
     try:
-        comm_id = request.user.username
+        comm_id = get_comittee_id(request.user.username)
 
         #forms_obj = [obj.__dict__ for obj in RefFormTypes.objects.raw("select  rctf.category,rft.form_type,rft.form_description,rft.form_tooltip,rft.form_pdf_url from ref_form_types rft join ref_cmte_type_vs_forms rctf on rft.form_type=rctf.form_type where rctf.cmte_type='" + cmte_type + "' and rctf.cmte_dsgn='" + cmte_dsgn +  "'")]
         forms_obj = [obj.__dict__ for obj in My_Forms_View.objects.raw("select * from my_forms_view where cmte_id='"  + comm_id + "' order by category,form_type")]
@@ -1713,7 +1715,7 @@ def get_f99_report_info(request):
                 id_comm = CommitteeInfo()
                 id_comm.id = request.query_params.get('reportid')
                 #comm_info = CommitteeInfo.objects.filter(committeeid=request.data['committeeid'], id=request.data['reportid']).last()
-                comm_info = CommitteeInfo.objects.filter(committeeid=request.user.username, id=request.query_params.get('reportid')).last()
+                comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username), id=request.query_params.get('reportid')).last()
                 serializer = CommitteeInfoSerializer(comm_info)
                 if comm_info:
                     return JsonResponse(serializer.data, status=status.HTTP_200_OK)
