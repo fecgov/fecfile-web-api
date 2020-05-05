@@ -4330,11 +4330,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 //end code commenting for reversion.
 
 
-    /*
+    
     if (item) {
       this.toggleValidationIndOrg(item.group);
     }
-    */
+    
   }
 
   /**
