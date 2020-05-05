@@ -2274,11 +2274,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (res) {
 
           const reportId = this._receiptService.getReportIdFromStorage(this.formType);
-          this._reportsService
-            .updateReportDate(new reportModel({ report_id: reportId }))
-            .subscribe((resUpdateReportDate: any) => {
-              //console.log(resUpdateReportDate);
-            });
+          // this._reportsService
+          //   .updateReportDate(new reportModel({ report_id: reportId }))
+          //   .subscribe((resUpdateReportDate: any) => {
+          //     //console.log(resUpdateReportDate);
+          //   });
           this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
             const message: any = {
               formType: this.formType,
@@ -4280,8 +4280,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         entityTypeObj.selected = false;
       }
     }
-
-    if(item.entityType === 'IND') {
+//reverting this code temporarily as this is breaking == 
+/*     if(item.entityType === 'IND') {
       let val = this.frmIndividualReceipt.get('entity_name').value;
       if(typeof val === 'object') {
         val = val.entity_name;
@@ -4326,7 +4326,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
       this.frmIndividualReceipt.patchValue(
         { entity_name: lastName + ', ' + firstName + ', ' + middleName + ', ' + prefix + ', ' + suffix }, { onlySelf: true });
-    }
+    } */
+//end code commenting for reversion.
+
 
     /*
     if (item) {
