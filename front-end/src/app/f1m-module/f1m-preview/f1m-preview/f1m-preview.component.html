@@ -49,13 +49,13 @@
   </section>
   <section *ngIf="type === 'qualification'">
     <div class="content">
-      <div class="paragraph">
+      <div class="paragraph" *ngIf="qualificationData && qualificationData.candidates.length > 0">
         <app-f1m-candidates-table [candidatesData]="qualificationData.candidates" [step]="step"
           *ngIf="qualificationData && qualificationData.candidates.length > 0">
         </app-f1m-candidates-table>
+        <br><hr/>
       </div>
     </div> <!-- ./content -->
-    <br><hr/>
     <div class="content">
       <div class="grid-row py-3">
         <h3>

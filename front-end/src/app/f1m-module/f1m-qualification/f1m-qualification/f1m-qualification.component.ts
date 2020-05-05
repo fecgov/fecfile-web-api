@@ -71,6 +71,10 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
             this.formPart2.disable();
           }
         }
+        else if(message && message.action === 'refreshScreen' && message.qualificationData){
+          this.qualificationData = message.qualificationData;
+          this.cd.detectChanges();
+        }
       });
   }
 
@@ -169,7 +173,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
     let counter:number = 1;
     if(this.qualificationData.candidates && this.qualificationData.candidates.length > 0){
       this.qualificationData.candidates.sort((a,b) => a.candidate_number > b.candidate_number ? 1 : -1);
-      this.qualificationData.candidates.array.forEach(candidate => {
+      this.qualificationData.candidates.forEach(candidate => {
         if(Number(candidate.candidate_number) === counter){
           counter++;
         }

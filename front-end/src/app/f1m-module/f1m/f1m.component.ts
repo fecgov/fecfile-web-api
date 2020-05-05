@@ -10,6 +10,7 @@ import { F1mService } from './f1m-services/f1m.service';
 import { DialogService } from '../../shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../shared/partials/confirm-modal/confirm-modal.component';
 import { TitleCasePipe } from '@angular/common';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-f1m',
@@ -40,6 +41,8 @@ export class F1mComponent implements OnInit, OnDestroy {
   public affiliationData: any = {};
   public emailsOnFile:any = []; 
 
+  private onDestroy$ = new Subject();
+
   public qualificationData : any = {
     type:'qualification',
     candidates: []
@@ -54,7 +57,14 @@ export class F1mComponent implements OnInit, OnDestroy {
     private _router: Router,
     private _reportsService: ReportsService,
     public titlecasePipe:TitleCasePipe
-    ) { }
+    ) { 
+      this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(message =>{
+        if(message && message.action === 'refreshScreen' && message.qualificationData){
+          this.qualificationData = message.qualificationData;
+          this.refreshAllComponents();
+        }
+      });
+    }
 
   public ngOnInit() {
     this.getPartyType();
@@ -129,7 +139,8 @@ export class F1mComponent implements OnInit, OnDestroy {
 
   
   ngOnDestroy(): void {
-    console.log('destroyed');
+    this._messageService.clearMessage();
+    this.onDestroy$.next(true);
   }
 
   public getPartyType() {
@@ -276,7 +287,7 @@ export class F1mComponent implements OnInit, OnDestroy {
         if (this.reportId) {
           this.step2data.reportId = this.reportId;
         }
-        this.step2data.candidate_number = this.step2data.candidate_number.toString();
+        this.step2data.candidate_number = this.qualificationComp.getNextCandidateNumber().toString();
         let saveCandScheduleAction = action.action === 'update' ? ScheduleActions.edit : ScheduleActions.add;
         this._f1mService.saveForm(this.step2data, saveCandScheduleAction, 'saveCandidate').subscribe(res => {
           this.qualificationData.candidates = res.candidates;
