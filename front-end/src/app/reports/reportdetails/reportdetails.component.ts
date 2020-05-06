@@ -18,6 +18,7 @@ import { reportModel } from '../model/report.model';
 import { ReportsService } from '../service/report.service';
 import { ReportFilterModel } from '../model/report-filter.model';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { AuthService} from '../../shared/services/AuthService/auth.service';
 import {
   form99,
   form3XReport,
@@ -140,6 +141,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _router: Router,
     private _reportTypeService: ReportTypeService,
     private _formsService: FormsService,
+    private authService: AuthService,
   ) {
     this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
@@ -955,16 +957,16 @@ public printReport(report: reportModel): void{
         });
       setTimeout(() => {
         // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
-
+        const isFiled = report.status.toUpperCase() === 'FILED';
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
           if (formType === '3X') {
             this._router.navigate([`/forms/form/${formType}`], {
-              queryParams: { step: 'financial_summary', reportId: report.report_id, edit: false }
+              queryParams: { step: 'financial_summary', reportId: report.report_id, edit: false, isFiled: isFiled }
             });
           } else if(formType === 'F99') {
             this._router.navigate([`/forms/form/${formType}`], {
-              queryParams: { step: 'step_1', reportId: report.report_id, edit: false }
+              queryParams: { step: 'step_1', reportId: report.report_id, edit: false, isFiled: isFiled }
             });
           }
       }, 1500);
@@ -1010,7 +1012,7 @@ public printReport(report: reportModel): void{
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
         this._router.navigate([`/forms/form/${formType}`], {
-          queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'receipts'  }
+          queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'receipts', isFiled: false  }
         });
       }, 1500);
     }
@@ -1612,5 +1614,14 @@ public printReport(report: reportModel): void{
         }          
       }
     )    
+  }
+  public isUpload() {
+    if (this.authService.isUploader() ||
+        this.authService.isAdmin() ||
+        this.authService.isCommitteeAdmin()
+    ) {
+        return true;
+    }
+    return false;
   }
 }

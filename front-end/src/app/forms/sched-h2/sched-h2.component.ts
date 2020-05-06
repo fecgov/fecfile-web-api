@@ -26,6 +26,7 @@ import { TransactionModel } from '../transactions/model/transaction.model';
 import { TransactionsMessageService } from '../transactions/service/transactions-message.service';
 import { GetTransactionsResponse, TransactionsService } from '../transactions/service/transactions.service';
 import { SchedH2Service } from './sched-h2.service';
+import {AuthService} from '../../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-sched-h2',
@@ -109,7 +110,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     private _schedHMessageServiceService: SchedHMessageServiceService,
     private _schedHService: SchedHServiceService,
     private _tranService: TransactionsService,
-    private _dlService: DialogService
+    private _dlService: DialogService,
+    _authService: AuthService,
   ) {
     super(
       _http,
@@ -132,7 +134,8 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
       _contributionDateValidator,
       _transactionsService,
       _reportsService,
-      _schedHMessageServiceService
+      _schedHMessageServiceService,
+      _authService,
     );
     _schedH2Service;
     _individualReceiptService;

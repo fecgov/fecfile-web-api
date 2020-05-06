@@ -169,7 +169,7 @@
 
                 <td class="bulk_action" >
                     <div *ngIf="isRecycleBinViewActive()">
-                        <button class="btn btn-sm btn-primary" (click)="restoreReport(report)">
+                        <button *ngIf="!authService.isReadOnly()" class="btn btn-sm btn-primary" (click)="restoreReport(report)">
                             <i class="undo-icon"></i>
                         </button>
                     </div>
@@ -184,16 +184,19 @@
 
 
                         <div id="forms__trx-dropdown-action1" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" (click)="editReport(report)">
+                            <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="editReport(report)">
                                 <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button *ngIf="authService.isReadOnly()" class="dropdown-item" (click)="viewReport(report)">
+                                <i class="fas fa-eye"></i> View
                             </button>
                             <button class="dropdown-item" (click)="printReport(report)">
                                 <i class="fas fa-print"></i> Print
                             </button>
-                            <button class="dropdown-item" (click)="uploadReport(report)">
+                            <button  *ngIf="isUpload()" class="dropdown-item" (click)="uploadReport(report)">
                                 <i class="fas fa-upload"></i> Upload
                             </button>
-                            <button class="dropdown-item" (click)="trashReport(report)">
+                            <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="trashReport(report)">
                                 <i class="fas fa-trash"></i> Trash
                             </button>
                         </div>
@@ -208,16 +211,22 @@
                         </button>
 
                         <div id="forms__trx-dropdown-action5" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
-                            <button *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item" (click)="editReport(report)">
+                            <button *ngIf="(report.amend_max === 'up' || report.amend_max === 'down')
+                             && !authService.isReadOnly()" class="dropdown-item"
+                                    (click)="editReport(report)">
                                 <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button *ngIf="authService.isReadOnly()" class="dropdown-item" (click)="viewReport(report)">
+                                <i class="fas fa-eye"></i> View
                             </button>
                             <button class="dropdown-item" (click)="printReport(report)">
                                 <i class="fas fa-print"></i> Print
                             </button>                            
-                            <button class="dropdown-item" (click)="uploadReport(report)">
+                            <button *ngIf="isUpload()" class="dropdown-item" (click)="uploadReport(report)">
                                 <i class="fas fa-upload"></i> Upload
                             </button>
-                            <button *ngIf="report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item" (click)="trashReport(report)">
+                            <button *ngIf="(report.amend_max === 'up' || report.amend_max === 'down') &&
+                                !authService.isReadOnly()" class="dropdown-item" (click)="trashReport(report)">
                                 <i class="fas fa-trash"></i> Trash
                             </button>
                         </div>
@@ -234,7 +243,7 @@
                             <button *ngIf="report.amend_ind === 'N' || report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item"  (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
-                            <button  *ngIf="report.amend_ind === 'N' ||report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item" (click)="amendReport(report)">
+                            <button  *ngIf="report.amend_ind === 'N' ||report.amend_max === 'up' || report.amend_max === 'down' && !authService.isReadOnly()" class="dropdown-item" (click)="amendReport(report)">
                                 <i class="fas fa-edit"></i> Amend
                             </button>
                             <button class="dropdown-item" (click)="downloadReport(report)">
@@ -274,16 +283,16 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action4" class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" (click)="editReport(report)">
+                            <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="editReport(report)">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button class="dropdown-item" (click)="printReport(report)">
                                 <i class="fas fa-print"></i> Print
                             </button>                            
-                            <button class="dropdown-item" (click)="uploadReport(report)">
+                            <button *ngIf="isUpload()" class="dropdown-item" (click)="uploadReport(report)">
                                 <i class="fas fa-upload"></i> Upload
                             </button>
-                            <button class="dropdown-item" (click)="trashReport(report)">
+                            <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="trashReport(report)">
                                 <i class="fas fa-trash"></i> Trash
                             </button>
                         </div>

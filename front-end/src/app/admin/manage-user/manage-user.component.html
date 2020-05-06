@@ -1,0 +1,201 @@
+<div class="manage-users-container" xmlns="http://www.w3.org/1999/html">
+    <hr>
+    <div class="committee-info">
+        <h2>Your Committee Information</h2><br>
+        <div class="row">
+            <div class="col-md-3">
+                <h4>{{accounts?.committeename}}</h4><br>
+                {{accounts?.street1}} <br>
+                <span *ngIf="accounts?.street2">{{accounts?.street2}} <br></span>
+                {{accounts?.city + ' ' + accounts?.state + ' ' + accounts?.zipcode}}<br>
+            </div>
+            <div class="col-md-3">
+                <h4> Treasurer:</h4> {{accounts?.treasurerfirstname + ' ' + accounts?.treasurerlastname}}<br>
+            </div>
+            <div class="col-md-3">
+                <h4> Email 1:</h4> {{accounts?.email_on_file ? accounts.email_on_file : 'NA'}}<br>
+                <h4> Email 2: </h4>{{accounts?.email_on_file1 ? accounts.email_on_file1 : 'NA'}}<br>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-3">
+                <h4>Website :</h4> {{accounts?.website ? accounts.website: 'NA'}}
+            </div>
+            <div class="col-md-3">
+                <h4>Telephone:</h4> {{accounts?.phone_number? phoneNumber(accounts?.phone_number): ' NA'}}
+            </div>
+            <div class="col-md-3">
+                <h4> Facsimile: </h4>{{accounts?.fax? phoneNumber(accounts?.fax) :  'NA'}}<br>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="add-user">
+        <h2>Add a User to Manage your Committee's Functions</h2><br>
+        <form [formGroup]="frmAddUser">
+            <div class="form-group radio">
+                <div class="col ">
+                    <h3>Role</h3> <br>
+                </div>
+                <div class="row">
+                    <div class="col col-md-2">
+                        <label>
+                            <input formControlName="role"
+                                   id="role-admin"
+                                   type="radio"
+                                   value="ADMIN">
+                            Admin</label>
+                    </div>
+                    <div class="col col-md-2">
+                        <label>
+                            <input formControlName="role"
+                                   id="role-entry"
+                                   type="radio"
+                                   value="ENTRY">
+                            Entry</label>
+                    </div>
+                    <div class="col col-md-2">
+                        <label>
+                            <input formControlName="role"
+                                   id="role-uploader"
+                                   type="radio"
+                                   value="UPLOADER">
+                            Uploader</label>
+                    </div>
+                    <div class="col col-md-2">
+                        <label>
+                            <input formControlName="role"
+                                   id="role-read-only"
+                                   type="radio"
+                                   value="READONLY">
+                            Read Only</label>
+                    </div>
+                </div>
+            </div>
+            <span *ngIf="frmAddUser.get('role').valid">
+                {{getSelectedRole()}}
+            </span>
+            <table class="user-input table table-borderless">
+                <thead>
+                <tr>
+                    <th style="text-align: left;">Basic Information</th>
+                    <th style="text-align: left;">Role Description</th>
+                </tr>
+                </thead>
+                <tbody class="user-data">
+                    <tr>
+                        <td class="basic-info" >
+                            <table class="basic-info">
+                                <tr>
+                                    <td class="label-info"><label>Last Name</label></td>
+                                    <td class="user-text">
+                                        <input formControlName="last_name"
+                                               placeholder="Enter Last Name"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('last_name')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label>First Name</label></td>
+                                    <td class="user-text"><input formControlName="first_name"
+                                               placeholder="Enter First Name"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('first_name')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label>Contact Number</label></td>
+                                    <td class="user-text"><input formControlName="contact"
+                                               placeholder="Enter Phone Number"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('contact')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label>Email Address</label></td>
+                                    <td class="user-text"><input formControlName="email"
+                                               placeholder="Enter Email Address"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('email')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="role-desc" >
+                            <b>Administrator</b>
+                                <ul>
+                                    <li>{{_roleDesc.admin}}</li>
+                                </ul>
+                            <b>Entry</b>
+                            <ul>
+                                 <li>{{_roleDesc.entry}}</li>
+                            </ul>
+                            <b>Uploader</b>
+                            <ul>
+                                <li>{{_roleDesc.uploader}}</li>
+                            </ul>
+                            <b>Read Only</b>
+                            <ul>
+                               <li>
+                                   {{_roleDesc.readonly}}
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="padding-left: 35px;">
+                <button (click)="addUser()"
+                    class="btn btn-primary">
+                   {{!isEdit ? 'Add User' : 'Save'}}
+                </button> &nbsp;
+                <button  (click)="clearForm()"
+                    class="btn btn-secondary-dark-gray">
+                    Clear Form
+                 </button>
+            </div>
+        </form>
+    </div>
+    <hr>
+    <div class="manage-users">
+        <h2>Manage Existing Users</h2>
+    <table sortable-table (sorted)="onSorted($event)" class="table table-bordered sort-true" style="width:80%">
+        <thead>
+        <th sortable-column="lastName">Last Name</th>
+        <th sortable-column="firstName">First Name</th>
+        <th sortable-column="email">Email Address</th>
+        <th sortable-column="role">Role</th>
+        <th sortable-column="isActive">Status</th>
+        <th>Action</th>
+        </thead>
+        <tbody>
+        <tr *ngFor="let user of users">
+            <td>{{user.lastName}}</td>
+            <td>{{user.firstName}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.role}}</td>
+            <td>{{user.status ? 'Active':'Inactive'}}</td>
+            <td>
+                <i class="fas fa-edit fa-2x" (click)="editUser(user)"></i>  &nbsp;
+                <i [ngClass]="getStatusClass(user.status)" (click)="toggleStatus(user)"></i> &nbsp;
+                <i class="fas fa-times-circle fa-2x" (click)="deleteUser(user)"></i>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+</div>

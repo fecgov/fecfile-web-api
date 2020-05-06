@@ -4,14 +4,13 @@ from .models import Account
 
 
 class AccountSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False)
-    confirm_password = serializers.CharField(write_only=True, required=False)
+    #password = serializers.CharField(write_only=True, required=False)
+    #confirm_password = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = Account
-        fields = ('id', 'email', 'username', 'created_at', 'updated_at',
-                   'tagline', 'password',
-                  'confirm_password',)
+        fields = ('id', 'email', 'username', 'first_name', 'last_name',
+                   'role', 'is_active')
         read_only_fields = ('created_at', 'updated_at',)
 
     def create(self, validated_data):

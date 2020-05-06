@@ -22,11 +22,40 @@
           </div>
         </div>
       </div>
+      <div class="grid-row form-field__info">
+        <div class="grid-row__col grid-row__col--3 title-name text-right">
+          <label class="left-text" for="login-email-id">
+            Email
+          </label>
+        </div>
+        <div class="grid-row__col grid-row__col--8">
+          <input
+          type="text"
+          class="login-email-id login-input"
+          id="login-email-id"
+          placeholder="Enter Email"
+          formControlName="emailId"
+          (keyup)="updateStatus()"
+          [ngClass]="{'': (!frm.get('emailId').invalid && frm.get('emailId').touched) || !loginEmailInputError,
+              'login-input-error':  (frm.get('emailId').invalid && frm.get('emailId').touched) || loginEmailInputError}"
+          />
+        <div
+                class="error"
+                *ngIf="(frm.get('emailId').invalid && frm.get('emailId').touched) || loginEmailInputError ">
+          <div class="error__email-id" *ngIf="frm.get('emailId').hasError('required')">
+            Please enter Email ID.
+          </div>
+          <div class="error__email-id" *ngIf="frm.get('emailId').hasError('email')">
+            Invalid Email Format.
+          </div>
+        </div>
+      </div>
+      </div>
 
       <div class="grid-row form-field__info">
-        <div class="grid-row__col grid-row__col--2 title-name text-right">
+        <div class="grid-row__col grid-row__col--3 title-name text-right">
           <label class="left-text" for="login-committee-id">
-            Username
+            Committee ID
           </label>
         </div>
         
@@ -36,7 +65,7 @@
             type="text"
             class="login-committee-id login-input"
             id="login-committee-id"
-            placeholder="Enter your Username"
+            placeholder="Enter Committee ID"
             formControlName="commiteeId"
             (keyup)="updateStatus()"
             [ngClass]="{'': (!frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || !committeeIdInputError,
@@ -44,10 +73,9 @@
           />
           <div
             class="error"
-            *ngIf="(frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || committeeIdInputError "
-          >
+            *ngIf="(frm.get('commiteeId').invalid && frm.get('commiteeId').touched) || committeeIdInputError ">
             <div class="error__committee-id" *ngIf="frm.get('commiteeId').hasError('required')">
-              Please enter your username.
+              Please enter Committee ID.
             </div>
           </div>
         </div>
@@ -57,7 +85,7 @@
       </div>
 
       <div class="grid-row form-field__info">
-        <div class="grid-row__col grid-row__col--2 title-name text-right">
+        <div class="grid-row__col grid-row__col--3 title-name text-right">
           <label class="left-text" for="login-password">
             Password
           </label>
@@ -108,16 +136,13 @@
         <div class="grid-row__col grid-row__col--5 link-text text-center">
                       
               <a class="forgot-password-link link" draggable="false" href="https://test-webforms.fec.gov/psa/index.htm" target="_blank">
-                  Forgot your Password
+                  Forgot Password?
               </a>
-              or
-              <a class="forgot-committee-id-link link" draggable="false" href="https://www.fec.gov/data/" target="_blank">
-                Username?
-            </a>   
+
         </div>        
         <div class="grid-row__col grid-row__col--7 link-text">
           <a class="need-to-register-link link" draggable="false" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">
-           Register
+           Create an Account
           </a>
         </div>
       </div>

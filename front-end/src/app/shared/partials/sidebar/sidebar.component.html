@@ -39,7 +39,7 @@
               *ngIf="(committee_form.category === 'My Forms')"
               [ngClass]="formType === committee_form.form_type_mini ? 'links-list__item--selected' : ''"
             >
-              <div class="list-item__link">
+              <div *ngIf="!_authService.isReadOnly()" class="list-item__link">
                 <a
                    draggable="false"
                   [routerLink]="['/forms/form/', committee_form.form_type_mini]"
@@ -49,6 +49,13 @@
                 {{committee_form.form_description}}
                 <br />
                 due {{committee_form.due_date}}
+                </a>
+              </div>
+              <div *ngIf="_authService.isReadOnly()" class="list-item__link">
+                <a draggable="false">
+                  {{committee_form.form_description}}
+                  <br />
+                  due {{committee_form.due_date}}
                 </a>
               </div>
               <div class="list-item__info">
