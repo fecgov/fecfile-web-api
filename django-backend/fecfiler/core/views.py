@@ -8518,7 +8518,7 @@ def amend_form1m(request_dict):
       _sql = """INSERT INTO public.form_1m(
             report_id, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
-            can5_id, can5_con, date_51, orig_date, metreq_date, delete_ind,
+            can5_id, can5_con, date_51, orig_date, metreq_date,
             create_date, last_update_date)
             SELECT %s, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
