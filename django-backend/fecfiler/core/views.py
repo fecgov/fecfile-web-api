@@ -7596,6 +7596,12 @@ def trash_restore_sql_report(cmte_id, report_id, _delete="Y"):
                     )
                 # commented by Mahendra 10052019
                 # print("report_type4", report_type)
+            if report_type == "F1M":
+                 cursor.execute(
+                    """UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(
+                        _delete, datetime.datetime.now(), cmte_id, report_id
+                    )
+                )
             if report_type == "F3X":
                 # form 3X report
                 cursor.execute(
