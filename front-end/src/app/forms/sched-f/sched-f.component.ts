@@ -26,6 +26,7 @@ import { schedFstaticFormFields } from './static-form-fields.json';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { SchedHMessageServiceService } from '../sched-h-service/sched-h-message-service.service';
+import {AuthService} from '../../shared/services/AuthService/auth.service';
 
 /**
  * Schedule F is a sub-transaction of Schedule D.
@@ -76,8 +77,9 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
     _transactionsMessageService: TransactionsMessageService,
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
-    _reportsService: ReportsService, 
-    _schedHMessageServce: SchedHMessageServiceService
+    _reportsService: ReportsService,
+    _schedHMessageServce: SchedHMessageServiceService,
+    _authService: AuthService,
   ) {
     super(
       _http,
@@ -99,8 +101,9 @@ export class SchedFComponent extends AbstractSchedule implements OnInit, OnDestr
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService, 
-      _schedHMessageServce
+      _reportsService,
+      _schedHMessageServce,
+      _authService,
     );
   }
 

@@ -25,6 +25,7 @@ import { GetTransactionsResponse, TransactionsService } from '../transactions/se
 import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
 import { SchedH6Model } from './sched-h6.model';
 import { SchedH6Service } from './sched-h6.service';
+import {AuthService} from '../../shared/services/AuthService/auth.service';
 
 
 @Component({
@@ -102,7 +103,8 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     private _tranService: TransactionsService,
     private _rt: Router,
     private _dlService: DialogService,
-    _schedHMessageServiceService: SchedHMessageServiceService
+    _schedHMessageServiceService: SchedHMessageServiceService,
+    _authService: AuthService,
     ) {
      super(
       _http,
@@ -125,7 +127,8 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
       _contributionDateValidator,
       _transactionsService,
       _reportsService,
-      _schedHMessageServiceService
+      _schedHMessageServiceService,
+      _authService,
     );
     _schedH6Service;
     _individualReceiptService;

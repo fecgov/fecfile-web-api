@@ -25,6 +25,7 @@ import { DialogService } from './../../../../shared/services/DialogService/dialo
 import { ContributionDateValidator } from './../../../../shared/utils/forms/validation/contribution-date.validator';
 import { IndividualReceiptComponent } from './../../individual-receipt/individual-receipt.component';
 import { ScheduleActions } from './../../individual-receipt/schedule-actions.enum';
+import {AuthService} from '../../../../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-sched-e',
@@ -88,7 +89,9 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     private _multistateValidator: MultiStateValidator,
     private _changeDetector: ChangeDetectorRef,
     private _schedEService: SchedEService,
-    _schedHMessageServiceService:SchedHMessageServiceService) {
+    _schedHMessageServiceService: SchedHMessageServiceService,
+     _authService: AuthService,
+  ) {
     super(
       _http,
       _fb,
@@ -110,7 +113,8 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       _contributionDateValidator,
       _transactionsService,
       _reportsService,
-      _schedHMessageServiceService
+      _schedHMessageServiceService,
+      _authService,
     );
 
     _messageService.getMessage().takeUntil(this._schedEonDestroy$).subscribe(message => {

@@ -24,6 +24,7 @@ import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { ScheduleActions } from './schedule-actions.enum';
 import { SchedHMessageServiceService } from '../../sched-h-service/sched-h-message-service.service';
+import {AuthService} from '../../../shared/services/AuthService/auth.service';
 
 export enum SaveActions {
   saveOnly = 'saveOnly',
@@ -73,8 +74,9 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
     _transactionsMessageService: TransactionsMessageService,
     _contributionDateValidator: ContributionDateValidator,
     _transactionsService: TransactionsService,
-    _reportsService: ReportsService, 
-     _schedHMessageServce: SchedHMessageServiceService
+    _reportsService: ReportsService,
+     _schedHMessageServce: SchedHMessageServiceService,
+    _authService: AuthService,
   ) {
     super(
       _http,
@@ -96,8 +98,9 @@ export class IndividualReceiptComponent extends AbstractSchedule implements OnIn
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService, 
-      _schedHMessageServce
+      _reportsService,
+      _schedHMessageServce,
+      _authService,
     );
 
     this.queryParamsSubscription = _activatedRoute.queryParams.takeUntil(this._onDestroy$).subscribe(p => {
