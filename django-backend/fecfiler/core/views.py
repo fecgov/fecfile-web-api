@@ -8437,7 +8437,6 @@ def create_amended_reports(request):
             cmte_id = request.user.username
 
             val_data = get_reports_data(reportid)
-
             if not val_data:
                 return Response(
                     "Given Report_id canot be amended",
@@ -8468,6 +8467,7 @@ def create_amended_reports(request):
                     )
             elif data.get('form_type') == 'F1M':
                 amend_form1m(data)
+                data_obj = data
             else:
                 raise Exception("""This form_type cannot be amended. 
                   form type provided: {}""".format(data.get('form_type')))
@@ -8481,9 +8481,10 @@ def create_amended_reports(request):
 
 def amend_form1m(request_dict):
     try:
+      report_flag = False
       report_dict = {}
       f1m_dict = {}
-      for key, value in request_dict:
+      for key, value in request_dict.items():
          if key in ['form_type', 'cmte_id', 'email_1', 'email_2']:
             report_dict[key] = value
       report_dict['previous_report_id'] = request_dict['report_id']
@@ -8491,12 +8492,12 @@ def amend_form1m(request_dict):
       report_dict["amend_number"] = (
           request_dict.get("amend_number") + 1 if request_dict.get("amend_number") else 1)
       report_dict["status"] = "Saved"
-      report_id = post_amend_f1m_report(report_dict)
+      report_flag, report_id = post_amend_f1m_report(report_dict)
       _sql = """INSERT INTO public.form_1m(
             report_id, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
-            can5_id, can5_con, date_51, orig_date, metreq_date, sign_id, 
-            sign_date, delete_ind, create_date, last_update_date)
+            can5_id, can5_con, date_51, orig_date, metreq_date, delete_ind,
+            create_date, last_update_date)
             SELECT %s, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
             can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s
@@ -8506,10 +8507,12 @@ def amend_form1m(request_dict):
       with connection.cursor() as cursor:
           cursor.execute(_sql,value_list)
           logger.debug("FORM-1M POST")
-          logger.debug(cursor.query)
+          # logger.debug(cursor.query)
           if cursor.rowcount == 0:
               raise Exception('Failed to insert data into form_1m table.')
     except Exception as e:
+        if report_flag:
+            remove_reports_f1m(report_id, report_dict['previous_report_id'])
         raise Exception("""The amend_form1m function is throwing an error: """ + str(e))
 
 def post_amend_f1m_report(request_dict):
@@ -8529,7 +8532,7 @@ def post_amend_f1m_report(request_dict):
                 key_string[:-2], param_string[:-2])
             cursor.execute(sql,value_list)
             logger.debug("REPORTS POST")
-            logger.debug(cursor.query)
+            # logger.debug(cursor.query)
             if cursor.rowcount == 0:
                 raise Exception('Failed to insert data into reports table.')
             _sql = """UPDATE public.reports SET superceded_report_id = %s WHERE report_id= %s"""
@@ -8537,9 +8540,22 @@ def post_amend_f1m_report(request_dict):
             if cursor.rowcount == 0:
                 raise Exception("""Failed to update superceded_report_id into reports 
                   table for report: {}""".format(request_dict['previous_report_id']))
-        return request_dict['report_id']
+        return True, request_dict['report_id']
     except Exception as e:
         raise Exception("""The post_amend_f1m_report function is throwing an error: """ + str(e))
+
+def remove_reports_f1m(delete_id, update_id):
+    try:
+        with connection.cursor() as cursor:
+            delete_sql = """DELETE FROM public.reports WHERE report_id=%s"""
+            update_sql = """UPDATE public.reports SET superceded_report_id=null WHERE report_id=%s"""
+            cursor.execute(delete_sql, [delete_id])
+            cursor.execute(update_sql, [update_id])
+            if cursor.rowcount == 0:
+                raise Exception("""Failed to update superceded_report_id into reports 
+                  table for report: {}""".format(update_id))
+    except Exception as e:
+        raise Exception("""The remove_reports_f1m function is throwing an error: """ + str(e))
 
 def none_text_to_none(text):
     try:
