@@ -472,6 +472,7 @@ def step4_reports_put(request):
 def submit_f1m_report(request):
 	try:
 		report_dict= {'status' : "Submitted"}
+		report_dict['filed_date'] = datetime.datetime.now()
 		report_dict['cmte_id'] = get_comittee_id(request.user.username)
 		report_dict['report_id'] = request.data['reportId']
 		return report_put(report_dict)

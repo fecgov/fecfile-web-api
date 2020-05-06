@@ -8339,7 +8339,7 @@ GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TE
 def get_reports_data(report_id):
     try:
         query_string = """SELECT * FROM public.reports WHERE report_id = %s 
-        AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL """
+        AND status = 'Submitted' AND superceded_report_id IS NULL """
         forms_obj = None
         # print('here',forms_obj)
         with connection.cursor() as cursor:
@@ -8459,34 +8459,40 @@ def create_amended_reports(request):
             cmte_id = get_comittee_id(request.user.username)
 
             val_data = get_reports_data(reportid)
-
             if not val_data:
                 return Response(
                     "Given Report_id canot be amended",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            data = val_data[0]
+            if data.get('form_type') == 'F3X':
+                cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
-            cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
+                # cdate = date.today()
+                from_date = cvg_start_date
+                data_obj = None
 
-            # cdate = date.today()
-            from_date = cvg_start_date
-            data_obj = None
+                report_id_list = get_report_ids(cmte_id, from_date)
 
-            report_id_list = get_report_ids(cmte_id, from_date)
+                print(report_id_list, from_date)
 
-            print(report_id_list, from_date)
+                if report_id_list:
+                    for i in report_id_list:
+                        amended_obj = create_amended(i)
+                        if str(i) == str(reportid):
+                            data_obj = amended_obj
 
-            if report_id_list:
-                for i in report_id_list:
-                    amended_obj = create_amended(i)
-                    if str(i) == str(reportid):
-                        data_obj = amended_obj
-
-                    # post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+                        # post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+                else:
+                    return Response(
+                        "Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST
+                    )
+            elif data.get('form_type') == 'F1M':
+                amend_form1m(data)
+                data_obj = data
             else:
-                return Response(
-                    "Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST
-                )
+                raise Exception("""This form_type cannot be amended. 
+                  form type provided: {}""".format(data.get('form_type')))
 
         return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
@@ -8495,6 +8501,83 @@ def create_amended_reports(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
+def amend_form1m(request_dict):
+    try:
+      report_flag = False
+      report_dict = {}
+      f1m_dict = {}
+      for key, value in request_dict.items():
+         if key in ['form_type', 'cmte_id', 'email_1', 'email_2']:
+            report_dict[key] = value
+      report_dict['previous_report_id'] = request_dict['report_id']
+      report_dict["amend_ind"] = "A"
+      report_dict["amend_number"] = (
+          request_dict.get("amend_number") + 1 if request_dict.get("amend_number") else 1)
+      report_dict["status"] = "Saved"
+      report_flag, report_id = post_amend_f1m_report(report_dict)
+      _sql = """INSERT INTO public.form_1m(
+            report_id, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
+            can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
+            can5_id, can5_con, date_51, orig_date, metreq_date, delete_ind,
+            create_date, last_update_date)
+            SELECT %s, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
+            can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
+            can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s
+            FROM public.form_1m WHERE cmte_id=%s AND report_id= %s"""
+      value_list = [report_id, datetime.datetime.now(), datetime.datetime.now(),
+            report_dict['cmte_id'], report_dict['previous_report_id']]
+      with connection.cursor() as cursor:
+          cursor.execute(_sql,value_list)
+          logger.debug("FORM-1M POST")
+          # logger.debug(cursor.query)
+          if cursor.rowcount == 0:
+              raise Exception('Failed to insert data into form_1m table.')
+    except Exception as e:
+        if report_flag:
+            remove_reports_f1m(report_id, report_dict['previous_report_id'])
+        raise Exception("""The amend_form1m function is throwing an error: """ + str(e))
+
+def post_amend_f1m_report(request_dict):
+    try:
+        request_dict['report_id'] = str(get_next_report_id())
+        request_dict['create_date'] = datetime.datetime.now()
+        request_dict['last_update_date'] = datetime.datetime.now()
+        value_list = []
+        key_string = ""
+        param_string = ""
+        for key, value in request_dict.items():
+            key_string += key+", "
+            param_string += "%s, "
+            value_list.append(value)
+        with connection.cursor() as cursor:
+            sql = """INSERT INTO public.{}({}) VALUES ({})""".format('reports', 
+                key_string[:-2], param_string[:-2])
+            cursor.execute(sql,value_list)
+            logger.debug("REPORTS POST")
+            # logger.debug(cursor.query)
+            if cursor.rowcount == 0:
+                raise Exception('Failed to insert data into reports table.')
+            _sql = """UPDATE public.reports SET superceded_report_id = %s WHERE report_id= %s"""
+            cursor.execute(_sql, [request_dict['report_id'], request_dict['previous_report_id']])
+            if cursor.rowcount == 0:
+                raise Exception("""Failed to update superceded_report_id into reports 
+                  table for report: {}""".format(request_dict['previous_report_id']))
+        return True, request_dict['report_id']
+    except Exception as e:
+        raise Exception("""The post_amend_f1m_report function is throwing an error: """ + str(e))
+
+def remove_reports_f1m(delete_id, update_id):
+    try:
+        with connection.cursor() as cursor:
+            delete_sql = """DELETE FROM public.reports WHERE report_id=%s"""
+            update_sql = """UPDATE public.reports SET superceded_report_id=null WHERE report_id=%s"""
+            cursor.execute(delete_sql, [delete_id])
+            cursor.execute(update_sql, [update_id])
+            if cursor.rowcount == 0:
+                raise Exception("""Failed to update superceded_report_id into reports 
+                  table for report: {}""".format(update_id))
+    except Exception as e:
+        raise Exception("""The remove_reports_f1m function is throwing an error: """ + str(e))
 
 def none_text_to_none(text):
     try:
