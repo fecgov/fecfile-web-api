@@ -217,11 +217,14 @@
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <div class="forms__btn-container">
-                <button type="submit" class="btn btn-primary btn-right" 
+                <button *ngIf="scheduleAction !== 'view'" type="submit" class="btn btn-primary btn-right"
                   [disabled]="!f.valid || (h1PacADDisabled && h1PacGVDisabled && h1PacPCDisabled) || pacSaveDisable"
                   (click)="saveH1(f)">
                     Save
                   </button>
+<!--                  <div *ngIf="scheduleAction === 'view'">-->
+<!--                      <button type="button" class="btn btn-outline-dark btn-right" (click)="close()">Close</button>-->
+<!--                  </div>-->
               </div>
             </div>
           </div>

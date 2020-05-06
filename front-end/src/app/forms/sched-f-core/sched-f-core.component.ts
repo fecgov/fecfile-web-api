@@ -160,27 +160,35 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
    * Proceed to 2nd part of the payment.
    */
   public next() {
-    const radioName = 'coordinated_exp_ind';
+    if (this.editMode === true) {
+      const radioName = 'coordinated_exp_ind';
 
-    if (this._checkFormFieldIsValid(radioName) &&
-        this.frmIndividualReceipt.get(radioName).value === 'Y' ) {
-      if (!this._checkFormFieldIsValid('designating_cmte_id') && this.isDesignatedFiler) {
-        return;
+      if (this._checkFormFieldIsValid(radioName) &&
+          this.frmIndividualReceipt.get(radioName).value === 'Y') {
+        if (!this._checkFormFieldIsValid('designating_cmte_id') && this.isDesignatedFiler) {
+          return;
+        }
+        if (!this._checkFormFieldIsValid('designating_cmte_name') && this.isDesignatedFiler) {
+          return;
+        }
       }
-      if (!this._checkFormFieldIsValid('designating_cmte_name') && this.isDesignatedFiler) {
-        return;
+
+      this._setDesignatedValidators();
+
+      if (this.frmIndividualReceipt.get(radioName).value === null) {
+        this.removeValidation(radioName);
       }
     }
-
-    this._setDesignatedValidators();
-
-    if ( this.frmIndividualReceipt.get(radioName).value === null ) { this.removeValidation(radioName); }
     this.showPart2 = true;
   }
   /**
    * Return to the first part of the payment.
    */
   public back() {
+    if (this.editMode === false) {
+      this.showPart2 = false;
+      return;
+    }
     if ( this.subTransactionInfo && this.subTransactionInfo.isParent === false) {
       this.clearFormValues();
       this.showPart2 = true;

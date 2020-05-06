@@ -458,7 +458,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit
-      ? this._activatedRoute.snapshot.queryParams.edit
+      ? this._activatedRoute.snapshot.queryParams.edit.toLowerCase() === 'true'
       : true;
     localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');

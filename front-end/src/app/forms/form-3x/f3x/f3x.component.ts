@@ -68,7 +68,7 @@ export class F3xComponent implements OnInit, OnDestroy {
   public forceChangeDetectionFDebtPayment: Date;
   public forceChangeDetectionDebtSummary: Date;
   public forceChangeDetectionH1: Date;
-
+  public formView: boolean = false;
   public allTransactions: boolean = false;
 
   private _step: string = '';
@@ -478,11 +478,23 @@ export class F3xComponent implements OnInit, OnDestroy {
                   }
                 }
               }
+              // TODO: as of now VIEW not working for loans sched c 05/06/20
+              if (apiCall && apiCall === '/sc/schedC') {
+                // use a schedC specific field to reduce unwanted change detection in Sched C.
+                // this.step = 'loan';
+                this.scheduleType = 'sched_c';
+                this.scheduleCAction = ScheduleActions.edit;
+                this.transactionDetailSchedC = e.transactionDetail.transactionModel;
+                this.formView = true;
+              } else {
+              // assuming e.scheduleType is set already
+              const scheduleComponentIdentifier = this.extractScheduleCompIdentifier(apiCall, e.scheduleType);
 
-              this._populateFormForView(e, AbstractScheduleParentEnum.schedMainComponent);
+              this._populateFormForView(e, scheduleComponentIdentifier);
               const transactionModel: TransactionModel = e.transactionDetail.transactionModel;
               transactionTypeText = transactionModel.type;
               transactionType = transactionModel.transactionTypeIdentifier;
+            }
             } else {
               transactionTypeText = e.transactionTypeText ? e.transactionTypeText : '';
               transactionType = e.transactionType ? e.transactionType : '';
@@ -925,30 +937,30 @@ export class F3xComponent implements OnInit, OnDestroy {
   private _handleScheduleH(transaction: any): boolean {
     let transactionDetail = transaction.transactionDetail;
     let finish = false;
-
+    const scheduleAction = transaction.action  === 'view' ? ScheduleActions.view : ScheduleActions.edit;
     if (this.scheduleType === 'Schedule H1') {
       this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
-      this.scheduleAction = ScheduleActions.edit;
+      this.scheduleAction = scheduleAction;
       this.scheduleType = 'sched_h1';
       finish = true; //since h1 is not extending abstract schedule, it is being handled differently
     } else if (this.scheduleType === 'Schedule H2') {
-      this.scheduleAction = ScheduleActions.edit;
+      this.scheduleAction = scheduleAction;
       this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
       this.scheduleType = 'sched_h2';
     } else if (this.scheduleType === 'Schedule H3') {
-      this.scheduleAction = ScheduleActions.edit;
+      this.scheduleAction = scheduleAction;
       this.transactionType = 'ALLOC_H3_RATIO';
       this.scheduleType = 'sched_h3';
     } else if (this.scheduleType === 'Schedule H4') {
-      this.scheduleAction = ScheduleActions.edit;
+      this.scheduleAction = scheduleAction;
       this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
       this.scheduleType = 'sched_h4';
     } else if (this.scheduleType === 'Schedule H5') {
-      this.scheduleAction = ScheduleActions.edit;
+      this.scheduleAction = scheduleAction;
       this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
       this.scheduleType = 'sched_h5';
     } else if (this.scheduleType === 'Schedule H6') {
-      this.scheduleAction = ScheduleActions.edit;
+      this.scheduleAction = scheduleAction;
       this.transactionType = transactionDetail.transactionModel.transactionTypeIdentifier;
       this.scheduleType = 'sched_h6';
     }
@@ -1133,6 +1145,7 @@ export class F3xComponent implements OnInit, OnDestroy {
           this.step = this._step;
           queryParamsObj.step = this.step;
           queryParamsObj.showPart2 = this.showPart2;
+          queryParamsObj.formView = this.formView;
           if (this._cloned) {
             queryParamsObj.cloned = this._cloned;
             this._router.navigate([`/forms/form/${this.formType}`], {
@@ -1186,5 +1199,22 @@ export class F3xComponent implements OnInit, OnDestroy {
       });
     });
     return '';
+  }
+
+  private extractScheduleCompIdentifier(apiCall: string, scheduleType: string) {
+    let schCompIdentifier;
+    if ( apiCall === '/se/schedE') {
+      schCompIdentifier =   AbstractScheduleParentEnum.schedEComponent;
+    } else  if (apiCall === '/sf/schedF') {
+        if (scheduleType === 'sched_f_core') {
+          schCompIdentifier =  AbstractScheduleParentEnum.schedFCoreComponent;
+        } else {
+          schCompIdentifier = AbstractScheduleParentEnum.schedFComponent;
+        }
+    } else {
+      schCompIdentifier = AbstractScheduleParentEnum.schedMainComponent;
+    }
+
+    return schCompIdentifier;
   }
 }
