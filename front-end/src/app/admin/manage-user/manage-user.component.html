@@ -101,15 +101,36 @@
                                 </tr>
                                 <tr>
                                     <td><label>First Name</label></td>
-                                    <td><input formControlName="first_name" placeholder="Enter First Name" type="text"></td>
+                                    <td class="user-text"><input formControlName="first_name"
+                                               placeholder="Enter First Name"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('first_name')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><label>Contact Number</label></td>
-                                    <td><input formControlName="contact" placeholder="Enter Phone Number" type="text"></td>
+                                    <td class="user-text"><input formControlName="contact"
+                                               placeholder="Enter Phone Number"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('contact')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><label>Email Address</label></td>
-                                    <td><input formControlName="email" placeholder="Enter Email Address" type="text"></td>
+                                    <td class="user-text"><input formControlName="email"
+                                               placeholder="Enter Email Address"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('email')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
                                 </tr>
                             </table>
                         </td>
