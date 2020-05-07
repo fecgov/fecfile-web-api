@@ -5,7 +5,7 @@ import requests
 # from functools import lru_cache
 from django.db import connection
 from fecfiler.core.transaction_util import do_transaction
-from fecfiler.core.views import cmte_type
+from fecfiler.core.views import cmte_type, update_F3X
 
 
 # from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
@@ -1830,7 +1830,7 @@ def list_all_transactions_entity(
             "The list_all_transactions_entity function is throwing an error: " + str(e)
         )
 
-
+@update_F3X
 def update_sa_itmization_status(data, item_status=None):
     """
     helpder function for force itemization
@@ -1861,7 +1861,7 @@ def update_sa_itmization_status(data, item_status=None):
             raise Exception(
                 "update itemization status failed for {}".format(transaction_id)
             )
-
+    return data
 
 def get_linenumber_itemization(
     transaction_type_identifier, aggregate_amount, itemization_value, line_number

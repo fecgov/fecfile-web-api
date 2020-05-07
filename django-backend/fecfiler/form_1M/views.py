@@ -473,7 +473,8 @@ def step4_reports_put(request):
 def submit_f1m_report(request):
 	try:
 		report_dict= {'status' : "Submitted"}
-		report_dict['cmte_id'] = request.user.username
+		report_dict['filed_date'] = datetime.datetime.now()
+		report_dict['cmte_id'] = get_comittee_id(request.user.username)
 		report_dict['report_id'] = request.data['reportId']
 		return report_put(report_dict)
 	except Exception as e:
@@ -730,12 +731,12 @@ def form1M(request):
 
 			# both step4 POST
 			elif step == 'submit':
-				noneCheckMissingParameters(['sign', 'submission_date', 'reportId',
-					'filingPassword'],
-					checking_dict=request.data, value_dict=request.data,
+
+				noneCheckMissingParameters(['sign', 'submission_date', 'reportId'], 
+					checking_dict=request.data, value_dict=request.data, 
 					function_name='form1M-POST: step-4 SUBMIT')
-				password = request.data['filingPassword']
-				password_authenticate(cmte_id, password)
+				# password = request.data['filingPassword']
+				# password_authenticate(cmte_id, password)
 				request_dict = f1m_sql_dict(cmte_id, step, request.data)
 				check_report_id_status(cmte_id, request_dict['report_id'])
 				previous_f1m_dict = get_sql_f1m(request_dict)
@@ -1028,7 +1029,7 @@ def delete_candidate_f1m(request):
 	try:
 		is_read_only_or_filer_reports(request)
 		try:
-			cmte_id = request.user.username
+			cmte_id = get_comittee_id(request.user.username)
 			noneCheckMissingParameters(['reportId',	'candidate_number'],
 				checking_dict=request.query_params, value_dict=request.query_params,
 				function_name='delete_candidate_f1m')

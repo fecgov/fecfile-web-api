@@ -272,7 +272,7 @@
       </section>
       <section class="paragraph" *ngIf="qualificationData && qualificationData.candidates && qualificationData.candidates.length > 0">
         <hr/>
-        <app-f1m-candidates-table [candidatesData]="qualificationData.candidates" [scheduleAction]="scheduleAction">
+        <app-f1m-candidates-table [candidatesData]="qualificationData.candidates" [scheduleAction]="scheduleAction" [reportId]="reportId">
         </app-f1m-candidates-table>
       </section>
     </form>

@@ -22,7 +22,7 @@ export class AppComponent implements OnInit, OnDestroy{
   routerEventsSubscription: any;
   
   timeStart = false;
-  seconds = 1200;
+  seconds = 780;
 
   clientX = 0;
   clientY = 0;
@@ -132,7 +132,7 @@ export class AppComponent implements OnInit, OnDestroy{
 
   stop() {
     this.userIdle.stopTimer();
-    this.seconds = 1200;
+    this.seconds = 780;
     this.timeStart = false;
   }
 

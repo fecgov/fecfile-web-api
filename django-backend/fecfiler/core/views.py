@@ -1217,7 +1217,6 @@ def post_reports(data, reportid=None):
                         data.get("cvg_end_dt"),
                         data.get("coh_bop"),
                     )
-                    function_to_call_wrapper_update_F3X(report_id, data.get("cmte_id"))
                     # print('here3')
                 # print('here3.5')
                 output = get_reports(data)
@@ -1733,51 +1732,45 @@ def reports(request):
                 else:
                     additional_email_1 = None
 
-                if "additional_email_2" in request.data:
-                    additional_email_2 = check_email(request.data.get("additional_email_2"))
-                else:
-                    additional_email_2 = None
+              if "additional_email_2" in request.data:
+                  additional_email_2 = check_email(request.data.get("additional_email_2"))
+              else:
+                  additional_email_2 = None
 
-                datum = {
-                    "cmte_id": get_comittee_id(request.user.username),
-                    "form_type": request.data.get("form_type", None),
-                    "amend_ind": amend_ind,
-                    "report_type": request.data.get("report_type", None),
-                    "election_code": election_code,
-                    "date_of_election": date_format(request.data.get("date_of_election")),
-                    "state_of_election": request.data.get("state_of_election", None),
-                    "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
-                    "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
-                    "due_dt": date_format(request.data.get("due_dt")),
-                    "coh_bop": int(request.data.get("coh_bop")),
-                    "status": f_status,
-                    "email_1": email_1,
-                    "email_2": email_2,
-                    "additional_email_1": additional_email_1,
-                    "additional_email_2": additional_email_2,
-                }
-                data = post_reports(datum)
-                if type(data) is dict:
-                    # print(data)
-                    # do h1 carryover if new report created
-                    do_h1_carryover(data.get("cmteid"), data.get("reportid"))
-                    do_h2_carryover(data.get("cmteid"), data.get("reportid"))
-                    do_loan_carryover(data.get("cmteid"), data.get("reportid"))
-                    do_debt_carryover(data.get("cmteid"), data.get("reportid"))
-                    do_levin_carryover(data.get("cmteid"), data.get("reportid"))
-
-                    return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
-                elif type(data) is list:
-                    return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
-                else:
-                    raise Exception(
-                        "The output returned from post_reports function is neither dict nor list"
-                    )
-            except Exception as e:
-                logger.debug(e)
-                return Response(
-                    "The reports API - POST is throwing  an error: " + str(e),
-                    status=status.HTTP_400_BAD_REQUEST,
+              datum = {
+                  "cmte_id": get_comittee_id(request.user.username),
+                  "form_type": request.data.get("form_type", None),
+                  "amend_ind": amend_ind,
+                  "report_type": request.data.get("report_type", None),
+                  "election_code": election_code,
+                  "date_of_election": date_format(request.data.get("date_of_election")),
+                  "state_of_election": request.data.get("state_of_election", None),
+                  "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
+                  "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
+                  "due_dt": date_format(request.data.get("due_dt")),
+                  "coh_bop": int(request.data.get("coh_bop")),
+                  "status": f_status,
+                  "email_1": email_1,
+                  "email_2": email_2,
+                  "additional_email_1": additional_email_1,
+                  "additional_email_2": additional_email_2,
+              }
+              data = post_reports(datum)
+              if type(data) is dict:
+                  # print(data)
+                  # do h1 carryover if new report created
+                  do_h1_carryover(data.get("cmteid"), data.get("reportid"))
+                  do_h2_carryover(data.get("cmteid"), data.get("reportid"))
+                  do_loan_carryover(data.get("cmteid"), data.get("reportid"))
+                  do_debt_carryover(data.get("cmteid"), data.get("reportid"))
+                  do_levin_carryover(data.get("cmteid"), data.get("reportid"))
+                  function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
+                  return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
+              elif type(data) is list:
+                  return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+              else:
+                  raise Exception(
+                      "The output returned from post_reports function is neither dict nor list"
                 )
 
         """
@@ -5499,35 +5492,66 @@ GET THIRD NAVIGATION TRANSACTION TYPES VALUES API - CORE APP - SPRINT 13 - FNE 1
 ******************************************************************************************************************************
 """
 
-
-def loansanddebts(report_id, cmte_id):
+def loansanddebts(report_list, cmte_id):
     try:
         loans_sc_sql = """SELECT ((SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
         WHERE transaction_type_identifier = 'LOANS_OWED_BY_CMTE' AND memo_code IS NULL 
-        AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y') - 
-        (SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
-        WHERE transaction_type_identifier = 'LOANS_OWED_TO_CMTE' AND memo_code IS NULL 
-        AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y')) AS loans"""
-
-        error_message_sc = "The loans sql is throwing an error for sched_c table: "
-
-        loans_sd_sql = """SELECT ((SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
-        WHERE transaction_type_identifier = 'DEBT_TO_VENDOR' AND cmte_id = %s AND report_id = %s 
-        AND delete_ind is distinct from 'Y') -
+        AND cmte_id = %s AND report_id in ('{0}') AND delete_ind is distinct from 'Y') 
+        +
         (SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
-        WHERE transaction_type_identifier = 'DEBT_BY_VENDOR' AND cmte_id = %s AND report_id = %s 
-        AND delete_ind is distinct from 'Y')) AS debts"""
+        WHERE transaction_type_identifier = 'DEBT_TO_VENDOR' AND cmte_id = %s AND report_id in ('{0}') 
+        AND delete_ind is distinct from 'Y')) AS by_cmte""".format("', '".join(report_list))
 
-        error_message_sd = "The debts sql is throwing an error for sched_d table: "
+        error_message_sc = "The by_cmte sql is throwing an error: "
 
-        value_list = [cmte_id, report_id, cmte_id, report_id]
-        output = (
+        loans_sd_sql = """SELECT ((SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
+        WHERE transaction_type_identifier = 'LOANS_OWED_TO_CMTE' AND memo_code IS NULL 
+        AND cmte_id = %s AND report_id in ('{0}') AND delete_ind is distinct from 'Y')
+        +
+        (SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
+        WHERE transaction_type_identifier = 'DEBT_BY_VENDOR' AND cmte_id = %s AND report_id in ('{0}')
+        AND delete_ind is distinct from 'Y')) AS to_cmte""".format("', '".join(report_list))
+
+        error_message_sd = "The to_cmte sql is throwing an error: "
+
+        value_list = [cmte_id, cmte_id]
+        output = [
                 loans_sql(loans_sc_sql, value_list, error_message_sc)[0]
-                + loans_sql(loans_sd_sql, value_list, error_message_sd)[0]
-        )
+                ,loans_sql(loans_sd_sql, value_list, error_message_sd)[0]
+        ]
+        print(output)
         return output
     except Exception as e:
         raise Exception("The loansanddebts function is throwing an error" + str(e))
+
+# def loansanddebts(report_id, cmte_id):
+#     try:
+#         loans_sc_sql = """SELECT ((SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
+#         WHERE transaction_type_identifier = 'LOANS_OWED_BY_CMTE' AND memo_code IS NULL 
+#         AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y') - 
+#         (SELECT COALESCE(SUM(loan_balance), 0.0) FROM public.sched_c 
+#         WHERE transaction_type_identifier = 'LOANS_OWED_TO_CMTE' AND memo_code IS NULL 
+#         AND cmte_id = %s AND report_id = %s AND delete_ind is distinct from 'Y')) AS loans"""
+
+#         error_message_sc = "The loans sql is throwing an error for sched_c table: "
+
+#         loans_sd_sql = """SELECT ((SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
+#         WHERE transaction_type_identifier = 'DEBT_TO_VENDOR' AND cmte_id = %s AND report_id = %s 
+#         AND delete_ind is distinct from 'Y') -
+#         (SELECT COALESCE(SUM(balance_at_close), 0.0) FROM public.sched_d 
+#         WHERE transaction_type_identifier = 'DEBT_BY_VENDOR' AND cmte_id = %s AND report_id = %s 
+#         AND delete_ind is distinct from 'Y')) AS debts"""
+
+#         error_message_sd = "The debts sql is throwing an error for sched_d table: "
+
+#         value_list = [cmte_id, report_id, cmte_id, report_id]
+#         output = (
+#                 loans_sql(loans_sc_sql, value_list, error_message_sc)[0]
+#                 + loans_sql(loans_sd_sql, value_list, error_message_sd)[0]
+#         )
+#         return output
+#     except Exception as e:
+#         raise Exception("The loansanddebts function is throwing an error" + str(e))
 
 
 def getthirdnavamounts(cmte_id, report_id):
@@ -5635,7 +5659,12 @@ def get_thirdNavigationTransactionTypes(request):
         # period_receipt, period_disbursement, report_balance = getthirdnavamounts(
         #     cmte_id, report_id
         # )
-        loans_and_debts = loansanddebts(report_id, cmte_id)
+
+        # report_list = superceded_report_id_list(report_id)
+        # print(report_list)
+        # loans_and_debts = loansanddebts(report_list, cmte_id)
+
+        # loans_and_debts = loansanddebts(report_id, cmte_id)
 
         # coh_bop = prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id)
         # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
@@ -5648,10 +5677,18 @@ def get_thirdNavigationTransactionTypes(request):
         #                 'Others': 0,
         #                 'COH': coh_cop}
 
+        # forms_obj = {
+        #     "Receipts": output_dict['ttl_receipts_sum_page_per'],
+        #     "Disbursements": output_dict['ttl_disb_sum_page_per'],
+        #     "Loans/Debts": loans_and_debts[0]-loans_and_debts[1],
+        #     "Others": 0,
+        #     "COH": output_dict['coh_cop'],
+        # }
+
         forms_obj = {
             "Receipts": output_dict['ttl_receipts_sum_page_per'],
             "Disbursements": output_dict['ttl_disb_sum_page_per'],
-            "Loans/Debts": loans_and_debts,
+            "Loans/Debts": output_dict['debts_owed_by_cmte'] - output_dict['debts_owed_to_cmte'],
             "Others": 0,
             "COH": output_dict['coh_cop'],
         }
@@ -7627,6 +7664,12 @@ def trash_restore_sql_report(cmte_id, report_id, _delete="Y"):
                     )
                 # commented by Mahendra 10052019
                 # print("report_type4", report_type)
+            if report_type == "F1M":
+                 cursor.execute(
+                    """UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(
+                        _delete, datetime.datetime.now(), cmte_id, report_id
+                    )
+                )
             if report_type == "F3X":
                 # form 3X report
                 cursor.execute(
@@ -8340,7 +8383,7 @@ GET REPORTS AMENDENT API- CORE APP - SPRINT 22 - FNE 1547 - BY YESWANTH KUMAR TE
 def get_reports_data(report_id):
     try:
         query_string = """SELECT * FROM public.reports WHERE report_id = %s 
-        AND status = 'Submitted' AND form_type = 'F3X' AND superceded_report_id IS NULL """
+        AND status = 'Submitted' AND superceded_report_id IS NULL """
         forms_obj = None
         # print('here',forms_obj)
         with connection.cursor() as cursor:
@@ -8461,15 +8504,15 @@ def create_amended_reports(request):
                 reportid = request.POST.get("report_id")
                 cmte_id = get_comittee_id(request.user.username)
 
-                val_data = get_reports_data(reportid)
-
-                if not val_data:
-                    return Response(
-                        "Given Report_id canot be amended",
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-                cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
+              val_data = get_reports_data(reportid)
+              if not val_data:
+                  return Response(
+                      "Given Report_id canot be amended",
+                      status=status.HTTP_400_BAD_REQUEST,
+                  )
+              data = val_data[0]
+              if data.get('form_type') == 'F3X':
+                  cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
                 # cdate = date.today()
                 from_date = cvg_start_date
@@ -8491,6 +8534,13 @@ def create_amended_reports(request):
                         "Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST
                     )
 
+            elif data.get('form_type') == 'F1M':
+                output_dict = amend_form1m(data)
+                data_obj = {**data, **output_dict}
+            else:
+                raise Exception("""This form_type cannot be amended. 
+                  form type provided: {}""".format(data.get('form_type')))
+
             return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             return Response(
@@ -8501,6 +8551,84 @@ def create_amended_reports(request):
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
+def amend_form1m(request_dict):
+    try:
+      report_flag = False
+      report_dict = {}
+      f1m_dict = {}
+      for key, value in request_dict.items():
+         if key in ['form_type', 'cmte_id', 'email_1', 'email_2']:
+            report_dict[key] = value
+      report_dict['previous_report_id'] = request_dict['report_id']
+      report_dict["amend_ind"] = "A"
+      report_dict["amend_number"] = (
+          request_dict.get("amend_number") + 1 if request_dict.get("amend_number") else 1)
+      report_dict["status"] = "Saved"
+      report_flag, output_dict = post_amend_f1m_report(report_dict)
+      _sql = """INSERT INTO public.form_1m(
+            report_id, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
+            can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
+            can5_id, can5_con, date_51, orig_date, metreq_date,
+            create_date, last_update_date)
+            SELECT %s, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
+            can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
+            can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s
+            FROM public.form_1m WHERE cmte_id=%s AND report_id= %s"""
+      value_list = [output_dict['report_id'], datetime.datetime.now(), datetime.datetime.now(),
+            report_dict['cmte_id'], report_dict['previous_report_id']]
+      with connection.cursor() as cursor:
+          cursor.execute(_sql,value_list)
+          logger.debug("FORM-1M POST")
+          # logger.debug(cursor.query)
+          if cursor.rowcount == 0:
+              raise Exception('Failed to insert data into form_1m table.')
+      return output_dict
+    except Exception as e:
+        if report_flag:
+            remove_reports_f1m(output_dict['report_id'], report_dict['previous_report_id'])
+        raise Exception("""The amend_form1m function is throwing an error: """ + str(e))
+
+def post_amend_f1m_report(request_dict):
+    try:
+        request_dict['report_id'] = str(get_next_report_id())
+        request_dict['create_date'] = datetime.datetime.now()
+        request_dict['last_update_date'] = datetime.datetime.now()
+        value_list = []
+        key_string = ""
+        param_string = ""
+        for key, value in request_dict.items():
+            key_string += key+", "
+            param_string += "%s, "
+            value_list.append(value)
+        with connection.cursor() as cursor:
+            sql = """INSERT INTO public.{}({}) VALUES ({})""".format('reports', 
+                key_string[:-2], param_string[:-2])
+            cursor.execute(sql,value_list)
+            logger.debug("REPORTS POST")
+            # logger.debug(cursor.query)
+            if cursor.rowcount == 0:
+                raise Exception('Failed to insert data into reports table.')
+            _sql = """UPDATE public.reports SET superceded_report_id = %s WHERE report_id= %s"""
+            cursor.execute(_sql, [request_dict['report_id'], request_dict['previous_report_id']])
+            if cursor.rowcount == 0:
+                raise Exception("""Failed to update superceded_report_id into reports 
+                  table for report: {}""".format(request_dict['previous_report_id']))
+        return True, request_dict
+    except Exception as e:
+        raise Exception("""The post_amend_f1m_report function is throwing an error: """ + str(e))
+
+def remove_reports_f1m(delete_id, update_id):
+    try:
+        with connection.cursor() as cursor:
+            delete_sql = """DELETE FROM public.reports WHERE report_id=%s"""
+            update_sql = """UPDATE public.reports SET superceded_report_id=null WHERE report_id=%s"""
+            cursor.execute(delete_sql, [delete_id])
+            cursor.execute(update_sql, [update_id])
+            if cursor.rowcount == 0:
+                raise Exception("""Failed to update superceded_report_id into reports 
+                  table for report: {}""".format(update_id))
+    except Exception as e:
+        raise Exception("""The remove_reports_f1m function is throwing an error: """ + str(e))
 
 def none_text_to_none(text):
     try:
@@ -9843,27 +9971,29 @@ def update_f3x_details(report_id, cmte_id):
         ytd_result_dict = F3X_values(cmte_id, ytd_report_list, True)
         output_dict = {**result_dict, **ytd_result_dict}
 
-        sd_line_number_list = ["10", "9"]
-        for sd_line in sd_line_number_list:
-            # _sql_sched_d = """SELECT COALESCE(SUM(COALESCE(beginning_balance,0.0)+COALESCE(incurred_amount,0.0)),0.0)
-            #                   FROM public.sched_d WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
-            #                   AND cmte_id = %s AND report_id = %s """
-            _sql_sched_d = """ SELECT COALESCE((
-                            (SELECT COALESCE(SUM(beginning_balance),0.0) FROM public.sched_d 
-                            WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
-                            AND cmte_id = %s AND report_id = %s AND back_ref_transaction_id IS NULL) + 
-                            (SELECT COALESCE(SUM(incurred_amount),0.0) FROM public.sched_d 
-                            WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
-                            AND cmte_id = %s AND report_id = %s)),0.0)"""
-            _sd_values = [sd_line, cmte_id, report_id, sd_line, cmte_id, report_id]
+        # sd_line_number_list = ["10", "9"]
+        # for sd_line in sd_line_number_list:
+        #     # _sql_sched_d = """SELECT COALESCE(SUM(COALESCE(beginning_balance,0.0)+COALESCE(incurred_amount,0.0)),0.0)
+        #     #                   FROM public.sched_d WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
+        #     #                   AND cmte_id = %s AND report_id = %s """
+        #     _sql_sched_d = """ SELECT COALESCE((
+        #                     (SELECT COALESCE(SUM(beginning_balance),0.0) FROM public.sched_d 
+        #                     WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
+        #                     AND cmte_id = %s AND report_id = %s AND back_ref_transaction_id IS NULL) + 
+        #                     (SELECT COALESCE(SUM(incurred_amount),0.0) FROM public.sched_d 
+        #                     WHERE line_num = %s AND delete_ind IS DISTINCT FROM 'Y' 
+        #                     AND cmte_id = %s AND report_id = %s)),0.0)"""
+        #     _sd_values = [sd_line, cmte_id, report_id, sd_line, cmte_id, report_id]
 
-            with connection.cursor() as cursor:
-                cursor.execute(_sql_sched_d, _sd_values)
-                if sd_line == "10":
-                    output_dict['debts_owed_by_cmte'] = cursor.fetchone()[0]
-                else:
-                    output_dict['debts_owed_to_cmte'] = cursor.fetchone()[0]
-
+        #     with connection.cursor() as cursor:
+        #         cursor.execute(_sql_sched_d, _sd_values)
+        #         if sd_line == "10":
+        #             output_dict['debts_owed_by_cmte'] = cursor.fetchone()[0]
+        #         else:
+        #             output_dict['debts_owed_to_cmte'] = cursor.fetchone()[0]
+        debts_and_loans = loansanddebts(report_list, cmte_id)
+        output_dict['debts_owed_by_cmte'] = debts_and_loans[0]
+        output_dict['debts_owed_to_cmte'] = debts_and_loans[1]
         output_dict['coh_bop'] = prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id)
         output_dict['coh_begin_calendar_yr'] = prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, True)
         output_dict['ttl_receipts_sum_page_per'] = output_dict[f3x_col_line_dict['19'][0]]
@@ -9871,11 +10001,9 @@ def update_f3x_details(report_id, cmte_id):
         output_dict['ttl_receipts_sum_page_ytd'] = output_dict[f3x_col_line_dict['19'][3]]
         output_dict['ttl_disb_sum_page_ytd'] = output_dict[f3x_col_line_dict['31'][3]]
         output_dict['coh_cop'] = (output_dict['coh_bop'] + output_dict['ttl_receipts_sum_page_per'] - 
-            output_dict['ttl_disb_sum_page_per'] + output_dict['debts_owed_by_cmte'] - 
-            output_dict['debts_owed_to_cmte'])
+            output_dict['ttl_disb_sum_page_per'])
         output_dict['coh_coy'] = (output_dict['coh_begin_calendar_yr'] + output_dict['ttl_receipts_sum_page_ytd'] - 
-            output_dict['ttl_disb_sum_page_ytd'] + output_dict['debts_owed_by_cmte'] - 
-            output_dict['debts_owed_to_cmte'])
+            output_dict['ttl_disb_sum_page_ytd'])
         return put_F3X(report_id, cmte_id, output_dict)
 
     except Exception as e:
@@ -9886,16 +10014,45 @@ def update_f3x_details(report_id, cmte_id):
 
 def F3X_values(cmte_id, report_list, year_flag=False):
     try:
-        output_dict = {}
         if year_flag:
             i=3
         else:
             i=0
+        output_dict = {
+            f3x_col_line_dict['11AI'][i] : 0,
+            f3x_col_line_dict['11AII'][i] : 0,
+            f3x_col_line_dict['11B'][i] : 0,
+            f3x_col_line_dict['11C'][i] : 0,
+            f3x_col_line_dict['12'][i] : 0,
+            f3x_col_line_dict['13'][i] : 0,
+            f3x_col_line_dict['14'][i] : 0,
+            f3x_col_line_dict['15'][i] : 0,
+            f3x_col_line_dict['16'][i] : 0,
+            f3x_col_line_dict['17'][i] : 0,
+            f3x_col_line_dict['18A'][i] : 0,
+            f3x_col_line_dict['18B'][i] : 0,
+            f3x_col_line_dict['21AI'][i] : 0,
+            f3x_col_line_dict['21AII'][i] : 0,
+            f3x_col_line_dict['21B'][i] : 0,
+            f3x_col_line_dict['22'][i] : 0,
+            f3x_col_line_dict['23'][i] : 0,
+            f3x_col_line_dict['24'][i] : 0,
+            f3x_col_line_dict['25'][i] : 0,
+            f3x_col_line_dict['26'][i] : 0,
+            f3x_col_line_dict['27'][i] : 0,
+            f3x_col_line_dict['28A'][i] : 0,
+            f3x_col_line_dict['28B'][i] : 0,
+            f3x_col_line_dict['28C'][i] : 0,
+            f3x_col_line_dict['29'][i] : 0,
+            f3x_col_line_dict['30AI'][i] : 0,
+            f3x_col_line_dict['30AII'][i] : 0,
+            f3x_col_line_dict['30B'][i] : 0,
+        }
         _sql = """SELECT CASE 
-                    WHEN line_number = '11A' AND itemized IS DISTINCT FROM 'U' THEN '11AI'
-                    WHEN line_number = '11A' AND itemized = 'U' THEN '11AII'
-                    WHEN line_number = '21A' AND itemized IS DISTINCT FROM 'U' THEN '21AI'
-                    WHEN line_number = '21A' AND itemized = 'U' THEN '21AII'
+                    WHEN line_number = '11A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '11AI'
+                    WHEN line_number = '11A' AND itemized in ('U', 'FU') THEN '11AII'
+                    WHEN line_number = '21A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '21AI'
+                    WHEN line_number = '21A' AND itemized in ('U', 'FU') THEN '21AII'
                     WHEN line_number = '30A' THEN '30AI'
                     ELSE line_number
                     END AS line_num, 
@@ -9912,7 +10069,6 @@ def F3X_values(cmte_id, report_list, year_flag=False):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [cmte_id])
             amounts_list = cursor.fetchall()
-            print(amounts_list)
             if amounts_list:
                 for amount_tuple in amounts_list:
                     column = f3x_col_line_dict[amount_tuple[0]][i]
@@ -9990,9 +10146,10 @@ def get_year_reports(cmte_id, report_id):
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT report_id FROM public.reports WHERE cmte_id= %s AND date_part('year',cvg_start_date) = 
-                (SELECT date_part('year',cvg_start_date) FROM public.reports cr WHERE cr.cmte_id=%s AND cr.report_id=%s) 
+                (SELECT date_part('year',cvg_start_date) FROM public.reports cr1 WHERE cr1.cmte_id=%s AND cr1.report_id=%s) 
+                AND cvg_end_date <= (SELECT cvg_end_date FROM public.reports cr2 WHERE cr2.cmte_id=%s AND cr2.report_id=%s) 
                 AND form_type = 'F3X' AND delete_ind IS DISTINCT FROM 'Y'
-                ORDER BY cvg_start_date ASC""",[cmte_id, cmte_id, report_id]
+                ORDER BY cvg_start_date ASC""",[cmte_id, cmte_id, report_id, cmte_id, report_id]
             )
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
@@ -10004,6 +10161,6 @@ def get_year_reports(cmte_id, report_id):
         return data_ids
 
 @update_F3X
-def function_to_call_wrapper_update_F3X(report_id, cmte_id):
+def function_to_call_wrapper_update_F3X(cmte_id, report_id):
     return {"report_id" : report_id,
             "cmte_id" : cmte_id}

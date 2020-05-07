@@ -71,6 +71,10 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
             this.formPart2.disable();
           }
         }
+        else if(message && message.action === 'refreshScreen' && message.qualificationData){
+          this.qualificationData = message.qualificationData;
+          this.cd.detectChanges();
+        }
       });
   }
 
@@ -169,7 +173,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
     let counter:number = 1;
     if(this.qualificationData.candidates && this.qualificationData.candidates.length > 0){
       this.qualificationData.candidates.sort((a,b) => a.candidate_number > b.candidate_number ? 1 : -1);
-      this.qualificationData.candidates.array.forEach(candidate => {
+      this.qualificationData.candidates.forEach(candidate => {
         if(Number(candidate.candidate_number) === counter){
           counter++;
         }
@@ -237,7 +241,10 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
       debounceTime(500),
       distinctUntilChanged(),
       switchMap(searchText => {
-        if (searchText.length < 3) {
+        if(searchText.length === 0){
+          this.clearCandidateInfo();
+        }
+        else if (searchText.length < 3) {
           return Observable.of([]);
         } else {
           const searchTextUpper = searchText.toUpperCase();
@@ -257,6 +264,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
         if (searchText) {
           return this._typeaheadService.getContacts(searchText, 'cand_last_name');
         } else {
+          this.clearCandidateInfo();
           return Observable.of([]);
         }
       })
@@ -273,6 +281,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
         if (searchText) {
           return this._typeaheadService.getContacts(searchText, 'cand_first_name');
         } else {
+          this.clearCandidateInfo();
           return Observable.of([]);
         }
       })
@@ -394,6 +403,19 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
 
     return `${lastName}, ${firstName}, ${office}, ${officeState}, ${officeDistrict}`;
   }
+
+  clearCandidateInfo(){
+    this.form.controls['candidate_id'].reset();
+    this.form.controls['cand_last_name'].reset();
+    this.form.controls['cand_first_name'].reset();
+    this.form.controls['cand_middle_name'].reset();
+    this.form.controls['cand_prefix'].reset();
+    this.form.controls['cand_suffix'].reset();
+    this.form.controls['cand_office'].reset();
+    this.form.controls['cand_office_state'].reset();
+    this.form.controls['cand_office_district'].reset();
+  }
+
 
 
 

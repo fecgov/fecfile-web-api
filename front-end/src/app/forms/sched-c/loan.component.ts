@@ -86,7 +86,8 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   _routeListener: Subscription;
   private c1ExistsFlag: any;
   reportId: any;
-
+  formView: boolean = false;
+  routesSubscription: Subscription;
   constructor(
     private _loansService: LoanService,
     private _config: NgbTooltipConfig,
@@ -104,6 +105,9 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
+    this.routesSubscription = _activatedRoute.queryParams.subscribe(p => {
+      this.formView = p.formView ? p.formView === 'true' : false;
+    });
     this._clearFormSubscription = this._f3xMessageService.getInitFormMessage().subscribe(message => {
       if (this.frmLoan) {
         this.frmLoan.reset();
@@ -124,6 +128,10 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this._messageService.clearMessage();
     this.getFormFields();
     this.entityType = 'IND';
+    if (this.formView) {
+      this.frmLoan.disable();
+    }
+
   }
 
   public ngOnChanges(changes: SimpleChanges): void {

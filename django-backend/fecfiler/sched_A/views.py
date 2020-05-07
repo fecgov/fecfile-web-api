@@ -33,6 +33,7 @@ from fecfiler.core.views import (
     get_comittee_id,
     update_F3X, function_to_call_wrapper_update_F3X
 
+
 )
 
 from fecfiler.core.transaction_util import (
@@ -2728,10 +2729,10 @@ def trash_restore_transactions(request):
             transaction_id = _action.get("transaction_id", "")
             cmte_id = get_comittee_id(request.user.username)
 
-            action = _action.get("action", "")
-            _delete = "Y" if action == "trash" else ""
-            # get_schedA data, do sql transaction, update aggregation
-            # try:
+        action = _action.get("action", "")
+        _delete = "Y" if action == "trash" else ""
+        # get_schedA data, do sql transaction, update aggregation
+        try:
             table_list = SCHEDULE_TO_TABLE_DICT.get(transaction_id[:2])
             if table_list:
                 if transaction_id[:2] in ("SA", "LA", "LB", "SB", "SE", "SF", "SH"):
@@ -2986,9 +2987,9 @@ def trash_restore_transactions(request):
 
             function_to_call_wrapper_update_F3X(report_id, cmte_id)
 
-            # except Exception as e:
-            #     return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
-            #         status=status.HTTP_400_BAD_REQUEST)
+             except Exception as e:
+                 return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
+                     status=status.HTTP_400_BAD_REQUEST)
         return Response(
             {
                 "result": "success",
@@ -2999,6 +3000,7 @@ def trash_restore_transactions(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
 
 
 """

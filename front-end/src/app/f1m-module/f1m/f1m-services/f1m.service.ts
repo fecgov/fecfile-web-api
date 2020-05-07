@@ -15,9 +15,25 @@ export class F1mService {
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService,
-    // private _reportTypeService: ReportTypeService,
-    // private _activatedRoute: ActivatedRoute
     ) { }
+
+    public getForm(reportId: string): Observable<any> {
+      let token: string = JSON.parse(this._cookieService.get('user'));
+      let httpOptions = new HttpHeaders();
+      let params = new HttpParams();
+      let url: string = '/f1M/form1M'
+      
+      params = params.append('reportId', reportId);
+  
+      httpOptions = httpOptions.append('Content-Type', 'application/json');
+      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+  
+      return this._http
+        .get(`${environment.apiUrl}${url}`, {
+          headers: httpOptions,
+          params
+        })
+    }
 
     public saveForm(data:any,scheduleAction: ScheduleActions, stepType:string) : Observable<any>{
       const token: string = JSON.parse(this._cookieService.get('user'));
@@ -80,6 +96,24 @@ export class F1mService {
           })
     }
 
+    public trashCandidate(candidate: any, reportId: string) :  Observable<any>{
+      const token: string = JSON.parse(this._cookieService.get('user'));
+      const url: string = `${environment.apiUrl}/f1M/delete_cand_f1m`;
+  
+      let httpOptions = new HttpHeaders();
+  
+      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+      httpOptions = httpOptions.append('Content-Type', 'application/json');
+  
+      let params = new HttpParams();
+      params = params.append('reportId', reportId);
+      params = params.append('candidate_number', candidate.candidate_number);
+  
+      return this._http.delete(url, {
+        params,
+        headers: httpOptions
+      });
+    }
 }
 
 

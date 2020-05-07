@@ -193,7 +193,7 @@
                             <button class="dropdown-item" (click)="printReport(report)">
                                 <i class="fas fa-print"></i> Print
                             </button>
-                            <button  *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="uploadReport(report)">
+                            <button  *ngIf="isUpload()" class="dropdown-item" (click)="uploadReport(report)">
                                 <i class="fas fa-upload"></i> Upload
                             </button>
                             <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="trashReport(report)">
@@ -222,7 +222,7 @@
                             <button class="dropdown-item" (click)="printReport(report)">
                                 <i class="fas fa-print"></i> Print
                             </button>                            
-                            <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="uploadReport(report)">
+                            <button *ngIf="isUpload()" class="dropdown-item" (click)="uploadReport(report)">
                                 <i class="fas fa-upload"></i> Upload
                             </button>
                             <button *ngIf="(report.amend_max === 'up' || report.amend_max === 'down') &&
@@ -289,7 +289,7 @@
                             <button class="dropdown-item" (click)="printReport(report)">
                                 <i class="fas fa-print"></i> Print
                             </button>                            
-                            <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="uploadReport(report)">
+                            <button *ngIf="isUpload()" class="dropdown-item" (click)="uploadReport(report)">
                                 <i class="fas fa-upload"></i> Upload
                             </button>
                             <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="trashReport(report)">

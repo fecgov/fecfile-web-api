@@ -26,6 +26,7 @@ import { GetTransactionsResponse, TransactionsService } from '../transactions/se
 import { SchedHMessageServiceService } from './../sched-h-service/sched-h-message-service.service';
 import { SchedH4Model } from './sched-h4.model';
 import { SchedH4Service } from './sched-h4.service';
+import {AuthService} from '../../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-sched-h4',
@@ -102,8 +103,9 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     private _tranService: TransactionsService,
     private _rt: Router,
     private _dlService: DialogService,
-    _schedHMessageServiceService: SchedHMessageServiceService
-  ) {    
+    _schedHMessageServiceService: SchedHMessageServiceService,
+    _authService: AuthService,
+  ) {
      super(
       _http,
       _fb,
@@ -124,8 +126,9 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
       _transactionsMessageService,
       _contributionDateValidator,
       _transactionsService,
-      _reportsService, 
-      _schedHMessageServiceService
+      _reportsService,
+      _schedHMessageServiceService,
+       _authService,
     );
     _schedH4Service;
     _individualReceiptService;
