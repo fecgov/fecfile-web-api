@@ -366,100 +366,103 @@ def check_email_validation(email):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def manage_user(request):
+    try:
+        is_not_treasurer(request)
 
-    is_not_treasurer(request)
+        if request.method == "GET":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                if not check_null_value(cmte_id):
+                    raise Exception("Committe id is missing from request data")
 
-    if request.method == "GET":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            if not check_null_value(cmte_id):
-                raise Exception("Committe id is missing from request data")
+                datum = get_users_list(cmte_id)
+                json_result = {'users': datum, 'rows': len(datum)}
+                return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The manageUser API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        elif request.method == "DELETE":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                data = {"cmte_id": cmte_id}
+                if "id" in request.data and check_null_value(
+                        request.data.get("id")
+                ):
+                    data["user_id"] = request.data.get("id")
+                else:
+                    raise Exception("Missing Input: ID is mandatory")
 
-            datum = get_users_list(cmte_id)
-            json_result = {'users': datum, 'rows': len(datum)}
-            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_400_BAD_REQUEST, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The manageUser API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-    elif request.method == "DELETE":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            data = {"cmte_id": cmte_id}
-            if "id" in request.data and check_null_value(
-                    request.data.get("id")
-            ):
-                data["user_id"] = request.data.get("id")
-            else:
-                raise Exception("Missing Input: ID is mandatory")
+                row = delete_manage_user(data)
+                if row > 0:
+                    msg = "The User ID: {} has been successfully deleted"
+                else:
+                    msg = "The User ID: {} has not been successfully deleted." \
+                          "No matching record was found."
+                return JsonResponse(msg.format(data.get("user_id")),
+                                    status=status.HTTP_200_OK,
+                                    safe=False)
+            except Exception as e:
+                return JsonResponse(
+                    "The Manage User API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
+        elif request.method == "POST":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                data = {"cmte_id": cmte_id}
 
-            row = delete_manage_user(data)
-            if row > 0:
-                msg = "The User ID: {} has been successfully deleted"
-            else:
-                msg = "The User ID: {} has not been successfully deleted." \
-                      "No matching record was found."
-            return JsonResponse(msg.format(data.get("user_id")),
-                                status=status.HTTP_200_OK,
-                                safe=False)
-        except Exception as e:
-            return JsonResponse(
-                "The Manage User API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST, safe=False
-            )
-    elif request.method == "POST":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            data = {"cmte_id": cmte_id}
+                fields = user_data_dict()
+                data = validate(data, fields, request)
+                # check if user already exsist
+                user_exist = check_user_present(data)
+                # check if user was previously deleted, then reactivate
+                user_reactivated = user_previously_deleted(data)
+                if not user_exist and not user_reactivated:
+                    data = add_new_user(data, cmte_id)
 
-            fields = user_data_dict()
-            data = validate(data, fields, request)
-            # check if user already exsist
-            user_exist = check_user_present(data)
-            # check if user was previously deleted, then reactivate
-            user_reactivated = user_previously_deleted(data)
-            if not user_exist and not user_reactivated:
-                data = add_new_user(data, cmte_id)
+                output = get_users_list(cmte_id)
+                json_result = {'users': output}
+                return JsonResponse(json_result, status=status.HTTP_201_CREATED, safe=False)
+            except Exception as e:
+                return Response(
+                    "Adding new user - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            output = get_users_list(cmte_id)
-            json_result = {'users': output}
-            return JsonResponse(json_result, status=status.HTTP_201_CREATED, safe=False)
-        except Exception as e:
-            return Response(
-                "Adding new user - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        elif request.method == "PUT":
+            try:
+                old_email = get_email(request.user.username)
+                cmte_id = get_comittee_id(request.user.username)
+                username = cmte_id + request.data.get("email")
 
-    elif request.method == "PUT":
-        try:
-            old_email = get_email(request.user.username)
-            cmte_id = get_comittee_id(request.user.username)
-            username = cmte_id + request.data.get("email")
-
-            data = {"cmte_id": cmte_id, "user_name": get_comittee_id(request.user.username)}
-            fields = user_data_dict()
-            fields.append("id")
-            data = validate(data, fields, request)
-            data["new_user_name"] = username
-            data["old_email"] = old_email
-            rows = update_user(data)
-            output = get_users_list(cmte_id)
-            json_result = {'users': output, "rows_updated": rows}
-            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedL API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                data = {"cmte_id": cmte_id, "user_name": get_comittee_id(request.user.username)}
+                fields = user_data_dict()
+                fields.append("id")
+                data = validate(data, fields, request)
+                data["new_user_name"] = username
+                data["old_email"] = old_email
+                rows = update_user(data)
+                output = get_users_list(cmte_id)
+                json_result = {'users': output, "rows_updated": rows}
+                return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedL API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def validate(data, fields, request):
@@ -520,21 +523,25 @@ def update_toggle_status(status, data):
 
 @api_view(["PUT"])
 def toggle_user(request):
+    try:
+        is_not_treasurer(request)
 
-    is_not_treasurer(request)
+        if request.method == "PUT":
+            try:
+                username = request.user.username
+                if len(username) > 9:
+                    cmte_id = get_comittee_id(request.user.username)
+                data = {"username": username, "id": request.data.get("id"),
+                        "cmte_id": cmte_id}
+                toggle_status = get_toggle_status(data)
+                rows = update_toggle_status(toggle_status, data)
+                output = get_users_list(cmte_id)
+                json_result = {'users': output, "rows_updated": rows}
+                return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
+            except Exception as e:
+                logger.debug("exception occured while toggling status", str(e))
+                raise e
 
-    if request.method == "PUT":
-        try:
-            username = request.user.username
-            if len(username) > 9:
-                cmte_id = get_comittee_id(request.user.username)
-            data = {"username": username, "id": request.data.get("id"),
-                    "cmte_id": cmte_id}
-            toggle_status = get_toggle_status(data)
-            rows = update_toggle_status(toggle_status, data)
-            output = get_users_list(cmte_id)
-            json_result = {'users': output, "rows_updated": rows}
-            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-        except Exception as e:
-            logger.debug("exception occured while toggling status", str(e))
-            raise e
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
