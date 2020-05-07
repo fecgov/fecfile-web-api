@@ -1611,7 +1611,13 @@ public printReport(report: reportModel): void{
             queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'receipts'  }
           });
           }, 1500);
-        }          
+        }    
+        else if (report.form_type === 'F1M') {
+          const formType = '1M';
+          this._router.navigate([`/forms/form/${formType}`], {
+            queryParams: { step: 'step_2', reportId: report.report_id, edit:true}
+          });
+        }      
       }
     )    
   }
