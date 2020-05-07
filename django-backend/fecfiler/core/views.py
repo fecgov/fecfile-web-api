@@ -1216,7 +1216,6 @@ def post_reports(data, reportid=None):
                         data.get("cvg_end_dt"),
                         data.get("coh_bop"),
                     )
-                    function_to_call_wrapper_update_F3X(report_id, data.get("cmte_id"))
                     # print('here3')
                 # print('here3.5')
                 output = get_reports(data)
@@ -1757,7 +1756,7 @@ def reports(request):
                 do_loan_carryover(data.get("cmteid"), data.get("reportid"))
                 do_debt_carryover(data.get("cmteid"), data.get("reportid"))
                 do_levin_carryover(data.get("cmteid"), data.get("reportid"))
-
+                function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             elif type(data) is list:
                 return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
@@ -8488,8 +8487,8 @@ def create_amended_reports(request):
                         "Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST
                     )
             elif data.get('form_type') == 'F1M':
-                amend_form1m(data)
-                data_obj = data
+                output_dict = amend_form1m(data)
+                data_obj = {**data, **output_dict}
             else:
                 raise Exception("""This form_type cannot be amended. 
                   form type provided: {}""".format(data.get('form_type')))
@@ -8514,7 +8513,7 @@ def amend_form1m(request_dict):
       report_dict["amend_number"] = (
           request_dict.get("amend_number") + 1 if request_dict.get("amend_number") else 1)
       report_dict["status"] = "Saved"
-      report_flag, report_id = post_amend_f1m_report(report_dict)
+      report_flag, output_dict = post_amend_f1m_report(report_dict)
       _sql = """INSERT INTO public.form_1m(
             report_id, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
@@ -8524,7 +8523,7 @@ def amend_form1m(request_dict):
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
             can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s
             FROM public.form_1m WHERE cmte_id=%s AND report_id= %s"""
-      value_list = [report_id, datetime.datetime.now(), datetime.datetime.now(),
+      value_list = [output_dict['report_id'], datetime.datetime.now(), datetime.datetime.now(),
             report_dict['cmte_id'], report_dict['previous_report_id']]
       with connection.cursor() as cursor:
           cursor.execute(_sql,value_list)
@@ -8532,9 +8531,10 @@ def amend_form1m(request_dict):
           # logger.debug(cursor.query)
           if cursor.rowcount == 0:
               raise Exception('Failed to insert data into form_1m table.')
+      return output_dict
     except Exception as e:
         if report_flag:
-            remove_reports_f1m(report_id, report_dict['previous_report_id'])
+            remove_reports_f1m(output_dict['report_id'], report_dict['previous_report_id'])
         raise Exception("""The amend_form1m function is throwing an error: """ + str(e))
 
 def post_amend_f1m_report(request_dict):
@@ -8562,7 +8562,7 @@ def post_amend_f1m_report(request_dict):
             if cursor.rowcount == 0:
                 raise Exception("""Failed to update superceded_report_id into reports 
                   table for report: {}""".format(request_dict['previous_report_id']))
-        return True, request_dict['report_id']
+        return True, request_dict
     except Exception as e:
         raise Exception("""The post_amend_f1m_report function is throwing an error: """ + str(e))
 
@@ -9950,16 +9950,45 @@ def update_f3x_details(report_id, cmte_id):
 
 def F3X_values(cmte_id, report_list, year_flag=False):
     try:
-        output_dict = {}
         if year_flag:
             i=3
         else:
             i=0
+        output_dict = {
+            f3x_col_line_dict['11AI'][i] : 0,
+            f3x_col_line_dict['11AII'][i] : 0,
+            f3x_col_line_dict['11B'][i] : 0,
+            f3x_col_line_dict['11C'][i] : 0,
+            f3x_col_line_dict['12'][i] : 0,
+            f3x_col_line_dict['13'][i] : 0,
+            f3x_col_line_dict['14'][i] : 0,
+            f3x_col_line_dict['15'][i] : 0,
+            f3x_col_line_dict['16'][i] : 0,
+            f3x_col_line_dict['17'][i] : 0,
+            f3x_col_line_dict['18A'][i] : 0,
+            f3x_col_line_dict['18B'][i] : 0,
+            f3x_col_line_dict['21AI'][i] : 0,
+            f3x_col_line_dict['21AII'][i] : 0,
+            f3x_col_line_dict['21B'][i] : 0,
+            f3x_col_line_dict['22'][i] : 0,
+            f3x_col_line_dict['23'][i] : 0,
+            f3x_col_line_dict['24'][i] : 0,
+            f3x_col_line_dict['25'][i] : 0,
+            f3x_col_line_dict['26'][i] : 0,
+            f3x_col_line_dict['27'][i] : 0,
+            f3x_col_line_dict['28A'][i] : 0,
+            f3x_col_line_dict['28B'][i] : 0,
+            f3x_col_line_dict['28C'][i] : 0,
+            f3x_col_line_dict['29'][i] : 0,
+            f3x_col_line_dict['30AI'][i] : 0,
+            f3x_col_line_dict['30AII'][i] : 0,
+            f3x_col_line_dict['30B'][i] : 0,
+        }
         _sql = """SELECT CASE 
-                    WHEN line_number = '11A' AND itemized IS DISTINCT FROM 'U' THEN '11AI'
-                    WHEN line_number = '11A' AND itemized = 'U' THEN '11AII'
-                    WHEN line_number = '21A' AND itemized IS DISTINCT FROM 'U' THEN '21AI'
-                    WHEN line_number = '21A' AND itemized = 'U' THEN '21AII'
+                    WHEN line_number = '11A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '11AI'
+                    WHEN line_number = '11A' AND itemized in ('U', 'FU') THEN '11AII'
+                    WHEN line_number = '21A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '21AI'
+                    WHEN line_number = '21A' AND itemized in ('U', 'FU') THEN '21AII'
                     WHEN line_number = '30A' THEN '30AI'
                     ELSE line_number
                     END AS line_num, 
@@ -9976,7 +10005,6 @@ def F3X_values(cmte_id, report_list, year_flag=False):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [cmte_id])
             amounts_list = cursor.fetchall()
-            print(amounts_list)
             if amounts_list:
                 for amount_tuple in amounts_list:
                     column = f3x_col_line_dict[amount_tuple[0]][i]
@@ -10054,9 +10082,10 @@ def get_year_reports(cmte_id, report_id):
         with connection.cursor() as cursor:
             cursor.execute(
                 """SELECT report_id FROM public.reports WHERE cmte_id= %s AND date_part('year',cvg_start_date) = 
-                (SELECT date_part('year',cvg_start_date) FROM public.reports cr WHERE cr.cmte_id=%s AND cr.report_id=%s) 
+                (SELECT date_part('year',cvg_start_date) FROM public.reports cr1 WHERE cr1.cmte_id=%s AND cr1.report_id=%s) 
+                AND cvg_end_date <= (SELECT cvg_end_date FROM public.reports cr2 WHERE cr2.cmte_id=%s AND cr2.report_id=%s) 
                 AND form_type = 'F3X' AND delete_ind IS DISTINCT FROM 'Y'
-                ORDER BY cvg_start_date ASC""",[cmte_id, cmte_id, report_id]
+                ORDER BY cvg_start_date ASC""",[cmte_id, cmte_id, report_id, cmte_id, report_id]
             )
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
@@ -10068,6 +10097,6 @@ def get_year_reports(cmte_id, report_id):
         return data_ids
 
 @update_F3X
-def function_to_call_wrapper_update_F3X(report_id, cmte_id):
+def function_to_call_wrapper_update_F3X(cmte_id, report_id):
     return {"report_id" : report_id,
             "cmte_id" : cmte_id}
