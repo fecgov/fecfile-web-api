@@ -2744,7 +2744,7 @@ def autolookup_expand(request):
             FROM public.entity e, public.candidate_master c WHERE e.ref_cand_cmte_id = c.cand_id
             and c.principal_campaign_committee = %s
             and e.delete_ind is distinct from 'Y'
-            and e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
+            and e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')) t
             """
             parameters = [cmte_id, get_comittee_id(request.user.username)]
         if "cand_id" in request.query_params:
@@ -2757,7 +2757,7 @@ def autolookup_expand(request):
                             FROM public.entity e, public.entity c WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
                             AND c.red_cand_cmte_id = %s
                             AND e.delete_ind is distinct from 'Y'
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)) t
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')) t
             """
             parameters = [cand_id]
         with connection.cursor() as cursor:
@@ -2865,7 +2865,7 @@ def autolookup_search_contacts(request):
                             FROM public.entity e left join public.entity c ON e.ref_cand_cmte_id = c.principal_campaign_committee 
                             WHERE e.cmte_id in (%s, %s) 
                             AND substr(e.ref_cand_cmte_id,1,1)='C' 
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
                             """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
@@ -2881,7 +2881,7 @@ def autolookup_search_contacts(request):
                             e.last_update_date
                             FROM public.entity e WHERE e.cmte_id in (%s, %s) 
                             AND substr(e.ref_cand_cmte_id,1,1)='C'
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
                             """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
@@ -2915,7 +2915,7 @@ def autolookup_search_contacts(request):
                             e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
                             FROM public.entity e left join public.entity c  ON c.ref_cand_cmte_id = e.principal_campaign_committee  
                             WHERE e.cmte_id in (%s, %s) 
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s) 
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y') 
                             AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                             """
                                 + param_string
@@ -2934,7 +2934,7 @@ def autolookup_search_contacts(request):
                             e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
                             e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
                             FROM public.entity e WHERE e.cmte_id in (%s, %s) 
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
                             AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                             """
                                 + param_string
@@ -2961,7 +2961,7 @@ def autolookup_search_contacts(request):
                                 e.last_update_date
                                 FROM public.entity e left join public.entity c ON  e.ref_cand_cmte_id = c.principal_campaign_committee 
                                 WHERE e.cmte_id in (%s, %s) 
-                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
                                 """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
@@ -2977,7 +2977,7 @@ def autolookup_search_contacts(request):
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                                 e.last_update_date
                                 FROM public.entity e WHERE e.cmte_id in (%s, %s)
-                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
                                 """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
@@ -3007,7 +3007,7 @@ def autolookup_search_contacts(request):
                             WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
                             AND e.entity_type in ('IND','ORG') 
                             AND c.principal_campaign_committee is not null
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
                             """
                                 # query_string = (
                                 #     """
@@ -3038,7 +3038,7 @@ def autolookup_search_contacts(request):
                             e.last_update_date
                             FROM public.entity e WHERE e.cmte_id in (%s, %s)
                             AND e.entity_type in ('IND','ORG') 
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where cmte_id = %s)
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
                             """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
