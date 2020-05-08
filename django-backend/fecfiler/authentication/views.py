@@ -187,7 +187,7 @@ def check_user_present(data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND email = %s AND delete_ind !='Y' """
+            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) AND delete_ind !='Y' """
             cursor.execute(_sql, [data.get("cmte_id"), data.get("email")])
             user_list = cursor.fetchone()
             if user_list is not None:
@@ -219,7 +219,7 @@ def user_previously_deleted(data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND email = %s AND delete_ind ='Y'"""
+            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) AND delete_ind ='Y'"""
             cursor.execute(_sql, [data.get("cmte_id"), data.get("email")])
             user_list = cursor.fetchone()
             if user_list is not None:
