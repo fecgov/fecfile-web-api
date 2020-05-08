@@ -1732,46 +1732,52 @@ def reports(request):
                 else:
                     additional_email_1 = None
 
-              if "additional_email_2" in request.data:
-                  additional_email_2 = check_email(request.data.get("additional_email_2"))
-              else:
-                  additional_email_2 = None
+                if "additional_email_2" in request.data:
+                    additional_email_2 = check_email(request.data.get("additional_email_2"))
+                else:
+                    additional_email_2 = None
 
-              datum = {
-                  "cmte_id": get_comittee_id(request.user.username),
-                  "form_type": request.data.get("form_type", None),
-                  "amend_ind": amend_ind,
-                  "report_type": request.data.get("report_type", None),
-                  "election_code": election_code,
-                  "date_of_election": date_format(request.data.get("date_of_election")),
-                  "state_of_election": request.data.get("state_of_election", None),
-                  "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
-                  "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
-                  "due_dt": date_format(request.data.get("due_dt")),
-                  "coh_bop": int(request.data.get("coh_bop")),
-                  "status": f_status,
-                  "email_1": email_1,
-                  "email_2": email_2,
-                  "additional_email_1": additional_email_1,
-                  "additional_email_2": additional_email_2,
-              }
-              data = post_reports(datum)
-              if type(data) is dict:
-                  # print(data)
-                  # do h1 carryover if new report created
-                  do_h1_carryover(data.get("cmteid"), data.get("reportid"))
-                  do_h2_carryover(data.get("cmteid"), data.get("reportid"))
-                  do_loan_carryover(data.get("cmteid"), data.get("reportid"))
-                  do_debt_carryover(data.get("cmteid"), data.get("reportid"))
-                  do_levin_carryover(data.get("cmteid"), data.get("reportid"))
-                  function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
-                  return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
-              elif type(data) is list:
-                  return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
-              else:
-                  raise Exception(
-                      "The output returned from post_reports function is neither dict nor list"
+                datum = {
+                      "cmte_id": get_comittee_id(request.user.username),
+                      "form_type": request.data.get("form_type", None),
+                      "amend_ind": amend_ind,
+                      "report_type": request.data.get("report_type", None),
+                      "election_code": election_code,
+                      "date_of_election": date_format(request.data.get("date_of_election")),
+                      "state_of_election": request.data.get("state_of_election", None),
+                      "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
+                      "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
+                      "due_dt": date_format(request.data.get("due_dt")),
+                      "coh_bop": int(request.data.get("coh_bop")),
+                      "status": f_status,
+                      "email_1": email_1,
+                      "email_2": email_2,
+                      "additional_email_1": additional_email_1,
+                      "additional_email_2": additional_email_2,
+                  }
+                data = post_reports(datum)
+                if type(data) is dict:
+                      # print(data)
+                      # do h1 carryover if new report created
+                      do_h1_carryover(data.get("cmteid"), data.get("reportid"))
+                      do_h2_carryover(data.get("cmteid"), data.get("reportid"))
+                      do_loan_carryover(data.get("cmteid"), data.get("reportid"))
+                      do_debt_carryover(data.get("cmteid"), data.get("reportid"))
+                      do_levin_carryover(data.get("cmteid"), data.get("reportid"))
+                      function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
+                      return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
+                elif type(data) is list:
+                      return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+                else:
+                      raise Exception("The output returned from post_reports function is neither dict nor list")
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The reports API - POST is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
+
+
 
         """
         *********************************************** REPORTS - GET API CALL STARTS HERE **********************************************************
@@ -8497,22 +8503,21 @@ def get_report_ids(cmte_id, from_date, submit_flag=True, including=True):
 
 @api_view(["POST"])
 def create_amended_reports(request):
-    try:
-        is_read_only_or_filer_reports(request)
+
         try:
             if request.method == "POST":
                 reportid = request.POST.get("report_id")
                 cmte_id = get_comittee_id(request.user.username)
 
-              val_data = get_reports_data(reportid)
-              if not val_data:
-                  return Response(
-                      "Given Report_id canot be amended",
-                      status=status.HTTP_400_BAD_REQUEST,
-                  )
-              data = val_data[0]
-              if data.get('form_type') == 'F3X':
-                  cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
+                val_data = get_reports_data(reportid)
+                if not val_data:
+                          return Response(
+                              "Given Report_id canot be amended",
+                              status=status.HTTP_400_BAD_REQUEST,
+                          )
+                data = val_data[0]
+                if data.get('form_type') == 'F3X':
+                      cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
                 # cdate = date.today()
                 from_date = cvg_start_date
@@ -8547,9 +8552,7 @@ def create_amended_reports(request):
                 "Create amended report API is throwing an error: " + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
             )
-    except Exception as e:
-        json_result = {'message': str(e)}
-        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
 
 def amend_form1m(request_dict):
     try:

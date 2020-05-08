@@ -2987,7 +2987,7 @@ def trash_restore_transactions(request):
 
             function_to_call_wrapper_update_F3X(report_id, cmte_id)
 
-             except Exception as e:
+        except Exception as e:
                  return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
                      status=status.HTTP_400_BAD_REQUEST)
         return Response(

@@ -61,6 +61,9 @@ class Account(AbstractBaseUser, PermissionsMixin):
     def __unicode__(self):
         return self.username
 
+    def get_by_natural_key(self, username):
+        return self.get(username__iexact=username)
+
     def get_full_name(self):
         return ' '.join([self.username, self.tagline]).strip()
 
