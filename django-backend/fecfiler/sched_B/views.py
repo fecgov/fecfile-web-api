@@ -14,6 +14,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 from fecfiler.sched_L.views import update_sl_summary
 
 from fecfiler.core.views import (
@@ -1953,255 +1954,260 @@ def schedB(request):
     """
     CRUD api for sched_b
     """
-    global REQT_ELECTION_YR
-    if request.method == "POST":
-        if "election_year" in request.data:
-            REQT_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQT_ELECTION_YR = request.query_params.get("election_year")
-        try:
-            # checking if redesignation is triggered for a transaction
-            logger.debug("sched_b POST call with request data:{}".format(request.data))
-            redesignation_flag = False
-            if "redesignation_id" in request.data and request.data[
-                "redesignation_id"
-            ] not in ["", "", None, "null"]:
-                redesignation_flag = True
-                if "redesignation_report_id" not in request.data:
-                    raise Exception(
-                        "redesignation_report_id parameter is missing. Kindly provide this id to continue redesignation"
-                    )
-            cmte_id = get_comittee_id(request.user.username)
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            if not ("transaction_type_identifier" in request.data):
-                raise Exception("Missing Input: transaction_type_identifier")
-            # handling null,none value of report_id
-            # TODO: can report_id be 0? what does it mean?
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum = schedB_sql_dict(request.data)
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
-            # Adding memo_code and memo_text values for redesignation flags
-            if redesignation_flag:
-                datum["memo_code"] = "X"
-                datum["memo_text"] = "MEMO: Redesignated"
-                datum["report_id"] = check_report_id(
-                    request.data["redesignation_report_id"]
-                )
-                datum["redesignation_id"] = request.data["redesignation_id"]
-            if "entity_id" in request.data and check_null_value(
-                request.data.get("entity_id")
-            ):
-                datum["entity_id"] = request.data.get("entity_id")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
-                )
-                data = put_schedB(datum)
-            else:
-                logger.debug("calling post_schedB with data:{}".format(datum))
-                data = post_schedB(datum)
-
-            # Associating child transactions to parent and storing them to DB
-            if "child" in request.data:
-                children = check_type_list(request.data.get("child"))
-                if len(children) > 0:
-                    child_output = []
-                    for child in children:
-                        child_datum = schedB_sql_dict(child)
-                        child_datum["back_ref_transaction_id"] = data.get(
-                            "transaction_id"
-                        )
-                        child_datum["report_id"] = report_id
-                        child_datum["cmte_id"] = cmte_id
-                        if "entity_id" in child and check_null_value(
-                            child.get("entity_id")
-                        ):
-                            child_datum["entity_id"] = child.get("entity_id")
-                        if "transaction_id" in child and check_null_value(
-                            child.get("transaction_id")
-                        ):
-                            child_datum["transaction_id"] = check_transaction_id(
-                                child.get("transaction_id")
-                            )
-                            child_data = put_schedB(child_datum)
-                        else:
-                            child_data = post_schedB(child_datum)
-            output = get_schedB(data)
-            # for earmark child transaction: update parent transction  purpose_description
-            if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:
-                update_earmark_parent_purpose(datum)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedB API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    # Get records from schedB table
-    if request.method == "GET":
-        if "election_year" in request.data:
-            REQT_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQT_ELECTION_YR = request.query_params.get("election_year")
-
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
-                )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
-                )
-            datum = get_schedB(data)
-            # for obj in datum:
-            #     obj.update({"api_call": "sb/schedB"})
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedB API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    # Modify a single record from schedB table
-    if request.method == "PUT":
-        if "election_year" in request.data:
-            REQT_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQT_ELECTION_YR = request.query_params.get("election_year")
-
-        try:
-            # checking if redesignation is triggered for a transaction
-            redesignation_flag = False
-            if "isRedesignation" in request.data and request.data[
-                "isRedesignation"
-            ] not in ["None", "null", "", ""]:
-                if request.data["isRedesignation"] in ["True", "true", "t", "T", True]:
+    try:
+        is_read_only_or_filer_reports(request)
+        global REQT_ELECTION_YR
+        if request.method == "POST":
+            if "election_year" in request.data:
+                REQT_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQT_ELECTION_YR = request.query_params.get("election_year")
+            try:
+                # checking if redesignation is triggered for a transaction
+                logger.debug("sched_b POST call with request data:{}".format(request.data))
+                redesignation_flag = False
+                if "redesignation_id" in request.data and request.data[
+                    "redesignation_id"
+                ] not in ["", "", None, "null"]:
                     redesignation_flag = True
                     if "redesignation_report_id" not in request.data:
                         raise Exception(
-                            "redesignation_report_id parameter is missing. Kindly provide this id to continue reattribution"
+                            "redesignation_report_id parameter is missing. Kindly provide this id to continue redesignation"
                         )
-                    else:
-                        redesignation_report_id = check_report_id(
-                            request.data["redesignation_report_id"]
-                        )
-            datum = schedB_sql_dict(request.data)
-
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = check_transaction_id(
+                cmte_id = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                if not ("transaction_type_identifier" in request.data):
+                    raise Exception("Missing Input: transaction_type_identifier")
+                # handling null,none value of report_id
+                # TODO: can report_id be 0? what does it mean?
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum = schedB_sql_dict(request.data)
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
+                # Adding memo_code and memo_text values for redesignation flags
+                if redesignation_flag:
+                    datum["memo_code"] = "X"
+                    datum["memo_text"] = "MEMO: Redesignated"
+                    datum["report_id"] = check_report_id(
+                        request.data["redesignation_report_id"]
+                    )
+                    datum["redesignation_id"] = request.data["redesignation_id"]
+                if "entity_id" in request.data and check_null_value(
+                    request.data.get("entity_id")
+                ):
+                    datum["entity_id"] = request.data.get("entity_id")
+                if "transaction_id" in request.data and check_null_value(
                     request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                    data = put_schedB(datum)
+                else:
+                    logger.debug("calling post_schedB with data:{}".format(datum))
+                    data = post_schedB(datum)
+
+                # Associating child transactions to parent and storing them to DB
+                if "child" in request.data:
+                    children = check_type_list(request.data.get("child"))
+                    if len(children) > 0:
+                        child_output = []
+                        for child in children:
+                            child_datum = schedB_sql_dict(child)
+                            child_datum["back_ref_transaction_id"] = data.get(
+                                "transaction_id"
+                            )
+                            child_datum["report_id"] = report_id
+                            child_datum["cmte_id"] = cmte_id
+                            if "entity_id" in child and check_null_value(
+                                child.get("entity_id")
+                            ):
+                                child_datum["entity_id"] = child.get("entity_id")
+                            if "transaction_id" in child and check_null_value(
+                                child.get("transaction_id")
+                            ):
+                                child_datum["transaction_id"] = check_transaction_id(
+                                    child.get("transaction_id")
+                                )
+                                child_data = put_schedB(child_datum)
+                            else:
+                                child_data = post_schedB(child_datum)
+                output = get_schedB(data)
+                # for earmark child transaction: update parent transction  purpose_description
+                if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:
+                    update_earmark_parent_purpose(datum)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedB API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
 
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["back_ref_transaction_id"] = request.data.get(
-                "back_ref_transaction_id"
-            )
-            datum["cmte_id"] = get_comittee_id(request.user.username)
+        # Get records from schedB table
+        if request.method == "GET":
+            if "election_year" in request.data:
+                REQT_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQT_ELECTION_YR = request.query_params.get("election_year")
 
-            if "entity_id" in request.data and check_null_value(
-                request.data.get("entity_id")
-            ):
-                datum["entity_id"] = request.data.get("entity_id")
-            # updating data for redesignation fields
-            if redesignation_flag:
-                datum["memo_code"] = "X"
-                datum["memo_text"] = "MEMO: Redesignated"
-            data = put_schedB(datum)
-            # Updating auto generated transactions for redesignated transactions
-            if redesignation_flag:
-                redesignation_auto_update_transactions(
-                    datum["cmte_id"],
-                    redesignation_report_id,
-                    datum["expenditure_date"],
-                    datum["expenditure_amount"],
-                    datum["transaction_id"],
-                )
-                data["report_id"] = redesignation_report_id
-            output = get_schedB(data)
-            # for earmark child transaction: update parent transction  purpose_description
-            if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:
-                update_earmark_parent_purpose(datum)
-            # UPDATE auto generated redesignation transactions
-            if output[0].get("redesignation_ind") == "O":
-                update_auto_generated_redesignated_transactions(output[0])
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedB API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    # Delete a single record from schedB table
-    if request.method == "DELETE":
-
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
                     request.query_params.get("report_id")
-                )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.query_params and check_null_value(
                     request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                datum = get_schedB(data)
+                # for obj in datum:
+                #     obj.update({"api_call": "sb/schedB"})
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
                 )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedB(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedB API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedB API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        # Modify a single record from schedB table
+        if request.method == "PUT":
+            if "election_year" in request.data:
+                REQT_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQT_ELECTION_YR = request.query_params.get("election_year")
+
+            try:
+                # checking if redesignation is triggered for a transaction
+                redesignation_flag = False
+                if "isRedesignation" in request.data and request.data[
+                    "isRedesignation"
+                ] not in ["None", "null", "", ""]:
+                    if request.data["isRedesignation"] in ["True", "true", "t", "T", True]:
+                        redesignation_flag = True
+                        if "redesignation_report_id" not in request.data:
+                            raise Exception(
+                                "redesignation_report_id parameter is missing. Kindly provide this id to continue reattribution"
+                            )
+                        else:
+                            redesignation_report_id = check_report_id(
+                                request.data["redesignation_report_id"]
+                            )
+                datum = schedB_sql_dict(request.data)
+
+                if "transaction_id" in request.data and check_null_value(
+                    request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["back_ref_transaction_id"] = request.data.get(
+                    "back_ref_transaction_id"
+                )
+                datum["cmte_id"] = get_comittee_id(request.user.username)
+
+                if "entity_id" in request.data and check_null_value(
+                    request.data.get("entity_id")
+                ):
+                    datum["entity_id"] = request.data.get("entity_id")
+                # updating data for redesignation fields
+                if redesignation_flag:
+                    datum["memo_code"] = "X"
+                    datum["memo_text"] = "MEMO: Redesignated"
+                data = put_schedB(datum)
+                # Updating auto generated transactions for redesignated transactions
+                if redesignation_flag:
+                    redesignation_auto_update_transactions(
+                        datum["cmte_id"],
+                        redesignation_report_id,
+                        datum["expenditure_date"],
+                        datum["expenditure_amount"],
+                        datum["transaction_id"],
+                    )
+                    data["report_id"] = redesignation_report_id
+                output = get_schedB(data)
+                # for earmark child transaction: update parent transction  purpose_description
+                if datum.get("transaction_type_identifier") in EARMARK_SB_CHILD_LIST:
+                    update_earmark_parent_purpose(datum)
+                # UPDATE auto generated redesignation transactions
+                if output[0].get("redesignation_ind") == "O":
+                    update_auto_generated_redesignated_transactions(output[0])
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedB API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        # Delete a single record from schedB table
+        if request.method == "DELETE":
+
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
+                    request.query_params.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.query_params and check_null_value(
+                    request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedB(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedB API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def update_auto_generated_redesignated_transactions(data):
