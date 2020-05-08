@@ -14,6 +14,7 @@ import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/part
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { ContactFilterModel } from '../model/contacts-filter.model';
 import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
+import { AuthService} from '../../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-contacts-table',
@@ -123,6 +124,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
+    private _authService: AuthService
   ) {
     this.showPinColumnsSubscription = this._contactsMessageService.getShowPinColumnMessage()
       .subscribe(

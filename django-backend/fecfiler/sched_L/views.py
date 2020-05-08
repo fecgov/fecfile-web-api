@@ -27,7 +27,7 @@ from fecfiler.core.views import (
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities,
+    undo_delete_entities, get_comittee_id,
 )
 
 from fecfiler.core.transaction_util import (
@@ -613,7 +613,7 @@ def schedL(request):
 
     if request.method == "POST":
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
 
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: Report_id is mandatory")
@@ -657,7 +657,7 @@ def schedL(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
             ):
@@ -689,7 +689,7 @@ def schedL(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.data and check_null_value(
                 request.data.get("report_id")
             ):
@@ -736,7 +736,7 @@ def schedL(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
             if "levin_account_id" in request.data:
                 levin_acct_id = request.data.get("levin_account_id")
                 datum["record_id"] = levin_acct_id
@@ -1566,7 +1566,7 @@ def get_sl_summary_table(request):
     """
     response = {}
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         if not (
             "report_id" in request.query_params
@@ -1946,7 +1946,7 @@ def get_sla_summary_table(request):
     # response = {}
     logger.debug("get_sql_summary with data:{}".format(request.query_params))
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         if not (
             "report_id" in request.query_params
@@ -2047,7 +2047,7 @@ def get_slb_summary_table(request):
     # response = {}
     logger.debug("get_sql_summary with data:{}".format(request.query_params))
     try:
-        cmte_id = request.user.username
+        cmte_id = get_comittee_id(request.user.username)
 
         if not (
             "report_id" in request.query_params

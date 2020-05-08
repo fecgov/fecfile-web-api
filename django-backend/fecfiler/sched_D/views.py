@@ -37,7 +37,9 @@ from fecfiler.core.views import (
     put_entities,
     remove_entities,
     undo_delete_entities,
+    get_comittee_id,
     update_F3X
+
 )
 from fecfiler.sched_A.views import get_next_transaction_id
 from fecfiler.core.report_helper import new_report_date
@@ -92,7 +94,7 @@ def schedD(request):
     if request.method == "POST":
         logger.debug("POST request received:{}".format(request.data))
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: report_id is mandatory")
             # handling null,none value of report_id
@@ -139,7 +141,7 @@ def schedD(request):
 
     elif request.method == "GET":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params:
                 data["report_id"] = check_report_id(
                     request.query_params.get("report_id")
@@ -182,7 +184,7 @@ def schedD(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params:
                 data["report_id"] = check_report_id(
                     request.query_params.get("report_id")
@@ -229,7 +231,7 @@ def schedD(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')

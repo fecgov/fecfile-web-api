@@ -9,4 +9,6 @@ urlpatterns = [
     	views.get_original_registration_date, name="get_original_reg_date"),
     url(r"^f1M/get_cmte_met_req_date$", 
     	views.get_committee_met_req_date, name="get_cmte_met_req_date"),
+    url(r"^f1M/delete_cand_f1m$", 
+    	views.delete_candidate_f1m, name="delete_candidate_f1m"),
 ]

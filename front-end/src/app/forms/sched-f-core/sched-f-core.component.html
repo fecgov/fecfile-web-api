@@ -763,7 +763,10 @@
                   class="btn btn-previous btn-right" 
                   (click)="(frmIndividualReceipt.dirty) ? saveOrWarn() : viewTransactions()">
                   View Transactions
-                </button>                       
+                </button>
+                <div *ngIf="scheduleAction === viewScheduleAction">
+                  <button type="button" class="btn btn-outline-dark btn-right" (click)="viewTransactions()">Close</button>
+                </div>
               </ng-container>  
             </ng-container> 
           </div>

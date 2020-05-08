@@ -57,9 +57,11 @@
 <footer>
   <div class="row pl-2 py-2">
     <div class="forms__btn-container">
-      <button id="previous" class="btn btn-previous btn-left" *ngIf="step !== 'step_1' && step !== 'step_5'"
+      <button id="previous" class="btn btn-previous btn-left" *ngIf="showPreviousButton()"
         (click)="previous()">Previous</button>
-      <button id="saveAndContinue" *ngIf="(type === 'qualification' ? step === 'step_2' && qualificationData?.candidates?.length >=5 : step === 'step_2') && scheduleAction !== 'view'" class="btn btn-primary btn-right"
+      <button id="saveAndContinue" 
+        *ngIf="showSaveAndContinueButton()"
+        class="btn btn-primary btn-right"
         (click)="saveAndContinue()">Save &amp; Continue </button>
       <button id="skip" *ngIf="(step === 'step_2' && type === 'qualification' && qualificationComp && !qualificationComp.showPart2 && partyType === 'PTY') && scheduleAction !== 'view'"  class="btn btn-previous btn-right mr-3"
         (click)="skip()">Skip</button>
