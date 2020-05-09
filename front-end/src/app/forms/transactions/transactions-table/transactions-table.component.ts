@@ -72,11 +72,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public editMode: boolean = false;
 
   // ngx-pagination config
-  public maxItemsPerPage = 10;
-  public directionLinks = false;
-  public autoHide = true;
+  public pageSizes: number[] = [10,20,50];
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 4;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
   public config: PaginationInstance;
-  public numberOfPages = 0;
+  public numberOfPages: number = 0;
+  public pageNumbers: number[] = [];
+  public gotoPage: number = 1;
 
   private filters: TransactionFilterModel;
   // private keywords = [];
@@ -357,6 +361,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public getPage(page: number): void {
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
+    this.gotoPage = page;
 
     switch (this.tableType) {
       case this.transactionsView:
@@ -367,6 +372,33 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.getRecyclingPage(page);
         break;
     }
+  }
+
+    /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param page the page containing the contacts to get
+   */
+  public onMaxItemsPerPageChanged(event): void {
+    this.config.currentPage = 1;
+    this.gotoPage = 1;
+    // this.config.itemsPerPage = event.target.value;
+    this.config.itemsPerPage = event;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page containing the contacts to get
+   */
+  public onGotoPageChange(event): void {
+    let newPage = event;
+    if (this.config.currentPage == newPage) {
+      return;
+    }
+    this.config.currentPage = newPage;
+    this.getPage(this.config.currentPage);
   }
 
   getSubTransactions(transactionId, apiCall) {
@@ -501,6 +533,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.totalAmount = res.totalAmount ? res.totalAmount : 0;
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
         this.numberOfPages = res.totalPages;
+        this.pageNumbers = Array.from(new Array(res.totalPages), (x,i) => i+1);
         this.allTransactionsSelected = false;
       }, error => {
         //console.log('API Error occured: ' + error);
@@ -835,6 +868,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Determine if pagination should be shown.
    */
   public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
     }
