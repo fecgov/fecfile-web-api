@@ -9,6 +9,12 @@ import { ReportTypeService } from 'src/app/forms/form-3x/report-type/report-type
 import { DatePipe } from '@angular/common';
 import { DebtSummaryModel } from '../model/debt-summary.model';
 
+export interface GetDebtsResponse {
+  items: DebtSummaryModel[];
+  totalCount: number;
+  totalPages: number;
+}
+
 /**
  * The service for Debt Summary
  */
@@ -27,7 +33,13 @@ export class DebtSummaryService {
   /**
    * Get the Debts comprising the Debt Summary.
    */
-  public getDebts(transactionType: string): Observable<any> {
+  public getDebts(
+      transactionType: string,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean
+    ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/sd/schedD';
@@ -38,6 +50,10 @@ export class DebtSummaryService {
 
     let params = new HttpParams();
     params = params.append('report_id', reportId);
+    params = params.append('page', page.toString());
+    params = params.append('itemsPerPage', itemsPerPage.toString());
+    params = params.append('sortColumnName', sortColumnName);
+    params = params.append('descending', `${descending}`);
 
     // Getting the summary debts requires the transactionType for the transaction not the summary.
     if (transactionType) {
@@ -193,5 +209,89 @@ export class DebtSummaryService {
         debt.name = debt.entity_name;
       }
     }
+  }
+
+    /**
+   * Map a single field name to its server field name equivalent.
+   *
+   * TODO Too many places where fields names are referenced when converting
+   * from/to server names.  Need to consolidate.
+   *
+   * TODO The API should be changed to pass the property names expected by the front end.
+   */
+  public mapToSingleServerName(appFieldName: string) {
+
+    // TODO map field names in constructor
+    let name = '';
+
+    // if (appFieldName === 'zip') {
+    //   this._propertyNameConverterMap.get(appFieldName);
+    // }
+
+    name = appFieldName;
+    switch (appFieldName) {
+      case 'name':
+        name = 'name';
+        break;
+      case 'entity_name':
+        name = 'entity_name';
+        break;  
+      case 'entityType':
+        name = 'entityType';
+        break;
+      case 'id':
+        name = 'id';
+        break;
+      case 'street1':
+        name = 'street1';
+        break; 
+      case 'street2':
+        name = 'street2';
+        break;         
+      case 'city':
+        name = 'city';
+        break;         
+      case 'state':
+        name = 'state';
+        break;                                
+      case 'zip':
+        name = 'zip';
+        break;                        
+      case 'employer':
+        name = 'employer';
+        break;
+      case 'occupation':
+        name = 'occupation';
+        break;
+      case 'phoneNumber':
+        name = 'phoneNumber';
+        break;  
+      case 'entityName':
+        name= 'entityName';
+        break;
+      case 'officeSought':
+        name= 'officeSought';
+        break;  
+      case 'candOffice':
+        name= 'candOffice';
+        break;
+      case 'candOfficeState':
+        name= 'candOfficeState';
+        break;
+      case 'candOfficeDistrict':
+        name= 'candOfficeDistrict';
+        break;       
+      case 'candCmteId':
+        name= 'candCmteId';
+        break;     
+      case 'deletedDate':
+        name= 'deletedDate';
+        break;   
+      case 'activeTransactionsCnt':
+        name= 'activeTransactionsCnt';
+        break;           
+      default:
+    }
+    return name ? name : '';
   }
 }

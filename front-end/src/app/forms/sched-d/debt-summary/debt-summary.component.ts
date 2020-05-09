@@ -14,7 +14,7 @@ import { TableService } from 'src/app/shared/services/TableService/table.service
 import { UtilService } from 'src/app/shared/utils/util.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
-import { DebtSummaryService } from './service/debt-summary.service';
+import { DebtSummaryService, GetDebtsResponse } from './service/debt-summary.service';
 import { DebtSummaryModel } from './model/debt-summary.model';
 import {
   ConfirmModalComponent,
@@ -63,16 +63,19 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
   public formType = '3X';
 
   // ngx-pagination config
-  public maxItemsPerPage = 100;
-  public directionLinks = false;
-  public autoHide = true;
+  public pageSizes: number[] = [10,20,50];
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
   public config: PaginationInstance;
-  public numberOfPages = 1;
+  public numberOfPages: number = 0;
+  public pageNumbers: number[] = [];
+  public gotoPage: number = 1;
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
   public allDebtSelected: boolean;
-  public p: number = 1;
 
   /**
    * Array of columns to be made sortable.
@@ -97,7 +100,8 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
     private _dialogService: DialogService,
     private _debtSummaryService: DebtSummaryService,
     private _transactionsService: TransactionsService
-  ) {}
+  ) {
+  }
 
   /**
    * Initialize the component.
@@ -105,11 +109,10 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
   ngOnInit() {
     const paginateConfig: PaginationInstance = {
       id: 'forms__debt-summ-table-pagination',
-      itemsPerPage: 3,
+      itemsPerPage: this.maxItemsPerPage,
       currentPage: 1
     };
     this.config = paginateConfig;
-    this.config.currentPage = 1;
 
     // TODO decide if sort settings are needed after leaving page.
     // Not supporting cachedVals as of original impl
@@ -117,7 +120,99 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
     // this.getCachedValues();
     // this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
 
-    this.getDebtSummaries();
+    //this.getDebtSummaries();
+
+    this.getPage(this.config.currentPage);
+  }
+
+    /**
+	 * The records for a given page.
+	 *
+	 * @param page the page containing the records to get
+	 */
+  public getPage(page: number): void {
+
+    this.bulkActionCounter = 0;
+    this.bulkActionDisabled = true;
+    this.gotoPage = page;
+
+    this.getDebtSummaries(page);
+  }
+
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.gotoPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    if (this.config.currentPage == page) {
+      return;
+    }
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+	 * Determine if pagination should be shown.
+	 */
+  public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
+    if (this.config.totalItems > this.config.itemsPerPage) {
+      return true;
+    }
+    // otherwise, no show.
+    return false;
+  }  
+
+  /**
+   * Determine the item range shown by the server-side pagination.
+   */
+  public determineItemRange(): string {
+
+    let start = 0;
+    let end = 0;
+    // this.numberOfPages = 0;
+    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
+      this.config.currentPage : 1;
+
+    if (!this.debtModel) {
+      return '0';
+    }
+
+    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
+      && this.debtModel.length > 0) {
+      // this.calculateNumberOfPages();
+
+      if (this.config.currentPage === this.numberOfPages) {
+        // end = this.contactsModel.length;
+        end = this.config.totalItems;
+        start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
+      } else {
+        end = this.config.currentPage * this.config.itemsPerPage;
+        start = (end - this.config.itemsPerPage) + 1;
+      }
+      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
+      // if (end > this.contactsModel.length) {
+      //   end = this.contactsModel.length;
+      // }
+    }
+    this.firstItemOnPage = start;
+    this.lastItemOnPage = end;
+    return start + ' - ' + end;
   }
 
   /**
@@ -126,13 +221,22 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
    * @param changes
    */
   public ngOnChanges(changes: SimpleChanges) {
-    this.getDebtSummaries();
+    // const paginateConfig: PaginationInstance = {
+    //   id: 'forms__debt-summ-table-pagination',
+    //   itemsPerPage: this.maxItemsPerPage,
+    //   currentPage: 1
+    // };
+    // this.config = paginateConfig;
+
+    //this.getDebtSummaries(1);
   }
 
   /**
    * Get the Debt Summaries for the Report
    */
-  public getDebtSummaries(): void {
+  public getDebtSummaries(page: number): void {
+    this.config.currentPage = page;
+
     this.debtModel = [];
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
@@ -155,12 +259,30 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       sortedCol = new SortableColumnModel('', false, false, false, false);
     }
 
-    this._debtSummaryService.getDebts(this.transactionType).subscribe((res: any) => {
+    const serverSortColumnName = this._debtSummaryService.
+      mapToSingleServerName(this.currentSortedColumnName);
+
+    this._debtSummaryService.getDebts(
+      this.transactionType,
+      page,
+      this.config.itemsPerPage,
+      serverSortColumnName,
+      sortedCol.descending
+    ).subscribe((res: any) => {
       this.debtModel = [];
 
+      // TODO: refactor against GetDebtsResponse once python pagination is done
       const debtModelL = this._debtSummaryService.mapFromServerFields(res);
-      this.debtModel = debtModelL;
+      //this.debtModel = debtModelL;
+      this.debtModel = debtModelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
       this.allDebtSelected = false;
+
+      this.config.totalItems = debtModelL.length ? debtModelL.length : 0;
+      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
+      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
+      if (this.numberOfPages === 1) {
+        this.config.currentPage = 1;
+      }
     });
   }
 
@@ -374,7 +496,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       .then(res => {
         if (res === 'okay') {
           this._debtSummaryService.deleteDebt(debt).subscribe((res2: any) => {
-            this.getDebtSummaries();
+            this.getDebtSummaries(this.config.currentPage);
             this._dialogService.confirm(
               'Transaction has been successfully deleted and sent to the recycle bin. ' + debt.transactionId,
               ConfirmModalComponent,
@@ -407,7 +529,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
           this._transactionsService
             .trashOrRestoreTransactions('3X', 'trash', payment.reportId, [trx])
             .subscribe((res: GetTransactionsResponse) => {
-              this.getDebtSummaries();
+              this.getDebtSummaries(this.config.currentPage);
               this._dialogService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + payment.transactionId,
                 ConfirmModalComponent,
@@ -449,7 +571,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
           this._transactionsService
             .trashOrRestoreTransactions(this.formType, 'trash', reportId, selectedTransactions)
             .subscribe((res: any) => {
-              this.getDebtSummaries();
+              this.getDebtSummaries(this.config.currentPage);
               let afterMessage = '';
               if (selectedTransactions.length === 1) {
                 afterMessage = `Transaction ${selectedTransactions[0].transactionId}
