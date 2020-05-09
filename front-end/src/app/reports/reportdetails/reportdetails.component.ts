@@ -80,11 +80,16 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   //public existingReportId: string;
 
   // ngx-pagination config
-  public maxItemsPerPage = 30;
-  public directionLinks = false;
-  public autoHide = true;
+  public pageSizes: number[] = [10,20,50];
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
   public config: PaginationInstance;
-  public numberOfPages = 0;
+  public numberOfPages: number = 0;
+  public pageNumbers: number[] = [];
+  public gotoPage: number = 1;
+
   public reportID = 0;
   // private keywords = [];
   private firstItemOnPage = 0;
@@ -166,7 +171,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     const paginateConfig: PaginationInstance = {
       id: 'forms__rep-table-pagination',
-      itemsPerPage: 30,
+      itemsPerPage: this.maxItemsPerPage,
       currentPage: 1
     };
     this.config = paginateConfig;
@@ -206,6 +211,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   public getPage(page: number): void {
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
+    this.gotoPage = page;
 
     switch (this.tableType) {
       case this.reportsView:
@@ -218,6 +224,31 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       default:
         break;
     }
+  }
+
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.gotoPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    if (this.config.currentPage == page) {
+      return;
+    }
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
   }
 
   /**
@@ -310,7 +341,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.config.totalItems = res.totalreportsCount ? res.totalreportsCount : 0;
         this.numberOfPages =
           res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
-
+        
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
         this.allReportsSelected = false;
       });
   }
@@ -351,6 +383,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.numberOfPages =
           res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
 
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
         this.allReportsSelected = false;
       });
   }
@@ -739,6 +772,9 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
    * Determine if pagination should be shown.
    */
   public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
     }

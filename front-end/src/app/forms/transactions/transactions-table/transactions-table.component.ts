@@ -531,7 +531,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.totalAmount = res.totalAmount ? res.totalAmount : 0;
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
         this.numberOfPages = res.totalPages;
-        this.pageNumbers = Array.from(new Array(res.totalPages), (x,i) => i+1);
+
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
         this.allTransactionsSelected = false;
       }, error => {
         //console.log('API Error occured: ' + error);
@@ -685,7 +686,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
         this.numberOfPages = res.totalPages;
-        this.pageNumbers = Array.from(new Array(res.totalPages), (x,i) => i+1);
+
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
         this.allTransactionsSelected = false;
       });
   }

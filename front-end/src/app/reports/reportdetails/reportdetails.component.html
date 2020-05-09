@@ -69,8 +69,14 @@
             </div>
         </div>
     </div>
-    <div class="grid-row float-right">
-        <div class="float-right forms__trx-item-range">
+    <div class="grid-row d-flex justify-content-between reports__page-item-range">
+        <div class="d-flex">
+            <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>
+            <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
+                (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage" class="border border-light">
+            </ng-select>
+        </div>
+        <div class="reports__item-range">
             {{determineItemRange()}} of {{config.totalItems}}
         </div>
     </div>
@@ -304,9 +310,17 @@
             </ng-container>
         </tbody>
     </table>
-    <div *ngIf="showPagination()" class="d-flex justify-content-center Report-table-pagination-container">
-        <pagination-controls [id]="config.id" (pageChange)="getPage($event)">
-        </pagination-controls>
+    <div *ngIf="showPagination()" class="d-flex justify-content-center reports__table-pagination-container">
+        <div class="my-auto">
+            <pagination-controls [id]="config.id" (pageChange)="getPage($event)" [maxSize]="paginationControlsMaxSize">
+            </pagination-controls>
+        </div>
+        <div *ngIf="pageNumbers.length > 1" class="d-flex ml-1">
+            <div class="mr-1 my-auto text-muted">Go to page:</div>
+            <ng-select #pageNumber [items]="pageNumbers" [clearable]="false" [hideSelected]="true"
+                (change)="onGotoPageChange($event)" [(ngModel)]="gotoPage" class="border border-light">
+            </ng-select>
+        </div>
     </div>
 
     <div bsModal #columnOptionsModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog"
