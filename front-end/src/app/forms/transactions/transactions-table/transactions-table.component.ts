@@ -74,7 +74,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   // ngx-pagination config
   public pageSizes: number[] = [10,20,50];
   public maxItemsPerPage: number = this.pageSizes[0];
-  public paginationControlsMaxSize: number = 4;
+  public paginationControlsMaxSize: number = 10;
   public directionLinks: boolean = false;
   public autoHide: boolean = true;
   public config: PaginationInstance;
@@ -374,30 +374,28 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-    /**
+  /**
    * onChange for maxItemsPerPage.
    *
-   * @param page the page containing the contacts to get
+   * @param pageSize the page size to get
    */
-  public onMaxItemsPerPageChanged(event): void {
+  public onMaxItemsPerPageChanged(pageSize: number): void {
     this.config.currentPage = 1;
     this.gotoPage = 1;
-    // this.config.itemsPerPage = event.target.value;
-    this.config.itemsPerPage = event;
+    this.config.itemsPerPage = pageSize;
     this.getPage(this.config.currentPage);
   }
 
   /**
    * onChange for gotoPage.
    *
-   * @param page the page containing the contacts to get
+   * @param page the page to get
    */
-  public onGotoPageChange(event): void {
-    let newPage = event;
-    if (this.config.currentPage == newPage) {
+  public onGotoPageChange(page: number): void {
+    if (this.config.currentPage == page) {
       return;
     }
-    this.config.currentPage = newPage;
+    this.config.currentPage = page;
     this.getPage(this.config.currentPage);
   }
 
@@ -687,6 +685,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
         this.numberOfPages = res.totalPages;
+        this.pageNumbers = Array.from(new Array(res.totalPages), (x,i) => i+1);
         this.allTransactionsSelected = false;
       });
   }

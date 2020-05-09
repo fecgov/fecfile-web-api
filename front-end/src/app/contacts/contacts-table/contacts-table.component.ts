@@ -57,11 +57,15 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
   public bulkActionCounter = 0;
 
   // ngx-pagination config
-  public maxItemsPerPage = 10;
-  public directionLinks = false;
-  public autoHide = true;
+  public pageSizes: number[] = [10,20,50];
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
   public config: PaginationInstance;
-  public numberOfPages = 0;
+  public numberOfPages: number = 0;
+  public pageNumbers: number[] = [];
+  public gotoPage: number = 1;
 
   private filters: ContactFilterModel;
   // private keywords = [];
@@ -193,6 +197,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
+    this.gotoPage = page;
 
     switch (this.tableType) {
       case this.contactsView:
@@ -207,6 +212,30 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.gotoPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    if (this.config.currentPage == page) {
+      return;
+    }
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
+  }
 
   /**
 	 * The Contacts for a given page.
@@ -256,6 +285,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 
         this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
+        this.pageNumbers = Array.from(new Array(res.totalPages), (x,i) => i+1);
         this.allContactsSelected = false;
       });
   }
@@ -321,6 +351,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 
         this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
+        this.pageNumbers = Array.from(new Array(res.totalPages), (x,i) => i+1);
         this.allContactsSelected = false;
 
 
@@ -521,6 +552,9 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 	 * Determine if pagination should be shown.
 	 */
   public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
     }
