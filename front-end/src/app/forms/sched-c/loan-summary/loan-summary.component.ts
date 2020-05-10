@@ -67,11 +67,15 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public bulkActionCounter = 0;
 
   // ngx-pagination config
-  public maxItemsPerPage = 100;
-  public directionLinks = false;
-  public autoHide = true;
+  public pageSizes: number[] = [2,10,20,50];
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
   public config: PaginationInstance;
-  public numberOfPages = 0;
+  public numberOfPages: number = 0;
+  public pageNumbers: number[] = [];
+  public gotoPage: number = 1;
 
   //private filters: ContactFilterModel;
   // private keywords = [];
@@ -118,7 +122,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   private columnOptionCount = 0;
   private maxColumnOption = 5;
   public allLoanSelected: boolean;
-  public currentPageNumber: number = 1;
   private _loanSummaryRefreshDataSubscription: Subscription;
 
   constructor(
@@ -130,6 +133,13 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     private _transactionService: TransactionsService,
     private _reportTypeService: ReportTypeService
   ) {
+    const paginateConfig: PaginationInstance = {
+      id: 'forms__loan-summ-table-pagination',
+      itemsPerPage: this.maxItemsPerPage,
+      currentPage: 1
+    };
+    this.config = paginateConfig;
+
     this.showPinColumnsSubscription = this._LoanMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
     });
@@ -158,16 +168,17 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     if (!this.reportId || this.reportId === '0') {
       this.reportId = this._reportTypeService.getReportIdFromStorage(this.formType);
     }
+    
     this.loadPage();
   }
 
   private loadPage(message: any = null) {
-    const paginateConfig: PaginationInstance = {
-      id: 'forms__ctn-table-pagination',
-      itemsPerPage: 10,
-      currentPage: this.currentPageNumber
-    };
-    this.config = paginateConfig;
+    // const paginateConfig: PaginationInstance = {
+    //   id: 'forms__ctn-table-pagination',
+    //   itemsPerPage: 10,
+    //   currentPage: this.currentPageNumber
+    // };
+    // this.config = paginateConfig;
     // this.config.currentPage = 1;
     this.tableType = ActiveView.loanSummary;
     this.getCachedValues();
@@ -180,10 +191,10 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.getPage(this.config.currentPage, message);
   }
 
-  public goToPage(pageEvent: any) {
-    //console.log(pageEvent);
-    this.currentPageNumber = pageEvent;
-  }
+  // public goToPage(pageEvent: any) {
+  //   //console.log(pageEvent);
+  //   this.currentPageNumber = pageEvent;
+  // }
 
   /**
    * A method to run when component is destroyed.
@@ -203,6 +214,8 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public getPage(page: number, message: any = null): void {
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
+    this.gotoPage = page;
+
     //console.log(" getPage this.tableType", this.tableType)
     switch (this.tableType) {
       case this.LoanView:
@@ -211,6 +224,31 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       default:
         break;
     }
+  }
+
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.gotoPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    if (this.config.currentPage == page) {
+      return;
+    }
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
   }
 
   /**
@@ -242,7 +280,13 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     const serverSortColumnName = this._LoanService.mapToSingleServerName(this.currentSortedColumnName);
 
     this._LoanService
-      .getLoan(message)
+      .getLoan(
+        message,
+        page,
+        this.config.itemsPerPage,
+        serverSortColumnName,
+        sortedCol.descending
+      )
       //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
       .subscribe((res: any) => {
         // res=this.tempApiResponse;
@@ -292,11 +336,20 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         this._LoanService.addUIFileds(res);
         this._LoanService.mockApplyFilters(res);
         const LoanModelL = this._LoanService.mapFromServerFields(res);
-        this.LoanModel = LoanModelL;
-
-        this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
-        this.numberOfPages = res.totalPages;
+        if (LoanModelL) {
+          //this.debtModel = debtModelL;
+          this.LoanModel = LoanModelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
+          this.config.totalItems = LoanModelL.length ? LoanModelL.length : 0;
+        } else {
+          this.config.totalItems = 0;
+        }
+        //this.LoanModel = LoanModelL;
+        // this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
+        // this.numberOfPages = res.totalPages;
         this.allLoanSelected = false;
+
+        this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
       });
   }
 
@@ -568,6 +621,9 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * Determine if pagination should be shown.
    */
   public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
     }
