@@ -32,6 +32,7 @@ import {
   ModalHeaderClassEnum
 } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import {AuthService} from '../../shared/services/AuthService/auth.service';
+import { PaginationInstance } from 'ngx-pagination';
 
 @Component({
   selector: 'app-sched-h5',
@@ -77,8 +78,6 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
   public h5Entries = [];
   public h5Ratios: any;
-  public h5TableConfig: any;
-  public h5EntryTableConfig: any;
 
   public levinAccountsies: any;
 
@@ -108,6 +107,19 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public trashSubscription: Subscription;
 
   private _h5OnDestroy$ = new Subject();
+
+  // ngx-pagination config
+  public pageSizes: number[] = [10,20,50];
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
+  public config: PaginationInstance;
+  public numberOfPages: number = 0;
+  public pageNumbers: number[] = [];
+  public gotoPage: number = 1;
+  private firstItemOnPage = 0;
+  private lastItemOnPage = 0;
 
   constructor(
     _http: HttpClient,
@@ -175,6 +187,13 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     _dlService;
     _tranMessageService;
 
+    const paginateConfig: PaginationInstance = {
+      id: 'forms__sched-h5-table-pagination',
+      itemsPerPage: this.maxItemsPerPage,
+      currentPage: 1
+    };
+    this.config = paginateConfig;
+
     this.populateFormForEdit = this._schedHMessageServiceService.getpopulateHFormForEditMessage()
       .subscribe(p => {
         if (p.scheduleType === 'Schedule H5') {
@@ -191,7 +210,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       .subscribe(
         message => {
           if (message.scheduleType === 'Schedule H5') {
-            this.setH5Sum();
+            this.setH5Sum(this.config.currentPage);
           }
         }
       )
@@ -201,7 +220,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       .subscribe(
         message => {
           if (message.scheduleType === 'Schedule H5') {
-            this.setH5Sum();
+            this.setH5Sum(this.config.currentPage);
           }
         }
       )
@@ -230,28 +249,19 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     //this._getFormFields();
 
-    this.setH5();
+    this.setH5(this.config.currentPage);
     this.setCategory();
     this.setActivityOrEventIdentifier();
 
     //this.setH5Sum();
     //this.setH5SumP();
 
-    this.h5TableConfig = {
-      itemsPerPage: 8,
-      currentPage: 1,
-      totalItems: 8
-    };
-    this.h5EntryTableConfig = {
-      itemsPerPage: 3,
-      currentPage: 1,
-      totalItems: 3
-    };
-
     this.setLevinAccounts();
 
     this.h5Ratios = {};
     this.h5Ratios['child'] = [];
+
+    this.getPage(this.config.currentPage);
   }
 
   public ngOnChanges(changes: SimpleChanges) {
@@ -261,7 +271,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this._setTransactionDetail();
 
     if (this.transactionType === 'ALLOC_H5_SUM') {
-      this.setH5Sum();
+      this.setH5Sum(this.config.currentPage);
     }
 
     if (this.transactionType === 'ALLOC_H5_SUM_P') {
@@ -297,13 +307,6 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   public saveAndReturnToParentDebt() {
     this._setTransactionDetail();
     this.saveAndReturnToParent();
-  }
-
-  pageChanged(event) {
-    this.h5TableConfig.currentPage = event;
-  }
-  entryPageChanged(event) {
-    this.h5EntryTableConfig.currentPage = event;
   }
 
   public getReportId(): string {
@@ -404,18 +407,24 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public saveAndGetSummary(ratio: any, scheduleAction: any) {
-
+    let page = 1;
+    this.config.currentPage = page;
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
     this._schedH5Service.saveAndGetSummary(ratio, reportId, scheduleAction).subscribe(res => {
-      if (res) {
-        //this.saveHRes = res;
-        this.h5Entries = [];
+      //this.saveHRes = res;
+      this.h5Entries = [];
+      this.h5Sum = [];
 
-        this.h5Sum = [];
-        this.h5Sum = res;
-        this.h5TableConfig.totalItems = res.length;
+      let modelL = res;
+      if (modelL) {
+        this.h5Sum = modelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
+        this.config.totalItems = modelL.length ? modelL.length : 0;
+      } else {
+        this.config.totalItems = 0;
       }
+      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
+      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
     });
   }
 
@@ -483,7 +492,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
       if (this.scheduleAction !== ScheduleActions.edit) {
         this.h5Entries.push(formObj);
-        this.h5EntryTableConfig.totalItems = this.h5Entries.length;
+        this.config.totalItems = this.h5Entries.length;
         this.h5Ratios.child.push(formObj);
       } else {
         this.h5EntrieEdit = formObj;
@@ -510,7 +519,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
 
-  public setH5() {
+  public setH5(page: number) {
+    this.config.currentPage = page;
 
     this.schedH5 = new FormGroup({
       account_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
@@ -594,7 +604,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     this.isSubmit = false;
     this.schedH5.reset();
-    this.setH5();
+    this.setH5(this.config.currentPage);
 
     this.h5Entries = [];
     this.schedH5.patchValue({ transferred_amount: 0 }, { onlySelf: true });
@@ -610,7 +620,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public returnToAdd(): void {
-    this.setH5();
+    this.setH5(this.config.currentPage);
     this.transactionType = 'ALLOC_H5_RATIO';
   }
 
@@ -656,17 +666,31 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     }
   }
 
-  public setH5Sum() {
-
+  public setH5Sum(page: number) {
+    this.config.currentPage = page;
     this.h5Sum = [];
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
-    this.h5Subscription = this._schedH5Service.getSummary(reportId).subscribe(res => {
-      if (res) {
-        this.h5Sum = res;
-        this.h5TableConfig.totalItems = res.length;
+    this.h5Subscription = this._schedH5Service.getSummary(
+        reportId,
+        page,
+        this.config.itemsPerPage,
+        'default',
+        false
+      ).subscribe(res => {
+      this.h5Sum = [];
+      let modelL = res;
+
+      // pagination
+      if (modelL) {
+        this.h5Sum = modelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
+        this.config.totalItems = modelL.length ? modelL.length : 0;
+      } else {
+        this.config.totalItems = 0;
       }
+      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
+      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
     });
 
     /*  
@@ -853,7 +877,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public clearFormValues() {
-    this.setH5();
+    this.setH5(this.config.currentPage);
     this.h5Entries = [];
     this.h5Ratios = {};
     this.h5Ratios['child'] = [];
@@ -955,7 +979,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
             .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               //this.getTransactionsPage(this.config.currentPage);
-              this.setH5Sum();
+              this.setH5Sum(this.config.currentPage);
               this._dlService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
                 ConfirmModalComponent,
@@ -976,7 +1000,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         if (res === 'okay') {
           this.h5Entries = this.h5Entries.filter(obj => obj !== trx);
           this.h5Ratios.child = this.h5Ratios.child.filter(obj => obj !== trx);
-          this.h5EntryTableConfig.totalItems = this.h5Entries.length;
+          this.config.totalItems = this.h5Entries.length;
 
           let sum = 0;
           this.h5Entries.forEach(obj => {
@@ -1072,4 +1096,103 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
   }
 
+  /**
+   * The records for a given page.
+   *
+   * @param page the page containing the records to get
+   */
+  public getPage(page: number): void {
+    this.gotoPage = page;
+
+    switch (this.transactionType) {
+      case 'ALLOC_H5_SUM':
+        this.setH5Sum(page);
+        break;
+      case 'ALLOC_H5_RATIO':
+        this.setH5(page);
+        break;
+    }
+  }
+
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.gotoPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    if (this.config.currentPage == page) {
+      return;
+    }
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
+  }  
+
+  /**
+   * Determine if pagination should be shown.
+   */
+  public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
+    if (this.config.totalItems > this.config.itemsPerPage) {
+      return true;
+    }
+    // otherwise, no show.
+    return false;
+  }  
+
+  /**
+   * Determine the item range shown by the server-side pagination.
+   */
+  public determineItemRange(): string {
+    let start = 0;
+    let end = 0;
+    // this.numberOfPages = 0;
+    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? this.config.currentPage : 1;
+
+    let modelL: any[];
+    switch (this.transactionType) {
+      case 'ALLOC_H5_SUM':
+        modelL = this.h5Sum;
+        break;
+      case 'ALLOC_H5_RATIO':
+        modelL = this.h5Entries;
+        break;
+    }
+    if (!modelL) {
+      return '0';
+    }
+
+    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0 && modelL.length > 0) {
+      // this.calculateNumberOfPages();
+
+      if (this.config.currentPage === this.numberOfPages) {
+        // end = this.transactionsModel.length;
+        end = this.config.totalItems;
+        start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
+      } else {
+        end = this.config.currentPage * this.config.itemsPerPage;
+        start = end - this.config.itemsPerPage + 1;
+      }
+      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
+      // if (end > this.transactionsModel.length) {
+      //   end = this.transactionsModel.length;
+      // }
+    }
+    this.firstItemOnPage = start;
+    this.lastItemOnPage = end;
+    return start + ' - ' + end;
+  }  
 }

@@ -187,7 +187,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _tranMessageService;
 
     const paginateConfig: PaginationInstance = {
-      id: 'forms__sched-h2-table-pagination',
+      id: 'forms__sched-h3-table-pagination',
       itemsPerPage: this.maxItemsPerPage,
       currentPage: 1
     };
@@ -816,21 +816,19 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
     this._schedH3Service.saveAndGetSummary(ratio, reportId, scheduleAction).subscribe(res => {
-      if (res) {
-        //this.saveHRes = res;
-        this.h3Sum = [];
-        this.h3Entries = [];
+      //this.saveHRes = res;
+      this.h3Sum = [];
+      this.h3Entries = [];
 
-        let modelL = res;
-        if (modelL) {
-          this.h3Sum = modelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
-          this.config.totalItems = modelL.length ? modelL.length : 0;
-        } else {
-          this.config.totalItems = 0;
-        }
-        this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
-        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
+      let modelL = res;
+      if (modelL) {
+        this.h3Sum = modelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
+        this.config.totalItems = modelL.length ? modelL.length : 0;
+      } else {
+        this.config.totalItems = 0;
       }
+      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
+      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
     });
   }
 
