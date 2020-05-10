@@ -150,7 +150,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
     _dlService;
 
     const paginateConfig: PaginationInstance = {
-      id: 'forms__sched-h2-table-pagination',
+      id: 'forms__sched-h4-table-pagination',
       itemsPerPage: this.maxItemsPerPage,
       currentPage: 1
     };
