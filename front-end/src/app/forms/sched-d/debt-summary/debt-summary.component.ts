@@ -273,11 +273,15 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
 
       // TODO: refactor against GetDebtsResponse once python pagination is done
       const debtModelL = this._debtSummaryService.mapFromServerFields(res);
-      //this.debtModel = debtModelL;
-      this.debtModel = debtModelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
+      if (debtModelL) {
+        //this.debtModel = debtModelL;
+        this.debtModel = debtModelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
+        this.config.totalItems = debtModelL.length ? debtModelL.length : 0;
+      } else {
+        this.config.totalItems = 0;
+      }
       this.allDebtSelected = false;
 
-      this.config.totalItems = debtModelL.length ? debtModelL.length : 0;
       this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
       this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
       if (this.numberOfPages === 1) {
