@@ -203,7 +203,15 @@ export class SchedH3Service {
     }
   }
 
-  public saveAndGetSummary(ratio: any, reportId: string, scheduleAction: SchedHActions): Observable<any> {
+  public saveAndGetSummary(
+      ratio: any, 
+      reportId: string, 
+      scheduleAction: SchedHActions,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean
+    ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     const url = '/sh3/schedH3';
@@ -237,7 +245,7 @@ export class SchedH3Service {
 
               let sub: Subscription;
               let sum: any;
-              sub = this.getSummary(reportId).subscribe(res =>
+              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
                 {
                   if(res) {
                     sum =  res;
@@ -266,7 +274,7 @@ export class SchedH3Service {
 
               let sub: Subscription;
               let sum: any;
-              sub = this.getSummary(reportId).subscribe(res =>
+              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
                 {
                   if(res) {
                     sum =  res;

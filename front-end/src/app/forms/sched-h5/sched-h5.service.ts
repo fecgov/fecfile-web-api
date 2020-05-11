@@ -152,7 +152,15 @@ export class SchedH5Service {
       );
   }
 
-  public saveAndGetSummary(ratio: any, reportId: string, scheduleAction: SchedHActions): Observable<any> {
+  public saveAndGetSummary(
+      ratio: any, 
+      reportId: string, 
+      scheduleAction: SchedHActions,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean
+    ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     const url = '/sh5/schedH5';
@@ -186,7 +194,7 @@ export class SchedH5Service {
 
               let sub: Subscription;
               let sum: any;
-              sub = this.getSummary(reportId).subscribe(res =>
+              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
                 {
                   if(res) {
                     sum =  res;
@@ -215,7 +223,7 @@ export class SchedH5Service {
 
               let sub: Subscription;
               let sum: any;
-              sub = this.getSummary(reportId).subscribe(res =>
+              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
                 {
                   if(res) {
                     sum =  res;

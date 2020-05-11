@@ -411,7 +411,15 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.config.currentPage = page;
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
-    this._schedH5Service.saveAndGetSummary(ratio, reportId, scheduleAction).subscribe(res => {
+    this._schedH5Service.saveAndGetSummary(
+        ratio, 
+        reportId, 
+        scheduleAction,
+        page,
+        this.config.itemsPerPage,
+        'default',
+        false
+      ).subscribe(res => {
       //this.saveHRes = res;
       this.h5Entries = [];
       this.h5Sum = [];

@@ -815,7 +815,15 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
-    this._schedH3Service.saveAndGetSummary(ratio, reportId, scheduleAction).subscribe(res => {
+    this._schedH3Service.saveAndGetSummary(
+        ratio, 
+        reportId, 
+        scheduleAction,
+        page,
+        this.config.itemsPerPage,
+        'default',
+        false
+      ).subscribe(res => {
       //this.saveHRes = res;
       this.h3Sum = [];
       this.h3Entries = [];

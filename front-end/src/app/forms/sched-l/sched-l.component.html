@@ -49,312 +49,298 @@
       </div>
     </header>
 
-    <section *ngIf="showSelectType && transactionType === 'LA_ENTRY'">
-      <div class="subtitle">
-        <h2>
-            <b>What Type of Levin Receipts are you adding?</b>
-        </h2>
-      </div>
-      
-      <div>
-        <table class="table table-striped summary_table_text"> 
-            <thead>
-            </thead>
-            <tbody>
-              <tr>               
-                <td class="summary_text_level_3" id="LEVIN_INDV_REC" (click)="selectTypeChange('LEVIN_INDV_REC')">
-                  <input type="radio" formControlName="type" value="LEVIN_INDV_REC" placeholder="Individual Receipt">
-                  <label for="LEVIN_INDV_REC" class="child-options-label">Individual Receipt</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_ORG_REC" (click)="selectTypeChange('LEVIN_ORG_REC')">
-                  <input type="radio" formControlName="type" value="LEVIN_ORG_REC" placeholder="Business Receipt">
-                  <label for="LEVIN_ORG_REC" class="child-options-label">Business Receipt</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_PARTN_REC" (click)="selectTypeChange('LEVIN_PARTN_REC')">                
-                  <input type="radio" formControlName="type" value="LEVIN_PARTN_REC" placeholder="Partnership Receipt"> 
-                  <label for="LEVIN_PARTN_REC" class="child-options-label">Partnership Receipt</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <!--<tr>                
-                <td class="summary_text_level_3" id="LEVIN_PARTN_MEMO" (click)="selectTypeChange($event)">
-                  <input type="radio" formControlName="type" value="LEVIN_PARTN_MEMO" placeholder="Partnership Memo">
-                  <label for="LEVIN_PARTN_MEMO" class="child-options-label">Partnership Memo</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>-->
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_PAC_REC" (click)="selectTypeChange('LEVIN_PAC_REC')">
-                  <input type="radio" formControlName="type" value="LEVIN_PAC_REC" placeholder="PAC Receipt">
-                  <label for="LEVIN_PAC_REC" class="child-options-label">PAC Receipt</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_NON_FED_REC" (click)="selectTypeChange('LEVIN_NON_FED_REC')">
-                  <input type="radio" formControlName="type" value="LEVIN_NON_FED_REC" placeholder="Non-Federal PAC Receipt">
-                  <label for="LEVIN_NON_FED_REC" class="child-options-label">Non-Federal PAC Receipt</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_TRIB_REC" (click)="selectTypeChange('LEVIN_TRIB_REC')">
-                  <input type="radio" formControlName="type" value="LEVIN_TRIB_REC" placeholder="Tribal Receipt">
-                  <label for="LEVIN_TRIB_REC" class="child-options-label">Tribal Receipt</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_OTH_REC" (click)="selectTypeChange('LEVIN_OTH_REC')">
-                  <input type="radio" formControlName="type" value="LEVIN_OTH_REC" placeholder="Other Receipt">
-                  <label for="LEVIN_OTH_REC" class="child-options-label">Other Receipt</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-            </tbody>
-        </table>
-      </div>
+    <!-- Page - body (before table) -->
+    <ng-container>
+      <section *ngIf="showSelectType && transactionType === 'LA_ENTRY'">
+        <div class="subtitle">
+          <h2>
+              <b>What Type of Levin Receipts are you adding?</b>
+          </h2>
+        </div>
+      </section>
 
-      <footer>
-          <footer>
-            <div class="grid-row">
-              <div class="grid-row__col grid-row__col--12">
-                <div class="forms__btn-container">
-                  <button class="btn btn-previous btn-left" type="button" 
-                  (click)="previousStep()">
-                    Cancel
-                  </button>
-                  
-                                                  
-                </div>
-              </div>
-            </div>
-          </footer>
-      </footer>
-    </section>
+      <section *ngIf="showSelectType && transactionType === 'LB_ENTRY'">
+        <div class="subtitle">
+          <h2>
+              <b>What Type of Levin Disbursements are you adding?</b>
+          </h2>
+        </div>
+      </section>
+    </ng-container>
 
-    <section *ngIf="showSelectType && transactionType === 'LB_ENTRY'">
-      <div class="subtitle">
-        <h2>
-            <b>What Type of Levin Disbursements are you adding?</b>
-        </h2>
-      </div>
-      
-      <div>
-        <table class="table table-striped summary_table_text"> 
-            <thead>
-            </thead>
-            <tbody>
-              <tr>               
-                <td class="summary_text_level_3" id="LEVIN_VOTER_REG" (click)="selectTypeChange('LEVIN_VOTER_REG')">
-                  <input type="radio" formControlName="type" value="LEVIN_VOTER_REG" placeholder="Voter Registration">
-                  <label for="LEVIN_VOTER_REG" class="child-options-label">Voter Registration</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_VOTER_ID" (click)="selectTypeChange('LEVIN_VOTER_ID')">
-                  <input type="radio" formControlName="type" value="LEVIN_VOTER_ID" placeholder="Voter ID">
-                  <label for="LEVIN_VOTER_ID" class="child-options-label">Voter ID</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_GOTV" (click)="selectTypeChange('LEVIN_GOTV')">                
-                  <input type="radio" formControlName="type" value="LEVIN_GOTV" placeholder="Get out the Vote (GOTV)"> 
-                  <label for="LEVIN_GOTV" class="child-options-label">Get out the Vote (GOTV)</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_GEN" (click)="selectTypeChange('LEVIN_GEN')">
-                  <input type="radio" formControlName="type" value="LEVIN_GEN" placeholder="Generic Campaign Activity">
-                  <label for="LEVIN_GEN" class="child-options-label">Generic Campaign Activity</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-              <tr>                
-                <td class="summary_text_level_3" id="LEVIN_OTH_DISB" (click)="selectTypeChange('LEVIN_OTH_DISB')">
-                  <input type="radio" formControlName="type" value="LEVIN_OTH_DISB" placeholder="Other Disbursement">
-                  <label for="LEVIN_OTH_DISB" class="child-options-label">Other Disbursement</label>
-                  <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
-                      tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
-                      <i class="info-icon" aria-hidden="true"></i>
-                      <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>                
-              </tr>
-            </tbody>
-        </table>
-      </div>
+    <!-- Pagination - selection -->
+    <ng-container>
+      <section *ngIf="(transactionType === 'LA_SUM' || transactionType === 'LB_SUM')">
+        <div class="grid-row d-flex justify-content-between sched-l__page-range">
+          <div class="d-flex ml-3">
+            <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>
+            <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
+              (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage" class="border border-light"
+              [ngModelOptions]="{standalone: true}">
+            </ng-select>
+          </div>
+          <div class="sched-l__item-range">
+            {{determineItemRange()}} of {{config.totalItems}}
+          </div>
+        </div>
+      </section>
+    </ng-container>
 
-      <footer>
-          <footer>
-            <div class="grid-row">
-              <div class="grid-row__col grid-row__col--12">
-                <div class="forms__btn-container">
-                  <button class="btn btn-previous btn-left" type="button" 
-                  (click)="previousStep()">
-                    Cancel
-                  </button>
-                  
-                                                  
-                </div>
-              </div>
-            </div>
-          </footer>
-      </footer>
-    </section>
-
-    <section *ngIf="transactionType === 'LA_SUM' || transactionType === 'LB_SUM'">
-      <ng-container>              
-        <table class="table table-striped table-hover table__sortable">
+    <!-- Page - body (table) -->
+    <ng-container>
+      <section *ngIf="showSelectType && transactionType === 'LA_ENTRY'">
+        <table class="table table-striped summary_table_text">
           <thead>
-              <tr>
-                  <th >                              
-                  </th>
-                  <th 
-                      (click)="changeSortDirection('activity_event_name')">Type
-                      <i class="fa fa-sort" aria-hidden="false"></i>
-                  </th>
-                  <th 
-                      (click)="changeSortDirection('activity')">Account Name
-                      <i class="fa fa-sort" aria-hidden="false"></i>
-                  </th>
-                  <th 
-                      (click)="changeSortDirection('date')">Name/Organization
-                      <i class="fa fa-sort" aria-hidden="false"></i>
-                  </th>
-                  <th 
-                      (click)="changeSortDirection('ratio_code')">Date
-                      <i class="fa fa-sort" aria-hidden="false"></i>
-                  </th>
-                  <th 
-                      (click)="changeSortDirection('federal_percent')">Amount
-                      <i class="fa fa-sort" aria-hidden="false"></i>
-                  </th>
-              </tr>
           </thead>
           <tbody>
-            <ng-container *ngFor="let trx of schedLsModel | paginate: tableConfig">
-                <tr 
-                  [ngStyle]="{'background-color': trx.memo_code !=='X' ? '' : '#D9EDF6'}">
-                  <td>
-                    <input type="checkbox" (click)="checkForMultiChecked($event)">
-                  </td>
-                  <td> 
-                    <div class="row td-arrow">
-                        {{ trx.tran_desc }}
-                    </div>
-                  </td> 
-                  <td>
-                    <div class="row td-arrow">
-                      {{ trx.levin_account_name }}
-                    </div>
-                  </td>
-
-                  
-
-                  <td [ngClass]="trx.child.length > 0 ? 'parent': ''" 
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_INDV_REC" (click)="selectTypeChange('LEVIN_INDV_REC')">
+                <input type="radio" formControlName="type" value="LEVIN_INDV_REC" placeholder="Individual Receipt">
+                <label for="LEVIN_INDV_REC" class="child-options-label">Individual Receipt</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_ORG_REC" (click)="selectTypeChange('LEVIN_ORG_REC')">
+                <input type="radio" formControlName="type" value="LEVIN_ORG_REC" placeholder="Business Receipt">
+                <label for="LEVIN_ORG_REC" class="child-options-label">Business Receipt</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_PARTN_REC" (click)="selectTypeChange('LEVIN_PARTN_REC')">
+                <input type="radio" formControlName="type" value="LEVIN_PARTN_REC" placeholder="Partnership Receipt">
+                <label for="LEVIN_PARTN_REC" class="child-options-label">Partnership Receipt</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <!--<tr>                
+                          <td class="summary_text_level_3" id="LEVIN_PARTN_MEMO" (click)="selectTypeChange($event)">
+                            <input type="radio" formControlName="type" value="LEVIN_PARTN_MEMO" placeholder="Partnership Memo">
+                            <label for="LEVIN_PARTN_MEMO" class="child-options-label">Partnership Memo</label>
+                            <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                                tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                                <i class="info-icon" aria-hidden="true"></i>
+                                <span class="sr-only">Click here for more information</span>
+                            </button>
+                          </td>                
+                        </tr>-->
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_PAC_REC" (click)="selectTypeChange('LEVIN_PAC_REC')">
+                <input type="radio" formControlName="type" value="LEVIN_PAC_REC" placeholder="PAC Receipt">
+                <label for="LEVIN_PAC_REC" class="child-options-label">PAC Receipt</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_NON_FED_REC" (click)="selectTypeChange('LEVIN_NON_FED_REC')">
+                <input type="radio" formControlName="type" value="LEVIN_NON_FED_REC" placeholder="Non-Federal PAC Receipt">
+                <label for="LEVIN_NON_FED_REC" class="child-options-label">Non-Federal PAC Receipt</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_TRIB_REC" (click)="selectTypeChange('LEVIN_TRIB_REC')">
+                <input type="radio" formControlName="type" value="LEVIN_TRIB_REC" placeholder="Tribal Receipt">
+                <label for="LEVIN_TRIB_REC" class="child-options-label">Tribal Receipt</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_OTH_REC" (click)="selectTypeChange('LEVIN_OTH_REC')">
+                <input type="radio" formControlName="type" value="LEVIN_OTH_REC" placeholder="Other Receipt">
+                <label for="LEVIN_OTH_REC" class="child-options-label">Other Receipt</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    
+      <section *ngIf="showSelectType && transactionType === 'LB_ENTRY'">
+        <table class="table table-striped summary_table_text">
+          <thead>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_VOTER_REG" (click)="selectTypeChange('LEVIN_VOTER_REG')">
+                <input type="radio" formControlName="type" value="LEVIN_VOTER_REG" placeholder="Voter Registration">
+                <label for="LEVIN_VOTER_REG" class="child-options-label">Voter Registration</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_VOTER_ID" (click)="selectTypeChange('LEVIN_VOTER_ID')">
+                <input type="radio" formControlName="type" value="LEVIN_VOTER_ID" placeholder="Voter ID">
+                <label for="LEVIN_VOTER_ID" class="child-options-label">Voter ID</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_GOTV" (click)="selectTypeChange('LEVIN_GOTV')">
+                <input type="radio" formControlName="type" value="LEVIN_GOTV" placeholder="Get out the Vote (GOTV)">
+                <label for="LEVIN_GOTV" class="child-options-label">Get out the Vote (GOTV)</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_GEN" (click)="selectTypeChange('LEVIN_GEN')">
+                <input type="radio" formControlName="type" value="LEVIN_GEN" placeholder="Generic Campaign Activity">
+                <label for="LEVIN_GEN" class="child-options-label">Generic Campaign Activity</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td class="summary_text_level_3" id="LEVIN_OTH_DISB" (click)="selectTypeChange('LEVIN_OTH_DISB')">
+                <input type="radio" formControlName="type" value="LEVIN_OTH_DISB" placeholder="Other Disbursement">
+                <label for="LEVIN_OTH_DISB" class="child-options-label">Other Disbursement</label>
+                <button type="button" class="btn btn-info" ngbTooltip="Language will be provided by RAD"
+                  tooltipClass="form-tooltip" (click)="$event.stopPropagation();$event.preventDefault();">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    
+      <section *ngIf="transactionType === 'LA_SUM' || transactionType === 'LB_SUM'">
+        <table class="table table-striped table-hover table__sortable">
+          <thead>
+            <tr>
+              <th>
+              </th>
+              <th (click)="changeSortDirection('activity_event_name')">Type
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+              <th (click)="changeSortDirection('activity')">Account Name
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+              <th (click)="changeSortDirection('date')">Name/Organization
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+              <th (click)="changeSortDirection('ratio_code')">Date
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+              <th (click)="changeSortDirection('federal_percent')">Amount
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let trx of schedLsModel | paginate: config">
+              <tr [ngStyle]="{'background-color': trx.memo_code !=='X' ? '' : '#D9EDF6'}">
+                <td>
+                  <input type="checkbox" (click)="checkForMultiChecked($event)">
+                </td>
+                <td>
+                  <div class="row td-arrow">
+                    {{ trx.tran_desc }}
+                  </div>
+                </td>
+                <td>
+                  <div class="row td-arrow">
+                    {{ trx.levin_account_name }}
+                  </div>
+                </td>
+      
+      
+      
+                <td [ngClass]="trx.child.length > 0 ? 'parent': ''"
                   (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''">
-                      <div class="row td-arrow">
-                        {{ trx.entity_type == 'IND' ?
-                            trx.first_name + ' ' + trx.last_name :
-                            trx.entity_name
-                        }}
-                        &nbsp;&nbsp;<div *ngIf="trx.child.length > 0" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
-                      <div >
-                        <i *ngIf="trx.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow" (click)="clickArrow(trx)"></i>
-                        <i *ngIf="trx.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(trx)"></i>
-                      </div>
+                  <div class="row td-arrow">
+                    {{ trx.entity_type == 'IND' ?
+                                      trx.first_name + ' ' + trx.last_name :
+                                      trx.entity_name
+                                  }}
+                    &nbsp;&nbsp;<div *ngIf="trx.child.length > 0" class="align_right arrow"
+                      [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
+                    <div>
+                      <i *ngIf="trx.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow" (click)="clickArrow(trx)"></i>
+                      <i *ngIf="trx.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(trx)"></i>
                     </div>
-                  </td>
-                  <td>
-                      {{ transactionType == 'LA_SUM' ? (trx.contribution_date | date: 'MM/dd/yyyy') : (trx.expenditure_date | date: 'MM/dd/yyyy')}}
-                  </td>
-                  <td>{{ transactionType == 'LA_SUM' ? (trx.contribution_amount | currency:'USD':'symbol-narrow':'1.2-2') : 
-                      (trx.expenditure_amount | currency:'USD':'symbol-narrow':'1.2-2')}}</td>
-                  <td>
-                      <div *ngIf="trx.memo_code == 'X'"><input type="checkbox" checked onclick="return false;">Memo</div>
-                      <div *ngIf="trx.memo_code != 'X'"><input type="checkbox" onclick="return false;">Memo</div>                            
-                  </td>
-
-                  <td class="bulk_action" >
-                      <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-  
-                          <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-                              <i class="ellipsis-icon"></i>
-                          </button>
-
-                          <div id="sched-h4__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                              <button class="dropdown-item" (click)="editTransaction(trx)">
-                                  <i class="fas fa-edit"></i> Edit
-                              </button>
-                              <button class="dropdown-item" (click)="printTransaction(trx)">
-                                  <i class="fas fa-print"></i> Print
-                              </button>
-                              <button class="dropdown-item" (click)="cloneTransaction(trx)"><i class="fas fa-copy"></i> Clone</button>
-                              <button *ngIf="checkIfTrashable(trx)" class="dropdown-item" (click)="trashTransaction(trx)"><i class="fas fa-trash" ></i> Trash</button>
-                          </div>
-                      </div>
-                  </td>
-                  
+                  </div>
+                </td>
+                <td>
+                  {{ transactionType == 'LA_SUM' ? (trx.contribution_date | date: 'MM/dd/yyyy') : (trx.expenditure_date | date: 'MM/dd/yyyy')}}
+                </td>
+                <td>{{ transactionType == 'LA_SUM' ? (trx.contribution_amount | currency:'USD':'symbol-narrow':'1.2-2') : 
+                                (trx.expenditure_amount | currency:'USD':'symbol-narrow':'1.2-2')}}</td>
+                <td>
+                  <div *ngIf="trx.memo_code == 'X'"><input type="checkbox" checked onclick="return false;">Memo</div>
+                  <div *ngIf="trx.memo_code != 'X'"><input type="checkbox" onclick="return false;">Memo</div>
+                </td>
+      
+                <td class="bulk_action">
+                  <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+      
+                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                      <i class="ellipsis-icon"></i>
+                    </button>
+      
+                    <div id="sched-h4__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                      <button class="dropdown-item" (click)="editTransaction(trx)">
+                        <i class="fas fa-edit"></i> Edit
+                      </button>
+                      <button class="dropdown-item" (click)="printTransaction(trx)">
+                        <i class="fas fa-print"></i> Print
+                      </button>
+                      <button class="dropdown-item" (click)="cloneTransaction(trx)"><i class="fas fa-copy"></i>
+                        Clone</button>
+                      <button *ngIf="checkIfTrashable(trx)" class="dropdown-item" (click)="trashTransaction(trx)"><i
+                          class="fas fa-trash"></i> Trash</button>
+                    </div>
+                  </div>
+                </td>
+      
               </tr>
-              <tr [ngbCollapse]="trx.child.length > 0? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;" class="child-bg">
+              <tr [ngbCollapse]="trx.child.length > 0? !trx.toggleChild: ''" *ngFor="let trxChild of trx.child;"
+                class="child-bg">
                 <td>
                   <input type="checkbox" (click)="checkForMultiChecked($event)">
                 </td>
@@ -362,66 +348,70 @@
                   <div class="row td-arrow">
                     {{ trxChild.tran_desc }}
                   </div>
-                </td> 
+                </td>
                 <td>
                   <div class="row td-arrow">
                     {{ trxChild.levin_account_name }}
                   </div>
                 </td>
                 <td>
-                    <div class="row td-arrow">
-                      {{ trxChild.entity_type == 'IND' ?
-                      trxChild.first_name + ' ' + trxChild.last_name :
-                      trxChild.entity_name
-                      }}
-                    <div >
-                      <i *ngIf="trxChild.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow" (click)="clickArrow(trxChild)"></i>
-                      <i *ngIf="trxChild.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(trxChild)"></i>
+                  <div class="row td-arrow">
+                    {{ trxChild.entity_type == 'IND' ?
+                                trxChild.first_name + ' ' + trxChild.last_name :
+                                trxChild.entity_name
+                                }}
+                    <div>
+                      <i *ngIf="trxChild.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow"
+                        (click)="clickArrow(trxChild)"></i>
+                      <i *ngIf="trxChild.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow"
+                        (click)="clickArrow(trxChild)"></i>
                     </div>
                   </div>
                 </td>
                 <td>
-                    {{ transactionType == 'LA_SUM' ? (trxChild.contribution_date | date: 'MM/dd/yyyy') : (trxChild.expenditure_date | date: 'MM/dd/yyyy')}}
+                  {{ transactionType == 'LA_SUM' ? (trxChild.contribution_date | date: 'MM/dd/yyyy') : (trxChild.expenditure_date | date: 'MM/dd/yyyy')}}
                 </td>
                 <td>{{ transactionType == 'LA_SUM' ? (trxChild.contribution_amount | currency:'USD':'symbol-narrow':'1.2-2') : 
-                    (trxChild.expenditure_amount | currency:'USD':'symbol-narrow':'1.2-2')}}</td>
+                              (trxChild.expenditure_amount | currency:'USD':'symbol-narrow':'1.2-2')}}</td>
                 <td>
-                    <div *ngIf="trxChild.memo_code == 'X'"><input type="checkbox" checked onclick="return false;">Memo</div>
-                    <div *ngIf="trxChild.memo_code != 'X'"><input type="checkbox" onclick="return false;">Memo</div>                            
+                  <div *ngIf="trxChild.memo_code == 'X'"><input type="checkbox" checked onclick="return false;">Memo</div>
+                  <div *ngIf="trxChild.memo_code != 'X'"><input type="checkbox" onclick="return false;">Memo</div>
                 </td>
-
-                <td class="bulk_action" >
-                    <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-
-                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-                            <i class="ellipsis-icon"></i>
-                        </button>
-
-                        <div id="sched-h4__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                            <button class="dropdown-item" (click)="editTransaction(trxChild)">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button class="dropdown-item">
-                                <i class="fas fa-print"></i> Print
-                            </button>
-                            <button class="dropdown-item" (click)="cloneTransaction(trxChild)"><i class="fas fa-copy"></i> Clone</button>
-                            <button *ngIf="checkIfTrashable(trxChild)" class="dropdown-item" (click)="trashTransaction(trxChild)"><i class="fas fa-trash" ></i> Trash</button>
-                        </div>
+      
+                <td class="bulk_action">
+                  <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+      
+                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                      <i class="ellipsis-icon"></i>
+                    </button>
+      
+                    <div id="sched-h4__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                      <button class="dropdown-item" (click)="editTransaction(trxChild)">
+                        <i class="fas fa-edit"></i> Edit
+                      </button>
+                      <button class="dropdown-item">
+                        <i class="fas fa-print"></i> Print
+                      </button>
+                      <button class="dropdown-item" (click)="cloneTransaction(trxChild)"><i class="fas fa-copy"></i>
+                        Clone</button>
+                      <button *ngIf="checkIfTrashable(trxChild)" class="dropdown-item" (click)="trashTransaction(trxChild)"><i
+                          class="fas fa-trash"></i> Trash</button>
                     </div>
+                  </div>
                 </td>
               </tr>
             </ng-container>
-        </tbody>
-
+          </tbody>
+      
         </table>
-        </ng-container>
-    </section>
-    <section *ngIf="lSum && transactionType === 'L_SUM'">
+      </section>
+    
+      <section *ngIf="lSum && transactionType === 'L_SUM'">
         <div class="financial-summary-content">
           <div class="row">
             <div class="tab-container" [ngSwitch]="viewMode">
               <div id="tab1" *ngSwitchDefault>
-          <!--<ng-container>-->
+                <!--<ng-container>-->
                 <table class="summary_table_text">
                   <tbody class="summary_text">
                     <tr>
@@ -429,355 +419,405 @@
                         <div class="row">
                           <div class="grid-col">
                             <b>Levin Account:&nbsp;&nbsp;</b>
-                            <ng-select #levinAccountSelect 
-                              [items]="levinAccounts" 
-                              class="forms__select" 
-                              bindValue="levin_account_id" 
-                              bindLabel="levin_account_name" 
-                              (change)="getSummaryByLevinAccount($event)"
-                              placeholder="Select Account"
-                              [selectOnTab]="true"
-                              [ngStyle]= "{ 'width': '450px' }">
+                            <ng-select #levinAccountSelect [items]="levinAccounts" class="forms__select"
+                              bindValue="levin_account_id" bindLabel="levin_account_name"
+                              (change)="getSummaryByLevinAccount($event)" placeholder="Select Account" [selectOnTab]="true"
+                              [ngStyle]="{ 'width': '450px' }">
                             </ng-select>
                           </div>
                         </div>
                         <p></p>
                       </td>
-                    </tr>  
+                    </tr>
                     <tr>
-                        <td width=60%>
-                          <div class="summary_text_level_1" >
-                            1. RECEIPTS
-                          </div>
-                        </td>
-                        <td width=20%>
-                          <div class="summary_text_amt_level_1" >
-                            Current Period
-                          </div>
-                        </td>
-                        <td width=20%>
-                          <div class="summary_text_amt_level_1" >
-                            Calendar Year-to-Date
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              1a. Itemized Receipts From Persons
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.itemized_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.itemized_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              1b. Unitemized Receipts From Persons
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.non_itemized_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.non_itemized_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              1c. Total Receipts From Persons
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.itemized_non_itemized_combined | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.itemized_non_itemized_combined_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_2" >
-                              2. OTHER RECEIPTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_2" >
-                            {{ lSum.other_sl_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_2" >
-                              {{ lSum.other_sl_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_1" >
-                              3. TOTAL RECEIPTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_1" >
-                            {{ lSum.total_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_1" >
-                              {{ lSum.total_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_2" >
-                              4. TRANSFERS TO FEDERAL OR ALLOCATION ACCOUNT
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_2" >
-                            &nbsp;
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_2" >
-                              &nbsp;
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              4(a) Voter Registration DISBURSEMENTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.voter_registration_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.voter_registration_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              4(b) Voter ID DISBURSEMENTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.voter_ID_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.voter_ID_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              4(c). GOTV DISBURSEMENTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.GOTV_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.GOTV_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              4(d). Generic Campaign DISBURSEMENTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.generic_campaign_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.generic_campaign_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_1" >
-                              4(e). Line 4 TOTAL
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_1" >
-                            {{ lSum.line4_subtotal | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_1" >
-                              {{ lSum.line4_subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_2" >
-                              5. OTHER DISBURSEMENTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_2" >
-                            {{ lSum.other_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_2" >
-                              {{ lSum.other_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_1" >
-                              6. TOTAL DISBURSEMENTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_1" >
-                            {{ lSum.total_disbursement_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_1" >
-                              {{ lSum.total_disbursement_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              7. CASH ON HAND (Beginning)
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.coh_bop_report | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.coh_bop_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              8. RECEIPTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.total_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.total_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              9. SUBTOTAL
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.subtotal_report | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_3 summary_level_3" >
-                              10. DISBURSEMENTS
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                            {{ lSum.total_disbursement_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_3" >
-                              {{ lSum.total_disbursement_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
-                      <tr>
-                        <td>
-                          <div class="summary_text_level_2" >
-                              11. ENDING CASH ON HAND
-                          </div>
-                        </td>
-                        <td>
-                          <div class="summary_text_amt_level_2" >
-                            {{ lSum.coh_cop_report | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                        <td>
-                          <div class="summary_text_amt_level_2" >
-                              {{ lSum.coh_cop_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                          </div>
-                        </td>  
-                      </tr>
+                      <td width=60%>
+                        <div class="summary_text_level_1">
+                          1. RECEIPTS
+                        </div>
+                      </td>
+                      <td width=20%>
+                        <div class="summary_text_amt_level_1">
+                          Current Period
+                        </div>
+                      </td>
+                      <td width=20%>
+                        <div class="summary_text_amt_level_1">
+                          Calendar Year-to-Date
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          1a. Itemized Receipts From Persons
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.itemized_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.itemized_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          1b. Unitemized Receipts From Persons
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.non_itemized_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.non_itemized_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          1c. Total Receipts From Persons
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.itemized_non_itemized_combined | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.itemized_non_itemized_combined_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_2">
+                          2. OTHER RECEIPTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_2">
+                          {{ lSum.other_sl_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_2">
+                          {{ lSum.other_sl_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_1">
+                          3. TOTAL RECEIPTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_1">
+                          {{ lSum.total_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_1">
+                          {{ lSum.total_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_2">
+                          4. TRANSFERS TO FEDERAL OR ALLOCATION ACCOUNT
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_2">
+                          &nbsp;
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_2">
+                          &nbsp;
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          4(a) Voter Registration DISBURSEMENTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.voter_registration_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.voter_registration_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          4(b) Voter ID DISBURSEMENTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.voter_ID_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.voter_ID_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          4(c). GOTV DISBURSEMENTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.GOTV_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.GOTV_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          4(d). Generic Campaign DISBURSEMENTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.generic_campaign_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.generic_campaign_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_1">
+                          4(e). Line 4 TOTAL
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_1">
+                          {{ lSum.line4_subtotal | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_1">
+                          {{ lSum.line4_subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_2">
+                          5. OTHER DISBURSEMENTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_2">
+                          {{ lSum.other_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_2">
+                          {{ lSum.other_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_1">
+                          6. TOTAL DISBURSEMENTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_1">
+                          {{ lSum.total_disbursement_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_1">
+                          {{ lSum.total_disbursement_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          7. CASH ON HAND (Beginning)
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.coh_bop_report | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.coh_bop_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          8. RECEIPTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.total_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.total_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          9. SUBTOTAL
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.subtotal_report | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_3 summary_level_3">
+                          10. DISBURSEMENTS
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.total_disbursement_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_3">
+                          {{ lSum.total_disbursement_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="summary_text_level_2">
+                          11. ENDING CASH ON HAND
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_2">
+                          {{ lSum.coh_cop_report | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="summary_text_amt_level_2">
+                          {{ lSum.coh_cop_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                        </div>
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-      <!--</ng-container>-->
-    
-  </section>
+      </section>
+    </ng-container>
 
-  
+    <!-- Pagination - paging -->
+    <ng-container>
+      <section *ngIf="(transactionType === 'LA_SUM' || transactionType === 'LB_SUM')">
+        <hr />
+        <div *ngIf="showPagination()" class="d-flex justify-content-center sched-l__table-pagination-container">
+          <div class="my-auto">
+            <pagination-controls [id]="config.id" (pageChange)="getPage($event)" [maxSize]="paginationControlsMaxSize">
+            </pagination-controls>
+          </div>
+          <div *ngIf="pageNumbers.length > 1" class="d-flex ml-1">
+            <div class="mr-1 my-auto text-muted">Go to page:</div>
+            <ng-select #pageNumber [items]="pageNumbers" [clearable]="false" [hideSelected]="true"
+              (change)="onGotoPageChange($event)" [(ngModel)]="gotoPage" class="border border-light" 
+              [ngModelOptions]="{standalone: true}">
+            </ng-select>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- Page - footer -->
+    <ng-container>
+      <section *ngIf="showSelectType && transactionType === 'LA_ENTRY'">
+        <footer>
+          <footer>
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12">
+                <div class="forms__btn-container">
+                  <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
+                    Cancel
+                  </button>
     
+    
+                </div>
+              </div>
+            </div>
+          </footer>
+        </footer>
+      </section>
+
+      <section *ngIf="showSelectType && transactionType === 'LB_ENTRY'">
+        <footer>
+          <footer>
+            <div class="grid-row">
+              <div class="grid-row__col grid-row__col--12">
+                <div class="forms__btn-container">
+                  <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
+                    Cancel
+                  </button>
+    
+    
+                </div>
+              </div>
+            </div>
+          </footer>
+        </footer>
+      </section>
+    </ng-container>
   </form>
 </div>

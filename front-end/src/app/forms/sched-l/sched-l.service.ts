@@ -16,7 +16,14 @@ export class SchedLService {
     private _cookieService: CookieService,
   ) { }
 
-  public getTransactions(reportId: string, levinType: string): Observable<any> {
+  public getTransactions(
+      reportId: string, 
+      levinType: string,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean
+    ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     let url = '/sl/get_sla_summary_table';
@@ -29,6 +36,10 @@ export class SchedLService {
 
     let params = new HttpParams();
     params = params.append('report_id', reportId);
+    params = params.append('page', page.toString());
+    params = params.append('itemsPerPage', itemsPerPage.toString());
+    params = params.append('sortColumnName', sortColumnName);
+    params = params.append('descending', `${descending}`);
     
     return this._http
       .get(
