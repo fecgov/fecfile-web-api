@@ -31,8 +31,8 @@ from fecfiler.core.views import (
     superceded_report_id_list,
     get_sched_h_transaction_table,
     get_comittee_id,
-    update_F3X, function_to_call_wrapper_update_F3X
-
+    update_F3X,
+    function_to_call_wrapper_update_F3X
 
 )
 
@@ -3000,7 +3000,6 @@ def trash_restore_transactions(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
-
 
 
 """
