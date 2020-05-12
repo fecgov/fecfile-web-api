@@ -2432,6 +2432,12 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
     a helper function for handling FEC entity:
     clone FEC entity and mark it for future query exclusion
     """
+    """
+    overriding entity_type to COM if it is not a Candidate by Satheesh on 05/12/2020
+    """
+    if entity_type != 'CAN':
+        entity_type = 'COM'
+
     new_entity_id = get_next_entity_id(entity_type)
     clone_sql = """
             INSERT INTO public.entity(
