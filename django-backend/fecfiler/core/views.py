@@ -8504,54 +8504,64 @@ def get_report_ids(cmte_id, from_date, submit_flag=True, including=True):
 @api_view(["POST"])
 def create_amended_reports(request):
 
-        try:
-            if request.method == "POST":
+    try:
+        is_read_only_or_filer_reports(request)
+
+        if request.method == "POST":
+            try:
                 reportid = request.POST.get("report_id")
                 cmte_id = get_comittee_id(request.user.username)
 
                 val_data = get_reports_data(reportid)
                 if not val_data:
-                          return Response(
-                              "Given Report_id canot be amended",
-                              status=status.HTTP_400_BAD_REQUEST,
-                          )
+                    return Response(
+                                "Given Report_id canot be amended",
+                                status=status.HTTP_400_BAD_REQUEST,
+                    )
                 data = val_data[0]
                 if data.get('form_type') == 'F3X':
-                      cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
+                            cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
-                # cdate = date.today()
-                from_date = cvg_start_date
-                data_obj = None
+                            # cdate = date.today()
+                            from_date = cvg_start_date
+                            data_obj = None
 
-                report_id_list = get_report_ids(cmte_id, from_date)
+                            report_id_list = get_report_ids(cmte_id, from_date)
 
-                print(report_id_list, from_date)
+                            print(report_id_list, from_date)
 
-                if report_id_list:
-                    for i in report_id_list:
-                        amended_obj = create_amended(i)
-                        if str(i) == str(reportid):
-                            data_obj = amended_obj
+                            if report_id_list:
+                                for i in report_id_list:
+                                    amended_obj = create_amended(i)
+                                    if str(i) == str(reportid):
+                                        data_obj = amended_obj
 
-                        # post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+                                        # post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+                            else:
+                                return Response(
+                                    "Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST
+                                )
+
+                elif data.get('form_type') == 'F1M':
+                    output_dict = amend_form1m(data)
+                    data_obj = {**data, **output_dict}
+
+
                 else:
-                    return Response(
-                        "Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST
-                    )
+                    raise Exception("""This form_type cannot be amended. 
+                              form type provided: {}""".format(data.get('form_type')))
+            except Exception as e:
+                return Response(
+                    "Create amended report API is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-            elif data.get('form_type') == 'F1M':
-                output_dict = amend_form1m(data)
-                data_obj = {**data, **output_dict}
-            else:
-                raise Exception("""This form_type cannot be amended. 
-                  form type provided: {}""".format(data.get('form_type')))
 
-            return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
-        except Exception as e:
-            return Response(
-                "Create amended report API is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def amend_form1m(request_dict):

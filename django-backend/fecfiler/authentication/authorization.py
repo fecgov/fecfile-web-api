@@ -11,10 +11,10 @@ def is_not_treasurer(request):
 
 def is_read_only_or_filer_reports(request):
     is_allowed = False
-    if request.user.role == 'READONLY' or request.user.role == 'UPLOADER':
+    if request.user.role == 'READONLY':
         if request.method == 'GET':
             is_allowed = True
-    elif request.user.role != 'READONLY' and request.user.role != 'UPLOADER':
+    elif request.user.role != 'READONLY':
         is_allowed = True
     if not is_allowed:
         raise Exception("User is not allowed to access this API ")
@@ -30,6 +30,6 @@ def is_read_only_or_filer_submit(request):
 
 def is_not_read_only_or_filer(request):
     is_allowed = True
-    if request.user.role == 'READONLY' or request.user.role == 'UPLOADER':
+    if request.user.role == 'READONLY':
         is_allowed = False
     return is_allowed
