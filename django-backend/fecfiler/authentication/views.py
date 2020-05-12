@@ -351,8 +351,8 @@ def update_user(data):
 def check_custom_validations(email, role):
     try:
         check_email_validation(email)
-        if role.upper() not in ["ADMIN","READONLY", "UPLOADER", "ENTRY"]:
-            raise Exception("Role should be ADMIN,READONLY, UPLOADER, ENTRY")
+        if role.upper() not in ["ADMIN","READONLY", "ENTRY"]:
+            raise Exception("Role should be ADMIN,READONLY, ENTRY")
     except Exception as e:
         logger.debug("Custom validation failed")
         raise e
@@ -386,10 +386,9 @@ def manage_user(request):
                 )
             except Exception as e:
                 logger.debug(e)
-                return Response(
-                    "The manageUser API - GET is throwing an error: " + str(e),
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
         elif request.method == "DELETE":
             try:
                 cmte_id = get_comittee_id(request.user.username)
@@ -411,10 +410,9 @@ def manage_user(request):
                                     status=status.HTTP_200_OK,
                                     safe=False)
             except Exception as e:
-                return JsonResponse(
-                    "The Manage User API - DELETE is throwing an error: " + str(e),
-                    status=status.HTTP_400_BAD_REQUEST, safe=False
-                )
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
         elif request.method == "POST":
             try:
                 cmte_id = get_comittee_id(request.user.username)
@@ -433,10 +431,8 @@ def manage_user(request):
                 json_result = {'users': output}
                 return JsonResponse(json_result, status=status.HTTP_201_CREATED, safe=False)
             except Exception as e:
-                return Response(
-                    "Adding new user - POST is throwing an exception: " + str(e),
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
         elif request.method == "PUT":
             try:
@@ -456,10 +452,8 @@ def manage_user(request):
                 return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
                 logger.debug(e)
-                return Response(
-                    "The schedL API - PUT is throwing an error: " + str(e),
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
@@ -540,7 +534,8 @@ def toggle_user(request):
                 return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
                 logger.debug("exception occured while toggling status", str(e))
-                raise e
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
     except Exception as e:
         json_result = {'message': str(e)}
