@@ -1,16 +1,13 @@
 @import 'src/app/shared/scss/global';
 
-.login {    
-    background-image: url("../../../assets/img/fec-logo-5opac.png");
-    background-color: #cccccc;
-    height: 100%;   
+.login {
+  background: #cccccc url("../../../assets/img/fec-logo-5opac.png") no-repeat center;
+  height: 100%;
     padding-top: 15px;
     //padding-left: 500px;
     //padding: 25px;
-    background-repeat: no-repeat;
-    //background-size: 100% auto;
-    background-size: 140% auto; //130% auto;
-    background-position: 330px 1px; //350px 75px;
+    background-size: 50% auto;
+    //background-size: 100% 100%; //130% auto;
     //background-position: 1% 1%;
     header {
       .logo {
