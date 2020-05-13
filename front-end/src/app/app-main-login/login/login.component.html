@@ -15,7 +15,7 @@
       <div class="grid-row">
         <div class="grid-row__col grid-row__col--12">
           <div class="text-error" *ngIf="hasFailed">
-            Invalid username or password.
+            Invalid email, committee id or password.
           </div>
           <div class="logged-out-msg text-info" *ngIf="loggedOut.loggedOut">
             {{ loggedOut?.msg }}
@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="grid-row form-field__info">
-        <div class="grid-row__col grid-row__col--3 title-name text-right">
+        <div class="grid-row__col grid-row__col--3 title-name text-left">
           <label class="left-text" for="login-email-id">
             Email
           </label>
@@ -53,7 +53,7 @@
       </div>
 
       <div class="grid-row form-field__info">
-        <div class="grid-row__col grid-row__col--3 title-name text-right">
+        <div class="grid-row__col grid-row__col--3 title-name text-left">
           <label class="left-text" for="login-committee-id">
             Committee ID
           </label>
@@ -85,7 +85,7 @@
       </div>
 
       <div class="grid-row form-field__info">
-        <div class="grid-row__col grid-row__col--3 title-name text-right">
+        <div class="grid-row__col grid-row__col--3 title-name text-left">
           <label class="left-text" for="login-password">
             Password
           </label>
@@ -124,7 +124,7 @@
       </div>
 
       <div class="grid-row">
-        <div class="grid-row__col grid-row__col--12 text-left offset-3">
+        <div class="grid-row__col grid-row__col--8 text-left offset-3">
           <button type="submit" class="login__btn" [disabled]="isBusy">
             <ng-template [ngIf]="true">Enter</ng-template>
           </button>
@@ -132,17 +132,18 @@
       </div>
 
       <div class="grid-row">
-        
-        <div class="grid-row__col grid-row__col--5 link-text text-center">
+        <div class="grid-row__col grid-row__col--8 text-left  offset-3">
                       
-              <a class="forgot-password-link link" draggable="false" href="https://test-webforms.fec.gov/psa/index.htm" target="_blank">
+              <a class="forgot-password-link link" draggable="false" href="#">
                   Forgot Password?
               </a>
-
-        </div>        
-        <div class="grid-row__col grid-row__col--7 link-text">
+              &nbsp; | &nbsp;
+          <a class="need-to-register-link link" draggable="false" href="#">
+            Forgot Committee ID?
+          </a>
+          &nbsp; | &nbsp;
           <a class="need-to-register-link link" draggable="false" href="https://test-webforms.fec.gov/webforms/form1/index.htm" target="_blank">
-           Create an Account
+           Register
           </a>
         </div>
       </div>

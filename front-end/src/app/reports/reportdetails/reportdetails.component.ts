@@ -1622,10 +1622,8 @@ public printReport(report: reportModel): void{
     )    
   }
   public isUpload() {
-    if (this.authService.isUploader() ||
-        this.authService.isAdmin() ||
-        this.authService.isCommitteeAdmin()
-    ) {
+    if (this.authService.isAdmin() ||
+        this.authService.isCommitteeAdmin()) {
         return true;
     }
     return false;
