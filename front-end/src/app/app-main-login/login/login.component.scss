@@ -54,10 +54,10 @@
   }
   .link-text {
     //text-align: right;
-    color: #CA1A0F ;//#C80505;  
+    color: #5c1b17;//#C80505;
     height: 40px;
     margin-bottom: 15px;
-    margin-top: 30px;  
+    margin-top: 30px;
   }
   .title-name {
     margin-top: 10px;
@@ -107,7 +107,7 @@
           font-family: 'Lato-Reg', sans-serif;
           color: #CA1A0F;//#C80505;
           top: 150px;
-          text-align: right; 
+          text-align: right;
         }
         .login-input {
           /*     
@@ -164,14 +164,15 @@
           width: 140px;
           height: 40px;
           margin-bottom: 15px;
-          margin-top: 30px;          
+          margin-top: 30px;
+          margin-left: 30px;
           color: #ffffff;
           background-color: #164F85;
           font-family: 'Lato-Bold', sans-serif;
           font-size: 20px;
           font-weight: 700;
           border-radius: 5px;
-          border-style: solid;          
+          border-style: solid;
         }
         .login__btn:hover {
           background-color: #C80505;

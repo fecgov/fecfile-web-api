@@ -145,13 +145,13 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Upload]
+          role: [Roles.CommitteeAdmin, Roles.Admin]
         }
       },
       {
         path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Upload]
+          role: [Roles.CommitteeAdmin, Roles.Admin]
         }
       },
       {
@@ -161,7 +161,7 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Upload]
+          role: [Roles.CommitteeAdmin, Roles.Admin]
         }
       },
       { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
