@@ -2985,7 +2985,7 @@ def trash_restore_transactions(request):
             # update report last_update_date
             renew_report_update_date(report_id)
 
-            function_to_call_wrapper_update_F3X(report_id, cmte_id)
+            function_to_call_wrapper_update_F3X(cmte_id,report_id)
 
         except Exception as e:
                  return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
