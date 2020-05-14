@@ -92,7 +92,7 @@ export class ManageUserComponent implements OnInit {
       }, error => { console.log(error);
         if (error.message) {
           this._dialogService.confirm(
-              error.message,
+              error.error.message,
               ConfirmModalComponent,
               'Error !!!',
               false,
