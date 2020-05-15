@@ -7847,7 +7847,7 @@ def delete_trashed_contacts(request):
                     + """'"""
                 )
                 cursor.execute(
-                    """DELETE FROM public.exluded_entity WHERE ref_entity_id in ("""
+                    """DELETE FROM public.excluded_entity WHERE ref_entity_id in ("""
                     + entity_ids
                     + """) AND cmte_id = '"""
                     + cmte_id
