@@ -62,19 +62,7 @@ export class AuthService {
         const sessionData = this._session.getSession();
         if (sessionData) {
             const decodedAccessToken = jwt_decode(sessionData);
-            if (decodedAccessToken.role === Roles.Upload || decodedAccessToken.role === Roles.ReadOnly) {
-                return true;
-            }
-            return false;
-        }
-        this.destroySession();
-    }
-
-    public isUploader(): boolean {
-        const sessionData = this._session.getSession();
-        if (sessionData) {
-            const decodedAccessToken = jwt_decode(sessionData);
-            if (decodedAccessToken.role === Roles.Upload) {
+            if (decodedAccessToken.role === Roles.ReadOnly) {
                 return true;
             }
             return false;

@@ -14,6 +14,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 from fecfiler.core.transaction_util import (
     get_line_number_trans_type,
     get_sched_a_transactions,
@@ -89,169 +90,171 @@ def schedD(request):
     """
     sched_a api supporting POST, GET, DELETE, PUT
     """
-
+    try:
+        is_read_only_or_filer_reports(request)
     # create new sched_d transaction
-    if request.method == "POST":
-        logger.debug("POST request received:{}".format(request.data))
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            # save entoty first
-            logger.debug("checking and filtering reqt data...")
-            datum = schedD_sql_dict(request.data)
-            logger.debug("valid data set:{}".format(datum))
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
+        if request.method == "POST":
+            logger.debug("POST request received:{}".format(request.data))
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                # save entoty first
+                logger.debug("checking and filtering reqt data...")
+                datum = schedD_sql_dict(request.data)
+                logger.debug("valid data set:{}".format(datum))
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
 
-            # if 'creditor_entity_id' in request.data and check_null_value(
-            #         request.data.get('creditor_entity_id')):
-            #     datum['creditor_entity_id'] = request.data.get(
-            #         'creditor_entity_id')
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = check_transaction_id(
+                # if 'creditor_entity_id' in request.data and check_null_value(
+                #         request.data.get('creditor_entity_id')):
+                #     datum['creditor_entity_id'] = request.data.get(
+                #         'creditor_entity_id')
+                if "transaction_id" in request.data and check_null_value(
                     request.data.get("transaction_id")
-                )
-                logger.debug(
-                    "update transaction {} with data:{}".format(
-                        datum.get("transaction_id", datum)
+                ):
+                    datum["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
                     )
+                    logger.debug(
+                        "update transaction {} with data:{}".format(
+                            datum.get("transaction_id", datum)
+                        )
+                    )
+                    data = put_schedD(datum)
+                else:
+                    logger.debug("saving new sd transaction:{}".format(datum))
+                    data = post_schedD(datum)
+                # Associating child transactions to parent and storing them to DB
+
+                output = get_schedD(data)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedD API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
+
+        elif request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params:
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                # elif "report_id" in request.query_params:
+                #     data["report_id"] = check_report_id(
+                #         request.query_params.get("report_id")
+                #     )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.query_params and check_null_value(
+                    request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                if 'transaction_type_identifier' in request.query_params:
+                    data['transaction_type_identifier'] = request.query_params.get(
+                        'transaction_type_identifier')
+                # if "transaction_id" in request.data and check_null_value(
+                #     request.data.get("transaction_id")
+                # ):
+                #     data["transaction_id"] = check_transaction_id(
+                #         request.data.get("transaction_id")
+                #     )
+                datum = get_schedD(data)
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedD API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        elif request.method == "DELETE":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params:
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.query_params and check_null_value(
+                    request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedD(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    "The schedD API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        elif request.method == "PUT":
+            try:
+                datum = schedD_sql_dict(request.data)
+                if "transaction_id" in request.data and check_null_value(
+                    request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = request.data.get("transaction_id")
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["cmte_id"] = get_comittee_id(request.user.username)
+
+                # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+                #     datum['entity_id'] = request.data.get('entity_id')
+                # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+                #     data = put_schedB(datum)
+                #     output = get_schedB(data)
+                # else:
                 data = put_schedD(datum)
-            else:
-                logger.debug("saving new sd transaction:{}".format(datum))
-                data = post_schedD(datum)
-            # Associating child transactions to parent and storing them to DB
-
-            output = get_schedD(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedD API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "GET":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params:
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
+                output = get_schedD(data)
+                # output = get_schedA(data)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedD API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-            # elif "report_id" in request.query_params:
-            #     data["report_id"] = check_report_id(
-            #         request.query_params.get("report_id")
-            #     )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
-                )
-            if 'transaction_type_identifier' in request.query_params:
-                data['transaction_type_identifier'] = request.query_params.get(
-                    'transaction_type_identifier')
-            # if "transaction_id" in request.data and check_null_value(
-            #     request.data.get("transaction_id")
-            # ):
-            #     data["transaction_id"] = check_transaction_id(
-            #         request.data.get("transaction_id")
-            #     )
-            datum = get_schedD(data)
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedD API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
-    elif request.method == "DELETE":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params:
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
-                )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
-                )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedD(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The schedD API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "PUT":
-        try:
-            datum = schedD_sql_dict(request.data)
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = request.data.get("transaction_id")
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["cmte_id"] = get_comittee_id(request.user.username)
-
-            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-            #     datum['entity_id'] = request.data.get('entity_id')
-            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-            #     data = put_schedB(datum)
-            #     output = get_schedB(data)
-            # else:
-            data = put_schedD(datum)
-            output = get_schedD(data)
-            # output = get_schedA(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedD API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    else:
-        raise NotImplementedError
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def delete_schedD(data):

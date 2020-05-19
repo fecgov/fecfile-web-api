@@ -10,7 +10,6 @@ import {IAccount} from '../../account/account';
 export const roleDesc = {
   readonly: 'Can only view data, and cannot perform any other functions.',
   admin : 'Has all the access except managing users',
-  uploader : 'Can only view data, and upload',
   entry : 'Has access to enter, edit and delete information, but cannot upload reports or create other users.'
 };
 
@@ -90,8 +89,15 @@ export class ManageUserComponent implements OnInit {
           this.users = this.mapFromUserFields(res.users);
           this.isEdit = false;
         }
-      }, error => {
-        console.log(error);
+      }, error => { console.log(error);
+        if (error.message) {
+          this._dialogService.confirm(
+              error.error.message,
+              ConfirmModalComponent,
+              'Error !!!',
+              false,
+              ModalHeaderClassEnum.errorHeader);
+        }
       });
     } else {
       const formData: any = {};
@@ -119,6 +125,14 @@ export class ManageUserComponent implements OnInit {
           },
           error => {
             console.log(error);
+            if (error.error.message) {
+              this._dialogService.confirm(
+                  error.error.message,
+                  ConfirmModalComponent,
+                  'Error !!!',
+                  false,
+                  ModalHeaderClassEnum.errorHeader);
+            }
           });
     }
   }
