@@ -59,7 +59,7 @@
                       <!-- [attr.readonly]="isReadOnly(col?.name, col.type)" -->
                       <input *ngIf="col?.name !== 'first_name' 
                           && col?.name !== 'last_name'
-                          && col?.name !== 'entity_name'" class="form-control" [style.width]="col?.width"
+                          && col?.name !== 'entity_name' && col?.name !== 'loan_due_date'" class="form-control" [style.width]="col?.width"
                         [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
                         [attr.readonly]="isFieldReadOnly(col)" [attr.value]="col?.value"
                         [maxlength]="col?.name === 'loan_amount_original' ? null : col?.validation?.max"
@@ -102,7 +102,15 @@
                         : ''
                     " id="typeahead-template-entity-name" [ngbTypeahead]="searchOrg" [resultTemplate]="rtOrg"
                       [focusFirst]=false [inputFormatter]="formatterOrgName" (selectItem)="handleSelectedOrgItem($event)" />
-
+                      <input *ngIf="col?.name === 'loan_due_date'" class="form-control" [style.width]="col?.width"
+                        [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                        [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                        [ngClass]="
+                        frmLoan.get(col?.name)?.invalid &&
+                        (frmLoan.touched || frmLoan.dirty)
+                          ? 'input-field-error'
+                          : ''
+                      " id="loan_due_date" (keyup)="dueDateChanged($event)" />
                     </div>
                     <div class="error-text" *ngIf="
                       (frmLoan.touched || frmLoan.dirty) &&
