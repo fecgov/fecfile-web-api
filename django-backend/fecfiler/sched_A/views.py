@@ -1503,7 +1503,7 @@ def schedA_sql_dict(data):
             data.get("transaction_type_identifier")
         )
         # Adding election year to election code for 'REF_TO_FED_CAN'
-        if data.get("transaction_type_identifier") in ['REF_TO_FED_CAN', 'REF_TO_OTH_CMTE'] and data.get("election_year"):
+        if data.get("transaction_type_identifier") in ['REF_TO_FED_CAN', 'REF_TO_OTH_CMTE'] and data.get("election_year") not in ('YYYY', None) and data.get("election_code"):
             datum['election_code'] += data.get("election_year")
         if (
             data.get("transaction_type_identifier")
