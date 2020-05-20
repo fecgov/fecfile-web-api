@@ -531,7 +531,7 @@ def create_json_builders(request):
         # Figuring out the form type
         form_type = output.get('data').get('formType')
         # Adding Summary data to output based on form type
-        if form_type == 'F3X' and (not transaction_flag):
+        if form_type == 'F3X':
             full_form_type = FORMTYPE_FORM_DICT.get(form_type)
             # Figuring out what schedules are to be checked for the form type
             schedule_name_list = get_schedules_for_form_type(full_form_type)
@@ -548,8 +548,9 @@ def create_json_builders(request):
                 {'sched_type': 'sched_h3'}, {'sched_type': 'sched_h5'},
                 {'sched_type': 'sched_l'}]
             # Iterating through schedules list and populating data into output
-            output['data']['summary'] = get_f3x_summary_details(
-                report_id, cmte_id)
+            if (not transaction_flag):
+                output['data']['summary'] = get_f3x_summary_details(
+                    report_id, cmte_id)
             output['data']['schedules'] = {}
             for schedule_name in schedule_name_list:
                 schedule = SCHED_SCHED_CODES_DICT.get(
