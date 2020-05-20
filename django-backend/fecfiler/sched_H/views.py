@@ -228,10 +228,10 @@ def validate_federal_nonfed_ratio(data):
     0.45 + 0.55 == 1.00
     """
     if not (
-        (
-            float(data.get("federal_percent")) + float(data.get("non_federal_percent"))
-            == float(1)
-        )
+            (
+                    float(data.get("federal_percent")) + float(data.get("non_federal_percent"))
+                    == float(1)
+            )
     ):
         raise Exception("Error: combined federal and non-federal value should be 100%.")
 
@@ -517,7 +517,7 @@ def schedH1(request):
                     datum["public_communications"] = True
 
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -541,7 +541,7 @@ def schedH1(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                    request.query_params.get("report_id")
+                        request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -549,7 +549,7 @@ def schedH1(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                    request.query_params.get("transaction_id")
+                        request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -573,13 +573,13 @@ def schedH1(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                    request.data.get("report_id")
+                        request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -604,7 +604,7 @@ def schedH1(request):
                 cmte_id = get_comittee_id(request.user.username)
                 datum = schedH1_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -650,8 +650,6 @@ def schedH1(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
-
-
 
 
 @api_view(["GET"])
@@ -1130,8 +1128,8 @@ def get_h1_percentage(request):
         # raise Exception ('Missing Input: report_id is mandatory')
 
         if not (
-            "calendar_year" in request.query_params
-            and check_null_value(request.query_params.get("calendar_year"))
+                "calendar_year" in request.query_params
+                and check_null_value(request.query_params.get("calendar_year"))
         ):
             raise Exception("Missing Input: calendar_year is mandatory")
         calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
@@ -1748,10 +1746,10 @@ def get_h2_summary_table(request):
                 _rec["trashable"] = False
                 if _rec["ratio_code"] == "n":
                     if (
-                        count_h2_transactions(
-                            cmte_id, report_id, _rec["activity_event_name"]
-                        )
-                        == 0
+                            count_h2_transactions(
+                                cmte_id, report_id, _rec["activity_event_name"]
+                            )
+                            == 0
                     ):
                         _rec["trashable"] = True
                 # else:
@@ -1791,6 +1789,39 @@ def count_h2_transactions(cmte_id, report_id, activity_event_name):
         raise
 
 
+def check_if_activity_present(datum):
+    report_id = datum.get("report_id")
+    activity_name = datum.get("activity_event_name")
+    activity_name = activity_name.replace(" ", "")
+    fundraising_val = datum.get("fundraising")
+    direct_cand_val = datum.get("direct_cand_support")
+
+    if fundraising_val:
+        event_type = "fundraising"
+    elif direct_cand_val:
+        event_type = "direct_cand_support"
+
+    _sql = """
+        select * from public.sched_h2
+        where translate(lower(activity_event_name), ' ', '') = lower(%s)
+        and fundraising = %s
+        and direct_cand_support = %s
+        and delete_ind is distinct from 'Y'
+        """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (activity_name, fundraising_val, direct_cand_val))
+            event_list = cursor.fetchone()
+            if event_list is not None:
+                raise NoOPError(
+                    "same event activity already exist for report id:{} and event_type:{}".format(
+                        report_id, event_type
+                    )
+                )
+    except Exception as e:
+        raise e
+
+
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH2(request):
     try:
@@ -1810,8 +1841,10 @@ def schedH2(request):
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
 
+                check_if_activity_present(datum)
+
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -1834,7 +1867,7 @@ def schedH2(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                    request.query_params.get("report_id")
+                        request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -1842,7 +1875,7 @@ def schedH2(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                    request.query_params.get("transaction_id")
+                        request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -1866,13 +1899,13 @@ def schedH2(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                    request.data.get("report_id")
+                        request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -1896,7 +1929,7 @@ def schedH2(request):
             try:
                 datum = schedH2_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -1924,7 +1957,6 @@ def schedH2(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
-
 
 
 """
@@ -2001,6 +2033,7 @@ def update_h3_total_amount(data):
     back_ref_transaction_id = data.get("back_ref_transaction_id")
     _v = [back_ref_transaction_id] * 3
     do_transaction(_sql, _v)
+
 
 @update_F3X
 @new_report_date
@@ -2079,6 +2112,7 @@ def validate_sh3_data(data):
     # TODO: temp_change
     if not data.get("total_amount_transferred"):
         data["total_amount_transferred"] = 0
+
 
 @update_F3X
 @new_report_date
@@ -2234,7 +2268,6 @@ def get_child_schedH3(transaction_id, report_id, cmte_id):
 
 
 def get_list_all_schedH3(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -2694,7 +2727,6 @@ def get_h3_aggregate_amount(request):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH3(request):
-
     try:
         is_read_only_or_filer_reports(request)
 
@@ -2763,7 +2795,7 @@ def schedH3(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                    request.query_params.get("report_id")
+                        request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -2771,7 +2803,7 @@ def schedH3(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                    request.query_params.get("transaction_id")
+                        request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -2799,13 +2831,13 @@ def schedH3(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                    request.data.get("report_id")
+                        request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -2829,7 +2861,7 @@ def schedH3(request):
             try:
                 datum = schedH3_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -2864,7 +2896,6 @@ def schedH3(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
-
 
 
 """
@@ -2984,6 +3015,7 @@ def get_existing_h4_total(cmte_id, transaction_id):
             return cursor.fetchone()[0]
     except:
         raise
+
 
 @update_F3X
 @new_report_date
@@ -3122,7 +3154,7 @@ def validate_fed_nonfed_share(data):
         if "," in str(data.get(_rec)):
             data[_rec] = data[_rec].replace(",", "")
     if float(data.get("fed_share_amount")) + float(
-        data.get("non_fed_share_amount")
+            data.get("non_fed_share_amount")
     ) != float(data.get("total_amount")):
         raise Exception(
             "Error: fed_amount and non_fed_amount should sum to total amount."
@@ -3186,7 +3218,7 @@ def list_all_transactions_event_type(start_dt, end_dt, activity_event_type, cmte
 
 
 def list_all_transactions_event_identifier(
-    start_dt, end_dt, activity_event_identifier, cmte_id
+        start_dt, end_dt, activity_event_identifier, cmte_id
 ):
     """
     load all transactions with the specified activity event type
@@ -3234,7 +3266,6 @@ def list_all_transactions_event_identifier(
 
 
 def update_transaction_ytd_amount(cmte_id, transaction_id, aggregate_amount):
-
     """
     update h4 ytd amount
     """
@@ -3298,6 +3329,7 @@ def update_activity_event_amount_ytd(data):
             "The update_activity_event_amount_ytd function is throwing an error: "
             + str(e)
         )
+
 
 @update_F3X
 @new_report_date
@@ -3451,7 +3483,6 @@ def get_schedH4(data):
 
 
 def get_list_all_schedH4(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # GET single row from schedH4 table
@@ -3581,7 +3612,6 @@ def delete_schedH4(data):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH4(request):
-
     try:
         is_read_only_or_filer_reports(request)
 
@@ -3600,7 +3630,7 @@ def schedH4(request):
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     try:
                         datum["transaction_id"] = check_transaction_id(
@@ -3627,7 +3657,7 @@ def schedH4(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                    request.query_params.get("report_id")
+                        request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -3635,7 +3665,7 @@ def schedH4(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                    request.query_params.get("transaction_id")
+                        request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -3659,13 +3689,13 @@ def schedH4(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                    request.data.get("report_id")
+                        request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -3689,7 +3719,7 @@ def schedH4(request):
             try:
                 datum = schedH4_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -3805,6 +3835,7 @@ def update_h5_total_amount(data):
     _v = [back_ref_transaction_id] * 3
     do_transaction(_sql, _v)
 
+
 @update_F3X
 @new_report_date
 def put_schedH5(data):
@@ -3882,6 +3913,7 @@ def validate_sh5_data(data):
     validate sH5 json data
     """
     check_mandatory_fields_SH5(data)
+
 
 @update_F3X
 @new_report_date
@@ -4029,7 +4061,6 @@ def get_child_schedH5(transaction_id, report_id, cmte_id):
 
 
 def get_list_all_schedH5(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # GET single row from schedH5 table
@@ -4256,10 +4287,10 @@ def get_sched_h5_breakdown(request):
             _t = {k: 0 for k, v in result[0].items() if not v}
             result[0].update(_t)
             result[0]["total"] = (
-                float(result[0].get("voter_id", 0))
-                + float(result[0].get("voter_registration", 0))
-                + float(result[0].get("gotv", 0))
-                + float(result[0].get("generic_campaign", 0))
+                    float(result[0].get("voter_id", 0))
+                    + float(result[0].get("voter_registration", 0))
+                    + float(result[0].get("gotv", 0))
+                    + float(result[0].get("generic_campaign", 0))
             )
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
@@ -4268,7 +4299,6 @@ def get_sched_h5_breakdown(request):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH5(request):
-
     try:
         is_read_only_or_filer_reports(request)
 
@@ -4287,7 +4317,7 @@ def schedH5(request):
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -4336,7 +4366,7 @@ def schedH5(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.query_params and check_null_value(
-                    request.query_params.get("report_id")
+                        request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -4344,7 +4374,7 @@ def schedH5(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                    request.query_params.get("transaction_id")
+                        request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -4368,13 +4398,13 @@ def schedH5(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                    request.data.get("report_id")
+                        request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -4398,7 +4428,7 @@ def schedH5(request):
             try:
                 datum = schedH5_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
@@ -4553,6 +4583,7 @@ def get_existing_h6_total(cmte_id, transaction_id):
             return cursor.fetchone()[0]
     except:
         raise
+
 
 @update_F3X
 @new_report_date
@@ -4784,7 +4815,6 @@ def list_all_transactions_event_type_h6(start_dt, end_dt, activity_event_type, c
 
 
 def update_transaction_ytd_amount_h6(cmte_id, transaction_id, aggregate_amount):
-
     """
     update h4 ytd amount
     """
@@ -4837,6 +4867,7 @@ def update_activity_event_amount_ytd_h6(data):
             "The update_activity_event_amount_ytd function is throwing an error: "
             + str(e)
         )
+
 
 @update_F3X
 @new_report_date
@@ -4915,7 +4946,7 @@ def get_schedH6(data):
 
         # TODO: need to remove this when db correction done
         for obj in forms_obj:
-            obj["api_call"]="/sh6/schedH6"
+            obj["api_call"] = "/sh6/schedH6"
             obj["fed_share_amount"] = obj.get("federal_share")
             obj["non_fed_share_amount"] = obj.get("levin_share")
             obj["total_amount"] = obj.get("total_fed_levin_amount")
@@ -4931,7 +4962,6 @@ def get_schedH6(data):
 
 
 def get_list_all_schedH6(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # GET single row from schedH6 table
@@ -5060,7 +5090,6 @@ def delete_schedH6(data):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH6(request):
-
     try:
         is_read_only_or_filer_reports(request)
 
@@ -5080,7 +5109,7 @@ def schedH6(request):
                 datum["report_id"] = report_id
                 datum["cmte_id"] = cmte_id
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -5106,7 +5135,7 @@ def schedH6(request):
                 # make sure we get query parameters from both
                 # request.data.update(request.query_params)
                 if "report_id" in request.query_params and check_null_value(
-                    request.query_params.get("report_id")
+                        request.query_params.get("report_id")
                 ):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
@@ -5114,7 +5143,7 @@ def schedH6(request):
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.query_params and check_null_value(
-                    request.query_params.get("transaction_id")
+                        request.query_params.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.query_params.get("transaction_id")
@@ -5138,13 +5167,13 @@ def schedH6(request):
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
                 if "report_id" in request.data and check_null_value(
-                    request.data.get("report_id")
+                        request.data.get("report_id")
                 ):
                     data["report_id"] = check_report_id(request.data.get("report_id"))
                 else:
                     raise Exception("Missing Input: report_id is mandatory")
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     data["transaction_id"] = check_transaction_id(
                         request.data.get("transaction_id")
@@ -5168,7 +5197,7 @@ def schedH6(request):
             try:
                 datum = schedH6_sql_dict(request.data)
                 if "transaction_id" in request.data and check_null_value(
-                    request.data.get("transaction_id")
+                        request.data.get("transaction_id")
                 ):
                     datum["transaction_id"] = request.data.get("transaction_id")
                 else:
