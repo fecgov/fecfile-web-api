@@ -186,6 +186,60 @@
         ]
       },
       {
+        "childForm": false,
+        "childFormTitle": null,
+        "colClassName": "col col-md-4",
+        "seperator": true,
+        "cols": [
+          {
+            "preText": null,
+            "setEntityIdTo": "entity_id",
+            "isReadonly": false,
+            "entityGroup": null,
+            "toggle": false,
+            "inputGroup": false,
+            "inputIcon": "",
+            "text": "Employer",
+            "infoIcon": true,
+            "infoText": "Request language from RAD",
+            "name": "employer",
+            "type": "text",
+            "value": null,
+            "scroll": false,
+            "height": "30px",
+            "width": "200px",
+            "validation": {
+              "required": true,
+              "max": 38,
+              "alphaNumeric": true
+            }
+          },
+          {
+            "preText": null,
+            "setEntityIdTo": "entity_id",
+            "isReadonly": false,
+            "entityGroup": null,
+            "toggle": false,
+            "inputGroup": false,
+            "inputIcon": "",
+            "text": "Occupation",
+            "infoIcon": true,
+            "infoText": "Request language from RAD",
+            "name": "occupation",
+            "type": "text",
+            "value": null,
+            "scroll": false,
+            "height": "30px",
+            "width": "200px",
+            "validation": {
+              "required": true,
+              "max": 38,
+              "alphaNumeric": true
+            }
+          }
+        ]
+      },
+      {
         "colClassName": "col col-md-4",
         "seperator": true,
         "cols": [
@@ -332,7 +386,7 @@
             "type": "date",
             "value": null,
             "height": "30px",
-            "width": "100px",
+            "width": "154px",
             "validation": {
               "required": true,
               "max": null,
@@ -352,13 +406,19 @@
             "type": "date",
             "value": null,
             "height": "30px",
-            "width": "100px",
+            "width": "154px",
             "validation": {
-              "required": true,
-              "max": null,
+              "required": false,
+              "max": 15,
               "date": true
             }
-          },
+          }
+        ]
+      },
+      {
+        "colClassName": "col col-md-5",
+        "seperator": false,
+        "cols": [
           {
             "isReadonly": false,
             "entityGroup": null,
@@ -372,9 +432,9 @@
             "type": "text",
             "value": null,
             "height": "30px",
-            "width": "100px",
+            "width": "154px",
             "validation": {
-              "required": true,
+              "required": false,
               "max": 15,
               "dollarAmount": false
             }
@@ -394,7 +454,7 @@
             "height": "100%",
             "width": "100%",
             "validation": {
-              "required": true,
+              "required": false,
               "max": 4,
               "alphaNumeric": true
             }
@@ -670,11 +730,17 @@
             "height": "30px",
             "width": "154px",
             "validation": {
-              "required": true,
-              "max": null,
+              "required": false,
+              "max": 15,
               "date": true
             }
-          },
+          }
+        ]
+      },
+      {
+        "colClassName": "col col-md-5",
+        "seperator": false,
+        "cols": [
           {
             "isReadonly": false,
             "entityGroup": null,
@@ -690,7 +756,7 @@
             "height": "30px",
             "width": "154px",
             "validation": {
-              "required": true,
+              "required": false,
               "max": 15,
               "dollarAmount": false
             }
@@ -710,7 +776,7 @@
             "height": "100%",
             "width": "100%",
             "validation": {
-              "required": true,
+              "required": false,
               "max": 4,
               "alphaNumeric": true
             }
