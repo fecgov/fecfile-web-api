@@ -176,7 +176,7 @@ f3x_col_line_dict = {
 
 logger = logging.getLogger(__name__)
 # aws s3 bucket connection
-conn = boto.connect_s3()
+# conn = boto.connect_s3()
 
 
 class NoOPError(Exception):
