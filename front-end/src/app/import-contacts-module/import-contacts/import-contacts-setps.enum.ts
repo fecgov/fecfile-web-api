@@ -1,5 +1,5 @@
 /**
- * Enumeration of sections for Schedule C1.
+ * Enumeration of steps for Import Contacts.
  */
 export enum ImportContactsStepsEnum {
   step1Upload = 'step_1_upload',

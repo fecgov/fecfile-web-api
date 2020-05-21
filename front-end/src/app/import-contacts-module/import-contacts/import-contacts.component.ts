@@ -1,7 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
 import { ImportContactsStepsEnum } from './import-contacts-setps.enum';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { TimeoutMessageService } from 'src/app/shared/services/TimeoutMessageService/timeout-message-service.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-import-contacts',
@@ -9,7 +11,7 @@ import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/con
   styleUrls: ['./import-contacts.component.scss'],
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ImportContactsComponent implements OnInit {
+export class ImportContactsComponent implements OnInit, OnDestroy {
 
   public steps: Array<any>;
   public currentStep: ImportContactsStepsEnum;
@@ -21,8 +23,16 @@ export class ImportContactsComponent implements OnInit {
   public userContacts: Array<any>;
 
   private unsavedData: boolean;
+  private onDestroy$ = new Subject();
 
-  constructor(private _dialogService: DialogService) { }
+  constructor(
+    private _dialogService: DialogService,
+    private _timeoutMessageService: TimeoutMessageService
+  ) {
+    _timeoutMessageService.getTimeoutMessage().takeUntil(this.onDestroy$).subscribe(message => {
+      this.unsavedData = false;
+    });
+  }
 
   ngOnInit() {
     this.steps = [
@@ -32,7 +42,12 @@ export class ImportContactsComponent implements OnInit {
       { text: 'Import', step: this.step4ImportDone }
     ];
     this.currentStep = this.step1Upload;
-    this.unsavedData = true; // false
+    this.unsavedData = true;
+    this.onDestroy$ = new Subject();
+  }
+
+  ngOnDestroy() {
+    this.onDestroy$.next();
   }
 
   public showNextStep() {
@@ -79,6 +94,7 @@ export class ImportContactsComponent implements OnInit {
  */
   public async canDeactivate(): Promise<boolean> {
     // TODO check for form changes and set boolean property in this class.
+    // TODO need to determine if session timeout.  If true, don't show.
 
     if (this.unsavedData) {
       let result: boolean = null;
@@ -98,6 +114,7 @@ export class ImportContactsComponent implements OnInit {
     } else {
       return true;
     }
+
   }
 
 }
