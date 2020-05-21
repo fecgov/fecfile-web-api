@@ -52,7 +52,9 @@
                 </a>
               </div>
               <div *ngIf="_authService.isReadOnly()" class="list-item__link">
-                <a draggable="false">
+                <a draggable="false"
+                   [style.pointer-events]="'none'"
+                   >
                   {{committee_form.form_description}}
                   <br />
                   due {{committee_form.due_date}}
@@ -66,6 +68,8 @@
                   <ng-container *ngIf="formType !== committee_form.form_type_mini">
                     <a
                       draggable="false"
+                      [style.pointer-events]="_authService.isReadOnly() ?'none':'auto'"
+                      tabindex="{{_authService.isReadOnly()?-1:0}}"
                       [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                       [queryParams]="{ step: 'step_1' }"
                       (click)="formSelected(committee_form.form_type_mini)"
@@ -130,6 +134,8 @@
                 <ng-container *ngIf="formType !== committee_form.form_type_mini">
                   <a
                     draggable="false"
+                    [style.pointer-events]="_authService.isReadOnly() ?'none':'auto'"
+                    tabindex="{{_authService.isReadOnly()?-1:0}}"
                     [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                     [queryParams]="{ step: 'step_1' }"
                     (click)="formSelected(committee_form.form_type_mini)"
@@ -146,6 +152,8 @@
                   <ng-container *ngIf="formType !== committee_form.form_type_mini">
                     <a
                       draggable="false"
+                      [style.pointer-events]="_authService.isReadOnly() ?'none':'auto'"
+                      tabindex="{{_authService.isReadOnly()?-1:0}}"
                       [routerLink]="['/forms/form/', committee_form.form_type_mini]"
                       [queryParams]="{ step: 'step_1' }"
                       (click)="formSelected(committee_form.form_type_mini)"

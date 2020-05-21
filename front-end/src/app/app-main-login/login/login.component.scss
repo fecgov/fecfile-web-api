@@ -1,16 +1,13 @@
 @import 'src/app/shared/scss/global';
 
-.login {    
-    background-image: url("../../../assets/img/fec-logo-5opac.png");
-    background-color: #cccccc;
-    height: 100%;   
+.login {
+  background: #cccccc url("../../../assets/img/fec-logo-5opac.png") no-repeat center;
+  height: 100%;
     padding-top: 15px;
     //padding-left: 500px;
     //padding: 25px;
-    background-repeat: no-repeat;
-    //background-size: 100% auto;
-    background-size: 140% auto; //130% auto;
-    background-position: 330px 1px; //350px 75px;
+    background-size: 50% auto;
+    //background-size: 100% 100%; //130% auto;
     //background-position: 1% 1%;
     header {
       .logo {
@@ -50,14 +47,15 @@
   }  
   .fec-title {
     height: 50%;
-    width: 50%;   
+    width: 50%;
+    margin-bottom: 50px;
   }
   .link-text {
     //text-align: right;
-    color: #CA1A0F ;//#C80505;  
+    color: #5c1b17;//#C80505;
     height: 40px;
     margin-bottom: 15px;
-    margin-top: 30px;  
+    margin-top: 30px;
   }
   .title-name {
     margin-top: 10px;
@@ -107,7 +105,7 @@
           font-family: 'Lato-Reg', sans-serif;
           color: #CA1A0F;//#C80505;
           top: 150px;
-          text-align: right; 
+          text-align: right;
         }
         .login-input {
           /*     
@@ -163,15 +161,16 @@
           //font-family: $mainFontFamily;
           width: 140px;
           height: 40px;
-          margin-bottom: 15px;
-          margin-top: 30px;          
+          margin-bottom: 40px;
+          margin-top: 30px;
+          margin-left: 30px;
           color: #ffffff;
           background-color: #164F85;
           font-family: 'Lato-Bold', sans-serif;
           font-size: 20px;
           font-weight: 700;
           border-radius: 5px;
-          border-style: solid;          
+          border-style: solid;
         }
         .login__btn:hover {
           background-color: #C80505;
@@ -181,6 +180,9 @@
           font-weight: bold;
           margin-bottom: 20px;
           margin-top: 10px;
+        }
+        .forgot-password-link{
+          margin-left: 30px;
         }
       }
     }

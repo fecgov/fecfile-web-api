@@ -35,6 +35,7 @@ import {
   ConfirmModalComponent,
   ModalHeaderClassEnum
 } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import {AuthService} from '../../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-sched-l',
@@ -113,7 +114,8 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     private _schedLService: SchedLService,
     private _individualReceiptService: IndividualReceiptService,
     private _tranMessageService: TransactionsMessageService,
-    _schedHMessageServiceService: SchedHMessageServiceService
+    _schedHMessageServiceService: SchedHMessageServiceService,
+    _authService: AuthService,
   ) {
      super(
       _http,
@@ -136,7 +138,8 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
       _contributionDateValidator,
       _transactionsService,
       _reportsService,
-      _schedHMessageServiceService
+      _schedHMessageServiceService,
+      _authService,
     );
     _schedLService;
     _individualReceiptService;

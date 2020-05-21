@@ -123,7 +123,7 @@ def get_header_details():
         "version": "8.3",
         "softwareName": "ABC Inc",
         "softwareVersion": "1.02 Beta",
-        "additionalInfomation": "Any other useful information"
+        "additionalInformation": "Any other useful information"
     }
 
 
@@ -148,6 +148,49 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
     except:
         raise
 
+"""
+***************************** CANDIDATE DETAILS API *************************************
+"""
+
+def get_candidate_details_jsonbuilder(request_dict):
+  try:
+    if request_dict.get('establishmentStatus') == 'Q':
+      output_list = []
+      for i in range(1,6):
+        column_name = 'can'+str(i)+'_id'
+        candidate_id = request_dict.get(column_name)
+        if candidate_id:
+          candidate_dict = get_sql_candidate_jsonbuilder(candidate_id)
+          candidate_dict['contributionDate'] = request_dict.get(column_name[:-2]+'con')
+          candidate_dict['candidateNumber'] = i
+          output_list.append(candidate_dict)
+        del request_dict[column_name]
+        del request_dict[column_name[:-2]+'con']
+      request_dict['candidates'] = output_list
+    return request_dict
+  except Exception as e:
+    raise Exception(
+      'The get_candidate_details_jsonbuilder function is throwing an error: ' + str(e))
+
+def get_sql_candidate_jsonbuilder(candidate_id):
+  try:
+    sql = """SELECT cand_id AS "candidateId", cand_last_name AS "candidateLastName", cand_first_name AS "candidateFirstName", 
+    cand_middle_name AS "candidateMiddleName", cand_prefix AS "candidatePrefix", cand_suffix AS "candidateSuffix", 
+    cand_office AS "candidateOffice", cand_office_state AS "candidateState", 
+    cand_office_district AS "candidateDistrict" FROM public.candidate_master WHERE cand_id=%s"""
+    with connection.cursor() as cursor:
+      cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql),[candidate_id])
+      logger.debug("CANDIDATE TABLE")
+      logger.debug(cursor.query)
+      output_dict = cursor.fetchone()[0]
+      if output_dict:
+        return output_dict[0]
+      else:
+        raise Exception("""The candidateId: {} does not exist in 
+          candidate table.""".format(candidate_id))
+  except Exception as e:
+    raise Exception(
+      'The get_sql_candidate_jsonbuilder function is throwing an error: ' + str(e))
 
 def get_data_details(report_id, cmte_id):
     try:
@@ -160,22 +203,55 @@ def get_data_details(report_id, cmte_id):
         values_1 = [cmte_id]
         string_1 = "Committee Master"
 
-        query_2 = """SELECT COALESCE(cmte_addr_chg_flag,'') AS "changeOfAddress", COALESCE(state_of_election,'') AS "electionState",
-                                        COALESCE(report_type,'') AS "reportCode", COALESCE(amend_ind,'') AS "amendmentIndicator", COALESCE(election_code,'') AS "electionCode",
-                                        COALESCE(qual_cmte_flag,'') AS "qualifiedCommitteeIndicator", COALESCE(to_char(date_of_election,'MM/DD/YYYY'),'') AS "electionDate",
-                                        COALESCE(to_char(date_signed,'MM/DD/YYYY'),'') AS "dateSigned"
-                                FROM public.form_3x Where report_id = %s and cmte_id = %s AND delete_ind is distinct from 'Y'"""
-        values_2 = [report_id, cmte_id]
-        string_2 = "Form 3X"
-
         query_3 = """SELECT COALESCE(amend_number, 0) AS "amendmentNumber", COALESCE(to_char(cvg_start_date,'MM/DD/YYYY'),'') AS "coverageStartDate", COALESCE(to_char(cvg_end_date,'MM/DD/YYYY'),'') AS "coverageEndDate",
                                 form_type AS "formType", report_id AS "reportId"
                                 FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'"""
         values_3 = [report_id, cmte_id]
         string_3 = "Reports"
-        return {**json_query(query_1, values_1, string_1, False)[0],
-                **json_query(query_2, values_2, string_2, False)[0],
+
+        output = {**json_query(query_1, values_1, string_1, False)[0],
                 **json_query(query_3, values_3, string_3, False)[0]}
+
+        if output['formType'] == 'F3X':
+            query_2 = """SELECT COALESCE(cmte_addr_chg_flag,'') AS "changeOfAddress", COALESCE(state_of_election,'') AS "electionState",
+                                            COALESCE(report_type,'') AS "reportCode", COALESCE(amend_ind,'') AS "amendmentIndicator", COALESCE(election_code,'') AS "electionCode",
+                                            COALESCE(qual_cmte_flag,'') AS "qualifiedCommitteeIndicator", COALESCE(to_char(date_of_election,'MM/DD/YYYY'),'') AS "electionDate",
+                                            COALESCE(to_char(date_signed,'MM/DD/YYYY'),'') AS "dateSigned"
+                                    FROM public.form_3x Where report_id = %s and cmte_id = %s AND delete_ind is distinct from 'Y'"""
+            values_2 = [report_id, cmte_id]
+            string_2 = "Form 3X"
+            output = {**output, **json_query(query_2, values_2, string_2, False)[0]}
+
+        elif output['formType'] == 'F1M':
+            query_2 = """SELECT CASE WHEN (SELECT est_status FROM public.form_1m WHERE report_id=%s and cmte_id=%s) = 'A'
+                            THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", aff_cmte_id AS "affiliatedCommitteeId", 
+                            (SELECT cmte.cmte_name FROM committee_master cmte WHERE cmte.cmte_id = aff_cmte_id) AS "affiliatedCommitteeName", 
+                            COALESCE(to_char(aff_date,'MM/DD/YYYY'),'') AS "affiliatedDate", sign_id AS "signatureId", 
+                            COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate" 
+                              FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
+                          WHEN (SELECT est_status FROM public.form_1m WHERE report_id=%s and cmte_id=%s) = 'Q'
+                            THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", can1_id, 
+                            COALESCE(to_char(can1_con,'MM/DD/YYYY'),'') AS "can1_con", can2_id, COALESCE(to_char(can2_con,'MM/DD/YYYY'),'') AS "can2_con", 
+                            can3_id, COALESCE(to_char(can3_con,'MM/DD/YYYY'),'') AS "can3_con", can4_id, COALESCE(to_char(can4_con,'MM/DD/YYYY'),'') AS "can4_con", 
+                            can5_id, COALESCE(to_char(can5_con,'MM/DD/YYYY'),'') AS "can5_con", COALESCE(to_char(date_51,'MM/DD/YYYY'),'') AS "51stContributorDate", 
+                            COALESCE(to_char(orig_date,'MM/DD/YYYY'),'') AS "registrationDate", COALESCE(to_char(metreq_date,'MM/DD/YYYY'),'') AS "requirementsMetDate", 
+                            sign_id AS "signatureId", COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate"  
+                              FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
+                          END AS "output" """
+            values_2 = [report_id, cmte_id, report_id, cmte_id, report_id, cmte_id, report_id, cmte_id]
+            string_2 = "Form 1M"
+            f1m_data = json_query(query_2, values_2, string_2, False)[0]['output']
+            if f1m_data:
+                f1m_data = f1m_data[0]
+                f1m_data = get_candidate_details_jsonbuilder(f1m_data)
+                output = {**output, **f1m_data}
+            else:
+                raise Exception('There is no form 1m data for this report id: {} and cmte id: {}'.format(report_id, cmte_id))
+
+        else:
+            raise Exception('The JSON Builder has not been implemented for this report type: ' + output['formType'])
+
+        return output
 
     except Exception:
         raise
@@ -454,27 +530,27 @@ def create_json_builders(request):
         output['data'] = get_data_details(report_id, cmte_id)
         # Figuring out the form type
         form_type = output.get('data').get('formType')
-        full_form_type = FORMTYPE_FORM_DICT.get(form_type)
-        # Figuring out what schedules are to be checked for the form type
-        schedule_name_list = get_schedules_for_form_type(full_form_type)
-        # List of all the child transactions that need back_ref_transaction_id
-        ALL_CHILD_TRANSACTION_TYPES_LIST = get_all_child_transaction_identifers(form_type)
-
-        # *******************************TEMPORARY MODIFICATION FTO CHECK ONLY SCHED A AND SCHED B TABLES************************************
-        schedule_name_list = [
-            {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_c'}, {'sched_type': 'sched_d'},
-            {'sched_type': 'sched_e'},
-            {'sched_type': 'sched_f'}, {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'},
-            {'sched_type': 'sched_c1'},
-            {'sched_type': 'sched_c2'}, {'sched_type': 'sched_h1'}, {'sched_type': 'sched_h2'},
-            {'sched_type': 'sched_h3'}, {'sched_type': 'sched_h5'},
-            {'sched_type': 'sched_l'}]
         # Adding Summary data to output based on form type
-        if form_type == 'F3X' and (not transaction_flag):
+        if form_type == 'F3X':
+            full_form_type = FORMTYPE_FORM_DICT.get(form_type)
+            # Figuring out what schedules are to be checked for the form type
+            schedule_name_list = get_schedules_for_form_type(full_form_type)
+            # List of all the child transactions that need back_ref_transaction_id
+            ALL_CHILD_TRANSACTION_TYPES_LIST = get_all_child_transaction_identifers(form_type)
+
+            # *******************************TEMPORARY MODIFICATION FTO CHECK ONLY SCHED A AND SCHED B TABLES************************************
+            schedule_name_list = [
+                {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_c'}, {'sched_type': 'sched_d'},
+                {'sched_type': 'sched_e'},
+                {'sched_type': 'sched_f'}, {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'},
+                {'sched_type': 'sched_c1'},
+                {'sched_type': 'sched_c2'}, {'sched_type': 'sched_h1'}, {'sched_type': 'sched_h2'},
+                {'sched_type': 'sched_h3'}, {'sched_type': 'sched_h5'},
+                {'sched_type': 'sched_l'}]
             # Iterating through schedules list and populating data into output
-            output['data']['summary'] = get_f3x_summary_details(
-                report_id, cmte_id)
-        if schedule_name_list:
+            if (not transaction_flag):
+                output['data']['summary'] = get_f3x_summary_details(
+                    report_id, cmte_id)
             output['data']['schedules'] = {}
             for schedule_name in schedule_name_list:
                 schedule = SCHED_SCHED_CODES_DICT.get(
@@ -552,9 +628,10 @@ def create_json_builders(request):
 
         # Transfering the local json file to S3 bucket
         client = boto3.client('s3')
+
         transfer = S3Transfer(client)
         transfer.upload_file(tmp_path, 'dev-efile-repo', tmp_filename)
-
+        # return Response("Success", status=status.HTTP_201_CREATED)
         if call_from == "PrintPreviewPDF":
             data_obj = {'form_type': form_type}
             file_obj = {'json_file': ('data.json', open(

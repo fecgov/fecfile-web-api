@@ -37,6 +37,8 @@ from fecfiler.core.views import NoOPError, get_levin_accounts, get_comittee_id
 
 # API view functionality for GET DELETE and PUT
 # Exception handling is taken care to validate the committeinfo
+from ..authentication.authorization import is_read_only_or_filer_submit, is_read_only_or_filer_reports, is_not_read_only_or_filer
+
 logger = logging.getLogger(__name__)
 
 # API which prints Form 99 data
@@ -303,7 +305,9 @@ def create_f99_info(request):
             #logger.
             #return Response({"error":"An unexpected error occurred" + str(sys.exc_info()[0]) + ". Please contact administrator"}, status=status.HTTP_400_BAD_REQUEST)
         if serializer.is_valid():
-            serializer.save()
+            if is_not_read_only_or_filer(request):
+                if is_not_read_only_or_filer:
+                    serializer.save()
             return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
          
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -325,54 +329,48 @@ def f99_file_upload(self, request, format=None):
 """
 @api_view(['POST'])
 def update_f99_info(request, print_flag=False):
+    try:
+        is_read_only_or_filer_reports(request)
 
-    if request.method == 'POST':
-        try:
-            if 'id' in request.data and (not request.data['id']=='') and int(request.data['id'])>=1:
-                comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
-                print(request.data.get('email_on_file_1'))
-                print(comm_info.email_on_file_1)
+        if request.method == 'POST':
+            try:
+                if 'id' in request.data and (not request.data['id']=='') and int(request.data['id'])>=1:
+                    comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+                    print(request.data.get('email_on_file_1'))
+                    print(comm_info.email_on_file_1)
 
-                if comm_info:
-                    if comm_info.is_submitted==False:
-                        comm_info.committeeid =  request.data.get('committeeid')
-                        comm_info.committeename = request.data.get('committeename')
-                        comm_info.street1 = request.data.get('street1')
-                        comm_info.street2 = request.data.get('street2')
-                        comm_info.city = request.data.get('city')
-                        comm_info.state = request.data.get('state')
-                        comm_info.text = request.data.get('text')
-                        comm_info.reason = request.data.get('reason')
-                        comm_info.zipcode = request.data.get('zipcode')
-                        comm_info.treasurerlastname = request.data.get('treasurerlastname')
-                        comm_info.treasurerfirstname = request.data.get('treasurerfirstname')
-                        comm_info.treasurermiddlename = request.data.get('treasurermiddlename')
-                        comm_info.treasurerprefix = request.data.get('treasurerprefix')
-                        comm_info.treasurersuffix = request.data.get('treasurersuffix')
-                        comm_info.is_submitted = request.data.get('is_submitted')
-                        try:
-                            comm_info.filename = request.data.get('file').name
-                            comm_info.file = request.data.get('file')
-                        except:
-                            pass
-                        comm_info.form_type = request.data.get('form_type')
-                        comm_info.coverage_start_date = request.data.get('coverage_start_date')
-                        comm_info.coverage_end_date = request.data.get('coverage_end_date')                       
-                        comm_info.signee = request.data.get('signee')
-                        comm_info.email_on_file = request.data.get('email_on_file')
-                        comm_info.email_on_file_1 = request.data.get('email_on_file_1')
-                        comm_info.additional_email_1 = request.data.get('additional_email_1')
-                        comm_info.additional_email_2 = request.data.get('additional_email_2')
-                        comm_info.updated_at = datetime.datetime.now()
-                        comm_info.save()
-                        result = CommitteeInfo.objects.filter(id=request.data['id']).last()
-                        if result:
-                            serializer = CommitteeInfoSerializer(result)
-                            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
-                        else:
-                            return Response({})
-                    else:
-                        if print_flag:
+                    if comm_info:
+                        if comm_info.is_submitted==False:
+                            comm_info.committeeid =  request.data.get('committeeid')
+                            comm_info.committeename = request.data.get('committeename')
+                            comm_info.street1 = request.data.get('street1')
+                            comm_info.street2 = request.data.get('street2')
+                            comm_info.city = request.data.get('city')
+                            comm_info.state = request.data.get('state')
+                            comm_info.text = request.data.get('text')
+                            comm_info.reason = request.data.get('reason')
+                            comm_info.zipcode = request.data.get('zipcode')
+                            comm_info.treasurerlastname = request.data.get('treasurerlastname')
+                            comm_info.treasurerfirstname = request.data.get('treasurerfirstname')
+                            comm_info.treasurermiddlename = request.data.get('treasurermiddlename')
+                            comm_info.treasurerprefix = request.data.get('treasurerprefix')
+                            comm_info.treasurersuffix = request.data.get('treasurersuffix')
+                            comm_info.is_submitted = request.data.get('is_submitted')
+                            try:
+                                comm_info.filename = request.data.get('file').name
+                                comm_info.file = request.data.get('file')
+                            except:
+                                pass
+                            comm_info.form_type = request.data.get('form_type')
+                            comm_info.coverage_start_date = request.data.get('coverage_start_date')
+                            comm_info.coverage_end_date = request.data.get('coverage_end_date')
+                            comm_info.signee = request.data.get('signee')
+                            comm_info.email_on_file = request.data.get('email_on_file')
+                            comm_info.email_on_file_1 = request.data.get('email_on_file_1')
+                            comm_info.additional_email_1 = request.data.get('additional_email_1')
+                            comm_info.additional_email_2 = request.data.get('additional_email_2')
+                            comm_info.updated_at = datetime.datetime.now()
+                            comm_info.save()
                             result = CommitteeInfo.objects.filter(id=request.data['id']).last()
                             if result:
                                 serializer = CommitteeInfoSerializer(result)
@@ -380,21 +378,32 @@ def update_f99_info(request, print_flag=False):
                             else:
                                 return Response({})
                         else:
-                            logger.debug("FEC Error 002:This form is already submitted")
-                            return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
+                            if print_flag:
+                                result = CommitteeInfo.objects.filter(id=request.data['id']).last()
+                                if result:
+                                    serializer = CommitteeInfoSerializer(result)
+                                    return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+                                else:
+                                    return Response({})
+                            else:
+                                logger.debug("FEC Error 002:This form is already submitted")
+                                return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        logger.debug("FEC Error 003:This form Id number does not exist")
+                        return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    logger.debug("FEC Error 003:This form Id number does not exist")
-                    return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                print('new id is created')
-                #create_f99_info(request)
-        except CommitteeInfo.DoesNotExist:
-            logger.debug("FEC Error 004:There is no unsubmitted data. Please create f99 form object before submitting")
-            return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+                    print('new id is created')
+                    #create_f99_info(request)
+            except CommitteeInfo.DoesNotExist:
+                logger.debug("FEC Error 004:There is no unsubmitted data. Please create f99 form object before submitting")
+                return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
 
-        except ValueError:
-            logger.debug("FEC Error 006:This form Id number is not an integer")
-            return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+            except ValueError:
+                logger.debug("FEC Error 006:This form Id number is not an integer")
+                return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
     """   
     #Updates the last unsubmitted comm_info object only. you can use this to change the 'text' and 'is_submitted' field as well as any other field.
@@ -440,77 +449,82 @@ def update_f99_info(request, print_flag=False):
 @api_view(['POST'])
 def submit_comm_info(request):
     if request.method == 'POST':
-        
-        data = {
-            'committeeid': request.data.get('committeeid'),
-            'committeename': request.data.get('committeename'),
-            'street1': request.data.get('street1'),
-            'street2': request.data.get('street2'),
-            'city': request.data.get('city'),
-            'state': request.data.get('state'),
-            'text': request.data.get('text'),
-            #'reason' :request.data.get('text'),
-            'reason' :request.data.get('reason'),
-            'zipcode': request.data.get('zipcode'),
-            'treasurerlastname': request.data.get('treasurerlastname'),
-            'treasurerfirstname': request.data.get('treasurerfirstname'),
-            'treasurermiddlename': request.data.get('treasurermiddlename'),
-            'treasurerprefix': request.data.get('treasurerprefix'),
-            'treasurersuffix': request.data.get('treasurersuffix'),
-            
-            'signee': request.data.get('signee'),
-            'email_on_file' : request.data.get('email_on_file'),
-            'email_on_file_1': request.data.get('email_on_file_1'),
-
-            'additional_email_1' : request.data.get('additional_email_1'),
-            'additional_email_2': request.data.get('additional_email_2'),
-            'form_type': request.data.get('form_type'),
-            'coverage_start_date': request.data.get('coverage_start_date'),
-            'coverage_end_date': request.data.get('coverage_end_date'),
-
-        }
-        logger.debug("Incoming parameters: submit_comm_info" + str(request.data))                
-        incoming_data = data
-
-        print("Reason text= ", request.data.get('text'))
-        strcheck_Reason=check_F99_Reason_Text(request.data.get('text'))
-
-        print ("strcheck_Reason", strcheck_Reason)
-        if strcheck_Reason != "":
-           return Response({"FEC Error 999":"The reason text is not in proper format - HTML tag violation...!"}, status=status.HTTP_400_BAD_REQUEST)
-
-
-        #import ipdb; ipdb.set_trace()
-        # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
-
-        #not(request.data['is_submitted'] in['True',True,'true'] and
-        #if not incoming_data['committeeid'] == get_comittee_id(request.user.username):
-            #return Response({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
-        # just making sure that committeeid is not updated by mistake
         try:
-            comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
-            if comm_info:
-                if comm_info.is_submitted==False:
-                    incoming_data['updated_at'] = datetime.datetime.now()
-                    incoming_data['created_at'] = comm_info.created_at
-                    comm_info.is_submitted=True
-                    serializer = CommitteeInfoSerializer(comm_info, data=incoming_data)
+            is_read_only_or_filer_reports(request)
+        
+            data = {
+                'committeeid': request.data.get('committeeid'),
+                'committeename': request.data.get('committeename'),
+                'street1': request.data.get('street1'),
+                'street2': request.data.get('street2'),
+                'city': request.data.get('city'),
+                'state': request.data.get('state'),
+                'text': request.data.get('text'),
+                #'reason' :request.data.get('text'),
+                'reason' :request.data.get('reason'),
+                'zipcode': request.data.get('zipcode'),
+                'treasurerlastname': request.data.get('treasurerlastname'),
+                'treasurerfirstname': request.data.get('treasurerfirstname'),
+                'treasurermiddlename': request.data.get('treasurermiddlename'),
+                'treasurerprefix': request.data.get('treasurerprefix'),
+                'treasurersuffix': request.data.get('treasurersuffix'),
+
+                'signee': request.data.get('signee'),
+                'email_on_file' : request.data.get('email_on_file'),
+                'email_on_file_1': request.data.get('email_on_file_1'),
+
+                'additional_email_1' : request.data.get('additional_email_1'),
+                'additional_email_2': request.data.get('additional_email_2'),
+                'form_type': request.data.get('form_type'),
+                'coverage_start_date': request.data.get('coverage_start_date'),
+                'coverage_end_date': request.data.get('coverage_end_date'),
+
+            }
+            logger.debug("Incoming parameters: submit_comm_info" + str(request.data))
+            incoming_data = data
+
+            print("Reason text= ", request.data.get('text'))
+            strcheck_Reason=check_F99_Reason_Text(request.data.get('text'))
+
+            print ("strcheck_Reason", strcheck_Reason)
+            if strcheck_Reason != "":
+               return Response({"FEC Error 999":"The reason text is not in proper format - HTML tag violation...!"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+            #import ipdb; ipdb.set_trace()
+            # overwrite is_submitted just in case user sends it, all submit changes to go via submit_comm_info api as we save to s3 and call fec api.
+
+            #not(request.data['is_submitted'] in['True',True,'true'] and
+            #if not incoming_data['committeeid'] == get_comittee_id(request.user.username):
+                #return Response({"FEC Error 005":"is_submitted and committeeid field changes are restricted for this api call. Please use the create api to finalize or update the data"}, status=status.HTTP_400_BAD_REQUEST)
+            # just making sure that committeeid is not updated by mistake
+            try:
+                comm_info = CommitteeInfo.objects.filter(id=request.data['id']).last()
+                if comm_info:
+                    if comm_info.is_submitted==False:
+                        incoming_data['updated_at'] = datetime.datetime.now()
+                        incoming_data['created_at'] = comm_info.created_at
+                        comm_info.is_submitted=True
+                        serializer = CommitteeInfoSerializer(comm_info, data=incoming_data)
+                    else:
+                        return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
                 else:
-                    return Response({"FEC Error 002":"This form is already submitted"}, status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-            
-        except CommitteeInfo.DoesNotExist:
-            return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
-        except ValueError:
-                    return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
-            
-        if serializer.is_valid():
-            serializer.save()
-            email(True, serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+            except CommitteeInfo.DoesNotExist:
+                return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
+            except ValueError:
+                        return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if serializer.is_valid():
+                serializer.save()
+                email(True, serializer.data)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            json_result = {'message': str(e)}
+            return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
     """
     Submits the last unsubmitted but saved comm_info object only. Returns the saved object with updated timestamp and comm_info details
@@ -714,39 +728,49 @@ def get_signee(request):
 
 @api_view(['POST'])
 def update_committee(request, cid):
-    # # update details of a single comm
-    if request.method == 'POST':
-         serializer = CommitteeSerializer(comm, data=request.data)
-         if serializer.is_valid():
-             serializer.save()
-             return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+    try:
+        is_read_only_or_filer_reports(request)
+        # # update details of a single comm
+        if request.method == 'POST':
+             serializer = CommitteeSerializer(comm, data=request.data)
+             if serializer.is_valid():
+                 serializer.save()
+                 return Response(serializer.data, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 @api_view(['POST'])
 def create_committee(request):
     # insert a new record for a committee
-    if request.method == 'POST':
-        data = {
-            'committeeid': request.data.get('committeeid'),
-            'committeename': request.data.get('committeename'),
-            'street1': request.data.get('street1'),
-            'street2': request.data.get('street2'),
-            'city': request.data.get('city'),
-            'state': request.data.get('state'),
-            'zipcode': int(request.data.get('zipcode')),
-            'treasurerlastname': request.data.get('treasurerlastname'),
-            'treasurerfirstname': request.data.get('treasurerfirstname'),
-            'treasurermiddlename': request.data.get('treasurermiddlename'),
-            'treasurerprefix': request.data.get('treasurerprefix'),
-            'treasurersuffix': request.data.get('treasurersuffix'),
-            'email_on_file' : request.data.get('email_on_file'),
-            'email_on_file_1' : request.data.get('email_on_file_1'),
-        }
+    try:
+        is_read_only_or_filer_reports(request)
+        if request.method == 'POST':
+            data = {
+                'committeeid': request.data.get('committeeid'),
+                'committeename': request.data.get('committeename'),
+                'street1': request.data.get('street1'),
+                'street2': request.data.get('street2'),
+                'city': request.data.get('city'),
+                'state': request.data.get('state'),
+                'zipcode': int(request.data.get('zipcode')),
+                'treasurerlastname': request.data.get('treasurerlastname'),
+                'treasurerfirstname': request.data.get('treasurerfirstname'),
+                'treasurermiddlename': request.data.get('treasurermiddlename'),
+                'treasurerprefix': request.data.get('treasurerprefix'),
+                'treasurersuffix': request.data.get('treasurersuffix'),
+                'email_on_file' : request.data.get('email_on_file'),
+                'email_on_file_1' : request.data.get('email_on_file_1'),
+            }
 
 
-        serializer = CommitteeSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            serializer = CommitteeSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 # validate api for Form 99
 @api_view(['POST'])
@@ -1013,33 +1037,38 @@ def delete_forms(request):
     """
     deletes the multiple saved reports based on report/form id. Returns success or fail message
     """
-    if request.method == 'POST':
-        for obj in request.data:
-            try:
-                if obj.get('form_type') == 'F99':
-                    comm_info = CommitteeInfo.objects.filter(is_submitted=False, isdeleted=False, id=obj.get('id')).first()
-                    # or can be written like comm_info = CommitteeInfo.objects.filter(is_submitted=False, isdeleted=False, id=request.data.get('id'))[0]
-                    # way to access single object out of multiple objects -> for object in objects:
-                
-                    if comm_info:
-                        #print('%s') %new_data.get('committeename')
-                        new_data = vars(comm_info)
-                        new_data["isdeleted"]=True
-                        new_data["deleted_at"]=datetime.datetime.now()
-                        serializer = CommitteeInfoSerializer(comm_info, data=new_data)
-                        if serializer.is_valid():
-                            serializer.save()
-                            #print(serializer.data)
+    try:
+        is_read_only_or_filer_reports(request)
+        if request.method == 'POST':
+            for obj in request.data:
+                try:
+                    if obj.get('form_type') == 'F99':
+                        comm_info = CommitteeInfo.objects.filter(is_submitted=False, isdeleted=False, id=obj.get('id')).first()
+                        # or can be written like comm_info = CommitteeInfo.objects.filter(is_submitted=False, isdeleted=False, id=request.data.get('id'))[0]
+                        # way to access single object out of multiple objects -> for object in objects:
+
+                        if comm_info:
+                            #print('%s') %new_data.get('committeename')
+                            new_data = vars(comm_info)
+                            new_data["isdeleted"]=True
+                            new_data["deleted_at"]=datetime.datetime.now()
+                            serializer = CommitteeInfoSerializer(comm_info, data=new_data)
+                            if serializer.is_valid():
+                                serializer.save()
+                                #print(serializer.data)
+                            else:
+                                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                         else:
-                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-                    else:
-                        #print(comm_info.id)
-                        return Response({"error":"ERRCODE: FEC03. Form with id %d is already deleted or has been submitted beforehand." %obj.get('id')}, status=status.HTTP_400_BAD_REQUEST)                    
-            except:
-                return Response({"error":"There is an error while deleting forms."}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"Forms deleted successfully"}, status=status.HTTP_200_OK)
-    else:
-        return Response({"error":"ERRCODE: FEC02. POST method is expected."}, status=status.HTTP_400_BAD_REQUEST) 
+                            #print(comm_info.id)
+                            return Response({"error":"ERRCODE: FEC03. Form with id %d is already deleted or has been submitted beforehand." %obj.get('id')}, status=status.HTTP_400_BAD_REQUEST)
+                except:
+                    return Response({"error":"There is an error while deleting forms."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"Forms deleted successfully"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error":"ERRCODE: FEC02. POST method is expected."}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 #email through AWS SES
 def email(boolean, data):

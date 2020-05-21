@@ -71,10 +71,11 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
       getpopulateHFormForEditMessage()
       .subscribe(
         p => {
+          const isViewMode = p.action === 'view' ? true : false;
           if (p.scheduleType === 'Schedule H1') {
             let res = this._schedHService.getSchedule(p.transactionDetail.transactionModel).subscribe(res => {
               if (res && res.length === 1) {
-                this.editH1(res[0]);
+                this.editH1(res[0], isViewMode);
               }
             });
           }
@@ -254,22 +255,31 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
     }
   }
 
-  public editH1(item: any) {
+  public editH1(item: any, isViewMode: boolean) {
     if (this.onDestroy$) {
       this.onDestroy$.next(true);
     }
-    this.scheduleAction = ScheduleActions.edit;
+    this.scheduleAction = isViewMode ? ScheduleActions.view : ScheduleActions.edit;
     this.transaction_id = item.transaction_id;
 
     this.pacSaveDisable = false;
     this.partySaveDisable = false;
 
+    if (this.scheduleAction === ScheduleActions.view) {
+      this.form.form.disable();
+      this.h1Disabled = true;
+      this.h1PacADDisabled = true;
+      this.h1PacGVDisabled = true;
+      this.h1PacPCDisabled = true;
+    }
     this.checkH1Disabled();
     this.checkH1PacDisabled();
 
     if (this.isPac()) {
-      this.form.control.patchValue({ federal_share: this._decimalPipe.transform(item.federal_percent * 100, '2.0') }, { onlySelf: true });
-      this.form.control.patchValue({ nonfederal_share: this._decimalPipe.transform(item.non_federal_percent * 100, '2.0') }, { onlySelf: true });
+      this.form.control.patchValue({ federal_share: this._decimalPipe.transform(item.federal_percent * 100, '2.0') },
+          { onlySelf: true });
+      this.form.control.patchValue({ nonfederal_share: this._decimalPipe.transform(item.non_federal_percent * 100, '2.0') },
+          { onlySelf: true });
       this.form.control.patchValue({ applied_activity1: item.administrative }, { onlySelf: true });
       this.form.control.patchValue({ applied_activity2: item.generic_voter_drive }, { onlySelf: true });
       this.form.control.patchValue({ applied_activity3: item.public_communications }, { onlySelf: true });
@@ -358,14 +368,23 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
             } else if (res[0].federal_percent === 0.15) {
               this.form.control.patchValue({ h1_election_year_options: '4' }, { onlySelf: true });
             }
-            this.getH1Disable = true;
-            this.h1Disabled = true;
+            // Checking the schedule action again here to ensure it is validated against the
+            // latest status after the network call
+            // During Edit the schedule action changes while the above network call is pending
+            // Fixes issues from FNE-2374
+            if (this.scheduleAction === ScheduleActions.add) {
+              this.getH1Disable = true;
+              this.h1Disabled = true;
+            } else if (this.scheduleAction === ScheduleActions.edit) {
+              this.getH1Disable = false;
+              this.h1Disabled = false;
+            }
           } else {
             this.getH1Disable = false;
             this.h1Disabled = false;
           }
         }
-      )
+      );
       //this.h1Disabled = this.getH1Disable;
       //this.h1Disabled = true;
     } else {
