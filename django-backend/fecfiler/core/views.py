@@ -1765,9 +1765,15 @@ def reports(request):
                       do_debt_carryover(data.get("cmteid"), data.get("reportid"))
                       do_levin_carryover(data.get("cmteid"), data.get("reportid"))
                       function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
+
+                      data['status'] = "success"
                       return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
                 elif type(data) is list:
-                      return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+                      output_dict = {
+                          'status' : "fail",
+                          'data' : data
+                      }
+                      return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
                 else:
                       raise Exception("The output returned from post_reports function is neither dict nor list")
             except Exception as e:
