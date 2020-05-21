@@ -8,6 +8,9 @@ import { CleanContactsComponent } from './import-contacts/clean-contacts/clean-c
 import { ImportDoneContactsComponent } from './import-contacts/import-done-contacts/import-done-contacts.component';
 import { SharedModule } from '../shared/shared.module';
 import { ProgressBarComponent } from './import-contacts/progress-bar/progress-bar.component';
+import { DuplicateContactsComponent } from './import-contacts/clean-contacts/duplicate-contacts/duplicate-contacts.component';
+import { ErrorContactsComponent } from './import-contacts/clean-contacts/error-contacts/error-contacts.component';
+import { ErrorContactsFieldComponent } from './import-contacts/clean-contacts/error-contacts/error-contacts-field/error-contacts-field.component';
 
 @NgModule({
   imports: [
@@ -20,7 +23,10 @@ import { ProgressBarComponent } from './import-contacts/progress-bar/progress-ba
     ConfigureContactsComponent,
     CleanContactsComponent,
     ImportDoneContactsComponent,
-    ProgressBarComponent
+    ProgressBarComponent,
+    DuplicateContactsComponent,
+    ErrorContactsComponent,
+    ErrorContactsFieldComponent
   ]
 })
 export class ImportContactsModule { }

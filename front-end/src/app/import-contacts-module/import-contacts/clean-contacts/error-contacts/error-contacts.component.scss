@@ -1,0 +1,86 @@
+@import '../../../../shared/scss/global';
+
+.error_contacts__container {
+  position: relative;
+
+  .error_contacts__table-inner {
+    overflow-x: auto;
+    overflow-y: visible;
+    max-width: 96%; /* 1420px; */
+    margin-left: 4% /* 67px; */;
+
+    table {
+      table-layout: fixed;
+      th {
+        width: 10em; /* 150px; */
+        height: 2.5em;
+      }
+      .hard_left {
+        position: absolute;
+        left: 0; 
+        width: 2%;
+        .action_button {
+          margin: -4px;
+        }
+      }
+      td {
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .error_contacts__heading {
+      padding: .5em 0;
+  }
+
+  .error_contacts__table-pagination-container {
+    padding: 1em;
+  } 
+
+  /* style ngx-pagination - start */
+  /* override some styling where use of !important is made. */
+
+  .ngx-pagination .current{
+    padding: 0.1875rem 0.625rem;
+    background: #9B9B9B !important;;
+    color: #fefefe;
+    cursor: default;
+  }
+
+  .ngx-pagination a, .ngx-pagination button {
+    color: #9B9B9B !important;;
+    display: block;
+    padding: 0.1875rem 0.625rem;
+    border-radius: 0;
+  }	
+
+  /* style ngx-pagination - end */
+
+  .error_contacts__begin-import {
+    width: 20em;
+    height: 3em;
+    margin: 1.2em 0;
+  }
+
+  .error_contacts__ignore-warn {
+    font-size: 3em;
+    padding: 20px;
+    text-align: center;
+    color: $fecRed;
+    float: left;
+  }
+}
+
+.modal {
+  .modal-lg, .modal-xl {
+    max-width: 95%;
+  }
+  #error_contacts__pin-modal-header {
+    background-color: $primaryBlue;
+    color: $white;
+    span {
+      color: $white;
+    }
+  }
+}
+
