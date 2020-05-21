@@ -99,8 +99,8 @@ def update_earmark_out_expenditure(transaction_id, contribution_amount):
                 )
             )
             cursor.execute(_sql, [contribution_amount, transaction_id])
-            if cursor.rowcount == 0:
-                raise Exception("Error: updating earmark out memo failed.")
+            # if cursor.rowcount == 0:
+            #     raise Exception("Error: updating earmark out memo failed.")
     except:
         raise
 
