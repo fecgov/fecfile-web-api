@@ -38,6 +38,7 @@ import { F3xMessageService } from '../service/f3x-message.service';
 import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { ScheduleActions } from './schedule-actions.enum';
+import {AuthService} from '../../../shared/services/AuthService/auth.service';
 
 
 
@@ -216,7 +217,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     protected _contributionDateValidator: ContributionDateValidator,
     private _transactionsService: TransactionsService,
     protected _reportsService: ReportsService,
-    protected _schedHMessageServce: SchedHMessageServiceService
+    protected _schedHMessageServce: SchedHMessageServiceService,
+    protected _authService: AuthService,
 
   ) {
     this._config.placement = 'right';
@@ -456,7 +458,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.editMode = this._activatedRoute.snapshot.queryParams.edit
-      ? this._activatedRoute.snapshot.queryParams.edit
+      ? this._activatedRoute.snapshot.queryParams.edit.toLowerCase() === 'true'
       : true;
     localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
     localStorage.setItem('Receipts_Entry_Screen', 'Yes');
@@ -2274,11 +2276,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         if (res) {
 
           const reportId = this._receiptService.getReportIdFromStorage(this.formType);
-          this._reportsService
-            .updateReportDate(new reportModel({ report_id: reportId }))
-            .subscribe((resUpdateReportDate: any) => {
-              //console.log(resUpdateReportDate);
-            });
+          // this._reportsService
+          //   .updateReportDate(new reportModel({ report_id: reportId }))
+          //   .subscribe((resUpdateReportDate: any) => {
+          //     //console.log(resUpdateReportDate);
+          //   });
           this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
             const message: any = {
               formType: this.formType,
@@ -2841,6 +2843,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    * Goes to the previous step.
    */
   public previousStep(): void {
+    //if readonly go to view transactoins
+    if (this._authService.isReadOnly()) {
+      this.viewTransactions();
+      return;
+    }
     this.canDeactivate().then(result => {
       if (result === true) {
         localStorage.removeItem(`form_${this.formType}_saved`);
@@ -4280,8 +4287,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         entityTypeObj.selected = false;
       }
     }
-
-    if(item.entityType === 'IND') {
+//reverting this code temporarily as this is breaking == 
+/*     if(item.entityType === 'IND') {
       let val = this.frmIndividualReceipt.get('entity_name').value;
       if(typeof val === 'object') {
         val = val.entity_name;
@@ -4326,13 +4333,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
       this.frmIndividualReceipt.patchValue(
         { entity_name: lastName + ', ' + firstName + ', ' + middleName + ', ' + prefix + ', ' + suffix }, { onlySelf: true });
-    }
+    } */
+//end code commenting for reversion.
 
-    /*
+
+    
     if (item) {
       this.toggleValidationIndOrg(item.group);
     }
-    */
+    
   }
 
   /**

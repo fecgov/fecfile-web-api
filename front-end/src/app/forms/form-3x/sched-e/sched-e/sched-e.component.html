@@ -717,9 +717,12 @@
                       type="button" (click)="returnToParent(editScheduleAction)">
                       Cancel
                     </button>
-                    <button class="btn btn-secondary btn-right" (click)="saveOnly()">
+                    <button *ngIf="scheduleAction !== viewScheduleAction" class="btn btn-secondary btn-right" (click)="saveOnly()">
                       Save &amp; Add Transaction
                     </button>
+                    <div *ngIf="scheduleAction === viewScheduleAction">
+                      <button type="button" class="btn btn-outline-dark btn-right" (click)="viewTransactions()">Close</button>
+                    </div>
                     <a *ngIf="subTransactionInfo?.isParent === false" class="btn btn-primary btn-right"
                       (click)="saveAndReturnToParent()">
                       Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}

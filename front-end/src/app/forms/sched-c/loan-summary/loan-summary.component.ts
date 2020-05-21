@@ -18,6 +18,7 @@ import { DialogService } from '../../../shared/services/DialogService/dialog.ser
 import { CONTEXT_NAME } from '@angular/compiler/src/render3/view/util';
 import { ScheduleActions } from '../../form-3x/individual-receipt/schedule-actions.enum';
 import { TransactionModel } from '../../transactions/model/transaction.model';
+import { DatePipe } from '@angular/common';
 
 export enum ActiveView {
   loanSummary = 'loanSummary',
@@ -66,6 +67,8 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
 
+
+  private _datePipe: DatePipe;
   // ngx-pagination config
   public maxItemsPerPage = 100;
   public directionLinks = false;
@@ -130,6 +133,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     private _transactionService: TransactionsService,
     private _reportTypeService: ReportTypeService
   ) {
+    this._datePipe = new DatePipe('en-US');
     this.showPinColumnsSubscription = this._LoanMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
     });
@@ -193,6 +197,22 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this.showPinColumnsSubscription.unsubscribe();
     this.keywordFilterSearchSubscription.unsubscribe();
     this._loanSummaryRefreshDataSubscription.unsubscribe();
+  }
+
+  public convertToString(dueDate:string): string{
+    if (dueDate){
+      let temp = new Date(dueDate);
+      if (isNaN(temp.getTime())){
+        return dueDate;
+      }
+      else{
+        return this._datePipe.transform(dueDate, 'MM/dd/yyyy');
+      }
+    } 
+    else{
+      return '';
+    }
+
   }
 
   /**

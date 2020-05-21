@@ -27,6 +27,7 @@ import { TransactionsMessageService } from '../transactions/service/transactions
 import { GetTransactionsResponse, TransactionsService } from '../transactions/service/transactions.service';
 import { SchedH3Service } from './sched-h3.service';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
+import {AuthService} from '../../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-sched-h3',
@@ -138,6 +139,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     private _dlService: DialogService,
     private _changeDet: ChangeDetectorRef,
     private _tranMessageService: TransactionsMessageService,
+    _authService: AuthService,
   ) {
     super(
       _http,
@@ -160,7 +162,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       _contributionDateValidator,
       _transactionsService,
       _reportsService,
-      _schedHMessageServiceService
+      _schedHMessageServiceService,
+      _authService,
     );
     _schedH3Service;
     _individualReceiptService;

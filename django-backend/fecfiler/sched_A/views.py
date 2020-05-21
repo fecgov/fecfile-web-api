@@ -16,6 +16,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
@@ -30,7 +31,8 @@ from fecfiler.core.views import (
     superceded_report_id_list,
     get_sched_h_transaction_table,
     get_comittee_id,
-    update_F3X
+    update_F3X,
+    function_to_call_wrapper_update_F3X
 
 )
 
@@ -1501,7 +1503,7 @@ def schedA_sql_dict(data):
             data.get("transaction_type_identifier")
         )
         # Adding election year to election code for 'REF_TO_FED_CAN'
-        if data.get("transaction_type_identifier") in ['REF_TO_FED_CAN', 'REF_TO_OTH_CMTE'] and data.get("election_year"):
+        if data.get("transaction_type_identifier") in ['REF_TO_FED_CAN', 'REF_TO_OTH_CMTE'] and data.get("election_year") not in ('YYYY', None) and data.get("election_code"):
             datum['election_code'] += data.get("election_year")
         if (
             data.get("transaction_type_identifier")
@@ -1911,202 +1913,206 @@ def schedA(request):
     """
     sched_a api supporting POST, GET, DELETE, PUT
     """
-
+    try:
+        is_read_only_or_filer_reports(request)
     # POST api: create new transactions and children transactions if any
-    global REQ_ELECTION_YR
-    if request.method == "POST":
-        if "election_year" in request.data:
-            REQ_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQ_ELECTION_YR = request.query_params.get("election_year")
-        try:
-            # checking if reattribution is triggered for a transaction
-            reattribution_flag = False
-            if "reattribution_id" in request.data and request.data[
-                "reattribution_id"
-            ] not in ["", "", None, "null"]:
-                reattribution_flag = True
-                if "reattribution_report_id" not in request.data:
-                    raise Exception(
-                        "reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution"
-                    )
-            validate_sa_data(request.data)
-            cmte_id = get_comittee_id(request.user.username)
-            report_id = check_report_id(request.data.get("report_id"))
-            # To check if the report id exists in reports table
-            form_type = find_form_type(report_id, cmte_id)
-            datum = schedA_sql_dict(request.data)
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
-            # Adding memo_code and memo_text values for reattribution flags
-            if reattribution_flag:
-                datum["memo_code"] = "X"
-                datum["memo_text"] = "MEMO: Reattribution"
-                datum["report_id"] = check_report_id(
-                    request.data["reattribution_report_id"]
-                )
-                datum["reattribution_id"] = request.data["reattribution_id"]
-            # posting data into schedA
-            data = post_schedA(datum)
-            output = get_schedA(data)
-            # for earmark child transaction: update parent transction  purpose_description
-            if datum.get("transaction_type_identifier") in EARMARK_SA_CHILD_LIST:
-                update_earmark_parent_purpose(datum)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedA API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    # Get records from schedA table
-    if request.method == "GET":
-        if "election_year" in request.data:
-            REQ_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQ_ELECTION_YR = request.query_params.get("election_year")
-
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
-                )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            # To check if the report id exists in reports table
-            form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
-                )
-            datum = get_schedA(data)
-            # # for obj in datum:
-            #     obj.update({'api_call' : 'sa/schedA'})
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedA API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    # PUT api call handled here
-    if request.method == "PUT":
-        if "election_year" in request.data:
-            REQ_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQ_ELECTION_YR = request.query_params.get("election_year")
-        try:
-            # checking if reattribution is triggered for a transaction
-            reattribution_flag = False
-            if "isReattribution" in request.data and request.data[
-                "isReattribution"
-            ] not in ["None", "null", "", ""]:
-                if request.data["isReattribution"] in ["True", "true", "t", "T", True]:
+        global REQ_ELECTION_YR
+        if request.method == "POST":
+            if "election_year" in request.data:
+                REQ_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQ_ELECTION_YR = request.query_params.get("election_year")
+            try:
+                # checking if reattribution is triggered for a transaction
+                reattribution_flag = False
+                if "reattribution_id" in request.data and request.data[
+                    "reattribution_id"
+                ] not in ["", "", None, "null"]:
                     reattribution_flag = True
                     if "reattribution_report_id" not in request.data:
                         raise Exception(
                             "reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution"
                         )
-                    else:
-                        reattribution_report_id = check_report_id(
-                            request.data["reattribution_report_id"]
-                        )
-            validate_sa_data(request.data)
-            datum = schedA_sql_dict(request.data)
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = request.data.get("transaction_id")
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
+                validate_sa_data(request.data)
+                cmte_id = get_comittee_id(request.user.username)
                 report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["cmte_id"] = get_comittee_id(request.user.username)
-            # To check if the report id exists in reports table
-            form_type = find_form_type(report_id, datum.get("cmte_id"))
-            # updating data for reattribution fields
-            if reattribution_flag:
-                datum["memo_code"] = "X"
-                datum["memo_text"] = "MEMO: Reattribution"
-            data = put_schedA(datum)
-            # Updating auto generated transactions for reattribution transactions
-            if reattribution_flag:
-                reattribution_auto_update_transactions(
-                    datum["cmte_id"],
-                    reattribution_report_id,
-                    datum["contribution_date"],
-                    datum["contribution_amount"],
-                    datum["transaction_id"],
+                # To check if the report id exists in reports table
+                form_type = find_form_type(report_id, cmte_id)
+                datum = schedA_sql_dict(request.data)
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
+                # Adding memo_code and memo_text values for reattribution flags
+                if reattribution_flag:
+                    datum["memo_code"] = "X"
+                    datum["memo_text"] = "MEMO: Reattribution"
+                    datum["report_id"] = check_report_id(
+                        request.data["reattribution_report_id"]
+                    )
+                    datum["reattribution_id"] = request.data["reattribution_id"]
+                # posting data into schedA
+                data = post_schedA(datum)
+                output = get_schedA(data)
+                # for earmark child transaction: update parent transction  purpose_description
+                if datum.get("transaction_type_identifier") in EARMARK_SA_CHILD_LIST:
+                    update_earmark_parent_purpose(datum)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedA API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-                data["report_id"] = reattribution_report_id
-            output = get_schedA(data)
 
-            # for earmark child transaction: update parent transction  purpose_description
-            if datum.get("transaction_type_identifier") in EARMARK_SA_CHILD_LIST:
-                update_earmark_parent_purpose(datum)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedA API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        # Get records from schedA table
+        if request.method == "GET":
+            if "election_year" in request.data:
+                REQ_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQ_ELECTION_YR = request.query_params.get("election_year")
 
-    # delete api call handled here
-    if request.method == "DELETE":
-        if "election_year" in request.data:
-            REQ_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQ_ELECTION_YR = request.query_params.get("election_year")
-
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
                     request.query_params.get("report_id")
-                )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            # To check if the report id exists in reports table
-            form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                # To check if the report id exists in reports table
+                form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
+                if "transaction_id" in request.query_params and check_null_value(
                     request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                datum = get_schedA(data)
+                # # for obj in datum:
+                #     obj.update({'api_call' : 'sa/schedA'})
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
                 )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedA(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The schedA API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedA API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        # PUT api call handled here
+        if request.method == "PUT":
+            if "election_year" in request.data:
+                REQ_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQ_ELECTION_YR = request.query_params.get("election_year")
+            try:
+                # checking if reattribution is triggered for a transaction
+                reattribution_flag = False
+                if "isReattribution" in request.data and request.data[
+                    "isReattribution"
+                ] not in ["None", "null", "", ""]:
+                    if request.data["isReattribution"] in ["True", "true", "t", "T", True]:
+                        reattribution_flag = True
+                        if "reattribution_report_id" not in request.data:
+                            raise Exception(
+                                "reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution"
+                            )
+                        else:
+                            reattribution_report_id = check_report_id(
+                                request.data["reattribution_report_id"]
+                            )
+                validate_sa_data(request.data)
+                datum = schedA_sql_dict(request.data)
+                if "transaction_id" in request.data and check_null_value(
+                    request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = request.data.get("transaction_id")
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["cmte_id"] = get_comittee_id(request.user.username)
+                # To check if the report id exists in reports table
+                form_type = find_form_type(report_id, datum.get("cmte_id"))
+                # updating data for reattribution fields
+                if reattribution_flag:
+                    datum["memo_code"] = "X"
+                    datum["memo_text"] = "MEMO: Reattribution"
+                data = put_schedA(datum)
+                # Updating auto generated transactions for reattribution transactions
+                if reattribution_flag:
+                    reattribution_auto_update_transactions(
+                        datum["cmte_id"],
+                        reattribution_report_id,
+                        datum["contribution_date"],
+                        datum["contribution_amount"],
+                        datum["transaction_id"],
+                    )
+                    data["report_id"] = reattribution_report_id
+                output = get_schedA(data)
+
+                # for earmark child transaction: update parent transction  purpose_description
+                if datum.get("transaction_type_identifier") in EARMARK_SA_CHILD_LIST:
+                    update_earmark_parent_purpose(datum)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedA API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        # delete api call handled here
+        if request.method == "DELETE":
+            if "election_year" in request.data:
+                REQ_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQ_ELECTION_YR = request.query_params.get("election_year")
+
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
+                    request.query_params.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                # To check if the report id exists in reports table
+                form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
+                if "transaction_id" in request.query_params and check_null_value(
+                    request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedA(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    "The schedA API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def update_sa_aggregation_status(transaction_id, aggregation_status=None):
@@ -2138,21 +2144,26 @@ def force_itemize_sa(request):
     1. set itemized_ind = 'Y'
     2. update line number if necessary
     """
-    # if request.method == "GET":
     try:
-        cmte_id = get_comittee_id(request.user.username)
-        report_id = request.data.get("report_id")
-        transaction_id = request.data.get("transaction_id")
-        if not transaction_id:
-            raise Exception("transaction id is required for this api call.")
-        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, item_status="FI")
-        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        is_read_only_or_filer_reports(request)
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            report_id = request.data.get("report_id")
+            transaction_id = request.data.get("transaction_id")
+            if not transaction_id:
+                raise Exception("transaction id is required for this api call.")
+            sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+            update_sa_itmization_status(sa_data, item_status="FI")
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                "The force_aggregate_sa API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     except Exception as e:
-        return Response(
-            "The force_aggregate_sa API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["PUT"])
@@ -2162,21 +2173,26 @@ def force_unitemize_sa(request):
     1. set itemized_ind = 'N'
     2. update line number if necessary
     """
-    # if request.method == "GET":
     try:
-        cmte_id = get_comittee_id(request.user.username)
-        report_id = request.data.get("report_id")
-        transaction_id = request.data.get("transaction_id")
-        if not transaction_id:
-            raise Exception("transaction id is required for this api call.")
-        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, item_status="FU")
-        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        is_read_only_or_filer_reports(request)
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            report_id = request.data.get("report_id")
+            transaction_id = request.data.get("transaction_id")
+            if not transaction_id:
+                raise Exception("transaction id is required for this api call.")
+            sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+            update_sa_itmization_status(sa_data, item_status="FU")
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                "The force_aggregate_sa API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     except Exception as e:
-        return Response(
-            "The force_aggregate_sa API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["PUT"])
@@ -2188,27 +2204,33 @@ def force_aggregate_sa(request):
     """
     # if request.method == "GET":
     try:
-        cmte_id = get_comittee_id(request.user.username)
-        report_id = request.data.get("report_id")
-        transaction_id = request.data.get("transaction_id")
-        if not transaction_id:
-            raise Exception("transaction id is required for this api call.")
-        update_sa_aggregation_status(transaction_id, aggregation_status="Y")
-        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+        is_read_only_or_filer_reports(request)
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            report_id = request.data.get("report_id")
+            transaction_id = request.data.get("transaction_id")
+            if not transaction_id:
+                raise Exception("transaction id is required for this api call.")
+            update_sa_aggregation_status(transaction_id, aggregation_status="Y")
+            sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
 
-        update_linenumber_aggamt_transactions_SA(
-            sa_data.get("contribution_date"),
-            sa_data.get("transaction_type_identifier"),
-            sa_data.get("entity_id"),
-            cmte_id,
-            report_id,
-        )
-        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+            update_linenumber_aggamt_transactions_SA(
+                sa_data.get("contribution_date"),
+                sa_data.get("transaction_type_identifier"),
+                sa_data.get("entity_id"),
+                cmte_id,
+                report_id,
+            )
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                "The force_aggregate_sa API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
     except Exception as e:
-        return Response(
-            "The force_aggregate_sa API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
 
 
 @api_view(["PUT"])
@@ -2218,29 +2240,34 @@ def force_unaggregate_sa(request):
     1. set aggregate_ind = 'N'
     2. re-do entity-based aggregation on sa
     """
-    # if request.method == "GET":
     try:
-        cmte_id = get_comittee_id(request.user.username)
-        report_id = request.data.get("report_id")
-        transaction_id = request.data.get("transaction_id")
-        if not transaction_id:
-            raise Exception("transaction id is required for this api call.")
-        update_sa_aggregation_status(transaction_id, aggregation_status="N")
-        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+        is_read_only_or_filer_reports(request)
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            report_id = request.data.get("report_id")
+            transaction_id = request.data.get("transaction_id")
+            if not transaction_id:
+                raise Exception("transaction id is required for this api call.")
+            update_sa_aggregation_status(transaction_id, aggregation_status="N")
+            sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
 
-        update_linenumber_aggamt_transactions_SA(
-            sa_data.get("contribution_date"),
-            sa_data.get("transaction_type_identifier"),
-            sa_data.get("entity_id"),
-            cmte_id,
-            report_id,
-        )
-        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+            update_linenumber_aggamt_transactions_SA(
+                sa_data.get("contribution_date"),
+                sa_data.get("transaction_type_identifier"),
+                sa_data.get("entity_id"),
+                cmte_id,
+                report_id,
+            )
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                "The force_aggregate_sa API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     except Exception as e:
-        return Response(
-            "The force_aggregate_sa API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["GET"])
@@ -2692,186 +2719,168 @@ def trash_restore_transactions(request):
         }
  
     """
-    logger.info("trash_restore_transactions called with {}".format(request.data))
-    deleted_transaction_ids = []
-    _actions = request.data.get("actions", [])
-    for _action in _actions:
-        report_id = _action.get("report_id", "")
-        transaction_id = _action.get("transaction_id", "")
-        cmte_id = get_comittee_id(request.user.username)
+    try:
+        is_read_only_or_filer_reports(request)
+        logger.info("trash_restore_transactions called with {}".format(request.data))
+        deleted_transaction_ids = []
+        _actions = request.data.get("actions", [])
+        for _action in _actions:
+            report_id = _action.get("report_id", "")
+            transaction_id = _action.get("transaction_id", "")
+            cmte_id = get_comittee_id(request.user.username)
 
         action = _action.get("action", "")
         _delete = "Y" if action == "trash" else ""
         # get_schedA data, do sql transaction, update aggregation
-        # try:
-        table_list = SCHEDULE_TO_TABLE_DICT.get(transaction_id[:2])
-        if table_list:
-            if transaction_id[:2] in ("SA", "LA", "LB", "SB", "SE", "SF", "SH"):
-                # Handling deletion/restoration of payments for schedule C and schedule D
-                back_ref_transaction_id, transaction_amount = get_backref_id_trash(
-                    transaction_id, cmte_id
-                )
-                if back_ref_transaction_id and back_ref_transaction_id[:2] in (
-                    "SC",
-                    "SD",
-                ):
-                    update_parent_amounts_to_trash(
-                        transaction_amount, back_ref_transaction_id, cmte_id, _delete
+        try:
+            table_list = SCHEDULE_TO_TABLE_DICT.get(transaction_id[:2])
+            if table_list:
+                if transaction_id[:2] in ("SA", "LA", "LB", "SB", "SE", "SF", "SH"):
+                    # Handling deletion/restoration of payments for schedule C and schedule D
+                    back_ref_transaction_id, transaction_amount = get_backref_id_trash(
+                        transaction_id, cmte_id
                     )
-                # load data and prepare for aggregation and take care parent-child relationship
-
-                tran_data = {}
-                if transaction_id[:2] == "SF":
-                    tran_data = load_schedF(cmte_id, report_id, transaction_id)[0]
-                if transaction_id[:2] == "SE":
-                    tran_data = load_schedE(cmte_id, report_id, transaction_id)[0]
-
-                # Deleting/Restoring the transaction
-                deleted_transaction_ids.append(
-                    trash_restore_sql_transaction(
-                        table_list, report_id, transaction_id, _delete
-                    )
-                )
-
-                # Handling aggregate update for sched_A transactions
-                if transaction_id[:2] == "SA":
-                    datum = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
-                    update_linenumber_aggamt_transactions_SA(
-                        datetime.datetime.strptime(
-                            datum.get("contribution_date"), "%Y-%m-%d"
-                        ).date(),
-                        datum.get("transaction_type_identifier"),
-                        datum.get("entity_id"),
-                        datum.get("cmte_id"),
-                        datum.get("report_id"),
-                    )
-                    # Deleting/Restoring auto generated transactions for Schedule A
-                    if _delete == "Y" or (
-                        _delete != "Y"
-                        and datum.get("transaction_type_identifier")
-                        in [
-                            "IK_REC",
-                            "IK_BC_REC",
-                            "PARTY_IK_REC",
-                            "PARTY_IK_BC_REC",
-                            "PAC_IK_REC",
-                            "PAC_IK_BC_REC",
-                            "IK_TRAN",
-                            "IK_TRAN_FEA",
-                        ]
+                    if back_ref_transaction_id and back_ref_transaction_id[:2] in (
+                        "SC",
+                        "SD",
                     ):
+                        update_parent_amounts_to_trash(
+                            transaction_amount, back_ref_transaction_id, cmte_id, _delete
+                        )
+                    # load data and prepare for aggregation and take care parent-child relationship
+
+                    tran_data = {}
+                    if transaction_id[:2] == "SF":
+                        tran_data = load_schedF(cmte_id, report_id, transaction_id)[0]
+                    if transaction_id[:2] == "SE":
+                        tran_data = load_schedE(cmte_id, report_id, transaction_id)[0]
+
+                    # Deleting/Restoring the transaction
+                    deleted_transaction_ids.append(
+                        trash_restore_sql_transaction(
+                            table_list, report_id, transaction_id, _delete
+                        )
+                    )
+
+                    # Handling aggregate update for sched_A transactions
+                    if transaction_id[:2] == "SA":
+                        datum = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
+                        update_linenumber_aggamt_transactions_SA(
+                            datetime.datetime.strptime(
+                                datum.get("contribution_date"), "%Y-%m-%d"
+                            ).date(),
+                            datum.get("transaction_type_identifier"),
+                            datum.get("entity_id"),
+                            datum.get("cmte_id"),
+                            datum.get("report_id"),
+                        )
+                        # Deleting/Restoring auto generated transactions for Schedule A
+                        if _delete == "Y" or (
+                            _delete != "Y"
+                            and datum.get("transaction_type_identifier")
+                            in [
+                                "IK_REC",
+                                "IK_BC_REC",
+                                "PARTY_IK_REC",
+                                "PARTY_IK_BC_REC",
+                                "PAC_IK_REC",
+                                "PAC_IK_BC_REC",
+                                "IK_TRAN",
+                                "IK_TRAN_FEA",
+                            ]
+                        ):
+                            _actions.extend(
+                                get_child_transactions_to_trash(transaction_id, _delete)
+                            )
+                        # Handling Reattribution auto generated transactions: reattribution_id
+                        if _delete == "Y" and datum["reattribution_ind"] in ["R", "O"]:
+                            if datum["reattribution_ind"] == "R":
+                                update_reatt_original_trans(
+                                    datum["reattribution_id"], cmte_id
+                                )
+
+                            _actions.extend(
+                                get_auto_generated_reattribution_transactions(
+                                    action,
+                                    transaction_id,
+                                    datum["reattribution_ind"],
+                                    cmte_id,
+                                )
+                            )
+                        elif _delete != "Y" and datum["reattribution_ind"] == "R":
+                            check_reattribution_original_delete(
+                                datum["reattribution_id"], cmte_id
+                            )
+                            update_reatt_original_trans(
+                                datum["reattribution_id"], cmte_id, transaction_id, "O"
+                            )
+                            _actions.extend(
+                                get_auto_generated_reattribution_transactions(
+                                    action,
+                                    transaction_id,
+                                    datum["reattribution_ind"],
+                                    cmte_id,
+                                )
+                            )
+
+                    if transaction_id[:2] == "LA":
+                        tran_data = get_list_schedA(
+                            report_id, cmte_id, transaction_id, True
+                        )[0]
+                        logger.debug(
+                            "update sl aggregate with LA data {}".format(tran_data)
+                        )
+                        update_aggregate_la(tran_data)
+                        logger.debug("update sl summary with LA data {}".format(tran_data))
+                        update_sl_summary(tran_data)
+
+                    if transaction_id[:2] == "LB":
+                        tran_data = get_sched_b_transactions(
+                            report_id, cmte_id, transaction_id=transaction_id
+                        )[0]
+                        logger.debug("update sl summary with LB data {}".format(tran_data))
+                        update_aggregate_lb(tran_data)
+                        update_sl_summary(tran_data)
+
+                    # Handling delete of sched_B, sched_E, sched_F child transactions
+                    if transaction_id[:2] in ["SB", "SE", "SF"] and _delete == "Y":
                         _actions.extend(
                             get_child_transactions_to_trash(transaction_id, _delete)
                         )
-                    # Handling Reattribution auto generated transactions: reattribution_id
-                    if _delete == "Y" and datum["reattribution_ind"] in ["R", "O"]:
-                        if datum["reattribution_ind"] == "R":
-                            update_reatt_original_trans(
-                                datum["reattribution_id"], cmte_id
+                    if transaction_id[:2] == "SB":
+                        # Handling redesignation_id auto generated transactions: redesignation_id
+                        datum = get_list_schedB(report_id, cmte_id, transaction_id, True)[0]
+                        if _delete == "Y" and datum["redesignation_ind"] in ["R", "O"]:
+                            if datum["redesignation_ind"] == "R":
+                                update_redes_original_trans(
+                                    datum["redesignation_id"], cmte_id
+                                )
+
+                            _actions.extend(
+                                get_auto_generated_redesignation_transactions(
+                                    action,
+                                    transaction_id,
+                                    datum["redesignation_ind"],
+                                    cmte_id,
+                                )
                             )
-
-                        _actions.extend(
-                            get_auto_generated_reattribution_transactions(
-                                action,
-                                transaction_id,
-                                datum["reattribution_ind"],
-                                cmte_id,
-                            )
-                        )
-                    elif _delete != "Y" and datum["reattribution_ind"] == "R":
-                        check_reattribution_original_delete(
-                            datum["reattribution_id"], cmte_id
-                        )
-                        update_reatt_original_trans(
-                            datum["reattribution_id"], cmte_id, transaction_id, "O"
-                        )
-                        _actions.extend(
-                            get_auto_generated_reattribution_transactions(
-                                action,
-                                transaction_id,
-                                datum["reattribution_ind"],
-                                cmte_id,
-                            )
-                        )
-
-                if transaction_id[:2] == "LA":
-                    tran_data = get_list_schedA(
-                        report_id, cmte_id, transaction_id, True
-                    )[0]
-                    logger.debug(
-                        "update sl aggregate with LA data {}".format(tran_data)
-                    )
-                    update_aggregate_la(tran_data)
-                    logger.debug("update sl summary with LA data {}".format(tran_data))
-                    update_sl_summary(tran_data)
-
-                if transaction_id[:2] == "LB":
-                    tran_data = get_sched_b_transactions(
-                        report_id, cmte_id, transaction_id=transaction_id
-                    )[0]
-                    logger.debug("update sl summary with LB data {}".format(tran_data))
-                    update_aggregate_lb(tran_data)
-                    update_sl_summary(tran_data)
-
-                # Handling delete of sched_B, sched_E, sched_F child transactions
-                if transaction_id[:2] in ["SB", "SE", "SF"] and _delete == "Y":
-                    _actions.extend(
-                        get_child_transactions_to_trash(transaction_id, _delete)
-                    )
-                if transaction_id[:2] == "SB":
-                    # Handling redesignation_id auto generated transactions: redesignation_id
-                    datum = get_list_schedB(report_id, cmte_id, transaction_id, True)[0]
-                    if _delete == "Y" and datum["redesignation_ind"] in ["R", "O"]:
-                        if datum["redesignation_ind"] == "R":
-                            update_redes_original_trans(
+                        elif _delete != "Y" and datum["redesignation_ind"] == "R":
+                            check_redesignation_original_delete(
                                 datum["redesignation_id"], cmte_id
                             )
-
-                        _actions.extend(
-                            get_auto_generated_redesignation_transactions(
-                                action,
-                                transaction_id,
-                                datum["redesignation_ind"],
-                                cmte_id,
+                            update_redes_original_trans(
+                                datum["redesignation_id"], cmte_id, transaction_id, "O"
                             )
-                        )
-                    elif _delete != "Y" and datum["redesignation_ind"] == "R":
-                        check_redesignation_original_delete(
-                            datum["redesignation_id"], cmte_id
-                        )
-                        update_redes_original_trans(
-                            datum["redesignation_id"], cmte_id, transaction_id, "O"
-                        )
-                        _actions.extend(
-                            get_auto_generated_redesignation_transactions(
-                                action,
-                                transaction_id,
-                                datum["redesignation_ind"],
-                                cmte_id,
+                            _actions.extend(
+                                get_auto_generated_redesignation_transactions(
+                                    action,
+                                    transaction_id,
+                                    datum["redesignation_ind"],
+                                    cmte_id,
+                                )
                             )
-                        )
-                    # datum = get_list_schedB(report_id, cmte_id, transaction_id, True)[0]
-                    update_schedB_aggamt_transactions(
-                        datetime.datetime.strptime(
-                            datum.get("expenditure_date"), "%Y-%m-%d"
-                        ).date(),
-                        datum.get("transaction_type_identifier"),
-                        datum.get("entity_id"),
-                        datum.get("cmte_id"),
-                        datum.get("report_id"),
-                    )
-                    if datum["transaction_type_identifier"] in [
-                        "OPEXP_HQ_ACC_REG_REF",
-                        "OPEXP_HQ_ACC_IND_REF",
-                        "OPEXP_HQ_ACC_TRIB_REF",
-                        "OPEXP_CONV_ACC_REG_REF",
-                        "OPEXP_CONV_ACC_TRIB_REF",
-                        "OPEXP_CONV_ACC_IND_REF",
-                        "OTH_DISB_NP_RECNT_REG_REF",
-                        "OTH_DISB_NP_RECNT_TRIB_REF",
-                        "OTH_DISB_NP_RECNT_IND_REF",
-                    ]:
-                        update_linenumber_aggamt_transactions_SA(
+                        # datum = get_list_schedB(report_id, cmte_id, transaction_id, True)[0]
+                        update_schedB_aggamt_transactions(
                             datetime.datetime.strptime(
                                 datum.get("expenditure_date"), "%Y-%m-%d"
                             ).date(),
@@ -2880,94 +2889,117 @@ def trash_restore_transactions(request):
                             datum.get("cmte_id"),
                             datum.get("report_id"),
                         )
+                        if datum["transaction_type_identifier"] in [
+                            "OPEXP_HQ_ACC_REG_REF",
+                            "OPEXP_HQ_ACC_IND_REF",
+                            "OPEXP_HQ_ACC_TRIB_REF",
+                            "OPEXP_CONV_ACC_REG_REF",
+                            "OPEXP_CONV_ACC_TRIB_REF",
+                            "OPEXP_CONV_ACC_IND_REF",
+                            "OTH_DISB_NP_RECNT_REG_REF",
+                            "OTH_DISB_NP_RECNT_TRIB_REF",
+                            "OTH_DISB_NP_RECNT_IND_REF",
+                        ]:
+                            update_linenumber_aggamt_transactions_SA(
+                                datetime.datetime.strptime(
+                                    datum.get("expenditure_date"), "%Y-%m-%d"
+                                ).date(),
+                                datum.get("transaction_type_identifier"),
+                                datum.get("entity_id"),
+                                datum.get("cmte_id"),
+                                datum.get("report_id"),
+                            )
 
-                if transaction_id[:2] == "SF":
-                    update_aggregate_sf(
-                        tran_data["cmte_id"],
-                        tran_data["beneficiary_cand_id"],
-                        datetime.datetime.strptime(
-                            tran_data.get("expenditure_date"), "%Y-%m-%d"
+                    if transaction_id[:2] == "SF":
+                        update_aggregate_sf(
+                            tran_data["cmte_id"],
+                            tran_data["beneficiary_cand_id"],
+                            datetime.datetime.strptime(
+                                tran_data.get("expenditure_date"), "%Y-%m-%d"
+                            )
+                            .date()
+                            .strftime("%m/%d/%Y"),
                         )
-                        .date()
-                        .strftime("%m/%d/%Y"),
-                    )
 
-                if transaction_id[:2] == "SE":
-                    update_aggregate_se(tran_data)
+                    if transaction_id[:2] == "SE":
+                        update_aggregate_se(tran_data)
 
-                # Handling delete of schedule H4/H6 transactions: delete child trans and update aggregate
-                if transaction_id[:2] == "SH" and _delete == "Y":
-                    tran_tbl = get_sched_h_transaction_table(transaction_id)
-                    if tran_tbl == "sched_h4":
-                        logger.debug(
-                            "sched_h4 trash: check child transaction and update ytd amount:"
-                        )
+                    # Handling delete of schedule H4/H6 transactions: delete child trans and update aggregate
+                    if transaction_id[:2] == "SH" and _delete == "Y":
+                        tran_tbl = get_sched_h_transaction_table(transaction_id)
+                        if tran_tbl == "sched_h4":
+                            logger.debug(
+                                "sched_h4 trash: check child transaction and update ytd amount:"
+                            )
+                            _actions.extend(
+                                get_child_transactions_to_trash(transaction_id, _delete)
+                            )
+                            data = load_schedH4(cmte_id, report_id, transaction_id)[0]
+                            logger.debug(
+                                "update sched h4 aggregate amount after trashing {}".format(
+                                    data
+                                )
+                            )
+                            update_activity_event_amount_ytd_h4(data)
+                        if tran_tbl == "sched_h6":
+                            logger.debug(
+                                "sched_h6 trash: check child transaction and update ytd amount:"
+                            )
+                            _actions.extend(
+                                get_child_transactions_to_trash(transaction_id, _delete)
+                            )
+                            data = load_schedH6(cmte_id, report_id, transaction_id)[0]
+                            logger.debug(
+                                "update sched h4 aggregate amount after trashing {}".format(
+                                    data
+                                )
+                            )
+                            update_activity_event_amount_ytd_h6(data)
+                elif transaction_id[:2] in ("SC", "SD"):
+                    logger.debug("trash/restore {}".format(transaction_id))
+                    # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D
+                    if _delete == "Y" or (transaction_id[:2] == "SC" and _delete != "Y"):
                         _actions.extend(
                             get_child_transactions_to_trash(transaction_id, _delete)
                         )
-                        data = load_schedH4(cmte_id, report_id, transaction_id)[0]
-                        logger.debug(
-                            "update sched h4 aggregate amount after trashing {}".format(
-                                data
-                            )
+                    # Deleting/Restoring the transaction
+                    deleted_transaction_ids.append(
+                        trash_restore_sql_transaction(
+                            table_list, report_id, transaction_id, _delete
                         )
-                        update_activity_event_amount_ytd_h4(data)
-                    if tran_tbl == "sched_h6":
-                        logger.debug(
-                            "sched_h6 trash: check child transaction and update ytd amount:"
-                        )
-                        _actions.extend(
-                            get_child_transactions_to_trash(transaction_id, _delete)
-                        )
-                        data = load_schedH6(cmte_id, report_id, transaction_id)[0]
-                        logger.debug(
-                            "update sched h4 aggregate amount after trashing {}".format(
-                                data
-                            )
-                        )
-                        update_activity_event_amount_ytd_h6(data)
-            elif transaction_id[:2] in ("SC", "SD"):
-                logger.debug("trash/restore {}".format(transaction_id))
-                # Handling auto deletion of payments and auto generated transactions for sched_C and sched_D
-                if _delete == "Y" or (transaction_id[:2] == "SC" and _delete != "Y"):
-                    _actions.extend(
-                        get_child_transactions_to_trash(transaction_id, _delete)
                     )
-                # Deleting/Restoring the transaction
-                deleted_transaction_ids.append(
-                    trash_restore_sql_transaction(
-                        table_list, report_id, transaction_id, _delete
+                else:
+                    # Deleting/Restoring the transaction
+                    deleted_transaction_ids.append(
+                        trash_restore_sql_transaction(
+                            table_list, report_id, transaction_id, _delete
+                        )
                     )
-                )
             else:
-                # Deleting/Restoring the transaction
-                deleted_transaction_ids.append(
-                    trash_restore_sql_transaction(
-                        table_list, report_id, transaction_id, _delete
+                raise Exception(
+                    "The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT. Deleted transactions are: {}".format(
+                        transaction_id, ",".join(deleted_transaction_ids)
                     )
                 )
-        else:
-            raise Exception(
-                "The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT. Deleted transactions are: {}".format(
-                    transaction_id, ",".join(deleted_transaction_ids)
-                )
-            )
 
-        # update report last_update_date
-        renew_report_update_date(report_id)
+            # update report last_update_date
+            renew_report_update_date(report_id)
 
-        function_to_call_wrapper_update_F3X(report_id, cmte_id)
+            function_to_call_wrapper_update_F3X(cmte_id,report_id)
 
-        # except Exception as e:
-        #     return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
-        #         status=status.HTTP_400_BAD_REQUEST)
-    return Response(
-        {
-            "result": "success",
-            "deletedTransactions": "{}".format(",".join(deleted_transaction_ids)),
-        },
-        status=status.HTTP_200_OK,
-    )
+        except Exception as e:
+                 return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
+                     status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {
+                "result": "success",
+                "deletedTransactions": "{}".format(",".join(deleted_transaction_ids)),
+            },
+            status=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """

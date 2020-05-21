@@ -5,7 +5,7 @@ import { ChangeDetectionStrategy, Component, OnInit, Input } from '@angular/core
   selector: 'app-f1m-preview',
   templateUrl: './f1m-preview.component.html',
   styleUrls: ['./f1m-preview.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class F1mPreviewComponent implements OnInit {
 

@@ -553,22 +553,22 @@
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                      <button *ngIf="isIKOUT(trx)" class="dropdown-item" (click)="viewTransaction(trx)">
+                      <button *ngIf="isIKOUT(trx) || _authService.isReadOnly()" class="dropdown-item" (click)="viewTransaction(trx)">
                         <i class="view-icon"></i> View
                       </button>
-                      <button class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="editTransaction(trxChild)">
+                      <button *ngIf="!_authService.isReadOnly()" class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="editTransaction(trxChild)">
                         <i class="edit-icon"></i> Edit
                       </button>
-                      <button *ngIf="isForceItemizable(trxChild)" class="dropdown-item" (click)="forceItemizationToggle(trxChild)">
+                      <button *ngIf="isForceItemizable(trxChild) && !_authService.isReadOnly()" class="dropdown-item" (click)="forceItemizationToggle(trxChild)">
                         <i class="fas fa-calculator"></i>{{getItemizationInd(trxChild)}}
                       </button>
                       <button class="dropdown-item" (click)="printTransaction(trxChild)">
                         <i class="fas fa-print"></i> Print
                       </button>
-                      <button class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="cloneTransaction(trxChild)">
+                      <button *ngIf="!_authService.isReadOnly()" class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="cloneTransaction(trxChild)">
                         <i class="fas fa-copy"></i> Clone
                       </button>
-                      <button *ngIf="checkIfTrashable(trxChild)" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                      <button *ngIf="checkIfTrashable(trxChild) && !_authService.isReadOnly()" class="dropdown-item" (click)="trashTransaction(trxChild)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </div>
@@ -705,7 +705,7 @@
                     <button class="dropdown-item" (click)="exportAllSelected()">
                       <i class="file-export-icon"></i> Export
                     </button>
-                    <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
+                    <button *ngIf="checkIfTrashable() || !_authService.isReadOnly()" class="dropdown-item" (click)="trashAllSelected()">
                       <i class="trash-icon"></i> Trash
                     </button>
                   </div>
@@ -777,11 +777,14 @@
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                      <button class="dropdown-item" [disabled]="isDisabled(trx)" (click)="editTransaction(trx)">
+                      <button *ngIf="!_authService.isReadOnly()" class="dropdown-item" [disabled]="isDisabled(trx)" (click)="editTransaction(trx)">
                         <i class="edit-icon"></i> Edit
                       </button>
-                      <button *ngIf="isForceItemizable(trx)" class="dropdown-item" (click)="forceItemizationToggle(trx)">
+                      <button *ngIf="isForceItemizable(trx) && !_authService.isReadOnly()" class="dropdown-item" (click)="forceItemizationToggle(trx)">
                         <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
+                      </button>
+                      <button *ngIf="_authService.isReadOnly()" class="dropdown-item" (click)="viewTransaction(trx)">
+                        <i class="view-icon"></i> View
                       </button>
                       <button class="dropdown-item" (click)="printTransaction(trx)">
                         <i class="fas fa-print"></i> Print
@@ -795,10 +798,10 @@
                             <i class="trash-icon"></i> Trash
                           </button>
                       </span>
-                    <button class="dropdown-item" (click)="goToLoanRepayment(trx)" *ngIf="trx.apiCall === '/sc/schedC'">
+                    <button class="dropdown-item" (click)="goToLoanRepayment(trx)" *ngIf="trx.apiCall === '/sc/schedC' && !_authService.isReadOnly()">
                       <i class="print-icon"></i> Loan repayment
                     </button>
-                    <button class="dropdown-item" (click)="goToDebtPayment(trx)" *ngIf="trx.apiCall === '/sd/schedD'">
+                    <button  *ngIf="trx.apiCall === '/sd/schedD' && !_authService.isReadOnly()" class="dropdown-item" (click)="goToDebtPayment(trx)">
                       <i class="print-icon"></i> Make a payment
                     </button>
                     </div>
@@ -978,24 +981,28 @@
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                      <button class="dropdown-item" [disabled]="isDisabled(trx)" (click)="editTransaction(trx)">
+                      <button *ngIf="!_authService.isReadOnly()" class="dropdown-item" [disabled]="isDisabled(trx)" (click)="editTransaction(trx)">
                         <i class="edit-icon"></i> Edit
                       </button>
-                      <button *ngIf="isForceItemizable(trx)" class="dropdown-item" (click)="forceItemizationToggle(trx)">
+                      <button *ngIf="isForceItemizable(trx) && !_authService.isReadOnly()" class="dropdown-item" (click)="forceItemizationToggle(trx)">
                         <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
                       </button>
                       <button class="dropdown-item" (click)="printTransaction(trx)">
                         <i class="fas fa-print"></i> Print
                       </button>
                       <button *ngIf="trx.scheduleType !== 'Schedule H1' && trx.scheduleType !== 'Schedule H2' && 
-                                    trx.scheduleType !== 'Schedule H3' && trx.scheduleType !== 'Schedule H5'" 
+                                    trx.scheduleType !== 'Schedule H3' && trx.scheduleType !== 'Schedule H5' &&
+                                    !_authService.isReadOnly()"
                       class="dropdown-item" [disabled]="isDisabled(trx)" (click)="cloneTransaction(trx)">
                         <i class="fas fa-copy"></i> Clone
+                      </button>
+                      <button *ngIf="_authService.isReadOnly()" class="dropdown-item" (click)="viewTransaction(trx)">
+                        <i class="view-icon"></i> View
                       </button>
                       <span [title]="(((trx.scheduleType === 'Schedule H1' || trx.scheduleType === 'Schedule H2') && trx.isTrashable !== undefined)? !trx.isTrashable : !trx.iseditable) 
                       ? 'This transaction cannot be deleted because of a linked transaction.': ''">
                         <button [disabled]="((trx.scheduleType === 'Schedule H1' || trx.scheduleType === 'Schedule H2') && trx.isTrashable !== undefined) ? !trx.isTrashable : !trx.iseditable"
-                                *ngIf="checkIfTrashable(trx)" class="dropdown-item"
+                                *ngIf="checkIfTrashable(trx) && !_authService.isReadOnly()" class="dropdown-item"
                                 (click)="trashTransaction(trx)">
                             <i class="trash-icon"></i> Trash
                         </button> 
@@ -1047,11 +1054,14 @@
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                      <button class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="editTransaction(trxChild)">
+                      <button *ngIf="!_authService.isReadOnly()" class="dropdown-item" [disabled]="isDisabled(trxChild)" (click)="editTransaction(trxChild)">
                         <i class="edit-icon"></i> Edit
                       </button>
-                      <button *ngIf="isForceItemizable(trxChild)" class="dropdown-item" (click)="forceItemizationToggle(trxChild)">
+                      <button *ngIf="isForceItemizable(trxChild) && !_authService.isReadOnly()" class="dropdown-item" (click)="forceItemizationToggle(trxChild)">
                         <i class="fas fa-calculator"></i>{{getItemizationInd(trxChild)}}
+                      </button>
+                      <button *ngIf="_authService.isReadOnly()" class="dropdown-item" (click)="viewTransaction(trxChild)">
+                        <i class="view-icon"></i> View
                       </button>
                       <button class="dropdown-item" (click)="printTransaction(trxChild)">
                         <i class="fas fa-print"></i> Print
@@ -1063,7 +1073,7 @@
                       (click)="cloneTransaction(trxChild)">
                         <i class="fas fa-copy"></i> Clone
                       </button>
-                      <button *ngIf="checkIfTrashable(trxChild)" class="dropdown-item" (click)="trashTransaction(trxChild)">
+                      <button *ngIf="checkIfTrashable(trxChild) && !_authService.isReadOnly()" class="dropdown-item" (click)="trashTransaction(trxChild)">
                         <i class="trash-icon"></i> Trash
                       </button>
                     </div>

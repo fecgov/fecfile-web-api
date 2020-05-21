@@ -23,7 +23,7 @@
                 <h4>Website :</h4> {{accounts?.website ? accounts.website: 'NA'}}
             </div>
             <div class="col-md-3">
-                <h4>Telephone:</h4> {{accounts?.phone_number? phoneNumber(accounts?.phone_number): ' NA'}}
+                <h4>Telephone:</h4> {{accounts?.treasurerphone? phoneNumber(accounts?.treasurerphone): ' NA'}}
             </div>
             <div class="col-md-3">
                 <h4> Facsimile: </h4>{{accounts?.fax? phoneNumber(accounts?.fax) :  'NA'}}<br>
@@ -40,7 +40,12 @@
                 </div>
                 <div class="row">
                     <div class="col col-md-2">
-                        <label>
+                        <label [ngClass]="
+                        frmAddUser.get('role')?.invalid &&
+                        (frmAddUser.touched)
+                          ? 'input-field-label-error'
+                          : ''
+                        ">
                             <input formControlName="role"
                                    id="role-admin"
                                    type="radio"
@@ -48,7 +53,12 @@
                             Admin</label>
                     </div>
                     <div class="col col-md-2">
-                        <label>
+                        <label [ngClass]="
+                        frmAddUser.get('role')?.invalid &&
+                        (frmAddUser.touched)
+                          ? 'input-field-label-error'
+                          : ''
+                        ">
                             <input formControlName="role"
                                    id="role-entry"
                                    type="radio"
@@ -56,15 +66,12 @@
                             Entry</label>
                     </div>
                     <div class="col col-md-2">
-                        <label>
-                            <input formControlName="role"
-                                   id="role-uploader"
-                                   type="radio"
-                                   value="UPLOADER">
-                            Uploader</label>
-                    </div>
-                    <div class="col col-md-2">
-                        <label>
+                        <label [ngClass]="
+                        frmAddUser.get('role')?.invalid &&
+                        (frmAddUser.touched)
+                          ? 'input-field-label-error'
+                          : ''
+                        ">
                             <input formControlName="role"
                                    id="role-read-only"
                                    type="radio"
@@ -101,15 +108,36 @@
                                 </tr>
                                 <tr>
                                     <td><label>First Name</label></td>
-                                    <td><input formControlName="first_name" placeholder="Enter First Name" type="text"></td>
+                                    <td class="user-text"><input formControlName="first_name"
+                                               placeholder="Enter First Name"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('first_name')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><label>Contact Number</label></td>
-                                    <td><input formControlName="contact" placeholder="Enter Phone Number" type="text"></td>
+                                    <td class="user-text"><input formControlName="contact"
+                                               placeholder="Enter Phone Number"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('contact')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><label>Email Address</label></td>
-                                    <td><input formControlName="email" placeholder="Enter Email Address" type="text"></td>
+                                    <td class="user-text"><input formControlName="email"
+                                               placeholder="Enter Email Address"
+                                               type="text"
+                                               [ngClass]=" frmAddUser.get('email')?.invalid &&
+                                                (frmAddUser.touched || frmAddUser.dirty)
+                                               ? 'input-field-error'
+                                               : ''">
+                                    </td>
                                 </tr>
                             </table>
                         </td>
@@ -121,10 +149,6 @@
                             <b>Entry</b>
                             <ul>
                                  <li>{{_roleDesc.entry}}</li>
-                            </ul>
-                            <b>Uploader</b>
-                            <ul>
-                                <li>{{_roleDesc.uploader}}</li>
                             </ul>
                             <b>Read Only</b>
                             <ul>

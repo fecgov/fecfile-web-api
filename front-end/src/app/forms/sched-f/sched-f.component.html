@@ -707,6 +707,9 @@
                         (click)="saveOnly()">
                         Save &amp; Add Transaction
                       </button>
+                      <div *ngIf="scheduleAction === viewScheduleAction">
+                        <button type="button" class="btn btn-outline-dark btn-right" (click)="viewTransactions()">Close</button>
+                      </div>
                       <button class="btn btn-primary btn-right"
                         (click)="saveAndReturnToParentDebt()">
                         Save &amp; Return to {{ subTransactionInfo.transactionTypeDescription }}

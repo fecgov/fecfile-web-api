@@ -1264,6 +1264,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   public checkIfEditMode(trx: any = null) {
+    if (this._authService.isReadOnly()) {
+      return;
+    }
     this._dialogService
       .confirm(
         'This report has been filed with the FEC. If you want to change, you must Amend the report',
