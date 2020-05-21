@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { ErrorFieldModel } from '../../../model/error-field.model';
 
 @Component({
   selector: 'app-error-contacts-field',
@@ -8,7 +9,7 @@ import { Component, OnInit, Input } from '@angular/core';
 export class ErrorContactsFieldComponent implements OnInit {
 
   @Input()
-  public field: ErrorContactsFieldComponent;
+  public field: ErrorFieldModel;
 
   constructor() { }
 

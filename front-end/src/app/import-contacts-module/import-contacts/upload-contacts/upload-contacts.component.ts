@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEnc
 import { CsvConverterService } from '../service/csv-converter.service';
 import * as XLSX from 'xlsx';
 import { timer, interval, Observable, Subject } from 'rxjs';
-import { takeUntil, finalize } from 'rxjs/operators';
+import { takeUntil, finalize, switchMap } from 'rxjs/operators';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { UploadContactsService } from './service/upload-contacts.service';
 import { UtilService } from 'src/app/shared/utils/util.service';
@@ -26,8 +26,11 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
   public userContactFields: Array<string>;
   public showUpload: boolean;
   public progressPercent: number;
+  public processingPercent: number;
+  public hideProcessingProgress: boolean;
 
-  private onDestroy$ = new Subject();
+  private onDestroy$: Subject<any>;
+  private uploadProcessing$: Subject<any>;
 
 
   constructor(
@@ -37,13 +40,19 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
   ) { }
 
   public ngOnInit() {
+    this.onDestroy$ = new Subject();
     this.showUpload = true;
+    this.hideProcessingProgress = true;
     this.progressPercent = 0;
+    this.processingPercent = 0;
     this.getProgress();
   }
 
   public ngOnDestroy() {
     this.onDestroy$.next();
+    if (this.uploadProcessing$) {
+      this.uploadProcessing$.next();
+    }
   }
 
   /**
@@ -197,27 +206,50 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
   private _uploadCsv(file: File) {
     this.uploadContactsService.uploadFile(file).takeUntil(this.onDestroy$)
       .subscribe((data: any) => {
-        // console.log('data', data);
+        // read the header record from the uploaded file
         this.uploadContactsService.readCsvFileHeader(file).subscribe((headerFields: Array<string>) => {
           this.userContactFields = headerFields;
-          setTimeout(() => {
-            this.emitUserContacts();
-          }, 1000);
         });
+        this.checkForProcessingProgress();
       });
   }
 
   private _uploadJson(file: File) {
     this.uploadContactsService.uploadFile(file).takeUntil(this.onDestroy$)
       .subscribe((data: any) => {
-        // console.log('data', data);
+        // read the header record from the uploaded file
         this.uploadContactsService.readJsonFilePropertyNames(file).subscribe((headerFields: Array<string>) => {
           this.userContactFields = headerFields;
-          setTimeout(() => {
-            this.emitUserContacts();
-          }, 1000);
+          // setTimeout(() => {
+          //   this.emitUserContacts();
+          // }, 1000);
         });
+        this.checkForProcessingProgress();
       });
+  }
+
+  /**
+   * Check for processing progress now that upload is complete.
+   */
+  private checkForProcessingProgress() {
+    this.hideProcessingProgress = false;
+    const progressPoller = interval(500);
+    this.uploadProcessing$ = new Subject();
+    progressPoller.takeUntil(this.uploadProcessing$);
+    this.processingPercent = 0;
+    progressPoller.subscribe(val => {
+      this.uploadContactsService.checkUploadProcessing().takeUntil(this.uploadProcessing$).subscribe(res => {
+        this.processingPercent += res;
+        if (this.processingPercent > 99) {
+          this.uploadProcessing$.next();
+          // Using setTimeout to avoid another subject but should use RxJs (try delay or interval)
+          // The purpose here is to allow the user to see the 100% completion before switching view.
+          setTimeout(() => {
+            // this.emitUserContacts();
+          }, 1000);
+        }
+      });
+    });
   }
 
   public getProgress() {

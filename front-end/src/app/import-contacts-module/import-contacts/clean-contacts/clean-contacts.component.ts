@@ -17,11 +17,15 @@ export class CleanContactsComponent implements OnInit, OnDestroy {
   private showErrorsSubject: BehaviorSubject<boolean>;
   private onDestroy$ = new Subject();
 
+  public showProgress: boolean;
+  public progressPercent: number;
+
   constructor(
     private _importContactsService: ImportContactsService
   ) { }
 
   public ngOnInit(): void {
+
     this.onDestroy$ = new Subject();
 
     this.showDuplicatesSubject = new BehaviorSubject<boolean>(false);

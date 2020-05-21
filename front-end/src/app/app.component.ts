@@ -1,4 +1,4 @@
-import { Component, HostListener, SimpleChanges, OnDestroy, OnInit, HostBinding , ChangeDetectionStrategy } from '@angular/core';
+import { Component, HostListener, SimpleChanges, OnDestroy, OnInit, HostBinding, ChangeDetectionStrategy } from '@angular/core';
 import { Router, NavigationStart, NavigationEnd } from '@angular/router';
 import { MessageService } from './shared/services/MessageService/message.service';
 import { DialogService } from './shared/services/DialogService/dialog.service';
@@ -8,25 +8,27 @@ import { UserIdleService } from 'angular-user-idle';
 import { SessionService } from './shared/services/SessionService/session.service';
 import { formatDate } from '@angular/common';
 import { FormsService } from './shared/services/FormsService/forms.service';
+import { TimeoutMessageService } from './shared/services/TimeoutMessageService/timeout-message-service.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit, OnDestroy{
+export class AppComponent implements OnInit, OnDestroy {
 
   @HostBinding('@.disabled')
   public animationsDisabled = true;
-  
+
   routerEventsSubscription: any;
-  
+
   timeStart = false;
-  seconds = 1200;
+  // seconds = 1200;
+  seconds = 30;
 
   clientX = 0;
   clientY = 0;
-  private timeIsUp:boolean = false;
+  private timeIsUp: boolean = false;
   timerSubscription: any;
   idlePingSubscription: any;
   timeoutSubscription: any;
@@ -36,6 +38,7 @@ export class AppComponent implements OnInit, OnDestroy{
     private userIdle: UserIdleService,
     private _router: Router,
     private _messageService: MessageService,
+    private _timeoutMessageService: TimeoutMessageService,
     private _dialogService: DialogService,
     private _sessionService: SessionService,
     private _formService: FormsService
@@ -94,6 +97,8 @@ export class AppComponent implements OnInit, OnDestroy{
                 response === ModalDismissReasons.BACKDROP_CLICK ||
                 response === ModalDismissReasons.ESC
               ) {
+                this._dialogService.checkIfModalOpen();
+                this._timeoutMessageService.sendTimeoutMessage(true);
                 this._router.navigate(['']);
               }
             });
@@ -109,7 +114,7 @@ export class AppComponent implements OnInit, OnDestroy{
     this.timeoutSubscription.unsubscribe();
     this.routerEventsSubscriptionOnNgDoCheck.unsubscribe();
   }
-  
+
   ngDoCheck(): void {
     if (this._router.url === '/') {
       this.stopWatching();
