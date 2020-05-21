@@ -1217,10 +1217,6 @@ def post_reports(data, reportid=None):
                         data.get("cvg_end_dt"),
                         data.get("coh_bop"),
                     )
-                    # print('here3')
-                # print('here3.5')
-                output = get_reports(data)
-                # print('here4')
             except Exception as e:
                 # Resetting Report ID
                 get_prev_report_id(report_id)
@@ -1229,7 +1225,7 @@ def post_reports(data, reportid=None):
                 raise Exception(
                     "The post_sql_form3x function is throwing an error: " + str(e)
                 )
-
+            output = get_reports(data)
             return output[0]
         else:
             return forms_obj
@@ -1313,7 +1309,6 @@ def put_reports(data):
                         data.get("report_id"),
                         cmte_id,
                     )
-                output = get_reports(data)
             except Exception as e:
                 put_sql_report(
                     prev_report_type,
@@ -1332,6 +1327,7 @@ def put_reports(data):
                     "The put_sql_form3x function is throwing an error: " + str(e)
                 )
 
+            output = get_reports(data)
             return output[0]
         else:
             return forms_obj
