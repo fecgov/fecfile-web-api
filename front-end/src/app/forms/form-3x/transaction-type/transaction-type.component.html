@@ -115,14 +115,15 @@
                           /> -->
                     <ul class="child-options">
                       <ng-container *ngFor="let childOption of option.options">
-                        <li class="child-options__item" (click)="updateTypeSelected(childOption)">
-                          <label for="option_{{ childOption.value }}" class="child-options-label">
+                        <li class="child-options__item" >
+                          <label for="option_{{ childOption.value }}" class="child-options-label" (click)="updateTypeSelected(childOption)">
                             <input
                               id="option_{{ childOption.value }}"
                               placeholder="{{ childOption.text }}"
                               type="radio"
                               [name]="secondaryOption"
                               [value]="childOption.value"
+                              (click)="updateTypeSelected(childOption)"
                             />
                             {{ childOption.text }}
                           </label>

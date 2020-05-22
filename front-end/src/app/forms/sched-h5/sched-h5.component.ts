@@ -859,7 +859,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.h5Ratios['child'] = [];
     this.transferredAmountErr = false;
     if (this.scheduleAction === ScheduleActions.edit) {
-      this.scheduleAction = ScheduleActions.add
+      this.scheduleAction = ScheduleActions.add;
     }
   }
 
@@ -876,7 +876,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH5.patchValue({ category: 'voter_id' }, { onlySelf: true });
     } else if (item.transfer_type === 'Voter Registration') {
       this.schedH5.patchValue({ category: 'voter_registration' }, { onlySelf: true });
-    } else if (item.transfer_type === 'Generic Campaign Activities') {
+    } else if (item.transfer_type === 'Generic Campaign') {
       this.schedH5.patchValue({ category: 'generic_campaign' }, { onlySelf: true });
     } else if (item.transfer_type === 'GOTV') {
       this.schedH5.patchValue({ category: 'gotv' }, { onlySelf: true });
