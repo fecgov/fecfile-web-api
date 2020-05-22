@@ -312,6 +312,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         element.type = "text";
         element.value = input;
         element.dispatchEvent(e);
+        element.focus();
       }
       else if(input.match(/^[0-9]+$/) && element.type === "text"){
         element.type = "date";
