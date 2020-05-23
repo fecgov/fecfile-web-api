@@ -26,7 +26,7 @@ import csv
 from django.core.paginator import Paginator
 from fecfiler.core.views import (get_list_entity, NoOPError, get_cvg_dates, get_comittee_id)
 
-conn = boto.connect_s3()
+# conn = boto.connect_s3()
 
 # Dictionary mapping form type value to form type in forms_and_schedules table
 FORMTYPE_FORM_DICT = {
