@@ -368,14 +368,23 @@ export class SchedH1Component implements OnInit, OnChanges, OnDestroy {
             } else if (res[0].federal_percent === 0.15) {
               this.form.control.patchValue({ h1_election_year_options: '4' }, { onlySelf: true });
             }
-            this.getH1Disable = true;
-            this.h1Disabled = true;
+            // Checking the schedule action again here to ensure it is validated against the
+            // latest status after the network call
+            // During Edit the schedule action changes while the above network call is pending
+            // Fixes issues from FNE-2374
+            if (this.scheduleAction === ScheduleActions.add) {
+              this.getH1Disable = true;
+              this.h1Disabled = true;
+            } else if (this.scheduleAction === ScheduleActions.edit) {
+              this.getH1Disable = false;
+              this.h1Disabled = false;
+            }
           } else {
             this.getH1Disable = false;
             this.h1Disabled = false;
           }
         }
-      )
+      );
       //this.h1Disabled = this.getH1Disable;
       //this.h1Disabled = true;
     } else {

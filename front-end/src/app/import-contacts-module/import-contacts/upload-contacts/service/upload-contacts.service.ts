@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
 import * as S3 from 'aws-sdk/clients/s3';
@@ -9,8 +9,12 @@ import { AWSError } from 'aws-sdk/global';
 import { ManagedUpload, SelectObjectContentEventStream } from 'aws-sdk/clients/s3';
 import { StreamingEventStream } from 'aws-sdk/lib/event-stream/event-stream';
 import { ERROR_COMPONENT_TYPE } from '@angular/compiler';
+import { map } from 'rxjs/operators';
 
 
+/**
+ * A service for uploading a file to AWS.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -40,10 +44,17 @@ export class UploadContactsService {
    */
   public uploadFile(file: File): Observable<any> {
 
+    let committeeId = null;
+    if (localStorage.getItem('committee_details') !== null) {
+      const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+      committeeId = cmteDetails.committeeid;
+    }
+
     this.progressPercent = 0;
     const params = {
       Bucket: this.bucketName,
       Key: file.name,
+      Metadata: { committeeId: committeeId },
       Body: file,
       ACL: 'public-read',
       ContentType: file.type
@@ -256,6 +267,27 @@ export class UploadContactsService {
       }
     });
     // });
+  }
+
+  public checkUploadProcessing(): Observable<any> {
+    let httpOptions = new HttpHeaders();
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    const params = new HttpParams();
+
+    return this._http
+      .get('assets/mock-data/import-contacts/duplicates_even.json', {
+        headers: httpOptions,
+        params
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            res = 25;
+            return res;
+          }
+          return false;
+        })
+      );
   }
 
 }
