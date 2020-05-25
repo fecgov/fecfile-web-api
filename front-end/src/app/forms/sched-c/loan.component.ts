@@ -312,6 +312,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         element.type = "text";
         element.value = input;
         element.dispatchEvent(e);
+        element.focus();
       }
       else if(input.match(/^[0-9]+$/) && element.type === "text"){
         element.type = "date";
@@ -1366,6 +1367,21 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
         transactionCategory: this._transactionCategory
       }
     });
+  }
+
+  public getLoanDueDateAdditionalText() : string{
+    
+    let element :any =  document.getElementById('loan_due_date');
+    if(element){
+      if(element.type === 'date'){
+        return ' Type alphabet keys to enter text instead';
+      }
+      else if(element.type === 'text'){
+        return ' Type any number to switch to date field';
+      }
+    }
+    
+    return '';
   }
 
 }
