@@ -1949,6 +1949,7 @@ def reports(request):
                     "state_of_election": request.data.get("state_of_election"),
                     "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
                     "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
+                    "due_date": date_format(request.data.get("due_dt")),
                     "coh_bop": int(request.data.get("coh_bop")),
                     "status": f_status,
                     "email_1": email_1,
@@ -6116,16 +6117,19 @@ def get_report_info(request):
                 with connection.cursor() as cursor:
                     # GET all rows from Reports table
 
-                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, 
-                                        report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
+                    query_string = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode, 
+                                        rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
                                         rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, 
-                                        '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, 
-                                        due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop,
+                                        x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
+                                        rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
                                          (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
                                          email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
                                          additional_email_2 as additionalEmail2, 
-                                         (SELECT CASE WHEN due_date IS NOT NULL AND due_date < now() THEN True ELSE False END ) AS overdue
-                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s"""
+                                         (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue
+                                      FROM public.reports rp 
+                                      LEFT JOIN form_3x x ON rp.report_id = x.report_id
+                                      LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
+                                      WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id = %s AND rp.report_id = %s"""
                     # print("query_string", query_string)
 
                     cursor.execute(
