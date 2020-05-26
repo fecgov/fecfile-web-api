@@ -45,7 +45,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
     private _activatedRoute: ActivatedRoute,
     private _formService: FormsService,
     private _config: NgbTooltipConfig,
-    private _authService: AuthService
+    private _authService: AuthService,
+    private _messageService : MessageService
   ) { }
 
   ngOnInit(): void {
@@ -179,6 +180,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
               localStorage.removeItem("form3xReportTypes");
               localStorage.removeItem("form3xSelectedReportType");
               localStorage.removeItem("form_3X_ReportInfo");
+
+              //also destroy any current f3x component if present
+              this._messageService.sendMessage({formType : '3X', action: 'destroy'});
             }
 
             this.formType = form;

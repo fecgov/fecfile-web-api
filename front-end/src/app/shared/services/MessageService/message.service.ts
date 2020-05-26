@@ -9,6 +9,7 @@ export class MessageService {
     private _subject: BehaviorSubject<any> = new BehaviorSubject<any>('');
     private _populateChildComponentsubject: BehaviorSubject<any> = new BehaviorSubject<any>('');
     private _rollbackChangesSubject: BehaviorSubject<any> = new BehaviorSubject<any>('');
+    private _updateReportType: BehaviorSubject<any> = new BehaviorSubject<any>('');
 
     constructor() { }
 
@@ -89,4 +90,31 @@ export class MessageService {
     public getRollbackChangesMessage(): Observable<any> {
         return this._rollbackChangesSubject.asObservable();
     }
+
+        /**
+     * Sends the message to a component.
+     *
+     * @param      {Any}  message  The message
+     */
+    public sendUpdateReportTypeMessage(message: any) {
+        this._updateReportType.next(message);
+    }
+
+    /**
+     * Clears the message if needed.
+     *
+     */
+    public clearUpdateReportTypeMessage() {
+        this._updateReportType.next('');
+    }
+
+    /**
+     * Gets the message.
+     *
+     * @return     {Observable}  The message.
+     */
+    public getUpdateReportTypeMessage(): Observable<any> {
+        return this._updateReportType.asObservable();
+    }
+
 }
