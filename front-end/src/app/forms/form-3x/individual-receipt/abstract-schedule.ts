@@ -6033,4 +6033,14 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       }
     }
   }
+
+  protected updateThirdNavAmounts(res: any) {
+    this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
+      const message: any = {
+        formType: this.formType,
+        totals: resp
+      };
+      this._messageService.sendMessage(message);
+    });
+  }
 }
