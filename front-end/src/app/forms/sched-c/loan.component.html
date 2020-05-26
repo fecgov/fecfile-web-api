@@ -44,7 +44,6 @@
                     <ng-container *ngIf="!col?.validation?.required && col?.name !== 'loan_balance'  && 
                       col?.name !== 'loan_payment_to_date' ">
                       (Optional)
-                      <ng-container *ngIf="col?.name === 'loan_due_date'">{{getLoanDueDateAdditionalText()}}</ng-container>
                     </ng-container>
                   </label>
                   <ng-container *ngIf="col?.type === 'text' || col?.type === 'date'">

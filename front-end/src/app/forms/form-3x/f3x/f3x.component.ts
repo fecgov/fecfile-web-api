@@ -1,3 +1,4 @@
+import { ReportsService } from 'src/app/reports/service/report.service';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewEncapsulation, Input } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
@@ -15,6 +16,7 @@ import { F3xMessageService } from '../service/f3x-message.service';
 import { TransactionTypeService } from '../transaction-type/transaction-type.service';
 import { LoanMessageService } from './../../sched-c/service/loan-message.service';
 import { TransactionModel } from './../../transactions/model/transaction.model';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
 
 @Component({
   selector: 'app-f3x',
@@ -87,6 +89,7 @@ export class F3xComponent implements OnInit, OnDestroy {
   queryParamsSubscription: Subscription;
   routerEventsSubscription: Subscription;
   returnToGlobalAllTransaction: boolean;
+  currentReportData: any;
 
   constructor(
     private _reportTypeService: ReportTypeService,
@@ -100,7 +103,9 @@ export class F3xComponent implements OnInit, OnDestroy {
     private _f3xMessageService: F3xMessageService,
     private _loanMessageService: LoanMessageService,
     private _schedHMessageServce: SchedHMessageServiceService,
-    private _schedHService: SchedHServiceService
+    private _schedHService: SchedHServiceService,
+    private _messageService: MessageService,
+    public reportsService:ReportsService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -132,6 +137,12 @@ export class F3xComponent implements OnInit, OnDestroy {
 
     this._f3xMessageService.getParentModelMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this.parentTransactionModel = message;
+    });
+
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(message => {
+      if(message && message.action === 'destroy' && message.formType === '3X'){
+        this.ngOnDestroy();
+      }
     });
   }
 
@@ -205,12 +216,34 @@ export class F3xComponent implements OnInit, OnDestroy {
       this.returnToGlobalAllTransaction = true;
       this.onNotify(this.jumpToTransaction);
     }
+
+    this.getCurrentReportInfoIfApplicable();
+    
+  }
+
+  getCurrentReportInfoIfApplicable() {
+    if(this._activatedRoute.snapshot.queryParams.reportId && this._activatedRoute.snapshot.queryParams.reportId !== undefined){
+      this.reportsService.getReportInfo(this.formType,this._activatedRoute.snapshot.queryParams.reportId).subscribe(data=>{
+        if(data){
+          this.currentReportData = data;
+          this._messageService.sendMessage({
+            action: 'updateCurrentReportHeaderData',
+            data: data
+          });
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
-    this.queryParamsSubscription.unsubscribe();
-    this.routerEventsSubscription.unsubscribe();
+    if(this.queryParamsSubscription){
+      this.queryParamsSubscription.unsubscribe();
+    }
+    if(this.routerEventsSubscription){
+      this.routerEventsSubscription.unsubscribe();
+    }
+    this._messageService.clearUpdateReportTypeMessage();
   }
 
   ngDoCheck(): void {
@@ -293,6 +326,7 @@ export class F3xComponent implements OnInit, OnDestroy {
 
     if (typeof this.selectedReport === 'object') {
       this.reportTypeIndicator = this.selectedReport.regular_special_report_ind;
+      this.selectedReportInfo = this.selectedReport;
       if (typeof this.reportTypeIndicator === 'string') {
         if (this.reportTypeIndicator === 'S') {
           this.specialReports = true;

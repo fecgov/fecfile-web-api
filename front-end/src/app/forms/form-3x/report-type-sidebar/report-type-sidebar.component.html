@@ -17,11 +17,10 @@
                 </span>
               </button>
             </label>
-            <select id="state" name="state" class="form-control" (change)="selectStateChange($event)">
+            <select formControlName = "state" id="state" name="state" class="form-control" (change)="selectStateChange($event)">
               <option value="0">---</option>
               <option
                 *ngFor="let state of electionStates"
-                [selected]="selectedElectionState === state.state"
                 [value]="state.state"
               >
                 {{ state.state_description }}
@@ -39,11 +38,12 @@
               </button>
             </label>
             <select
+              formControlName = "election_date"
               id="electionDate"
               name="electionDate"
               class="form-control"
               (change)="selectElectionDateChange($event)"
-              [disabled]="specialReports === true && (selectedElectionState === null || selectedElectionState === '0')"
+              
             >
               <option value="0" [selected]="specialReports === true && (selectedElectionState === null || selectedElectionState === '0')">---</option>
               <option
@@ -76,12 +76,14 @@
               </span>
             </div>
             <input
+              formControlName = "fromDate"
               type="date"
               name="txtFromDate"
               class="form-control"
+              id="fromDate"
               [value]="fromDate"
               (change)="fromDateChange($event.target.value)"
-              [disabled]="specialReports === true && (selectedElectionState === null || selectedElectionState === '0')"
+              
             />
           </div>
         </div>
@@ -102,12 +104,13 @@
               </span>
             </div>
             <input
+              formControlName = "toDate"
               type="date"
               name="txtToDate"
               class="form-control"
+              id="toDate"
               [value]="toDate"
               (change)="toDateChange($event.target.value)"
-              [disabled]="specialReports === true && (selectedElectionState === null || selectedElectionState === '0')"
             />
           </div>
         </div>
