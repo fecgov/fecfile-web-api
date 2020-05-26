@@ -399,6 +399,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       if (res) {
         this.saveHRes = res;
         this.h5Entries = [];
+        this.updateThirdNavAmounts(res);
       }
     });
   }
@@ -416,6 +417,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         this.h5Sum = res;
         this.h5TableConfig.totalItems = res.length;
       }
+
+      // Update third navigation totals
+      const report = {
+        'report_id': reportId
+      };
+      this.updateThirdNavAmounts(report);
     });
   }
 
