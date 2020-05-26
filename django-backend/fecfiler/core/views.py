@@ -637,7 +637,8 @@ def check_list_cvg_dates(args):
         forms_obj = []
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC",
+                """SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports 
+                WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC""",
                 [cmte_id, form_type],
             )
             if len(args) == 4:
@@ -657,7 +658,7 @@ def check_list_cvg_dates(args):
                 report_id = args[4]
                 for row in cursor.fetchall():
                     if not (row[1] is None or row[2] is None):
-                        if (cvg_end_dt <= row[2] and cvg_start_dt >= row[1]) and row[
+                        if (cvg_start_dt <= row[2] and row[1] <= cvg_end_dt) and row[
                             0
                         ] != int(report_id):
                             forms_obj.append(
