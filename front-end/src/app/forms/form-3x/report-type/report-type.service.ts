@@ -43,7 +43,7 @@ export class ReportTypeService {
    *
    * @param      {string}  formType  The form type
    */
-  public saveReport(formType: string, access_type: string): Observable<any> {
+  public saveReport(formType: string, access_type: string, editMode: boolean): Observable<any> {
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     let url: string = '/core/reports';
@@ -172,28 +172,55 @@ export class ReportTypeService {
       formData.append('status', 'Submitted');
     }
 
-    return this._http
-      .post(`${environment.apiUrl}${url}`, formData, {
-        headers: httpOptions
-      })
-      .pipe(
-        map(res => {
-          if (res) {
-            if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
-              const reportObj: form3xReportTypeDetails = JSON.parse(
-                window.localStorage.getItem(`form_${formType}_report_type`)
-              );
-              if (res['reportid']) {
-                reportObj.reportId = res['reportid'];
-                window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
-                localStorage.setItem(`reportId`, res['reportid']);
-              }
-            }
-            return res;
-          }
-          return false;
+    if(!editMode){
+      return this._http
+        .post(`${environment.apiUrl}${url}`, formData, {
+          headers: httpOptions
         })
-      );
+        .pipe(
+          map(res => {
+            if (res) {
+              if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
+                const reportObj: form3xReportTypeDetails = JSON.parse(
+                  window.localStorage.getItem(`form_${formType}_report_type`)
+                );
+                if (res['reportid']) {
+                  reportObj.reportId = res['reportid'];
+                  window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
+                  localStorage.setItem(`reportId`, res['reportid']);
+                }
+              }
+              return res;
+            }
+            return false;
+          })
+        );
+    }
+    else {
+      formData.append('report_id',form3xReportType.report_id);
+      return this._http
+        .put(`${environment.apiUrl}${url}`, formData, {
+          headers: httpOptions
+        })
+        .pipe(
+          map(res => {
+            if (res) {
+              if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
+                const reportObj: form3xReportTypeDetails = JSON.parse(
+                  window.localStorage.getItem(`form_${formType}_report_type`)
+                );
+                if (res['reportid']) {
+                  reportObj.reportId = res['reportid'];
+                  window.localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportObj));
+                  localStorage.setItem(`reportId`, res['reportid']);
+                }
+              }
+              return res;
+            }
+            return false;
+          })
+        );
+    }
   }
 
   public signandSaveSubmitReport(formType: string, access_type: string): Observable<any> {
