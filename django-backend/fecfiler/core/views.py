@@ -637,7 +637,8 @@ def check_list_cvg_dates(args):
         forms_obj = []
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC",
+                """SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports 
+                WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC""",
                 [cmte_id, form_type],
             )
             if len(args) == 4:
@@ -657,7 +658,7 @@ def check_list_cvg_dates(args):
                 report_id = args[4]
                 for row in cursor.fetchall():
                     if not (row[1] is None or row[2] is None):
-                        if (cvg_end_dt <= row[2] and cvg_start_dt >= row[1]) and row[
+                        if (cvg_start_dt <= row[2] and row[1] <= cvg_end_dt) and row[
                             0
                         ] != int(report_id):
                             forms_obj.append(
@@ -1218,9 +1219,7 @@ def post_reports(data, reportid=None):
                         data.get("cvg_end_dt"),
                         data.get("coh_bop"),
                     )
-                    # print('here3')
-                # print('here3.5')
-                output = get_reports(data)
+                update_transactions_change_cvg_dates(cmte_id, report_id, cvg_start_dt, cvg_end_dt, True)
                 # print('here4')
             except Exception as e:
                 # Resetting Report ID
@@ -1230,7 +1229,7 @@ def post_reports(data, reportid=None):
                 raise Exception(
                     "The post_sql_form3x function is throwing an error: " + str(e)
                 )
-
+            output = get_reports(data)
             return output[0]
         else:
             return forms_obj
@@ -1314,7 +1313,8 @@ def put_reports(data):
                         data.get("report_id"),
                         cmte_id,
                     )
-                output = get_reports(data)
+                update_transactions_change_cvg_dates(cmte_id, report_id, data.get("cvg_start_dt"), prev_cvg_start_dt)
+                update_transactions_change_cvg_dates(cmte_id, report_id, prev_cvg_end_dt, data.get("cvg_end_dt"))
             except Exception as e:
                 put_sql_report(
                     prev_report_type,
@@ -1333,6 +1333,7 @@ def put_reports(data):
                     "The put_sql_form3x function is throwing an error: " + str(e)
                 )
 
+            output = get_reports(data)
             return output[0]
         else:
             return forms_obj
@@ -1363,7 +1364,95 @@ def delete_reports(data):
     except:
         raise
 
+def update_transactions_change_cvg_dates(cmte_id, report_id, present_cvg_start_dt, prev_cvg_start_dt, end_date_include = False):
+    try:
+        logger.debug('update_transactions_change_cvg_dates function STARTED...')
+        if isinstance(present_cvg_start_dt, str):
+            present_cvg_start_dt = datetime.datetime.strptime(present_cvg_start_dt, "%Y-%m-%d").date()
+        if isinstance(prev_cvg_start_dt, str):
+            prev_cvg_start_dt = datetime.datetime.strptime(prev_cvg_start_dt, "%Y-%m-%d").date()
+        param_string = "AND transaction_date >= %s AND transaction_date {} %s AND report_id = %s".format("<=" if end_date_include else "<")
+        if present_cvg_start_dt > prev_cvg_start_dt:
+            new_report_id = 0
+            current_report_id = report_id
+            value_list = [prev_cvg_start_dt, present_cvg_start_dt, current_report_id]
+        elif prev_cvg_start_dt > present_cvg_start_dt:
+            new_report_id = report_id
+            current_report_id = 0
+            value_list = [present_cvg_start_dt, prev_cvg_start_dt, current_report_id]
+        else:
+            value_list = None
 
+        if value_list:
+            logger.debug("""Finding transactions between {} and {} in curret report: {}. 
+                            updating to new report id: {}""".format(value_list[0], value_list[1], value_list[2], new_report_id))
+
+            _sql = """WITH x AS (SELECT transaction_id FROM public.all_transactions_view WHERE (back_ref_transaction_id IS NULL OR back_ref_transaction_id like %s)
+                      AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' {0} AND cmte_id = %s 
+                      AND transaction_table NOT IN ('sched_d', 'sched_h1', 'sched_h2', 'sched_h3', 'sched_h5', 'sched_l'))
+
+                      SELECT transaction_id FROM x
+                      UNION
+                      SELECT v2.transaction_id FROM public.all_transactions_view v2 WHERE v2.back_ref_transaction_id IN (SELECT transaction_id FROM x
+                      WHERE transaction_id NOT LIKE %s)
+                      AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s
+                      UNION
+                      SELECT v3.transaction_id FROM public.sched_c2 v3 WHERE v3.back_ref_transaction_id IN (SELECT transaction_id FROM x
+                      WHERE transaction_id NOT LIKE %s)
+                      AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s
+                      UNION
+                      SELECT transaction_id FROM public.all_transactions_view WHERE back_ref_transaction_id IS NOT NULL AND cmte_id = %s 
+                      AND delete_ind IS DISTINCT FROM 'Y' {0} 
+                      AND transaction_table IN ('sched_h3', 'sched_h5')""".format(param_string)
+            _value_list = ['SC%']
+            _value_list.extend(value_list)
+            _value_list.extend([cmte_id, 'SC%', cmte_id, 'SC%', cmte_id, cmte_id])
+            _value_list.extend(value_list)
+            with connection.cursor() as cursor:
+                    cursor.execute(_sql, _value_list)
+                    transactions_list =  cursor.fetchall()
+            if transactions_list:
+                update_tran_list = []
+                for transaction in transactions_list:
+                    update_tran_list.append(transaction[0])
+                logger.debug("{} transactions found in Modified report coverage dates: '{}'".format(len(update_tran_list), "', '".join(update_tran_list)))
+                _sql2 = """UPDATE public.sched_a SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_b SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_c SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_c1 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_c2 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_e SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_f SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_h3 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_h4 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_h5 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_h6 SET report_id=%s WHERE transaction_id in ('{0}');""".format("', '".join(update_tran_list))
+                _value_list2 = [new_report_id]*11
+                with connection.cursor() as cursor:
+                        cursor.execute(_sql2, _value_list2)
+                        logger.debug("transactions updated...")
+            else:
+                logger.debug("no transactions found in Modified report coverage dates.")
+        logger.debug('update_transactions_change_cvg_dates function FINISHED...')
+        return Response('success',  status= status.HTTP_200_OK)
+    except Exception as e:
+        raise Exception('The update_transactions_change_cvg_dates function is throwing an error: ' + str(e))
+
+def count_orphaned_transactions(report_id, cmte_id):
+    try:
+        _sql = """SELECT count(*) FROM public.all_transactions_view WHERE report_id = '0' AND cmte_id = %s 
+              AND date_part('year', transaction_date) = (SELECT date_part('year', cvg_end_date) FROM reports WHERE 
+              cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y') AND delete_ind IS DISTINCT FROM 'Y'"""
+        _values = [cmte_id, cmte_id, report_id]
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _values)
+            value =  cursor.fetchone()[0]
+        if value:
+            return True
+        else:
+            return False
+    except Exception as e:
+        raise Exception('The count_orphaned_transactions function is throwing an error: ' + str(e))
 """
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
@@ -1757,18 +1846,24 @@ def reports(request):
                   }
                 data = post_reports(datum)
                 if type(data) is dict:
-                      # print(data)
-                      # do h1 carryover if new report created
-                      do_h1_carryover(data.get("cmteid"), data.get("reportid"))
-                      do_h2_carryover(data.get("cmteid"), data.get("reportid"))
-                      do_loan_carryover(data.get("cmteid"), data.get("reportid"))
-                      do_debt_carryover(data.get("cmteid"), data.get("reportid"))
-                      do_levin_carryover(data.get("cmteid"), data.get("reportid"))
-                      do_in_between_report_carryover(data.get("cmteid"), data.get("reportid"))
-                      function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
-                      return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
+                    # print(data)
+                    # do h1 carryover if new report created
+                    do_h1_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_h2_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_loan_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_debt_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_levin_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_in_between_report_carryover(data.get("cmteid"), data.get("reportid"))
+                    function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
+
+                    data['status'] = "success"
+                    return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
                 elif type(data) is list:
-                      return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+                    output_dict = {
+                          'status' : "fail",
+                          'data' : data
+                      }
+                    return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
                 else:
                       raise Exception("The output returned from post_reports function is neither dict nor list")
             except Exception as e:
@@ -1810,6 +1905,7 @@ def reports(request):
         """
         if request.method == "PUT":
             try:
+                cmte_id = get_comittee_id(request.user.username)
                 if "amend_ind" in request.data:
                     amend_ind = request.data.get("amend_ind")
                 else:
@@ -1847,13 +1943,14 @@ def reports(request):
 
                 datum = {
                     "report_id": request.data.get("report_id"),
-                    "cmte_id": get_comittee_id(request.user.username),
+                    "cmte_id": cmte_id,
                     "form_type": request.data.get("form_type"),
                     "report_type": request.data.get("report_type"),
                     "date_of_election": date_format(request.data.get("date_of_election")),
                     "state_of_election": request.data.get("state_of_election"),
                     "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
                     "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
+                    "due_date": date_format(request.data.get("due_dt")),
                     "coh_bop": int(request.data.get("coh_bop")),
                     "status": f_status,
                     "email_1": email_1,
@@ -1868,14 +1965,22 @@ def reports(request):
                     datum["election_code"] = request.data.get("election_code")
 
                 data = put_reports(datum)
+                orphanedTransactionsExist = count_orphaned_transactions(request.data.get("report_id"), cmte_id)
                 if f_status == "Submitted" and data:
                     return JsonResponse(
                         {"Submitted": True}, status=status.HTTP_201_CREATED, safe=False
                     )
                 elif type(data) is dict:
+                    data['status'] = "success"
+                    data['orphanedTransactionsExist'] = orphanedTransactionsExist
                     return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
                 elif type(data) is list:
-                    return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
+                    output_dict = {
+                          'status' : "fail",
+                          'orphanedTransactionsExist': orphanedTransactionsExist,
+                          'data' : data
+                      }
+                    return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
                 else:
                     raise Exception(
                         "The output returned from put_reports function is neither dict nor list"
@@ -6013,16 +6118,19 @@ def get_report_info(request):
                 with connection.cursor() as cursor:
                     # GET all rows from Reports table
 
-                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, 
-                                        report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
+                    query_string = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode, 
+                                        rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
                                         rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, 
-                                        '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, 
-                                        due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop,
+                                        x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
+                                        rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
                                          (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
                                          email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
                                          additional_email_2 as additionalEmail2, 
-                                         (SELECT CASE WHEN due_date IS NOT NULL AND due_date < now() THEN True ELSE False END ) AS overdue
-                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s"""
+                                         (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue
+                                      FROM public.reports rp 
+                                      LEFT JOIN form_3x x ON rp.report_id = x.report_id
+                                      LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
+                                      WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id = %s AND rp.report_id = %s"""
                     # print("query_string", query_string)
 
                     cursor.execute(
