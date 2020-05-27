@@ -63,6 +63,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   private  updateRptSubscription: Subscription  = null;
   invalidDatesServerValidation: boolean;
 
+  public selectedState: string = null;
+  public selectedElectionDate: string = null;
+
   constructor(
     private _fb: FormBuilder,
     private _router: Router,
@@ -111,6 +114,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
               this.fromDateSelected = res.selectedFromDate;
               this.toDateSelected = res.selectedToDate;
               this._dueDate = res.dueDate;
+              this._selectedElectionDate = res.selectedElectionDate;
+              this._selectedElectionState = res.selectedState
           }
           if(this.frmReportType){
             if (!this.reportEditMode) {
@@ -643,7 +648,10 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
         }
         else{
-
+            this._messageService.sendMessage({
+              action: 'updateCurrentReportHeaderData',
+              data: res
+            });
             if (res.orphanedTransactionsExist){
               this.showOrphanTransactionsExistWarningMessage(res);
             }else{
