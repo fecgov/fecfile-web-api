@@ -6120,7 +6120,7 @@ def get_report_info(request):
 
                     query_string = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode, 
                                         rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
-                                        rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, 
+                                        rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState, 
                                         x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
                                         rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
                                          (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
