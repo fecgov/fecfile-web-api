@@ -1,9 +1,9 @@
 {
   "Quarterly-Election-Year": {
-  	"report_type": [
+    "report_type": [
       {
         "report_type": "Q1",
-        "report_type_desciption": "April 15 Quarterly",
+        "report_type_desciption": "April 15 Quarterly - Q1",
         "report_type_info": "In an election year covers activity from January 1 thru March 31 and due on the 15th of April.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -24,7 +24,7 @@
       },
       {
         "report_type": "Q2",
-        "report_type_desciption": "July 15 Quarterly",
+        "report_type_desciption": "July 15 Quarterly - Q2",
         "report_type_info": "In an election year covers overs activity from April 1 thru June 30 and due on the 15th of July.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -45,7 +45,7 @@
       },
       {
         "report_type": "Q3",
-        "report_type_desciption": "October 15 Quarterly",
+        "report_type_desciption": "October 15 Quarterly - Q3",
         "report_type_info": "In an election year covers activity from July 1 thru September 30 and due on the 15th of October.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -66,7 +66,7 @@
       },
       {
         "report_type": "12G",
-        "report_type_desciption": "12 Day Pre-General",
+        "report_type_desciption": "12 Day Pre-General - 12G",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the general. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -87,7 +87,7 @@
       },
       {
         "report_type": "30G",
-        "report_type_desciption": "30 Day Post-General",
+        "report_type_desciption": "30 Day Post-General - 30G",
         "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -108,7 +108,7 @@
       },
       {
         "report_type": "YE",
-        "report_type_desciption": "Year End",
+        "report_type_desciption": "Year End - YE",
         "report_type_info": "In an election year covers activity from October 1 thru December 31 and due on the 15th of January of the following year.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -129,7 +129,7 @@
       },
       {
         "report_type": "12P",
-        "report_type_desciption": "12 Day Pre-Primary",
+        "report_type_desciption": "12 Day Pre-Primary - 12P",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -150,7 +150,7 @@
       },
       {
         "report_type": "12R",
-        "report_type_desciption": "12 Day Pre-Runoff",
+        "report_type_desciption": "12 Day Pre-Runoff - 12R",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -171,7 +171,7 @@
       },
       {
         "report_type": "12S",
-        "report_type_desciption": "12 Day Pre-Special",
+        "report_type_desciption": "12 Day Pre-Special - 12S",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -192,7 +192,7 @@
       },
       {
         "report_type": "12C",
-        "report_type_desciption": "12 Day Pre-Convention",
+        "report_type_desciption": "12 Day Pre-Convention - 12C",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -213,7 +213,7 @@
       },
       {
         "report_type": "30R",
-        "report_type_desciption": "30 Day Post-Runoff",
+        "report_type_desciption": "30 Day Post-Runoff - 30R",
         "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -234,7 +234,7 @@
       },
       {
         "report_type": "30S",
-        "report_type_desciption": "30 Day Post-Special",
+        "report_type_desciption": "30 Day Post-Special - 30S",
         "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -255,7 +255,7 @@
       },
       {
         "report_type": "TER",
-        "report_type_desciption": "Termination Report",
+        "report_type_desciption": "Termination Report - TER",
         "report_type_info": "Need language from RAD",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -277,10 +277,10 @@
     ]
   },
   "Quarterly-Non-Election-Year": {
-  	"report_type": [
+    "report_type": [
       {
         "report_type": "MY",
-        "report_type_desciption": "Mid-Year",
+        "report_type_desciption": "Mid-Year - MY",
         "report_type_info": "In a non-election year covers activity from January 1 thru June 30 and due on the 31st of July.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -301,7 +301,7 @@
       },
       {
         "report_type": "YE",
-        "report_type_desciption": "Year-End",
+        "report_type_desciption": "Year-End - YE",
         "report_type_info": "In a non-election year covers activity from July 1 thru December 31 and due on the 31st of January of the following year.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -322,7 +322,7 @@
       },
       {
         "report_type": "12P",
-        "report_type_desciption": "12 Day Pre-Primary",
+        "report_type_desciption": "12 Day Pre-Primary - 12P",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -343,7 +343,7 @@
       },
       {
         "report_type": "12R",
-        "report_type_desciption": "12 Day Pre-Runoff",
+        "report_type_desciption": "12 Day Pre-Runoff - 12R",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -364,7 +364,7 @@
       },
       {
         "report_type": "12S",
-        "report_type_desciption": "12 Day Pre-Special",
+        "report_type_desciption": "12 Day Pre-Special - 12S",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -385,7 +385,7 @@
       },
       {
         "report_type": "12C",
-        "report_type_desciption": "12 Day Pre-Convention",
+        "report_type_desciption": "12 Day Pre-Convention - 12C",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the primary. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -406,7 +406,7 @@
       },
       {
         "report_type": "30R",
-        "report_type_desciption": "30 Day Post-Runoff",
+        "report_type_desciption": "30 Day Post-Runoff - 30R",
         "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -427,7 +427,7 @@
       },
       {
         "report_type": "30S",
-        "report_type_desciption": "30 Day Post-Special",
+        "report_type_desciption": "30 Day Post-Special - 30S",
         "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -448,7 +448,7 @@
       },
       {
         "report_type": "TER",
-        "report_type_desciption": "Termination Report",
+        "report_type_desciption": "Termination Report - TER",
         "report_type_info": "Need language from RAD",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -470,10 +470,10 @@
     ]
   },
   "Monthly-Election-Year": {
-  	"report_type": [
+    "report_type": [
       {
         "report_type": "M2",
-        "report_type_desciption": "February 20 Monthly",
+        "report_type_desciption": "February 20 Monthly - M2",
         "report_type_info": "In an election year/non-election year covers activity from January 1 thru January 31 and due on the 20th of February.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -494,7 +494,7 @@
       },
       {
         "report_type": "M3",
-        "report_type_desciption": "March 20 Monthly",
+        "report_type_desciption": "March 20 Monthly - M3",
         "report_type_info": "In an election year/non-election year covers activity from February 1 thru February 28 and due on the 20th of March.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -515,7 +515,7 @@
       },
       {
         "report_type": "M4",
-        "report_type_desciption": "April 20 Monthly",
+        "report_type_desciption": "April 20 Monthly - M4",
         "report_type_info": "In an election year/non-election year covers activity from March 1 thru March 31 and due on the 20th of April.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -536,7 +536,7 @@
       },
       {
         "report_type": "M5",
-        "report_type_desciption": "May 20 Monthly",
+        "report_type_desciption": "May 20 Monthly - M5",
         "report_type_info": "In an election year/non-election year covers activity from April 1 thru April 30 and due on the 20th of May.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -557,7 +557,7 @@
       },
       {
         "report_type": "M6",
-        "report_type_desciption": "June 20 Monthly",
+        "report_type_desciption": "June 20 Monthly - M6",
         "report_type_info": "In an election year/non-election year covers activity from May 1 thru May 31 and due on the 20th of June.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -578,7 +578,7 @@
       },
       {
         "report_type": "M7",
-        "report_type_desciption": "July 20 Monthly",
+        "report_type_desciption": "July 20 Monthly - M7",
         "report_type_info": "In an election year/non-election year covers activity from June 1 thru June 30 and due on the 20th of July.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -599,7 +599,7 @@
       },
       {
         "report_type": "M8",
-        "report_type_desciption": "August 20 Monthly",
+        "report_type_desciption": "August 20 Monthly - M8",
         "report_type_info": "In an election year/non-election year covers activity from July 1 thru July 31 and due on the 20th of August.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "Y",
@@ -620,7 +620,7 @@
       },
       {
         "report_type": "M9",
-        "report_type_desciption": "September 20 Monthly",
+        "report_type_desciption": "September 20 Monthly - M9",
         "report_type_info": "In an election year/non-election year covers activity from August 1 thru August 31 and due on the 20th of September.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -641,7 +641,7 @@
       },
       {
         "report_type": "M10",
-        "report_type_desciption": "October 20 Monthly",
+        "report_type_desciption": "October 20 Monthly - M10",
         "report_type_info": "In an election year/non-election year covers activity from September 1 thru September 30 and due on the 20th of October.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -662,7 +662,7 @@
       },
       {
         "report_type": "12G",
-        "report_type_desciption": "12 Day Pre-General",
+        "report_type_desciption": "12 Day Pre-General - 12G",
         "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the general. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -683,7 +683,7 @@
       },
       {
         "report_type": "30G",
-        "report_type_desciption": "30 Day Post-General",
+        "report_type_desciption": "30 Day Post-General - 30G",
         "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
         "regular_special_report_ind": "S",
         "default_disp_ind": "N",
@@ -704,7 +704,7 @@
       },
       {
         "report_type": "YE",
-        "report_type_desciption": "Year-End",
+        "report_type_desciption": "Year-End - YE",
         "report_type_info": "In an election year/non-election year covers activity from December 1 thru December 31 and due on the 20th of January of the following year.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -725,7 +725,7 @@
       },
       {
         "report_type": "TER",
-        "report_type_desciption": "Termination Report",
+        "report_type_desciption": "Termination Report - TER",
         "report_type_info": "Need language from RAD",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -750,7 +750,7 @@
     "report_type": [
       {
         "report_type": "M2",
-        "report_type_desciption": "February 20 Monthly",
+        "report_type_desciption": "February 20 Monthly - M2",
         "report_type_info": "In an election year/non-election year covers activity from January 1 thru January 31 and due on the 20th of February.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -771,7 +771,7 @@
       },
       {
         "report_type": "M3",
-        "report_type_desciption": "March 20 Monthly",
+        "report_type_desciption": "March 20 Monthly - M3",
         "report_type_info": "In an election year/non-election year covers activity from February 1 thru February 28 and due on the 20th of March.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -792,7 +792,7 @@
       },
       {
         "report_type": "M4",
-        "report_type_desciption": "April 20 Monthly",
+        "report_type_desciption": "April 20 Monthly - M4",
         "report_type_info": "In an election year/non-election year covers activity from March 1 thru March 31 and due on the 20th of April.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -813,7 +813,7 @@
       },
       {
         "report_type": "M5",
-        "report_type_desciption": "May 20 Monthly",
+        "report_type_desciption": "May 20 Monthly - M5",
         "report_type_info": "In an election year/non-election year covers activity from April 1 thru April 30 and due on the 20th of May.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -834,7 +834,7 @@
       },
       {
         "report_type": "M6",
-        "report_type_desciption": "June 20 Monthly",
+        "report_type_desciption": "June 20 Monthly - M6",
         "report_type_info": "In an election year/non-election year covers activity from May 1 thru May 31 and due on the 20th of June.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -855,7 +855,7 @@
       },
       {
         "report_type": "M7",
-        "report_type_desciption": "July 20 Monthly",
+        "report_type_desciption": "July 20 Monthly - M7",
         "report_type_info": "In an election year/non-election year covers activity from June 1 thru June 30 and due on the 20th of July.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -876,7 +876,7 @@
       },
       {
         "report_type": "M8",
-        "report_type_desciption": "August 20 Monthly",
+        "report_type_desciption": "August 20 Monthly - M8",
         "report_type_info": "In an election year/non-election year covers activity from July 1 thru July 31 and due on the 20th of August.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "Y",
@@ -897,7 +897,7 @@
       },
       {
         "report_type": "M9",
-        "report_type_desciption": "September 20 Monthly",
+        "report_type_desciption": "September 20 Monthly - M9",
         "report_type_info": "In an election year/non-election year covers activity from August 1 thru August 31 and due on the 20th of September.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -918,7 +918,7 @@
       },
       {
         "report_type": "M10",
-        "report_type_desciption": "October 20 Monthly",
+        "report_type_desciption": "October 20 Monthly - M10",
         "report_type_info": "In an election year/non-election year covers activity from September 1 thru September 30 and due on the 20th of October.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -939,7 +939,7 @@
       },
       {
         "report_type": "M11",
-        "report_type_desciption": "November 20 Monthly",
+        "report_type_desciption": "November 20 Monthly - M11",
         "report_type_info": "In an election year covers activity from October 1 thru October 31 and due on the 20th of November.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -960,7 +960,7 @@
       },
       {
         "report_type": "M12",
-        "report_type_desciption": "December 20 Monthly",
+        "report_type_desciption": "December 20 Monthly - M12",
         "report_type_info": "In an election year covers activity from November 1 thru November 31 and due on the 20th of December.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -981,7 +981,7 @@
       },
       {
         "report_type": "YE",
-        "report_type_desciption": "Year-End",
+        "report_type_desciption": "Year-End - YE",
         "report_type_info": "In an election year/non-election year covers activity from December 1 thru December 31 and due on the 20th of January of the following year.",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
@@ -1002,7 +1002,7 @@
       },
       {
         "report_type": "TER",
-        "report_type_desciption": "Termination Report",
+        "report_type_desciption": "Termination Report - TER",
         "report_type_info": "Need language from RAD",
         "regular_special_report_ind": "R",
         "default_disp_ind": "N",
