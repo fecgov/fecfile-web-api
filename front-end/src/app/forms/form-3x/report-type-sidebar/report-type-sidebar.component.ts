@@ -76,6 +76,13 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
     this.messageSubscription = this._messageService.getMessage().subscribe(message => {
       if(message && message.component === 'coverage-sidebar' && message.action === 'clearCoverageForm'){
         if(this.frmReportSidebar){
+          this.dueDate = null;
+          this.fromDate = null;
+          this.toDate = null;
+          this._selectedState = null;
+          this._selectedElectionDate = null;
+          this.selectedElectionState = null;
+          this.selectedElecetionDate = null;
           this.frmReportSidebar.reset();
         }
       }
