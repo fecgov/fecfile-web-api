@@ -807,6 +807,12 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         this.h3Sum = res;
         this.h3TableConfig.totalItems = res.length;
       }
+
+      // Update third navigation totals
+      const report = {
+        'report_id': reportId
+      };
+      this.updateThirdNavAmounts(report);
     });
   }
 
