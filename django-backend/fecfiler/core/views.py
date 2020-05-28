@@ -898,8 +898,46 @@ def get_list_report(report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
 
-            query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
-                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s"""
+            query_string = """SELECT    rp.cmte_id                    AS cmteid, 
+                                        rp.report_id                  AS reportid, 
+                                        rp.form_type                  AS formtype, 
+                                        ''                            AS electioncode, 
+                                        rp.report_type                AS reporttype, 
+                                        rt.rpt_type_desc              AS reporttypedescription, 
+                                        rt.regular_special_report_ind AS regularspecialreportind, 
+                                        x.state_of_election           AS electionstate, 
+                                        x.date_of_election::date      AS electiondate, 
+                                        rp.cvg_start_date             AS cvgstartdate, 
+                                        rp.cvg_end_date               AS cvgenddate, 
+                                        rp.due_date                   AS duedate, 
+                                        rp.amend_ind                  AS amend_indicator, 
+                                        0                             AS coh_bop, 
+                                        ( 
+                                                SELECT 
+                                                        CASE 
+                                                            WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date 
+                                                            ELSE 0 
+                                                        END ) AS daysuntildue, 
+                                        email_1            AS    email1, 
+                                        email_2            AS    email2, 
+                                        additional_email_1 AS    additionalemail1, 
+                                        additional_email_2 AS    additionalemail2, 
+                                        ( 
+                                                SELECT 
+                                                        CASE 
+                                                            WHEN rp.due_date IS NOT NULL 
+                                                            AND    rp.due_date < now() THEN true 
+                                                            ELSE false 
+                                                        END ) AS overdue 
+                                FROM      PUBLIC.reports rp 
+                                LEFT JOIN form_3x x 
+                                ON        rp.report_id = x.report_id 
+                                LEFT JOIN PUBLIC.ref_rpt_types rt 
+                                ON        rp.report_type=rt.rpt_type 
+                                WHERE     rp.delete_ind IS DISTINCT 
+                                FROM      'Y' 
+                                AND       rp.cmte_id = %s 
+                                AND       rp.report_id = %s"""
 
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""",

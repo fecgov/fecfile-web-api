@@ -397,7 +397,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
       let selectedStateObj = this.selectedReport.election_state.find(el => {
         return el.state === state;
       });
-      if (selectedStateObj.hasOwnProperty('dates')) {
+      if (selectedStateObj && selectedStateObj.hasOwnProperty('dates')) {
         if (Array.isArray(selectedStateObj.dates)) {
           this.electionDates = [];
           this.electionDates = selectedStateObj.dates;
