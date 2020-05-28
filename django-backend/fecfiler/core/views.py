@@ -378,27 +378,47 @@ GET REPORT TYPES API- CORE APP - SPRINT 6 - FNE 471 - BY PRAVEEN JINKA
 @api_view(["GET"])
 def get_report_types(request):
     try:
-        with connection.cursor() as cursor:
+        """ Temporarily commented as we are hard coding output using report_types json"""
+        # with connection.cursor() as cursor:
 
-            # report_year = datetime.datetime.now().strftime('%Y')
-            forms_obj = {}
-            cmte_id = get_comittee_id(request.user.username)
-            form_type = request.query_params.get("form_type")
-            cursor.execute(
-                "select report_types_json From public.report_type_and_due_dates_view where cmte_id = %s and form_type = %s",
-                [cmte_id, form_type],
-            )
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj = json.loads(data_row[0])
+        #     # report_year = datetime.datetime.now().strftime('%Y')
+        #     forms_obj = {}
+        #     cmte_id = get_comittee_id(request.user.username)
+        #     form_type = request.query_params.get("form_type")
+        #     cursor.execute(
+        #         "select report_types_json From public.report_type_and_due_dates_view where cmte_id = %s and form_type = %s",
+        #         [cmte_id, form_type],
+        #     )
+        #     for row in cursor.fetchall():
+        #         data_row = list(row)
+        #         forms_obj = json.loads(data_row[0])
 
-        if not bool(forms_obj):
-            return Response(
-                "No entries were found for the form type: {} for this committee".format(
-                    form_type
-                ),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        # if not bool(forms_obj):
+        #     return Response(
+        #         "No entries were found for the form type: {} for this committee".format(
+        #             form_type
+        #         ),
+        #         status=status.HTTP_400_BAD_REQUEST,
+        #     )
+        cmte_id = get_comittee_id(request.user.username)
+        with open('./fecfiler/core/report_types.json') as f:
+            data = json.load(f)
+
+        # test_date = date_format(request.data.get('test_date'))
+        # print(test_date)
+        # if test_date:
+        #     _year = test_date.year
+        # if test_date <= datetime.date(_year, 1, 31):
+        #     _year -= 1
+
+        _year = datetime.date.today().year
+        if datetime.date.today() <= datetime.date(_year, 1, 31):
+            _year = _year-1
+
+        if _year%2 == 1:
+            odd = True
+        else:
+            odd = False
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -410,13 +430,29 @@ def get_report_types(request):
                 cmte_filing_freq = cmte_filing_freq[0]
 
         if cmte_filing_freq == "Q":
-            reports = forms_obj.get("report_type")
-            for report in reports:
-                if report.get("report_type") == "YE":
-                    report["election_state"][0]["dates"][0]["cvg_start_date"] = (
-                            report["election_state"][0]["dates"][0]["cvg_end_date"][:4]
-                            + "-10-01"
-                    )
+            if odd:
+                parameter = "Quarterly-Non-Election-Year"
+            else:
+                parameter = "Quarterly-Election-Year"
+        else:
+            if odd:
+                parameter = "Monthly-Non-Election-Year"
+            else:
+                parameter = "Monthly-Election-Year"
+
+        forms_obj = data.get(parameter)
+        for report_type in forms_obj['report_type']:
+            for election_state in report_type['election_state']:
+                for dates in election_state['dates']:
+                    if dates.get('cvg_start_date'):
+                        dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
+                    if dates.get('cvg_end_date'):
+                        dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
+                    if dates.get('due_date'):
+                        if "YYYY-01" in dates.get('due_date'):
+                            dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
+                        else:
+                            dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
 
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
