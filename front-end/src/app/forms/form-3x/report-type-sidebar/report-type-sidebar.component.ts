@@ -117,17 +117,17 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
   }
 
   private populateDataForEdit(message: any) {
-    this.frmReportSidebar.controls['fromDate'].patchValue(message.currentReportData.currentStartDate);
-    this.frmReportSidebar.controls['toDate'].patchValue(message.currentReportData.currentEndDate);
-    this.frmReportSidebar.controls['state'].patchValue(message.currentReportData.currentElectionState);
-    this.populateDatesByState(message.currentReportData.currentElectionState);
-    this.frmReportSidebar.controls['election_date'].patchValue(message.currentReportData.currentElectionDate);
-    this.fromDate = message.currentReportData.currentStartDate;
-    this.toDate = message.currentReportData.currentEndDate;
-    this.dueDate = message.currentReportData.currentDueDate;
-    this.fromDateChange(message.currentReportData.currentStartDate);
-
-    // this.messageDataForEdit = message;
+    if(message && message.currentReportData){
+      this.frmReportSidebar.controls['fromDate'].patchValue(message.currentReportData.currentStartDate);
+      this.frmReportSidebar.controls['toDate'].patchValue(message.currentReportData.currentEndDate);
+      this.frmReportSidebar.controls['state'].patchValue(message.currentReportData.currentElectionState);
+      this.populateDatesByState(message.currentReportData.currentElectionState);
+      this.frmReportSidebar.controls['election_date'].patchValue(message.currentReportData.currentElectionDate);
+      this.fromDate = message.currentReportData.currentStartDate;
+      this.toDate = message.currentReportData.currentEndDate;
+      this.dueDate = message.currentReportData.currentDueDate;
+      this.fromDateChange(message.currentReportData.currentStartDate);
+    }
   }
 
 /*   ngOnInit(): void {
@@ -145,11 +145,11 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
 
   public initForm() {
     this.frmReportSidebar = this._fb.group({
-      state: new FormControl({value:null}),
-      election_date: new FormControl({value:null}),
-      fromDate: new FormControl({value:null},[Validators.required]),
-      toDate: new FormControl({value:null},[Validators.required]),
-      dueDate: new FormControl({value:null})
+      state: new FormControl({value:null,disabled: false}),
+      election_date: new FormControl({value:null,disabled: false}),
+      fromDate: new FormControl({value:null,disabled: false},[Validators.required]),
+      toDate: new FormControl({value:null,disabled: false},[Validators.required]),
+      dueDate: new FormControl({value:null,disabled: false})
     });
   }
 
@@ -287,6 +287,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
                           if(this.frmReportSidebar){
                             this.frmReportSidebar.controls['fromDate'].patchValue(this.fromDate);
                             this.frmReportSidebar.controls['toDate'].patchValue(this.toDate);
+                            this.fromDateChange(this.fromDate);
                           }
                         }
 
@@ -303,6 +304,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
                           if(this.frmReportSidebar){
                             this.frmReportSidebar.controls['fromDate'].patchValue(this.fromDate);
                             this.frmReportSidebar.controls['toDate'].patchValue(this.toDate);
+                            this.fromDateChange(this.fromDate);
                           }
 
                         }
@@ -472,10 +474,10 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
         message.action = 'coverageDatesUpdated'
         message.validDates = false;
         message.selectedFromDate = date;
-        message.selectedToDate = this.frmReportSidebar.value.toDate;
+        message.selectedToDate = this.frmReportSidebar.controls['toDate'].value;
         message.dueDate = this.dueDate;
-        message.selectedState = this.frmReportSidebar.value.state;
-        message.selectedElectionDate = this.frmReportSidebar.value.election_date;
+        message.selectedState = this.frmReportSidebar.controls['state'].value;
+        message.selectedElectionDate = this.frmReportSidebar.controls['election_date'].value;
         message.electionDates = [];
       /* } else {
         this.fromDate = date;

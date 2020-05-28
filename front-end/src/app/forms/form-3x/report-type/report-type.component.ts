@@ -1,3 +1,4 @@
+import { UtilService } from './../../../shared/utils/util.service';
 import { IndividualReceiptService } from './../individual-receipt/individual-receipt.service';
 import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
@@ -77,7 +78,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     private _datePipe: DatePipe,
     private  _reportService: ReportsService,
     private  _transactionsMessageService: TransactionsMessageService, 
-    private _indReceiptService: IndividualReceiptService
+    private _indReceiptService: IndividualReceiptService,
+    private _utilService:UtilService
   ) {
     
     this._messageService.getUpdateReportTypeMessage().takeUntil(this.onDestroy$).subscribe(message => {
@@ -648,6 +650,12 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
         }
         else{
+            if(res && res.hasOwnProperty('cvgstartdate')){
+              res.cvgstartdate = this._utilService.formatDate(res.cvgstartdate)
+            }
+            if(res && res.hasOwnProperty('cvgenddate')){
+              res.cvgenddate = this._utilService.formatDate(res.cvgenddate)
+            }
             this._messageService.sendMessage({
               action: 'updateCurrentReportHeaderData',
               data: res
