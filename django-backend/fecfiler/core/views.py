@@ -175,6 +175,8 @@ f3x_col_line_dict = {
 # NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER = ['LOAN_FROM_IND', 'LOAN_FROM_BANK', 'LOAN_OWN_TO_CMTE_OUT', 'IK_OUT', 'IK_BC_OUT',
 #     'PARTY_IK_OUT', 'PARTY_IK_BC_OUT', 'PAC_IK_OUT', 'PAC_IK_BC_OUT', 'IK_TRAN_OUT', 'IK_TRAN_FEA_OUT']
 
+FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS = 99999
+
 logger = logging.getLogger(__name__)
 # aws s3 bucket connection
 # conn = boto.connect_s3()
@@ -806,14 +808,14 @@ def check_mandatory_fields_form3x(data):
 **************************************************** FUNCTIONS - REPORT IDS **********************************************************
 """
 
-
 def get_next_report_id():
     try:
         with connection.cursor() as cursor:
             cursor.execute("""SELECT nextval('report_id_seq')""")
             report_ids = cursor.fetchone()
             report_id = report_ids[0]
-
+            if report_id == FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS:
+                report_id = get_next_report_id()
         return report_id
     except Exception:
         raise
@@ -1447,12 +1449,12 @@ def update_transactions_change_cvg_dates(cmte_id, report_id, present_cvg_start_d
             prev_cvg_start_dt = datetime.datetime.strptime(prev_cvg_start_dt, "%Y-%m-%d").date()
         param_string = "AND transaction_date >= %s AND transaction_date {} %s AND report_id = %s".format("<=" if end_date_include else "<")
         if present_cvg_start_dt > prev_cvg_start_dt:
-            new_report_id = 0
+            new_report_id = FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS
             current_report_id = report_id
             value_list = [prev_cvg_start_dt, present_cvg_start_dt, current_report_id]
         elif prev_cvg_start_dt > present_cvg_start_dt:
             new_report_id = report_id
-            current_report_id = 0
+            current_report_id = FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS
             value_list = [present_cvg_start_dt, prev_cvg_start_dt, current_report_id]
         else:
             value_list = None
@@ -1514,10 +1516,10 @@ def update_transactions_change_cvg_dates(cmte_id, report_id, present_cvg_start_d
 
 def count_orphaned_transactions(report_id, cmte_id):
     try:
-        _sql = """SELECT count(*) FROM public.all_transactions_view WHERE report_id = '0' AND cmte_id = %s 
+        _sql = """SELECT count(*) FROM public.all_transactions_view WHERE report_id = %s AND cmte_id = %s 
               AND date_part('year', transaction_date) = (SELECT date_part('year', cvg_end_date) FROM reports WHERE 
               cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y') AND delete_ind IS DISTINCT FROM 'Y'"""
-        _values = [cmte_id, cmte_id, report_id]
+        _values = [FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS, cmte_id, cmte_id, report_id]
         with connection.cursor() as cursor:
             cursor.execute(_sql, _values)
             value =  cursor.fetchone()[0]
@@ -10266,12 +10268,11 @@ def F3X_values(cmte_id, report_list, year_flag=False):
         _sql = """SELECT CASE 
                     WHEN line_number = '11A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '11AI'
                     WHEN line_number = '11A' AND itemized in ('U', 'FU') THEN '11AII'
-                    WHEN line_number = '21A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '21AI'
-                    WHEN line_number = '21A' AND itemized in ('U', 'FU') THEN '21AII'
+                    WHEN line_number = '21A' THEN '21AI'
                     WHEN line_number = '30A' THEN '30AI'
                     ELSE line_number
                     END AS line_num, 
-                COALESCE(SUM(transaction_amount),0.0) 
+                COALESCE(SUM(transaction_amount),0.0)
                 FROM public.all_transactions_view 
                 WHERE memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' 
                     AND transaction_table NOT IN ('sched_c') AND report_id IN ('{}') 
