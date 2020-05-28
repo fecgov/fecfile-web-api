@@ -2007,6 +2007,7 @@ def reports(request):
                         {"Submitted": True}, status=status.HTTP_201_CREATED, safe=False
                     )
                 elif type(data) is dict:
+                    function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
                     data['status'] = "success"
                     data['orphanedTransactionsExist'] = orphanedTransactionsExist
                     return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
@@ -10330,7 +10331,7 @@ def get_year_reports(cmte_id, report_id):
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
                     data_ids.append(row[0])
-
+        # data_ids.append(0)
         return data_ids
     except Exception as e:
         print(e)
