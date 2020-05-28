@@ -943,24 +943,27 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    * @return     {number}  The days until report due.
    */
   private _calcDaysUntilReportDue(reportDueDate: any): number {
-    const oneDay: number = 24 * 60 * 60 * 1000;
-    const today: any = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const dueDateArr = reportDueDate.split('-');
-    let dueDate: any = '';
-
-    const dueDateMonth = parseInt(dueDateArr[1]) - 1; // Month
-    const dueDateDay = parseInt(dueDateArr[2]); // Day
-    const dueDateYear = parseInt(dueDateArr[0]); // Year
-    const modifiedReportDueDate = new Date(dueDateYear, dueDateMonth, dueDateDay);
-
-    const formattedDateToday: any = this._datePipe.transform(today,'MM/dd/yyyy');
-    const formattedDueDate: any = this._datePipe.transform(reportDueDate,'MM/dd/yyyy');
-
-    dueDate = Math.round(Math.abs((today.getTime() - modifiedReportDueDate.getTime()) / oneDay));
-
-    return dueDate;
+    if(reportDueDate){
+      const oneDay: number = 24 * 60 * 60 * 1000;
+      const today: any = new Date();
+      today.setHours(0, 0, 0, 0);
+  
+      const dueDateArr = reportDueDate.split('-');
+      let dueDate: any = '';
+  
+      const dueDateMonth = parseInt(dueDateArr[1]) - 1; // Month
+      const dueDateDay = parseInt(dueDateArr[2]); // Day
+      const dueDateYear = parseInt(dueDateArr[0]); // Year
+      const modifiedReportDueDate = new Date(dueDateYear, dueDateMonth, dueDateDay);
+  
+      const formattedDateToday: any = this._datePipe.transform(today,'MM/dd/yyyy');
+      const formattedDueDate: any = this._datePipe.transform(reportDueDate,'MM/dd/yyyy');
+  
+      dueDate = Math.round(Math.abs((today.getTime() - modifiedReportDueDate.getTime()) / oneDay));
+  
+      return dueDate;
+    }
+    return null;
   }
 
   /*
