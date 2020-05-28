@@ -10272,7 +10272,9 @@ def F3X_values(cmte_id, report_list, year_flag=False):
                     WHEN line_number = '30A' THEN '30AI'
                     ELSE line_number
                     END AS line_num, 
-                COALESCE(SUM(transaction_amount),0.0)
+                COALESCE(SUM(transaction_amount),0.0),
+                COALESCE(SUM(fed_amount),0.0),
+                COALESCE(SUM(non_fed_amount),0.0)
                 FROM public.all_transactions_view 
                 WHERE memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' 
                     AND transaction_table NOT IN ('sched_c') AND report_id IN ('{}') 
@@ -10289,7 +10291,14 @@ def F3X_values(cmte_id, report_list, year_flag=False):
                 for amount_tuple in amounts_list:
                     column = f3x_col_line_dict[amount_tuple[0]][i]
                     if column in output_dict:
-                        output_dict[column] += amount_tuple[1]
+                        if amount_tuple[0] == '21AI':
+                            output_dict[column] += amount_tuple[2]
+                            output_dict[f3x_col_line_dict['21AII'][i]] += amount_tuple[3]
+                        elif amount_tuple[0] == '30AI':
+                            output_dict[column] += amount_tuple[2]
+                            output_dict[f3x_col_line_dict['30AII'][i]] += amount_tuple[3]
+                        else:
+                            output_dict[column] += amount_tuple[1]
                     else:
                         output_dict[column] = amount_tuple[1]
         output_dict[f3x_col_line_dict['11A'][i]] = (output_dict.get(f3x_col_line_dict['11AI'][i],0) + 
