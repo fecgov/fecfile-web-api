@@ -11,6 +11,7 @@ from django.db import connection
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -1710,6 +1711,32 @@ def get_h2_summary_table(request):
             ) t;
     """
     try:
+    #: Get the request parameters and set for Pagination
+        query_params = request.query_params
+        page_num = get_int_value(query_params.get("page"))
+
+        descending = query_params.get("descending")
+        if not (
+            "sortColumnName" in query_params
+            and check_null_value(query_params.get("sortColumnName"))
+        ):
+            sortcolumn = "name"
+        elif query_params.get("sortColumnName") == "default":
+            sortcolumn = "name"
+        else:
+            sortcolumn = query_params.get("sortColumnName")
+        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        search_string = query_params.get("search")
+        params = query_params.get("filters", {})
+        keywords = params.get("keywords")
+        if str(descending).lower() == "true":
+            descending = "DESC"
+        else:
+            descending = "ASC"
+        trans_query_string_count = ""
+
+        #: Hardcode cmte value for now and remove after dev complete
+        #cmte_id = "C00000935"
         cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         # logger.debug('checking if it is a new report')
@@ -1757,9 +1784,60 @@ def get_h2_summary_table(request):
         # calendar_year = check_calendar_year(request.query_params.get('calendar_year'))
         # start_dt = datetime.date(int(calendar_year), 1, 1)
         # end_dt = datetime.date(int(calendar_year), 12, 31)
-        return Response(json_res, status=status.HTTP_200_OK)
+        
+
+# : insert pagination functionality
+
+            '''total_count = len(json_res)
+            paginator = Paginator(json_res, itemsperpage)
+            if paginator.num_pages < page_num:
+                page_num = paginator.num_pages
+            json_res = paginator.page(page_num)
+            json_result = {
+                "transactions": list(json_res),
+                "totaltransactionsCount": total_count,
+                "itemsPerPage": itemsperpage,
+                "pageNumber": page_num,
+                "totalPages": paginator.num_pages,
+            }
+            '''
+            json_result = get_pagination_dataset(json_res, itemsperpage, page_num)
+            return Response(json_result, status=status.HTTP_200_OK)
     except:
         raise
+#: get the paginator page with other details like  
+def get_pagination_dataset(json_res, itemsperpage, page_num):
+    if check_null_value(json_res) is False  or json_res is None:
+        json_result = {
+            "transactions": "",
+            "totaltransactionsCount": "",
+            "itemsPerPage": "",
+            "pageNumber": "",
+            "totalPages": "",
+        }
+        return json_result
+    else:
+        total_count = len(json_res)
+        paginator = Paginator(json_res, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        json_res = paginator.page(page_num)
+        json_result = {
+            "transactions": list(json_res),
+            "totaltransactionsCount": total_count,
+            "itemsPerPage": itemsperpage,
+            "pageNumber": page_num,
+            "totalPages": paginator.num_pages,
+        }
+        return json_result
+
+
+def get_int_value(num):
+    if num is not None: 
+        num = int(num)
+    else:
+        num = 1 
+    return int(num)          
 
 
 def count_h2_transactions(cmte_id, report_id, activity_event_name):
@@ -2512,7 +2590,36 @@ def get_h3_summary(request):
     """
     try:
         logger.debug("get_h3_summary...")
+#: Insert pagination functionality
+        query_params = request.query_params
+        page_num = get_int_value(query_params.get("page"))
+
+        descending = query_params.get("descending")
+        if not (
+            "sortColumnName" in query_params
+            and check_null_value(query_params.get("sortColumnName"))
+        ):
+            sortcolumn = "name"
+        elif query_params.get("sortColumnName") == "default":
+            sortcolumn = "name"
+        else:
+            sortcolumn = query_params.get("sortColumnName")
+        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        search_string = query_params.get("search")
+        params = query_params.get("filters", {})
+        keywords = params.get("keywords")
+        if str(descending).lower() == "true":
+            descending = "DESC"
+        else:
+            descending = "ASC"
+        trans_query_string_count = ""
+        row1=""
+        totalcount=""
+
+        #: Hardcode cmte value for now and remove after dev complete
+        #cmte_id = "C00000935"
         cmte_id = get_comittee_id(request.user.username)
+
         report_id = request.query_params.get("report_id")
         # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
         logger.debug("cmte_id:{}, report_id:{}".format(cmte_id, report_id))
@@ -2562,7 +2669,10 @@ def get_h3_summary(request):
                     else:
                         _rec["aggregate_amount"] = 0
                         # pass
-            return Response(_sum, status=status.HTTP_200_OK)
+
+            json_result = get_pagination_dataset(_sum, itemsperpage, page_num)
+            return Response(json_result, status=status.HTTP_200_OK)
+            #return Response(_sum, status=status.HTTP_200_OK)
     except:
         raise
 
@@ -3571,6 +3681,29 @@ def delete_schedH4(data):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH4(request):
+    #: Get the request parameters and set for Pagination
+    query_params = request.query_params
+    page_num = get_int_value(query_params.get("page"))
+
+    descending = query_params.get("descending")
+    if not (
+        "sortColumnName" in query_params
+        and check_null_value(query_params.get("sortColumnName"))
+    ):
+        sortcolumn = "name"
+    elif query_params.get("sortColumnName") == "default":
+        sortcolumn = "name"
+    else:
+        sortcolumn = query_params.get("sortColumnName")
+    itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+    search_string = query_params.get("search")
+    params = query_params.get("filters", {})
+    keywords = params.get("keywords")
+    if str(descending).lower() == "true":
+        descending = "DESC"
+    else:
+        descending = "ASC"
+    trans_query_string_count = ""
 
     if request.method == "POST":
         try:
@@ -3612,6 +3745,8 @@ def schedH4(request):
 
     elif request.method == "GET":
         try:
+            #: Hardcode cmte value for now and remove after dev complete
+            #cmte_id = "C00000935"
             data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params and check_null_value(
                 request.query_params.get("report_id")
@@ -3628,13 +3763,26 @@ def schedH4(request):
                     request.query_params.get("transaction_id")
                 )
             datum = get_schedH4(data)
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+
+            json_result = get_pagination_dataset(datum, itemsperpage, page_num)
+            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
         except NoOPError as e:
             logger.debug(e)
-            forms_obj = []
+            #: updated the return status to 200 with null object for testing
+            forms_obj = {
+                "transactions": "",
+                "totaltransactionsCount": "",
+                "itemsPerPage": "",
+                "pageNumber": "",
+                "totalPages": "",
+            }
             return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
+             forms_obj, status=status.HTTP_200_OK, safe=False
+             )
+            #return JsonResponse(
+            #     forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+            # )
+
         except Exception as e:
             logger.debug(e)
             return Response(
@@ -4154,6 +4302,32 @@ def get_h5_summary(request):
     # TODO: what is gonna happen when people click edit button? 
     """
     try:
+    #: Get the request parameters and set for Pagination
+        query_params = request.query_params
+        page_num = get_int_value(query_params.get("page"))
+
+        descending = query_params.get("descending")
+        if not (
+            "sortColumnName" in query_params
+            and check_null_value(query_params.get("sortColumnName"))
+        ):
+            sortcolumn = "name"
+        elif query_params.get("sortColumnName") == "default":
+            sortcolumn = "name"
+        else:
+            sortcolumn = query_params.get("sortColumnName")
+        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        search_string = query_params.get("search")
+        params = query_params.get("filters", {})
+        keywords = params.get("keywords")
+        if str(descending).lower() == "true":
+            descending = "DESC"
+        else:
+            descending = "ASC"
+        trans_query_string_count = ""
+                
+        #: Hardcode cmte value for now and remove after dev complete
+        #cmte_id = "C00000935"
         cmte_id = get_comittee_id(request.user.username)
         report_id = request.query_params.get("report_id")
         # aggregate_dic = load_h3_aggregate_amount(cmte_id, report_id)
@@ -4198,7 +4372,10 @@ def get_h5_summary(request):
             #         _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'])
             #     else:
             #         pass
-            return Response(_sum, status=status.HTTP_200_OK)
+            
+            #: update for pagination
+            json_result = get_pagination_dataset(_sum, itemsperpage, page_num)
+            return Response(json_result, status=status.HTTP_200_OK)
     except:
         raise
 
@@ -5081,6 +5258,32 @@ def schedH6(request):
 
     elif request.method == "GET":
         try:
+        #: Get the request parameters and set for Pagination
+            query_params = request.query_params
+            page_num = get_int_value(query_params.get("page"))
+
+            descending = query_params.get("descending")
+            if not (
+                "sortColumnName" in query_params
+                and check_null_value(query_params.get("sortColumnName"))
+            ):
+                sortcolumn = "name"
+            elif query_params.get("sortColumnName") == "default":
+                sortcolumn = "name"
+            else:
+                sortcolumn = query_params.get("sortColumnName")
+            itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+            search_string = query_params.get("search")
+            params = query_params.get("filters", {})
+            keywords = params.get("keywords")
+            if str(descending).lower() == "true":
+                descending = "DESC"
+            else:
+                descending = "ASC"
+            trans_query_string_count = ""
+                    
+            #: Hardcode cmte value for now and remove after dev complete
+            #data = {"cmte_id": "C00000935"}
             data = {"cmte_id": get_comittee_id(request.user.username)}
             # make sure we get query parameters from both
             # request.data.update(request.query_params)
@@ -5099,13 +5302,27 @@ def schedH6(request):
                     request.query_params.get("transaction_id")
                 )
             datum = get_schedH6(data)
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+
+            #: update for pagination
+            json_result = get_pagination_dataset(datum, itemsperpage, page_num)
+            return Response(json_result, status=status.HTTP_200_OK)
+
         except NoOPError as e:
             logger.debug(e)
-            forms_obj = []
+            #: tobe removed after development testing for 
+            forms_obj =  {
+                "transactions": "",
+                "totaltransactionsCount": "",
+                "itemsPerPage": "",
+                "pageNumber": "",
+                "totalPages": "",
+            }
             return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                forms_obj, status=status.HTTP_200_OK, safe=False
             )
+            # return JsonResponse(
+            #     forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+            # )
         except Exception as e:
             logger.debug(e)
             return Response(

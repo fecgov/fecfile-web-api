@@ -10,6 +10,7 @@ from django.db import connection
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -1945,7 +1946,35 @@ def get_sla_summary_table(request):
     """
     # response = {}
     logger.debug("get_sql_summary with data:{}".format(request.query_params))
+ 
     try:
+    
+        #: Get the request parameters and set for Pagination
+        query_params = request.query_params
+        page_num = get_int_value(query_params.get("page"))
+
+        descending = query_params.get("descending")
+        if not (
+            "sortColumnName" in query_params
+            and check_null_value(query_params.get("sortColumnName"))
+        ):
+            sortcolumn = "name"
+        elif query_params.get("sortColumnName") == "default":
+            sortcolumn = "name"
+        else:
+            sortcolumn = query_params.get("sortColumnName")
+        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        search_string = query_params.get("search")
+        params = query_params.get("filters", {})
+        keywords = params.get("keywords")
+        if str(descending).lower() == "true":
+            descending = "DESC"
+        else:
+            descending = "ASC"
+        trans_query_string_count = ""
+
+        #: Hardcode cmte value for now and remove after dev complete
+        #cmte_id = "C00000935"
         cmte_id = get_comittee_id(request.user.username)
 
         if not (
@@ -2011,12 +2040,50 @@ def get_sla_summary_table(request):
                                 m_obj.update(API_CALL_LA)
 
                             obj["child"] = memo_objs
-        return Response(result, status=status.HTTP_200_OK)
+
+        #: update for pagination
+        json_result = get_pagination_dataset(result, itemsperpage, page_num)
+        return Response(json_result, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The get_sla_summary_table API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+#: get the paginator page with other details like  
+def get_pagination_dataset(json_res, itemsperpage, page_num):
+    if check_null_value(json_res) is False or json_res is None:
+        json_result = {
+            "transactions": "",
+            "totaltransactionsCount": "",
+            "itemsPerPage": "",
+            "pageNumber": "",
+            "totalPages": "",
+        }
+        return json_result
+    else:
+        total_count = len(json_res)
+        paginator = Paginator(json_res, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        json_res = paginator.page(page_num)
+        json_result = {
+            "transactions": list(json_res),
+            "totaltransactionsCount": total_count,
+            "itemsPerPage": itemsperpage,
+            "pageNumber": page_num,
+            "totalPages": paginator.num_pages,
+        }
+        return json_result
+
+
+def get_int_value(num):
+    if num is not None: 
+        num = int(num)
+    else:
+        num = 1 
+    return int(num)          
 
 
 def load_levin_account_data(transaction_id):
@@ -2046,7 +2113,35 @@ def get_slb_summary_table(request):
     """
     # response = {}
     logger.debug("get_sql_summary with data:{}".format(request.query_params))
+    
     try:
+
+        #: Get the request parameters and set for Pagination
+        query_params = request.query_params
+        page_num = get_int_value(query_params.get("page"))
+
+        descending = query_params.get("descending")
+        if not (
+            "sortColumnName" in query_params
+            and check_null_value(query_params.get("sortColumnName"))
+        ):
+            sortcolumn = "name"
+        elif query_params.get("sortColumnName") == "default":
+            sortcolumn = "name"
+        else:
+            sortcolumn = query_params.get("sortColumnName")
+        itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+        search_string = query_params.get("search")
+        params = query_params.get("filters", {})
+        keywords = params.get("keywords")
+        if str(descending).lower() == "true":
+            descending = "DESC"
+        else:
+            descending = "ASC"
+        trans_query_string_count = ""
+
+        #: Hardcode cmte value for now and remove after dev complete
+        #cmte_id = "C00000935"
         cmte_id = get_comittee_id(request.user.username)
 
         if not (
@@ -2097,7 +2192,10 @@ def get_slb_summary_table(request):
                     #     )
                     #     if memo_objs:
                     #         obj["child"] = memo_objs
-        return Response(result, status=status.HTTP_200_OK)
+        #: update for pagination
+        json_result = get_pagination_dataset(result, itemsperpage, page_num)
+        return Response(json_result, status=status.HTTP_200_OK)
+        #return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The get_slb_summary_table API is throwing an error: " + str(e),
