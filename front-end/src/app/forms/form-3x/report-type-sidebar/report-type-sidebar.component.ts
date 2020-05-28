@@ -88,6 +88,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
         if(this.frmReportSidebar){
           this.populateDataForEdit(message);
           this.messageDataForEdit = message;
+          // this.changeDataBasedOnSelectedReport();
           // this.bypassNgOnChange = true;
           
           
@@ -116,11 +117,17 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
   }
 
   private populateDataForEdit(message: any) {
-    this.frmReportSidebar.controls['fromDate'].patchValue(message.currentReportData.currentStartDate);
-    this.frmReportSidebar.controls['toDate'].patchValue(message.currentReportData.currentEndDate);
-    this.fromDate = message.currentReportData.currentStartDate;
-    this.toDate = message.currentReportData.currentEndDate;
-    this.fromDateChange(message.currentReportData.currentStartDate);
+    if(message && message.currentReportData){
+      this.frmReportSidebar.controls['fromDate'].patchValue(message.currentReportData.currentStartDate);
+      this.frmReportSidebar.controls['toDate'].patchValue(message.currentReportData.currentEndDate);
+      this.frmReportSidebar.controls['state'].patchValue(message.currentReportData.currentElectionState);
+      this.populateDatesByState(message.currentReportData.currentElectionState);
+      this.frmReportSidebar.controls['election_date'].patchValue(message.currentReportData.currentElectionDate);
+      this.fromDate = message.currentReportData.currentStartDate;
+      this.toDate = message.currentReportData.currentEndDate;
+      this.dueDate = message.currentReportData.currentDueDate;
+      this.fromDateChange(message.currentReportData.currentStartDate);
+    }
   }
 
 /*   ngOnInit(): void {
@@ -138,11 +145,11 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
 
   public initForm() {
     this.frmReportSidebar = this._fb.group({
-      state: new FormControl({value:null}),
-      election_date: new FormControl({value:null}),
-      fromDate: new FormControl({value:null},[Validators.required]),
-      toDate: new FormControl({value:null},[Validators.required]),
-      dueDate: new FormControl({value:null})
+      state: new FormControl({value:null,disabled: false}),
+      election_date: new FormControl({value:null,disabled: false}),
+      fromDate: new FormControl({value:null,disabled: false},[Validators.required]),
+      toDate: new FormControl({value:null,disabled: false},[Validators.required]),
+      dueDate: new FormControl({value:null,disabled: false})
     });
   }
 
@@ -181,6 +188,11 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
       }
     } */
 
+    if(changes && changes.selectedReport && changes.selectedReport.currentValue){
+      if(this._activatedRoute.snapshot.queryParams.edit === 'true'){
+        this.populateDataForEdit(this.messageDataForEdit);
+      }
+    }
     this.changeDataBasedOnSelectedReport();
     
     //this is being done only the first time the form loads for edit flow since ngONChange is resetting the value so setting it back.
@@ -266,19 +278,33 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
                     if (Array.isArray(this.selectedReport.election_state[0].dates)) {
                       let dates: any = this.selectedReport.election_state[0].dates;
                       if (Array.isArray(dates)) {
-                        if (typeof dates[0].cvg_start_date === 'string' &&
+                        if(this.messageDataForEdit && this.messageDataForEdit.currentReportData.currentReportType === this.selectedReport.report_type){
+
+                          this.fromDate = this.messageDataForEdit.currentReportData.currentStartDate;
+                          this.toDate = this.messageDataForEdit.currentReportData.currentEndDate;
+                          this.dueDate = this.messageDataForEdit.currentReportData.currentDueDate;
+
+                          if(this.frmReportSidebar){
+                            this.frmReportSidebar.controls['fromDate'].patchValue(this.fromDate);
+                            this.frmReportSidebar.controls['toDate'].patchValue(this.toDate);
+                            this.fromDateChange(this.fromDate);
+                          }
+                        }
+
+                        else if (typeof dates[0].cvg_start_date === 'string' &&
                           dates[0].cvg_start_date !== null &&
                           typeof dates[0].cvg_end_date === 'string' &&
                           dates[0].cvg_end_date !== null &&
                           typeof dates[0].due_date === 'string' &&
                           dates[0].due_date.length !== null) {
-                          this.fromDate = dates[0].cvg_start_date;
-                          this.toDate = dates[0].cvg_end_date;
-                          this.dueDate = dates[0].due_date;
+                            this.fromDate = dates[0].cvg_start_date;
+                            this.toDate = dates[0].cvg_end_date;
+                            this.dueDate = dates[0].due_date;
 
                           if(this.frmReportSidebar){
                             this.frmReportSidebar.controls['fromDate'].patchValue(this.fromDate);
                             this.frmReportSidebar.controls['toDate'].patchValue(this.toDate);
+                            this.fromDateChange(this.fromDate);
                           }
 
                         }
@@ -366,6 +392,19 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
+  private populateDatesByState(state:string){
+    if(this.selectedReport){
+      let selectedStateObj = this.selectedReport.election_state.find(el => {
+        return el.state === state;
+      });
+      if (selectedStateObj.hasOwnProperty('dates')) {
+        if (Array.isArray(selectedStateObj.dates)) {
+          this.electionDates = [];
+          this.electionDates = selectedStateObj.dates;
+        }
+      }
+    }
+  }
   private showFiledWarning() {
     this._dialogService
       .confirm('This report has been filed with the FEC. If you want to change, you must Amend the report', ConfirmModalComponent, 'Warning', true, ModalHeaderClassEnum.warningHeader, null, 'Return to Reports')
@@ -435,8 +474,10 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
         message.action = 'coverageDatesUpdated'
         message.validDates = false;
         message.selectedFromDate = date;
-        message.selectedToDate = this.frmReportSidebar.value.toDate;
+        message.selectedToDate = this.frmReportSidebar.controls['toDate'].value;
         message.dueDate = this.dueDate;
+        message.selectedState = this.frmReportSidebar.controls['state'].value;
+        message.selectedElectionDate = this.frmReportSidebar.controls['election_date'].value;
         message.electionDates = [];
       /* } else {
         this.fromDate = date;
@@ -479,6 +520,8 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
         message.selectedToDate = date;
         message.selectedFromDate = this.frmReportSidebar.value.fromDate;
         message.dueDate = this.dueDate;
+        message.selectedState = this.frmReportSidebar.value.state;
+        message.selectedElectionDate = this.frmReportSidebar.value.election_date;
         message.electionDates = [];
       /* } else {
         this.toDate = date;
