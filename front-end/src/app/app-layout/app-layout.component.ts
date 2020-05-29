@@ -46,6 +46,8 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   public reportOverDue: boolean = false;
   private subscription: Subscription;
   public currentReportData:any = {};
+  public electionDate: string = null;
+  public electionState: string = null;
 
   private _step: string = null;
 
@@ -118,6 +120,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(message=>{
       if(message && message.action === 'updateCurrentReportHeaderData' && message.data){
         this.currentReportData = message.data;
+        this.populateHeaderData(this.currentReportData);
       }
     });
 
@@ -167,9 +170,9 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
         if(this.currentReportData && Array.isArray(this.currentReportData) && this.currentReportData.length > 0){
           this.populateHeaderData(this.currentReportData[0]);
         }
-        else{
+        /* else{
           this.populateHeaderData(formInfo);
-        }
+        } */
 
         if (this._step !== 'step_1') {
           this.showFormDueDate = true;
@@ -202,16 +205,16 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       this.reportType = formInfo.reporttype;
     }
     if (formInfo.hasOwnProperty('cvgStartDate')) {
-      this.formStartDate = formInfo.cvgStartDate;
+      this.formStartDate = this._utilService.formatDateToYYYYMMDD(formInfo.cvgStartDate);
     }
     else if (formInfo.hasOwnProperty('cvgstartdate')) {
-      this.formStartDate = formInfo.cvgstartdate;
+      this.formStartDate = this._utilService.formatDateToYYYYMMDD(formInfo.cvgstartdate);
     }
     if (formInfo.hasOwnProperty('cvgEndDate')) {
-      this.formEndDate = formInfo.cvgEndDate;
+      this.formEndDate = this._utilService.formatDateToYYYYMMDD(formInfo.cvgEndDate);
     }
     else if (formInfo.hasOwnProperty('cvgenddate')) {
-      this.formEndDate = formInfo.cvgenddate;
+      this.formEndDate = this._utilService.formatDateToYYYYMMDD(formInfo.cvgenddate);
     }
     if (formInfo.hasOwnProperty('daysUntilDue')) {
       this.formDaysUntilDue = Math.abs(formInfo.daysUntilDue).toString();
@@ -234,6 +237,18 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
           }*/
       // //console.log("formInfo.overdue =", formInfo.overdue);
       this.reportOverDue = formInfo.overdue;
+    }
+    if(formInfo.hasOwnProperty('electionDate')){
+      this.electionDate = formInfo.electionDate;
+    }
+    else if(formInfo.hasOwnProperty('electiondate')){
+      this.electionDate = formInfo.electiondate;
+    }
+    if(formInfo.hasOwnProperty('electionState')){
+      this.electionState = formInfo.electionState;
+    }
+    else if(formInfo.hasOwnProperty('electionstate')){
+      this.electionState = formInfo.electionstate;
     }
   }
 
@@ -323,9 +338,12 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     this._messageService.sendUpdateReportTypeMessage({
       currentReportData: {
         'currentReportDescription': this.formDescription,
-        'currentStartDate': this._utilService.formatDateToYYYYMMDD(this.formStartDate), 
-        'currentEndDate': this._utilService.formatDateToYYYYMMDD(this.formEndDate),
-        'currentReportType': this.reportType
+        'currentStartDate': this.formStartDate, 
+        'currentEndDate': this.formEndDate,
+        'currentDueDate' : this.dueDate,
+        'currentReportType': this.reportType,
+        'currentElectionDate':this.electionDate,
+        'currentElectionState':this.electionState
       }
     });
   }

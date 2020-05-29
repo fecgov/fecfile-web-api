@@ -15,7 +15,7 @@ from functools import wraps
 
 # Create your views here.
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports
-from fecfiler.core.views import get_comittee_id
+from fecfiler.core.views import get_comittee_id, get_next_report_id
 
 logger = logging.getLogger(__name__)
 
@@ -302,17 +302,6 @@ def update_report_update_date(report_id):
     except:
         raise
 
-def next_report_id():
-	try:
-		with connection.cursor() as cursor:
-			cursor.execute("""SELECT nextval('report_id_seq')""")
-			report_ids = cursor.fetchone()
-			report_id = report_ids[0]
-		return report_id
-	except Exception as e:
-		raise Exception(
-			'The get_next_report_id function is throwing an error: ' + str(e))
-
 def check_report_id_status(cmte_id, report_id, delete_flag=True, submit_flag=True):
 	try:
 		if report_id not in [None, '', " ", 'null']:
@@ -344,7 +333,7 @@ def check_report_id_status(cmte_id, report_id, delete_flag=True, submit_flag=Tru
 def report_post(request):
 	try:
 		report_dict = {
-			'report_id': str(next_report_id()),
+			'report_id': str(get_next_report_id()),
 			'cmte_id': get_comittee_id(request.user.username),
 			'form_type': 'F1M',
 			'amend_ind': 'N',
