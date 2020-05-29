@@ -171,7 +171,7 @@
               <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
-                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle (click)="checkIfOrphanTransaction(trx)">
                     <i class="ellipsis-icon"></i>
                   </button>
                   <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -250,7 +250,7 @@
               <div *ngIf="!_allTransactions || (_allTransactions && trxChild.reportstatus !== 'Filed')">
                 <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                   aria-label="Action dropdown">
-                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle (click)="checkIfOrphanTransaction(trx)">
                     <i class="ellipsis-icon"></i>
                   </button>
                   <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -472,7 +472,7 @@
                 <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
-                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <button class="btn btn-sm btn-primary" ngbDropdownToggle (click)="checkIfOrphanTransaction(trx)">
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -549,7 +549,7 @@
                 <div *ngIf="!_allTransactions || (_allTransactions && trxChild.reportstatus !== 'Filed')">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
-                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <button class="btn btn-sm btn-primary" ngbDropdownToggle (click)="checkIfOrphanTransaction(trx)">
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -773,7 +773,7 @@
                 <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
-                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <button class="btn btn-sm btn-primary" ngbDropdownToggle (click)="checkIfOrphanTransaction(trx)">
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -820,7 +820,7 @@
               <td style="padding-left: 70px;" colspan="5">Schedule C1</td>
               <td>
                 <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-                  <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
+                  <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled" (click)="checkIfOrphanTransaction(trx)">
                     <i class="ellipsis-icon"></i>
                   </button>
                   <div id="loanSumamry__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -841,7 +841,7 @@
                   <i class="ellipsis-icon"></i>
                 </button>
                 <div id="loanSumamry__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
-                  <button class="dropdown-item" (click)="goToEndorsersSummary(trx)">
+                  <button class="dropdown-item" (click)="goToEndorsersSummary(trx)" (click)="checkIfOrphanTransaction(trx)">
                     <i class="edit-icon"></i> Edit
                   </button>
                 </div>
@@ -977,7 +977,7 @@
                 <div *ngIf="!_allTransactions || (_allTransactions && trx.iseditable)">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
-                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <button class="btn btn-sm btn-primary" ngbDropdownToggle (click)="checkIfOrphanTransaction(trx)">
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
@@ -1050,7 +1050,7 @@
                 <div *ngIf="!_allTransactions || (_allTransactions && trxChild.reportstatus !== 'Filed')">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
                     aria-label="Action dropdown">
-                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                    <button class="btn btn-sm btn-primary" ngbDropdownToggle (click)="checkIfOrphanTransaction(trx)">
                       <i class="ellipsis-icon"></i>
                     </button>
                     <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>

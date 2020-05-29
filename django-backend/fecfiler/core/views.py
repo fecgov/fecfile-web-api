@@ -175,6 +175,8 @@ f3x_col_line_dict = {
 # NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER = ['LOAN_FROM_IND', 'LOAN_FROM_BANK', 'LOAN_OWN_TO_CMTE_OUT', 'IK_OUT', 'IK_BC_OUT',
 #     'PARTY_IK_OUT', 'PARTY_IK_BC_OUT', 'PAC_IK_OUT', 'PAC_IK_BC_OUT', 'IK_TRAN_OUT', 'IK_TRAN_FEA_OUT']
 
+FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS = 99999
+
 logger = logging.getLogger(__name__)
 # aws s3 bucket connection
 # conn = boto.connect_s3()
@@ -378,27 +380,47 @@ GET REPORT TYPES API- CORE APP - SPRINT 6 - FNE 471 - BY PRAVEEN JINKA
 @api_view(["GET"])
 def get_report_types(request):
     try:
-        with connection.cursor() as cursor:
+        """ Temporarily commented as we are hard coding output using report_types json"""
+        # with connection.cursor() as cursor:
 
-            # report_year = datetime.datetime.now().strftime('%Y')
-            forms_obj = {}
-            cmte_id = get_comittee_id(request.user.username)
-            form_type = request.query_params.get("form_type")
-            cursor.execute(
-                "select report_types_json From public.report_type_and_due_dates_view where cmte_id = %s and form_type = %s",
-                [cmte_id, form_type],
-            )
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj = json.loads(data_row[0])
+        #     # report_year = datetime.datetime.now().strftime('%Y')
+        #     forms_obj = {}
+        #     cmte_id = get_comittee_id(request.user.username)
+        #     form_type = request.query_params.get("form_type")
+        #     cursor.execute(
+        #         "select report_types_json From public.report_type_and_due_dates_view where cmte_id = %s and form_type = %s",
+        #         [cmte_id, form_type],
+        #     )
+        #     for row in cursor.fetchall():
+        #         data_row = list(row)
+        #         forms_obj = json.loads(data_row[0])
 
-        if not bool(forms_obj):
-            return Response(
-                "No entries were found for the form type: {} for this committee".format(
-                    form_type
-                ),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        # if not bool(forms_obj):
+        #     return Response(
+        #         "No entries were found for the form type: {} for this committee".format(
+        #             form_type
+        #         ),
+        #         status=status.HTTP_400_BAD_REQUEST,
+        #     )
+        cmte_id = get_comittee_id(request.user.username)
+        with open('./fecfiler/core/report_types.json') as f:
+            data = json.load(f)
+
+        # test_date = date_format(request.data.get('test_date'))
+        # print(test_date)
+        # if test_date:
+        #     _year = test_date.year
+        # if test_date <= datetime.date(_year, 1, 31):
+        #     _year -= 1
+
+        _year = datetime.date.today().year
+        if datetime.date.today() <= datetime.date(_year, 1, 31):
+            _year = _year-1
+
+        if _year%2 == 1:
+            odd = True
+        else:
+            odd = False
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -410,13 +432,29 @@ def get_report_types(request):
                 cmte_filing_freq = cmte_filing_freq[0]
 
         if cmte_filing_freq == "Q":
-            reports = forms_obj.get("report_type")
-            for report in reports:
-                if report.get("report_type") == "YE":
-                    report["election_state"][0]["dates"][0]["cvg_start_date"] = (
-                            report["election_state"][0]["dates"][0]["cvg_end_date"][:4]
-                            + "-10-01"
-                    )
+            if odd:
+                parameter = "Quarterly-Non-Election-Year"
+            else:
+                parameter = "Quarterly-Election-Year"
+        else:
+            if odd:
+                parameter = "Monthly-Non-Election-Year"
+            else:
+                parameter = "Monthly-Election-Year"
+
+        forms_obj = data.get(parameter)
+        for report_type in forms_obj['report_type']:
+            for election_state in report_type['election_state']:
+                for dates in election_state['dates']:
+                    if dates.get('cvg_start_date'):
+                        dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
+                    if dates.get('cvg_end_date'):
+                        dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
+                    if dates.get('due_date'):
+                        if "YYYY-01" in dates.get('due_date'):
+                            dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
+                        else:
+                            dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
 
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
@@ -770,14 +808,14 @@ def check_mandatory_fields_form3x(data):
 **************************************************** FUNCTIONS - REPORT IDS **********************************************************
 """
 
-
 def get_next_report_id():
     try:
         with connection.cursor() as cursor:
             cursor.execute("""SELECT nextval('report_id_seq')""")
             report_ids = cursor.fetchone()
             report_id = report_ids[0]
-
+            if report_id == FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS:
+                report_id = get_next_report_id()
         return report_id
     except Exception:
         raise
@@ -898,8 +936,46 @@ def get_list_report(report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
 
-            query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
-                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s"""
+            query_string = """SELECT    rp.cmte_id                    AS cmteid, 
+                                        rp.report_id                  AS reportid, 
+                                        rp.form_type                  AS formtype, 
+                                        ''                            AS electioncode, 
+                                        rp.report_type                AS reporttype, 
+                                        rt.rpt_type_desc              AS reporttypedescription, 
+                                        rt.regular_special_report_ind AS regularspecialreportind, 
+                                        x.state_of_election           AS electionstate, 
+                                        x.date_of_election::date      AS electiondate, 
+                                        rp.cvg_start_date             AS cvgstartdate, 
+                                        rp.cvg_end_date               AS cvgenddate, 
+                                        rp.due_date                   AS duedate, 
+                                        rp.amend_ind                  AS amend_indicator, 
+                                        0                             AS coh_bop, 
+                                        ( 
+                                                SELECT 
+                                                        CASE 
+                                                            WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date 
+                                                            ELSE 0 
+                                                        END ) AS daysuntildue, 
+                                        email_1            AS    email1, 
+                                        email_2            AS    email2, 
+                                        additional_email_1 AS    additionalemail1, 
+                                        additional_email_2 AS    additionalemail2, 
+                                        ( 
+                                                SELECT 
+                                                        CASE 
+                                                            WHEN rp.due_date IS NOT NULL 
+                                                            AND    rp.due_date < now() THEN true 
+                                                            ELSE false 
+                                                        END ) AS overdue 
+                                FROM      PUBLIC.reports rp 
+                                LEFT JOIN form_3x x 
+                                ON        rp.report_id = x.report_id 
+                                LEFT JOIN PUBLIC.ref_rpt_types rt 
+                                ON        rp.report_type=rt.rpt_type 
+                                WHERE     rp.delete_ind IS DISTINCT 
+                                FROM      'Y' 
+                                AND       rp.cmte_id = %s 
+                                AND       rp.report_id = %s"""
 
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""",
@@ -1373,12 +1449,12 @@ def update_transactions_change_cvg_dates(cmte_id, report_id, present_cvg_start_d
             prev_cvg_start_dt = datetime.datetime.strptime(prev_cvg_start_dt, "%Y-%m-%d").date()
         param_string = "AND transaction_date >= %s AND transaction_date {} %s AND report_id = %s".format("<=" if end_date_include else "<")
         if present_cvg_start_dt > prev_cvg_start_dt:
-            new_report_id = 0
+            new_report_id = FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS
             current_report_id = report_id
             value_list = [prev_cvg_start_dt, present_cvg_start_dt, current_report_id]
         elif prev_cvg_start_dt > present_cvg_start_dt:
             new_report_id = report_id
-            current_report_id = 0
+            current_report_id = FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS
             value_list = [present_cvg_start_dt, prev_cvg_start_dt, current_report_id]
         else:
             value_list = None
@@ -1440,10 +1516,10 @@ def update_transactions_change_cvg_dates(cmte_id, report_id, present_cvg_start_d
 
 def count_orphaned_transactions(report_id, cmte_id):
     try:
-        _sql = """SELECT count(*) FROM public.all_transactions_view WHERE report_id = '0' AND cmte_id = %s 
+        _sql = """SELECT count(*) FROM public.all_transactions_view WHERE report_id = %s AND cmte_id = %s 
               AND date_part('year', transaction_date) = (SELECT date_part('year', cvg_end_date) FROM reports WHERE 
               cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y') AND delete_ind IS DISTINCT FROM 'Y'"""
-        _values = [cmte_id, cmte_id, report_id]
+        _values = [FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS, cmte_id, cmte_id, report_id]
         with connection.cursor() as cursor:
             cursor.execute(_sql, _values)
             value =  cursor.fetchone()[0]
@@ -1971,6 +2047,7 @@ def reports(request):
                         {"Submitted": True}, status=status.HTTP_201_CREATED, safe=False
                     )
                 elif type(data) is dict:
+                    function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
                     data['status'] = "success"
                     data['orphanedTransactionsExist'] = orphanedTransactionsExist
                     return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
@@ -6120,7 +6197,7 @@ def get_report_info(request):
 
                     query_string = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode, 
                                         rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
-                                        rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, 
+                                        rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState, 
                                         x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
                                         rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
                                          (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
@@ -10191,12 +10268,13 @@ def F3X_values(cmte_id, report_list, year_flag=False):
         _sql = """SELECT CASE 
                     WHEN line_number = '11A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '11AI'
                     WHEN line_number = '11A' AND itemized in ('U', 'FU') THEN '11AII'
-                    WHEN line_number = '21A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '21AI'
-                    WHEN line_number = '21A' AND itemized in ('U', 'FU') THEN '21AII'
+                    WHEN line_number = '21A' THEN '21AI'
                     WHEN line_number = '30A' THEN '30AI'
                     ELSE line_number
                     END AS line_num, 
-                COALESCE(SUM(transaction_amount),0.0) 
+                COALESCE(SUM(transaction_amount),0.0),
+                COALESCE(SUM(fed_amount),0.0),
+                COALESCE(SUM(non_fed_amount),0.0)
                 FROM public.all_transactions_view 
                 WHERE memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' 
                     AND transaction_table NOT IN ('sched_c') AND report_id IN ('{}') 
@@ -10213,7 +10291,14 @@ def F3X_values(cmte_id, report_list, year_flag=False):
                 for amount_tuple in amounts_list:
                     column = f3x_col_line_dict[amount_tuple[0]][i]
                     if column in output_dict:
-                        output_dict[column] += amount_tuple[1]
+                        if amount_tuple[0] == '21AI':
+                            output_dict[column] += amount_tuple[2]
+                            output_dict[f3x_col_line_dict['21AII'][i]] += amount_tuple[3]
+                        elif amount_tuple[0] == '30AI':
+                            output_dict[column] += amount_tuple[2]
+                            output_dict[f3x_col_line_dict['30AII'][i]] += amount_tuple[3]
+                        else:
+                            output_dict[column] += amount_tuple[1]
                     else:
                         output_dict[column] = amount_tuple[1]
         output_dict[f3x_col_line_dict['11A'][i]] = (output_dict.get(f3x_col_line_dict['11AI'][i],0) + 
@@ -10294,7 +10379,7 @@ def get_year_reports(cmte_id, report_id):
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
                     data_ids.append(row[0])
-
+        # data_ids.append(0)
         return data_ids
     except Exception as e:
         print(e)
