@@ -27,7 +27,7 @@ from rest_framework_jwt.settings import api_settings
 from ..core.transaction_util import do_transaction
 from ..core.views import check_null_value, NoOPError, get_comittee_id, get_email
 
-#jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+# jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
@@ -47,6 +47,7 @@ def jwt_response_payload_handler(token, user=None, request=None):
     return {
         'token': token,
     }
+
 
 # payload = jwt_response_payload_handler(user)
 # token = jwt_encode_handler(payload)
@@ -134,8 +135,8 @@ def get_users_list(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from manage user table
-            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND role != 'TREASURER' order by id) t"""
-            cursor.execute(_sql, [cmte_id])
+            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND lower(role) != %s order by id) t"""
+            cursor.execute(_sql, [cmte_id, "cadmin"])
             user_list = cursor.fetchall()
             if user_list is None:
                 raise NoOPError(
@@ -159,9 +160,9 @@ def delete_manage_user(data):
             _sql = """UPDATE public.authentication_account
                         SET delete_ind = 'Y' 
                         WHERE id = %s AND cmtee_id = %s
-                        AND role != 'TREASURER'
+                        AND lower(role) != %s
                     """
-            _v = (data.get("user_id"), data.get("cmte_id"))
+            _v = (data.get("user_id"), data.get("cmte_id"), "cadmin")
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
                 logger.debug("deleting user for {} failed."
@@ -334,25 +335,21 @@ def update_user(data):
         email = get_current_email(data)
         if email != data.get("email"):
             user_already_exist = check_user_present(data)
-        if not user_already_exist:
+        backup_admin_exist = backup_user_exist(data)
+        if not user_already_exist and not backup_admin_exist:
             rows = put_sql_user(data)
-        else:
-            raise Exception("user already present with "
-                            "committee id{} and email id{}", data.get("cmte_id"),
-                            data.get("email"))
+
     except Exception as e:
         # print(e)
-        raise Exception(
-            "The user update sql is throwing an error: " + str(e)
-        )
+        raise Exception(str(e))
     return rows
 
 
 def check_custom_validations(email, role):
     try:
         check_email_validation(email)
-        if role.upper() not in ["ADMIN","READONLY", "ENTRY"]:
-            raise Exception("Role should be ADMIN,READONLY, ENTRY")
+        if role.upper() not in ["BCADMIN", "ADMIN", "REVIEWER", "EDITOR"]:
+            raise Exception("Role should be Back-up ADMIN,ADMIN,REVIEWER, EDITOR")
     except Exception as e:
         logger.debug("Custom validation failed")
         raise e
@@ -362,6 +359,29 @@ def check_email_validation(email):
     regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
     if not re.search(regex, email):
         raise Exception("Email-id is not valid")
+
+
+def backup_user_exist(data):
+    try:
+        if data.get("role").lower() != 'bcadmin':
+            return False
+
+        with connection.cursor() as cursor:
+            # check if user already exist
+            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(role) = lower(%s) AND delete_ind !='Y' """
+            cursor.execute(_sql, [data.get("cmte_id"), "bcadmin"])
+            backup_admin_list = cursor.fetchone()
+            if backup_admin_list is not None:
+                raise NoOPError(
+                    "Back up Admin exist for committee id:{}".format(
+                        data.get("cmte_id")
+                    )
+                )
+            else:
+                return False
+    except Exception as e:
+        logger.debug("Exception occurred while adding user.", str(e))
+        raise e
 
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
@@ -424,7 +444,8 @@ def manage_user(request):
                 user_exist = check_user_present(data)
                 # check if user was previously deleted, then reactivate
                 user_reactivated = user_previously_deleted(data)
-                if not user_exist and not user_reactivated:
+                backup_admin_exist = backup_user_exist(data)
+                if not user_exist and not user_reactivated and not backup_admin_exist:
                     data = add_new_user(data, cmte_id)
 
                 output = get_users_list(cmte_id)
@@ -502,8 +523,8 @@ def update_toggle_status(status, data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND role != 'TREASURER' """
-            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id")])
+            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND lower(role) != %s """
+            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id"), "cadmin"])
 
             if cursor.rowcount != 1:
                 raise NoOPError(
