@@ -364,7 +364,7 @@ def check_email_validation(email):
 
 def backup_user_exist(data):
     try:
-        if data.get("role").upper() != Roles.BC_ADMIN:
+        if data.get("role").upper() != Roles.BC_ADMIN.value:
             return False
 
         with connection.cursor() as cursor:
