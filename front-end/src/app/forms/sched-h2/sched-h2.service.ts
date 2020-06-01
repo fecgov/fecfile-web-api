@@ -43,7 +43,7 @@ export class SchedH2Service {
     params = params.append('descending', `${descending}`);
     
     return this._http
-      .get(
+      .get<{items: any[], totalItems: number}>(
         `${environment.apiUrl}${url}`,      
         {
           params,
@@ -51,13 +51,20 @@ export class SchedH2Service {
         }
       )
       .pipe(map(res => {
-          if (res) {
-            //console.log('H2 Summary Table res: ', res);
-            return res;
-          }
-          return false;
-          })
-      );
+        if (res) {
+          return {
+            //items: this.mapFromServerFields(res.items),
+            items: res.items,
+            totalItems: res.totalItems
+          };
+        } else {
+          return {
+            items: null,
+            totalItems: 0
+          };
+        }
+      })
+    );
   }
 
   public saveH2Ratio(ratio: any, scheduleAction: SchedHActions): Observable<any> {

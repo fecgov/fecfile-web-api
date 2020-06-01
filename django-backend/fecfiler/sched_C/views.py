@@ -1415,8 +1415,6 @@ def get_outstanding_loans(request):
     #: adding pagination, sorting and dynamic fields listing funcitonality  
     # URL coded for: GET /api/v1/sc/get_outstanding_loans?username=C00000935&report_id=737&page=1&itemsPerPage=5&sortColumnName=default&descending=false HTTP/1.1"
     param_string = ""
-    cmte_id =  request.user.username
-    #cmte_id = get_comittee_id(request.user.username)
     query_params = request.query_params
     page_num = int(query_params.get("page"))
     descending = query_params.get("descending")#request.data.get("descending", "false")
@@ -1444,7 +1442,7 @@ def get_outstanding_loans(request):
     valid_transaction_types = ["LOANS_OWED_BY_CMTE", "LOANS_OWED_TO_CMTE"]
     logger.debug("POST request received.")
     try:
-        cmte_id = query_params.get("username")
+        cmte_id = get_comittee_id(request.user.username)
         report_id = query_params.get("report_id")
         if not report_id:
             raise Exception("report_id is required.")
@@ -1596,8 +1594,8 @@ def get_outstanding_loans(request):
         else:
             numofpages = 0    
         json_result = {
-            "transactions": list(json_result),
-            "totalTransactionCount": totalcount,
+            "items": list(json_result),
+            "totalItems": totalcount,
             "itemsPerPage": itemsperpage,
             "pageNumber": page_num,
             "totalPages": numofpages,

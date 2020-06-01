@@ -105,7 +105,7 @@ export class SchedH3Service {
     params = params.append('descending', `${descending}`);
     
     return this._http
-      .get(
+      .get<{items: any[], totalItems: number}>(
         `${environment.apiUrl}${url}`,      
         {
           params,
@@ -113,11 +113,18 @@ export class SchedH3Service {
         }
       )
       .pipe(map(res => {
-          if (res) {
-            //console.log('H3 Summary res: ', res);
-            return res;
-          }
-          return false;
+        if (res) {
+          return {
+            //items: this.mapFromServerFields(res.items),
+            items: res.items,
+            totalItems: res.totalItems
+          };
+        } else {
+          return {
+            items: null,
+            totalItems: 0
+          };
+        }
       })
       );
   }

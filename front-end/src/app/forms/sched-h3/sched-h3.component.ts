@@ -75,7 +75,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public h3Subscription: Subscription;
   public saveHRes: any;
 
-  public h3EntryTableConfig: any;
+  //public h3EntryTableConfig: any;
 
   public receiptDateErr = false;
 
@@ -106,13 +106,12 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public trashSubscription: Subscription;
 
   // ngx-pagination config
-  public pageSizes: number[] = [10,20,50];
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
   public maxItemsPerPage: number = this.pageSizes[0];
   public paginationControlsMaxSize: number = 10;
   public directionLinks: boolean = false;
   public autoHide: boolean = true;
   public config: PaginationInstance;
-  public numberOfPages: number = 0;
   public pageNumbers: number[] = [];
   public gotoPage: number = 1;
   private firstItemOnPage = 0;
@@ -599,18 +598,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       'default',
       false
     ).subscribe(res => {
-      this.h3Sum = [];
-      let modelL = res;
-
-      // pagination
-      if (modelL) {
-        this.h3Sum = modelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
-        this.config.totalItems = modelL.length ? modelL.length : 0;
-      } else {
-        this.config.totalItems = 0;
-      }
-      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
-      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
+      const pagedResponse = this._utilService.pageResponse(res, this.config);
+      this.h3Sum = pagedResponse.items;
+      this.pageNumbers = pagedResponse.pageNumbers;
     });
   }
 
@@ -760,7 +750,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         */
         if (this.scheduleAction !== ScheduleActions.edit) {
           this.h3Entries.push(formObj);
-          this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+          //this.h3EntryTableConfig.totalItems = this.h3Entries.length;
           this.h3Ratios.child.push(formObj);
 
           this.h3Ratios.child.filter(obj => obj.activity_event_name === formObj.activity_event_name)
@@ -769,6 +759,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         } else {
           this.h3EntrieEdit = formObj;
         }
+
+        const serializedForm = JSON.stringify(formObj);
+        this.saveH3Ratio(serializedForm, this.scheduleAction);
 
         this.schedH3.reset();
         this.isSubmit = false;
@@ -824,19 +817,10 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         'default',
         false
       ).subscribe(res => {
-      //this.saveHRes = res;
-      this.h3Sum = [];
-      this.h3Entries = [];
-
-      let modelL = res;
-      if (modelL) {
-        this.h3Sum = modelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
-        this.config.totalItems = modelL.length ? modelL.length : 0;
-      } else {
-        this.config.totalItems = 0;
-      }
-      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
-      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
+        this.h3Entries = [];
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.h3Sum = pagedResponse.items;
+        this.pageNumbers = pagedResponse.pageNumbers;
     });
   }
 
@@ -1081,7 +1065,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.h3Entries = this.h3Entries.filter(obj => obj !== item);
     this.h3Ratios.child = this.h3Ratios.child.filter(obj => obj !== item);
 
-    this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+    //this.h3EntryTableConfig.totalItems = this.h3Entries.length;
 
     let sum = 0;
     this.h3Entries.forEach(obj => {
@@ -1192,7 +1176,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         if (res === 'okay') {
           this.h3Entries = this.h3Entries.filter(obj => obj !== trx);
           this.h3Ratios.child = this.h3Ratios.child.filter(obj => obj !== trx);
-          this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+          //this.h3EntryTableConfig.totalItems = this.h3Entries.length;
 
           let sum = 0;
           this.h3Entries.forEach(obj => {
@@ -1370,42 +1354,22 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange(): string {
-    let start = 0;
-    let end = 0;
-    // this.numberOfPages = 0;
-    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? this.config.currentPage : 1;
-
-    let modelL: any[];
+    let items: any[];
     switch (this.transactionType) {
       case 'ALLOC_H3_SUM':
-        modelL = this.h3Sum;
+        items = this.h3Sum;
         break;
       case 'ALLOC_H3_RATIO':
-        modelL = this.h3Entries;
+        items = this.h3Entries;
         break;
     }
-    if (!modelL) {
-      return '0';
-    }
 
-    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0 && modelL.length > 0) {
-      // this.calculateNumberOfPages();
+    let range: {
+      firstItemOnPage: number, lastItemOnPage: number, itemRange: string
+    } = this._utilService.determineItemRange(this.config, items);
 
-      if (this.config.currentPage === this.numberOfPages) {
-        // end = this.transactionsModel.length;
-        end = this.config.totalItems;
-        start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
-      } else {
-        end = this.config.currentPage * this.config.itemsPerPage;
-        start = end - this.config.itemsPerPage + 1;
-      }
-      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
-      // if (end > this.transactionsModel.length) {
-      //   end = this.transactionsModel.length;
-      // }
-    }
-    this.firstItemOnPage = start;
-    this.lastItemOnPage = end;
-    return start + ' - ' + end;
+    this.firstItemOnPage = range.firstItemOnPage;
+    this.lastItemOnPage = range.lastItemOnPage;
+    return range.itemRange;
   }
 }

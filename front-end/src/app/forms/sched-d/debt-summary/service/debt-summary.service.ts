@@ -39,7 +39,7 @@ export class DebtSummaryService {
       itemsPerPage: number,
       sortColumnName: string,
       descending: boolean
-    ): Observable<any> {
+    ): Observable<{items: any[], totalItems: number}> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/sd/schedD';
@@ -66,16 +66,23 @@ export class DebtSummaryService {
     }
 
     return this._http
-      .get(`${environment.apiUrl}${url}`, {
+      .get<{items: any[], totalItems: number}>(`${environment.apiUrl}${url}`, {
         headers: httpOptions,
         params
       })
       .pipe(
         map(res => {
           if (res) {
-            return res;
+            return {
+              items: this.mapFromServerFields(res.items),
+              totalItems: res.totalItems
+            };
+          } else {
+            return {
+              items: null,
+              totalItems: 0
+            };
           }
-          return false;
         })
       );
   }

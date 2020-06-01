@@ -63,9 +63,9 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
   public formType = '3X';
 
   // ngx-pagination config
-  public pageSizes: number[] = [10,20,50];
+  public pageSizes: number[] = [2, 10,20,50];
   public maxItemsPerPage: number = this.pageSizes[0];
-  public paginationControlsMaxSize: number = 10;
+  public paginationControlsMaxSize: number = 10; 
   public directionLinks: boolean = false;
   public autoHide: boolean = true;
   public config: PaginationInstance;
@@ -182,37 +182,13 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange(): string {
+    let range: {
+      firstItemOnPage: number, lastItemOnPage: number, itemRange: string
+    } = this._utilService.determineItemRange(this.config, this.debtModel);
 
-    let start = 0;
-    let end = 0;
-    // this.numberOfPages = 0;
-    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ?
-      this.config.currentPage : 1;
-
-    if (!this.debtModel) {
-      return '0';
-    }
-
-    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0
-      && this.debtModel.length > 0) {
-      // this.calculateNumberOfPages();
-
-      if (this.config.currentPage === this.numberOfPages) {
-        // end = this.contactsModel.length;
-        end = this.config.totalItems;
-        start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
-      } else {
-        end = this.config.currentPage * this.config.itemsPerPage;
-        start = (end - this.config.itemsPerPage) + 1;
-      }
-      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
-      // if (end > this.contactsModel.length) {
-      //   end = this.contactsModel.length;
-      // }
-    }
-    this.firstItemOnPage = start;
-    this.lastItemOnPage = end;
-    return start + ' - ' + end;
+    this.firstItemOnPage = range.firstItemOnPage;
+    this.lastItemOnPage = range.lastItemOnPage;
+    return range.itemRange;
   }
 
   /**
@@ -268,25 +244,11 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
       this.config.itemsPerPage,
       serverSortColumnName,
       sortedCol.descending
-    ).subscribe((res: any) => {
-      this.debtModel = [];
-
-      // TODO: refactor against GetDebtsResponse once python pagination is done
-      const debtModelL = this._debtSummaryService.mapFromServerFields(res);
-      if (debtModelL) {
-        //this.debtModel = debtModelL;
-        this.debtModel = debtModelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
-        this.config.totalItems = debtModelL.length ? debtModelL.length : 0;
-      } else {
-        this.config.totalItems = 0;
-      }
+    ).subscribe((response: any) => {
+      const pagedResponse = this._utilService.pageResponse(response, this.config);
+      this.debtModel = pagedResponse.items;
+      this.pageNumbers = pagedResponse.pageNumbers;
       this.allDebtSelected = false;
-
-      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
-      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
-      if (this.numberOfPages === 1) {
-        this.config.currentPage = 1;
-      }
     });
   }
 

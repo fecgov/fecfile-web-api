@@ -1993,7 +1993,7 @@ def get_sla_summary_table(request):
             AND a.levin_account_id = l.levin_account_id
             AND a.entity_id = e.entity_id
             AND a.transaction_type_identifier = tp.tran_identifier 
-            AND a.transaction_type_identifier in ("""
+            --AND a.transaction_type_identifier in ("""
 
         _sql_p2 = """)
             AND a.delete_ind is distinct from 'Y'
@@ -2055,8 +2055,8 @@ def get_sla_summary_table(request):
 def get_pagination_dataset(json_res, itemsperpage, page_num):
     if check_null_value(json_res) is False or json_res is None:
         json_result = {
-            "transactions": "",
-            "totaltransactionsCount": "",
+            "items": "",
+            "totalItems": "",
             "itemsPerPage": "",
             "pageNumber": "",
             "totalPages": "",
@@ -2069,8 +2069,8 @@ def get_pagination_dataset(json_res, itemsperpage, page_num):
             page_num = paginator.num_pages
         json_res = paginator.page(page_num)
         json_result = {
-            "transactions": list(json_res),
-            "totaltransactionsCount": total_count,
+            "items": list(json_res),
+            "totalItems": total_count,
             "itemsPerPage": itemsperpage,
             "pageNumber": page_num,
             "totalPages": paginator.num_pages,

@@ -109,7 +109,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
   private _h5OnDestroy$ = new Subject();
 
   // ngx-pagination config
-  public pageSizes: number[] = [10,20,50];
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
   public maxItemsPerPage: number = this.pageSizes[0];
   public paginationControlsMaxSize: number = 10;
   public directionLinks: boolean = false;
@@ -420,19 +420,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         'default',
         false
       ).subscribe(res => {
-      //this.saveHRes = res;
-      this.h5Entries = [];
-      this.h5Sum = [];
-
-      let modelL = res;
-      if (modelL) {
-        this.h5Sum = modelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
-        this.config.totalItems = modelL.length ? modelL.length : 0;
-      } else {
-        this.config.totalItems = 0;
-      }
-      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
-      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
+        this.h5Entries = [];
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.h5Sum = pagedResponse.items;
+        this.pageNumbers = pagedResponse.pageNumbers;
     });
   }
 
@@ -518,8 +509,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH5.patchValue({ transferred_amount: '' }, { onlySelf: true });
       this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(total_amount_transferred, '.2-2') }, { onlySelf: true });
 
-      //this.saveH5(serializedForm);
-      //this.schedH5.reset();
+      this.saveH5(serializedForm);
+      this.schedH5.reset();
 
       // Note: Do after all patching to avoid form change detection which will set to false
       localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
@@ -687,50 +678,10 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         'default',
         false
       ).subscribe(res => {
-      this.h5Sum = [];
-      let modelL = res;
-
-      // pagination
-      if (modelL) {
-        this.h5Sum = modelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
-        this.config.totalItems = modelL.length ? modelL.length : 0;
-      } else {
-        this.config.totalItems = 0;
-      }
-      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
-      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.h5Sum = pagedResponse.items;
+        this.pageNumbers = pagedResponse.pageNumbers;
     });
-
-    /*  
-    this.h5Sum = [
-      {
-        "transfer_type": "GOTV",
-        "account_name": "Farmington Country Club Gala",
-        "date": "04/21/2016",
-        "transfer_amount": "21309.42"
-      },
-      {
-        "transfer_type": "voter_ID",
-        "account_name": "Chicago's Men's Rotary Club",
-        "date": "04/21/2016",
-        "transfer_amount": "21309.42"
-      },
-      {
-        "transfer_type": "voter_registration",
-        "account_name": "Chicago's Men's Rotary Club",
-        "date": "03/20/2016",
-        "transfer_amount": "3394.99"
-
-      },
-      {
-        "transfer_type": "voter_ID",
-        "account_name": "Trenton Rally",
-        "date": "03/14/2016",
-        "transfer_amount": "5209.44"
-      }
-
-    ]
-    */
   }
 
   public setH5SumP() {
@@ -1165,42 +1116,22 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange(): string {
-    let start = 0;
-    let end = 0;
-    // this.numberOfPages = 0;
-    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? this.config.currentPage : 1;
-
-    let modelL: any[];
+    let items: any[];
     switch (this.transactionType) {
       case 'ALLOC_H5_SUM':
-        modelL = this.h5Sum;
+        items = this.h5Sum;
         break;
       case 'ALLOC_H5_RATIO':
-        modelL = this.h5Entries;
+        items = this.h5Entries;
         break;
     }
-    if (!modelL) {
-      return '0';
-    }
 
-    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0 && modelL.length > 0) {
-      // this.calculateNumberOfPages();
+    let range: {
+      firstItemOnPage: number, lastItemOnPage: number, itemRange: string
+    } = this._utilService.determineItemRange(this.config, items);
 
-      if (this.config.currentPage === this.numberOfPages) {
-        // end = this.transactionsModel.length;
-        end = this.config.totalItems;
-        start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
-      } else {
-        end = this.config.currentPage * this.config.itemsPerPage;
-        start = end - this.config.itemsPerPage + 1;
-      }
-      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
-      // if (end > this.transactionsModel.length) {
-      //   end = this.transactionsModel.length;
-      // }
-    }
-    this.firstItemOnPage = start;
-    this.lastItemOnPage = end;
-    return start + ' - ' + end;
+    this.firstItemOnPage = range.firstItemOnPage;
+    this.lastItemOnPage = range.lastItemOnPage;
+    return range.itemRange;
   }  
 }

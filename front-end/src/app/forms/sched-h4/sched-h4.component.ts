@@ -75,7 +75,7 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
   public trashSubscription: Subscription;
 
   // ngx-pagination config
-  public pageSizes: number[] = [10,20,50];
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
   public maxItemsPerPage: number = this.pageSizes[0];
   public paginationControlsMaxSize: number = 10;
   public directionLinks: boolean = false;
@@ -272,26 +272,9 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
         'default',
         false
       ).subscribe(res => {
-      let modelL: any;
-      if (res) {
-        modelL = this.mapFromServerFields(res);
-        this.setArrow(modelL);
-        modelL = modelL.filter(obj => obj.back_ref_transaction_id === null);
-      }
-      if (modelL) {
-        // this.schedH4sModelL = this.mapFromServerFields(res);
-        // this.schedH4sModel = this.mapFromServerFields(res);
-        // this.setArrow(this.schedH4sModel);
-  
-        //this.schedH4sModel = this.schedH4sModel .filter(obj => obj.memo_code !== 'X');
-        // this.schedH4sModel = this.schedH4sModel.filter(obj => obj.back_ref_transaction_id === null);
-        this.schedH4sModel = modelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
-        this.config.totalItems = modelL.length ? modelL.length : 0;
-      } else {
-        this.config.totalItems = 0;
-      }
-      this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
-      this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.schedH4sModel = pagedResponse.items;
+        this.pageNumbers = pagedResponse.pageNumbers;
     });
   }
  
@@ -537,36 +520,13 @@ export class SchedH4Component extends AbstractSchedule implements OnInit, OnDest
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange(): string {
-    let start = 0;
-    let end = 0;
-    // this.numberOfPages = 0;
-    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? this.config.currentPage : 1;
+    let range: {
+      firstItemOnPage: number, lastItemOnPage: number, itemRange: string
+    } = this._utilService.determineItemRange(this.config, this.schedH4sModel);
 
-    let modelL: any[];
-    modelL = this.h4Sum;
-    if (!modelL) {
-      return '0';
-    }
-
-    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0 && modelL.length > 0) {
-      // this.calculateNumberOfPages();
-
-      if (this.config.currentPage === this.numberOfPages) {
-        // end = this.transactionsModel.length;
-        end = this.config.totalItems;
-        start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
-      } else {
-        end = this.config.currentPage * this.config.itemsPerPage;
-        start = end - this.config.itemsPerPage + 1;
-      }
-      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
-      // if (end > this.transactionsModel.length) {
-      //   end = this.transactionsModel.length;
-      // }
-    }
-    this.firstItemOnPage = start;
-    this.lastItemOnPage = end;
-    return start + ' - ' + end;
+    this.firstItemOnPage = range.firstItemOnPage;
+    this.lastItemOnPage = range.lastItemOnPage;
+    return range.itemRange;
   }
 }
 

@@ -285,8 +285,8 @@ def get_int_value(num):
 def get_pagination_dataset(json_res, itemsperpage, page_num):
     if check_null_value(json_res) is False or json_res is None:
         json_result = {
-            "transactions": "",
-            "totaltransactionsCount": "",
+            "items": "",
+            "totalItems": "",
             "itemsPerPage": "",
             "pageNumber": "",
             "totalPages": "",
@@ -299,8 +299,8 @@ def get_pagination_dataset(json_res, itemsperpage, page_num):
             page_num = paginator.num_pages
         json_res = paginator.page(page_num)
         json_result = {
-            "transactions": list(json_res),
-            "totaltransactionsCount": total_count,
+            "items": list(json_res),
+            "totalItems": total_count,
             "itemsPerPage": itemsperpage,
             "pageNumber": page_num,
             "totalPages": paginator.num_pages,
@@ -398,7 +398,7 @@ def schedD(request):
         try:
             #: Hardcode cmte value for now and remove after dev complete
             #data = {"cmte_id": "C00000935"} 
-            data =  {"cmte_id": request.user.username}
+            data =  {"cmte_id": get_comittee_id(request.user.username)}
      
             if "report_id" in request.query_params:
                 data["report_id"] = check_report_id(

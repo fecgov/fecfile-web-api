@@ -6282,7 +6282,7 @@ def contactsTable(request):
 
         if request.method == "POST":
             # print("request.data: ", request.data)
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             param_string = ""
             page_num = int(request.data.get("page", 1))
             descending = request.data.get("descending", "false")

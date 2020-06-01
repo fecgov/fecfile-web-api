@@ -67,7 +67,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public bulkActionCounter = 0;
 
   // ngx-pagination config
-  public pageSizes: number[] = [10,20,50];
+  public pageSizes: number[] = [2, 10,20,50];
   public maxItemsPerPage: number = this.pageSizes[0];
   public paginationControlsMaxSize: number = 10;
   public directionLinks: boolean = false;
@@ -153,7 +153,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
     this._loanSummaryRefreshDataSubscription = this._LoanMessageService
       .getLoanSummaryRefreshMessage()
       .subscribe(message => {
-        this.loadPage(message);
+        //this.loadPage(message);
       });
   }
   /**
@@ -287,69 +287,11 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
         serverSortColumnName,
         sortedCol.descending
       )
-      //TODO : ZS -- change resType back to  GetLoanResponse once service is fixed
-      .subscribe((res: any) => {
-        // res=this.tempApiResponse;
-        //console.log(" getLoanPage res =", res)
-        this.LoanModel = [];
-
-        // fixes an issue where no items shown when current page != 1 and new filter
-        // result has only 1 page.
-        if (res.totalPages === 1) {
-          this.config.currentPage = 1;
-        }
-
-        //TODO - ZS -- this is temporary fix to map fields to the right attributes until service response is fixed
-        res.forEach(element => {
-          //set name
-          if (element.entity_type === 'IND') {
-
-            const lastName = element.last_name ? element.last_name.trim() : '';
-            const firstName = element.first_name ? element.first_name.trim() : '';
-            const middleName = element.middle_name ? ', ' + element.middle_name.trim() : '';
-            const suffix = element.suffix ? ', ' + element.suffix.trim() : '';
-            const prefix = element.prefix ? ', ' + element.prefix.trim() : '';
-
-            element.name = `${lastName}, ${firstName}` + `${middleName}` + `${prefix}` + `${suffix}`;
-          } else if (element.entity_type === 'ORG') {
-            element.name = element.entity_name;
-          }
-
-          //add endorser and c1 check flags to decide whether to show or not in expansion accordion.
-          if (element.child && element.child.length > 0) {
-            let c1childArray = element.child.filter(cElement => {
-              return cElement.transaction_type_identifier === 'SC1';
-            });
-            if (c1childArray.length > 0) {
-              element.hasC1 = true;
-            }
-
-            let c2childArray = element.child.filter(cElement => {
-              return cElement.transaction_type_identifier === 'SC2';
-            });
-            if (c2childArray.length > 0) {
-              element.hasC2 = true;
-            }
-          }
-        });
-
-        this._LoanService.addUIFileds(res);
-        this._LoanService.mockApplyFilters(res);
-        const LoanModelL = this._LoanService.mapFromServerFields(res);
-        if (LoanModelL) {
-          //this.debtModel = debtModelL;
-          this.LoanModel = LoanModelL.slice((page - 1) * this.config.itemsPerPage, page * this.config.itemsPerPage);
-          this.config.totalItems = LoanModelL.length ? LoanModelL.length : 0;
-        } else {
-          this.config.totalItems = 0;
-        }
-        //this.LoanModel = LoanModelL;
-        // this.config.totalItems = res.totalloansCount ? res.totalloansCount : 0;
-        // this.numberOfPages = res.totalPages;
+      .subscribe((response: any) => {
+        const pagedResponse = this._utilService.pageResponse(response, this.config);
+        this.LoanModel = pagedResponse.items;
+        this.pageNumbers = pagedResponse.pageNumbers;
         this.allLoanSelected = false;
-
-        this.numberOfPages = this.config.totalItems > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
-        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1);
       });
   }
 
@@ -744,34 +686,13 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * Determine the item range shown by the server-side pagination.
    */
   public determineItemRange(): string {
-    let start = 0;
-    let end = 0;
-    // this.numberOfPages = 0;
-    this.config.currentPage = this._utilService.isNumber(this.config.currentPage) ? this.config.currentPage : 1;
+    let range: {
+      firstItemOnPage: number, lastItemOnPage: number, itemRange: string
+    } = this._utilService.determineItemRange(this.config, this.LoanModel);
 
-    if (!this.LoanModel) {
-      return '0';
-    }
-
-    if (this.config.currentPage > 0 && this.config.itemsPerPage > 0 && this.LoanModel.length > 0) {
-      // this.calculateNumberOfPages();
-
-      if (this.config.currentPage === this.numberOfPages) {
-        // end = this.LoanModel.length;
-        end = this.config.totalItems;
-        start = (this.config.currentPage - 1) * this.config.itemsPerPage + 1;
-      } else {
-        end = this.config.currentPage * this.config.itemsPerPage;
-        start = end - this.config.itemsPerPage + 1;
-      }
-      // // fix issue where last page shown range > total items (e.g. 11-20 of 19).
-      // if (end > this.LoanModel.length) {
-      //   end = this.LoanModel.length;
-      // }
-    }
-    this.firstItemOnPage = start;
-    this.lastItemOnPage = end;
-    return start + ' - ' + end;
+    this.firstItemOnPage = range.firstItemOnPage;
+    this.lastItemOnPage = range.lastItemOnPage;
+    return range.itemRange;
   }
 
   /**

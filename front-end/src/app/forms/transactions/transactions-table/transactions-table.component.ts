@@ -72,7 +72,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public editMode: boolean = false;
 
   // ngx-pagination config
-  public pageSizes: number[] = [10,20,50];
+  public pageSizes: number[] = [2, 10,20,50];
   public maxItemsPerPage: number = this.pageSizes[0];
   public paginationControlsMaxSize: number = 10;
   public directionLinks: boolean = false;

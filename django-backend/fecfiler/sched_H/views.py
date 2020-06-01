@@ -1809,8 +1809,8 @@ def get_h2_summary_table(request):
 def get_pagination_dataset(json_res, itemsperpage, page_num):
     if check_null_value(json_res) is False  or json_res is None:
         json_result = {
-            "transactions": "",
-            "totaltransactionsCount": "",
+            "items": "",
+            "totalItems": "",
             "itemsPerPage": "",
             "pageNumber": "",
             "totalPages": "",
@@ -1823,8 +1823,8 @@ def get_pagination_dataset(json_res, itemsperpage, page_num):
             page_num = paginator.num_pages
         json_res = paginator.page(page_num)
         json_result = {
-            "transactions": list(json_res),
-            "totaltransactionsCount": total_count,
+            "items": list(json_res),
+            "totalItems": total_count,
             "itemsPerPage": itemsperpage,
             "pageNumber": page_num,
             "totalPages": paginator.num_pages,
@@ -2646,8 +2646,8 @@ def get_h3_summary(request):
             create_date ,
             last_update_date
             FROM public.sched_h3
-            WHERE (report_id = %s or report_id = 0) AND cmte_id = %s
-            AND back_ref_transaction_id is not null
+            WHERE (report_id = %s or report_id = 0) AND cmte_id = %s 
+            --AND back_ref_transaction_id is not null
             AND delete_ind is distinct from 'Y'
             ) t
             """
@@ -4358,7 +4358,7 @@ def get_h5_summary(request):
             ) AS transfer_type
             FROM public.sched_h5
             WHERE report_id = %s AND cmte_id = %s
-            AND back_ref_transaction_id is not null
+            --AND back_ref_transaction_id is not null
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))

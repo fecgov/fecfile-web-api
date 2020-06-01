@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
+import { PaginationInstance } from 'ngx-pagination';
 
 @Injectable({
   providedIn: 'root'
@@ -175,5 +176,63 @@ export class UtilService {
     } else {
       return false;
     }
+  }
+
+  public static PAGINATION_PAGE_SIZES: number[] = [2,10,20,50];
+
+  public pageResponse(response: any, config: PaginationInstance)
+    : { items: any[], pageNumbers: number[] } {
+    let items: any[] = [];
+    let pageNumbers: number[] = [];
+    if (response) {
+      config.totalItems = response.totalItems ? response.totalItems : 0;
+      if (response.items) {
+        const page = config.currentPage;
+        items = response.items.slice((page - 1) * config.itemsPerPage, page * config.itemsPerPage);
+      } 
+      const numberOfPages = config.totalItems > config.itemsPerPage ? Math.round(config.totalItems / config.itemsPerPage) : 1;
+      if (numberOfPages === 1) {
+        config.currentPage = 1;
+      }
+      pageNumbers = Array.from(new Array(numberOfPages), (x, i) => i + 1);
+    } else {
+      config.totalItems = 0;
+      config.currentPage = 1;
+    }
+    return {
+      items: items,
+      pageNumbers: pageNumbers
+    };
+  }
+
+  public determineItemRange(config: PaginationInstance, items: any[])
+    : {firstItemOnPage: number, lastItemOnPage: number, itemRange: string} {
+    if (!items || items.length === 0) {
+      return {
+        firstItemOnPage: 0, 
+        lastItemOnPage: 0, 
+        itemRange: '0'
+      }
+    }
+
+    let start = 0;
+    let end = 0;
+    config.currentPage = this.isNumber(config.currentPage) ? config.currentPage : 1;
+    if (config.currentPage > 0 && config.itemsPerPage > 0 && items.length > 0) {
+      const numberOfPages = config.totalItems > config.itemsPerPage ? Math.round(config.totalItems / config.itemsPerPage) : 1;
+      if (config.currentPage === numberOfPages) {
+        end = config.totalItems;
+        start = (config.currentPage - 1) * config.itemsPerPage + 1;
+      } else {
+        end = config.currentPage * config.itemsPerPage;
+        start = (end - config.itemsPerPage) + 1;
+      }
+    }
+
+    return { 
+      firstItemOnPage: start, 
+      lastItemOnPage: end, 
+      itemRange: start + ' - ' + end 
+    };
   }
 }
