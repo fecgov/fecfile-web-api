@@ -78,7 +78,6 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   public showSelectType = true;
 
   public schedLsModel: Array<SchedLModel>;
-  public schedLsModelL: Array<SchedLModel>;
   private clonedTransaction: any;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
@@ -213,6 +212,9 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnDestroy(): void {
+    if (this.lSubscription) {
+      this.lSubscription.unsubscribe();
+    }
     super.ngOnDestroy();
   }
 
@@ -265,7 +267,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
         const pagedResponse = this._utilService.pageResponse(res, this.config);
         this.schedLsModel = this.mapFromServerFields(pagedResponse.items);
         this.pageNumbers = pagedResponse.pageNumbers;
-        //this.setArrow(this.schedLsModel);
+        this.setArrow(this.schedLsModel);
       });
   }
 
@@ -319,7 +321,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     if(item.arrow_dir === 'down') {
       let indexRep = this.schedLsModel.indexOf(item);
       if (indexRep > -1) {
-        let tmp: Array<SchedLModel> = this.schedLsModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id);
+        let tmp: Array<SchedLModel> = this.schedLsModel.filter(obj => obj.back_ref_transaction_id === item.transaction_id);
         for(let entry of tmp) {
           entry.arrow_dir = 'show';
           this.schedLsModel.splice(indexRep + 1, 0, entry);
@@ -470,7 +472,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public checkIfTrashable(trx: any): boolean {
-    if (this.schedLsModelL.filter(obj => obj.back_ref_transaction_id === trx.transaction_id).length !== 0) {
+    if (this.schedLsModel.filter(obj => obj.back_ref_transaction_id === trx.transaction_id).length !== 0) {
       return false;
     }
     return true;
