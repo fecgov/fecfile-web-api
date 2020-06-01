@@ -15,6 +15,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework_jwt.compat import get_username_field, get_username
 
+from .auth_enum import Roles
 from .authorization import is_not_treasurer
 from .models import Account
 import re
@@ -135,8 +136,8 @@ def get_users_list(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from manage user table
-            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND lower(role) != %s order by id) t"""
-            cursor.execute(_sql, [cmte_id, "cadmin"])
+            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND upper(role) != %s order by id) t"""
+            cursor.execute(_sql, [cmte_id, Roles.C_ADMIN])
             user_list = cursor.fetchall()
             if user_list is None:
                 raise NoOPError(
@@ -160,9 +161,9 @@ def delete_manage_user(data):
             _sql = """UPDATE public.authentication_account
                         SET delete_ind = 'Y' 
                         WHERE id = %s AND cmtee_id = %s
-                        AND lower(role) != %s
+                        AND upper(role) != %s
                     """
-            _v = (data.get("user_id"), data.get("cmte_id"), "cadmin")
+            _v = (data.get("user_id"), data.get("cmte_id"), Roles.C_ADMIN)
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
                 logger.debug("deleting user for {} failed."
@@ -348,8 +349,8 @@ def update_user(data):
 def check_custom_validations(email, role):
     try:
         check_email_validation(email)
-        if role.upper() not in ["BCADMIN", "ADMIN", "REVIEWER", "EDITOR"]:
-            raise Exception("Role should be Back-up ADMIN,ADMIN,REVIEWER, EDITOR")
+        if role.upper() not in ["BC_ADMIN", "ADMIN", "REVIEWER", "EDITOR"]:
+            raise Exception("Role should be BC_ADMIN,ADMIN,REVIEWER, EDITOR")
     except Exception as e:
         logger.debug("Custom validation failed")
         raise e
@@ -363,13 +364,13 @@ def check_email_validation(email):
 
 def backup_user_exist(data):
     try:
-        if data.get("role").lower() != 'bcadmin':
+        if data.get("role").upper() != Roles.BC_ADMIN:
             return False
 
         with connection.cursor() as cursor:
             # check if user already exist
             _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(role) = lower(%s) AND delete_ind !='Y' """
-            cursor.execute(_sql, [data.get("cmte_id"), "bcadmin"])
+            cursor.execute(_sql, [data.get("cmte_id"), Roles.BC_ADMIN])
             backup_admin_list = cursor.fetchone()
             if backup_admin_list is not None:
                 raise NoOPError(
@@ -523,8 +524,8 @@ def update_toggle_status(status, data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND lower(role) != %s """
-            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id"), "cadmin"])
+            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND upper(role) != %s """
+            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id"), Roles.C_ADMIN])
 
             if cursor.rowcount != 1:
                 raise NoOPError(
