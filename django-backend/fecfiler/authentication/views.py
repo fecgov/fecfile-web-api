@@ -137,7 +137,7 @@ def get_users_list(cmte_id):
         with connection.cursor() as cursor:
             # GET single row from manage user table
             _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND upper(role) != %s order by id) t"""
-            cursor.execute(_sql, [cmte_id, Roles.C_ADMIN])
+            cursor.execute(_sql, [cmte_id, Roles.C_ADMIN.value])
             user_list = cursor.fetchall()
             if user_list is None:
                 raise NoOPError(
@@ -163,7 +163,7 @@ def delete_manage_user(data):
                         WHERE id = %s AND cmtee_id = %s
                         AND upper(role) != %s
                     """
-            _v = (data.get("user_id"), data.get("cmte_id"), Roles.C_ADMIN)
+            _v = (data.get("user_id"), data.get("cmte_id"), Roles.C_ADMIN.value)
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
                 logger.debug("deleting user for {} failed."
@@ -370,7 +370,7 @@ def backup_user_exist(data):
         with connection.cursor() as cursor:
             # check if user already exist
             _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(role) = lower(%s) AND delete_ind !='Y' """
-            cursor.execute(_sql, [data.get("cmte_id"), Roles.BC_ADMIN])
+            cursor.execute(_sql, [data.get("cmte_id"), Roles.BC_ADMIN.value])
             backup_admin_list = cursor.fetchone()
             if backup_admin_list is not None:
                 raise NoOPError(
@@ -525,7 +525,7 @@ def update_toggle_status(status, data):
         with connection.cursor() as cursor:
             # check if user already exist
             _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND upper(role) != %s """
-            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id"), Roles.C_ADMIN])
+            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id"), Roles.C_ADMIN.value])
 
             if cursor.rowcount != 1:
                 raise NoOPError(
