@@ -446,6 +446,12 @@ def manage_user(request):
                 # check if user was previously deleted, then reactivate
                 user_reactivated = user_previously_deleted(data)
                 backup_admin_exist = backup_user_exist(data)
+                if data.get("role").upper() == Roles.BC_ADMIN.value and request.user.role != Roles.C_ADMIN.value:
+                    raise NoOPError(
+                        "Current Role does not have authority to create Back Up Admin. Please reach out to Committee "
+                        "Admin."
+                        )
+
                 if not user_exist and not user_reactivated and not backup_admin_exist:
                     data = add_new_user(data, cmte_id)
 
