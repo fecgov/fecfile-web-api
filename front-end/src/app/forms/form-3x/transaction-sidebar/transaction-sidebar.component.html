@@ -108,7 +108,7 @@
       </div>
       <ng-container *ngIf="step !== 'step_3'">
         <div class="btn-row signAndSubmit">
-          <button *ngIf="_authService.isCommitteeAdmin() || _authService.isAdmin()"
+          <button *ngIf="_authService.isCommitteeAdmin() || _authService.isBackupCommitteeAdmin() || _authService.isAdmin()"
             id="sidebar_signBtn"
             type="button"
             class="btn btn-secondary"

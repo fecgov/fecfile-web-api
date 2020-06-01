@@ -1,6 +1,7 @@
 export enum Roles {
-    CommitteeAdmin = 'TREASURER',
+    CommitteeAdmin = 'C_ADMIN',
     Admin = 'ADMIN',
-    Entry = 'ENTRY',
-    ReadOnly = 'READONLY'
+    Editor = 'EDITOR',
+    Reviewer = 'REVIEWER',
+    BackupCommitteeAdmin = 'BC_ADMIN',
 }
