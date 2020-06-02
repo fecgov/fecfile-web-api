@@ -565,8 +565,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           */
          return this._typeaheadService.getContacts(searchText, 'last_name')
           .map(contacts => {
-            let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
-            return (f.length > 0) ? f : null;
+            if(contacts){
+              let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
+              return (f.length > 0) ? f : null;
+            }
+            else{
+              return null;
+            }
           });
 
         } else {
@@ -604,8 +609,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           */
          return this._typeaheadService.getContacts(searchText, 'first_name')
           .map(contacts => {
-            let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
-            return (f.length > 0) ? f : null;
+            if(contacts){
+              let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
+              return (f.length > 0) ? f : null;
+            }
+            else{
+              return null;
+            }
           });
         } else {
           return Observable.of([]);
@@ -675,8 +685,12 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
           return this._typeaheadService.getContacts(searchText, 'entity_name')
             .map(contacts => {
-              let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
-              return (f.length > 0) ? f : null;
+              if(contacts){
+                let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
+                return (f.length > 0) ? f : null;
+              }else{
+                return null;
+              }
             });
         } else {
           return Observable.of([]);
