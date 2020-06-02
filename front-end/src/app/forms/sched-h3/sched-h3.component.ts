@@ -113,7 +113,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public autoHide: boolean = true;
   public config: PaginationInstance;
   public pageNumbers: number[] = [];
-  public gotoPage: number = 1;
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
   
@@ -1299,8 +1298,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
    * @param page the page containing the transactions to get
    */
   public getPage(page: number): void {
-    this.gotoPage = page;
-
     switch (this.transactionType) {
       case 'ALLOC_H3_SUM':
         this.setH3Sum(page);
@@ -1318,7 +1315,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
    */
   public onMaxItemsPerPageChanged(pageSize: number): void {
     this.config.currentPage = 1;
-    this.gotoPage = 1;
     this.config.itemsPerPage = pageSize;
     this.getPage(this.config.currentPage);
   }
@@ -1329,9 +1325,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
    * @param page the page to get
    */
   public onGotoPageChange(page: number): void {
-    if (this.config.currentPage == page) {
-      return;
-    }
     this.config.currentPage = page;
     this.getPage(this.config.currentPage);
   }  

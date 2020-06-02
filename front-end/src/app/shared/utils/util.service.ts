@@ -184,11 +184,16 @@ export class UtilService {
     : { items: any[], pageNumbers: number[] } {
     let items: any[] = [];
     let pageNumbers: number[] = [];
+
     if (response) {
       config.totalItems = response.totalItems ? response.totalItems : 0;
       if (response.items) {
         const page = config.currentPage;
-        items = response.items.slice((page - 1) * config.itemsPerPage, page * config.itemsPerPage);
+        if (response.clientsidePagination) {
+          items = response.items.slice((page - 1) * config.itemsPerPage, page * config.itemsPerPage);
+        } else {
+          items = response.items;
+        }
       } 
       const numberOfPages = config.totalItems > config.itemsPerPage ? Math.round(config.totalItems / config.itemsPerPage) : 1;
       if (numberOfPages === 1) {

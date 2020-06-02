@@ -71,7 +71,6 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
   public config: PaginationInstance;
   public numberOfPages: number = 0;
   public pageNumbers: number[] = [];
-  public gotoPage: number = 1;
 
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
@@ -134,7 +133,6 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
 
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
-    this.gotoPage = page;
 
     this.getDebtSummaries(page);
   }
@@ -146,7 +144,6 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
    */
   public onMaxItemsPerPageChanged(pageSize: number): void {
     this.config.currentPage = 1;
-    this.gotoPage = 1;
     this.config.itemsPerPage = pageSize;
     this.getPage(this.config.currentPage);
   }
@@ -157,9 +154,6 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
    * @param page the page to get
    */
   public onGotoPageChange(page: number): void {
-    if (this.config.currentPage == page) {
-      return;
-    }
     this.config.currentPage = page;
     this.getPage(this.config.currentPage);
   }

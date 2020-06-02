@@ -92,7 +92,6 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   public config: PaginationInstance;
   public numberOfPages: number = 0;
   public pageNumbers: number[] = [];
-  public gotoPage: number = 1;
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
 
@@ -514,8 +513,6 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
    * @param page the page containing the records to get
    */
   public getPage(page: number): void {
-    this.gotoPage = page;
-
     this.getTransactions(this._individualReceiptService.getReportIdFromStorage(this.formType), 
       this.transactionType, page);
   }
@@ -527,7 +524,6 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
    */
   public onMaxItemsPerPageChanged(pageSize: number): void {
     this.config.currentPage = 1;
-    this.gotoPage = 1;
     this.config.itemsPerPage = pageSize;
     this.getPage(this.config.currentPage);
   }
@@ -538,9 +534,6 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
    * @param page the page to get
    */
   public onGotoPageChange(page: number): void {
-    if (this.config.currentPage == page) {
-      return;
-    }
     this.config.currentPage = page;
     this.getPage(this.config.currentPage);
   }  

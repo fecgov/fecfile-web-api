@@ -146,7 +146,7 @@
     <div *ngIf="pageNumbers.length > 1" class="d-flex ml-1">
       <div class="mr-1 my-auto text-muted">Go to page:</div>
       <ng-select #pageNumber [items]="pageNumbers" [clearable]="false" [hideSelected]="true"
-        (change)="onGotoPageChange($event)" [(ngModel)]="gotoPage"
+        (change)="onGotoPageChange($event)" [(ngModel)]="config.currentPage" [ngModelOptions]="{standalone: true}"
         class="border border-light">
       </ng-select>
     </div>

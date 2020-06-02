@@ -75,7 +75,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public config: PaginationInstance;
   public numberOfPages: number = 0;
   public pageNumbers: number[] = [];
-  public gotoPage: number = 1;
 
   //private filters: ContactFilterModel;
   // private keywords = [];
@@ -214,7 +213,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   public getPage(page: number, message: any = null): void {
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
-    this.gotoPage = page;
 
     //console.log(" getPage this.tableType", this.tableType)
     switch (this.tableType) {
@@ -233,7 +231,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    */
   public onMaxItemsPerPageChanged(pageSize: number): void {
     this.config.currentPage = 1;
-    this.gotoPage = 1;
     this.config.itemsPerPage = pageSize;
     this.getPage(this.config.currentPage);
   }
@@ -244,9 +241,6 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
    * @param page the page to get
    */
   public onGotoPageChange(page: number): void {
-    if (this.config.currentPage == page) {
-      return;
-    }
     this.config.currentPage = page;
     this.getPage(this.config.currentPage);
   }

@@ -3770,8 +3770,8 @@ def schedH4(request):
             logger.debug(e)
             #: updated the return status to 200 with null object for testing
             forms_obj = {
-                "transactions": "",
-                "totaltransactionsCount": "",
+                "items": "",
+                "totalItems": "",
                 "itemsPerPage": "",
                 "pageNumber": "",
                 "totalPages": "",
