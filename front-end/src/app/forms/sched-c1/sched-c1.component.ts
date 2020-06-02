@@ -675,7 +675,9 @@ export class SchedC1Component implements OnInit, OnChanges {
   }
 
   private _clearFormValues() {
-    this.c1Form.reset();
+    if(this.c1Form){
+      this.c1Form.reset();
+    }
   }
 
   // type ahead start
