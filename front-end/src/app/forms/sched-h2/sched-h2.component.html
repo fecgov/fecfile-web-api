@@ -309,14 +309,17 @@
       <div [hidden]="showPart2" class="paragraph">
         <ng-container>
           <div class="grid-row d-flex justify-content-between sched-h2__page-range">
-            <div class="d-flex ml-3">
+            <div class="d-flex ml-3" *ngIf="showPageSizes()">
               <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>    
               <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
                 (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage"
                 class="border border-light" [ngModelOptions]="{standalone: true}">
               </ng-select>
             </div>
-            <div class="sched-h2__item-range">
+            <div class="d-flex ml-3 my-2" *ngIf="!showPageSizes()">
+              <div class="d-inline mr-1 my-auto text-muted">No record found</div>
+            </div>
+            <div class="sched-h2__item-range" *ngIf="showPageSizes()">
               {{determineItemRange()}} of {{config.totalItems}}
             </div>
           </div>

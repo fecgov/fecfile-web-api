@@ -4,14 +4,17 @@
 </div>
 <div class="debtSumamry__table-container">
   <div class="grid-row d-flex justify-content-between debtSumamry__page-item-range">
-    <div class="d-flex">
+    <div class="d-flex" *ngIf="showPageSizes()">
       <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>    
       <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
         (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage"
         class="border border-light">
       </ng-select>
     </div>
-    <div class="contacts__item-range">
+    <div class="d-flex ml-3 my-2" *ngIf="!showPageSizes()">
+      <div class="d-inline mr-1 my-auto text-muted">No record found</div>
+    </div>
+    <div class="contacts__item-range" *ngIf="showPageSizes()">
       {{determineItemRange()}} of {{config.totalItems}}
     </div>
   </div>

@@ -80,7 +80,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
   //public existingReportId: string;
 
   // ngx-pagination config
-  public pageSizes: number[] = [10,20,50];
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
   public maxItemsPerPage: number = this.pageSizes[0];
   public paginationControlsMaxSize: number = 10;
   public directionLinks: boolean = false;
@@ -1195,6 +1195,13 @@ public printReport(report: reportModel): void{
     }
     this.lastItemOnPage = end;
     return start + ' - ' + end;
+  }
+        
+  public showPageSizes(): boolean {
+    if (this.config && this.config.totalItems && this.config.totalItems > 0){
+      return true;
+    }
+    return false;
   }
 
   /**

@@ -63,7 +63,7 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
   public formType = '3X';
 
   // ngx-pagination config
-  public pageSizes: number[] = [2, 10,20,50];
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
   public maxItemsPerPage: number = this.pageSizes[0];
   public paginationControlsMaxSize: number = 10; 
   public directionLinks: boolean = false;
@@ -189,6 +189,13 @@ export class DebtSummaryComponent implements OnInit, OnChanges {
     this.firstItemOnPage = range.firstItemOnPage;
     this.lastItemOnPage = range.lastItemOnPage;
     return range.itemRange;
+  }
+      
+  public showPageSizes(): boolean {
+    if (this.config && this.config.totalItems && this.config.totalItems > 0){
+      return true;
+    }
+    return false;
   }
 
   /**

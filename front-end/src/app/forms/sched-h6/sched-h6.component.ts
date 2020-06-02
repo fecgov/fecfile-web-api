@@ -478,5 +478,12 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     this.lastItemOnPage = range.lastItemOnPage;
     return range.itemRange;
   }  
+  
+  public showPageSizes(): boolean {
+    if (this.config && this.config.totalItems && this.config.totalItems > 0){
+      return true;
+    }
+    return false;
+  }
 }
 

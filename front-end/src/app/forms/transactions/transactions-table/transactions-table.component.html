@@ -37,14 +37,17 @@
 
   <ng-container *ngIf="!apiError">
     <div class="grid-row d-flex justify-content-between">
-      <div class="d-flex ml-3">
+      <div class="d-flex ml-3" *ngIf="showPageSizes()">
         <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>    
         <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
           (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage"
           class="border border-light">
         </ng-select>
       </div>
-      <div *ngIf="isTransactionViewActive() || isRecycleBinViewActive()" class="transactions__item-range mr-2">
+      <div class="d-flex ml-3 my-2" *ngIf="!showPageSizes()">
+        <div class="d-inline mr-1 my-auto text-muted">No record found</div>
+      </div>
+      <div *ngIf="showPageSizes() && (isTransactionViewActive() || isRecycleBinViewActive())" class="transactions__item-range mr-2">
         {{determineItemRange()}} of {{config.totalItems}}
       </div>
     </div>
