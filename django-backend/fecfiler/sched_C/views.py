@@ -1889,7 +1889,7 @@ def post_schedC1(data):
                 remove_entities(get_data)
 
             # rollback treasurer entity
-            if treasrurer_rollback_flag:
+            if treasurer_rollback_flag:
                 entity_data = put_entities(old_treasurer_entity)
             else:
                 get_data = {
