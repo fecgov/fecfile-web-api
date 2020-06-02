@@ -635,9 +635,18 @@ export class SchedC1Component implements OnInit, OnChanges {
           amount = amount.toString().replace(/,/g, ``);
         }
         formData[field] = amount;
-      }  else if (field === 'loan_incurred_date' || field === 'loan_due_date') {
+      }  else if (field === 'loan_incurred_date') {
         formData[field] = this._utilService.formatDate(this.c1Form.get(field).value);
-      } else if (field === 'treasurer_last_name' ||
+      } else if(field === 'loan_due_date'){
+        let temp = new Date(this.c1Form.get(field).value);
+          if (isNaN(temp.getTime())) {
+            formData[field] = this.c1Form.get(field).value;
+          }
+          else {
+            formData[field] = this._utilService.formatDate(this.c1Form.get(field).value);
+          }
+      }
+      else if (field === 'treasurer_last_name' ||
       field === 'treasurer_first_name' ||
       field === 'authorized_last_name' ||
       field === 'authorized_first_name') {
