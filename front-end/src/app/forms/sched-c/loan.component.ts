@@ -1213,6 +1213,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       this._patchForm(loanData, 'election_code');
       this._patchForm(loanData, 'election_other_description');
       this._patchForm(loanData, 'loan_incurred_date');
+      this._patchForm(loanData, 'memo_text');
       let element : any = document.getElementById('loan_due_date');
       if(loanData.loan_due_date){
         this.setInputType(loanData, element);
