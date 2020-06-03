@@ -6,11 +6,16 @@ import {DialogService} from '../../shared/services/DialogService/dialog.service'
 import {ConfirmModalComponent, ModalHeaderClassEnum} from '../../shared/partials/confirm-modal/confirm-modal.component';
 import {SortService} from './service/sort-service/sort.service';
 import {IAccount} from '../../account/account';
+import {AuthService} from '../../shared/services/AuthService/auth.service';
 
 export const roleDesc = {
-  readonly: 'Can only view data, and cannot perform any other functions.',
-  admin : 'Has all the access except managing users',
-  entry : 'Has access to enter, edit and delete information, but cannot upload reports or create other users.'
+  reviewer: 'This role can only view data in all forms and schedules',
+  admin : 'This role can add/edit/delete data in all forms and schedules and file reports.',
+  editor : 'This role can add/edit/delete data in all forms and schedules.',
+  c_admin: 'This role can add/edit/delete data in all forms and schedules, file reports and create new users and is based on the person, ' +
+          'email address and phone number filed officially in the Form 1 for this committee. There is only 1 Committee Administrator.',
+  bc_admin: 'This role can add/edit/delete data in all forms and schedules, file reports and create new users and is created by the ' +
+      'Committee Administrator. There is only 1 Backup Committee Administrator.'
 };
 
 @Component({
@@ -32,6 +37,7 @@ export class ManageUserComponent implements OnInit {
       private _fb: FormBuilder,
       private _userService: ManageUserService,
       private _dialogService: DialogService,
+      public _authService: AuthService,
   ) {
     this.frmAddUser = _fb.group({
       role: ['', Validators.required],

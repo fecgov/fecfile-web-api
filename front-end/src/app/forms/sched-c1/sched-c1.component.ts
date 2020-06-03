@@ -85,7 +85,16 @@ export class SchedC1Component implements OnInit, OnChanges {
       this.c1Form.patchValue({ loan_amount: this._decimalPipe.transform(res.loan_amount_original, '.2-2') });
       this.c1Form.patchValue({ loan_intrest_rate: this._decimalPipe.transform(res.loan_intrest_rate, '.2-2')});
       this.c1Form.patchValue({ loan_incurred_date: res.loan_incurred_date });
-      this.c1Form.patchValue({ loan_due_date: res.loan_due_date });
+      let element : any = document.getElementById('loan_due_date');
+      if(res.loan_due_date){
+        let temp = new Date(res.loan_due_date);
+        if (isNaN(temp.getTime())) {
+          this.c1Form.patchValue({ loan_due_date: res.loan_due_date });
+        }
+        else {
+          this.c1Form.patchValue({ loan_due_date: this._utilService.formatDate(res.loan_due_date) });
+        }
+      }
 
       //if edit mode, check if a child c1 exists
       if(this.scheduleAction === ScheduleActions.edit){
@@ -102,6 +111,28 @@ export class SchedC1Component implements OnInit, OnChanges {
 
     });
   }
+
+  // private setInputType(loanData: any, element: HTMLInputElement) {
+  //   let temp = new Date(loanData.loan_due_date);
+  //   if (isNaN(temp.getTime())) {
+  //     if (element) {
+  //       // element.focus();
+  //       // element.type = "text";
+  //       // element.blur();
+  //       this.changeInputType(element,'text');
+  //     }
+  //   }
+  //   else {
+  //     if (element) {
+  //       // element.focus();
+  //       // element.type = "date";
+  //       // element.blur();
+  //       this.changeInputType(element,'date');
+  //     }
+  //   }
+  // }
+
+
   _prepopulateEditFields(c1: any) {
     this.c1Form.patchValue({original_loan_date:c1.original_loan_date});
     this.c1Form.patchValue({is_loan_restructured: c1.is_loan_restructured});
@@ -346,13 +377,7 @@ export class SchedC1Component implements OnInit, OnChanges {
     if (!this._checkFormFieldIsValid('loan_amount')) {
       return false;
     }
-    if (!this._checkFormFieldIsValid('loan_intrest_rate')) {
-      return false;
-    }
     if (!this._checkFormFieldIsValid('loan_incurred_date')) {
-      return false;
-    }
-    if (!this._checkFormFieldIsValid('loan_due_date')) {
       return false;
     }
     return true;
@@ -517,10 +542,10 @@ export class SchedC1Component implements OnInit, OnChanges {
       state: new FormControl({ value: '', disabled: true }),
       zip: new FormControl(null, [Validators.required, Validators.maxLength(9)]),
       loan_amount: new FormControl(null, [Validators.required, validateAmount()]),
-      loan_intrest_rate: new FormControl(null, [Validators.required]),
+      loan_intrest_rate: new FormControl(null, []),
       loan_incurred_date: new FormControl(null, [Validators.required]),
       original_loan_date: new FormControl(null, []),
-      loan_due_date: new FormControl(null, [Validators.required]),
+      loan_due_date: new FormControl(null, []),
       is_loan_restructured: new FormControl(null, [Validators.required]),
       credit_amount_this_draw: new FormControl(null, [validateAmount()]),
       total_outstanding_balance: new FormControl(null, [validateAmount()]),
@@ -621,9 +646,12 @@ export class SchedC1Component implements OnInit, OnChanges {
           amount = amount.toString().replace(/,/g, ``);
         }
         formData[field] = amount;
-      }  else if (field === 'loan_incurred_date' || field === 'loan_due_date') {
+      }  else if (field === 'loan_incurred_date') {
         formData[field] = this._utilService.formatDate(this.c1Form.get(field).value);
-      } else if (field === 'treasurer_last_name' ||
+      } else if(field === 'loan_due_date'){
+        formData[field] = this.c1Form.get(field).value;
+      }
+      else if (field === 'treasurer_last_name' ||
       field === 'treasurer_first_name' ||
       field === 'authorized_last_name' ||
       field === 'authorized_first_name') {
@@ -654,6 +682,17 @@ export class SchedC1Component implements OnInit, OnChanges {
     }
     formData['back_ref_transaction_id'] = this.transactionDetail.transactionId;
   }
+/* 
+  private setLoanDueDateFormat(field: string, formData: any) {
+    let temp = new Date(this.c1Form.get(field).value);
+    if (isNaN(temp.getTime())) {
+      formData[field] = this.c1Form.get(field).value;
+    }
+    else {
+      formData[field] = this.c1Form.get(field).value;
+      // formData[field] = this._utilService.formatDate(this.c1Form.get(field).value);
+    }
+  } */
 
   public uploadFile() {
     // TODO add file to form
@@ -661,7 +700,9 @@ export class SchedC1Component implements OnInit, OnChanges {
   }
 
   private _clearFormValues() {
-    this.c1Form.reset();
+    if(this.c1Form){
+      this.c1Form.reset();
+    }
   }
 
   // type ahead start

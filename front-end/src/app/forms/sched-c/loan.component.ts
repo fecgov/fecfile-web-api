@@ -88,6 +88,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   reportId: any;
   formView: boolean = false;
   routesSubscription: Subscription;
+  dueDateType: string = 'date';
   constructor(
     private _loansService: LoanService,
     private _config: NgbTooltipConfig,
@@ -162,6 +163,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     this._setEntityTypeDefault();
+    this.setInputType(null,document.getElementById('loan_due_date'));
   }
 
   private _setEntityTypeDefault() {
@@ -565,8 +567,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           */
          return this._typeaheadService.getContacts(searchText, 'last_name')
           .map(contacts => {
-            let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
-            return (f.length > 0) ? f : null;
+            if(contacts){
+              let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
+              return (f.length > 0) ? f : null;
+            }
+            else{
+              return null;
+            }
           });
 
         } else {
@@ -604,8 +611,13 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
           */
          return this._typeaheadService.getContacts(searchText, 'first_name')
           .map(contacts => {
-            let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
-            return (f.length > 0) ? f : null;
+            if(contacts){
+              let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
+              return (f.length > 0) ? f : null;
+            }
+            else{
+              return null;
+            }
           });
         } else {
           return Observable.of([]);
@@ -675,8 +687,12 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
 
           return this._typeaheadService.getContacts(searchText, 'entity_name')
             .map(contacts => {
-              let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
-              return (f.length > 0) ? f : null;
+              if(contacts){
+                let f = contacts.filter(con => con.entity_type === 'IND' || con.entity_type === 'ORG');
+                return (f.length > 0) ? f : null;
+              }else{
+                return null;
+              }
             });
         } else {
           return Observable.of([]);
@@ -1213,6 +1229,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
       this._patchForm(loanData, 'election_code');
       this._patchForm(loanData, 'election_other_description');
       this._patchForm(loanData, 'loan_incurred_date');
+      this._patchForm(loanData, 'memo_text');
       let element : any = document.getElementById('loan_due_date');
       if(loanData.loan_due_date){
         this.setInputType(loanData, element);
@@ -1233,15 +1250,31 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setInputType(loanData: any, element: any) {
-    let temp = new Date(loanData.loan_due_date);
-    if (isNaN(temp.getTime())) {
-      if (element) {
-        element.type = "text";
+    let value :string = null;
+    let temp = null;
+    if(loanData && loanData.loan_due_date){
+      value = loanData.loan_due_date;
+      temp = new Date(loanData.loan_due_date);
+      if (isNaN(temp.getTime())) {
+        if (element) {
+          element.type = "text";
+          element.value = value;
+          this.dueDateType = "text";
+        }
+      }
+      else {
+        if (element) {
+          element.type = "date";
+          this.dueDateType = "date";
+          element.value = value;
+        }
       }
     }
-    else {
-      if (element) {
+    else{
+      if(element){
         element.type = "date";
+        this.dueDateType = "date";
+        element.value = value;
       }
     }
   }
