@@ -44,9 +44,6 @@
           class="border border-light">
         </ng-select>
       </div>
-      <div class="d-flex ml-3 my-2" *ngIf="!showPageSizes()">
-        <div class="d-inline mr-1 my-auto text-muted">No record found</div>
-      </div>
       <div *ngIf="showPageSizes() && (isTransactionViewActive() || isRecycleBinViewActive())" class="transactions__item-range mr-2">
         {{determineItemRange()}} of {{config.totalItems}}
       </div>
@@ -1153,6 +1150,9 @@
           class="border border-light">
         </ng-select>
       </div>
+    </div>
+    <div *ngIf="!showPageSizes()" class="d-flex justify-content-center reports__table-pagination-container">
+      <div class="text-muted">No records found</div>
     </div>
   </ng-container>
   <div bsModal #columnOptionsModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog"

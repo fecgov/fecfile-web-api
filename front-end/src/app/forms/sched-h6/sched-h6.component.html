@@ -139,9 +139,6 @@
                 [ngModelOptions]="{standalone: true}">
               </ng-select>
             </div>
-            <div class="d-flex ml-3 my-2" *ngIf="!showPageSizes()">
-              <div class="d-inline mr-1 my-auto text-muted">No record found</div>
-            </div>
             <div class="sched-h6__item-range" *ngIf="showPageSizes()">
               {{determineItemRange()}} of {{config.totalItems}}
             </div>
@@ -295,6 +292,9 @@
                 [ngModelOptions]="{standalone: true}">
               </ng-select>
             </div>
+          </div>
+          <div *ngIf="!showPageSizes()" class="d-flex justify-content-center reports__table-pagination-container">
+            <div class="text-muted">No records found</div>
           </div>
         </ng-container>
       </div>
