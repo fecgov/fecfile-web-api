@@ -88,6 +88,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   reportId: any;
   formView: boolean = false;
   routesSubscription: Subscription;
+  dueDateType: string = 'date';
   constructor(
     private _loansService: LoanService,
     private _config: NgbTooltipConfig,
@@ -162,6 +163,7 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     this._setEntityTypeDefault();
+    this.setInputType(null,document.getElementById('loan_due_date'));
   }
 
   private _setEntityTypeDefault() {
@@ -1248,15 +1250,31 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private setInputType(loanData: any, element: any) {
-    let temp = new Date(loanData.loan_due_date);
-    if (isNaN(temp.getTime())) {
-      if (element) {
-        element.type = "text";
+    let value :string = null;
+    let temp = null;
+    if(loanData && loanData.loan_due_date){
+      value = loanData.loan_due_date;
+      temp = new Date(loanData.loan_due_date);
+      if (isNaN(temp.getTime())) {
+        if (element) {
+          element.type = "text";
+          element.value = value;
+          this.dueDateType = "text";
+        }
+      }
+      else {
+        if (element) {
+          element.type = "date";
+          this.dueDateType = "date";
+          element.value = value;
+        }
       }
     }
-    else {
-      if (element) {
+    else{
+      if(element){
         element.type = "date";
+        this.dueDateType = "date";
+        element.value = value;
       }
     }
   }
