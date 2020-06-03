@@ -87,9 +87,13 @@ export class SchedC1Component implements OnInit, OnChanges {
       this.c1Form.patchValue({ loan_incurred_date: res.loan_incurred_date });
       let element : any = document.getElementById('loan_due_date');
       if(res.loan_due_date){
-        this.setInputType(res, element);
-        this.c1Form.patchValue({ loan_due_date: res.loan_due_date });
-        // this._patchForm(loanData, 'loan_due_date');
+        let temp = new Date(res.loan_due_date);
+        if (isNaN(temp.getTime())) {
+          this.c1Form.patchValue({ loan_due_date: res.loan_due_date });
+        }
+        else {
+          this.c1Form.patchValue({ loan_due_date: this._utilService.formatDate(res.loan_due_date) });
+        }
       }
 
       //if edit mode, check if a child c1 exists
@@ -108,19 +112,26 @@ export class SchedC1Component implements OnInit, OnChanges {
     });
   }
 
-  private setInputType(loanData: any, element: any) {
-    let temp = new Date(loanData.loan_due_date);
-    if (isNaN(temp.getTime())) {
-      if (element) {
-        element.type = "text";
-      }
-    }
-    else {
-      if (element) {
-        element.type = "date";
-      }
-    }
-  }
+  // private setInputType(loanData: any, element: HTMLInputElement) {
+  //   let temp = new Date(loanData.loan_due_date);
+  //   if (isNaN(temp.getTime())) {
+  //     if (element) {
+  //       // element.focus();
+  //       // element.type = "text";
+  //       // element.blur();
+  //       this.changeInputType(element,'text');
+  //     }
+  //   }
+  //   else {
+  //     if (element) {
+  //       // element.focus();
+  //       // element.type = "date";
+  //       // element.blur();
+  //       this.changeInputType(element,'date');
+  //     }
+  //   }
+  // }
+
 
   _prepopulateEditFields(c1: any) {
     this.c1Form.patchValue({original_loan_date:c1.original_loan_date});
@@ -638,13 +649,7 @@ export class SchedC1Component implements OnInit, OnChanges {
       }  else if (field === 'loan_incurred_date') {
         formData[field] = this._utilService.formatDate(this.c1Form.get(field).value);
       } else if(field === 'loan_due_date'){
-        let temp = new Date(this.c1Form.get(field).value);
-          if (isNaN(temp.getTime())) {
-            formData[field] = this.c1Form.get(field).value;
-          }
-          else {
-            formData[field] = this._utilService.formatDate(this.c1Form.get(field).value);
-          }
+        formData[field] = this.c1Form.get(field).value;
       }
       else if (field === 'treasurer_last_name' ||
       field === 'treasurer_first_name' ||
@@ -677,6 +682,17 @@ export class SchedC1Component implements OnInit, OnChanges {
     }
     formData['back_ref_transaction_id'] = this.transactionDetail.transactionId;
   }
+/* 
+  private setLoanDueDateFormat(field: string, formData: any) {
+    let temp = new Date(this.c1Form.get(field).value);
+    if (isNaN(temp.getTime())) {
+      formData[field] = this.c1Form.get(field).value;
+    }
+    else {
+      formData[field] = this.c1Form.get(field).value;
+      // formData[field] = this._utilService.formatDate(this.c1Form.get(field).value);
+    }
+  } */
 
   public uploadFile() {
     // TODO add file to form
