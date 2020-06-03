@@ -103,7 +103,7 @@
                     " id="typeahead-template-entity-name" [ngbTypeahead]="searchOrg" [resultTemplate]="rtOrg"
                       [focusFirst]=false [inputFormatter]="formatterOrgName" (selectItem)="handleSelectedOrgItem($event)" />
                       <input *ngIf="col?.name === 'loan_due_date'" class="form-control" [style.width]="col?.width"
-                        [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                        [style.height]="col?.height" [attr.type]="dueDateType" [attr.name]="col?.name"
                         [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
                         [ngClass]="
                         frmLoan.get(col?.name)?.invalid &&
