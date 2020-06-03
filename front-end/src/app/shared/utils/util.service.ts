@@ -195,7 +195,13 @@ export class UtilService {
           items = response.items;
         }
       } 
-      const numberOfPages = config.totalItems > config.itemsPerPage ? Math.round(config.totalItems / config.itemsPerPage) : 1;
+      let numberOfPages = 1;
+      if (config.totalItems > config.itemsPerPage) { 
+        numberOfPages = Math.floor(config.totalItems / config.itemsPerPage);
+        if (numberOfPages * config.itemsPerPage < config.totalItems) {
+          numberOfPages++;
+        }
+      }
       if (numberOfPages === 1) {
         config.currentPage = 1;
       }
@@ -224,7 +230,13 @@ export class UtilService {
     let end = 0;
     config.currentPage = this.isNumber(config.currentPage) ? config.currentPage : 1;
     if (config.currentPage > 0 && config.itemsPerPage > 0 && items.length > 0) {
-      const numberOfPages = config.totalItems > config.itemsPerPage ? Math.round(config.totalItems / config.itemsPerPage) : 1;
+      let numberOfPages = 1;
+      if (config.totalItems > config.itemsPerPage) { 
+        numberOfPages = Math.floor(config.totalItems / config.itemsPerPage);
+        if (numberOfPages * config.itemsPerPage < config.totalItems) {
+          numberOfPages++;
+        }
+      }
       if (config.currentPage === numberOfPages) {
         end = config.totalItems;
         start = (config.currentPage - 1) * config.itemsPerPage + 1;
