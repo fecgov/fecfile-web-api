@@ -417,7 +417,7 @@
       },
       {
         "colClassName": "col col-md-5",
-        "seperator": false,
+        "seperator": true,
         "cols": [
           {
             "isReadonly": false,
@@ -456,6 +456,33 @@
             "validation": {
               "required": false,
               "max": 4,
+              "alphaNumeric": true
+            }
+          }
+        ]
+      },
+      {
+        "colClassName": "col col-md-5",
+        "seperator": false,
+        "cols": [
+          {
+            "isReadonly": false,
+            "entityGroup": null,
+            "toggle": false,
+            "inputGroup": false,
+            "inputIcon": "",
+            "text": "Memo Text",
+            "infoIcon": true,
+            "infoText": "Request language from RAD",
+            "name": "memo_text",
+            "type": "text",
+            "value": null,
+            "scroll": true,
+            "height": "30px",
+            "width": "380px",
+            "validation": {
+              "required": false,
+              "max": 100,
               "alphaNumeric": true
             }
           }
@@ -739,7 +766,7 @@
       },
       {
         "colClassName": "col col-md-5",
-        "seperator": false,
+        "seperator": true,
         "cols": [
           {
             "isReadonly": false,
@@ -778,6 +805,33 @@
             "validation": {
               "required": false,
               "max": 4,
+              "alphaNumeric": true
+            }
+          }
+        ]
+      },
+      {
+        "colClassName": "col col-md-5",
+        "seperator": false,
+        "cols": [
+          {
+            "isReadonly": false,
+            "entityGroup": null,
+            "toggle": false,
+            "inputGroup": false,
+            "inputIcon": "",
+            "text": "Memo Text",
+            "infoIcon": true,
+            "infoText": "Request language from RAD",
+            "name": "memo_text",
+            "type": "text",
+            "value": null,
+            "scroll": true,
+            "height": "30px",
+            "width": "380px",
+            "validation": {
+              "required": false,
+              "max": 100,
               "alphaNumeric": true
             }
           }

@@ -3,7 +3,7 @@ export class UserModel {
     lastName: string;
     email: string;
     role: string;
-    status: boolean;
+    status: string;
     id: number;
     contact: string;
     isActive: boolean;
@@ -13,7 +13,8 @@ export class UserModel {
         this.lastName = user.last_name ? user.last_name : '';
         this.email = user.email ? user.email : '';
         this.role = user.role ? user.role : '';
-        this.status = user.is_active ? true : false;
+        // TODO: Yet to implement
+        this.status = 'Pending';
         this.id = user.id ? user.id : 0;
         this.contact = user.contact ? user.contact : '';
         this.isActive = user.is_active ? true : false;
