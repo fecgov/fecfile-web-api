@@ -3807,44 +3807,17 @@ def schedH4(request):
                 return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
             except NoOPError as e:
                 logger.debug(e)
-                forms_obj = []
+                #: updated the return status to 200 with null object for testing
+                forms_obj = {
+                    "items": "",
+                    "totalItems": "",
+                    "itemsPerPage": "",
+                    "pageNumber": "",
+                    "totalPages": "",
+                }
                 return JsonResponse(
-                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                forms_obj, status=status.HTTP_200_OK, safe=False
                 )
-            except Exception as e:
-                logger.debug(e)
-                return Response(
-                    "The schedH4 API - GET is throwing an error: " + str(e),
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            datum = get_schedH4(data)
-
-            json_result = get_pagination_dataset(datum, itemsperpage, page_num)
-            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            #: updated the return status to 200 with null object for testing
-            forms_obj = {
-                "items": "",
-                "totalItems": "",
-                "itemsPerPage": "",
-                "pageNumber": "",
-                "totalPages": "",
-            }
-            return JsonResponse(
-             forms_obj, status=status.HTTP_200_OK, safe=False
-             )
-            #return JsonResponse(
-            #     forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            # )
-
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH4 API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         elif request.method == "DELETE":
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
@@ -5327,7 +5300,7 @@ def schedH6(request):
 
         elif request.method == "GET":
             try:
-            #: Get the request parameters and set for Pagination
+                #: Get the request parameters and set for Pagination
                 query_params = request.query_params
                 page_num = get_int_value(query_params.get("page"))
 
@@ -5362,41 +5335,25 @@ def schedH6(request):
                     data["report_id"] = check_report_id(
                         request.query_params.get("report_id")
                 )
-            except Exception as e:
+
+                datum = get_schedH6(data)
+
+                #: update for pagination
+                json_result = get_pagination_dataset(datum, itemsperpage, page_num)
+                return Response(json_result, status=status.HTTP_200_OK)
+            except NoOPError as e:
                 logger.debug(e)
-                return Response(
-                    "The schedH6 API - GET is throwing an error: " + str(e),
-                    status=status.HTTP_400_BAD_REQUEST,
+                #: tobe removed after development testing for 
+                forms_obj =  {
+                    "transactions": "",
+                    "totaltransactionsCount": "",
+                    "itemsPerPage": "",
+                    "pageNumber": "",
+                    "totalPages": "",
+                }
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_200_OK, safe=False
                 )
-            datum = get_schedH6(data)
-
-            #: update for pagination
-            json_result = get_pagination_dataset(datum, itemsperpage, page_num)
-            return Response(json_result, status=status.HTTP_200_OK)
-
-        except NoOPError as e:
-            logger.debug(e)
-            #: tobe removed after development testing for 
-            forms_obj =  {
-                "transactions": "",
-                "totaltransactionsCount": "",
-                "itemsPerPage": "",
-                "pageNumber": "",
-                "totalPages": "",
-            }
-            return JsonResponse(
-                forms_obj, status=status.HTTP_200_OK, safe=False
-            )
-            # return JsonResponse(
-            #     forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            # )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH6 API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         elif request.method == "DELETE":
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
