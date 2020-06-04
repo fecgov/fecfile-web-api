@@ -99,7 +99,9 @@ def check_columns_f1M(step):
 			key_list = ['report_id']
 		elif step == 'saveDates':
 			key_list = ['report_id', 'date_51', 'orig_date', 'metreq_date']
-		elif step == 'saveSignatureAndEmail' or step == 'submit':
+		elif step == 'saveSignatureAndEmail':
+			key_list = ['report_id']
+		elif step == 'submit':
 			key_list = ['report_id', 'sign_id', 'sign_date']
 		elif step == 'None':
 			key_list = ['report_id']
@@ -709,7 +711,7 @@ def form1M(request):
 
 			# both step4 POST
 			elif step == 'saveSignatureAndEmail':
-				noneCheckMissingParameters(['sign', 'submission_date', 'reportId'],
+				noneCheckMissingParameters(['reportId'],
 					checking_dict=request.data, value_dict=request.data,
 					function_name='form1M-POST: step-4 SAVE')
 				request_dict = f1m_sql_dict(cmte_id, step, request.data)
@@ -720,7 +722,6 @@ def form1M(request):
 
 			# both step4 POST
 			elif step == 'submit':
-
 				noneCheckMissingParameters(['sign', 'submission_date', 'reportId'], 
 					checking_dict=request.data, value_dict=request.data, 
 					function_name='form1M-POST: step-4 SUBMIT')
@@ -809,7 +810,7 @@ def form1M(request):
 
 				# both step4 PUT
 				elif step == 'saveSignatureAndEmail':
-					noneCheckMissingParameters(['sign', 'submission_date', 'reportId'],
+					noneCheckMissingParameters(['reportId'],
 						checking_dict=request.data, value_dict=request.data,
 						function_name='form1M-PUT: step-4 SAVE')
 					request_dict = f1m_sql_dict(cmte_id, step, request.data)
