@@ -2,7 +2,7 @@
   <form [formGroup]="frmReportType" (ngSubmit)="doValidateReportType()" (blur)="doValidateReportType()">
     <header>
       <div class="header-content mb-3">
-        <div class="float-left">
+        <div class="float-left" *ngIf="!reportEditMode">
           <h1>
             Report Type
             <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">
@@ -13,10 +13,23 @@
             </button>
           </h1>
         </div>
+        <div class="float-left" *ngIf="reportEditMode">
+          <h1>
+            Edit Report Type: {{currentReportDescription}}
+            <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">
+              <i class="info-icon" aria-hidden="true"></i>
+              <span class="sr-only">
+                Click for more information
+              </span>
+            </button>
+          </h1>
+      </div>
       </div>
     </header>
     <section>
       <div class="form-content">
+        <div class="grid-row">
+        </div>
         <div class="grid-row">
           <div class="grid-row__col grid-row__col--12">
             <div class="text-error text-center" *ngIf="(frmReportType.dirty || frmReportType.touched) && optionFailed">
@@ -26,15 +39,15 @@
               class="text-error text-center"
               *ngIf=" formType === '3X' &&
                 (frmReportType.dirty || frmReportType.touched) &&
-                !optionFailed &&
                 (!fromDateSelected || !toDateSelected)
               "
             >
               You must select coverage dates.
             </div>
-            <div class="text-error text-center" *ngIf="(frmReportType.dirty || frmReportType.touched) && invalidDates">
-              Entered date is outside of the report coverage period. Please enter transactions for this coverage period
-              only.
+            <div class="text-error text-center" *ngIf="(frmReportType.dirty || frmReportType.touched) && invalidDatesServerValidation">
+              <!-- Entered date is outside of the report coverage period. Please enter transactions for this coverage period
+              only. -->
+              Entered Start and End dates overlap with an already existing report's coverage dates. Please select valid dates and try again. 
             </div>
             <ng-template #nextErrors>
               <div *ngIf="customFormValidation.error">
@@ -46,8 +59,7 @@
           </div>
         </div>
         <ul class="options-list">
-          <li class="options-list__item pl-0" *ngFor="let committeeReportType of committeeReportTypes; let i = index"
-          (click)="optionsListClick(committeeReportType.report_type)">
+          <li class="options-list__item pl-0" *ngFor="let committeeReportType of committeeReportTypes; let i = index">
             <label
               class="child-options-label"
               style="font-family: Karla, sans-serif !important"
@@ -76,13 +88,26 @@
       </div>
     </section>
     <footer class="container-fluid">
-      <div class="grid-row">
+      <!-- While adding new report -->
+      <div class="grid-row" *ngIf="!reportEditMode">
         <div class="grid-row__col grid-row__col--11 forms__btn-container">
           <button class="btn btn-previous btn-left" type="button" (click)="cancel()">
             Cancel
           </button>
           <button class="btn btn-primary btn-right" type="submit">
             Next
+          </button>
+        </div>
+      </div>
+
+      <!-- While editing existing report -->
+      <div class="grid-row" *ngIf="reportEditMode">
+        <div class="grid-row__col grid-row__col--11 forms__btn-container">
+          <button class="btn btn-previous btn-left" type="button" (click)="cancelAndReturnToReport()">
+            Cancel
+          </button>
+          <button class="btn btn-primary btn-right" type="submit">
+            Update
           </button>
         </div>
       </div>

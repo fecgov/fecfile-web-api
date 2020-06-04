@@ -1322,6 +1322,23 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       });
   }
 
+  public checkIfOrphanTransaction(trx){
+    if(trx && (trx.reportId === '99999' || trx.reportId === 99999)){
+      this._dialogService
+        .confirm(
+          'This transaction is not tied to any report currently. Please modify coverage dates to link this transaction to a report to continue',
+          ConfirmModalComponent,
+          'Warning',
+          false,
+          ModalHeaderClassEnum.warningHeader,
+        )
+        .then(res => {
+          if (res === 'okay') {
+          } 
+        });
+    }
+  }
+
   /**
    * Determine the item range shown by the server-side pagination.
    */

@@ -1714,7 +1714,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                     COALESCE(t1.loan_amount, 0.0) AS "loanAmount",
                     COALESCE(t1.loan_intrest_rate, ''0.0'') AS "loanInterestRate",
                     COALESCE(to_char(t1.loan_incurred_date,''MM/DD/YYYY''), '''') AS "loanIncurredDate",
-                    COALESCE(to_char(t1.loan_due_date,''MM/DD/YYYY''), '''') AS "loanDueDate",
+                    COALESCE(t1.loan_due_date, '''') AS "loanDueDate",
                     COALESCE(t1.is_loan_restructured, '''') AS "isLoanRestructured",
                     COALESCE(to_char(t1.original_loan_date,''MM/DD/YYYY''), '''') AS "originalLoanDate",
                     COALESCE(t1.credit_amount_this_draw, 0.0) AS "creditAmountThisDraw",

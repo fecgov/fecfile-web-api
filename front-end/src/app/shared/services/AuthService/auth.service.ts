@@ -62,19 +62,7 @@ export class AuthService {
         const sessionData = this._session.getSession();
         if (sessionData) {
             const decodedAccessToken = jwt_decode(sessionData);
-            if (decodedAccessToken.role === Roles.Upload || decodedAccessToken.role === Roles.ReadOnly) {
-                return true;
-            }
-            return false;
-        }
-        this.destroySession();
-    }
-
-    public isUploader(): boolean {
-        const sessionData = this._session.getSession();
-        if (sessionData) {
-            const decodedAccessToken = jwt_decode(sessionData);
-            if (decodedAccessToken.role === Roles.Upload) {
+            if (decodedAccessToken.role === Roles.Reviewer) {
                 return true;
             }
             return false;
@@ -87,6 +75,18 @@ export class AuthService {
         if (sessionData) {
             const decodedAccessToken = jwt_decode(sessionData);
             if (decodedAccessToken.role === Roles.CommitteeAdmin) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        this.destroySession();
+    }
+    public isBackupCommitteeAdmin(): boolean {
+        const sessionData = this._session.getSession();
+        if (sessionData) {
+            const decodedAccessToken = jwt_decode(sessionData);
+            if (decodedAccessToken.role === Roles.BackupCommitteeAdmin) {
                 return true;
             } else {
                 return false;

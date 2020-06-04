@@ -23,7 +23,7 @@
                 <h4>Website :</h4> {{accounts?.website ? accounts.website: 'NA'}}
             </div>
             <div class="col-md-3">
-                <h4>Telephone:</h4> {{accounts?.phone_number? phoneNumber(accounts?.phone_number): ' NA'}}
+                <h4>Telephone:</h4> {{accounts?.treasurerphone? phoneNumber(accounts?.treasurerphone): ' NA'}}
             </div>
             <div class="col-md-3">
                 <h4> Facsimile: </h4>{{accounts?.fax? phoneNumber(accounts?.fax) :  'NA'}}<br>
@@ -39,37 +39,57 @@
                     <h3>Role</h3> <br>
                 </div>
                 <div class="row">
+                    <div class="col col-md-2" *ngIf="_authService.isCommitteeAdmin()">
+                        <label [ngClass]="
+                        frmAddUser.get('role')?.invalid &&
+                        (frmAddUser.touched)
+                          ? 'input-field-label-error'
+                          : ''
+                        ">
+                            <input formControlName="role"
+                                   id="role-bcadmin"
+                                   type="radio"
+                                   value="BC_ADMIN">
+                            Backup Committee Administrator</label>
+                    </div>
                     <div class="col col-md-2">
-                        <label>
+                        <label [ngClass]="
+                        frmAddUser.get('role')?.invalid &&
+                        (frmAddUser.touched)
+                          ? 'input-field-label-error'
+                          : ''
+                        ">
                             <input formControlName="role"
                                    id="role-admin"
                                    type="radio"
                                    value="ADMIN">
-                            Admin</label>
+                            Administrator</label>
                     </div>
                     <div class="col col-md-2">
-                        <label>
+                        <label [ngClass]="
+                        frmAddUser.get('role')?.invalid &&
+                        (frmAddUser.touched)
+                          ? 'input-field-label-error'
+                          : ''
+                        ">
                             <input formControlName="role"
                                    id="role-entry"
                                    type="radio"
-                                   value="ENTRY">
-                            Entry</label>
+                                   value="EDITOR">
+                            Editor</label>
                     </div>
                     <div class="col col-md-2">
-                        <label>
-                            <input formControlName="role"
-                                   id="role-uploader"
-                                   type="radio"
-                                   value="UPLOADER">
-                            Uploader</label>
-                    </div>
-                    <div class="col col-md-2">
-                        <label>
+                        <label [ngClass]="
+                        frmAddUser.get('role')?.invalid &&
+                        (frmAddUser.touched)
+                          ? 'input-field-label-error'
+                          : ''
+                        ">
                             <input formControlName="role"
                                    id="role-read-only"
                                    type="radio"
-                                   value="READONLY">
-                            Read Only</label>
+                                   value="REVIEWER">
+                            Reviewer</label>
                     </div>
                 </div>
             </div>
@@ -132,42 +152,49 @@
                                                : ''">
                                     </td>
                                 </tr>
+                                <tr>
+                                        <td>
+                                        <button (click)="addUser()"
+                                                class="btn btn-primary">
+                                            {{!isEdit ? 'Add User' : 'Save'}}
+                                        </button> &nbsp;
+                                        </td>
+                                        <td>
+                                        <button  (click)="clearForm()"
+                                                 class="btn btn-secondary-dark-gray">
+                                            Clear Form
+                                        </button>
+                                        </td>
+                                </tr>
                             </table>
                         </td>
                         <td class="role-desc" >
+                            <b>Committee Administrator</b>
+                            <ul>
+                                <li>{{_roleDesc.c_admin}}</li>
+                            </ul>
+                            <b>Backup Committee Administrator</b>
+                            <ul>
+                                <li>{{_roleDesc.bc_admin}}</li>
+                            </ul>
                             <b>Administrator</b>
                                 <ul>
                                     <li>{{_roleDesc.admin}}</li>
                                 </ul>
-                            <b>Entry</b>
+                            <b>Editor</b>
                             <ul>
-                                 <li>{{_roleDesc.entry}}</li>
+                                 <li>{{_roleDesc.editor}}</li>
                             </ul>
-                            <b>Uploader</b>
-                            <ul>
-                                <li>{{_roleDesc.uploader}}</li>
-                            </ul>
-                            <b>Read Only</b>
+                            <b>Reviewer</b>
                             <ul>
                                <li>
-                                   {{_roleDesc.readonly}}
+                                   {{_roleDesc.reviewer}}
                                 </li>
                             </ul>
                         </td>
                     </tr>
                 </tbody>
             </table>
-
-            <div style="padding-left: 35px;">
-                <button (click)="addUser()"
-                    class="btn btn-primary">
-                   {{!isEdit ? 'Add User' : 'Save'}}
-                </button> &nbsp;
-                <button  (click)="clearForm()"
-                    class="btn btn-secondary-dark-gray">
-                    Clear Form
-                 </button>
-            </div>
         </form>
     </div>
     <hr>
@@ -179,7 +206,8 @@
         <th sortable-column="firstName">First Name</th>
         <th sortable-column="email">Email Address</th>
         <th sortable-column="role">Role</th>
-        <th sortable-column="isActive">Status</th>
+        <th sortable-column="isActive">Active</th>
+        <th sortable-column="status">Status</th>
         <th>Action</th>
         </thead>
         <tbody>
@@ -188,10 +216,11 @@
             <td>{{user.firstName}}</td>
             <td>{{user.email}}</td>
             <td>{{user.role}}</td>
-            <td>{{user.status ? 'Active':'Inactive'}}</td>
+            <td>{{user.isActive ? 'Active':'Inactive'}}</td>
+            <td>{{user.status}}</td>
             <td>
                 <i class="fas fa-edit fa-2x" (click)="editUser(user)"></i>  &nbsp;
-                <i [ngClass]="getStatusClass(user.status)" (click)="toggleStatus(user)"></i> &nbsp;
+                <i [ngClass]="getStatusClass(user.isActive)" (click)="toggleStatus(user)"></i> &nbsp;
                 <i class="fas fa-times-circle fa-2x" (click)="deleteUser(user)"></i>
             </td>
         </tr>

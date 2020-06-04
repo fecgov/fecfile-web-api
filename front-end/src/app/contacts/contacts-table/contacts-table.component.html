@@ -74,7 +74,7 @@
           <div  *ngIf="isRecycleBinViewActive()">
             <button class="btn btn-sm btn-primary contacts__bulk_action_btn" 
               (click)="deleteRecyleBin()"
-              [disabled]="bulkActionDisabled || !_authService.isReadOnly()">
+              [disabled]="bulkActionDisabled || _authService.isReadOnly()">
               <i class="trash-icon"></i>
             </button>
           </div>          

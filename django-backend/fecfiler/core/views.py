@@ -42,11 +42,13 @@ from fecfiler.core.carryover_helper import (
     do_loan_carryover,
     do_debt_carryover,
     do_levin_carryover,
+    do_in_between_report_carryover,
 )
 
 # from fecfiler.core.jsonbuilder import create_f3x_expenditure_json_file, build_form3x_json_file,create_f3x_json_file, create_f3x_partner_json_file,create_f3x_returned_bounced_json_file,create_f3x_reattribution_json_file,create_inkind_bitcoin_f3x_json_file,get_report_info
 
 # Create your views here.
+from ..authentication.authorization import is_read_only_or_filer_reports, is_read_only_or_filer_submit
 
 """
 CREATE OR replace VIEW PUBLIC.dynamic_forms_view AS 
@@ -173,9 +175,11 @@ f3x_col_line_dict = {
 # NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER = ['LOAN_FROM_IND', 'LOAN_FROM_BANK', 'LOAN_OWN_TO_CMTE_OUT', 'IK_OUT', 'IK_BC_OUT',
 #     'PARTY_IK_OUT', 'PARTY_IK_BC_OUT', 'PAC_IK_OUT', 'PAC_IK_BC_OUT', 'IK_TRAN_OUT', 'IK_TRAN_FEA_OUT']
 
+FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS = 99999
+
 logger = logging.getLogger(__name__)
 # aws s3 bucket connection
-conn = boto.connect_s3()
+# conn = boto.connect_s3()
 
 
 class NoOPError(Exception):
@@ -376,27 +380,47 @@ GET REPORT TYPES API- CORE APP - SPRINT 6 - FNE 471 - BY PRAVEEN JINKA
 @api_view(["GET"])
 def get_report_types(request):
     try:
-        with connection.cursor() as cursor:
+        """ Temporarily commented as we are hard coding output using report_types json"""
+        # with connection.cursor() as cursor:
 
-            # report_year = datetime.datetime.now().strftime('%Y')
-            forms_obj = {}
-            cmte_id = get_comittee_id(request.user.username)
-            form_type = request.query_params.get("form_type")
-            cursor.execute(
-                "select report_types_json From public.report_type_and_due_dates_view where cmte_id = %s and form_type = %s",
-                [cmte_id, form_type],
-            )
-            for row in cursor.fetchall():
-                data_row = list(row)
-                forms_obj = json.loads(data_row[0])
+        #     # report_year = datetime.datetime.now().strftime('%Y')
+        #     forms_obj = {}
+        #     cmte_id = get_comittee_id(request.user.username)
+        #     form_type = request.query_params.get("form_type")
+        #     cursor.execute(
+        #         "select report_types_json From public.report_type_and_due_dates_view where cmte_id = %s and form_type = %s",
+        #         [cmte_id, form_type],
+        #     )
+        #     for row in cursor.fetchall():
+        #         data_row = list(row)
+        #         forms_obj = json.loads(data_row[0])
 
-        if not bool(forms_obj):
-            return Response(
-                "No entries were found for the form type: {} for this committee".format(
-                    form_type
-                ),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        # if not bool(forms_obj):
+        #     return Response(
+        #         "No entries were found for the form type: {} for this committee".format(
+        #             form_type
+        #         ),
+        #         status=status.HTTP_400_BAD_REQUEST,
+        #     )
+        cmte_id = get_comittee_id(request.user.username)
+        with open('./fecfiler/core/report_types.json') as f:
+            data = json.load(f)
+
+        # test_date = date_format(request.data.get('test_date'))
+        # print(test_date)
+        # if test_date:
+        #     _year = test_date.year
+        # if test_date <= datetime.date(_year, 1, 31):
+        #     _year -= 1
+
+        _year = datetime.date.today().year
+        if datetime.date.today() <= datetime.date(_year, 1, 31):
+            _year = _year-1
+
+        if _year%2 == 1:
+            odd = True
+        else:
+            odd = False
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -408,13 +432,29 @@ def get_report_types(request):
                 cmte_filing_freq = cmte_filing_freq[0]
 
         if cmte_filing_freq == "Q":
-            reports = forms_obj.get("report_type")
-            for report in reports:
-                if report.get("report_type") == "YE":
-                    report["election_state"][0]["dates"][0]["cvg_start_date"] = (
-                            report["election_state"][0]["dates"][0]["cvg_end_date"][:4]
-                            + "-10-01"
-                    )
+            if odd:
+                parameter = "Quarterly-Non-Election-Year"
+            else:
+                parameter = "Quarterly-Election-Year"
+        else:
+            if odd:
+                parameter = "Monthly-Non-Election-Year"
+            else:
+                parameter = "Monthly-Election-Year"
+
+        forms_obj = data.get(parameter)
+        for report_type in forms_obj['report_type']:
+            for election_state in report_type['election_state']:
+                for dates in election_state['dates']:
+                    if dates.get('cvg_start_date'):
+                        dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
+                    if dates.get('cvg_end_date'):
+                        dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
+                    if dates.get('due_date'):
+                        if "YYYY-01" in dates.get('due_date'):
+                            dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
+                        else:
+                            dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
 
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
@@ -635,7 +675,8 @@ def check_list_cvg_dates(args):
         forms_obj = []
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC",
+                """SELECT report_id, cvg_start_date, cvg_end_date, report_type FROM public.reports 
+                WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC""",
                 [cmte_id, form_type],
             )
             if len(args) == 4:
@@ -655,7 +696,7 @@ def check_list_cvg_dates(args):
                 report_id = args[4]
                 for row in cursor.fetchall():
                     if not (row[1] is None or row[2] is None):
-                        if (cvg_end_dt <= row[2] and cvg_start_dt >= row[1]) and row[
+                        if (cvg_start_dt <= row[2] and row[1] <= cvg_end_dt) and row[
                             0
                         ] != int(report_id):
                             forms_obj.append(
@@ -767,14 +808,14 @@ def check_mandatory_fields_form3x(data):
 **************************************************** FUNCTIONS - REPORT IDS **********************************************************
 """
 
-
 def get_next_report_id():
     try:
         with connection.cursor() as cursor:
             cursor.execute("""SELECT nextval('report_id_seq')""")
             report_ids = cursor.fetchone()
             report_id = report_ids[0]
-
+            if report_id == FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS:
+                report_id = get_next_report_id()
         return report_id
     except Exception:
         raise
@@ -895,8 +936,46 @@ def get_list_report(report_id, cmte_id):
     try:
         with connection.cursor() as cursor:
 
-            query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop, (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, additional_email_2 as additionalEmail2
-                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s"""
+            query_string = """SELECT    rp.cmte_id                    AS cmteid, 
+                                        rp.report_id                  AS reportid, 
+                                        rp.form_type                  AS formtype, 
+                                        ''                            AS electioncode, 
+                                        rp.report_type                AS reporttype, 
+                                        rt.rpt_type_desc              AS reporttypedescription, 
+                                        rt.regular_special_report_ind AS regularspecialreportind, 
+                                        x.state_of_election           AS electionstate, 
+                                        x.date_of_election::date      AS electiondate, 
+                                        rp.cvg_start_date             AS cvgstartdate, 
+                                        rp.cvg_end_date               AS cvgenddate, 
+                                        rp.due_date                   AS duedate, 
+                                        rp.amend_ind                  AS amend_indicator, 
+                                        0                             AS coh_bop, 
+                                        ( 
+                                                SELECT 
+                                                        CASE 
+                                                            WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date 
+                                                            ELSE 0 
+                                                        END ) AS daysuntildue, 
+                                        email_1            AS    email1, 
+                                        email_2            AS    email2, 
+                                        additional_email_1 AS    additionalemail1, 
+                                        additional_email_2 AS    additionalemail2, 
+                                        ( 
+                                                SELECT 
+                                                        CASE 
+                                                            WHEN rp.due_date IS NOT NULL 
+                                                            AND    rp.due_date < now() THEN true 
+                                                            ELSE false 
+                                                        END ) AS overdue 
+                                FROM      PUBLIC.reports rp 
+                                LEFT JOIN form_3x x 
+                                ON        rp.report_id = x.report_id 
+                                LEFT JOIN PUBLIC.ref_rpt_types rt 
+                                ON        rp.report_type=rt.rpt_type 
+                                WHERE     rp.delete_ind IS DISTINCT 
+                                FROM      'Y' 
+                                AND       rp.cmte_id = %s 
+                                AND       rp.report_id = %s"""
 
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""",
@@ -1216,9 +1295,7 @@ def post_reports(data, reportid=None):
                         data.get("cvg_end_dt"),
                         data.get("coh_bop"),
                     )
-                    # print('here3')
-                # print('here3.5')
-                output = get_reports(data)
+                update_transactions_change_cvg_dates(cmte_id, report_id, cvg_start_dt, cvg_end_dt, True)
                 # print('here4')
             except Exception as e:
                 # Resetting Report ID
@@ -1228,7 +1305,7 @@ def post_reports(data, reportid=None):
                 raise Exception(
                     "The post_sql_form3x function is throwing an error: " + str(e)
                 )
-
+            output = get_reports(data)
             return output[0]
         else:
             return forms_obj
@@ -1312,7 +1389,8 @@ def put_reports(data):
                         data.get("report_id"),
                         cmte_id,
                     )
-                output = get_reports(data)
+                update_transactions_change_cvg_dates(cmte_id, report_id, data.get("cvg_start_dt"), prev_cvg_start_dt)
+                update_transactions_change_cvg_dates(cmte_id, report_id, prev_cvg_end_dt, data.get("cvg_end_dt"))
             except Exception as e:
                 put_sql_report(
                     prev_report_type,
@@ -1331,6 +1409,7 @@ def put_reports(data):
                     "The put_sql_form3x function is throwing an error: " + str(e)
                 )
 
+            output = get_reports(data)
             return output[0]
         else:
             return forms_obj
@@ -1361,7 +1440,95 @@ def delete_reports(data):
     except:
         raise
 
+def update_transactions_change_cvg_dates(cmte_id, report_id, present_cvg_start_dt, prev_cvg_start_dt, end_date_include = False):
+    try:
+        logger.debug('update_transactions_change_cvg_dates function STARTED...')
+        if isinstance(present_cvg_start_dt, str):
+            present_cvg_start_dt = datetime.datetime.strptime(present_cvg_start_dt, "%Y-%m-%d").date()
+        if isinstance(prev_cvg_start_dt, str):
+            prev_cvg_start_dt = datetime.datetime.strptime(prev_cvg_start_dt, "%Y-%m-%d").date()
+        param_string = "AND transaction_date >= %s AND transaction_date {} %s AND report_id = %s".format("<=" if end_date_include else "<")
+        if present_cvg_start_dt > prev_cvg_start_dt:
+            new_report_id = FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS
+            current_report_id = report_id
+            value_list = [prev_cvg_start_dt, present_cvg_start_dt, current_report_id]
+        elif prev_cvg_start_dt > present_cvg_start_dt:
+            new_report_id = report_id
+            current_report_id = FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS
+            value_list = [present_cvg_start_dt, prev_cvg_start_dt, current_report_id]
+        else:
+            value_list = None
 
+        if value_list:
+            logger.debug("""Finding transactions between {} and {} in curret report: {}. 
+                            updating to new report id: {}""".format(value_list[0], value_list[1], value_list[2], new_report_id))
+
+            _sql = """WITH x AS (SELECT transaction_id FROM public.all_transactions_view WHERE (back_ref_transaction_id IS NULL OR back_ref_transaction_id like %s)
+                      AND memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' {0} AND cmte_id = %s 
+                      AND transaction_table NOT IN ('sched_d', 'sched_h1', 'sched_h2', 'sched_h3', 'sched_h5', 'sched_l'))
+
+                      SELECT transaction_id FROM x
+                      UNION
+                      SELECT v2.transaction_id FROM public.all_transactions_view v2 WHERE v2.back_ref_transaction_id IN (SELECT transaction_id FROM x
+                      WHERE transaction_id NOT LIKE %s)
+                      AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s
+                      UNION
+                      SELECT v3.transaction_id FROM public.sched_c2 v3 WHERE v3.back_ref_transaction_id IN (SELECT transaction_id FROM x
+                      WHERE transaction_id NOT LIKE %s)
+                      AND delete_ind IS DISTINCT FROM 'Y' AND cmte_id = %s
+                      UNION
+                      SELECT transaction_id FROM public.all_transactions_view WHERE back_ref_transaction_id IS NOT NULL AND cmte_id = %s 
+                      AND delete_ind IS DISTINCT FROM 'Y' {0} 
+                      AND transaction_table IN ('sched_h3', 'sched_h5')""".format(param_string)
+            _value_list = ['SC%']
+            _value_list.extend(value_list)
+            _value_list.extend([cmte_id, 'SC%', cmte_id, 'SC%', cmte_id, cmte_id])
+            _value_list.extend(value_list)
+            with connection.cursor() as cursor:
+                    cursor.execute(_sql, _value_list)
+                    transactions_list =  cursor.fetchall()
+            if transactions_list:
+                update_tran_list = []
+                for transaction in transactions_list:
+                    update_tran_list.append(transaction[0])
+                logger.debug("{} transactions found in Modified report coverage dates: '{}'".format(len(update_tran_list), "', '".join(update_tran_list)))
+                _sql2 = """UPDATE public.sched_a SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_b SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_c SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_c1 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_c2 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_e SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_f SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_h3 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_h4 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_h5 SET report_id=%s WHERE transaction_id in ('{0}');
+                           UPDATE public.sched_h6 SET report_id=%s WHERE transaction_id in ('{0}');""".format("', '".join(update_tran_list))
+                _value_list2 = [new_report_id]*11
+                with connection.cursor() as cursor:
+                        cursor.execute(_sql2, _value_list2)
+                        logger.debug("transactions updated...")
+            else:
+                logger.debug("no transactions found in Modified report coverage dates.")
+        logger.debug('update_transactions_change_cvg_dates function FINISHED...')
+        return Response('success',  status= status.HTTP_200_OK)
+    except Exception as e:
+        raise Exception('The update_transactions_change_cvg_dates function is throwing an error: ' + str(e))
+
+def count_orphaned_transactions(report_id, cmte_id):
+    try:
+        _sql = """SELECT count(*) FROM public.all_transactions_view WHERE report_id = %s AND cmte_id = %s 
+              AND date_part('year', transaction_date) = (SELECT date_part('year', cvg_end_date) FROM reports WHERE 
+              cmte_id = %s AND report_id = %s AND delete_ind IS DISTINCT FROM 'Y') AND delete_ind IS DISTINCT FROM 'Y'"""
+        _values = [FIXED_REPORT_ID_FOR_ORPHANED_TRANSACTIONS, cmte_id, cmte_id, report_id]
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _values)
+            value =  cursor.fetchone()[0]
+        if value:
+            return True
+        else:
+            return False
+    except Exception as e:
+        raise Exception('The count_orphaned_transactions function is throwing an error: ' + str(e))
 """
 ***************************************************** REPORTS - POST API CALL STARTS HERE **********************************************************
 """
@@ -1471,7 +1638,6 @@ def reposit_f3x_data(cmte_id, report_id):
     back_cursor.close()
     backend_connection.close()
 
-
 def reposit_f99_data(cmte_id, report_id):
     """
     helper funcrtion to move current F99 report data from efiling front db to backend db
@@ -1569,339 +1735,367 @@ def submit_report(request):
     """
     # print(request.data)
     # print(request.query_params)
-    SUBMIT_STATUS = "Submitted"
-    cmte_id = get_comittee_id(request.user.username)
-    if "report_id" in request.query_params:
-        report_id = request.query_params.get("report_id")
-        form_tp = request.query_params.get("form_type")
-    else:
-        report_id = request.data.get("report_id")
-        form_tp = request.data.get("form_type")
-    if not report_id:
-        raise Exception()
-    fec_id = report_id
-    if form_tp == "F3X":
-        update_tbl = "public.reports"
-        f_id = "report_id"
-    elif form_tp == "F99":
-        update_tbl = "public.forms_committeeinfo"
-        f_id = "id"
-    else:
-        raise Exception("Error: invalid form type.")
+    try:
+        is_read_only_or_filer_submit(request)
+        SUBMIT_STATUS = "Submitted"
+        cmte_id = get_comittee_id(request.user.username)
+        if "report_id" in request.query_params:
+            report_id = request.query_params.get("report_id")
+            form_tp = request.query_params.get("form_type")
+        else:
+            report_id = request.data.get("report_id")
+            form_tp = request.data.get("form_type")
+        if not report_id:
+            raise Exception()
+        fec_id = report_id
+        if form_tp == "F3X":
+            update_tbl = "public.reports"
+            f_id = "report_id"
+        elif form_tp == "F99":
+            update_tbl = "public.forms_committeeinfo"
+            f_id = "id"
+        else:
+            raise Exception("Error: invalid form type.")
 
-    if form_tp == "F3X":
-        _sql_update = (
-                """
-            UPDATE {}""".format(
-                    update_tbl
-                )
-                + """
-            SET filed_date = %s, status = %s, fec_id = %s"""
-                + """
-            WHERE {} = %s
-            """.format(
-            f_id
-        )
-        )
-    elif form_tp == "F99":
-        _sql_update = (
-                """
-            UPDATE {}""".format(
-                    update_tbl
-                )
-                + """
-            SET is_submitted = true, updated_at = %s, status = %s, fec_id = %s"""
-                + """
-            WHERE {} = %s
-            """.format(
-            f_id
-        )
-        )
-    else:
-        raise Exception("Error: invalid form type.")
+        if form_tp == "F3X":
+            _sql_update = (
+                    """
+                UPDATE {}""".format(
+                        update_tbl
+                    )
+                    + """
+                SET filed_date = %s, status = %s, fec_id = %s"""
+                    + """
+                WHERE {} = %s
+                """.format(
+                f_id
+            )
+            )
+        elif form_tp == "F99":
+            _sql_update = (
+                    """
+                UPDATE {}""".format(
+                        update_tbl
+                    )
+                    + """
+                SET is_submitted = true, updated_at = %s, status = %s, fec_id = %s"""
+                    + """
+                WHERE {} = %s
+                """.format(
+                f_id
+            )
+            )
+        else:
+            raise Exception("Error: invalid form type.")
 
-    with connection.cursor() as cursor:
-        cursor.execute(
-            _sql_update, [datetime.datetime.now(), SUBMIT_STATUS, fec_id, report_id]
-        )
-        if cursor.rowcount == 0:
-            raise Exception("report {} update failed".format(report_id))
+        with connection.cursor() as cursor:
+            cursor.execute(
+                _sql_update, [datetime.datetime.now(), SUBMIT_STATUS, fec_id, report_id]
+            )
+            if cursor.rowcount == 0:
+                raise Exception("report {} update failed".format(report_id))
 
-    if form_tp == "F3X":
-        reposit_f3x_data(cmte_id, report_id)
-    elif form_tp == "F99":
-        reposit_f99_data(cmte_id, report_id)
-    else:
-        raise Exception("Error: invalid form type.")
+        if form_tp == "F3X":
+            reposit_f3x_data(cmte_id, report_id)
+        elif form_tp == "F99":
+            reposit_f99_data(cmte_id, report_id)
+        else:
+            raise Exception("Error: invalid form type.")
 
-    logger.debug("sending email with data")
-    email_data = request.data.copy()
-    email_data.update(request.query_params.copy())
-    email_data["id"] = "FEC-" + email_data["report_id"]
-    email_data["committeeid"] = cmte_id
-    if "report_type" in email_data:
-        email_data["report_desc"] = email_data.get("report_type")
-    if "cvg_start_dt" in email_data:
-        email_data["coverage_start_date"] = email_data.get("cvg_start_dt")
-    if "cvg_end_dt" in email_data:
-        email_data["coverage_end_date"] = email_data.get("cvg_end_dt")
-    if "cmte_name" in email_data:
-        email_data["committeename"] = email.get("cmte_name")
+        logger.debug("sending email with data")
+        email_data = request.data.copy()
+        email_data.update(request.query_params.copy())
+        email_data["id"] = "FEC-" + email_data["report_id"]
+        email_data["committeeid"] = cmte_id
+        if "report_type" in email_data:
+            email_data["report_desc"] = email_data.get("report_type")
+        if "cvg_start_dt" in email_data:
+            email_data["coverage_start_date"] = email_data.get("cvg_start_dt")
+        if "cvg_end_dt" in email_data:
+            email_data["coverage_end_date"] = email_data.get("cvg_end_dt")
+        if "cmte_name" in email_data:
+            email_data["committeename"] = email.get("cmte_name")
 
-    logger.debug("sending email with data {}".format(email_data))
-    email(True, email_data)
-    logger.debug("email success.")
+        logger.debug("sending email with data {}".format(email_data))
+        email(True, email_data)
+        logger.debug("email success.")
 
-    if form_tp == "F3X":
-        _sql_response = """
-        SELECT json_agg(t) FROM (
-            SELECT 'FEC-' || fec_id as fec_id, status, filed_date, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
-            FROM public.reports
-            WHERE report_id = %s)t
-        """
-    elif form_tp == "F99":
-        _sql_response = """
-        SELECT json_agg(t) FROM (
-            SELECT 'FEC-' || fec_id as fec_id, 
-            status, 
-            CASE
-            WHEN is_submitted = true THEN updated_at
-            ELSE NULL::timestamp with time zone
-            END AS filed_date,
-            message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
-            FROM public.forms_committeeinfo
-            WHERE id = %s)t
-        """
-    else:
-        raise Exception("Error: invalid form type")
+        if form_tp == "F3X":
+            _sql_response = """
+            SELECT json_agg(t) FROM (
+                SELECT 'FEC-' || fec_id as fec_id, status, filed_date, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+                FROM public.reports
+                WHERE report_id = %s)t
+            """
+        elif form_tp == "F99":
+            _sql_response = """
+            SELECT json_agg(t) FROM (
+                SELECT 'FEC-' || fec_id as fec_id, 
+                status, 
+                CASE
+                WHEN is_submitted = true THEN updated_at
+                ELSE NULL::timestamp with time zone
+                END AS filed_date,
+                message, committeeid as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
+                FROM public.forms_committeeinfo
+                WHERE id = %s)t
+            """
+        else:
+            raise Exception("Error: invalid form type")
 
-    with connection.cursor() as cursor:
-        cursor.execute(_sql_response, [report_id])
-        if cursor.rowcount == 0:
-            raise Exception("report {} update failed".format(report_id))
-        rep_json = cursor.fetchone()[0]
+        with connection.cursor() as cursor:
+            cursor.execute(_sql_response, [report_id])
+            if cursor.rowcount == 0:
+                raise Exception("report {} update failed".format(report_id))
+            rep_json = cursor.fetchone()[0]
 
-    return JsonResponse(rep_json[0], status=status.HTTP_200_OK, safe=False)
+        return JsonResponse(rep_json[0], status=status.HTTP_200_OK, safe=False)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def reports(request):
-    if request.method == "POST":
-        try:
-            if "amend_ind" in request.data and check_null_value(
-                    request.data.get("amend_ind")
-            ):
-                amend_ind = request.data.get("amend_ind")
-            else:
-                amend_ind = "N"
+    try:
+        is_read_only_or_filer_reports(request)
+        if request.method == "POST":
+            try:
+                if "amend_ind" in request.data and check_null_value(
+                        request.data.get("amend_ind")
+                ):
+                    amend_ind = request.data.get("amend_ind")
+                else:
+                    amend_ind = "N"
 
-            if "election_code" in request.data and check_null_value(
-                    request.data.get("election_code")
-            ):
-                election_code = request.data.get("election_code")
-            else:
-                election_code = None
+                if "election_code" in request.data and check_null_value(
+                        request.data.get("election_code")
+                ):
+                    election_code = request.data.get("election_code")
+                else:
+                    election_code = None
 
-            if "status" in request.data and check_null_value(
-                    request.data.get("status")
-            ):
-                f_status = request.data.get("status")
-            else:
-                f_status = "Saved"
+                if "status" in request.data and check_null_value(
+                        request.data.get("status")
+                ):
+                    f_status = request.data.get("status")
+                else:
+                    f_status = "Saved"
 
-            if "email_1" in request.data:
-                email_1 = check_email(request.data.get("email_1"))
-            else:
-                email_1 = None
+                if "email_1" in request.data:
+                    email_1 = check_email(request.data.get("email_1"))
+                else:
+                    email_1 = None
 
-            if "email_2" in request.data:
-                email_2 = check_email(request.data.get("email_2"))
-            else:
-                email_2 = None
+                if "email_2" in request.data:
+                    email_2 = check_email(request.data.get("email_2"))
+                else:
+                    email_2 = None
 
-            if "additional_email_1" in request.data:
-                additional_email_1 = check_email(request.data.get("additional_email_1"))
-            else:
-                additional_email_1 = None
+                if "additional_email_1" in request.data:
+                    additional_email_1 = check_email(request.data.get("additional_email_1"))
+                else:
+                    additional_email_1 = None
 
-            if "additional_email_2" in request.data:
-                additional_email_2 = check_email(request.data.get("additional_email_2"))
-            else:
-                additional_email_2 = None
+                if "additional_email_2" in request.data:
+                    additional_email_2 = check_email(request.data.get("additional_email_2"))
+                else:
+                    additional_email_2 = None
 
-            datum = {
-                "cmte_id": get_comittee_id(request.user.username),
-                "form_type": request.data.get("form_type", None),
-                "amend_ind": amend_ind,
-                "report_type": request.data.get("report_type", None),
-                "election_code": election_code,
-                "date_of_election": date_format(request.data.get("date_of_election")),
-                "state_of_election": request.data.get("state_of_election", None),
-                "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
-                "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
-                "due_dt": date_format(request.data.get("due_dt")),
-                "coh_bop": int(request.data.get("coh_bop")),
-                "status": f_status,
-                "email_1": email_1,
-                "email_2": email_2,
-                "additional_email_1": additional_email_1,
-                "additional_email_2": additional_email_2,
-            }
-            data = post_reports(datum)
-            if type(data) is dict:
-                # print(data)
-                # do h1 carryover if new report created
-                do_h1_carryover(data.get("cmteid"), data.get("reportid"))
-                do_h2_carryover(data.get("cmteid"), data.get("reportid"))
-                do_loan_carryover(data.get("cmteid"), data.get("reportid"))
-                do_debt_carryover(data.get("cmteid"), data.get("reportid"))
-                do_levin_carryover(data.get("cmteid"), data.get("reportid"))
-                function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
-                return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
-            elif type(data) is list:
-                return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
-            else:
-                raise Exception(
-                    "The output returned from post_reports function is neither dict nor list"
+                datum = {
+                      "cmte_id": get_comittee_id(request.user.username),
+                      "form_type": request.data.get("form_type", None),
+                      "amend_ind": amend_ind,
+                      "report_type": request.data.get("report_type", None),
+                      "election_code": election_code,
+                      "date_of_election": date_format(request.data.get("date_of_election")),
+                      "state_of_election": request.data.get("state_of_election", None),
+                      "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
+                      "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
+                      "due_dt": date_format(request.data.get("due_dt")),
+                      "coh_bop": int(request.data.get("coh_bop")),
+                      "status": f_status,
+                      "email_1": email_1,
+                      "email_2": email_2,
+                      "additional_email_1": additional_email_1,
+                      "additional_email_2": additional_email_2,
+                  }
+                data = post_reports(datum)
+                if type(data) is dict:
+                    # print(data)
+                    # do h1 carryover if new report created
+                    do_h1_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_h2_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_loan_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_debt_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_levin_carryover(data.get("cmteid"), data.get("reportid"))
+                    do_in_between_report_carryover(data.get("cmteid"), data.get("reportid"))
+                    function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
+
+                    data['status'] = "success"
+                    return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
+                elif type(data) is list:
+                    output_dict = {
+                          'status' : "fail",
+                          'data' : data
+                      }
+                    return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
+                else:
+                      raise Exception("The output returned from post_reports function is neither dict nor list")
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The reports API - POST is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The reports API - POST is throwing  an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
-    """
-    *********************************************** REPORTS - GET API CALL STARTS HERE **********************************************************
-    """
-    # Get records from reports table
 
-    if request.method == "GET":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params:
-                data["report_id"] = request.query_params.get("report_id")
-            forms_obj = get_reports(data)
-            return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The reports API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
-    """
-    ************************************************* REPORTS - PUT API CALL STARTS HERE **********************************************************
-    """
-    if request.method == "PUT":
-        try:
-            if "amend_ind" in request.data:
-                amend_ind = request.data.get("amend_ind")
-            else:
-                amend_ind = "N"
+        """
+        *********************************************** REPORTS - GET API CALL STARTS HERE **********************************************************
+        """
+        # Get records from reports table
 
-            if "election_code" in request.data:
-                election_code = request.data.get("election_code")
-            else:
-                election_code = ""
-
-            if "status" in request.data:
-                f_status = request.data.get("status")
-            else:
-                f_status = "Saved"
-
-            if "email_1" in request.data:
-                email_1 = check_email(request.data.get("email_1"))
-            else:
-                email_1 = ""
-
-            if "email_2" in request.data:
-                email_2 = check_email(request.data.get("email_2"))
-            else:
-                email_2 = ""
-
-            if "additional_email_1" in request.data:
-                additional_email_1 = check_email(request.data.get("additional_email_1"))
-            else:
-                additional_email_1 = ""
-
-            if "additional_email_2" in request.data:
-                additional_email_2 = check_email(request.data.get("additional_email_2"))
-            else:
-                additional_email_2 = ""
-
-            datum = {
-                "report_id": request.data.get("report_id"),
-                "cmte_id": get_comittee_id(request.user.username),
-                "form_type": request.data.get("form_type"),
-                "report_type": request.data.get("report_type"),
-                "date_of_election": date_format(request.data.get("date_of_election")),
-                "state_of_election": request.data.get("state_of_election"),
-                "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
-                "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
-                "coh_bop": int(request.data.get("coh_bop")),
-                "status": f_status,
-                "email_1": email_1,
-                "email_2": email_2,
-                "additional_email_1": additional_email_1,
-                "additional_email_2": additional_email_2,
-            }
-            if "amend_ind" in request.data:
-                datum["amend_ind"] = request.data.get("amend_ind")
-
-            if "election_code" in request.data:
-                datum["election_code"] = request.data.get("election_code")
-
-            data = put_reports(datum)
-            if f_status == "Submitted" and data:
+        if request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params:
+                    data["report_id"] = request.query_params.get("report_id")
+                forms_obj = get_reports(data)
+                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
                 return JsonResponse(
-                    {"Submitted": True}, status=status.HTTP_201_CREATED, safe=False
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
                 )
-            elif type(data) is dict:
-                return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
-            elif type(data) is list:
-                return JsonResponse(data, status=status.HTTP_200_OK, safe=False)
-            else:
-                raise Exception(
-                    "The output returned from put_reports function is neither dict nor list"
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The reports API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The reports API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
-    """
-    ************************************************ REPORTS - DELETE API CALL STARTS HERE **********************************************************
-    """
-    if request.method == "DELETE":
+        """
+        ************************************************* REPORTS - PUT API CALL STARTS HERE **********************************************************
+        """
+        if request.method == "PUT":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                if "amend_ind" in request.data:
+                    amend_ind = request.data.get("amend_ind")
+                else:
+                    amend_ind = "N"
 
-        try:
-            data = {
-                "cmte_id": get_comittee_id(request.user.username),
-                "report_id": request.query_params.get("report_id"),
-                "form_type": request.query_params.get("form_type"),
-            }
-            delete_reports(data)
-            return Response(
-                "The Report ID: {} has been successfully deleted".format(
-                    data.get("report_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The reports API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                if "election_code" in request.data:
+                    election_code = request.data.get("election_code")
+                else:
+                    election_code = ""
+
+                if "status" in request.data:
+                    f_status = request.data.get("status")
+                else:
+                    f_status = "Saved"
+
+                if "email_1" in request.data:
+                    email_1 = check_email(request.data.get("email_1"))
+                else:
+                    email_1 = ""
+
+                if "email_2" in request.data:
+                    email_2 = check_email(request.data.get("email_2"))
+                else:
+                    email_2 = ""
+
+                if "additional_email_1" in request.data:
+                    additional_email_1 = check_email(request.data.get("additional_email_1"))
+                else:
+                    additional_email_1 = ""
+
+                if "additional_email_2" in request.data:
+                    additional_email_2 = check_email(request.data.get("additional_email_2"))
+                else:
+                    additional_email_2 = ""
+
+                datum = {
+                    "report_id": request.data.get("report_id"),
+                    "cmte_id": cmte_id,
+                    "form_type": request.data.get("form_type"),
+                    "report_type": request.data.get("report_type"),
+                    "date_of_election": date_format(request.data.get("date_of_election")),
+                    "state_of_election": request.data.get("state_of_election"),
+                    "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
+                    "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
+                    "due_date": date_format(request.data.get("due_dt")),
+                    "coh_bop": int(request.data.get("coh_bop")),
+                    "status": f_status,
+                    "email_1": email_1,
+                    "email_2": email_2,
+                    "additional_email_1": additional_email_1,
+                    "additional_email_2": additional_email_2,
+                }
+                if "amend_ind" in request.data:
+                    datum["amend_ind"] = request.data.get("amend_ind")
+
+                if "election_code" in request.data:
+                    datum["election_code"] = request.data.get("election_code")
+
+                data = put_reports(datum)
+                orphanedTransactionsExist = count_orphaned_transactions(request.data.get("report_id"), cmte_id)
+                if f_status == "Submitted" and data:
+                    return JsonResponse(
+                        {"Submitted": True}, status=status.HTTP_201_CREATED, safe=False
+                    )
+                elif type(data) is dict:
+                    function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
+                    data['status'] = "success"
+                    data['orphanedTransactionsExist'] = orphanedTransactionsExist
+                    return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
+                elif type(data) is list:
+                    output_dict = {
+                          'status' : "fail",
+                          'orphanedTransactionsExist': orphanedTransactionsExist,
+                          'data' : data
+                      }
+                    return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
+                else:
+                    raise Exception(
+                        "The output returned from put_reports function is neither dict nor list"
+                    )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The reports API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        """
+        ************************************************ REPORTS - DELETE API CALL STARTS HERE **********************************************************
+        """
+        if request.method == "DELETE":
+
+            try:
+                data = {
+                    "cmte_id": get_comittee_id(request.user.username),
+                    "report_id": request.query_params.get("report_id"),
+                    "form_type": request.query_params.get("form_type"),
+                }
+                delete_reports(data)
+                return Response(
+                    "The Report ID: {} has been successfully deleted".format(
+                        data.get("report_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The reports API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """
@@ -2421,6 +2615,12 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
     a helper function for handling FEC entity:
     clone FEC entity and mark it for future query exclusion
     """
+    """
+    overriding entity_type to COM if it is not a Candidate by Satheesh on 05/12/2020
+    """
+    if entity_type != 'CAN':
+        entity_type = 'COM'
+
     new_entity_id = get_next_entity_id(entity_type)
     clone_sql = """
             INSERT INTO public.entity(
@@ -2429,18 +2629,18 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
                 suffix, street_1, street_2, city, state, zip_code, 
                 occupation, employer, ref_cand_cmte_id, delete_ind, 
                 create_date, last_update_date, cand_office, cand_office_state, 
-                cand_office_district, cand_election_year, phone_number)
+                cand_office_district, cand_election_year, phone_number, ref_entity_id)
             SELECT %s, entity_type, %s, entity_name, 
                 first_name, last_name, middle_name, preffix, 
                 suffix, street_1, street_2, city, state, zip_code, 
                 occupation, employer, ref_cand_cmte_id, delete_ind, 
                 create_date, last_update_date, cand_office, cand_office_state, 
-                cand_office_district, cand_election_year, phone_number
+                cand_office_district, cand_election_year, phone_number, entity_id
             FROM public.entity e 
             WHERE e.entity_id = %s;
             """
     exclude_sql = """
-    INSERT INTO excluded_entity(entity_id, cmte_id) values(%s, %s);
+    INSERT INTO excluded_entity(entity_id, cmte_id, ref_entity_id) values(%s, %s, %s);
     """
     with connection.cursor() as cursor:
         # UPDATE delete_ind flag to Y in DB
@@ -2448,7 +2648,7 @@ def clone_fec_entity(cmte_id, entity_type, entity_id):
         cursor.execute(clone_sql, [new_entity_id, cmte_id, entity_id])
         if cursor.rowcount == 0:
             raise Exception(""" FEC Entity ID: {} clone failure.""".format(entity_id))
-        cursor.execute(exclude_sql, [entity_id, cmte_id])
+        cursor.execute(exclude_sql, [entity_id, cmte_id, new_entity_id])
         if cursor.rowcount == 0:
             raise Exception(
                 """ FEC Entity ID: {} exclusion failure.""".format(entity_id)
@@ -2582,126 +2782,131 @@ def remove_entities(data):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def entities(request):
-    # insert a new record for reports table
-    if request.method == "POST":
-        try:
-            datum = {
-                "entity_type": request.data.get("entity_type"),
-                "cmte_id": get_comittee_id(request.user.username),
-                "entity_name": request.data.get("entity_name"),
-                "first_name": request.data.get("first_name"),
-                "last_name": request.data.get("last_name"),
-                "middle_name": request.data.get("middle_name"),
-                "preffix": request.data.get("prefix"),
-                "suffix": request.data.get("suffix"),
-                "street_1": request.data.get("street_1"),
-                "street_2": request.data.get("street_2"),
-                "city": request.data.get("city"),
-                "state": request.data.get("state"),
-                "zip_code": request.data.get("zip_code"),
-                "occupation": request.data.get("occupation"),
-                "employer": request.data.get("employer"),
-                "ref_cand_cmte_id": request.data.get("ref_cand_cmte_id"),
-                "cand_office": request.data.get("cand_office"),
-                "cand_office_state": request.data.get("cand_office_state"),
-                "cand_office_district": request.data.get("cand_office_district"),
-                "cand_election_year": request.data.get("cand_election_year"),
-                "phone_number": request.data.get("phone_number"),
-            }
-            data = post_entities(datum)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The entity-POST API is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+    try:
+        is_read_only_or_filer_reports(request)
+        # insert a new record for reports table
+        if request.method == "POST":
+            try:
+                datum = {
+                    "entity_type": request.data.get("entity_type"),
+                    "cmte_id": get_comittee_id(request.user.username),
+                    "entity_name": request.data.get("entity_name"),
+                    "first_name": request.data.get("first_name"),
+                    "last_name": request.data.get("last_name"),
+                    "middle_name": request.data.get("middle_name"),
+                    "preffix": request.data.get("prefix"),
+                    "suffix": request.data.get("suffix"),
+                    "street_1": request.data.get("street_1"),
+                    "street_2": request.data.get("street_2"),
+                    "city": request.data.get("city"),
+                    "state": request.data.get("state"),
+                    "zip_code": request.data.get("zip_code"),
+                    "occupation": request.data.get("occupation"),
+                    "employer": request.data.get("employer"),
+                    "ref_cand_cmte_id": request.data.get("ref_cand_cmte_id"),
+                    "cand_office": request.data.get("cand_office"),
+                    "cand_office_state": request.data.get("cand_office_state"),
+                    "cand_office_district": request.data.get("cand_office_district"),
+                    "cand_election_year": request.data.get("cand_election_year"),
+                    "phone_number": request.data.get("phone_number"),
+                }
+                data = post_entities(datum)
+                return JsonResponse(data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The entity-POST API is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    """
-    ************************************************ ENTITIES - GET API CALL STARTS HERE **********************************************************
-    """
-    if request.method == "GET":
+        """
+        ************************************************ ENTITIES - GET API CALL STARTS HERE **********************************************************
+        """
+        if request.method == "GET":
 
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "entity_id" in request.query_params:
-                data["entity_id"] = request.query_params.get("entity_id")
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "entity_id" in request.query_params:
+                    data["entity_id"] = request.query_params.get("entity_id")
 
-            forms_obj = get_entities(data)
-            return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The entity-GET API is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                forms_obj = get_entities(data)
+                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The entity-GET API is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    """
-    ************************************************ ENTITIES - PUT API CALL STARTS HERE **********************************************************
-    """
-    if request.method == "PUT":
+        """
+        ************************************************ ENTITIES - PUT API CALL STARTS HERE **********************************************************
+        """
+        if request.method == "PUT":
 
-        try:
-            datum = {
-                "entity_id": request.data.get("entity_id"),
-                "entity_type": request.data.get("entity_type"),
-                "cmte_id": get_comittee_id(request.user.username),
-                "entity_name": request.data.get("entity_name"),
-                "first_name": request.data.get("first_name"),
-                "last_name": request.data.get("last_name"),
-                "middle_name": request.data.get("middle_name"),
-                "preffix": request.data.get("prefix"),
-                "suffix": request.data.get("suffix"),
-                "street_1": request.data.get("street_1"),
-                "street_2": request.data.get("street_2"),
-                "city": request.data.get("city"),
-                "state": request.data.get("state"),
-                "zip_code": request.data.get("zip_code"),
-                "occupation": request.data.get("occupation"),
-                "employer": request.data.get("employer"),
-                "ref_cand_cmte_id": request.data.get("ref_cand_cmte_id"),
-                "cand_office": request.data.get("cand_office"),
-                "cand_office_state": request.data.get("cand_office_state"),
-                "cand_office_district": request.data.get("cand_office_district"),
-                "cand_election_year": request.data.get("cand_election_year"),
-                "phone_number": request.data.get("phone_number"),
-                # 'last_update_date': request.data.get('last_update_date')
-            }
-            data = put_entities(datum)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The entity-PUT call is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            try:
+                datum = {
+                    "entity_id": request.data.get("entity_id"),
+                    "entity_type": request.data.get("entity_type"),
+                    "cmte_id": get_comittee_id(request.user.username),
+                    "entity_name": request.data.get("entity_name"),
+                    "first_name": request.data.get("first_name"),
+                    "last_name": request.data.get("last_name"),
+                    "middle_name": request.data.get("middle_name"),
+                    "preffix": request.data.get("prefix"),
+                    "suffix": request.data.get("suffix"),
+                    "street_1": request.data.get("street_1"),
+                    "street_2": request.data.get("street_2"),
+                    "city": request.data.get("city"),
+                    "state": request.data.get("state"),
+                    "zip_code": request.data.get("zip_code"),
+                    "occupation": request.data.get("occupation"),
+                    "employer": request.data.get("employer"),
+                    "ref_cand_cmte_id": request.data.get("ref_cand_cmte_id"),
+                    "cand_office": request.data.get("cand_office"),
+                    "cand_office_state": request.data.get("cand_office_state"),
+                    "cand_office_district": request.data.get("cand_office_district"),
+                    "cand_election_year": request.data.get("cand_election_year"),
+                    "phone_number": request.data.get("phone_number"),
+                    # 'last_update_date': request.data.get('last_update_date')
+                }
+                data = put_entities(datum)
+                return JsonResponse(data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The entity-PUT call is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    """
-    ************************************************ ENTITIES - DELETE API CALL STARTS HERE **********************************************************
-    """
-    if request.method == "DELETE":
+        """
+        ************************************************ ENTITIES - DELETE API CALL STARTS HERE **********************************************************
+        """
+        if request.method == "DELETE":
 
-        try:
-            data = {
-                "entity_id": request.query_params.get("entity_id"),
-                "cmte_id": get_comittee_id(request.user.username),
-            }
-            delete_entities(data)
-            return Response(
-                "The Entity ID: {} has been successfully deleted".format(
-                    data.get("entity_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The entity-DELETE call is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            try:
+                data = {
+                    "entity_id": request.query_params.get("entity_id"),
+                    "cmte_id": get_comittee_id(request.user.username),
+                }
+                delete_entities(data)
+                return Response(
+                    "The Entity ID: {} has been successfully deleted".format(
+                        data.get("entity_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    "The entity-DELETE call is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """
@@ -2744,7 +2949,7 @@ def autolookup_expand(request):
             FROM public.entity e, public.candidate_master c WHERE e.ref_cand_cmte_id = c.cand_id
             and c.principal_campaign_committee = %s
             and e.delete_ind is distinct from 'Y'
-            and e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')) t
+            and e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null)) t
             """
             parameters = [cmte_id, get_comittee_id(request.user.username)]
         if "cand_id" in request.query_params:
@@ -2757,7 +2962,7 @@ def autolookup_expand(request):
                             FROM public.entity e, public.entity c WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
                             AND c.red_cand_cmte_id = %s
                             AND e.delete_ind is distinct from 'Y'
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')) t
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null)) t
             """
             parameters = [cand_id]
         with connection.cursor() as cursor:
@@ -2865,7 +3070,7 @@ def autolookup_search_contacts(request):
                             FROM public.entity e left join public.entity c ON e.ref_cand_cmte_id = c.principal_campaign_committee 
                             WHERE e.cmte_id in (%s, %s) 
                             AND substr(e.ref_cand_cmte_id,1,1)='C' 
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null)
                             """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
@@ -2881,7 +3086,7 @@ def autolookup_search_contacts(request):
                             e.last_update_date
                             FROM public.entity e WHERE e.cmte_id in (%s, %s) 
                             AND substr(e.ref_cand_cmte_id,1,1)='C'
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null)
                             """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
@@ -2906,6 +3111,7 @@ def autolookup_search_contacts(request):
                     # irrespective of principal campaign committee
                     if "expand" in request.query_params:
                         parameters = [global_search_id, committee_id, committee_id]
+
                         query_string = (
                                 """
                             SELECT json_agg(t) FROM 
@@ -2915,15 +3121,14 @@ def autolookup_search_contacts(request):
                             e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
                             FROM public.entity e left join public.entity c  ON c.ref_cand_cmte_id = e.principal_campaign_committee  
                             WHERE e.cmte_id in (%s, %s) 
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y') 
                             AND substr(e.ref_cand_cmte_id,1,1) != 'C'
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null) 
                             """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
                                 + order_string
                                 + """) t"""
                         )
-
                     else:
                         parameters = [global_search_id, committee_id, committee_id]
                         query_string = (
@@ -2934,7 +3139,7 @@ def autolookup_search_contacts(request):
                             e.city,e.state,e.zip_code,e.ref_cand_cmte_id,e.delete_ind,e.create_date,e.last_update_date,e.cand_office,e.cand_office_state,
                             e.cand_office_district,e.cand_election_year, e.principal_campaign_committee as payee_cmte_id
                             FROM public.entity e WHERE e.cmte_id in (%s, %s) 
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null)
                             AND substr(e.ref_cand_cmte_id,1,1) != 'C'
                             """
                                 + param_string
@@ -2961,7 +3166,7 @@ def autolookup_search_contacts(request):
                                 e.last_update_date
                                 FROM public.entity e left join public.entity c ON  e.ref_cand_cmte_id = c.principal_campaign_committee 
                                 WHERE e.cmte_id in (%s, %s) 
-                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
+                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null)
                                 """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
@@ -2977,7 +3182,7 @@ def autolookup_search_contacts(request):
                                 e.preffix,e.suffix,e.street_1,e.street_2,e.city,e.state,e.zip_code,e.occupation,e.employer,e.ref_cand_cmte_id,e.delete_ind,e.create_date,
                                 e.last_update_date
                                 FROM public.entity e WHERE e.cmte_id in (%s, %s)
-                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
+                                AND e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null)
                                 """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
@@ -3007,7 +3212,7 @@ def autolookup_search_contacts(request):
                             WHERE e.ref_cand_cmte_id = c.principal_campaign_committee
                             AND e.entity_type in ('IND','ORG') 
                             AND c.principal_campaign_committee is not null
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null)
                             """
                                 # query_string = (
                                 #     """
@@ -3038,7 +3243,7 @@ def autolookup_search_contacts(request):
                             e.last_update_date
                             FROM public.entity e WHERE e.cmte_id in (%s, %s)
                             AND e.entity_type in ('IND','ORG') 
-                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex, entity en where ex.cmte_id = %s and en.delete_ind != 'Y')
+                            AND e.entity_id not in (select ex.entity_id from excluded_entity ex where ex.cmte_id = %s and ex.delete_ind is null)
                             """
                                 + param_string
                                 + """ AND e.delete_ind is distinct from 'Y' ORDER BY """
@@ -4327,53 +4532,58 @@ def get_list_report_data(report_id, cmte_id):
 @api_view(["POST"])
 def delete_trashed_transactions(request):
     try:
-        committeeid = get_comittee_id(request.user.username)
-        row_count = 0
-        for _action in request.data.get("actions", []):
-            # report_id = _action.get('report_id', '')
-            trans_id = _action.get("transaction_id", "")
-            table_list = SCHEDULE_TO_TABLE_DICT.get(trans_id[:2])
-            if table_list:
-                for table in table_list:
-                    try:
-                        with connection.cursor() as cursor:
-                            cursor.execute(
-                                """Delete FROM public.{} where transaction_id = %s;""".format(
-                                    table
-                                ),
-                                [trans_id],
+        is_read_only_or_filer_reports(request)
+        try:
+            committeeid = get_comittee_id(request.user.username)
+            row_count = 0
+            for _action in request.data.get("actions", []):
+                # report_id = _action.get('report_id', '')
+                trans_id = _action.get("transaction_id", "")
+                table_list = SCHEDULE_TO_TABLE_DICT.get(trans_id[:2])
+                if table_list:
+                    for table in table_list:
+                        try:
+                            with connection.cursor() as cursor:
+                                cursor.execute(
+                                    """Delete FROM public.{} where transaction_id = %s;""".format(
+                                        table
+                                    ),
+                                    [trans_id],
+                                )
+                                row_count += cursor.rowcount
+                        except Exception as e:
+                            raise Exception(
+                                "delete_trashed_transactions SQl is throwing an error: "
+                                + str(e)
                             )
-                            row_count += cursor.rowcount
-                    except Exception as e:
+                    if not row_count:
+                        logger.debug(
+                            "Delete trashed transaction: "
+                            + str(trans_id)
+                            + " for committee: "
+                            + str(committeeid)
+                        )
                         raise Exception(
-                            "delete_trashed_transactions SQl is throwing an error: "
-                            + str(e)
+                            """The transaction ID: {1} is either already deleted or does not exist in {0} table""".format(
+                                ",".join(table_list), trans_id
+                            )
                         )
-                if not row_count:
-                    logger.debug(
-                        "Delete trashed transaction: "
-                        + str(trans_id)
-                        + " for committee: "
-                        + str(committeeid)
-                    )
+                else:
                     raise Exception(
-                        """The transaction ID: {1} is either already deleted or does not exist in {0} table""".format(
-                            ",".join(table_list), trans_id
+                        "The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT.".format(
+                            trans_id
                         )
                     )
-            else:
-                raise Exception(
-                    "The transaction id {} has not been assigned to SCHEDULE_TO_TABLE_DICT.".format(
-                        trans_id
-                    )
-                )
-        json_result = {"message": "Transaction deleted successfully"}
-        return Response(json_result, status=status.HTTP_201_CREATED)
+            json_result = {"message": "Transaction deleted successfully"}
+            return Response(json_result, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                "The delete_trashed_transactions API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
     except Exception as e:
-        return Response(
-            "The delete_trashed_transactions API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """
@@ -6004,16 +6214,19 @@ def get_report_info(request):
                 with connection.cursor() as cursor:
                     # GET all rows from Reports table
 
-                    query_string = """SELECT cmte_id as cmteId, report_id as reportId, form_type as formType, '' as electionCode, 
-                                        report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
-                                        rt.regular_special_report_ind as regularSpecialReportInd, '' as stateOfElection, 
-                                        '' as electionDate, cvg_start_date as cvgStartDate, cvg_end_date as cvgEndDate, 
-                                        due_date as dueDate, amend_ind as amend_Indicator, 0 as coh_bop,
+                    query_string = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode, 
+                                        rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
+                                        rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState, 
+                                        x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
+                                        rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
                                          (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
                                          email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
                                          additional_email_2 as additionalEmail2, 
-                                         (SELECT CASE WHEN due_date IS NOT NULL AND due_date < now() THEN True ELSE False END ) AS overdue
-                                      FROM public.reports rp, public.ref_rpt_types rt WHERE rp.report_type=rt.rpt_type AND delete_ind is distinct from 'Y' AND cmte_id = %s  AND report_id = %s"""
+                                         (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue
+                                      FROM public.reports rp 
+                                      LEFT JOIN form_3x x ON rp.report_id = x.report_id
+                                      LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
+                                      WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id = %s AND rp.report_id = %s"""
                     # print("query_string", query_string)
 
                     cursor.execute(
@@ -6654,49 +6867,49 @@ def get_line_sum_value(line_number, formula, sched_a_line_sum_dict, cmte_id, rep
 
 @api_view(["POST"])
 def prepare_json_builders_data(request):
-    try:
+    # try:
         # print("request.data: ", request.data)
         # commented by Mahendra 10052019
-        cmte_id = get_comittee_id(request.user.username)
-        param_string = ""
-        report_id = request.data.get("report_id")
-        sched_a_line_sum = {}
-        sched_b_line_sum = {}
+        # cmte_id = get_comittee_id(request.user.username)
+        # param_string = ""
+        # report_id = request.data.get("report_id")
+        # sched_a_line_sum = {}
+        # sched_b_line_sum = {}
 
-        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        # cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
 
         # cdate = date.today()
-        from_date = date(cvg_start_date.year, 1, 1)
+        # from_date = date(cvg_start_date.year, 1, 1)
 
-        to_date = date(cvg_end_date.year, 12, 31)
+        # to_date = date(cvg_end_date.year, 12, 31)
 
         # schedule_a_b_line_sum_dict = {}
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT line_number, sum(contribution_amount) from public.sched_a 
-                where cmte_id = '%s' AND report_id = '%s' group by line_number;"""
-                % (cmte_id, report_id)
-            )
+        # with connection.cursor() as cursor:
+        #     cursor.execute(
+        #         """
+        #         SELECT line_number, sum(contribution_amount) from public.sched_a 
+        #         where cmte_id = '%s' AND report_id = '%s' group by line_number;"""
+        #         % (cmte_id, report_id)
+        #     )
+        #     print(cursor.query)
+        #     commented by Mahendra 10052019
+        #     sched_a_line_sum_result = cursor.fetchall()
+        #     sched_a_line_sum = {
+        #         str(i[0].lower()): i[1] if i[1] else 0 for i in sched_a_line_sum_result
+        #     }
+        # with connection.cursor() as cursor:
+        #     cursor.execute(
+        #         """
+        #         SELECT line_number, sum(expenditure_amount) from public.sched_b 
+        #         where cmte_id = '%s' AND report_id = '%s' group by line_number;"""
+        #         % (cmte_id, report_id)
+        #     )
             # print(cursor.query)
             # commented by Mahendra 10052019
-            sched_a_line_sum_result = cursor.fetchall()
-            sched_a_line_sum = {
-                str(i[0].lower()): i[1] if i[1] else 0 for i in sched_a_line_sum_result
-            }
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT line_number, sum(expenditure_amount) from public.sched_b 
-                where cmte_id = '%s' AND report_id = '%s' group by line_number;"""
-                % (cmte_id, report_id)
-            )
-            # print(cursor.query)
-            # commented by Mahendra 10052019
-            sched_b_line_sum_result = cursor.fetchall()
-            sched_b_line_sum = {
-                str(i[0].lower()): i[1] if i[1] else 0 for i in sched_b_line_sum_result
-            }
+            # sched_b_line_sum_result = cursor.fetchall()
+            # sched_b_line_sum = {
+            #     str(i[0].lower()): i[1] if i[1] else 0 for i in sched_b_line_sum_result
+            # }
 
         # sched_a_line_sum.update(sched_b_line_sum)
         # print(sched_a_line_sum, "sched_a_line_sum")
@@ -6706,199 +6919,199 @@ def prepare_json_builders_data(request):
 
         ##schedule_a_b_line_sum_dict.update(sched_a_line_sum)
         ##schedule_a_b_line_sum_dict.update(sched_b_line_sum)
-        schedule_a_b_line_sum_dict = {}
-        schedule_a_b_line_sum_dict.update(sched_a_line_sum)
-        schedule_a_b_line_sum_dict.update(sched_b_line_sum)
+        # schedule_a_b_line_sum_dict = {}
+        # schedule_a_b_line_sum_dict.update(sched_a_line_sum)
+        # schedule_a_b_line_sum_dict.update(sched_b_line_sum)
 
-        col_a_line_sum = {}
-        col_b_line_sum = {}
+        # col_a_line_sum = {}
+        # col_b_line_sum = {}
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """ 
-                SELECT line_number, sum(contribution_amount) from public.sched_a 
-                where cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""",
-                [cmte_id, from_date, to_date],
-            )
-            # print(cursor.query)
-            # commented by Mahendra 10052019
-            col_a_line_sum_result = cursor.fetchall()
-            col_a_line_sum = {
-                str(i[0].lower()): i[1] if i[1] else 0 for i in col_a_line_sum_result
-            }
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT line_number, sum(expenditure_amount) from public.sched_b 
-                where cmte_id = %s AND expenditure_date >= %s AND expenditure_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""",
-                [cmte_id, from_date, to_date],
-            )
-            # print(cursor.query)
-            # commented by Mahendra 10052019
-            col_b_line_sum_result = cursor.fetchall()
-            col_b_line_sum = {
-                str(i[0].lower()): i[1] if i[1] else 0 for i in col_b_line_sum_result
-            }
+        # with connection.cursor() as cursor:
+        #     cursor.execute(
+        #         """ 
+        #         SELECT line_number, sum(contribution_amount) from public.sched_a 
+        #         where cmte_id = %s AND contribution_date >= %s AND contribution_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""",
+        #         [cmte_id, from_date, to_date],
+        #     )
+        #     # print(cursor.query)
+        #     # commented by Mahendra 10052019
+        #     col_a_line_sum_result = cursor.fetchall()
+        #     col_a_line_sum = {
+        #         str(i[0].lower()): i[1] if i[1] else 0 for i in col_a_line_sum_result
+        #     }
+        # with connection.cursor() as cursor:
+        #     cursor.execute(
+        #         """
+        #         SELECT line_number, sum(expenditure_amount) from public.sched_b 
+        #         where cmte_id = %s AND expenditure_date >= %s AND expenditure_date <= %s AND delete_ind is distinct from 'Y' group by line_number;""",
+        #         [cmte_id, from_date, to_date],
+        #     )
+        #     # print(cursor.query)
+        #     # commented by Mahendra 10052019
+        #     col_b_line_sum_result = cursor.fetchall()
+        #     col_b_line_sum = {
+        #         str(i[0].lower()): i[1] if i[1] else 0 for i in col_b_line_sum_result
+        #     }
 
-        col_line_sum_dict = {}
-        col_line_sum_dict.update(col_a_line_sum)
-        col_line_sum_dict.update(col_b_line_sum)
+        # col_line_sum_dict = {}
+        # col_line_sum_dict.update(col_a_line_sum)
+        # col_line_sum_dict.update(col_b_line_sum)
 
-        # print(col_a_line_sum, "col_a_line_sum")
-        # commented by Mahendra 10052019
-        # print(col_b_line_sum, "col_b_line_sum")
-        # commented by Mahendra 10052019
+        # # print(col_a_line_sum, "col_a_line_sum")
+        # # commented by Mahendra 10052019
+        # # print(col_b_line_sum, "col_b_line_sum")
+        # # commented by Mahendra 10052019
 
-        col_a = [
-            ("9", "0"),
-            ("10", "0"),
-            ("11ai", ""),
-            ("11aii", ""),
-            ("11aiii", "11ai + 11aii"),
-            ("11b", ""),
-            ("11c", ""),
-            ("11d", "11aiii + 11b + 11c"),
-            ("12", ""),
-            ("13", ""),
-            ("14", ""),
-            ("15", ""),
-            ("16", ""),
-            ("17", ""),
-            ("18a", "0"),
-            ("18b", "0"),
-            ("18c", "18a+18b"),
-            ("19", "11d+12+13+14+15+16+17+18c"),
-            ("20", "19 - 18c"),
-            ("21ai", "0"),
-            ("21aii", "0"),
-            ("21b", ""),
-            ("21c", "21ai + 21aii + 21b"),
-            ("22", ""),
-            ("23", ""),
-            ("24", ""),
-            ("25", "0"),
-            ("26", ""),
-            ("27", ""),
-            ("28a", ""),
-            ("28b", ""),
-            ("28c", ""),
-            ("28d", "28a + 28b + 28c"),
-            ("29", ""),
-            ("30ai", "0"),
-            ("30aii", "0"),
-            ("30b", ""),
-            ("30c", "30ai + 30aii + 30b"),
-            ("31", "21c + 22 - 27 + 28d + 29"),
-            ("32", "31 - 21aii + 30aii"),
-            ("33", "11d"),
-            ("34", "28d"),
-            ("35", "11d - 28d"),
-            ("36", "21ai + 21b"),
-            ("37", "15"),
-            ("38", "36 - 37"),
-            ("6a", ""),
-            ("6b", ""),
-            ("6c", "19"),
-            ("6d", "6b + 6c"),
-            ("7", "31"),
-            ("8", "6d - 7"),
-        ]
+        # col_a = [
+        #     ("9", "0"),
+        #     ("10", "0"),
+        #     ("11ai", ""),
+        #     ("11aii", ""),
+        #     ("11aiii", "11ai + 11aii"),
+        #     ("11b", ""),
+        #     ("11c", ""),
+        #     ("11d", "11aiii + 11b + 11c"),
+        #     ("12", ""),
+        #     ("13", ""),
+        #     ("14", ""),
+        #     ("15", ""),
+        #     ("16", ""),
+        #     ("17", ""),
+        #     ("18a", "0"),
+        #     ("18b", "0"),
+        #     ("18c", "18a+18b"),
+        #     ("19", "11d+12+13+14+15+16+17+18c"),
+        #     ("20", "19 - 18c"),
+        #     ("21ai", "0"),
+        #     ("21aii", "0"),
+        #     ("21b", ""),
+        #     ("21c", "21ai + 21aii + 21b"),
+        #     ("22", ""),
+        #     ("23", ""),
+        #     ("24", ""),
+        #     ("25", "0"),
+        #     ("26", ""),
+        #     ("27", ""),
+        #     ("28a", ""),
+        #     ("28b", ""),
+        #     ("28c", ""),
+        #     ("28d", "28a + 28b + 28c"),
+        #     ("29", ""),
+        #     ("30ai", "0"),
+        #     ("30aii", "0"),
+        #     ("30b", ""),
+        #     ("30c", "30ai + 30aii + 30b"),
+        #     ("31", "21c + 22 - 27 + 28d + 29"),
+        #     ("32", "31 - 21aii + 30aii"),
+        #     ("33", "11d"),
+        #     ("34", "28d"),
+        #     ("35", "11d - 28d"),
+        #     ("36", "21ai + 21b"),
+        #     ("37", "15"),
+        #     ("38", "36 - 37"),
+        #     ("6a", ""),
+        #     ("6b", ""),
+        #     ("6c", "19"),
+        #     ("6d", "6b + 6c"),
+        #     ("7", "31"),
+        #     ("8", "6d - 7"),
+        # ]
 
-        col_a_dict_original = OrderedDict()
-        for i in col_a:
-            col_a_dict_original[i[0]] = i[1]
-        final_col_a_dict = {}
-        for line_number in col_a_dict_original:
-            final_col_a_dict[line_number] = get_line_sum_value(
-                line_number,
-                col_a_dict_original[line_number],
-                schedule_a_b_line_sum_dict,
-                cmte_id,
-                report_id,
-            )
-            schedule_a_b_line_sum_dict[line_number] = final_col_a_dict[line_number]
+        # col_a_dict_original = OrderedDict()
+        # for i in col_a:
+        #     col_a_dict_original[i[0]] = i[1]
+        # final_col_a_dict = {}
+        # for line_number in col_a_dict_original:
+        #     final_col_a_dict[line_number] = get_line_sum_value(
+        #         line_number,
+        #         col_a_dict_original[line_number],
+        #         schedule_a_b_line_sum_dict,
+        #         cmte_id,
+        #         report_id,
+        #     )
+        #     schedule_a_b_line_sum_dict[line_number] = final_col_a_dict[line_number]
 
-        # print(final_col_a_dict, "col_a_dict")
-        # commented by Mahendra 10052019
+        # # print(final_col_a_dict, "col_a_dict")
+        # # commented by Mahendra 10052019
 
-        col_b = [
-            ("11ai", ""),
-            ("11aii", ""),
-            ("11aiii", "11ai + 11aii"),
-            ("11b", ""),
-            ("11c", ""),
-            ("11d", "11aiii + 11b + 11c"),
-            ("12", ""),
-            ("13", ""),
-            ("14", ""),
-            ("15", ""),
-            ("16", ""),
-            ("17", ""),
-            ("18a", "0"),
-            ("18b", "0"),
-            ("18c", "18a+18b"),
-            ("19", "11d+12+13+14+15+16+17+18c"),
-            ("20", "19 - 18c"),
-            ("21ai", "0"),
-            ("21aii", "0"),
-            ("21b", ""),
-            ("21c", "21ai + 21aii + 21b"),
-            ("22", ""),
-            ("23", ""),
-            ("24", ""),
-            ("25", "0"),
-            ("26", ""),
-            ("27", ""),
-            ("28a", ""),
-            ("28b", ""),
-            ("28c", ""),
-            ("28d", "28a + 28b + 28c"),
-            ("29", ""),
-            ("30ai", "0"),
-            ("30aii", "0"),
-            ("30b", ""),
-            ("30c", "30ai + 30aii + 30b"),
-            ("31", "21c + 22 - 27 + 28d + 29"),
-            ("32", "31 - 21aii + 30aii"),
-            ("33", "11d"),
-            ("34", "28d"),
-            ("35", "11d - 28d"),
-            ("36", "21ai + 21b"),
-            ("37", "15"),
-            ("38", "36 - 37"),
-            ("6a", ""),
-            ("6b", ""),
-            ("6c", "19"),
-            ("6d", "6a + 6c"),
-            ("7", "31"),
-            ("8", "6d - 7"),
-        ]
+        # col_b = [
+        #     ("11ai", ""),
+        #     ("11aii", ""),
+        #     ("11aiii", "11ai + 11aii"),
+        #     ("11b", ""),
+        #     ("11c", ""),
+        #     ("11d", "11aiii + 11b + 11c"),
+        #     ("12", ""),
+        #     ("13", ""),
+        #     ("14", ""),
+        #     ("15", ""),
+        #     ("16", ""),
+        #     ("17", ""),
+        #     ("18a", "0"),
+        #     ("18b", "0"),
+        #     ("18c", "18a+18b"),
+        #     ("19", "11d+12+13+14+15+16+17+18c"),
+        #     ("20", "19 - 18c"),
+        #     ("21ai", "0"),
+        #     ("21aii", "0"),
+        #     ("21b", ""),
+        #     ("21c", "21ai + 21aii + 21b"),
+        #     ("22", ""),
+        #     ("23", ""),
+        #     ("24", ""),
+        #     ("25", "0"),
+        #     ("26", ""),
+        #     ("27", ""),
+        #     ("28a", ""),
+        #     ("28b", ""),
+        #     ("28c", ""),
+        #     ("28d", "28a + 28b + 28c"),
+        #     ("29", ""),
+        #     ("30ai", "0"),
+        #     ("30aii", "0"),
+        #     ("30b", ""),
+        #     ("30c", "30ai + 30aii + 30b"),
+        #     ("31", "21c + 22 - 27 + 28d + 29"),
+        #     ("32", "31 - 21aii + 30aii"),
+        #     ("33", "11d"),
+        #     ("34", "28d"),
+        #     ("35", "11d - 28d"),
+        #     ("36", "21ai + 21b"),
+        #     ("37", "15"),
+        #     ("38", "36 - 37"),
+        #     ("6a", ""),
+        #     ("6b", ""),
+        #     ("6c", "19"),
+        #     ("6d", "6a + 6c"),
+        #     ("7", "31"),
+        #     ("8", "6d - 7"),
+        # ]
 
-        col_b_dict_original = OrderedDict()
-        for i in col_b:
-            col_b_dict_original[i[0]] = i[1]
-        final_col_b_dict = {}
-        for line_number in col_b_dict_original:
-            final_col_b_dict[line_number] = get_line_sum_value(
-                line_number,
-                col_b_dict_original[line_number],
-                col_line_sum_dict,
-                cmte_id,
-                report_id,
-            )
-            col_line_sum_dict[line_number] = final_col_b_dict[line_number]
-        # print(final_col_b_dict, "col_b_dict")
-        # commented by Mahendra 10052019
+        # col_b_dict_original = OrderedDict()
+        # for i in col_b:
+        #     col_b_dict_original[i[0]] = i[1]
+        # final_col_b_dict = {}
+        # for line_number in col_b_dict_original:
+        #     final_col_b_dict[line_number] = get_line_sum_value(
+        #         line_number,
+        #         col_b_dict_original[line_number],
+        #         col_line_sum_dict,
+        #         cmte_id,
+        #         report_id,
+        #     )
+        #     col_line_sum_dict[line_number] = final_col_b_dict[line_number]
+        # # print(final_col_b_dict, "col_b_dict")
+        # # commented by Mahendra 10052019
 
-        for i in final_col_a_dict:
-            a_val = final_col_a_dict[i]
-            b_val = final_col_b_dict.get(i)
-            a_formula = col_a_dict_original.get(i, "")
-            b_formula = col_b_dict_original.get(i, "")
-            if a_formula:
-                a_formula = a_formula.replace(" ", "")
-            if b_formula:
-                b_formula = b_formula.replace(" ", "")
+        # for i in final_col_a_dict:
+        #     a_val = final_col_a_dict[i]
+        #     b_val = final_col_b_dict.get(i)
+        #     a_formula = col_a_dict_original.get(i, "")
+        #     b_formula = col_b_dict_original.get(i, "")
+        #     if a_formula:
+        #         a_formula = a_formula.replace(" ", "")
+        #     if b_formula:
+        #         b_formula = b_formula.replace(" ", "")
 
             # if a_formula == b_formula and a_val != b_val:
             #     try:
@@ -6908,8 +7121,8 @@ def prepare_json_builders_data(request):
             #         correc_val = 0
             #     final_col_b_dict[i] = correc_val
             #     final_col_a_dict[i] = correc_val
-            final_col_b_dict[i] = b_val
-            final_col_a_dict[i] = a_val
+            # final_col_b_dict[i] = b_val
+            # final_col_a_dict[i] = a_val
 
         # commented by Mahendra 10052019
         # print("---------------------------------")
@@ -6917,145 +7130,145 @@ def prepare_json_builders_data(request):
         # print("---------------------------------")
         # print("Final B", final_col_b_dict)
 
-        update_col_a_dict = {
-            "6b": "coh_bop",
-            "6c": "ttl_receipts_sum_page_per",
-            "6d": "subttl_sum_page_per",
-            "7": "ttl_disb_sum_page_per",
-            "8": "coh_cop",
-            "9": "debts_owed_to_cmte",
-            "10": "debts_owed_by_cmte",
-            "11ai": "indv_item_contb_per",
-            "11aii": "indv_unitem_contb_per",
-            "11aiii": "ttl_indv_contb",
-            "11b": "pol_pty_cmte_contb_per_i",
-            "11c": "other_pol_cmte_contb_per_i",
-            "11d": "ttl_contb_col_ttl_per",
-            "12": "tranf_from_affiliated_pty_per",
-            "13": "all_loans_received_per",
-            "14": "loan_repymts_received_per",
-            "15": "offsets_to_op_exp_per_i",
-            "16": "fed_cand_contb_ref_per",
-            "17": "other_fed_receipts_per",
-            "18a": "tranf_from_nonfed_acct_per",
-            "18b": "tranf_from_nonfed_levin_per",
-            "18c": "ttl_nonfed_tranf_per",
-            "19": "ttl_receipts_per",
-            "20": "ttl_fed_receipts_per",
-            "21ai": "shared_fed_op_exp_per",
-            "21aii": "shared_nonfed_op_exp_per",
-            "21b": "other_fed_op_exp_per",
-            "21c": "ttl_op_exp_per",
-            "22": "tranf_to_affliliated_cmte_per",
-            "23": "fed_cand_cmte_contb_per",
-            "24": "indt_exp_per",
-            "25": "coord_exp_by_pty_cmte_per",
-            "26": "loan_repymts_made_per",
-            "27": "loans_made_per",
-            "28a": "indv_contb_ref_per",
-            "28b": "pol_pty_cmte_contb_per_ii",
-            "28c": "other_pol_cmte_contb_per_ii",
-            "28d": "ttl_contb_ref_per_i",
-            "29": "other_disb_per",
-            "30ai": "shared_fed_actvy_fed_shr_per",
-            "30aii": "shared_fed_actvy_nonfed_per",
-            "30b": "non_alloc_fed_elect_actvy_per",
-            "30c": "ttl_fed_elect_actvy_per",
-            "31": "ttl_disb_per",
-            "32": "ttl_fed_disb_per",
-            "33": "ttl_contb_per",
-            "34": "ttl_contb_ref_per_ii",
-            "35": "net_contb_per",
-            "36": "ttl_fed_op_exp_per",
-            "37": "offsets_to_op_exp_per_ii",
-            "38": "net_op_exp_per",
-        }
+        # update_col_a_dict = {
+        #     "6b": "coh_bop",
+        #     "6c": "ttl_receipts_sum_page_per",
+        #     "6d": "subttl_sum_page_per",
+        #     "7": "ttl_disb_sum_page_per",
+        #     "8": "coh_cop",
+        #     "9": "debts_owed_to_cmte",
+        #     "10": "debts_owed_by_cmte",
+        #     "11ai": "indv_item_contb_per",
+        #     "11aii": "indv_unitem_contb_per",
+        #     "11aiii": "ttl_indv_contb",
+        #     "11b": "pol_pty_cmte_contb_per_i",
+        #     "11c": "other_pol_cmte_contb_per_i",
+        #     "11d": "ttl_contb_col_ttl_per",
+        #     "12": "tranf_from_affiliated_pty_per",
+        #     "13": "all_loans_received_per",
+        #     "14": "loan_repymts_received_per",
+        #     "15": "offsets_to_op_exp_per_i",
+        #     "16": "fed_cand_contb_ref_per",
+        #     "17": "other_fed_receipts_per",
+        #     "18a": "tranf_from_nonfed_acct_per",
+        #     "18b": "tranf_from_nonfed_levin_per",
+        #     "18c": "ttl_nonfed_tranf_per",
+        #     "19": "ttl_receipts_per",
+        #     "20": "ttl_fed_receipts_per",
+        #     "21ai": "shared_fed_op_exp_per",
+        #     "21aii": "shared_nonfed_op_exp_per",
+        #     "21b": "other_fed_op_exp_per",
+        #     "21c": "ttl_op_exp_per",
+        #     "22": "tranf_to_affliliated_cmte_per",
+        #     "23": "fed_cand_cmte_contb_per",
+        #     "24": "indt_exp_per",
+        #     "25": "coord_exp_by_pty_cmte_per",
+        #     "26": "loan_repymts_made_per",
+        #     "27": "loans_made_per",
+        #     "28a": "indv_contb_ref_per",
+        #     "28b": "pol_pty_cmte_contb_per_ii",
+        #     "28c": "other_pol_cmte_contb_per_ii",
+        #     "28d": "ttl_contb_ref_per_i",
+        #     "29": "other_disb_per",
+        #     "30ai": "shared_fed_actvy_fed_shr_per",
+        #     "30aii": "shared_fed_actvy_nonfed_per",
+        #     "30b": "non_alloc_fed_elect_actvy_per",
+        #     "30c": "ttl_fed_elect_actvy_per",
+        #     "31": "ttl_disb_per",
+        #     "32": "ttl_fed_disb_per",
+        #     "33": "ttl_contb_per",
+        #     "34": "ttl_contb_ref_per_ii",
+        #     "35": "net_contb_per",
+        #     "36": "ttl_fed_op_exp_per",
+        #     "37": "offsets_to_op_exp_per_ii",
+        #     "38": "net_op_exp_per",
+        # }
 
-        update_col_b_dict = {
-            "6a": "coh_begin_calendar_yr",
-            "6c": "ttl_receipts_sum_page_ytd",
-            "6d": "subttl_sum_ytd",
-            "7": "ttl_disb_sum_page_ytd",
-            "8": "coh_coy",
-            "11ai": "indv_item_contb_ytd",
-            "11aii": "indv_unitem_contb_ytd",
-            "11aiii": "ttl_indv_contb_ytd",
-            "11b": "pol_pty_cmte_contb_ytd_i",
-            "11c": "other_pol_cmte_contb_ytd_i",
-            "11d": "ttl_contb_col_ttl_ytd",
-            "12": "tranf_from_affiliated_pty_ytd",
-            "13": "all_loans_received_ytd",
-            "14": "loan_repymts_received_ytd",
-            "15": "offsets_to_op_exp_ytd_i",
-            "16": "fed_cand_cmte_contb_ytd",
-            "17": "other_fed_receipts_ytd",
-            "18a": "tranf_from_nonfed_acct_ytd",
-            "18b": "tranf_from_nonfed_levin_ytd",
-            "18c": "ttl_nonfed_tranf_ytd",
-            "19": "ttl_receipts_ytd",
-            "20": "ttl_fed_receipts_ytd",
-            "21ai": "shared_fed_op_exp_ytd",
-            "21aii": "shared_nonfed_op_exp_ytd",
-            "21b": "other_fed_op_exp_ytd",
-            "21c": "ttl_op_exp_ytd",
-            "22": "tranf_to_affilitated_cmte_ytd",
-            "23": "fed_cand_cmte_contb_ref_ytd",
-            "24_independentExpenditures": "indt_exp_ytd",
-            "25": "coord_exp_by_pty_cmte_ytd",
-            "26": "loan_repymts_made_ytd",
-            "27": "loans_made_ytd",
-            "28a": "indv_contb_ref_ytd",
-            "28b": "pol_pty_cmte_contb_ytd_ii",
-            "28c": "other_pol_cmte_contb_ytd_ii",
-            "28d": "ttl_contb_ref_ytd_i",
-            "29": "other_disb_ytd",
-            "30ai": "shared_fed_actvy_fed_shr_ytd",
-            "30aii": "shared_fed_actvy_nonfed_ytd",
-            "30b": "non_alloc_fed_elect_actvy_ytd",
-            "30c": "ttl_fed_elect_actvy_ytd",
-            "31": "ttl_disb_ytd",
-            "32": "ttl_fed_disb_ytd",
-            "33": "ttl_contb_ytd",
-            "34": "ttl_contb_ref_ytd_ii",
-            "35": "net_contb_ytd",
-            "36": "ttl_fed_op_exp_ytd",
-            "37": "offsets_to_op_exp_ytd_ii",
-            "38": "net_op_exp_ytd",
-        }
+        # update_col_b_dict = {
+        #     "6a": "coh_begin_calendar_yr",
+        #     "6c": "ttl_receipts_sum_page_ytd",
+        #     "6d": "subttl_sum_ytd",
+        #     "7": "ttl_disb_sum_page_ytd",
+        #     "8": "coh_coy",
+        #     "11ai": "indv_item_contb_ytd",
+        #     "11aii": "indv_unitem_contb_ytd",
+        #     "11aiii": "ttl_indv_contb_ytd",
+        #     "11b": "pol_pty_cmte_contb_ytd_i",
+        #     "11c": "other_pol_cmte_contb_ytd_i",
+        #     "11d": "ttl_contb_col_ttl_ytd",
+        #     "12": "tranf_from_affiliated_pty_ytd",
+        #     "13": "all_loans_received_ytd",
+        #     "14": "loan_repymts_received_ytd",
+        #     "15": "offsets_to_op_exp_ytd_i",
+        #     "16": "fed_cand_cmte_contb_ytd",
+        #     "17": "other_fed_receipts_ytd",
+        #     "18a": "tranf_from_nonfed_acct_ytd",
+        #     "18b": "tranf_from_nonfed_levin_ytd",
+        #     "18c": "ttl_nonfed_tranf_ytd",
+        #     "19": "ttl_receipts_ytd",
+        #     "20": "ttl_fed_receipts_ytd",
+        #     "21ai": "shared_fed_op_exp_ytd",
+        #     "21aii": "shared_nonfed_op_exp_ytd",
+        #     "21b": "other_fed_op_exp_ytd",
+        #     "21c": "ttl_op_exp_ytd",
+        #     "22": "tranf_to_affilitated_cmte_ytd",
+        #     "23": "fed_cand_cmte_contb_ref_ytd",
+        #     "24_independentExpenditures": "indt_exp_ytd",
+        #     "25": "coord_exp_by_pty_cmte_ytd",
+        #     "26": "loan_repymts_made_ytd",
+        #     "27": "loans_made_ytd",
+        #     "28a": "indv_contb_ref_ytd",
+        #     "28b": "pol_pty_cmte_contb_ytd_ii",
+        #     "28c": "other_pol_cmte_contb_ytd_ii",
+        #     "28d": "ttl_contb_ref_ytd_i",
+        #     "29": "other_disb_ytd",
+        #     "30ai": "shared_fed_actvy_fed_shr_ytd",
+        #     "30aii": "shared_fed_actvy_nonfed_ytd",
+        #     "30b": "non_alloc_fed_elect_actvy_ytd",
+        #     "30c": "ttl_fed_elect_actvy_ytd",
+        #     "31": "ttl_disb_ytd",
+        #     "32": "ttl_fed_disb_ytd",
+        #     "33": "ttl_contb_ytd",
+        #     "34": "ttl_contb_ref_ytd_ii",
+        #     "35": "net_contb_ytd",
+        #     "36": "ttl_fed_op_exp_ytd",
+        #     "37": "offsets_to_op_exp_ytd_ii",
+        #     "38": "net_op_exp_ytd",
+        # }
 
-        update_str = ""
-        for i in update_col_a_dict:
-            sum_value = final_col_a_dict.get(i, None)
-            if sum_value in ["", None, "None"]:
-                sum_value = 0
-            update_str += "%s=%s," % (update_col_a_dict[i], str(sum_value))
-        for i in update_col_b_dict:
-            sum_value = final_col_b_dict.get(i, None)
-            if sum_value in ["", None, "None"]:
-                sum_value = 0
-            update_str += "%s=%s," % (update_col_b_dict[i], str(sum_value))
+        # update_str = ""
+        # for i in update_col_a_dict:
+        #     sum_value = final_col_a_dict.get(i, None)
+        #     if sum_value in ["", None, "None"]:
+        #         sum_value = 0
+        #     update_str += "%s=%s," % (update_col_a_dict[i], str(sum_value))
+        # for i in update_col_b_dict:
+        #     sum_value = final_col_b_dict.get(i, None)
+        #     if sum_value in ["", None, "None"]:
+        #         sum_value = 0
+        #     update_str += "%s=%s," % (update_col_b_dict[i], str(sum_value))
 
-        update_str = update_str[:-1]
+        # update_str = update_str[:-1]
         # print("-------------------------")
         # print(update_str, "update_str")
         # commented by Mahendra 10052019
         # return Response({'Response':'Success'}, status=status_value)
 
-        with connection.cursor() as cursor:
+        # with connection.cursor() as cursor:
             # query_string = """SELECT * FROM public.form_3x WHERE cmte_id = %s AND report_id = %s"""
             # cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t;""", [cmte_id, report_id])
-            update_query = (
-                    """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
-                    % (update_str, cmte_id, report_id)
-            )
-            cursor.execute(update_query)
+            # update_query = (
+            #         """update public.form_3x set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
+            #         % (update_str, cmte_id, report_id)
+            # # )
+            # cursor.execute(update_query)
             # print("Updated on Database ---- yoyooooo")
-        return Response({"Response": "Success"}, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response(
-            {"Response": "Failed", "Message": str(e)},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    return Response({"Response": "Success"}, status=status.HTTP_200_OK)
+    # except Exception as e:
+    #     return Response(
+    #         {"Response": "Failed", "Message": str(e)},
+    #         status=status.HTTP_400_BAD_REQUEST,
+    #     )
 
 
 """
@@ -7361,89 +7574,94 @@ def contacts(request):
     """
     contacts api supporting POST, GET, DELETE, PUT
     """
+    try:
+        is_read_only_or_filer_reports(request)
 
-    if request.method == "POST":
-        try:
-            # cmte_id = get_comittee_id(request.user.username)
-            datum = contact_sql_dict(request.data)
-            datum["cmte_id"] = get_comittee_id(request.user.username)
-            # datum['cmte_id'] = cmte_id
-            post_contact(datum)
-            # commented by Mahendra 10052019
-            # print ("datum", datum)
-            output = get_contact(datum)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The contacts API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        if request.method == "POST":
+            try:
+                # cmte_id = get_comittee_id(request.user.username)
+                datum = contact_sql_dict(request.data)
+                datum["cmte_id"] = get_comittee_id(request.user.username)
+                # datum['cmte_id'] = cmte_id
+                post_contact(datum)
+                # commented by Mahendra 10052019
+                # print ("datum", datum)
+                output = get_contact(datum)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The contacts API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    """
-    *********************************************** contact - GET API CALL STARTS HERE **********************************************************
-    """
-    # Get records from entity table
-    if request.method == "GET":
+        """
+        *********************************************** contact - GET API CALL STARTS HERE **********************************************************
+        """
+        # Get records from entity table
+        if request.method == "GET":
 
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params:
-                data["report_id"] = request.query_params.get("report_id")
-            output = get_contact(data)
-            return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The reports API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params:
+                    data["report_id"] = request.query_params.get("report_id")
+                output = get_contact(data)
+                return JsonResponse(output[0], status=status.HTTP_200_OK, safe=False)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The reports API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    """
-    ************************************************* contact - PUT API CALL STARTS HERE **********************************************************
-    """
-    if request.method == "PUT":
-        try:
-            datum = contact_entity_dict(request.data)
-            datum["cmte_id"] = get_comittee_id(request.user.username)
-            # datum['cmte_id'] = cmte_id
-            put_contact_data(datum)
-            print("datum", datum)
-            output = get_entities(datum)
-            dict_data = output[0]
-            dict_data["phone_number"] = (
-                str(dict_data["phone_number"]) if dict_data.get("phone_number") else ""
-            )
-            return JsonResponse(dict_data, status=status.HTTP_200_OK, safe=False)
-        except Exception as e:
-            return Response(
-                "The contacts API - PUT is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        """
+        ************************************************* contact - PUT API CALL STARTS HERE **********************************************************
+        """
+        if request.method == "PUT":
+            try:
+                datum = contact_entity_dict(request.data)
+                datum["cmte_id"] = get_comittee_id(request.user.username)
+                # datum['cmte_id'] = cmte_id
+                put_contact_data(datum)
+                print("datum", datum)
+                output = get_entities(datum)
+                dict_data = output[0]
+                dict_data["phone_number"] = (
+                    str(dict_data["phone_number"]) if dict_data.get("phone_number") else ""
+                )
+                return JsonResponse(dict_data, status=status.HTTP_200_OK, safe=False)
+            except Exception as e:
+                return Response(
+                    "The contacts API - PUT is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    """
-    ************************************************ contact - DELETE API CALL STARTS HERE **********************************************************
-    """
-    if request.method == "DELETE":
+        """
+        ************************************************ contact - DELETE API CALL STARTS HERE **********************************************************
+        """
+        if request.method == "DELETE":
 
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "id" in request.query_params and check_null_value(
-                    request.query_params.get("id")
-            ):
-                data["id"] = request.query_params.get("id")
-            else:
-                raise Exception("Missing Input: entity_id is mandatory")
-            delete_contact(data)
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "id" in request.query_params and check_null_value(
+                        request.query_params.get("id")
+                ):
+                    data["id"] = request.query_params.get("id")
+                else:
+                    raise Exception("Missing Input: entity_id is mandatory")
+                delete_contact(data)
 
-            return Response(
-                "entity ID: {} has been successfully deleted".format(data.get("id")),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The contacts API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                return Response(
+                    "entity ID: {} has been successfully deleted".format(data.get("id")),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    "The contacts API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def delete_contact(data):
@@ -7612,148 +7830,153 @@ def get_reporttype(cmte_id, report_id):
 @api_view(["POST"])
 def delete_trashed_reports(request):
     try:
-        """api for trash and restore report. """
-        cmte_id = get_comittee_id(request.user.username)
-        # commented by Mahendra 10052019
-        # print("trash_restore_report cmte_id = ", cmte_id)
-        # print("delete_trashed_reports  request.data =", request.data.get('actions', []))
-        list_report_ids = ""
-        for _action in request.data.get("actions", []):
-            report_id = _action.get("id", "")
-            list_report_ids = list_report_ids + str(report_id) + ", "
-        # commented by Mahendra 10052019
-        # print("delete_trashed_reports list_report_ids before rstrip", list_report_ids)
-        report_ids = list_report_ids.strip().rstrip(",")
-        # commented by Mahendra 10052019
-        # print("delete_trashed_reports list_report_ids", report_ids)
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """DELETE FROM public.forms_committeeinfo WHERE id in ("""
-                + report_ids
-                + """) AND committeeid = '"""
-                + cmte_id
-                + """'"""
+        is_read_only_or_filer_reports(request)
+        try:
+            """api for trash and restore report. """
+            cmte_id = get_comittee_id(request.user.username)
+            # commented by Mahendra 10052019
+            # print("trash_restore_report cmte_id = ", cmte_id)
+            # print("delete_trashed_reports  request.data =", request.data.get('actions', []))
+            list_report_ids = ""
+            for _action in request.data.get("actions", []):
+                report_id = _action.get("id", "")
+                list_report_ids = list_report_ids + str(report_id) + ", "
+            # commented by Mahendra 10052019
+            # print("delete_trashed_reports list_report_ids before rstrip", list_report_ids)
+            report_ids = list_report_ids.strip().rstrip(",")
+            # commented by Mahendra 10052019
+            # print("delete_trashed_reports list_report_ids", report_ids)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """DELETE FROM public.forms_committeeinfo WHERE id in ("""
+                    + report_ids
+                    + """) AND committeeid = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.reports WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.form_3x  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_a  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_b  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_c  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_c1  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_c2  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_d  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_e  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_f  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_h1  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_h2  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_h3  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_h4  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_h5  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.sched_h6  WHERE report_id in ("""
+                    + report_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+            message = "success"
+            json_result = {"message": message}
+            return Response(json_result, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                "The delete_trashed_reports API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
             )
-            cursor.execute(
-                """DELETE FROM public.reports WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.form_3x  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_a  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_b  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_c  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_c1  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_c2  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_d  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_e  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_f  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_h1  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_h2  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_h3  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_h4  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_h5  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-            cursor.execute(
-                """DELETE FROM public.sched_h6  WHERE report_id in ("""
-                + report_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
-            )
-        message = "success"
-        json_result = {"message": message}
-        return Response(json_result, status=status.HTTP_201_CREATED)
     except Exception as e:
-        return Response(
-            "The delete_trashed_reports API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["GET"])
@@ -7998,74 +8221,91 @@ def trash_restore_sql_report(cmte_id, report_id, _delete="Y"):
 @api_view(["PUT"])
 def trash_restore_report(request):
     """api for trash and restore report. """
-    cmte_id = get_comittee_id(request.user.username)
-    # commented by Mahendra 10052019
-    # print("trash_restore_report  request.data =", request.data.get('actions', []))
-    for _action in request.data.get("actions", []):
-        report_id = _action.get("id", "")
+    try:
+        is_read_only_or_filer_reports(request)
+        cmte_id = get_comittee_id(request.user.username)
         # commented by Mahendra 10052019
-        # print("trash_restore_report cmte_id = ", cmte_id)
-        # print("trash_restore_report report_id = ", report_id)
+        # print("trash_restore_report  request.data =", request.data.get('actions', []))
+        for _action in request.data.get("actions", []):
+            report_id = _action.get("id", "")
+            # commented by Mahendra 10052019
+            # print("trash_restore_report cmte_id = ", cmte_id)
+            # print("trash_restore_report report_id = ", report_id)
 
-        result = "failed"
-        action = _action.get("action", "")
-        _delete = "Y" if action == "trash" else ""
-        try:
-            if _delete == "Y":
-                if check_report_to_delete(cmte_id, report_id) == "N":
-                    result = "failed"
+            result = "failed"
+            action = _action.get("action", "")
+            _delete = "Y" if action == "trash" else ""
+            try:
+                if _delete == "Y":
+                    if check_report_to_delete(cmte_id, report_id) == "N":
+                        result = "failed"
+                    else:
+                        trash_restore_sql_report(cmte_id, report_id, _delete)
+                        result = "success"
                 else:
                     trash_restore_sql_report(cmte_id, report_id, _delete)
                     result = "success"
-            else:
-                trash_restore_sql_report(cmte_id, report_id, _delete)
-                result = "success"
 
-        except Exception as e:
-            return Response(
-                "The trash_restore_report API is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            except Exception as e:
+                return Response(
+                    "The trash_restore_report API is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    if result == "success":
-        return Response({"result": "success"}, status=status.HTTP_200_OK)
-    else:
-        return Response({"result": "failed"}, status=status.HTTP_200_OK)
+        if result == "success":
+            return Response({"result": "success"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"result": "failed"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["POST"])
 def delete_trashed_contacts(request):
     try:
-        """api for trash and restore contact. """
-        cmte_id = get_comittee_id(request.user.username)
-        # commented by Mahendra 10052019
-        # print("trash_restore_contact cmte_id = ", cmte_id)
-        # print("delete_trashed_contacts  request.data =", request.data.get('actions', []))
-        list_entity_ids = "'"
-        for _action in request.data.get("actions", []):
-            entity_id = _action.get("id", "")
-            list_entity_ids = list_entity_ids + str(entity_id) + "','"
-        # print("delete_trashed_contacts list_entity_ids before substring", list_entity_ids)
-        entity_ids = list_entity_ids[0: len(list_entity_ids) - 2]
-        # print("delete_trashed_contacts list_entity_ids", entity_ids)
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """DELETE FROM public.entity WHERE entity_id in ("""
-                + entity_ids
-                + """) AND cmte_id = '"""
-                + cmte_id
-                + """'"""
+        is_read_only_or_filer_reports(request)
+        try:
+            """api for trash and restore contact. """
+            cmte_id = get_comittee_id(request.user.username)
+            # commented by Mahendra 10052019
+            # print("trash_restore_contact cmte_id = ", cmte_id)
+            # print("delete_trashed_contacts  request.data =", request.data.get('actions', []))
+            list_entity_ids = "'"
+            for _action in request.data.get("actions", []):
+                entity_id = _action.get("id", "")
+                list_entity_ids = list_entity_ids + str(entity_id) + "','"
+            # print("delete_trashed_contacts list_entity_ids before substring", list_entity_ids)
+            entity_ids = list_entity_ids[0: len(list_entity_ids) - 2]
+            # print("delete_trashed_contacts list_entity_ids", entity_ids)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """DELETE FROM public.entity WHERE entity_id in ("""
+                    + entity_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+                cursor.execute(
+                    """DELETE FROM public.excluded_entity WHERE ref_entity_id in ("""
+                    + entity_ids
+                    + """) AND cmte_id = '"""
+                    + cmte_id
+                    + """'"""
+                )
+
+            message = "success"
+            json_result = {"message": message}
+            return Response(json_result, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                "The delete_trashed_contacts API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
             )
-
-        message = "success"
-        json_result = {"message": message}
-        return Response(json_result, status=status.HTTP_201_CREATED)
-
     except Exception as e:
-        return Response(
-            "The delete_trashed_contacts API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["GET", "POST"])
@@ -8274,6 +8514,11 @@ def trash_restore_sql_contact(cmte_id, entity_id, _delete="Y"):
                     _delete, datetime.datetime.now(), cmte_id, entity_id
                 )
             )
+            cursor.execute(
+                """UPDATE public.excluded_entity SET delete_ind = '{}' WHERE cmte_id = '{}' AND ref_entity_id = '{}'  """.format(
+                    _delete, cmte_id, entity_id
+                )
+            )
     except Exception:
         raise
 
@@ -8281,38 +8526,43 @@ def trash_restore_sql_contact(cmte_id, entity_id, _delete="Y"):
 @api_view(["PUT"])
 def trash_restore_contact(request):
     """api for trash and restore contact. """
-    cmte_id = get_comittee_id(request.user.username)
-    # commented by Mahendra 10052019
-    # print("trash_restore_contact  request.data =", request.data.get('actions', []))
-    result = ""
-    for _action in request.data.get("actions", []):
-        entity_id = _action.get("id", "")
-        # print("trash_restore_contact entity_id = ", entity_id)
-        # print("trash_restore_contact cmte_id = ", cmte_id)
-        result = "failed"
-        action = _action.get("action", "")
-        _delete = "Y" if action == "trash" else ""
-        try:
-            if _delete == "Y":
-                # print("trying to trash_restore_contact...")
-                if check_contact_to_delete(cmte_id, entity_id) == "N":
-                    result = "failed"
+    try:
+        is_read_only_or_filer_reports(request)
+        cmte_id = get_comittee_id(request.user.username)
+        # commented by Mahendra 10052019
+        # print("trash_restore_contact  request.data =", request.data.get('actions', []))
+        result = ""
+        for _action in request.data.get("actions", []):
+            entity_id = _action.get("id", "")
+            # print("trash_restore_contact entity_id = ", entity_id)
+            # print("trash_restore_contact cmte_id = ", cmte_id)
+            result = "failed"
+            action = _action.get("action", "")
+            _delete = "Y" if action == "trash" else ""
+            try:
+                if _delete == "Y":
+                    # print("trying to trash_restore_contact...")
+                    if check_contact_to_delete(cmte_id, entity_id) == "N":
+                        result = "failed"
+                    else:
+                        trash_restore_sql_contact(cmte_id, entity_id, _delete)
+                        result = "success"
                 else:
                     trash_restore_sql_contact(cmte_id, entity_id, _delete)
                     result = "success"
-            else:
-                trash_restore_sql_contact(cmte_id, entity_id, _delete)
-                result = "success"
 
-        except Exception as e:
-            return Response(
-                "The trash_restore_contact API is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-    if result == "success":
-        return Response({"result": "success"}, status=status.HTTP_200_OK)
-    else:
-        return Response({"result": "failed"}, status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response(
+                    "The trash_restore_contact API is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        if result == "success":
+            return Response({"result": "success"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"result": "failed"}, status=status.HTTP_200_OK)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def check_contact_to_delete(cmte_id, entity_id):
@@ -8438,148 +8688,153 @@ def clone_a_transaction(request):
     """
     # TODO: need to update this list for ohter transactions
     logger.debug("request for cloning a transaction:{}".format(request.data))
+    try:
+        is_read_only_or_filer_reports(request)
 
-    transaction_tables = {
-        "SA": "sched_a",
-        "LA": "sched_a",
-        "SB": "sched_b",
-        "LB": "sched_b",
-        "SC": "sched_c",
-        "SD": "sched_d",
-        "SE": "sched_e",
-        "SF": "sched_f",
-    }
-    # cmte_id = get_comittee_id(request.user.username)
-    transaction_id = request.data.get("transaction_id")
-    if not transaction_id:
-        raise Exception("Error: transaction_id is required for this api.")
+        transaction_tables = {
+            "SA": "sched_a",
+            "LA": "sched_a",
+            "SB": "sched_b",
+            "LB": "sched_b",
+            "SC": "sched_c",
+            "SD": "sched_d",
+            "SE": "sched_e",
+            "SF": "sched_f",
+        }
+        # cmte_id = get_comittee_id(request.user.username)
+        transaction_id = request.data.get("transaction_id")
+        if not transaction_id:
+            raise Exception("Error: transaction_id is required for this api.")
 
-    if transaction_id[0:2] in transaction_tables:
-        transaction_table = transaction_tables.get(transaction_id[0:2])
-        # raise Exception('Error: invalid transaction id found.')
-    elif transaction_id[0:2] == "SH":
-        transaction_table = get_sched_h_transaction_table(transaction_id)
-    else:
-        raise Exception("Error: invalid transaction id found.")
+        if transaction_id[0:2] in transaction_tables:
+            transaction_table = transaction_tables.get(transaction_id[0:2])
+            # raise Exception('Error: invalid transaction id found.')
+        elif transaction_id[0:2] == "SH":
+            transaction_table = get_sched_h_transaction_table(transaction_id)
+        else:
+            raise Exception("Error: invalid transaction id found.")
 
-    table_schema_sql = """
-    SELECT column_name FROM information_schema.columns
-    WHERE table_name = '{}'
-    """.format(
-        transaction_table
-    )
+        table_schema_sql = """
+        SELECT column_name FROM information_schema.columns
+        WHERE table_name = '{}'
+        """.format(
+            transaction_table
+        )
 
-    with connection.cursor() as cursor:
-        logger.debug("fetching transaction table column names...")
-        # cursor.execute(table_schema_sql, (transaction_table))
-        cursor.execute(table_schema_sql)
-        rows = cursor.fetchall()
-        columns = []
-        for row in rows:
-            if row[0] not in [
-                "reattribution_id",
-                "reattribution_ind",
-                "redesignation_id",
-                "redesignation_ind",
-            ]:
-                columns.append(row[0])
-        logger.debug("table columns: {}".format(list(columns)))
+        with connection.cursor() as cursor:
+            logger.debug("fetching transaction table column names...")
+            # cursor.execute(table_schema_sql, (transaction_table))
+            cursor.execute(table_schema_sql)
+            rows = cursor.fetchall()
+            columns = []
+            for row in rows:
+                if row[0] not in [
+                    "reattribution_id",
+                    "reattribution_ind",
+                    "redesignation_id",
+                    "redesignation_ind",
+                ]:
+                    columns.append(row[0])
+            logger.debug("table columns: {}".format(list(columns)))
 
-        insert_str = ",".join(columns)
-        replace_list = ["transaction_id", "create_date", "last_update_date"]
-        tmp_list = [col if col not in replace_list else "%s" for col in columns]
-        select_str = ",".join(tmp_list)
-        print("select_str:{}".format(select_str))
+            insert_str = ",".join(columns)
+            replace_list = ["transaction_id", "create_date", "last_update_date"]
+            tmp_list = [col if col not in replace_list else "%s" for col in columns]
+            select_str = ",".join(tmp_list)
+            print("select_str:{}".format(select_str))
 
-        # set transaction date to today's date and transaction amount to 0
-        from datetime import date
+            # set transaction date to today's date and transaction amount to 0
+            from datetime import date
 
-        _today = date.today().strftime("%m/%d/%Y")
-        if transaction_id.startswith("SA") or transaction_id.startswith("LA"):
-            select_str = select_str.replace("contribution_date", "'" + _today + "'")
-            select_str = select_str.replace("contribution_amount", "'" + "0.00" + "'")
-        if (
-                transaction_id.startswith("SB")
-                or transaction_id.startswith("LB")
-                or transaction_id.startswith("SF")
-        ):
-            select_str = select_str.replace("expenditure_date", "'" + _today + "'")
-            select_str = select_str.replace("expenditure_amount", "'" + "0.00" + "'")
-        if transaction_id.startswith("SE"):
-            select_str = select_str.replace("disbursement_date", "'" + _today + "'")
-            select_str = select_str.replace("dissemination_date", "'" + _today + "'")
-            select_str = select_str.replace("expenditure_amount", "'" + "0.00" + "'")
-        if transaction_id.startswith("SH") and transaction_table == "sched_h4":
-            select_str = select_str.replace("expenditure_date", "'" + _today + "'")
-            select_str = select_str.replace("total_amount", "'" + "0.00" + "'")
-            select_str = select_str.replace("non_fed_share_amount", "'" + "0.00" + "'")
-            select_str = select_str.replace("fed_share_amount", "'" + "0.00" + "'")
-        if transaction_id.startswith("SH") and transaction_table == "sched_h6":
-            select_str = select_str.replace("expenditure_date", "'" + _today + "'")
-            select_str = select_str.replace(
-                "total_fed_levin_amount", "'" + "0.00" + "'"
+            _today = date.today().strftime("%m/%d/%Y")
+            if transaction_id.startswith("SA") or transaction_id.startswith("LA"):
+                select_str = select_str.replace("contribution_date", "'" + _today + "'")
+                select_str = select_str.replace("contribution_amount", "'" + "0.00" + "'")
+            if (
+                    transaction_id.startswith("SB")
+                    or transaction_id.startswith("LB")
+                    or transaction_id.startswith("SF")
+            ):
+                select_str = select_str.replace("expenditure_date", "'" + _today + "'")
+                select_str = select_str.replace("expenditure_amount", "'" + "0.00" + "'")
+            if transaction_id.startswith("SE"):
+                select_str = select_str.replace("disbursement_date", "'" + _today + "'")
+                select_str = select_str.replace("dissemination_date", "'" + _today + "'")
+                select_str = select_str.replace("expenditure_amount", "'" + "0.00" + "'")
+            if transaction_id.startswith("SH") and transaction_table == "sched_h4":
+                select_str = select_str.replace("expenditure_date", "'" + _today + "'")
+                select_str = select_str.replace("total_amount", "'" + "0.00" + "'")
+                select_str = select_str.replace("non_fed_share_amount", "'" + "0.00" + "'")
+                select_str = select_str.replace("fed_share_amount", "'" + "0.00" + "'")
+            if transaction_id.startswith("SH") and transaction_table == "sched_h6":
+                select_str = select_str.replace("expenditure_date", "'" + _today + "'")
+                select_str = select_str.replace(
+                    "total_fed_levin_amount", "'" + "0.00" + "'"
+                )
+                select_str = select_str.replace("federal_share", "'" + "0.00" + "'")
+                select_str = select_str.replace("levin_share", "'" + "0.00" + "'")
+                # exclude_list = ['expenditure_date', 'expenditure_amount']
+            # select_str = insert_str.replace(',transaction_id,', ',%s,'
+            # ).replace('create_date', '%s'
+            # ).replace('last_update_date', '%s')
+
+            clone_sql = """
+                INSERT INTO public.{table_name}({_insert})
+                SELECT {_select}
+                FROM public.{table_name}
+            """.format(
+                table_name=transaction_table, _insert=insert_str, _select=select_str
             )
-            select_str = select_str.replace("federal_share", "'" + "0.00" + "'")
-            select_str = select_str.replace("levin_share", "'" + "0.00" + "'")
-            # exclude_list = ['expenditure_date', 'expenditure_amount']
-        # select_str = insert_str.replace(',transaction_id,', ',%s,'
-        # ).replace('create_date', '%s'
-        # ).replace('last_update_date', '%s')
+            clone_sql = clone_sql + " WHERE transaction_id = %s;"
+            logger.debug("clone transaction with sql:{}".format(clone_sql))
 
-        clone_sql = """
-            INSERT INTO public.{table_name}({_insert})
+            new_tran_id = get_next_transaction_id(transaction_id[0:2])
+            logger.debug("new transaction id:{}".format(new_tran_id))
+
+            cursor.execute(
+                clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id)
+            )
+
+            if not cursor.rowcount:
+                raise Exception("transaction clone error")
+
+            # exclude_list = []
+            # if transaction_id.startswith('SA'):
+            #     exclude_list = ['contribution_date', 'contribution_amount']
+            # if transaction_id.startswith('SB'):
+            # exclude_list = ['expenditure_date', 'expenditure_amount']
+            # columns = set(columns) - set(exclude_list)
+            select_str = ",".join(columns)
+            load_sql = """
             SELECT {_select}
             FROM public.{table_name}
-        """.format(
-            table_name=transaction_table, _insert=insert_str, _select=select_str
-        )
-        clone_sql = clone_sql + " WHERE transaction_id = %s;"
-        logger.debug("clone transaction with sql:{}".format(clone_sql))
+            """.format(
+                table_name=transaction_table, _select=select_str
+            )
 
-        new_tran_id = get_next_transaction_id(transaction_id[0:2])
-        logger.debug("new transaction id:{}".format(new_tran_id))
+            load_sql = (
+                    """SELECT json_agg(t) 
+            FROM ("""
+                    + load_sql
+                    + """WHERE transaction_id = '{}' ) t
+            """.format(
+                new_tran_id
+            )
+            )
+            logger.debug("load_sql:{}".format(load_sql))
+            cursor.execute(load_sql)
+            rep_json = cursor.fetchone()[0]
+            for obj in rep_json:
+                if transaction_id.startswith("LA"):
+                    obj["api_call"] = "/sa/schedA"
+                if transaction_id.startswith("LB"):
+                    obj["api_call"] = "/sb/schedB"
 
-        cursor.execute(
-            clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id)
-        )
-
-        if not cursor.rowcount:
-            raise Exception("transaction clone error")
-
-        # exclude_list = []
-        # if transaction_id.startswith('SA'):
-        #     exclude_list = ['contribution_date', 'contribution_amount']
-        # if transaction_id.startswith('SB'):
-        # exclude_list = ['expenditure_date', 'expenditure_amount']
-        # columns = set(columns) - set(exclude_list)
-        select_str = ",".join(columns)
-        load_sql = """
-        SELECT {_select}
-        FROM public.{table_name}
-        """.format(
-            table_name=transaction_table, _select=select_str
-        )
-
-        load_sql = (
-                """SELECT json_agg(t) 
-        FROM ("""
-                + load_sql
-                + """WHERE transaction_id = '{}' ) t
-        """.format(
-            new_tran_id
-        )
-        )
-        logger.debug("load_sql:{}".format(load_sql))
-        cursor.execute(load_sql)
-        rep_json = cursor.fetchone()[0]
-        for obj in rep_json:
-            if transaction_id.startswith("LA"):
-                obj["api_call"] = "/sa/schedA"
-            if transaction_id.startswith("LB"):
-                obj["api_call"] = "/sb/schedB"
-
-        # return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
-        return Response(rep_json, status=status.HTTP_200_OK)
+            # return Response({"result":"success", "transaction_id":new_tran_id}, status=status.HTTP_200_OK)
+            return Response(rep_json, status=status.HTTP_200_OK)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """
@@ -8706,53 +8961,66 @@ def get_report_ids(cmte_id, from_date, submit_flag=True, including=True):
 
 @api_view(["POST"])
 def create_amended_reports(request):
-    try:
-        if request.method == "POST":
-            reportid = request.POST.get("report_id")
-            cmte_id = get_comittee_id(request.user.username)
 
-            val_data = get_reports_data(reportid)
-            if not val_data:
+    try:
+        is_read_only_or_filer_reports(request)
+
+        if request.method == "POST":
+            try:
+                reportid = request.POST.get("report_id")
+                cmte_id = get_comittee_id(request.user.username)
+
+                val_data = get_reports_data(reportid)
+                if not val_data:
+                    return Response(
+                                "Given Report_id canot be amended",
+                                status=status.HTTP_400_BAD_REQUEST,
+                    )
+                data = val_data[0]
+                if data.get('form_type') == 'F3X':
+                            cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
+
+                            # cdate = date.today()
+                            from_date = cvg_start_date
+                            data_obj = None
+
+                            report_id_list = get_report_ids(cmte_id, from_date)
+
+                            print(report_id_list, from_date)
+
+                            if report_id_list:
+                                for i in report_id_list:
+                                    amended_obj = create_amended(i)
+                                    if str(i) == str(reportid):
+                                        data_obj = amended_obj
+
+                                        # post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
+                            else:
+                                return Response(
+                                    "Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST
+                                )
+
+                elif data.get('form_type') == 'F1M':
+                    output_dict = amend_form1m(data)
+                    data_obj = {**data, **output_dict}
+
+
+                else:
+                    raise Exception("""This form_type cannot be amended. 
+                              form type provided: {}""".format(data.get('form_type')))
+            except Exception as e:
                 return Response(
-                    "Given Report_id canot be amended",
+                    "Create amended report API is throwing an error: " + str(e),
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            data = val_data[0]
-            if data.get('form_type') == 'F3X':
-                cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
-                # cdate = date.today()
-                from_date = cvg_start_date
-                data_obj = None
-
-                report_id_list = get_report_ids(cmte_id, from_date)
-
-                print(report_id_list, from_date)
-
-                if report_id_list:
-                    for i in report_id_list:
-                        amended_obj = create_amended(i)
-                        if str(i) == str(reportid):
-                            data_obj = amended_obj
-
-                        # post_sql_report(report_id, data.get('cmte_id'), data.get('form_type'), data.get('amend_ind'), data.get('report_type'), data.get('cvg_start_dt'), data.get('cvg_end_dt'), data.get('due_dt'), data.get('status'), data.get('email_1'), data.get('email_2'), data.get('additional_email_1'), data.get('additional_email_2'))
-                else:
-                    return Response(
-                        "Given Report_id Not found", status=status.HTTP_400_BAD_REQUEST
-                    )
-            elif data.get('form_type') == 'F1M':
-                output_dict = amend_form1m(data)
-                data_obj = {**data, **output_dict}
-            else:
-                raise Exception("""This form_type cannot be amended. 
-                  form type provided: {}""".format(data.get('form_type')))
 
         return JsonResponse(data_obj, status=status.HTTP_200_OK, safe=False)
+
     except Exception as e:
-        return Response(
-            "Create amended report API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
 
 def amend_form1m(request_dict):
     try:
@@ -9274,122 +9542,130 @@ def levin_accounts(request):
     """
     the api for adding/retrieving levin accounts
     """
-    if request.method == "GET":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            levin_account_id = request.query_params.get("levin_account_id")
-            if not levin_account_id:
-                forms_obj = get_levin_accounts(cmte_id)
-            else:
-                forms_obj = get_levin_account(cmte_id, levin_account_id)
+    try:
+        is_read_only_or_filer_reports(request)
+        if request.method == "GET":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                levin_account_id = request.query_params.get("levin_account_id")
+                if not levin_account_id:
+                    forms_obj = get_levin_accounts(cmte_id)
+                else:
+                    forms_obj = get_levin_account(cmte_id, levin_account_id)
 
-            if forms_obj:
-                return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
-            else:
-                return JsonResponse([], status=status.HTTP_204_NO_CONTENT, safe=False)
+                if forms_obj:
+                    return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
+                else:
+                    return JsonResponse([], status=status.HTTP_204_NO_CONTENT, safe=False)
 
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(forms_obj, status.HTTP_204_NO_CONTENT, safe=False)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The levin_account API - GET is throwing an error: " + str(e),
-                status.HTTP_400_BAD_REQUEST,
-            )
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(forms_obj, status.HTTP_204_NO_CONTENT, safe=False)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The levin_account API - GET is throwing an error: " + str(e),
+                    status.HTTP_400_BAD_REQUEST,
+                )
 
-    elif request.method == "POST":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
+        elif request.method == "POST":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
 
-            if not "levin_account_name" in request.data:
-                raise Exception("levin account name is required.")
-            if not request.data.get("levin_account_name"):
-                raise Exception("a valid levin account name is required.")
-            levin_account_name = request.data.get("levin_account_name")
+                if not "levin_account_name" in request.data:
+                    raise Exception("levin account name is required.")
+                if not request.data.get("levin_account_name"):
+                    raise Exception("a valid levin account name is required.")
+                levin_account_name = request.data.get("levin_account_name")
 
-            levin_account_id = get_next_levin_acct_id()
-            post_levin_account(cmte_id, levin_account_id, levin_account_name)
-            levin_obj = get_levin_account(cmte_id, levin_account_id)
-            return Response(levin_obj, status.HTTP_200_OK)
-        except Exception as e:
-            logger.debug("Error on creating a new levin account:" + str(e))
-            return Response(
-                "Error on creating a new levin account:" + str(e),
-                status.HTTP_400_BAD_REQUEST,
-            )
+                levin_account_id = get_next_levin_acct_id()
+                post_levin_account(cmte_id, levin_account_id, levin_account_name)
+                levin_obj = get_levin_account(cmte_id, levin_account_id)
+                return Response(levin_obj, status.HTTP_200_OK)
+            except Exception as e:
+                logger.debug("Error on creating a new levin account:" + str(e))
+                return Response(
+                    "Error on creating a new levin account:" + str(e),
+                    status.HTTP_400_BAD_REQUEST,
+                )
 
-    elif request.method == "PUT":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            levin_account_name = request.data.get("levin_account_name")
-            levin_account_id = request.data.get("levin_account_id")
-            put_levin_account(cmte_id, levin_account_id, levin_account_name)
-            levin_obj = get_levin_account(cmte_id, levin_account_id)
-            return Response(levin_obj, status.HTTP_200_OK)
-        except Exception as e:
-            logger.debug("Error on saving a new levin account name:" + str(e))
-            return Response(
-                "Error on saving levin account name:" + str(e),
-                status.HTTP_400_BAD_REQUEST,
-            )
-    elif request.method == "DELETE":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            levin_account_id = request.query_params.get("levin_account_id")
-            if not levin_account_id:
-                raise Exception("a valid levin account id is required.")
-            if not levin_deletable(cmte_id, levin_account_id):
-                raise Exception("levin account has transactions and not deletable.")
-            delete_levin_account(cmte_id, levin_account_id)
-            return Response(
-                "The account: {} has been successfully deleted".format(
-                    levin_account_id
-                ),
-                status=status.HTTP_200_OK,
-            )
-        except Exception as e:
-            logger.debug("Error on deleting account:" + str(e))
-            return Response(
-                "The levin account API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        elif request.method == "PUT":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                levin_account_name = request.data.get("levin_account_name")
+                levin_account_id = request.data.get("levin_account_id")
+                put_levin_account(cmte_id, levin_account_id, levin_account_name)
+                levin_obj = get_levin_account(cmte_id, levin_account_id)
+                return Response(levin_obj, status.HTTP_200_OK)
+            except Exception as e:
+                logger.debug("Error on saving a new levin account name:" + str(e))
+                return Response(
+                    "Error on saving levin account name:" + str(e),
+                    status.HTTP_400_BAD_REQUEST,
+                )
+        elif request.method == "DELETE":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                levin_account_id = request.query_params.get("levin_account_id")
+                if not levin_account_id:
+                    raise Exception("a valid levin account id is required.")
+                if not levin_deletable(cmte_id, levin_account_id):
+                    raise Exception("levin account has transactions and not deletable.")
+                delete_levin_account(cmte_id, levin_account_id)
+                return Response(
+                    "The account: {} has been successfully deleted".format(
+                        levin_account_id
+                    ),
+                    status=status.HTTP_200_OK,
+                )
+            except Exception as e:
+                logger.debug("Error on deleting account:" + str(e))
+                return Response(
+                    "The levin account API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    else:
-        pass
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["PUT"])
 def new_report_update_date(request):
     logger.debug("request for update report last_update_date:")
     try:
-        if request.method == "PUT":
-            cmte_id = get_comittee_id(request.user.username)
-            logger.debug("cmte id:{}".format(cmte_id))
-            if not request.data.get("report_id"):
-                raise Exception("Error: report_id is required for this api.")
-            report_id = check_report_id(request.data.get("report_id"))
-            logger.debug("report_id:{}".format(report_id))
-            _sql = """
-            UPDATE public.reports
-            SET last_update_date = %s
-            WHERE cmte_id = %s
-            AND report_id = %s 
-            """
-            with connection.cursor() as cursor:
-                cursor.execute(_sql, [datetime.datetime.now(), cmte_id, report_id])
-                if cursor.rowcount == 0:
-                    raise Exception("Error: updating report update date failed.")
+        is_read_only_or_filer_reports(request)
+        try:
+            if request.method == "PUT":
+                cmte_id = get_comittee_id(request.user.username)
+                logger.debug("cmte id:{}".format(cmte_id))
+                if not request.data.get("report_id"):
+                    raise Exception("Error: report_id is required for this api.")
+                report_id = check_report_id(request.data.get("report_id"))
+                logger.debug("report_id:{}".format(report_id))
+                _sql = """
+                UPDATE public.reports
+                SET last_update_date = %s
+                WHERE cmte_id = %s
+                AND report_id = %s 
+                """
+                with connection.cursor() as cursor:
+                    cursor.execute(_sql, [datetime.datetime.now(), cmte_id, report_id])
+                    if cursor.rowcount == 0:
+                        raise Exception("Error: updating report update date failed.")
 
-        else:
-            raise Exception("Error: request type not implemented.")
+            else:
+                raise Exception("Error: request type not implemented.")
+        except Exception as e:
+            return Response(
+                "new report update date API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response({"result": "success"}, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response(
-            "new report update date API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-    return Response({"result": "success"}, status=status.HTTP_200_OK)
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """
@@ -9835,275 +10111,280 @@ def get_sl_line_sum_value(
 @api_view(["POST"])
 def prepare_Schedl_summary_data(request):
     try:
-        # import ipdb;ipdb.set_trace()
-        cmte_id = get_comittee_id(request.user.username)
-        param_string = ""
-        report_id = request.data.get("report_id")
-        sched_la_line_sum = {}
-        sched_lb_line_sum = {}
+        is_read_only_or_filer_reports(request)
+        try:
+            # import ipdb;ipdb.set_trace()
+            cmte_id = get_comittee_id(request.user.username)
+            param_string = ""
+            report_id = request.data.get("report_id")
+            sched_la_line_sum = {}
+            sched_lb_line_sum = {}
 
-        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+            cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
 
-        # cdate = date.today()
-        from_date = date(cvg_start_date.year, 1, 1)
+            # cdate = date.today()
+            from_date = date(cvg_start_date.year, 1, 1)
 
-        to_date = cvg_end_date
+            to_date = cvg_end_date
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT sa.line_number, sum(sa.contribution_amount), la.levin_account_name from public.sched_a sa
-                join levin_account la on sa.levin_account_id = la.levin_account_id  
-                where sa.cmte_id = '%s' AND sa.report_id = '%s'  And line_number in ('1A','2')  group by sa.line_number,la.levin_account_name;"""
-                % (cmte_id, report_id)
-            )
-
-            sched_la_line_sum_result = cursor.fetchall()
-            sched_la_line_sum = {
-                str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2])
-                for i in sched_la_line_sum_result
-            }
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT sb.line_number, sum(sb.expenditure_amount), la.levin_account_name from public.sched_b sb
-                join levin_account la on sb.levin_account_id = la.levin_account_id 
-                where sb.cmte_id = '%s' AND sb.report_id = '%s' AND sb.line_number in  ('4A', '4B','4C','4D','5') group by sb.line_number,la.levin_account_name;"""
-                % (cmte_id, report_id)
-            )
-
-            sched_lb_line_sum_result = cursor.fetchall()
-            sched_lb_line_sum = {
-                str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2])
-                for i in sched_lb_line_sum_result
-            }
-
-        schedule_la_lb_line_sum_dict = {}
-        schedule_la_lb_line_sum_dict.update(sched_la_line_sum)
-        schedule_la_lb_line_sum_dict.update(sched_lb_line_sum)
-
-        col_la_line_sum = {}
-        col_lb_line_sum = {}
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """ 
-                SELECT sa.line_number, sum(sa.contribution_amount), la.levin_account_name from public.sched_a sa
-                join levin_account la on sa.levin_account_id = la.levin_account_id  
-                where sa.cmte_id = %s AND sa.contribution_date >= %s AND sa.contribution_date <= %s AND sa.line_number in ('1A','2') AND
-                sa.delete_ind is distinct from 'Y' group by sa.line_number,la.levin_account_name;""",
-                [cmte_id, from_date, to_date],
-            )
-
-            col_la_line_sum_result = cursor.fetchall()
-            col_la_line_sum = {
-                str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2])
-                for i in col_la_line_sum_result
-            }
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT sb.line_number, sum(sb.expenditure_amount), la.levin_account_name from public.sched_b sb
-                join levin_account la on sb.levin_account_id = la.levin_account_id 
-                where sb.cmte_id = %s AND sb.expenditure_date >= %s AND sb.expenditure_date <= %s AND sb.line_number in  ('4A', '4B','4C','4D','5') AND
-                sb.delete_ind is distinct from 'Y' group by sb.line_number,la.levin_account_name;""",
-                [cmte_id, from_date, to_date],
-            )
-
-            col_lb_line_sum_result = cursor.fetchall()
-            col_lb_line_sum = {
-                str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2])
-                for i in col_lb_line_sum_result
-            }
-
-        col_line_sum_dict = {}
-        col_line_sum_dict.update(col_la_line_sum)
-        col_line_sum_dict.update(col_lb_line_sum)
-
-        col_la = [
-            ("1a", ""),
-            ("1b", ""),
-            ("1c", "1a+1b"),
-            ("2", ""),
-            ("3", "1c+2"),
-            ("4a", ""),
-            ("4b", ""),
-            ("4c", ""),
-            ("4d", ""),
-            ("4e", "4a+4b+4c+4d"),
-            ("5", ""),
-            ("6", "4e+5"),
-            ("7", ""),
-            ("8", "3"),
-            ("9", "7+8"),
-            ("10", "6"),
-            ("11", "9 - 10"),
-        ]
-
-        col_la_dict_original = OrderedDict()
-        for i in col_la:
-            col_la_dict_original[i[0]] = i[1]
-        final_col_la_dict = {}
-        # print(col_la_dict_original,';;;;;;;;;;;;;;;;;;;;;;;;;;;;;')
-
-        levin_name = ""
-        for line_number in col_la_dict_original:
-            if not levin_name:
-                levin_name = (
-                    schedule_la_lb_line_sum_dict.get(line_number)[1]
-                    if schedule_la_lb_line_sum_dict.get(line_number)
-                    else ""
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT sa.line_number, sum(sa.contribution_amount), la.levin_account_name from public.sched_a sa
+                    join levin_account la on sa.levin_account_id = la.levin_account_id  
+                    where sa.cmte_id = '%s' AND sa.report_id = '%s'  And line_number in ('1A','2')  group by sa.line_number,la.levin_account_name;"""
+                    % (cmte_id, report_id)
                 )
-                # print(line_number,levin_name,'------------line_number lllllllllllllllllllllllllllllllllllll')
 
-            final_col_la_dict[line_number] = get_sl_line_sum_value(
-                line_number,
-                levin_name,
-                col_la_dict_original[line_number],
-                schedule_la_lb_line_sum_dict,
-                cmte_id,
-                report_id,
-                True,
-            )
+                sched_la_line_sum_result = cursor.fetchall()
+                sched_la_line_sum = {
+                    str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2])
+                    for i in sched_la_line_sum_result
+                }
 
-            schedule_la_lb_line_sum_dict[line_number] = final_col_la_dict[line_number]
-            # print(schedule_la_lb_line_sum_dict,'vallllllllllllllllllllllllllllllllllll scaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-
-        col_lb = [
-            ("1a", ""),
-            ("1b", ""),
-            ("1c", "1a+1b"),
-            ("2", ""),
-            ("3", "1c+2"),
-            ("4a", ""),
-            ("4b", ""),
-            ("4c", ""),
-            ("4d", ""),
-            ("4e", "4a+4b+4c+4d"),
-            ("5", ""),
-            ("6", "4e+5"),
-            ("7", "prev"),
-            ("8", "3"),
-            ("9", "7+8"),
-            ("10", "6"),
-            ("11", "9 - 10"),
-        ]
-
-        col_lb_dict_original = OrderedDict()
-        for i in col_lb:
-            col_lb_dict_original[i[0]] = i[1]
-        final_col_lb_dict = {}
-        for line_number in col_lb_dict_original:
-            if not levin_name:
-                levin_name = (
-                    col_line_sum_dict.get(line_number)[1]
-                    if col_line_sum_dict.get(line_number)
-                    else ""
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT sb.line_number, sum(sb.expenditure_amount), la.levin_account_name from public.sched_b sb
+                    join levin_account la on sb.levin_account_id = la.levin_account_id 
+                    where sb.cmte_id = '%s' AND sb.report_id = '%s' AND sb.line_number in  ('4A', '4B','4C','4D','5') group by sb.line_number,la.levin_account_name;"""
+                    % (cmte_id, report_id)
                 )
-            final_col_lb_dict[line_number] = get_sl_line_sum_value(
-                line_number,
-                levin_name,
-                col_lb_dict_original[line_number],
-                col_line_sum_dict,
-                cmte_id,
-                report_id,
-                False,
+
+                sched_lb_line_sum_result = cursor.fetchall()
+                sched_lb_line_sum = {
+                    str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2])
+                    for i in sched_lb_line_sum_result
+                }
+
+            schedule_la_lb_line_sum_dict = {}
+            schedule_la_lb_line_sum_dict.update(sched_la_line_sum)
+            schedule_la_lb_line_sum_dict.update(sched_lb_line_sum)
+
+            col_la_line_sum = {}
+            col_lb_line_sum = {}
+
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """ 
+                    SELECT sa.line_number, sum(sa.contribution_amount), la.levin_account_name from public.sched_a sa
+                    join levin_account la on sa.levin_account_id = la.levin_account_id  
+                    where sa.cmte_id = %s AND sa.contribution_date >= %s AND sa.contribution_date <= %s AND sa.line_number in ('1A','2') AND
+                    sa.delete_ind is distinct from 'Y' group by sa.line_number,la.levin_account_name;""",
+                    [cmte_id, from_date, to_date],
+                )
+
+                col_la_line_sum_result = cursor.fetchall()
+                col_la_line_sum = {
+                    str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2])
+                    for i in col_la_line_sum_result
+                }
+
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT sb.line_number, sum(sb.expenditure_amount), la.levin_account_name from public.sched_b sb
+                    join levin_account la on sb.levin_account_id = la.levin_account_id 
+                    where sb.cmte_id = %s AND sb.expenditure_date >= %s AND sb.expenditure_date <= %s AND sb.line_number in  ('4A', '4B','4C','4D','5') AND
+                    sb.delete_ind is distinct from 'Y' group by sb.line_number,la.levin_account_name;""",
+                    [cmte_id, from_date, to_date],
+                )
+
+                col_lb_line_sum_result = cursor.fetchall()
+                col_lb_line_sum = {
+                    str(i[0].lower()): (i[1], i[2]) if i[1] else (0, i[2])
+                    for i in col_lb_line_sum_result
+                }
+
+            col_line_sum_dict = {}
+            col_line_sum_dict.update(col_la_line_sum)
+            col_line_sum_dict.update(col_lb_line_sum)
+
+            col_la = [
+                ("1a", ""),
+                ("1b", ""),
+                ("1c", "1a+1b"),
+                ("2", ""),
+                ("3", "1c+2"),
+                ("4a", ""),
+                ("4b", ""),
+                ("4c", ""),
+                ("4d", ""),
+                ("4e", "4a+4b+4c+4d"),
+                ("5", ""),
+                ("6", "4e+5"),
+                ("7", ""),
+                ("8", "3"),
+                ("9", "7+8"),
+                ("10", "6"),
+                ("11", "9 - 10"),
+            ]
+
+            col_la_dict_original = OrderedDict()
+            for i in col_la:
+                col_la_dict_original[i[0]] = i[1]
+            final_col_la_dict = {}
+            # print(col_la_dict_original,';;;;;;;;;;;;;;;;;;;;;;;;;;;;;')
+
+            levin_name = ""
+            for line_number in col_la_dict_original:
+                if not levin_name:
+                    levin_name = (
+                        schedule_la_lb_line_sum_dict.get(line_number)[1]
+                        if schedule_la_lb_line_sum_dict.get(line_number)
+                        else ""
+                    )
+                    # print(line_number,levin_name,'------------line_number lllllllllllllllllllllllllllllllllllll')
+
+                final_col_la_dict[line_number] = get_sl_line_sum_value(
+                    line_number,
+                    levin_name,
+                    col_la_dict_original[line_number],
+                    schedule_la_lb_line_sum_dict,
+                    cmte_id,
+                    report_id,
+                    True,
+                )
+
+                schedule_la_lb_line_sum_dict[line_number] = final_col_la_dict[line_number]
+                # print(schedule_la_lb_line_sum_dict,'vallllllllllllllllllllllllllllllllllll scaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+
+            col_lb = [
+                ("1a", ""),
+                ("1b", ""),
+                ("1c", "1a+1b"),
+                ("2", ""),
+                ("3", "1c+2"),
+                ("4a", ""),
+                ("4b", ""),
+                ("4c", ""),
+                ("4d", ""),
+                ("4e", "4a+4b+4c+4d"),
+                ("5", ""),
+                ("6", "4e+5"),
+                ("7", "prev"),
+                ("8", "3"),
+                ("9", "7+8"),
+                ("10", "6"),
+                ("11", "9 - 10"),
+            ]
+
+            col_lb_dict_original = OrderedDict()
+            for i in col_lb:
+                col_lb_dict_original[i[0]] = i[1]
+            final_col_lb_dict = {}
+            for line_number in col_lb_dict_original:
+                if not levin_name:
+                    levin_name = (
+                        col_line_sum_dict.get(line_number)[1]
+                        if col_line_sum_dict.get(line_number)
+                        else ""
+                    )
+                final_col_lb_dict[line_number] = get_sl_line_sum_value(
+                    line_number,
+                    levin_name,
+                    col_lb_dict_original[line_number],
+                    col_line_sum_dict,
+                    cmte_id,
+                    report_id,
+                    False,
+                )
+                col_line_sum_dict[line_number] = final_col_lb_dict[line_number]
+
+            for i in final_col_la_dict:
+                la_val = final_col_la_dict[i]
+                lb_val = final_col_lb_dict.get(i)
+                la_formula = col_la_dict_original.get(i, "")
+                lb_formula = col_lb_dict_original.get(i, "")
+                if la_formula:
+                    la_formula = la_formula.replace(" ", "")
+                if lb_formula:
+                    lb_formula = lb_formula.replace(" ", "")
+
+                final_col_lb_dict[i] = lb_val
+                final_col_la_dict[i] = la_val
+
+            update_col_la_dict = {
+                "1a": "item_receipts",
+                "1b": "unitem_receipts",
+                "1c": "total_c_receipts",
+                "2": "other_receipts",
+                "3": "total_receipts",
+                "4a": "voter_reg_disb_amount",
+                "4b": "voter_id_disb_amount",
+                "4c": "gotv_disb_amount",
+                "4d": "generic_campaign_disb_amount",
+                "4e": "total_tran_to_fed_or_alloc",
+                "5": "other_disb",
+                "6": "total_disb",
+                "7": "coh_bop",
+                "8": "receipts",
+                "9": "subtotal",
+                "10": "disbursements",
+                "11": "coh_cop",
+            }
+
+            update_col_lb_dict = {
+                "1a": "item_receipts_ytd",
+                "1b": "unitem_receipts_ytd",
+                "1c": "total_c_receipts_ytd",
+                "2": "other_receipts_ytd",
+                "3": "total_receipts_ytd",
+                "4a": "voter_reg_disb_amount_ytd",
+                "4b": "voter_id_disb_amount_ytd",
+                "4c": "gotv_disb_amount_ytd",
+                "4d": "generic_campaign_disb_amount_ytd",
+                "4e": "total_tran_to_fed_or_alloc_ytd",
+                "5": "other_disb_ytd",
+                "6": "total_disb_ytd",
+                "7": "coh_coy",
+                "8": "receipts_ytd",
+                "9": "sub_total_ytd",
+                "10": "disbursements_ytd",
+                "11": "coh_cop_ytd",
+            }
+
+            update_str = ""
+            levin_accnt_name = None
+            sum_value = 0
+            for i in update_col_la_dict:
+                dict_value = final_col_la_dict.get(i, None)
+                if dict_value in ["", None, "None"]:
+                    sum_value = 0
+                    levin_accnt_name = None
+                else:
+                    sum_value = dict_value[0]
+                    levin_accnt_name = dict_value[1]
+                update_str += "%s=%s," % (update_col_la_dict[i], str(sum_value))
+                # update_str += "%s='%s'," % ('account_name', str(levin_accnt_name))
+            for i in update_col_lb_dict:
+                dict_value = final_col_lb_dict.get(i, None)
+                if dict_value in ["", None, "None"]:
+                    sum_value = 0
+                    levin_accnt_name = None
+                else:
+                    sum_value = dict_value[0]
+                    levin_accnt_name = dict_value[1]
+
+                update_str += "%s=%s," % (update_col_lb_dict[i], str(sum_value))
+            update_str += "%s='%s'," % ("account_name", str(levin_accnt_name))
+
+            update_str = update_str[:-1]
+            with connection.cursor() as cursor:
+                update_query = (
+                        """update public.sched_l set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
+                        % (update_str, cmte_id, report_id)
+                )
+                cursor.execute(update_query)
+            return Response({"Response": "Success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"Response": "Failed", "Message": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-            col_line_sum_dict[line_number] = final_col_lb_dict[line_number]
-
-        for i in final_col_la_dict:
-            la_val = final_col_la_dict[i]
-            lb_val = final_col_lb_dict.get(i)
-            la_formula = col_la_dict_original.get(i, "")
-            lb_formula = col_lb_dict_original.get(i, "")
-            if la_formula:
-                la_formula = la_formula.replace(" ", "")
-            if lb_formula:
-                lb_formula = lb_formula.replace(" ", "")
-
-            final_col_lb_dict[i] = lb_val
-            final_col_la_dict[i] = la_val
-
-        update_col_la_dict = {
-            "1a": "item_receipts",
-            "1b": "unitem_receipts",
-            "1c": "total_c_receipts",
-            "2": "other_receipts",
-            "3": "total_receipts",
-            "4a": "voter_reg_disb_amount",
-            "4b": "voter_id_disb_amount",
-            "4c": "gotv_disb_amount",
-            "4d": "generic_campaign_disb_amount",
-            "4e": "total_tran_to_fed_or_alloc",
-            "5": "other_disb",
-            "6": "total_disb",
-            "7": "coh_bop",
-            "8": "receipts",
-            "9": "subtotal",
-            "10": "disbursements",
-            "11": "coh_cop",
-        }
-
-        update_col_lb_dict = {
-            "1a": "item_receipts_ytd",
-            "1b": "unitem_receipts_ytd",
-            "1c": "total_c_receipts_ytd",
-            "2": "other_receipts_ytd",
-            "3": "total_receipts_ytd",
-            "4a": "voter_reg_disb_amount_ytd",
-            "4b": "voter_id_disb_amount_ytd",
-            "4c": "gotv_disb_amount_ytd",
-            "4d": "generic_campaign_disb_amount_ytd",
-            "4e": "total_tran_to_fed_or_alloc_ytd",
-            "5": "other_disb_ytd",
-            "6": "total_disb_ytd",
-            "7": "coh_coy",
-            "8": "receipts_ytd",
-            "9": "sub_total_ytd",
-            "10": "disbursements_ytd",
-            "11": "coh_cop_ytd",
-        }
-
-        update_str = ""
-        levin_accnt_name = None
-        sum_value = 0
-        for i in update_col_la_dict:
-            dict_value = final_col_la_dict.get(i, None)
-            if dict_value in ["", None, "None"]:
-                sum_value = 0
-                levin_accnt_name = None
-            else:
-                sum_value = dict_value[0]
-                levin_accnt_name = dict_value[1]
-            update_str += "%s=%s," % (update_col_la_dict[i], str(sum_value))
-            # update_str += "%s='%s'," % ('account_name', str(levin_accnt_name))
-        for i in update_col_lb_dict:
-            dict_value = final_col_lb_dict.get(i, None)
-            if dict_value in ["", None, "None"]:
-                sum_value = 0
-                levin_accnt_name = None
-            else:
-                sum_value = dict_value[0]
-                levin_accnt_name = dict_value[1]
-
-            update_str += "%s=%s," % (update_col_lb_dict[i], str(sum_value))
-        update_str += "%s='%s'," % ("account_name", str(levin_accnt_name))
-
-        update_str = update_str[:-1]
-        with connection.cursor() as cursor:
-            update_query = (
-                    """update public.sched_l set %s WHERE cmte_id = '%s' AND report_id = '%s';"""
-                    % (update_str, cmte_id, report_id)
-            )
-            cursor.execute(update_query)
-        return Response({"Response": "Success"}, status=status.HTTP_200_OK)
     except Exception as e:
-        return Response(
-            {"Response": "Failed", "Message": str(e)},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def get_original_amount_by_redesignation_id(transaction_id):
@@ -10241,12 +10522,13 @@ def F3X_values(cmte_id, report_list, year_flag=False):
         _sql = """SELECT CASE 
                     WHEN line_number = '11A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '11AI'
                     WHEN line_number = '11A' AND itemized in ('U', 'FU') THEN '11AII'
-                    WHEN line_number = '21A' AND itemized IS DISTINCT FROM 'U' AND itemized IS DISTINCT FROM 'FU' THEN '21AI'
-                    WHEN line_number = '21A' AND itemized in ('U', 'FU') THEN '21AII'
+                    WHEN line_number = '21A' THEN '21AI'
                     WHEN line_number = '30A' THEN '30AI'
                     ELSE line_number
                     END AS line_num, 
-                COALESCE(SUM(transaction_amount),0.0) 
+                COALESCE(SUM(transaction_amount),0.0),
+                COALESCE(SUM(fed_amount),0.0),
+                COALESCE(SUM(non_fed_amount),0.0)
                 FROM public.all_transactions_view 
                 WHERE memo_code IS DISTINCT FROM 'X' AND delete_ind IS DISTINCT FROM 'Y' 
                     AND transaction_table NOT IN ('sched_c') AND report_id IN ('{}') 
@@ -10263,7 +10545,14 @@ def F3X_values(cmte_id, report_list, year_flag=False):
                 for amount_tuple in amounts_list:
                     column = f3x_col_line_dict[amount_tuple[0]][i]
                     if column in output_dict:
-                        output_dict[column] += amount_tuple[1]
+                        if amount_tuple[0] == '21AI':
+                            output_dict[column] += amount_tuple[2]
+                            output_dict[f3x_col_line_dict['21AII'][i]] += amount_tuple[3]
+                        elif amount_tuple[0] == '30AI':
+                            output_dict[column] += amount_tuple[2]
+                            output_dict[f3x_col_line_dict['30AII'][i]] += amount_tuple[3]
+                        else:
+                            output_dict[column] += amount_tuple[1]
                     else:
                         output_dict[column] = amount_tuple[1]
         output_dict[f3x_col_line_dict['11A'][i]] = (output_dict.get(f3x_col_line_dict['11AI'][i],0) + 
@@ -10344,7 +10633,7 @@ def get_year_reports(cmte_id, report_id):
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
                     data_ids.append(row[0])
-
+        # data_ids.append(0)
         return data_ids
     except Exception as e:
         print(e)

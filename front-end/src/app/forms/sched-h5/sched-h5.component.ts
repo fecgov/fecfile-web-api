@@ -401,6 +401,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       if (res) {
         this.saveHRes = res;
         this.h5Entries = [];
+        this.updateThirdNavAmounts(res);
       }
     });
   }
@@ -423,6 +424,12 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
         const pagedResponse = this._utilService.pageResponse(res, this.config);
         this.h5Sum = pagedResponse.items;
         this.pageNumbers = pagedResponse.pageNumbers;
+
+      // Update third navigation totals
+      const report = {
+        'report_id': reportId
+      };
+      this.updateThirdNavAmounts(report);
     });
   }
 
@@ -841,7 +848,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.h5Ratios['child'] = [];
     this.transferredAmountErr = false;
     if (this.scheduleAction === ScheduleActions.edit) {
-      this.scheduleAction = ScheduleActions.add
+      this.scheduleAction = ScheduleActions.add;
     }
   }
 
@@ -858,7 +865,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH5.patchValue({ category: 'voter_id' }, { onlySelf: true });
     } else if (item.transfer_type === 'Voter Registration') {
       this.schedH5.patchValue({ category: 'voter_registration' }, { onlySelf: true });
-    } else if (item.transfer_type === 'Generic Campaign Activities') {
+    } else if (item.transfer_type === 'Generic Campaign') {
       this.schedH5.patchValue({ category: 'generic_campaign' }, { onlySelf: true });
     } else if (item.transfer_type === 'GOTV') {
       this.schedH5.patchValue({ category: 'gotv' }, { onlySelf: true });

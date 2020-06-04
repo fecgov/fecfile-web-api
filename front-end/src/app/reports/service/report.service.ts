@@ -421,7 +421,7 @@ export class ReportsService {
 
     if (form_type === 'F99') {
       url = '/f99/get_f99_report_info';
-    } else if (form_type === 'F3X') {
+    } else if (form_type === 'F3X' || form_type === '3X') {
       url = '/core/get_report_info';
     } else if(form_type === 'F1M'){
       url = '/f1M/form1M'

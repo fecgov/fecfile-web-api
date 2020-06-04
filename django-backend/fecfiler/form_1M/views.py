@@ -14,7 +14,8 @@ from django.http import JsonResponse
 from functools import wraps
 
 # Create your views here.
-from fecfiler.core.views import get_comittee_id
+from fecfiler.authentication.authorization import is_read_only_or_filer_reports
+from fecfiler.core.views import get_comittee_id, get_next_report_id
 
 logger = logging.getLogger(__name__)
 
@@ -301,17 +302,6 @@ def update_report_update_date(report_id):
     except:
         raise
 
-def next_report_id():
-	try:
-		with connection.cursor() as cursor:
-			cursor.execute("""SELECT nextval('report_id_seq')""")
-			report_ids = cursor.fetchone()
-			report_id = report_ids[0]
-		return report_id
-	except Exception as e:
-		raise Exception(
-			'The get_next_report_id function is throwing an error: ' + str(e))
-
 def check_report_id_status(cmte_id, report_id, delete_flag=True, submit_flag=True):
 	try:
 		if report_id not in [None, '', " ", 'null']:
@@ -343,7 +333,7 @@ def check_report_id_status(cmte_id, report_id, delete_flag=True, submit_flag=Tru
 def report_post(request):
 	try:
 		report_dict = {
-			'report_id': str(next_report_id()),
+			'report_id': str(get_next_report_id()),
 			'cmte_id': get_comittee_id(request.user.username),
 			'form_type': 'F1M',
 			'amend_ind': 'N',
@@ -648,18 +638,24 @@ def form1M(request):
 
 			# by affiliation step2 POST
 			if step == 'saveAffiliation':
-				noneCheckMissingParameters(['committee_id', 'affiliation_date'], checking_dict=request.data,
-						   value_dict=request.data, function_name='form1M-POST: step-2 Affiliation')
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				request_dict['est_status'] = 'A'
-				if 'report_id' in request_dict:
-					check_report_id_status(cmte_id, request_dict['report_id'])
-					previous_f1m_dict = get_sql_f1m(request_dict)
-					check_clear_establishment_status(cmte_id, request_dict['report_id'], 'Q')
-					f1m_flag, output_dict = f1m_put(request_dict)
-				else:
-					report_flag, request_dict['report_id'] = report_post(request)
-					f1m_flag, output_dict = f1m_post(request_dict)
+				try:
+					is_read_only_or_filer_reports(request)
+					noneCheckMissingParameters(['committee_id', 'affiliation_date'], checking_dict=request.data,
+							   value_dict=request.data, function_name='form1M-POST: step-2 Affiliation')
+					request_dict = f1m_sql_dict(cmte_id, step, request.data)
+					request_dict['est_status'] = 'A'
+					if 'report_id' in request_dict:
+						check_report_id_status(cmte_id, request_dict['report_id'])
+						previous_f1m_dict = get_sql_f1m(request_dict)
+						check_clear_establishment_status(cmte_id, request_dict['report_id'], 'Q')
+						f1m_flag, output_dict = f1m_put(request_dict)
+					else:
+						report_flag, request_dict['report_id'] = report_post(request)
+						f1m_flag, output_dict = f1m_post(request_dict)
+
+				except Exception as e:
+					json_result = {'message': str(e)}
+					return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 			# by qualification step2 POST - skipping candidates
 			elif step == 'saveQualification':
@@ -676,9 +672,9 @@ def form1M(request):
 
 			# by qualification step2 POST
 			elif step == 'saveCandidate':
-				noneCheckMissingParameters(['candidate_id', 'contribution_date', 
-					'candidate_number'], 
-					checking_dict=request.data, value_dict=request.data, 
+				noneCheckMissingParameters(['candidate_id', 'contribution_date',
+					'candidate_number'],
+					checking_dict=request.data, value_dict=request.data,
 					function_name='form1M-POST: step-2 Qualification')
 				candidate_number = check_candidate_number(request.data['candidate_number'])
 				request_dict = f1m_sql_dict(cmte_id, step, request.data)
@@ -701,9 +697,9 @@ def form1M(request):
 
 			# by qualification step3 POST
 			elif step == 'saveDates':
-				noneCheckMissingParameters(['reportId', 'registration_date', 
+				noneCheckMissingParameters(['reportId', 'registration_date',
 					'fifty_first_contributor_date',
-					'requirements_met_date'], checking_dict=request.data, value_dict=request.data, 
+					'requirements_met_date'], checking_dict=request.data, value_dict=request.data,
 					function_name='form1M-POST: step-3 Qualification')
 				request_dict = f1m_sql_dict(cmte_id, step, request.data)
 				check_report_id_status(cmte_id, request_dict['report_id'])
@@ -713,8 +709,8 @@ def form1M(request):
 
 			# both step4 POST
 			elif step == 'saveSignatureAndEmail':
-				noneCheckMissingParameters(['sign', 'submission_date', 'reportId'], 
-					checking_dict=request.data, value_dict=request.data, 
+				noneCheckMissingParameters(['sign', 'submission_date', 'reportId'],
+					checking_dict=request.data, value_dict=request.data,
 					function_name='form1M-POST: step-4 SAVE')
 				request_dict = f1m_sql_dict(cmte_id, step, request.data)
 				check_report_id_status(cmte_id, request_dict['report_id'])
@@ -724,6 +720,7 @@ def form1M(request):
 
 			# both step4 POST
 			elif step == 'submit':
+
 				noneCheckMissingParameters(['sign', 'submission_date', 'reportId'], 
 					checking_dict=request.data, value_dict=request.data, 
 					function_name='form1M-POST: step-4 SUBMIT')
@@ -753,89 +750,95 @@ def form1M(request):
 			if f1m_flag and not previous_f1m_dict:
 				f1m_remove(request_dict)
 			logger.debug(e)
-			return Response("The form1M API - POST is throwing an error: " + str(e), 
+			return Response("The form1M API - POST is throwing an error: " + str(e),
 				status=status.HTTP_400_BAD_REQUEST)
 
 	"""
 	************************************ PUT Call - form 1M ******************************************
 	"""
 	if request.method == "PUT":
+
 		try:
-			noneCheckMissingParameters(['step'], checking_dict=request.query_params,
-			   value_dict=request.query_params, function_name='form1M-PUT')
-			step = request.query_params['step']
+			is_read_only_or_filer_reports(request)
+			try:
+				noneCheckMissingParameters(['step'], checking_dict=request.query_params,
+				   value_dict=request.query_params, function_name='form1M-PUT')
+				step = request.query_params['step']
 
-			# by affiliation step2 PUT
-			if step == 'saveAffiliation':
-				noneCheckMissingParameters(['reportId','committee_id', 'affiliation_date'], 
-					checking_dict=request.data, value_dict=request.data, 
-					function_name='form1M-PUT: step-2 Affiliation')
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				check_report_id_status(cmte_id, request_dict['report_id'])
-				request_dict['est_status'] = 'A'
-				previous_f1m_dict = get_sql_f1m(request_dict)
-				check_clear_establishment_status(cmte_id, request_dict['report_id'], 'Q')
-				f1m_flag, output_dict = f1m_put(request_dict)
+				# by affiliation step2 PUT
+				if step == 'saveAffiliation':
+					noneCheckMissingParameters(['reportId','committee_id', 'affiliation_date'],
+						checking_dict=request.data, value_dict=request.data,
+						function_name='form1M-PUT: step-2 Affiliation')
+					request_dict = f1m_sql_dict(cmte_id, step, request.data)
+					check_report_id_status(cmte_id, request_dict['report_id'])
+					request_dict['est_status'] = 'A'
+					previous_f1m_dict = get_sql_f1m(request_dict)
+					check_clear_establishment_status(cmte_id, request_dict['report_id'], 'Q')
+					f1m_flag, output_dict = f1m_put(request_dict)
 
-			# by qualification step2 PUT
-			elif step == 'saveCandidate':
-				noneCheckMissingParameters(['reportId','candidate_id', 'contribution_date', 
-					'candidate_number'], 
-					checking_dict=request.data, value_dict=request.data, 
-					function_name='form1M-PUT: step-2 Qualification')
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				check_report_id_status(cmte_id, request_dict['report_id'])
-				candidate_number = check_candidate_number(request.data['candidate_number'])
-				column_name = 'can'+candidate_number+'_id'
-				request_dict[column_name] = request.data['candidate_id']
-				request_dict[column_name[:-2]+'con'] = request.data['contribution_date']
-				previous_f1m_dict = get_sql_f1m(request_dict)
-				if candidate_number == '1':
+				# by qualification step2 PUT
+				elif step == 'saveCandidate':
+					noneCheckMissingParameters(['reportId','candidate_id', 'contribution_date',
+						'candidate_number'],
+						checking_dict=request.data, value_dict=request.data,
+						function_name='form1M-PUT: step-2 Qualification')
+					request_dict = f1m_sql_dict(cmte_id, step, request.data)
+					check_report_id_status(cmte_id, request_dict['report_id'])
+					candidate_number = check_candidate_number(request.data['candidate_number'])
+					column_name = 'can'+candidate_number+'_id'
+					request_dict[column_name] = request.data['candidate_id']
+					request_dict[column_name[:-2]+'con'] = request.data['contribution_date']
+					previous_f1m_dict = get_sql_f1m(request_dict)
+					if candidate_number == '1':
+						check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
+						request_dict['est_status'] = 'Q'
+					f1m_flag, output_dict = f1m_put(request_dict)
+
+				# by qualification step3 PUT
+				elif step == 'saveDates':
+					noneCheckMissingParameters(['reportId', 'registration_date',
+						'fifty_first_contributor_date', 'requirements_met_date'],
+						checking_dict=request.data, value_dict=request.data,
+						function_name='form1M-PUT: step-3 Qualification')
+					request_dict = f1m_sql_dict(cmte_id, step, request.data)
+					check_report_id_status(cmte_id, request_dict['report_id'])
+					previous_f1m_dict = get_sql_f1m(request_dict)
 					check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
-					request_dict['est_status'] = 'Q'
-				f1m_flag, output_dict = f1m_put(request_dict)
+					f1m_flag, output_dict = f1m_put(request_dict)
 
-			# by qualification step3 PUT
-			elif step == 'saveDates':
-				noneCheckMissingParameters(['reportId', 'registration_date', 
-					'fifty_first_contributor_date', 'requirements_met_date'], 
-					checking_dict=request.data, value_dict=request.data, 
-					function_name='form1M-PUT: step-3 Qualification')
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				check_report_id_status(cmte_id, request_dict['report_id'])
-				previous_f1m_dict = get_sql_f1m(request_dict)
-				check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
-				f1m_flag, output_dict = f1m_put(request_dict)
+				# both step4 PUT
+				elif step == 'saveSignatureAndEmail':
+					noneCheckMissingParameters(['sign', 'submission_date', 'reportId'],
+						checking_dict=request.data, value_dict=request.data,
+						function_name='form1M-PUT: step-4 SAVE')
+					request_dict = f1m_sql_dict(cmte_id, step, request.data)
+					check_report_id_status(cmte_id, request_dict['report_id'])
+					previous_f1m_dict = get_sql_f1m(request_dict)
+					f1m_flag, output_dict = f1m_put(request_dict)
+					report_flag, previous_report_dict = step4_reports_put(request)
+				else:
+					raise Exception("""Kindly provide a valid value for 'step' parameter.
+					Input received: {}""".format(step))
 
-			# both step4 PUT
-			elif step == 'saveSignatureAndEmail':
-				noneCheckMissingParameters(['sign', 'submission_date', 'reportId'], 
-					checking_dict=request.data, value_dict=request.data, 
-					function_name='form1M-PUT: step-4 SAVE')
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				check_report_id_status(cmte_id, request_dict['report_id'])
-				previous_f1m_dict = get_sql_f1m(request_dict)
-				f1m_flag, output_dict = f1m_put(request_dict)
-				report_flag, previous_report_dict = step4_reports_put(request)
-			else:
-				raise Exception("""Kindly provide a valid value for 'step' parameter.
-				Input received: {}""".format(step))
-
-			output_dict = get_sql_f1m(request_dict, True)
-			return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
+				output_dict = get_sql_f1m(request_dict, True)
+				return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
+			except Exception as e:
+				logger.debug('ENTERED EXCEPTION CATCH - PUT')
+				if report_flag and previous_report_dict:
+					report_put(previous_report_dict)
+				if report_flag and not previous_report_dict:
+					report_remove(request_dict)
+				if f1m_flag and previous_f1m_dict:
+					f1m_put(f1m_sql_dict(cmte_id, "All", previous_f1m_dict))
+				if f1m_flag and not previous_f1m_dict:
+					f1m_remove(request_dict)
+				logger.debug(e)
+				return Response("The form1M API - PUT is throwing an error: " + str(e),
+					status=status.HTTP_400_BAD_REQUEST)
 		except Exception as e:
-			logger.debug('ENTERED EXCEPTION CATCH - PUT')
-			if report_flag and previous_report_dict:
-				report_put(previous_report_dict)
-			if report_flag and not previous_report_dict:
-				report_remove(request_dict)
-			if f1m_flag and previous_f1m_dict:
-				f1m_put(f1m_sql_dict(cmte_id, "All", previous_f1m_dict))
-			if f1m_flag and not previous_f1m_dict:
-				f1m_remove(request_dict)
-			logger.debug(e)
-			return Response("The form1M API - PUT is throwing an error: " + str(e), 
-				status=status.HTTP_400_BAD_REQUEST)
+			json_result = {'message': str(e)}
+			return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 	"""
 	************************************ GET Call - form 1M ******************************************
@@ -1013,22 +1016,27 @@ def get_committee_met_req_date(request):
 @api_view(['DELETE'])
 def delete_candidate_f1m(request):
 	try:
-		cmte_id = get_comittee_id(request.user.username)
-		noneCheckMissingParameters(['reportId',	'candidate_number'], 
-			checking_dict=request.query_params, value_dict=request.query_params, 
-			function_name='delete_candidate_f1m')
-		request_dict = {}
-		report_id = request.query_params['reportId']
-		check_report_id_status(cmte_id, report_id)
-		request_dict['cmte_id'] = cmte_id
-		request_dict['report_id'] = report_id
-		candidate_number = check_candidate_number(request.query_params['candidate_number'])
-		request_dict['can'+candidate_number+'_id'] = None
-		request_dict['can'+candidate_number+'_con'] = None
-		put_sql(request_dict, "form_1m", "delete_candidate_f1m")
-		output_dict = get_sql_f1m(request_dict)
-		return JsonResponse(output_dict, status=status.HTTP_201_CREATED, safe=False)
+		is_read_only_or_filer_reports(request)
+		try:
+			cmte_id = get_comittee_id(request.user.username)
+			noneCheckMissingParameters(['reportId',	'candidate_number'],
+				checking_dict=request.query_params, value_dict=request.query_params,
+				function_name='delete_candidate_f1m')
+			request_dict = {}
+			report_id = request.query_params['reportId']
+			check_report_id_status(cmte_id, report_id)
+			request_dict['cmte_id'] = cmte_id
+			request_dict['report_id'] = report_id
+			candidate_number = check_candidate_number(request.query_params['candidate_number'])
+			request_dict['can'+candidate_number+'_id'] = None
+			request_dict['can'+candidate_number+'_con'] = None
+			put_sql(request_dict, "form_1m", "delete_candidate_f1m")
+			output_dict = get_sql_f1m(request_dict)
+			return JsonResponse(output_dict, status=status.HTTP_201_CREATED, safe=False)
+		except Exception as e:
+			logger.debug(e)
+			return Response("The delete_candidate_f1m API is throwing an error: " + str(e),
+				status=status.HTTP_400_BAD_REQUEST)
 	except Exception as e:
-		logger.debug(e)
-		return Response("The delete_candidate_f1m API is throwing an error: " + str(e), 
-			status=status.HTTP_400_BAD_REQUEST)
+		json_result = {'message': str(e)}
+		return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)

@@ -1,15 +1,12 @@
-import { Subscription } from 'rxjs/Subscription';
-import { Component, HostListener, Input, OnInit, ViewEncapsulation, HostBinding, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { SessionService } from '../shared/services/SessionService/session.service';
-import { MessageService } from '../shared/services/MessageService/message.service';
-import { ApiService } from '../shared/services/APIService/api.service';
-import { UtilService } from '../shared/utils/util.service';
-import { HeaderComponent } from '../shared/partials/header/header.component';
-import { SidebarComponent } from '../shared/partials/sidebar/sidebar.component';
-import { FormsComponent } from '../forms/forms.component';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
+import { Subscription } from 'rxjs/Subscription';
+import { ApiService } from '../shared/services/APIService/api.service';
+import { MessageService } from '../shared/services/MessageService/message.service';
+import { SessionService } from '../shared/services/SessionService/session.service';
+import { UtilService } from '../shared/utils/util.service';
 
 @Component({
   selector: 'app-app-layout',
@@ -34,6 +31,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   public dashboardClass: string = null;
   public formDueDate: number = null;
   public formDescription: string = null;
+  public reportType: string = null;
   public formType: string = null;
   public formStartDate: string = null;
   public formEndDate: string = null;
@@ -47,6 +45,9 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   public dueDate: string = null;
   public reportOverDue: boolean = false;
   private subscription: Subscription;
+  public currentReportData:any = {};
+  public electionDate: string = null;
+  public electionState: string = null;
 
   private _step: string = null;
 
@@ -59,7 +60,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     private _utilService: UtilService,
     private _router: Router,
     private _modalService: NgbModal,
-    public _activatedRoute: ActivatedRoute
+    public _activatedRoute: ActivatedRoute, 
   ) {}
 
   ngOnInit(): void {
@@ -115,7 +116,16 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
         }
       }
     });
+
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(message=>{
+      if(message && message.action === 'updateCurrentReportHeaderData' && message.data){
+        this.currentReportData = message.data;
+        this.populateHeaderData(this.currentReportData);
+      }
+    });
+
   }
+
 
   /**
    * TODO: Figure out why this was placed here.
@@ -157,51 +167,12 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       // //console.log(" formInfo = ", formInfo);
 
       if (typeof formInfo === 'object') {
-        if (formInfo.hasOwnProperty('formType')) {
-          this.formType = formInfo.formType;
-        } else if (formInfo.hasOwnProperty('formtype')) {
-          this.formType = formInfo.formtype;
+        if(this.currentReportData && Array.isArray(this.currentReportData) && this.currentReportData.length > 0){
+          this.populateHeaderData(this.currentReportData[0]);
         }
-
-        if (formInfo.hasOwnProperty('report_type_desciption')) {
-          this.formDescription = formInfo.report_type_desciption;
-        } else if (formInfo.hasOwnProperty('reporttypedescription')) {
-          this.formDescription = formInfo.reporttypedescription;
-        }
-
-        if (formInfo.hasOwnProperty('cvgStartDate')) {
-          this.formStartDate = formInfo.cvgStartDate;
-        } else if (formInfo.hasOwnProperty('cvgstartdate')) {
-          this.formStartDate = formInfo.cvgstartdate;
-        }
-
-        if (formInfo.hasOwnProperty('cvgEndDate')) {
-          this.formEndDate = formInfo.cvgEndDate;
-        } else if (formInfo.hasOwnProperty('cvgenddate')) {
-          this.formEndDate = formInfo.cvgenddate;
-        }
-
-        if (formInfo.hasOwnProperty('daysUntilDue')) {
-          this.formDaysUntilDue = Math.abs(formInfo.daysUntilDue).toString();
-        } else if (formInfo.hasOwnProperty('daysuntildue')) {
-          this.formDaysUntilDue = Math.abs(formInfo.daysuntildue).toString();
-        }
-
-        if (formInfo.hasOwnProperty('dueDate')) {
-          this.dueDate = formInfo.dueDate;
-        } else if (formInfo.hasOwnProperty('duedate')) {
-          this.dueDate = formInfo.duedate;
-        }
-
-        if (formInfo.hasOwnProperty('overDue')) {
-          this.reportOverDue = formInfo.overDue;
-        } else if (formInfo.hasOwnProperty('overdue')) {
-          /*if (formInfo.overdue > 0) {
-                this.reportOverDue = true;
-              }*/
-          // //console.log("formInfo.overdue =", formInfo.overdue);
-          this.reportOverDue = formInfo.overdue;
-        }
+        /* else{
+          this.populateHeaderData(formInfo);
+        } */
 
         if (this._step !== 'step_1') {
           this.showFormDueDate = true;
@@ -213,6 +184,74 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       }
     }
   }
+  
+  private populateHeaderData(formInfo: any) {
+    if (formInfo.hasOwnProperty('formType')) {
+      this.formType = formInfo.formType;
+    }
+    else if (formInfo.hasOwnProperty('formtype')) {
+      this.formType = formInfo.formtype;
+    }
+    if (formInfo.hasOwnProperty('report_type_desciption')) {
+      this.formDescription = formInfo.report_type_desciption;
+    }
+    else if (formInfo.hasOwnProperty('reporttypedescription')) {
+      this.formDescription = formInfo.reporttypedescription;
+    }
+    if (formInfo.hasOwnProperty('report_type')) {
+      this.reportType = formInfo.report_type;
+    }
+    else if (formInfo.hasOwnProperty('reporttype')) {
+      this.reportType = formInfo.reporttype;
+    }
+    if (formInfo.hasOwnProperty('cvgStartDate')) {
+      this.formStartDate = this._utilService.formatDateToYYYYMMDD(formInfo.cvgStartDate);
+    }
+    else if (formInfo.hasOwnProperty('cvgstartdate')) {
+      this.formStartDate = this._utilService.formatDateToYYYYMMDD(formInfo.cvgstartdate);
+    }
+    if (formInfo.hasOwnProperty('cvgEndDate')) {
+      this.formEndDate = this._utilService.formatDateToYYYYMMDD(formInfo.cvgEndDate);
+    }
+    else if (formInfo.hasOwnProperty('cvgenddate')) {
+      this.formEndDate = this._utilService.formatDateToYYYYMMDD(formInfo.cvgenddate);
+    }
+    if (formInfo.hasOwnProperty('daysUntilDue')) {
+      this.formDaysUntilDue = Math.abs(formInfo.daysUntilDue).toString();
+    }
+    else if (formInfo.hasOwnProperty('daysuntildue')) {
+      this.formDaysUntilDue = Math.abs(formInfo.daysuntildue).toString();
+    }
+    if (formInfo.hasOwnProperty('dueDate')) {
+      this.dueDate = formInfo.dueDate;
+    }
+    else if (formInfo.hasOwnProperty('duedate')) {
+      this.dueDate = formInfo.duedate;
+    }
+    if (formInfo.hasOwnProperty('overDue')) {
+      this.reportOverDue = formInfo.overDue;
+    }
+    else if (formInfo.hasOwnProperty('overdue')) {
+      /*if (formInfo.overdue > 0) {
+            this.reportOverDue = true;
+          }*/
+      // //console.log("formInfo.overdue =", formInfo.overdue);
+      this.reportOverDue = formInfo.overdue;
+    }
+    if(formInfo.hasOwnProperty('electionDate')){
+      this.electionDate = formInfo.electionDate;
+    }
+    else if(formInfo.hasOwnProperty('electiondate')){
+      this.electionDate = formInfo.electiondate;
+    }
+    if(formInfo.hasOwnProperty('electionState')){
+      this.electionState = formInfo.electionState;
+    }
+    else if(formInfo.hasOwnProperty('electionstate')){
+      this.electionState = formInfo.electionstate;
+    }
+  }
+
   /**
    * Shows the top nav in tablet and mobile phone view when clicked.
    */
@@ -276,6 +315,36 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   }
 
   public editFrom(): void {
-    alert('Feature to be implemented.');
+
+    
+    let queryParamsMap: any = {
+      step: 'step_1',
+      edit: true,
+      reportId: this._activatedRoute.snapshot.queryParams.reportId
+    };
+
+    let formType :string = '';
+    if(this.formType === 'F3X'){
+      formType='3X';
+    }
+    else if(this.formType === '3X'){
+      formType ='3X';
+    }
+    this._router.navigate([`/forms/form/${formType}`], {
+      queryParams: queryParamsMap
+    });
+
+
+    this._messageService.sendUpdateReportTypeMessage({
+      currentReportData: {
+        'currentReportDescription': this.formDescription,
+        'currentStartDate': this.formStartDate, 
+        'currentEndDate': this.formEndDate,
+        'currentDueDate' : this.dueDate,
+        'currentReportType': this.reportType,
+        'currentElectionDate':this.electionDate,
+        'currentElectionState':this.electionState
+      }
+    });
   }
 }

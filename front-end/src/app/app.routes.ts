@@ -63,7 +63,7 @@ export const AppRoutes: Routes = [
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Editor]
         }
       },
       {
@@ -72,7 +72,7 @@ export const AppRoutes: Routes = [
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Editor]
         }
       },
       {
@@ -87,7 +87,7 @@ export const AppRoutes: Routes = [
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Editor]
         }
       },
       {
@@ -107,7 +107,7 @@ export const AppRoutes: Routes = [
         path: 'import-contacts',
         loadChildren: 'src/app/import-contacts-module/import-contacts.module#ImportContactsModule',
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+          role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin, Roles.Editor]
         }
       },
       {
@@ -117,7 +117,7 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Entry]
+          role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin, Roles.Editor]
         }
       },
       {
@@ -145,13 +145,13 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Upload]
+          role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin]
         }
       },
       {
         path: 'submitform/:form_id', component: SubmitComponent, pathMatch: 'full', canActivate: [CanActivateGuard],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Upload]
+          role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin]
         }
       },
       {
@@ -161,7 +161,7 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],
         data: {
-          role: [Roles.CommitteeAdmin, Roles.Admin, Roles.Upload]
+          role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin, Roles.Admin]
         }
       },
       { path: 'help', component: HelpComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
@@ -172,7 +172,7 @@ export const AppRoutes: Routes = [
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],
         data: {
-          role: [Roles.CommitteeAdmin]
+          role: [Roles.CommitteeAdmin, Roles.BackupCommitteeAdmin]
         }
       },
     ]

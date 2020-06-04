@@ -27,7 +27,7 @@ export interface IAccount{
     bankZip: string;
     candidatePrefix: string;
     fax: string;
-    phone_number: string;
+    treasurerphone: string;
     website: string;
 }
  export class Account implements IAccount {
@@ -59,6 +59,6 @@ export interface IAccount{
     public bankZip: string;
     public candidatePrefix: string;
     public fax: string;
-    public phone_number: string;
+    public treasurerphone: string;
     public website: string;
  }

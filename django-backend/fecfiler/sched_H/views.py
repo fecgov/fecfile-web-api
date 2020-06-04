@@ -16,6 +16,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
@@ -228,10 +229,10 @@ def validate_federal_nonfed_ratio(data):
     0.45 + 0.55 == 1.00
     """
     if not (
-        (
-            float(data.get("federal_percent")) + float(data.get("non_federal_percent"))
-            == float(1)
-        )
+            (
+                    float(data.get("federal_percent")) + float(data.get("non_federal_percent"))
+                    == float(1)
+            )
     ):
         raise Exception("Error: combined federal and non-federal value should be 100%.")
 
@@ -487,168 +488,169 @@ def delete_schedH1(data):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH1(request):
+    try:
+        is_read_only_or_filer_reports(request)
+        if request.method == "POST":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                logger.debug("filtering and validating h1 data:{}".format(request.data))
+                datum = schedH1_sql_dict(request.data)
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
+                datum["transaction_type_identifier"] = "ALLOC_H1"
+                # print('----')
+                if (not report_id) or (report_id == "0"):
+                    datum["election_year"] = None
+                else:
+                    datum["election_year"] = election_year(report_id)
+                # print('....')
+                if cmte_type(cmte_id) == "PTY":
+                    datum["administrative"] = True
+                    datum["generic_voter_drive"] = True
+                    datum["public_communications"] = True
 
-    if request.method == "POST":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            logger.debug("filtering and validating h1 data:{}".format(request.data))
-            datum = schedH1_sql_dict(request.data)
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
-            datum["transaction_type_identifier"] = "ALLOC_H1"
-            # print('----')
-            if (not report_id) or (report_id == "0"):
-                datum["election_year"] = None
-            else:
-                datum["election_year"] = election_year(report_id)
-            # print('....')
-            if cmte_type(cmte_id) == "PTY":
-                datum["administrative"] = True
-                datum["generic_voter_drive"] = True
-                datum["public_communications"] = True
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                    data = put_schedH1(datum)
+                else:
+                    # print(datum)
+                    logger.debug("h1 data after validation:{}".format(datum))
+                    data = post_schedH1(datum)
+                # Associating child transactions to parent and storing them to DB
 
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+                output = get_schedH1(data)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedH1 API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
+
+        elif request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
+                        request.query_params.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.query_params and check_null_value(
+                        request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                datum = get_schedH1(data)
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH1 API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        elif request.method == "DELETE":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.data and check_null_value(
+                        request.data.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(request.data.get("report_id"))
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedH1(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    "The schedH1 API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        elif request.method == "PUT":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                datum = schedH1_sql_dict(request.data)
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = request.data.get("transaction_id")
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
+                datum["transaction_type_identifier"] = "ALLOC_H1"
+                # print('----')
+                if (not report_id) or (report_id == "0"):
+                    datum["election_year"] = None
+                else:
+                    datum["election_year"] = int(election_year(report_id))
+                # print('....')
+                if cmte_type(cmte_id) == "PTY":
+                    datum["administrative"] = True
+                    datum["generic_voter_drive"] = True
+                    datum["public_communications"] = True
+
+                # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+                #     datum['entity_id'] = request.data.get('entity_id')
+                # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+                #     data = put_schedB(datum)
+                #     output = get_schedB(data)
+                # else:
                 data = put_schedH1(datum)
-            else:
-                # print(datum)
-                logger.debug("h1 data after validation:{}".format(datum))
-                data = post_schedH1(datum)
-            # Associating child transactions to parent and storing them to DB
-
-            output = get_schedH1(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedH1 API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "GET":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
+                # output = get_schedA(data)
+                return JsonResponse(data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH1 API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
-                )
-            datum = get_schedH1(data)
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH1 API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "DELETE":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.data and check_null_value(
-                request.data.get("report_id")
-            ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
-                )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedH1(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The schedH1 API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "PUT":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            datum = schedH1_sql_dict(request.data)
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = request.data.get("transaction_id")
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
-            datum["transaction_type_identifier"] = "ALLOC_H1"
-            # print('----')
-            if (not report_id) or (report_id == "0"):
-                datum["election_year"] = None
-            else:
-                datum["election_year"] = int(election_year(report_id))
-            # print('....')
-            if cmte_type(cmte_id) == "PTY":
-                datum["administrative"] = True
-                datum["generic_voter_drive"] = True
-                datum["public_communications"] = True
-
-            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-            #     datum['entity_id'] = request.data.get('entity_id')
-            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-            #     data = put_schedB(datum)
-            #     output = get_schedB(data)
-            # else:
-            data = put_schedH1(datum)
-            # output = get_schedA(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH1 API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    else:
-        raise NotImplementedError
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["GET"])
@@ -1127,8 +1129,8 @@ def get_h1_percentage(request):
         # raise Exception ('Missing Input: report_id is mandatory')
 
         if not (
-            "calendar_year" in request.query_params
-            and check_null_value(request.query_params.get("calendar_year"))
+                "calendar_year" in request.query_params
+                and check_null_value(request.query_params.get("calendar_year"))
         ):
             raise Exception("Missing Input: calendar_year is mandatory")
         calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
@@ -1771,10 +1773,10 @@ def get_h2_summary_table(request):
                 _rec["trashable"] = False
                 if _rec["ratio_code"] == "n":
                     if (
-                        count_h2_transactions(
-                            cmte_id, report_id, _rec["activity_event_name"]
-                        )
-                        == 0
+                            count_h2_transactions(
+                                cmte_id, report_id, _rec["activity_event_name"]
+                            )
+                            == 0
                     ):
                         _rec["trashable"] = True
                 # else:
@@ -1865,138 +1867,173 @@ def count_h2_transactions(cmte_id, report_id, activity_event_name):
         raise
 
 
+def check_if_activity_present(datum):
+    report_id = datum.get("report_id")
+    activity_name = datum.get("activity_event_name")
+    activity_name = activity_name.replace(" ", "")
+    fundraising_val = datum.get("fundraising")
+    direct_cand_val = datum.get("direct_cand_support")
+
+    if fundraising_val:
+        event_type = "fundraising"
+    elif direct_cand_val:
+        event_type = "direct_cand_support"
+
+    _sql = """
+        select * from public.sched_h2
+        where translate(lower(activity_event_name), ' ', '') = lower(%s)
+        and fundraising = %s
+        and direct_cand_support = %s
+        and delete_ind is distinct from 'Y'
+        """
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (activity_name, fundraising_val, direct_cand_val))
+            event_list = cursor.fetchone()
+            if event_list is not None:
+                raise NoOPError(
+                    "Same event activity already exist for report id:{} and event_type:{}".format(
+                        report_id, event_type
+                    )
+                )
+    except Exception as e:
+        raise e
+
+
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH2(request):
+    try:
+        is_read_only_or_filer_reports(request)
+        if request.method == "POST":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum = schedH2_sql_dict(request.data)
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
 
-    if request.method == "POST":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum = schedH2_sql_dict(request.data)
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
+                check_if_activity_present(datum)
 
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                    data = put_schedH2(datum)
+                else:
+                    # print(datum)
+                    data = post_schedH2(datum)
+                # Associating child transactions to parent and storing them to DB
+
+                output = get_schedH2(data)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
+
+        elif request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
+                        request.query_params.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.query_params and check_null_value(
+                        request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                datum = get_schedH2(data)
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH2 API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        elif request.method == "DELETE":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.data and check_null_value(
+                        request.data.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(request.data.get("report_id"))
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedH2(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    "The schedH2 API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        elif request.method == "PUT":
+            try:
+                datum = schedH2_sql_dict(request.data)
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = request.data.get("transaction_id")
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["cmte_id"] = get_comittee_id(request.user.username)
+
                 data = put_schedH2(datum)
-            else:
-                # print(datum)
-                data = post_schedH2(datum)
-            # Associating child transactions to parent and storing them to DB
-
-            output = get_schedH2(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedH2 API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "GET":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
+                return JsonResponse(data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH2 API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
-                )
-            datum = get_schedH2(data)
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH2 API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "DELETE":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.data and check_null_value(
-                request.data.get("report_id")
-            ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
-                )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedH2(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The schedH2 API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "PUT":
-        try:
-            datum = schedH2_sql_dict(request.data)
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = request.data.get("transaction_id")
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["cmte_id"] = get_comittee_id(request.user.username)
-
-            data = put_schedH2(datum)
-            return JsonResponse(data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH2 API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    else:
-        raise NotImplementedError
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """
@@ -2073,6 +2110,7 @@ def update_h3_total_amount(data):
     back_ref_transaction_id = data.get("back_ref_transaction_id")
     _v = [back_ref_transaction_id] * 3
     do_transaction(_sql, _v)
+
 
 @update_F3X
 @new_report_date
@@ -2151,6 +2189,7 @@ def validate_sh3_data(data):
     # TODO: temp_change
     if not data.get("total_amount_transferred"):
         data["total_amount_transferred"] = 0
+
 
 @update_F3X
 @new_report_date
@@ -2306,7 +2345,6 @@ def get_child_schedH3(transaction_id, report_id, cmte_id):
 
 
 def get_list_all_schedH3(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # GET single row from schedA table
@@ -2798,173 +2836,175 @@ def get_h3_aggregate_amount(request):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH3(request):
+    try:
+        is_read_only_or_filer_reports(request)
 
-    if request.method == "POST":
-        try:
-            logger.debug("POST a h3 with data:{}".format(request.data))
-            cmte_id = get_comittee_id(request.user.username)
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum = schedH3_sql_dict(request.data)
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
+        if request.method == "POST":
+            try:
+                logger.debug("POST a h3 with data:{}".format(request.data))
+                cmte_id = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum = schedH3_sql_dict(request.data)
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
 
-            # **********************************
-            # TODO: disable transaction_id checking for h3 to fix FNE-2142 bug
-            # if "transaction_id" in request.data and check_null_value(
-            #     request.data.get("transaction_id")
-            # ):
-            #     datum["transaction_id"] = check_transaction_id(
-            #         request.data.get("transaction_id")
-            #     )
-            #     data = put_schedH3(datum)
-            #     if "child" in request.data:
-            #         for _c in request.data["child"]:
-            #             parent_data = data
-            #             # _c.update(parent_data)
-            #             _c["back_ref_transaction_id"] = parent_data["transaction_id"]
-            #             _c = schedH3_sql_dict(_c)
-            #             put_schedH3(_c)
-            # else:
-            # print(datum)
-            # ************************************
+                # **********************************
+                # TODO: disable transaction_id checking for h3 to fix FNE-2142 bug
+                # if "transaction_id" in request.data and check_null_value(
+                #     request.data.get("transaction_id")
+                # ):
+                #     datum["transaction_id"] = check_transaction_id(
+                #         request.data.get("transaction_id")
+                #     )
+                #     data = put_schedH3(datum)
+                #     if "child" in request.data:
+                #         for _c in request.data["child"]:
+                #             parent_data = data
+                #             # _c.update(parent_data)
+                #             _c["back_ref_transaction_id"] = parent_data["transaction_id"]
+                #             _c = schedH3_sql_dict(_c)
+                #             put_schedH3(_c)
+                # else:
+                # print(datum)
+                # ************************************
 
-            logger.debug("saving h3 with data {}".format(datum))
-            data = post_schedH3(datum)
-            logger.debug("parent data saved:{}".format(data))
-            if "child" in request.data:
-                for _c in request.data["child"]:
-                    child_data = data
-                    child_data.update(_c)
-                    child_data["back_ref_transaction_id"] = data["transaction_id"]
-                    child_data = schedH3_sql_dict(child_data)
-                    logger.debug(
-                        "saving child transaction with data {}".format(child_data)
+                logger.debug("saving h3 with data {}".format(datum))
+                data = post_schedH3(datum)
+                logger.debug("parent data saved:{}".format(data))
+                if "child" in request.data:
+                    for _c in request.data["child"]:
+                        child_data = data
+                        child_data.update(_c)
+                        child_data["back_ref_transaction_id"] = data["transaction_id"]
+                        child_data = schedH3_sql_dict(child_data)
+                        logger.debug(
+                            "saving child transaction with data {}".format(child_data)
+                        )
+                        post_schedH3(child_data)
+                        logger.debug("child transaction saved.")
+                # Associating child transactions to parent and storing them to DB
+
+                output = get_schedH3(data)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+
+            except Exception as e:
+                return Response(
+                    "The schedH3 API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        elif request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
+                        request.query_params.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
                     )
-                    post_schedH3(child_data)
-                    logger.debug("child transaction saved.")
-            # Associating child transactions to parent and storing them to DB
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.query_params and check_null_value(
+                        request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                datum = get_schedH3(data)
+                if datum:
+                    return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+                else:
+                    return JsonResponse([], status=status.HTTP_200_OK, safe=False)
 
-            output = get_schedH3(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-
-        except Exception as e:
-            return Response(
-                "The schedH3 API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "GET":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
                 )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH3 API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-            datum = get_schedH3(data)
-            if datum:
-                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
-            else:
-                return JsonResponse([], status=status.HTTP_200_OK, safe=False)
 
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH3 API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "DELETE":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.data and check_null_value(
-                request.data.get("report_id")
-            ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+        elif request.method == "DELETE":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.data and check_null_value(
+                        request.data.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(request.data.get("report_id"))
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedH3(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
                 )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedH3(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The schedH3 API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            except Exception as e:
+                return Response(
+                    "The schedH3 API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    elif request.method == "PUT":
-        try:
-            datum = schedH3_sql_dict(request.data)
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = request.data.get("transaction_id")
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
+        elif request.method == "PUT":
+            try:
+                datum = schedH3_sql_dict(request.data)
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = request.data.get("transaction_id")
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
 
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["cmte_id"] = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["cmte_id"] = get_comittee_id(request.user.username)
 
-            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-            #     datum['entity_id'] = request.data.get('entity_id')
-            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-            #     data = put_schedB(datum)
-            #     output = get_schedB(data)
-            # else:
-            data = put_schedH3(datum)
-            output = get_schedH3(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED, safe=False)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH3 API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    else:
-        raise NotImplementedError
+                # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+                #     datum['entity_id'] = request.data.get('entity_id')
+                # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+                #     data = put_schedB(datum)
+                #     output = get_schedB(data)
+                # else:
+                data = put_schedH3(datum)
+                output = get_schedH3(data)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED, safe=False)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH3 API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """
@@ -3084,6 +3124,7 @@ def get_existing_h4_total(cmte_id, transaction_id):
             return cursor.fetchone()[0]
     except:
         raise
+
 
 @update_F3X
 @new_report_date
@@ -3222,7 +3263,7 @@ def validate_fed_nonfed_share(data):
         if "," in str(data.get(_rec)):
             data[_rec] = data[_rec].replace(",", "")
     if float(data.get("fed_share_amount")) + float(
-        data.get("non_fed_share_amount")
+            data.get("non_fed_share_amount")
     ) != float(data.get("total_amount")):
         raise Exception(
             "Error: fed_amount and non_fed_amount should sum to total amount."
@@ -3286,7 +3327,7 @@ def list_all_transactions_event_type(start_dt, end_dt, activity_event_type, cmte
 
 
 def list_all_transactions_event_identifier(
-    start_dt, end_dt, activity_event_identifier, cmte_id
+        start_dt, end_dt, activity_event_identifier, cmte_id
 ):
     """
     load all transactions with the specified activity event type
@@ -3334,7 +3375,6 @@ def list_all_transactions_event_identifier(
 
 
 def update_transaction_ytd_amount(cmte_id, transaction_id, aggregate_amount):
-
     """
     update h4 ytd amount
     """
@@ -3398,6 +3438,7 @@ def update_activity_event_amount_ytd(data):
             "The update_activity_event_amount_ytd function is throwing an error: "
             + str(e)
         )
+
 
 @update_F3X
 @new_report_date
@@ -3551,7 +3592,6 @@ def get_schedH4(data):
 
 
 def get_list_all_schedH4(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # GET single row from schedH4 table
@@ -3705,62 +3745,77 @@ def schedH4(request):
         descending = "ASC"
     trans_query_string_count = ""
 
-    if request.method == "POST":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum = schedH4_sql_dict(request.data)
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                try:
-                    datum["transaction_id"] = check_transaction_id(
-                        request.data.get("transaction_id")
-                    )
-                    data = put_schedH4(datum)
-                except:
-                    datum["transaction_id"] = None
+    try:
+        is_read_only_or_filer_reports(request)
+    
+        if request.method == "POST":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum = schedH4_sql_dict(request.data)
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
+                if "transaction_id" in request.data and check_null_value(
+                    request.data.get("transaction_id")
+                ):
+                    try:
+                        datum["transaction_id"] = check_transaction_id(
+                            request.data.get("transaction_id")
+                        )
+                        data = put_schedH4(datum)
+                    except:
+                        datum["transaction_id"] = None
+                        data = post_schedH4(datum)
+                else:
+                    # print(datum)
                     data = post_schedH4(datum)
-            else:
-                # print(datum)
-                data = post_schedH4(datum)
-            # Associating child transactions to parent and storing them to DB
+                # Associating child transactions to parent and storing them to DB
 
-            output = get_schedH4(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedH4 API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "GET":
-        try:
-            #: Hardcode cmte value for now and remove after dev complete
-            #cmte_id = "C00000935"
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
+                output = get_schedH4(data)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedH4 API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
+
+        elif request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
+                        request.query_params.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.query_params and check_null_value(
+                        request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                datum = get_schedH4(data)
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH4 API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
             datum = get_schedH4(data)
 
@@ -3790,76 +3845,77 @@ def schedH4(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    elif request.method == "DELETE":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.data and check_null_value(
-                request.data.get("report_id")
-            ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+        elif request.method == "DELETE":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.data and check_null_value(
+                        request.data.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(request.data.get("report_id"))
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedH4(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
                 )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedH4(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The schedH4 API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            except Exception as e:
+                return Response(
+                    "The schedH4 API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    elif request.method == "PUT":
-        try:
-            datum = schedH4_sql_dict(request.data)
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = request.data.get("transaction_id")
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
+        elif request.method == "PUT":
+            try:
+                datum = schedH4_sql_dict(request.data)
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = request.data.get("transaction_id")
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
 
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["cmte_id"] = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["cmte_id"] = get_comittee_id(request.user.username)
 
-            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-            #     datum['entity_id'] = request.data.get('entity_id')
-            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-            #     data = put_schedB(datum)
-            #     output = get_schedB(data)
-            # else:
-            data = put_schedH4(datum)
-            output = get_schedH4(data)[0]
-            # output = get_schedA(data)
-            return JsonResponse(output, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH4 API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+                #     datum['entity_id'] = request.data.get('entity_id')
+                # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+                #     data = put_schedB(datum)
+                #     output = get_schedB(data)
+                # else:
+                data = put_schedH4(datum)
+                output = get_schedH4(data)[0]
+                # output = get_schedA(data)
+                return JsonResponse(output, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH4 API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    else:
-        raise NotImplementedError
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """
@@ -3939,6 +3995,7 @@ def update_h5_total_amount(data):
     _v = [back_ref_transaction_id] * 3
     do_transaction(_sql, _v)
 
+
 @update_F3X
 @new_report_date
 def put_schedH5(data):
@@ -4016,6 +4073,7 @@ def validate_sh5_data(data):
     validate sH5 json data
     """
     check_mandatory_fields_SH5(data)
+
 
 @update_F3X
 @new_report_date
@@ -4163,7 +4221,6 @@ def get_child_schedH5(transaction_id, report_id, cmte_id):
 
 
 def get_list_all_schedH5(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # GET single row from schedH5 table
@@ -4419,10 +4476,10 @@ def get_sched_h5_breakdown(request):
             _t = {k: 0 for k, v in result[0].items() if not v}
             result[0].update(_t)
             result[0]["total"] = (
-                float(result[0].get("voter_id", 0))
-                + float(result[0].get("voter_registration", 0))
-                + float(result[0].get("gotv", 0))
-                + float(result[0].get("generic_campaign", 0))
+                    float(result[0].get("voter_id", 0))
+                    + float(result[0].get("voter_registration", 0))
+                    + float(result[0].get("gotv", 0))
+                    + float(result[0].get("generic_campaign", 0))
             )
         return Response(result, status=status.HTTP_200_OK)
     except Exception as e:
@@ -4431,168 +4488,171 @@ def get_sched_h5_breakdown(request):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH5(request):
+    try:
+        is_read_only_or_filer_reports(request)
 
-    if request.method == "POST":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum = schedH5_sql_dict(request.data)
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+        if request.method == "POST":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum = schedH5_sql_dict(request.data)
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                    data = put_schedH5(datum)
+                    if "child" in request.data:
+                        for _c in request.data["child"]:
+                            child_data = data
+                            child_data.update(_c)
+                            child_data["back_ref_transaction_id"] = data["transaction_id"]
+                            child_data = schedH5_sql_dict(child_data)
+                            child_data["cmte_id"] = cmte_id
+                            child_data["report_id"] = report_id
+                            logger.debug(
+                                "saving child transaction with data {}".format(child_data)
+                            )
+                            post_schedH5(child_data)
+                else:
+                    # print('---')
+                    # print(datum)
+                    data = post_schedH5(datum)
+                    logger.debug("parent data saved:{}".format(data))
+                    if "child" in request.data:
+                        for _c in request.data["child"]:
+                            child_data = data.copy()
+                            child_data.update(_c)
+                            child_data["back_ref_transaction_id"] = data["transaction_id"]
+                            child_data = schedH5_sql_dict(child_data)
+                            child_data["cmte_id"] = cmte_id
+                            child_data["report_id"] = report_id
+                            logger.debug(
+                                "saving child transaction with data {}".format(child_data)
+                            )
+                            post_schedH5(child_data)
+                # Associating child transactions to parent and storing them to DB
+
+                output = get_schedH5(data)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedH5 API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
+
+        elif request.method == "GET":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
+                        request.query_params.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.query_params and check_null_value(
+                        request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                datum = get_schedH5(data)
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH5 API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        elif request.method == "DELETE":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.data and check_null_value(
+                        request.data.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(request.data.get("report_id"))
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedH5(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    "The schedH5 API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        elif request.method == "PUT":
+            try:
+                datum = schedH5_sql_dict(request.data)
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = request.data.get("transaction_id")
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["cmte_id"] = get_comittee_id(request.user.username)
+
+                # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+                #     datum['entity_id'] = request.data.get('entity_id')
+                # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+                #     data = put_schedB(datum)
+                #     output = get_schedB(data)
+                # else:
                 data = put_schedH5(datum)
-                if "child" in request.data:
-                    for _c in request.data["child"]:
-                        child_data = data
-                        child_data.update(_c)
-                        child_data["back_ref_transaction_id"] = data["transaction_id"]
-                        child_data = schedH5_sql_dict(child_data)
-                        child_data["cmte_id"] = cmte_id
-                        child_data["report_id"] = report_id
-                        logger.debug(
-                            "saving child transaction with data {}".format(child_data)
-                        )
-                        post_schedH5(child_data)
-            else:
-                # print('---')
-                # print(datum)
-                data = post_schedH5(datum)
-                logger.debug("parent data saved:{}".format(data))
-                if "child" in request.data:
-                    for _c in request.data["child"]:
-                        child_data = data.copy()
-                        child_data.update(_c)
-                        child_data["back_ref_transaction_id"] = data["transaction_id"]
-                        child_data = schedH5_sql_dict(child_data)
-                        child_data["cmte_id"] = cmte_id
-                        child_data["report_id"] = report_id
-                        logger.debug(
-                            "saving child transaction with data {}".format(child_data)
-                        )
-                        post_schedH5(child_data)
-            # Associating child transactions to parent and storing them to DB
-
-            output = get_schedH5(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedH5 API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "GET":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
+                # output = get_schedH5(data)
+                return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH5 API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
-                )
-            datum = get_schedH5(data)
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH5 API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
-    elif request.method == "DELETE":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.data and check_null_value(
-                request.data.get("report_id")
-            ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
-                )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedH5(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The schedH5 API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    elif request.method == "PUT":
-        try:
-            datum = schedH5_sql_dict(request.data)
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = request.data.get("transaction_id")
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["cmte_id"] = get_comittee_id(request.user.username)
-
-            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-            #     datum['entity_id'] = request.data.get('entity_id')
-            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-            #     data = put_schedB(datum)
-            #     output = get_schedB(data)
-            # else:
-            data = put_schedH5(datum)
-            # output = get_schedH5(data)
-            return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH5 API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    else:
-        raise NotImplementedError
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """
@@ -4712,6 +4772,7 @@ def get_existing_h6_total(cmte_id, transaction_id):
             return cursor.fetchone()[0]
     except:
         raise
+
 
 @update_F3X
 @new_report_date
@@ -4943,7 +5004,6 @@ def list_all_transactions_event_type_h6(start_dt, end_dt, activity_event_type, c
 
 
 def update_transaction_ytd_amount_h6(cmte_id, transaction_id, aggregate_amount):
-
     """
     update h4 ytd amount
     """
@@ -4996,6 +5056,7 @@ def update_activity_event_amount_ytd_h6(data):
             "The update_activity_event_amount_ytd function is throwing an error: "
             + str(e)
         )
+
 
 @update_F3X
 @new_report_date
@@ -5074,7 +5135,7 @@ def get_schedH6(data):
 
         # TODO: need to remove this when db correction done
         for obj in forms_obj:
-            obj["api_call"]="/sh6/schedH6"
+            obj["api_call"] = "/sh6/schedH6"
             obj["fed_share_amount"] = obj.get("federal_share")
             obj["non_fed_share_amount"] = obj.get("levin_share")
             obj["total_amount"] = obj.get("total_fed_levin_amount")
@@ -5090,7 +5151,6 @@ def get_schedH6(data):
 
 
 def get_list_all_schedH6(report_id, cmte_id):
-
     try:
         with connection.cursor() as cursor:
             # GET single row from schedH6 table
@@ -5219,87 +5279,94 @@ def delete_schedH6(data):
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH6(request):
+    try:
+        is_read_only_or_filer_reports(request)
 
-    if request.method == "POST":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
+        if request.method == "POST":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
 
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum = schedH6_sql_dict(request.data)
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum = schedH6_sql_dict(request.data)
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                    data = put_schedH6(datum)
+                else:
+                    # print(datum)
+                    print("post new h6 with data:{}".format(datum))
+                    data = post_schedH6(datum)
+                # Associating child transactions to parent and storing them to DB
+                output = get_schedH6(data)
+
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedH6 API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-                data = put_schedH6(datum)
-            else:
-                # print(datum)
-                print("post new h6 with data:{}".format(datum))
-                data = post_schedH6(datum)
-            # Associating child transactions to parent and storing them to DB
-            output = get_schedH6(data)
 
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedH6 API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedH6 API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    elif request.method == "GET":
-        try:
-        #: Get the request parameters and set for Pagination
-            query_params = request.query_params
-            page_num = get_int_value(query_params.get("page"))
+        elif request.method == "GET":
+            try:
+            #: Get the request parameters and set for Pagination
+                query_params = request.query_params
+                page_num = get_int_value(query_params.get("page"))
 
-            descending = query_params.get("descending")
-            if not (
-                "sortColumnName" in query_params
-                and check_null_value(query_params.get("sortColumnName"))
-            ):
-                sortcolumn = "name"
-            elif query_params.get("sortColumnName") == "default":
-                sortcolumn = "name"
-            else:
-                sortcolumn = query_params.get("sortColumnName")
-            itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
-            search_string = query_params.get("search")
-            params = query_params.get("filters", {})
-            keywords = params.get("keywords")
-            if str(descending).lower() == "true":
-                descending = "DESC"
-            else:
-                descending = "ASC"
-            trans_query_string_count = ""
-                    
-            #: Hardcode cmte value for now and remove after dev complete
-            #data = {"cmte_id": "C00000935"}
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            # make sure we get query parameters from both
-            # request.data.update(request.query_params)
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
+                descending = query_params.get("descending")
+                if not (
+                    "sortColumnName" in query_params
+                    and check_null_value(query_params.get("sortColumnName"))
+                ):
+                    sortcolumn = "name"
+                elif query_params.get("sortColumnName") == "default":
+                    sortcolumn = "name"
+                else:
+                    sortcolumn = query_params.get("sortColumnName")
+                itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+                search_string = query_params.get("search")
+                params = query_params.get("filters", {})
+                keywords = params.get("keywords")
+                if str(descending).lower() == "true":
+                    descending = "DESC"
+                else:
+                    descending = "ASC"
+                trans_query_string_count = ""
+                        
+                #: Hardcode cmte value for now and remove after dev complete
+                #data = {"cmte_id": "C00000935"}
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                # make sure we get query parameters from both
+                # request.data.update(request.query_params)
+                if "report_id" in request.query_params and check_null_value(
                     request.query_params.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
                 )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH6 API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
             datum = get_schedH6(data)
 
@@ -5330,72 +5397,73 @@ def schedH6(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    elif request.method == "DELETE":
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.data and check_null_value(
-                request.data.get("report_id")
-            ):
-                data["report_id"] = check_report_id(request.data.get("report_id"))
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.data.get("transaction_id")
+        elif request.method == "DELETE":
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.data and check_null_value(
+                        request.data.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(request.data.get("report_id"))
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.data.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedH6(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
                 )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedH6(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The schedH6 API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            except Exception as e:
+                return Response(
+                    "The schedH6 API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    elif request.method == "PUT":
-        try:
-            datum = schedH6_sql_dict(request.data)
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = request.data.get("transaction_id")
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
+        elif request.method == "PUT":
+            try:
+                datum = schedH6_sql_dict(request.data)
+                if "transaction_id" in request.data and check_null_value(
+                        request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = request.data.get("transaction_id")
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
 
-            if not ("report_id" in request.data):
-                raise Exception("Missing Input: Report_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
-                report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["cmte_id"] = get_comittee_id(request.user.username)
+                if not ("report_id" in request.data):
+                    raise Exception("Missing Input: Report_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["cmte_id"] = get_comittee_id(request.user.username)
 
-            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
-            #     datum['entity_id'] = request.data.get('entity_id')
-            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
-            #     data = put_schedB(datum)
-            #     output = get_schedB(data)
-            # else:
-            data = put_schedH6(datum)
-            output = get_schedH6(data)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedH6 API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+                #     datum['entity_id'] = request.data.get('entity_id')
+                # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+                #     data = put_schedB(datum)
+                #     output = get_schedB(data)
+                # else:
+                data = put_schedH6(datum)
+                output = get_schedH6(data)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedH6 API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
-    else:
-        raise NotImplementedError
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)

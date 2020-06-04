@@ -15,6 +15,8 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework_jwt.compat import get_username_field, get_username
 
+from .auth_enum import Roles
+from .authorization import is_not_treasurer
 from .models import Account
 import re
 from .permissions import IsAccountOwner
@@ -26,7 +28,7 @@ from rest_framework_jwt.settings import api_settings
 from ..core.transaction_util import do_transaction
 from ..core.views import check_null_value, NoOPError, get_comittee_id, get_email
 
-#jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+# jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
@@ -46,6 +48,7 @@ def jwt_response_payload_handler(token, user=None, request=None):
     return {
         'token': token,
     }
+
 
 # payload = jwt_response_payload_handler(user)
 # token = jwt_encode_handler(payload)
@@ -133,8 +136,8 @@ def get_users_list(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from manage user table
-            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND role != 'TREASURER' order by id) t"""
-            cursor.execute(_sql, [cmte_id])
+            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND upper(role) != %s order by id) t"""
+            cursor.execute(_sql, [cmte_id, Roles.C_ADMIN.value])
             user_list = cursor.fetchall()
             if user_list is None:
                 raise NoOPError(
@@ -158,9 +161,9 @@ def delete_manage_user(data):
             _sql = """UPDATE public.authentication_account
                         SET delete_ind = 'Y' 
                         WHERE id = %s AND cmtee_id = %s
-                        AND role != 'TREASURER'
+                        AND upper(role) != %s
                     """
-            _v = (data.get("user_id"), data.get("cmte_id"))
+            _v = (data.get("user_id"), data.get("cmte_id"), Roles.C_ADMIN.value)
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
                 logger.debug("deleting user for {} failed."
@@ -186,7 +189,7 @@ def check_user_present(data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND email = %s AND delete_ind !='Y' """
+            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) AND delete_ind !='Y' """
             cursor.execute(_sql, [data.get("cmte_id"), data.get("email")])
             user_list = cursor.fetchone()
             if user_list is not None:
@@ -218,7 +221,7 @@ def user_previously_deleted(data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND email = %s AND delete_ind ='Y'"""
+            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) AND delete_ind ='Y'"""
             cursor.execute(_sql, [data.get("cmte_id"), data.get("email")])
             user_list = cursor.fetchone()
             if user_list is not None:
@@ -333,25 +336,21 @@ def update_user(data):
         email = get_current_email(data)
         if email != data.get("email"):
             user_already_exist = check_user_present(data)
-        if not user_already_exist:
+        backup_admin_exist = backup_user_exist(data)
+        if not user_already_exist and not backup_admin_exist:
             rows = put_sql_user(data)
-        else:
-            raise Exception("user already present with "
-                            "committee id{} and email id{}", data.get("cmte_id"),
-                            data.get("email"))
+
     except Exception as e:
         # print(e)
-        raise Exception(
-            "The user update sql is throwing an error: " + str(e)
-        )
+        raise Exception(str(e))
     return rows
 
 
 def check_custom_validations(email, role):
     try:
         check_email_validation(email)
-        if role.upper() not in ["ADMIN","READONLY", "UPLOADER", "ENTRY"]:
-            raise Exception("Role should be ADMIN,READONLY, UPLOADER, ENTRY")
+        if role.upper() not in ["BC_ADMIN", "ADMIN", "REVIEWER", "EDITOR"]:
+            raise Exception("Role should be BC_ADMIN,ADMIN,REVIEWER, EDITOR")
     except Exception as e:
         logger.debug("Custom validation failed")
         raise e
@@ -363,99 +362,129 @@ def check_email_validation(email):
         raise Exception("Email-id is not valid")
 
 
+def backup_user_exist(data):
+    try:
+        if data.get("role").upper() != Roles.BC_ADMIN.value:
+            return False
+
+        with connection.cursor() as cursor:
+            # check if user already exist
+            _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(role) = lower(%s) AND delete_ind !='Y' """
+            cursor.execute(_sql, [data.get("cmte_id"), Roles.BC_ADMIN.value])
+            backup_admin_list = cursor.fetchone()
+            if backup_admin_list is not None:
+                raise NoOPError(
+                    "Back up Admin exist for committee id:{}".format(
+                        data.get("cmte_id")
+                    )
+                )
+            else:
+                return False
+    except Exception as e:
+        logger.debug("Exception occurred while adding user.", str(e))
+        raise e
+
+
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def manage_user(request):
-    if request.method == "GET":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            if not check_null_value(cmte_id):
-                raise Exception("Committe id is missing from request data")
+    try:
+        is_not_treasurer(request)
 
-            datum = get_users_list(cmte_id)
-            json_result = {'users': datum, 'rows': len(datum)}
-            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_400_BAD_REQUEST, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The manageUser API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-    elif request.method == "DELETE":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            data = {"cmte_id": cmte_id}
-            if "id" in request.data and check_null_value(
-                    request.data.get("id")
-            ):
-                data["user_id"] = request.data.get("id")
-            else:
-                raise Exception("Missing Input: ID is mandatory")
+        if request.method == "GET":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                if not check_null_value(cmte_id):
+                    raise Exception("Committe id is missing from request data")
 
-            row = delete_manage_user(data)
-            if row > 0:
-                msg = "The User ID: {} has been successfully deleted"
-            else:
-                msg = "The User ID: {} has not been successfully deleted." \
-                      "No matching record was found."
-            return JsonResponse(msg.format(data.get("user_id")),
-                                status=status.HTTP_200_OK,
-                                safe=False)
-        except Exception as e:
-            return JsonResponse(
-                "The Manage User API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST, safe=False
-            )
-    elif request.method == "POST":
-        try:
-            cmte_id = get_comittee_id(request.user.username)
-            data = {"cmte_id": cmte_id}
+                datum = get_users_list(cmte_id)
+                json_result = {'users': datum, 'rows': len(datum)}
+                return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_400_BAD_REQUEST, safe=False
+                )
+            except Exception as e:
+                logger.debug(e)
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
-            fields = user_data_dict()
-            data = validate(data, fields, request)
-            # check if user already exsist
-            user_exist = check_user_present(data)
-            # check if user was previously deleted, then reactivate
-            user_reactivated = user_previously_deleted(data)
-            if not user_exist and not user_reactivated:
-                data = add_new_user(data, cmte_id)
+        elif request.method == "DELETE":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                data = {"cmte_id": cmte_id}
+                if "id" in request.data and check_null_value(
+                        request.data.get("id")
+                ):
+                    data["user_id"] = request.data.get("id")
+                else:
+                    raise Exception("Missing Input: ID is mandatory")
 
-            output = get_users_list(cmte_id)
-            json_result = {'users': output}
-            return JsonResponse(json_result, status=status.HTTP_201_CREATED, safe=False)
-        except Exception as e:
-            return Response(
-                "Adding new user - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                row = delete_manage_user(data)
+                if row > 0:
+                    msg = "The User ID: {} has been successfully deleted"
+                else:
+                    msg = "The User ID: {} has not been successfully deleted." \
+                          "No matching record was found."
+                return JsonResponse(msg.format(data.get("user_id")),
+                                    status=status.HTTP_200_OK,
+                                    safe=False)
+            except Exception as e:
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
-    elif request.method == "PUT":
-        try:
-            old_email = get_email(request.user.username)
-            cmte_id = get_comittee_id(request.user.username)
-            username = cmte_id + request.data.get("email")
+        elif request.method == "POST":
+            try:
+                cmte_id = get_comittee_id(request.user.username)
+                data = {"cmte_id": cmte_id}
 
-            data = {"cmte_id": cmte_id, "user_name": get_comittee_id(request.user.username)}
-            fields = user_data_dict()
-            fields.append("id")
-            data = validate(data, fields, request)
-            data["new_user_name"] = username
-            data["old_email"] = old_email
-            rows = update_user(data)
-            output = get_users_list(cmte_id)
-            json_result = {'users': output, "rows_updated": rows}
-            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedL API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+                fields = user_data_dict()
+                data = validate(data, fields, request)
+                # check if user already exsist
+                user_exist = check_user_present(data)
+                # check if user was previously deleted, then reactivate
+                user_reactivated = user_previously_deleted(data)
+                backup_admin_exist = backup_user_exist(data)
+                if data.get("role").upper() == Roles.BC_ADMIN.value and request.user.role != Roles.C_ADMIN.value:
+                    raise NoOPError(
+                        "Current Role does not have authority to create Back Up Admin. Please reach out to Committee "
+                        "Admin."
+                        )
+
+                if not user_exist and not user_reactivated and not backup_admin_exist:
+                    data = add_new_user(data, cmte_id)
+
+                output = get_users_list(cmte_id)
+                json_result = {'users': output}
+                return JsonResponse(json_result, status=status.HTTP_201_CREATED, safe=False)
+            except Exception as e:
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+        elif request.method == "PUT":
+            try:
+                old_email = get_email(request.user.username)
+                cmte_id = get_comittee_id(request.user.username)
+                username = cmte_id + request.data.get("email")
+
+                data = {"cmte_id": cmte_id, "user_name": get_comittee_id(request.user.username)}
+                fields = user_data_dict()
+                fields.append("id")
+                data = validate(data, fields, request)
+                data["new_user_name"] = username
+                data["old_email"] = old_email
+                rows = update_user(data)
+                output = get_users_list(cmte_id)
+                json_result = {'users': output, "rows_updated": rows}
+                return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
+            except Exception as e:
+                logger.debug(e)
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def validate(data, fields, request):
@@ -501,8 +530,8 @@ def update_toggle_status(status, data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND role != 'TREASURER' """
-            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id")])
+            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND upper(role) != %s """
+            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id"), Roles.C_ADMIN.value])
 
             if cursor.rowcount != 1:
                 raise NoOPError(
@@ -516,18 +545,26 @@ def update_toggle_status(status, data):
 
 @api_view(["PUT"])
 def toggle_user(request):
-    if request.method == "PUT":
-        try:
-            username = request.user.username
-            if len(username) > 9:
-                cmte_id = get_comittee_id(request.user.username)
-            data = {"username": username, "id": request.data.get("id"),
-                    "cmte_id": cmte_id}
-            toggle_status = get_toggle_status(data)
-            rows = update_toggle_status(toggle_status, data)
-            output = get_users_list(cmte_id)
-            json_result = {'users': output, "rows_updated": rows}
-            return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
-        except Exception as e:
-            logger.debug("exception occured while toggling status", str(e))
-            raise e
+    try:
+        is_not_treasurer(request)
+
+        if request.method == "PUT":
+            try:
+                username = request.user.username
+                if len(username) > 9:
+                    cmte_id = get_comittee_id(request.user.username)
+                data = {"username": username, "id": request.data.get("id"),
+                        "cmte_id": cmte_id}
+                toggle_status = get_toggle_status(data)
+                rows = update_toggle_status(toggle_status, data)
+                output = get_users_list(cmte_id)
+                json_result = {'users': output, "rows_updated": rows}
+                return JsonResponse(json_result, status=status.HTTP_200_OK, safe=False)
+            except Exception as e:
+                logger.debug("exception occured while toggling status", str(e))
+                json_result = {'message': str(e)}
+                return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)

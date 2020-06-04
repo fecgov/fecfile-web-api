@@ -820,6 +820,12 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         const pagedResponse = this._utilService.pageResponse(res, this.config);
         this.h3Sum = pagedResponse.items;
         this.pageNumbers = pagedResponse.pageNumbers;
+
+      // Update third navigation totals
+      const report = {
+        'report_id': reportId
+      };
+      this.updateThirdNavAmounts(report);
     });
   }
 

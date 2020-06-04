@@ -430,328 +430,328 @@
                       </td>
                     </tr>
                     <tr>
-                      <td width=60%>
-                        <div class="summary_text_level_1">
-                          1. RECEIPTS
-                        </div>
-                      </td>
-                      <td width=20%>
-                        <div class="summary_text_amt_level_1">
-                          Current Period
-                        </div>
-                      </td>
-                      <td width=20%>
-                        <div class="summary_text_amt_level_1">
-                          Calendar Year-to-Date
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          1a. Itemized Receipts From Persons
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.itemized_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.itemized_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          1b. Unitemized Receipts From Persons
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.non_itemized_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.non_itemized_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          1c. Total Receipts From Persons
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.itemized_non_itemized_combined | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.itemized_non_itemized_combined_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_2">
-                          2. OTHER RECEIPTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_2">
-                          {{ lSum.other_sl_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_2">
-                          {{ lSum.other_sl_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_1">
-                          3. TOTAL RECEIPTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_1">
-                          {{ lSum.total_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_1">
-                          {{ lSum.total_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_2">
-                          4. TRANSFERS TO FEDERAL OR ALLOCATION ACCOUNT
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_2">
-                          &nbsp;
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_2">
-                          &nbsp;
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          4(a) Voter Registration DISBURSEMENTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.voter_registration_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.voter_registration_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          4(b) Voter ID DISBURSEMENTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.voter_ID_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.voter_ID_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          4(c). GOTV DISBURSEMENTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.GOTV_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.GOTV_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          4(d). Generic Campaign DISBURSEMENTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.generic_campaign_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.generic_campaign_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_1">
-                          4(e). Line 4 TOTAL
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_1">
-                          {{ lSum.line4_subtotal | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_1">
-                          {{ lSum.line4_subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_2">
-                          5. OTHER DISBURSEMENTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_2">
-                          {{ lSum.other_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_2">
-                          {{ lSum.other_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_1">
-                          6. TOTAL DISBURSEMENTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_1">
-                          {{ lSum.total_disbursement_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_1">
-                          {{ lSum.total_disbursement_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          7. CASH ON HAND (Beginning)
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.coh_bop_report | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.coh_bop_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          8. RECEIPTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.total_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.total_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          9. SUBTOTAL
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.subtotal_report | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_3 summary_level_3">
-                          10. DISBURSEMENTS
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.total_disbursement_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_3">
-                          {{ lSum.total_disbursement_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="summary_text_level_2">
-                          11. ENDING CASH ON HAND
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_2">
-                          {{ lSum.coh_cop_report | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                      <td>
-                        <div class="summary_text_amt_level_2">
-                          {{ lSum.coh_cop_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
-                        </div>
-                      </td>
-                    </tr>
+                        <td width=60%>
+                          <div class="summary_text_level_1" >
+                            1. RECEIPTS
+                          </div>
+                        </td>
+                        <td width=20%>
+                          <div class="summary_text_amt_level_1" >
+                            Current Period
+                          </div>
+                        </td>
+                        <td width=20%>
+                          <div class="summary_text_amt_level_1" >
+                            Calendar Year-to-Date
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              1a. Itemized Receipts From Persons
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.itemized_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.itemized_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              1b. Unitemized Receipts From Persons
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.non_itemized_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.non_itemized_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              1c. Total Receipts From Persons
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.itemized_non_itemized_combined | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.itemized_non_itemized_combined_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_2" >
+                              2. OTHER RECEIPTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_2" >
+                            {{ lSum.other_sl_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_2" >
+                              {{ lSum.other_sl_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_1" >
+                              3. TOTAL RECEIPTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_1" >
+                            {{ lSum.total_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_1" >
+                              {{ lSum.total_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_2" >
+                              4. TRANSFERS TO FEDERAL OR ALLOCATION ACCOUNT
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_2" >
+                            &nbsp;
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_2" >
+                              &nbsp;
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              4(a) Voter Registration DISBURSEMENTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.voter_registration_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.voter_registration_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              4(b) Voter ID DISBURSEMENTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.voter_ID_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.voter_ID_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              4(c). GOTV DISBURSEMENTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.GOTV_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.GOTV_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              4(d). Generic Campaign DISBURSEMENTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.generic_campaign_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.generic_campaign_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_1" >
+                              4(e). Line 4 TOTAL
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_1" >
+                            {{ lSum.line4_subtotal | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_1" >
+                              {{ lSum.line4_subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_2" >
+                              5. OTHER DISBURSEMENTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_2" >
+                            {{ lSum.other_disbursement | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_2" >
+                              {{ lSum.other_disbursement_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_1" >
+                              6. TOTAL DISBURSEMENTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_1" >
+                            {{ lSum.total_disbursement_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_1" >
+                              {{ lSum.total_disbursement_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              7. CASH ON HAND (Beginning)
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.coh_bop_report | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.coh_bop_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              8. RECEIPTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.total_receipt_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.total_receipt_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              9. SUBTOTAL
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.subtotal_report | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.subtotal_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_3 summary_level_3" >
+                              10. DISBURSEMENTS
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                            {{ lSum.total_disbursement_amount | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_3" >
+                              {{ lSum.total_disbursement_amount_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
+                      <tr>
+                        <td>
+                          <div class="summary_text_level_2" >
+                              11. ENDING CASH ON HAND
+                          </div>
+                        </td>
+                        <td>
+                          <div class="summary_text_amt_level_2" >
+                            {{ lSum.coh_cop_report | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                        <td>
+                          <div class="summary_text_amt_level_2" >
+                              {{ lSum.coh_cop_ytd | currency:'USD':'symbol-narrow':'1.2-2'}}
+                          </div>
+                        </td>  
+                      </tr>
                   </tbody>
                 </table>
               </div>

@@ -16,6 +16,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from fecfiler.authentication.authorization import is_read_only_or_filer_reports
 from fecfiler.core.views import (
     NoOPError,
     check_null_value,
@@ -1502,7 +1503,7 @@ def schedA_sql_dict(data):
             data.get("transaction_type_identifier")
         )
         # Adding election year to election code for 'REF_TO_FED_CAN'
-        if data.get("transaction_type_identifier") in ['REF_TO_FED_CAN', 'REF_TO_OTH_CMTE'] and data.get("election_year"):
+        if data.get("transaction_type_identifier") in ['REF_TO_FED_CAN', 'REF_TO_OTH_CMTE'] and data.get("election_year") not in ('YYYY', None) and data.get("election_code"):
             datum['election_code'] += data.get("election_year")
         if (
             data.get("transaction_type_identifier")
@@ -1912,202 +1913,206 @@ def schedA(request):
     """
     sched_a api supporting POST, GET, DELETE, PUT
     """
-
+    try:
+        is_read_only_or_filer_reports(request)
     # POST api: create new transactions and children transactions if any
-    global REQ_ELECTION_YR
-    if request.method == "POST":
-        if "election_year" in request.data:
-            REQ_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQ_ELECTION_YR = request.query_params.get("election_year")
-        try:
-            # checking if reattribution is triggered for a transaction
-            reattribution_flag = False
-            if "reattribution_id" in request.data and request.data[
-                "reattribution_id"
-            ] not in ["", "", None, "null"]:
-                reattribution_flag = True
-                if "reattribution_report_id" not in request.data:
-                    raise Exception(
-                        "reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution"
-                    )
-            validate_sa_data(request.data)
-            cmte_id = get_comittee_id(request.user.username)
-            report_id = check_report_id(request.data.get("report_id"))
-            # To check if the report id exists in reports table
-            form_type = find_form_type(report_id, cmte_id)
-            datum = schedA_sql_dict(request.data)
-            datum["report_id"] = report_id
-            datum["cmte_id"] = cmte_id
-            # Adding memo_code and memo_text values for reattribution flags
-            if reattribution_flag:
-                datum["memo_code"] = "X"
-                datum["memo_text"] = "MEMO: Reattribution"
-                datum["report_id"] = check_report_id(
-                    request.data["reattribution_report_id"]
-                )
-                datum["reattribution_id"] = request.data["reattribution_id"]
-            # posting data into schedA
-            data = post_schedA(datum)
-            output = get_schedA(data)
-            # for earmark child transaction: update parent transction  purpose_description
-            if datum.get("transaction_type_identifier") in EARMARK_SA_CHILD_LIST:
-                update_earmark_parent_purpose(datum)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedA API - POST is throwing an exception: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    # Get records from schedA table
-    if request.method == "GET":
-        if "election_year" in request.data:
-            REQ_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQ_ELECTION_YR = request.query_params.get("election_year")
-
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
-                    request.query_params.get("report_id")
-                )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            # To check if the report id exists in reports table
-            form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
-                    request.query_params.get("transaction_id")
-                )
-            datum = get_schedA(data)
-            # # for obj in datum:
-            #     obj.update({'api_call' : 'sa/schedA'})
-            return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
-        except NoOPError as e:
-            logger.debug(e)
-            forms_obj = []
-            return JsonResponse(
-                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
-            )
-        except Exception as e:
-            logger.debug(e)
-            return Response(
-                "The schedA API - GET is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    # PUT api call handled here
-    if request.method == "PUT":
-        if "election_year" in request.data:
-            REQ_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQ_ELECTION_YR = request.query_params.get("election_year")
-        try:
-            # checking if reattribution is triggered for a transaction
-            reattribution_flag = False
-            if "isReattribution" in request.data and request.data[
-                "isReattribution"
-            ] not in ["None", "null", "", ""]:
-                if request.data["isReattribution"] in ["True", "true", "t", "T", True]:
+        global REQ_ELECTION_YR
+        if request.method == "POST":
+            if "election_year" in request.data:
+                REQ_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQ_ELECTION_YR = request.query_params.get("election_year")
+            try:
+                # checking if reattribution is triggered for a transaction
+                reattribution_flag = False
+                if "reattribution_id" in request.data and request.data[
+                    "reattribution_id"
+                ] not in ["", "", None, "null"]:
                     reattribution_flag = True
                     if "reattribution_report_id" not in request.data:
                         raise Exception(
                             "reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution"
                         )
-                    else:
-                        reattribution_report_id = check_report_id(
-                            request.data["reattribution_report_id"]
-                        )
-            validate_sa_data(request.data)
-            datum = schedA_sql_dict(request.data)
-            if "transaction_id" in request.data and check_null_value(
-                request.data.get("transaction_id")
-            ):
-                datum["transaction_id"] = request.data.get("transaction_id")
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            # handling null,none value of report_id
-            if not (check_null_value(request.data.get("report_id"))):
-                report_id = "0"
-            else:
+                validate_sa_data(request.data)
+                cmte_id = get_comittee_id(request.user.username)
                 report_id = check_report_id(request.data.get("report_id"))
-            # end of handling
-            datum["report_id"] = report_id
-            datum["cmte_id"] = get_comittee_id(request.user.username)
-            # To check if the report id exists in reports table
-            form_type = find_form_type(report_id, datum.get("cmte_id"))
-            # updating data for reattribution fields
-            if reattribution_flag:
-                datum["memo_code"] = "X"
-                datum["memo_text"] = "MEMO: Reattribution"
-            data = put_schedA(datum)
-            # Updating auto generated transactions for reattribution transactions
-            if reattribution_flag:
-                reattribution_auto_update_transactions(
-                    datum["cmte_id"],
-                    reattribution_report_id,
-                    datum["contribution_date"],
-                    datum["contribution_amount"],
-                    datum["transaction_id"],
+                # To check if the report id exists in reports table
+                form_type = find_form_type(report_id, cmte_id)
+                datum = schedA_sql_dict(request.data)
+                datum["report_id"] = report_id
+                datum["cmte_id"] = cmte_id
+                # Adding memo_code and memo_text values for reattribution flags
+                if reattribution_flag:
+                    datum["memo_code"] = "X"
+                    datum["memo_text"] = "MEMO: Reattribution"
+                    datum["report_id"] = check_report_id(
+                        request.data["reattribution_report_id"]
+                    )
+                    datum["reattribution_id"] = request.data["reattribution_id"]
+                # posting data into schedA
+                data = post_schedA(datum)
+                output = get_schedA(data)
+                # for earmark child transaction: update parent transction  purpose_description
+                if datum.get("transaction_type_identifier") in EARMARK_SA_CHILD_LIST:
+                    update_earmark_parent_purpose(datum)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedA API - POST is throwing an exception: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-                data["report_id"] = reattribution_report_id
-            output = get_schedA(data)
 
-            # for earmark child transaction: update parent transction  purpose_description
-            if datum.get("transaction_type_identifier") in EARMARK_SA_CHILD_LIST:
-                update_earmark_parent_purpose(datum)
-            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response(
-                "The schedA API - PUT is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        # Get records from schedA table
+        if request.method == "GET":
+            if "election_year" in request.data:
+                REQ_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQ_ELECTION_YR = request.query_params.get("election_year")
 
-    # delete api call handled here
-    if request.method == "DELETE":
-        if "election_year" in request.data:
-            REQ_ELECTION_YR = request.data.get("election_year")
-        if "election_year" in request.query_params:
-            REQ_ELECTION_YR = request.query_params.get("election_year")
-
-        try:
-            data = {"cmte_id": get_comittee_id(request.user.username)}
-            if "report_id" in request.query_params and check_null_value(
-                request.query_params.get("report_id")
-            ):
-                data["report_id"] = check_report_id(
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
                     request.query_params.get("report_id")
-                )
-            else:
-                raise Exception("Missing Input: report_id is mandatory")
-            # To check if the report id exists in reports table
-            form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
-            if "transaction_id" in request.query_params and check_null_value(
-                request.query_params.get("transaction_id")
-            ):
-                data["transaction_id"] = check_transaction_id(
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                # To check if the report id exists in reports table
+                form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
+                if "transaction_id" in request.query_params and check_null_value(
                     request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                datum = get_schedA(data)
+                # # for obj in datum:
+                #     obj.update({'api_call' : 'sa/schedA'})
+                return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
+            except NoOPError as e:
+                logger.debug(e)
+                forms_obj = []
+                return JsonResponse(
+                    forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
                 )
-            else:
-                raise Exception("Missing Input: transaction_id is mandatory")
-            delete_schedA(data)
-            return Response(
-                "The Transaction ID: {} has been successfully deleted".format(
-                    data.get("transaction_id")
-                ),
-                status=status.HTTP_201_CREATED,
-            )
-        except Exception as e:
-            return Response(
-                "The schedA API - DELETE is throwing an error: " + str(e),
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            except Exception as e:
+                logger.debug(e)
+                return Response(
+                    "The schedA API - GET is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        # PUT api call handled here
+        if request.method == "PUT":
+            if "election_year" in request.data:
+                REQ_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQ_ELECTION_YR = request.query_params.get("election_year")
+            try:
+                # checking if reattribution is triggered for a transaction
+                reattribution_flag = False
+                if "isReattribution" in request.data and request.data[
+                    "isReattribution"
+                ] not in ["None", "null", "", ""]:
+                    if request.data["isReattribution"] in ["True", "true", "t", "T", True]:
+                        reattribution_flag = True
+                        if "reattribution_report_id" not in request.data:
+                            raise Exception(
+                                "reattribution_report_id parameter is missing. Kindly provide this id to continue reattribution"
+                            )
+                        else:
+                            reattribution_report_id = check_report_id(
+                                request.data["reattribution_report_id"]
+                            )
+                validate_sa_data(request.data)
+                datum = schedA_sql_dict(request.data)
+                if "transaction_id" in request.data and check_null_value(
+                    request.data.get("transaction_id")
+                ):
+                    datum["transaction_id"] = request.data.get("transaction_id")
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                # handling null,none value of report_id
+                if not (check_null_value(request.data.get("report_id"))):
+                    report_id = "0"
+                else:
+                    report_id = check_report_id(request.data.get("report_id"))
+                # end of handling
+                datum["report_id"] = report_id
+                datum["cmte_id"] = get_comittee_id(request.user.username)
+                # To check if the report id exists in reports table
+                form_type = find_form_type(report_id, datum.get("cmte_id"))
+                # updating data for reattribution fields
+                if reattribution_flag:
+                    datum["memo_code"] = "X"
+                    datum["memo_text"] = "MEMO: Reattribution"
+                data = put_schedA(datum)
+                # Updating auto generated transactions for reattribution transactions
+                if reattribution_flag:
+                    reattribution_auto_update_transactions(
+                        datum["cmte_id"],
+                        reattribution_report_id,
+                        datum["contribution_date"],
+                        datum["contribution_amount"],
+                        datum["transaction_id"],
+                    )
+                    data["report_id"] = reattribution_report_id
+                output = get_schedA(data)
+
+                # for earmark child transaction: update parent transction  purpose_description
+                if datum.get("transaction_type_identifier") in EARMARK_SA_CHILD_LIST:
+                    update_earmark_parent_purpose(datum)
+                return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response(
+                    "The schedA API - PUT is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        # delete api call handled here
+        if request.method == "DELETE":
+            if "election_year" in request.data:
+                REQ_ELECTION_YR = request.data.get("election_year")
+            if "election_year" in request.query_params:
+                REQ_ELECTION_YR = request.query_params.get("election_year")
+
+            try:
+                data = {"cmte_id": get_comittee_id(request.user.username)}
+                if "report_id" in request.query_params and check_null_value(
+                    request.query_params.get("report_id")
+                ):
+                    data["report_id"] = check_report_id(
+                        request.query_params.get("report_id")
+                    )
+                else:
+                    raise Exception("Missing Input: report_id is mandatory")
+                # To check if the report id exists in reports table
+                form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
+                if "transaction_id" in request.query_params and check_null_value(
+                    request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = check_transaction_id(
+                        request.query_params.get("transaction_id")
+                    )
+                else:
+                    raise Exception("Missing Input: transaction_id is mandatory")
+                delete_schedA(data)
+                return Response(
+                    "The Transaction ID: {} has been successfully deleted".format(
+                        data.get("transaction_id")
+                    ),
+                    status=status.HTTP_201_CREATED,
+                )
+            except Exception as e:
+                return Response(
+                    "The schedA API - DELETE is throwing an error: " + str(e),
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 def update_sa_aggregation_status(transaction_id, aggregation_status=None):
@@ -2139,21 +2144,26 @@ def force_itemize_sa(request):
     1. set itemized_ind = 'Y'
     2. update line number if necessary
     """
-    # if request.method == "GET":
     try:
-        cmte_id = get_comittee_id(request.user.username)
-        report_id = request.data.get("report_id")
-        transaction_id = request.data.get("transaction_id")
-        if not transaction_id:
-            raise Exception("transaction id is required for this api call.")
-        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, item_status="FI")
-        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        is_read_only_or_filer_reports(request)
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            report_id = request.data.get("report_id")
+            transaction_id = request.data.get("transaction_id")
+            if not transaction_id:
+                raise Exception("transaction id is required for this api call.")
+            sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+            update_sa_itmization_status(sa_data, item_status="FI")
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                "The force_aggregate_sa API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     except Exception as e:
-        return Response(
-            "The force_aggregate_sa API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["PUT"])
@@ -2163,21 +2173,26 @@ def force_unitemize_sa(request):
     1. set itemized_ind = 'N'
     2. update line number if necessary
     """
-    # if request.method == "GET":
     try:
-        cmte_id = get_comittee_id(request.user.username)
-        report_id = request.data.get("report_id")
-        transaction_id = request.data.get("transaction_id")
-        if not transaction_id:
-            raise Exception("transaction id is required for this api call.")
-        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
-        update_sa_itmization_status(sa_data, item_status="FU")
-        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        is_read_only_or_filer_reports(request)
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            report_id = request.data.get("report_id")
+            transaction_id = request.data.get("transaction_id")
+            if not transaction_id:
+                raise Exception("transaction id is required for this api call.")
+            sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+            update_sa_itmization_status(sa_data, item_status="FU")
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                "The force_aggregate_sa API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     except Exception as e:
-        return Response(
-            "The force_aggregate_sa API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["PUT"])
@@ -2189,27 +2204,33 @@ def force_aggregate_sa(request):
     """
     # if request.method == "GET":
     try:
-        cmte_id = get_comittee_id(request.user.username)
-        report_id = request.data.get("report_id")
-        transaction_id = request.data.get("transaction_id")
-        if not transaction_id:
-            raise Exception("transaction id is required for this api call.")
-        update_sa_aggregation_status(transaction_id, aggregation_status="Y")
-        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+        is_read_only_or_filer_reports(request)
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            report_id = request.data.get("report_id")
+            transaction_id = request.data.get("transaction_id")
+            if not transaction_id:
+                raise Exception("transaction id is required for this api call.")
+            update_sa_aggregation_status(transaction_id, aggregation_status="Y")
+            sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
 
-        update_linenumber_aggamt_transactions_SA(
-            sa_data.get("contribution_date"),
-            sa_data.get("transaction_type_identifier"),
-            sa_data.get("entity_id"),
-            cmte_id,
-            report_id,
-        )
-        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+            update_linenumber_aggamt_transactions_SA(
+                sa_data.get("contribution_date"),
+                sa_data.get("transaction_type_identifier"),
+                sa_data.get("entity_id"),
+                cmte_id,
+                report_id,
+            )
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                "The force_aggregate_sa API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
     except Exception as e:
-        return Response(
-            "The force_aggregate_sa API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
 
 
 @api_view(["PUT"])
@@ -2219,29 +2240,34 @@ def force_unaggregate_sa(request):
     1. set aggregate_ind = 'N'
     2. re-do entity-based aggregation on sa
     """
-    # if request.method == "GET":
     try:
-        cmte_id = get_comittee_id(request.user.username)
-        report_id = request.data.get("report_id")
-        transaction_id = request.data.get("transaction_id")
-        if not transaction_id:
-            raise Exception("transaction id is required for this api call.")
-        update_sa_aggregation_status(transaction_id, aggregation_status="N")
-        sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
+        is_read_only_or_filer_reports(request)
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            report_id = request.data.get("report_id")
+            transaction_id = request.data.get("transaction_id")
+            if not transaction_id:
+                raise Exception("transaction id is required for this api call.")
+            update_sa_aggregation_status(transaction_id, aggregation_status="N")
+            sa_data = get_list_schedA(report_id, cmte_id, transaction_id)[0]
 
-        update_linenumber_aggamt_transactions_SA(
-            sa_data.get("contribution_date"),
-            sa_data.get("transaction_type_identifier"),
-            sa_data.get("entity_id"),
-            cmte_id,
-            report_id,
-        )
-        return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+            update_linenumber_aggamt_transactions_SA(
+                sa_data.get("contribution_date"),
+                sa_data.get("transaction_type_identifier"),
+                sa_data.get("entity_id"),
+                cmte_id,
+                report_id,
+            )
+            return JsonResponse({"status": "success"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                "The force_aggregate_sa API is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     except Exception as e:
-        return Response(
-            "The force_aggregate_sa API is throwing an error: " + str(e),
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 @api_view(["GET"])
@@ -2693,13 +2719,15 @@ def trash_restore_transactions(request):
         }
  
     """
-    logger.info("trash_restore_transactions called with {}".format(request.data))
-    deleted_transaction_ids = []
-    _actions = request.data.get("actions", [])
-    for _action in _actions:
-        report_id = _action.get("report_id", "")
-        transaction_id = _action.get("transaction_id", "")
-        cmte_id = get_comittee_id(request.user.username)
+    try:
+        is_read_only_or_filer_reports(request)
+        logger.info("trash_restore_transactions called with {}".format(request.data))
+        deleted_transaction_ids = []
+        _actions = request.data.get("actions", [])
+        for _action in _actions:
+            report_id = _action.get("report_id", "")
+            transaction_id = _action.get("transaction_id", "")
+            cmte_id = get_comittee_id(request.user.username)
 
         action = _action.get("action", "")
         _delete = "Y" if action == "trash" else ""
@@ -2957,18 +2985,21 @@ def trash_restore_transactions(request):
             # update report last_update_date
             renew_report_update_date(report_id)
 
-            function_to_call_wrapper_update_F3X(cmte_id, report_id)
+            function_to_call_wrapper_update_F3X(cmte_id,report_id)
 
         except Exception as e:
-            return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
-                status=status.HTTP_400_BAD_REQUEST)
-    return Response(
-        {
-            "result": "success",
-            "deletedTransactions": "{}".format(",".join(deleted_transaction_ids)),
-        },
-        status=status.HTTP_200_OK,
-    )
+                 return Response("The trash_restore_transactions API is throwing an error: " + str(e) + ". Deleted transactions are: {}".format(",".join(deleted_transaction_ids)),
+                     status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {
+                "result": "success",
+                "deletedTransactions": "{}".format(",".join(deleted_transaction_ids)),
+            },
+            status=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
 """

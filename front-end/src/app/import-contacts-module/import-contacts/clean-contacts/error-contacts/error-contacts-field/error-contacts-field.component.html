@@ -1,0 +1,15 @@
+<ng-container *ngIf="!field?.isError; else errorMessage">{{field?.value}}</ng-container>
+<ng-template #errorMessage>
+
+  <!--this looks odd -->
+  <!-- <span class="error_message">{{field?.errorMessage}}</span>
+  <ng-container *ngIf="field?.value">: {{field?.value}}</ng-container> -->
+
+  <span *ngIf="field?.value" ngbTooltip="{{field?.errorMessage}}">{{field?.value}}
+    <span class="error_message"> *</span>
+  </span>
+  <span *ngIf="!field?.value" ngbTooltip="{{field?.errorMessage}}">
+    <span class="error_message">Missing *</span>
+  </span>
+
+</ng-template>

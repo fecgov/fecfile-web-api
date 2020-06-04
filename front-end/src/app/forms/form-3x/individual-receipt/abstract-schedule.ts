@@ -211,7 +211,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     protected _decimalPipe: DecimalPipe,
     protected _reportTypeService: ReportTypeService,
     protected _typeaheadService: TypeaheadService,
-    private _dialogService: DialogService,
+    protected _dialogService: DialogService,
     private _f3xMessageService: F3xMessageService,
     private _transactionsMessageService: TransactionsMessageService,
     protected _contributionDateValidator: ContributionDateValidator,
@@ -6032,5 +6032,15 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.saveForEditEarmark();
       }
     }
+  }
+
+  protected updateThirdNavAmounts(res: any) {
+    this._receiptService.getSchedule(this.formType, res).subscribe(resp => {
+      const message: any = {
+        formType: this.formType,
+        totals: resp
+      };
+      this._messageService.sendMessage(message);
+    });
   }
 }

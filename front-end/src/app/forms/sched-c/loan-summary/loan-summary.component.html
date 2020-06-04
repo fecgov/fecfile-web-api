@@ -94,7 +94,7 @@
           </td>
           <td  *ngIf="isColumnVisible('loan_balance')">
             {{ln.loan_balance | currency:'USD':'symbol-narrow':'1.2-2'}}</td>
-          <td  *ngIf="isColumnVisible('loan_due_date')">{{ln.loan_due_date | date: 'MM/dd/yyyy' }}</td>
+          <td  *ngIf="isColumnVisible('loan_due_date')">{{convertToString(ln.loan_due_date)}}</td>
 
           <td>
             <div  *ngIf="isLoanSummryViewActive()" class="btn-group" ngbDropdown role="group"
