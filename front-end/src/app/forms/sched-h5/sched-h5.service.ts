@@ -22,7 +22,13 @@ export class SchedH5Service {
     private _cookieService: CookieService,
   ) { }
 
-  public getSummary(reportId: string): Observable<any> {
+  public getSummary(
+      reportId: string,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean
+    ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/sh5/get_h5_summary';
@@ -32,6 +38,10 @@ export class SchedH5Service {
 
     let params = new HttpParams();
     params = params.append('report_id', reportId);
+    params = params.append('page', page.toString());
+    params = params.append('itemsPerPage', itemsPerPage.toString());
+    params = params.append('sortColumnName', sortColumnName);
+    params = params.append('descending', `${descending}`);
 
     return this._http
       .get(
@@ -142,7 +152,15 @@ export class SchedH5Service {
       );
   }
 
-  public saveAndGetSummary(ratio: any, reportId: string, scheduleAction: SchedHActions): Observable<any> {
+  public saveAndGetSummary(
+      ratio: any, 
+      reportId: string, 
+      scheduleAction: SchedHActions,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean
+    ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions =  new HttpHeaders();
     const url = '/sh5/schedH5';
@@ -176,7 +194,7 @@ export class SchedH5Service {
 
               let sub: Subscription;
               let sum: any;
-              sub = this.getSummary(reportId).subscribe(res =>
+              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
                 {
                   if(res) {
                     sum =  res;
@@ -205,7 +223,7 @@ export class SchedH5Service {
 
               let sub: Subscription;
               let sum: any;
-              sub = this.getSummary(reportId).subscribe(res =>
+              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
                 {
                   if(res) {
                     sum =  res;

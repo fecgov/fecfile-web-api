@@ -30,17 +30,25 @@
       </button>
     </nav>
   </div>
-  <div class="grid-row float-right transactions__page-item-range">
-    <div *ngIf="isTransactionViewActive() || isRecycleBinViewActive()"
-      class="float-right transactions__item-range">
-      {{determineItemRange()}} of {{config.totalItems}}
-    </div>
-  </div>
+  
   <div *ngIf="apiError" class="text-error text-center">
       There was an unexpected error. Please try again. 
   </div> 
 
   <ng-container *ngIf="!apiError">
+    <div class="grid-row d-flex justify-content-between">
+      <div class="d-flex ml-3" *ngIf="showPageSizes()">
+        <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>    
+        <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
+          (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage"
+          class="border border-light">
+        </ng-select>
+      </div>
+      <div *ngIf="showPageSizes() && (isTransactionViewActive() || isRecycleBinViewActive())" class="transactions__item-range mr-2">
+        {{determineItemRange()}} of {{config.totalItems}}
+      </div>
+    </div>
+
   <!--Receipt transaction table-->
     <table class="table table-striped table-hover table__sortable transactions__table" *ngIf="transactionCategory === 'receipts'">
       <thead>
@@ -1131,8 +1139,20 @@
     </table>
     <hr/>
     <div *ngIf="showPagination()" class="d-flex justify-content-center transactions__table-pagination-container">
-      <pagination-controls [id]="config.id" (pageChange)="getPage($event)">
-      </pagination-controls>
+      <div class="my-auto">
+        <pagination-controls [id]="config.id" (pageChange)="getPage($event)" [maxSize]="paginationControlsMaxSize">
+        </pagination-controls>
+      </div>
+      <div *ngIf="pageNumbers.length > 1" class="d-flex ml-1">
+        <div class="mr-1 my-auto text-muted">Go to page:</div>
+        <ng-select #pageNumber [items]="pageNumbers" [clearable]="false" [hideSelected]="true"
+          (change)="onGotoPageChange($event)" [(ngModel)]="gotoPage"
+          class="border border-light">
+        </ng-select>
+      </div>
+    </div>
+    <div *ngIf="!showPageSizes()" class="d-flex justify-content-center reports__table-pagination-container">
+      <div class="text-muted">No records found</div>
     </div>
   </ng-container>
   <div bsModal #columnOptionsModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog"
