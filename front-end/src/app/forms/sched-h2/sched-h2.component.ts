@@ -365,6 +365,13 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
           this._reportTypeService.printPreview('transaction_table_screen', '3X', res.transaction_id);
         }
       }
+    }, error => {
+      this._dialogService.confirm(
+          error.error,
+          ConfirmModalComponent,
+          'Error !!!',
+          false,
+          ModalHeaderClassEnum.errorHeader);
     });
   }
 

@@ -1814,7 +1814,7 @@ def check_if_activity_present(datum):
             event_list = cursor.fetchone()
             if event_list is not None:
                 raise NoOPError(
-                    "same event activity already exist for report id:{} and event_type:{}".format(
+                    "Same event activity already exist for report id:{} and event_type:{}".format(
                         report_id, event_type
                     )
                 )
@@ -1858,8 +1858,7 @@ def schedH2(request):
                 output = get_schedH2(data)
                 return JsonResponse(output[0], status=status.HTTP_201_CREATED)
             except Exception as e:
-                return Response(
-                    "The schedH2 API - POST is throwing an exception: " + str(e),
+                return Response(str(e),
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
