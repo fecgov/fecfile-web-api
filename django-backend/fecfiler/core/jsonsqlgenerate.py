@@ -1372,6 +1372,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     COALESCE(t1.subordinate_cmte_state, '''') AS "subordinateCommitteeState",
                     COALESCE(t1.subordinate_cmte_zip,  '''') AS "subordinateCommitteeZipCode",
                     COALESCE(t2.entity_type, '''') AS "entityType",
+                    COALESCE(t2.entity_name, '''') AS "payeeOrganizationName",
                     COALESCE(t2.last_name, '''') AS "payeeLastName", 
                     COALESCE(t2.first_name, '''') AS "payeeFirstName",
                     COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
