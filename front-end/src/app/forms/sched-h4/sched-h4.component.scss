@@ -59,7 +59,7 @@
       }
       @include clearfix();
     }
-    section {
+    section {    
       .coord_expenditure_text {
         padding-top: 3em;
         padding-bottom: 1em;
@@ -253,6 +253,25 @@
     display: block;
     padding: 0.1875rem 0.625rem;
     border-radius: 0;
+  }
+
+  .ngx-pagination {
+    margin-bottom: 0;
+  }
+
+  ng-select { 
+    .ng-dropdown-panel { 
+      width: auto !important; 
+      max-width: 550px; 
+    } 
+  }
+  
+  .sched-h4__page-range {
+    margin: 0 auto;
+    width: 96%;
+  }
+  .sched-h4__item-range {
+    padding: 0m 0 0.25em 0;
   }
   
   .dropdown-toggle:after {

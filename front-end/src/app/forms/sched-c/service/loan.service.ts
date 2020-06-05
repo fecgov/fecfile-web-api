@@ -86,7 +86,13 @@ export class LoanService {
    * @param filters
    * @return     {Observable}
    */
-  public getLoan(message: any = null): Observable<any> {
+  public getLoan(
+      message: any = null,
+      page: number,
+      itemsPerPage: number,
+      sortColumnName: string,
+      descending: boolean
+    ): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
     const url = '/sc/get_outstanding_loans';
@@ -105,9 +111,13 @@ export class LoanService {
 
     let params = new HttpParams();
     params = params.append('report_id', reportId);
+    params = params.append('page', page.toString());
+    params = params.append('itemsPerPage', itemsPerPage.toString());
+    params = params.append('sortColumnName', sortColumnName);
+    params = params.append('descending', `${descending}`);
 
     return this._http
-      .get(
+      .get<{items: any[], totalItems: number}>(
         `${environment.apiUrl}${url}`,
         {
           headers: httpOptions,
@@ -116,11 +126,18 @@ export class LoanService {
       )
       .pipe(map(res => {
         if (res) {
-          //console.log('get_outstanding_loans API res: ', res);
-
-          return res;
+          // this.addUIFileds(res);
+          // this.mockApplyFilters(res);
+          return {
+            items: this.mapFromServerFields(res.items),
+            totalItems: res.totalItems
+          };
+        } else {
+          return {
+            items: null,
+            totalItems: 0
+          };
         }
-        return false;
       }));
   }
 
@@ -240,7 +257,7 @@ export class LoanService {
       model.transaction_type_identifier = row.transaction_type_identifier;
       model.transaction_id = row.transaction_id;
       model.entity_id = row.entity_id;
-      model.name = row.name;
+      model.name = row.entity_name;
       model.street1 = row.street1;
       model.street2 = row.street2;
       model.city = row.city;
