@@ -1426,10 +1426,4 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       return true;
   }
  }
-
-  public noWhitespaceValidator(control: FormControl) {
-    const isWhitespace = (control.value || '').trim().length === 0;
-    const isValid = !isWhitespace;
-    return isValid ? null : { 'whitespace': true };
-  }
 }
