@@ -52,149 +52,240 @@
       </div>
     </header>
 
-    <section *ngIf="transactionType === 'ALLOC_H5_RATIO'">
-      <div [hidden]="showPart2" class="paragraph">
-        <div class="row">
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="account_name">
-                Account Name
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <select id="" formControlName="account_name" class="form-control" [ngClass]="
-                  schedH5.get('account_name')?.invalid && (schedH5.touched || schedH5.dirty) && isSubmit
-                    ? 'input-field-error'
-                    : ''
-                ">
-                <option value="" selected>Select account name</option>
-                <option *ngFor="let item of levinAccountsies" [value]="item.levin_account_name">
-                  {{ item.levin_account_name }}
-                </option>
-              </select>
-            </div>
-          </div>
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="">
-                Date
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="row input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="filter-max-amount">
-                    <i class="calendar-icon" aria-hidden="true"></i>
-                  </span>
-                </div>
-                <input class="form-control" type="date" [formControlName]="'receipt_date'" [attr.name]="'receipt_date'"
-                  [style.width]="'50%'" [style.height]="'30px'" (change)="receiptDateChanged($event.target.value)"
-                  [ngClass]="
-                    schedH5.get('receipt_date')?.invalid && (schedH5.touched || schedH5.dirty)
+    <!-- Page - body (before table) -->
+    <ng-container>
+      <section *ngIf="transactionType === 'ALLOC_H5_RATIO'">
+        <div [hidden]="showPart2" class="paragraph">
+          <div class="row">
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="account_name">
+                  Account Name
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <select id="" formControlName="account_name" class="form-control" [ngClass]="
+                    schedH5.get('account_name')?.invalid && (schedH5.touched || schedH5.dirty) && isSubmit
                       ? 'input-field-error'
                       : ''
-                  " />
-              </div>
-              <div class="text-error text-left" *ngIf="receiptDateErr">
-                The date entered falls outside of the report coverage period. Transactions for this report should fall
-                within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you need to add a
-                transaction with a date that falls outside of the coverage period for this report, you will need to
-                check the memo code box.
+                  ">
+                  <option value="" selected>Select account name</option>
+                  <option *ngFor="let item of levinAccountsies" [value]="item.levin_account_name">
+                    {{ item.levin_account_name }}
+                  </option>
+                </select>
               </div>
             </div>
-          </div>
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="">
-                Total Amount of Transfer
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="row input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="filter-max-amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
-                  </span>
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="">
+                  Date
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="row input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="filter-max-amount">
+                      <i class="calendar-icon" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" type="date" [formControlName]="'receipt_date'" [attr.name]="'receipt_date'"
+                    [style.width]="'50%'" [style.height]="'30px'" (change)="receiptDateChanged($event.target.value)"
+                    [ngClass]="
+                      schedH5.get('receipt_date')?.invalid && (schedH5.touched || schedH5.dirty)
+                        ? 'input-field-error'
+                        : ''
+                    " />
                 </div>
-                <input class="form-control" type="text" [formControlName]="'total_amount_transferred'"
-                  [attr.name]="'total_amount_transferred'" [style.width]="'50%'" [style.height]="'30px'"
-                  [attr.readonly]="true" />
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6 col-md-offset-2">
-            <div class="form-group">
-              <label for=""> </label>
-
-              <select id="" formControlName="category" class="form-control" (change)="selectCategoryChange($event)">
-                <option value="" selected>Select Category</option>
-                <option *ngFor="let category of categories" [value]="category.id">
-                  {{ category.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="">
-                Amount
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="row input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="filter-max-amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
-                  </span>
+                <div class="text-error text-left" *ngIf="receiptDateErr">
+                  The date entered falls outside of the report coverage period. Transactions for this report should fall
+                  within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you need to add a
+                  transaction with a date that falls outside of the coverage period for this report, you will need to
+                  check the memo code box.
                 </div>
-                <input class="form-control" type="text" [formControlName]="'transferred_amount'"
-                  [attr.name]="'transferred_amount'" [style.width]="'50%'" [style.height]="'30px'"
-                  (blur)="handleOnBlurEvent($event, col)" [ngClass]="
-                    schedH5.get('transferred_amount')?.invalid && (schedH5.touched || schedH5.dirty) && (!isSaveAndAdd)
-                      ? 'input-field-error'
-                      : ''
-                  " />
               </div>
-              <div class="text-error text-left" *ngIf="transferredAmountErr">
-                Please enter a valid amount.
+            </div>
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="">
+                  Total Amount of Transfer
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="row input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="filter-max-amount">
+                      <i class="dollar-sign-icon" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" type="text" [formControlName]="'total_amount_transferred'"
+                    [attr.name]="'total_amount_transferred'" [style.width]="'50%'" [style.height]="'30px'"
+                    [attr.readonly]="true" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-md-6 col-md-offset-2">
+              <div class="form-group">
+                <label for=""> </label>
+  
+                <select id="" formControlName="category" class="form-control" (change)="selectCategoryChange($event)">
+                  <option value="" selected>Select Category</option>
+                  <option *ngFor="let category of categories" [value]="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="">
+                  Amount
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="row input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="filter-max-amount">
+                      <i class="dollar-sign-icon" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" type="text" [formControlName]="'transferred_amount'"
+                    [attr.name]="'transferred_amount'" [style.width]="'50%'" [style.height]="'30px'"
+                    (blur)="handleOnBlurEvent($event, col)" [ngClass]="
+                      schedH5.get('transferred_amount')?.invalid && (schedH5.touched || schedH5.dirty) && (!isSaveAndAdd)
+                        ? 'input-field-error'
+                        : ''
+                    " />
+                </div>
+                <div class="text-error text-left" *ngIf="transferredAmountErr">
+                  Please enter a valid amount.
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+    </ng-container>
 
-      <div *ngIf="scheduleAction !== editScheduleAction">
+    <!-- Pagination - selection -->
+    <ng-container>
+      <section *ngIf="transactionType === 'ALLOC_H5_SUM'">
+        <div class="grid-row d-flex justify-content-between sched-h5__page-range">
+          <div class="d-flex ml-3" *ngIf="showPageSizes()">
+            <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>
+            <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
+              (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage" class="border border-light"
+              [ngModelOptions]="{standalone: true}">
+            </ng-select>
+          </div>
+          <div class="sched-h5__item-range" *ngIf="showPageSizes()">
+            {{determineItemRange()}} of {{config.totalItems}}
+          </div>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- Page - body (table) -->
+    <ng-container>
+      <section *ngIf="transactionType === 'ALLOC_H5_RATIO'">
+        <div *ngIf="scheduleAction !== editScheduleAction">
+          <ng-container>
+            <table class="table table-striped table-hover table__sortable">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th (click)="changeSortDirection('date')">
+                    Date
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+                  <th (click)="changeSortDirection('transfer_type')">
+                    Transfer Type
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+                  <th (click)="changeSortDirection('account_name')">
+                    Account Name
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+    
+                  <th (click)="changeSortDirection('transfer_amount')">
+                    Transfer Amount
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+                  <!-- <th  (click)="changeSortDirection('federal_percent')">Aggregate Amount -->
+                  <!-- <i class="fa fa-sort" aria-hidden="false"></i> -->
+                  <!-- </th> -->
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container *ngFor="let item of h5Entries | paginate: config">
+                  <tr>
+                    <td>
+                      <input type="checkbox" (click)="checkForMultiChecked($event)" />
+                    </td>
+                    <td>{{ item.receipt_date | date: 'MM/dd/yyyy' }}</td>
+                    <td>
+                      <div *ngIf="item.category == 'voter_id'">Voter ID</div>
+                      <div *ngIf="item.category == 'voter_registration'">Voter Registration</div>
+                      <div *ngIf="item.category == 'generic_campaign'">Generic Campaign Activities</div>
+                      <div *ngIf="item.category == 'gotv'">GOTV</div>
+                    </td>
+                    <td>{{ item.account_name }}</td>
+                    <td class="summary_text_amt">
+                      {{ item.transferred_amount }}
+                    </td>
+                    <td class="bulk_action">
+                      <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                          <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
+                          <button class="dropdown-item" (click)="editH5Sub(item)"><i class="fas fa-edit"></i>
+                            Edit</button>
+                          <button class="dropdown-item" (click)="trashSubTransaction(item)"><i class="fas fa-trash"></i>
+                            Trash</button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </ng-container>
+        </div>
+      </section>
+    
+      <section *ngIf="transactionType === 'ALLOC_H5_SUM'">
         <ng-container>
           <table class="table table-striped table-hover table__sortable">
             <thead>
               <tr>
-                <th ></th>
-                <th  (click)="changeSortDirection('date')">
+                <th></th>
+                <th (click)="changeSortDirection('date')">
                   Date
                   <i class="fa fa-sort" aria-hidden="false"></i>
                 </th>
-                <th  (click)="changeSortDirection('transfer_type')">
+                <th (click)="changeSortDirection('transfer_type')">
                   Transfer Type
                   <i class="fa fa-sort" aria-hidden="false"></i>
                 </th>
-                <th  (click)="changeSortDirection('account_name')">
+                <th (click)="changeSortDirection('account_name')">
                   Account Name
                   <i class="fa fa-sort" aria-hidden="false"></i>
                 </th>
-
-                <th  (click)="changeSortDirection('transfer_amount')">
+    
+                <th (click)="changeSortDirection('transfer_amount')">
                   Transfer Amount
                   <i class="fa fa-sort" aria-hidden="false"></i>
                 </th>
@@ -204,31 +295,33 @@
               </tr>
             </thead>
             <tbody>
-              <ng-container *ngFor="let item of h5Entries | paginate: h5EntryTableConfig">
+              <ng-container *ngFor="let report of h5Sum | paginate: config">
                 <tr>
                   <td>
                     <input type="checkbox" (click)="checkForMultiChecked($event)" />
                   </td>
-                  <td>{{ item.receipt_date | date: 'MM/dd/yyyy' }}</td>
-                  <td>
-                    <div *ngIf="item.category == 'voter_id'">Voter ID</div>
-                    <div *ngIf="item.category == 'voter_registration'">Voter Registration</div>
-                    <div *ngIf="item.category == 'generic_campaign'">Generic Campaign Activities</div>
-                    <div *ngIf="item.category == 'gotv'">GOTV</div>
-                  </td>
-                  <td>{{ item.account_name }}</td>
-                  <td class="summary_text_amt">
-                    {{ item.transferred_amount }}
-                  </td>
+                  <!-- <td> -->
+                  <!-- <div *ngIf="report.event_type == 'fundraising'">Fundraising</div> -->
+                  <!-- <div *ngIf="report.event_type == 'direct_cand_suppot'">Direct Candidate Suppot</div> -->
+                  <!-- </td>  -->
+                  <!-- <td>{{ report.activity_event_name }}</td> -->
+                  <td>{{ report.receipt_date | date: 'MM/dd/yyyy' }}</td>
+                  <td>{{ report.transfer_type }}</td>
+                  <td>{{ report.account_name }}</td>
+                  <td class="summary_text_amt">{{ report.transfer_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}</td>
+                  <!-- <td class="summary_text_amt">{{ report.aggregateAmount | currency:'USD':'symbol-narrow':'1.2-2' }}</td> -->
+    
                   <td class="bulk_action">
-                      <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-                          <i class="fas fa-ellipsis-h"></i>
-                        </button>
+                    <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                      <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                        <i class="fas fa-ellipsis-h"></i>
+                      </button>
+    
                       <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
-                        <button class="dropdown-item" (click)="editH5Sub(item)"><i class="fas fa-edit"></i>
-                          Edit</button>
-                        <button class="dropdown-item" (click)="trashSubTransaction(item)"><i class="fas fa-trash"></i>
+                        <button class="dropdown-item" (click)="editH5(report)"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="dropdown-item" (click)="printTransaction(report)"><i class="fas fa-print"></i>
+                          Print</button>
+                        <button class="dropdown-item" (click)="trashTransaction(report)"><i class="fas fa-trash"></i>
                           Trash</button>
                       </div>
                     </div>
@@ -237,184 +330,133 @@
               </ng-container>
             </tbody>
           </table>
-          <hr />
-          <div class="d-flex justify-content-center">
-            <pagination-controls (pageChange)="entryPageChanged($event)"></pagination-controls>
-          </div>
         </ng-container>
-      </div>
+      </section>
+    
+      <section *ngIf="transactionType === 'ALLOC_H5_SUM_P'">
+        <div id="sumary">
+          <table class="table table-striped summary_table_text">
+            <thead>
+              <tr class="summary_text_amt_level_1">
+                <th>
+                  <h3>Categories</h3>
+                </th>
+                <th>
+                  <h3>Breakdown of Transfer Received</h3>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let report of h5SumP">
+                <tr>
+                  <td class="summary_text_level_3" [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
+                      'totalRow' : 'summary_text_level_3'">
+                    {{ report.category }}
+                    <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                    </button>
+                  </td>
+    
+                  <td class="summary_text_amt" [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
+                      'totalRow' : 'summary_text_level_3'">{{ report.amount | currency:'USD':'symbol-narrow':'1.2-2' }}
+                  </td>
+    
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </ng-container>
 
-    </section>
+    <!-- Pagination - paging -->
+    <ng-container>
+      <section *ngIf="(transactionType === 'ALLOC_H5_RATIO' && scheduleAction !== editScheduleAction) || (transactionType === 'ALLOC_H5_SUM')">
+        <hr />
+        <div *ngIf="showPagination()" class="d-flex justify-content-center sched-h5__table-pagination-container">
+          <div class="my-auto">
+            <pagination-controls [id]="config.id" (pageChange)="getPage($event)" [maxSize]="paginationControlsMaxSize">
+            </pagination-controls>
+          </div>
+          <div *ngIf="pageNumbers.length > 1" class="d-flex ml-1">
+            <div class="mr-1 my-auto text-muted">Go to page:</div>
+            <ng-select #pageNumber [items]="pageNumbers" [clearable]="false" [hideSelected]="true"
+              (change)="onGotoPageChange($event)" [(ngModel)]="config.currentPage" class="border border-light" 
+              [ngModelOptions]="{standalone: true}">
+            </ng-select>
+          </div>
+        </div>
+        <div *ngIf="!showPageSizes()" class="d-flex justify-content-center reports__table-pagination-container">
+          <div class="text-muted">No records found</div>
+        </div>
+      </section>
+    </ng-container>
 
-    <footer *ngIf="transactionType === 'ALLOC_H5_RATIO'">
-      <footer>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <div *ngIf="scheduleAction === addScheduleAction">
+    <!-- Page - footer -->
+    <ng-container>
+      <section *ngIf="transactionType === 'ALLOC_H5_RATIO'">
+        <footer>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="forms__btn-container">
+                <div *ngIf="scheduleAction === addScheduleAction">
+                  <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
+                    Previous
+                  </button>
+                  <button *ngIf="scheduleAction !== viewScheduleAction" class="btn btn-secondary btn-right" type="button" [disabled]="saveAndAddDisabled"
+                    (click)="saveAddMore()">
+                    Save &amp; Add Transaction
+                  </button>
+                  <a class="btn btn-previous btn-right" (click)="goSummary()">
+                    Summary
+                  </a>
+                </div>
+                <div *ngIf="scheduleAction === editScheduleAction">
+                  <button class="btn btn-previous btn-left" type="button" (click)="cancelReturnToSum()">
+                    Cancel
+                  </button>
+                  <button class="btn btn-secondary btn-right" type="button" (click)="saveEdit()">
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </section>
+
+      <section *ngIf="transactionType === 'ALLOC_H5_SUM'">
+        <footer>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="forms__btn-container">
                 <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                   Previous
                 </button>
-                <button *ngIf="scheduleAction !== viewScheduleAction" class="btn btn-secondary btn-right" type="button" [disabled]="saveAndAddDisabled"
-                  (click)="saveAddMore()">
-                  Save &amp; Add Transaction
-                </button>
-                <a class="btn btn-previous btn-right" (click)="goSummary()">
-                  Summary
-                </a>
-              </div>
-              <div *ngIf="scheduleAction === editScheduleAction">
-                <button class="btn btn-previous btn-left" type="button" (click)="cancelReturnToSum()">
-                  Cancel
-                </button>
-                <button class="btn btn-secondary btn-right" type="button" (click)="saveEdit()">
-                  Save
+  
+                <button class="btn btn-previous btn-right" type="button" (click)="returnToAdd()">
+                  Add
                 </button>
               </div>
             </div>
           </div>
-        </div>
-      </footer>
-    </footer>
+        </footer>
+      </section>
 
-    <section *ngIf="transactionType === 'ALLOC_H5_SUM'">
-      <ng-container>
-        <table class="table table-striped table-hover table__sortable">
-          <thead>
-            <tr>
-              <th ></th>
-              <th  (click)="changeSortDirection('date')">
-                Date
-                <i class="fa fa-sort" aria-hidden="false"></i>
-              </th>
-              <th  (click)="changeSortDirection('transfer_type')">
-                Transfer Type
-                <i class="fa fa-sort" aria-hidden="false"></i>
-              </th>
-              <th  (click)="changeSortDirection('account_name')">
-                Account Name
-                <i class="fa fa-sort" aria-hidden="false"></i>
-              </th>
-
-              <th  (click)="changeSortDirection('transfer_amount')">
-                Transfer Amount
-                <i class="fa fa-sort" aria-hidden="false"></i>
-              </th>
-              <!-- <th  (click)="changeSortDirection('federal_percent')">Aggregate Amount -->
-              <!-- <i class="fa fa-sort" aria-hidden="false"></i> -->
-              <!-- </th> -->
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngFor="let report of h5Sum | paginate: h5TableConfig">
-              <tr>
-                <td>
-                  <input type="checkbox" (click)="checkForMultiChecked($event)" />
-                </td>
-                <!-- <td> -->
-                <!-- <div *ngIf="report.event_type == 'fundraising'">Fundraising</div> -->
-                <!-- <div *ngIf="report.event_type == 'direct_cand_suppot'">Direct Candidate Suppot</div> -->
-                <!-- </td>  -->
-                <!-- <td>{{ report.activity_event_name }}</td> -->
-                <td>{{ report.receipt_date | date: 'MM/dd/yyyy' }}</td>
-                <td>{{ report.transfer_type }}</td>
-                <td>{{ report.account_name }}</td>
-                <td class="summary_text_amt">{{ report.transfer_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}</td>
-                <!-- <td class="summary_text_amt">{{ report.aggregateAmount | currency:'USD':'symbol-narrow':'1.2-2' }}</td> -->
-
-                <td class="bulk_action">
-                  <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-                      <i class="fas fa-ellipsis-h"></i>
-                    </button>
-
-                    <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
-                      <button class="dropdown-item" (click)="editH5(report)"><i class="fas fa-edit"></i> Edit</button>
-                      <button class="dropdown-item" (click)="printTransaction(report)"><i class="fas fa-print"></i>
-                        Print</button>
-                      <button class="dropdown-item" (click)="trashTransaction(report)"><i class="fas fa-trash"></i>
-                        Trash</button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-        <hr />
-        <div class="d-flex justify-content-center pagination-controls">
-          <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
-        </div>
-      </ng-container>
-    </section>
-
-    <footer *ngIf="transactionType === 'ALLOC_H5_SUM'">
-      <footer>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
-                Previous
-              </button>
-
-              <button class="btn btn-previous btn-right" type="button" (click)="returnToAdd()">
-                Add
-              </button>
+      <section *ngIf="transactionType === 'ALLOC_H5_SUM_P'">
+        <footer>
+          <div class="grid-row">
+            <div class="grid-row__col grid-row__col--12">
+              <div class="forms__btn-container">
+                <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
+                  Previous
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
-    </footer>
-
-    <section *ngIf="transactionType === 'ALLOC_H5_SUM_P'">
-      <div id="sumary">
-        <table class="table table-striped summary_table_text">
-          <thead>
-            <tr class="summary_text_amt_level_1">
-              <th>
-                <h3>Categories</h3>
-              </th>
-              <th>
-                <h3>Breakdown of Transfer Received</h3>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngFor="let report of h5SumP">
-              <tr>
-                <td class="summary_text_level_3" [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
-                  'totalRow' : 'summary_text_level_3'">
-                  {{ report.category }}
-                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                    tooltipClass="form-tooltip">
-                    <i class="info-icon" aria-hidden="true"></i>
-                    <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>
-
-                <td class="summary_text_amt" [ngClass]="report.category === 'This Period (Total Amount of Transfer Received)' ?
-                  'totalRow' : 'summary_text_level_3'">{{ report.amount | currency:'USD':'symbol-narrow':'1.2-2' }}
-                </td>
-
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <footer *ngIf="transactionType === 'ALLOC_H5_SUM_P'">
-      <footer>
-        <div class="grid-row">
-          <div class="grid-row__col grid-row__col--12">
-            <div class="forms__btn-container">
-              <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
-                Previous
-              </button>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </footer>
+        </footer>
+      </section>
+    </ng-container>
   </form>
 </div>

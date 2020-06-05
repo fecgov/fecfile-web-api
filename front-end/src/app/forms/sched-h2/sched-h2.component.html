@@ -308,6 +308,18 @@
     <section *ngIf="transactionType === 'ALLOC_H2_SUM'">
       <div [hidden]="showPart2" class="paragraph">
         <ng-container>
+          <div class="grid-row d-flex justify-content-between sched-h2__page-range">
+            <div class="d-flex ml-3" *ngIf="showPageSizes()">
+              <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>    
+              <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
+                (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage"
+                class="border border-light" [ngModelOptions]="{standalone: true}">
+              </ng-select>
+            </div>
+            <div class="sched-h2__item-range" *ngIf="showPageSizes()">
+              {{determineItemRange()}} of {{config.totalItems}}
+            </div>
+          </div>
           <table class="table table-striped table-hover table__sortable">
             <thead>
               <tr>
@@ -340,7 +352,7 @@
             </thead>
             <tbody>
               <ng-container>
-                <tr *ngFor="let item of h2Sum | paginate: tableConfig">
+                <tr *ngFor="let item of h2Sum | paginate: config">
                   <td>
                     <input type="checkbox" (click)="checkForMultiChecked($event)" />
                   </td>
@@ -385,8 +397,21 @@
             </tbody>
           </table>
           <hr />
-          <div class="d-flex justify-content-center pagination-container">
-            <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
+          <div *ngIf="showPagination()" class="d-flex justify-content-center sched-h2__table-pagination-container">
+            <div class="my-auto">
+              <pagination-controls [id]="config.id" (pageChange)="getPage($event)" [maxSize]="paginationControlsMaxSize">
+              </pagination-controls>
+            </div>
+            <div *ngIf="pageNumbers.length > 1" class="d-flex ml-1">
+              <div class="mr-1 my-auto text-muted">Go to page:</div>
+              <ng-select #pageNumber [items]="pageNumbers" [clearable]="false" [hideSelected]="true"
+                (change)="onGotoPageChange($event)" [(ngModel)]="config.currentPage" [ngModelOptions]="{standalone: true}"
+                class="border border-light">
+              </ng-select>
+            </div>
+          </div>
+          <div *ngIf="!showPageSizes()" class="d-flex justify-content-center reports__table-pagination-container">
+            <div class="text-muted">No records found</div>
           </div>
         </ng-container>
       </div>

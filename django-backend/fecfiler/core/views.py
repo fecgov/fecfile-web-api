@@ -4078,6 +4078,8 @@ def get_all_transactions(request):
             )
 
         trans_query_string = get_trans_query(ctgry_type, cmte_id, param_string)
+        #: get the total count
+        trans_query_string_count = get_trans_query_for_total_count(trans_query_string)
 
         # transactions ordering ASC or DESC
         if ctgry_type == "loans_tran":
@@ -4097,6 +4099,9 @@ def get_all_transactions(request):
 
         output_list = []
         total_amount = 0.0
+        #: set transaction query with offsets.
+        trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
+
         with connection.cursor() as cursor:
             # logger.debug('query all transactions with sql:{}'.format(trans_query_string))
             cursor.execute(
@@ -4104,7 +4109,7 @@ def get_all_transactions(request):
             )
             print(cursor.query)
             data_row = cursor.fetchone()
-            print(data_row)
+#            print(data_row)
             if data_row and data_row[0]:
                 transaction_list = data_row[0]
                 logger.debug(
@@ -4169,24 +4174,38 @@ def get_all_transactions(request):
                             output_list.append(transaction)
             else:
                 status_value = status.HTTP_200_OK
+            #: run the record count query        
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
+            )
+            row1=cursor.fetchone()[0]
+            totalcount =  row1[0]['count']
+        
         # logger.debug(output_list)
-        total_count = len(output_list)
+#: tweak the query to get the transactions count as per page
+#       set the pagination and page details
+        # total_count = len(output_list)
+        # :tweaked and using the paginator class for now as need more time to research on the page usage in UI, need to revisit !!! 
+        numofpages = get_num_of_pages(totalcount, itemsperpage)
         paginator = Paginator(output_list, itemsperpage)
-        if paginator.num_pages < page_num:
-            forms_obj = []
+        if paginator.num_pages > 0:
+             forms_obj = paginator.page(1)
         else:
-            forms_obj = paginator.page(page_num)
+            forms_obj = []
+        print("total form objects : ", len(list(forms_obj)))     
         json_result = {
             "transactions": list(forms_obj),
-            "totalTransactionCount": total_count,
+            "totalTransactionCount": totalcount,
             "itemsPerPage": itemsperpage,
             "pageNumber": page_num,
-            "totalPages": paginator.num_pages,
+            "totalPages": numofpages,
         }
+        #print("""aaaaaaaaa""")
         if total_amount:
             json_result["totalAmount"] = total_amount
         return Response(json_result, status=status_value)
     except Exception as e:
+        print(e)
         return Response(
             "The get_all_transactions API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
@@ -6283,6 +6302,8 @@ end print priview api
 Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
 **********************************************************************************************************************************************
 """
+'''
+Old Code 
 
 
 @api_view(["GET", "POST"])
@@ -6290,7 +6311,6 @@ def contactsTable(request):
     try:
 
         if request.method == "POST":
-            # print("request.data: ", request.data)
             cmte_id = get_comittee_id(request.user.username)
             param_string = ""
             page_num = int(request.data.get("page", 1))
@@ -6427,8 +6447,9 @@ def contactsTable(request):
                 trans_query_string = trans_query_string + """ ORDER BY name ASC"""
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
+                    """SELECT  w(t) FROM (""" + trans_query_string + """) t"""
                 )
+                print("contacts trans_query_string: ",trans_query_string)                
                 for row in cursor.fetchall():
                     data_row = list(row)
                     forms_obj = data_row[0]
@@ -6464,6 +6485,239 @@ def contactsTable(request):
             "The contactsTable API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+'''
+
+@api_view(["GET", "POST"])
+def contactsTable(request):
+    try:
+
+        if request.method == "POST":
+            # print("request.data: ", request.data)
+            cmte_id = get_comittee_id(request.user.username)
+            param_string = ""
+            page_num = int(request.data.get("page", 1))
+            descending = request.data.get("descending", "false")
+            sortcolumn = request.data.get("sortColumnName")
+            itemsperpage = request.data.get("itemsPerPage", 5)
+            search_string = request.data.get("search")
+            # import ipdb;ipdb.set_trace()
+            params = request.data.get("filters", {})
+            keywords = params.get("keywords")
+            if str(descending).lower() == "true":
+                descending = "DESC"
+            else:
+                descending = "ASC"
+
+            keys = [
+                "id",
+                "entity_type",
+                "name",
+                "street1",
+                "street2",
+                "city",
+                "state",
+                "zip",
+                "occupation",
+                "employer",
+                "candOfficeState",
+                "candOfficeDistrict",
+                "candCmteId",
+                "phone_number",
+                "deleteddate",
+            ]
+            search_keys = [
+                "id",
+                "entity_type",
+                "name",
+                "street1",
+                "street2",
+                "city",
+                "state",
+                "zip",
+                "occupation",
+                "employer",
+                "candOfficeState",
+                "candOfficeDistrict",
+                "candCmteId",
+                "phone_number",
+                "deleteddate",
+            ]
+            if search_string:
+                for key in search_keys:
+                    if not param_string:
+                        param_string = (
+                            param_string
+                            + " AND (CAST("
+                            + key
+                            + " as CHAR(100)) ILIKE '%"
+                            + str(search_string)
+                            + "%'"
+                        )
+                    else:
+                        param_string = (
+                            param_string
+                            + " OR CAST("
+                            + key
+                            + " as CHAR(100)) ILIKE '%"
+                            + str(search_string)
+                            + "%'"
+                        )
+                param_string = param_string + " )"
+            keywords_string = ""
+            if keywords:
+                for key in keys:
+                    for word in keywords:
+                        if '"' in word:
+                            continue
+                        elif "'" in word:
+                            if not keywords_string:
+                                keywords_string = (
+                                    keywords_string
+                                    + " AND ( CAST("
+                                    + key
+                                    + " as CHAR(100)) = "
+                                    + str(word)
+                                )
+                            else:
+                                keywords_string = (
+                                    keywords_string
+                                    + " OR CAST("
+                                    + key
+                                    + " as CHAR(100)) = "
+                                    + str(word)
+                                )
+                        else:
+                            if not keywords_string:
+                                keywords_string = (
+                                    keywords_string
+                                    + " AND ( CAST("
+                                    + key
+                                    + " as CHAR(100)) ILIKE '%"
+                                    + str(word)
+                                    + "%'"
+                                )
+                            else:
+                                keywords_string = (
+                                    keywords_string
+                                    + " OR CAST("
+                                    + key
+                                    + " as CHAR(100)) ILIKE '%"
+                                    + str(word)
+                                    + "%'"
+                                )
+                keywords_string = keywords_string + " )"
+            param_string = param_string + keywords_string
+
+            trans_query_string = (
+                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
+                                        where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='"""
+                + cmte_id
+                + """' """
+                + param_string
+            )
+            #: get the total count
+            trans_query_string_count = ("""SELECT count(*) 
+                                            FROM all_contacts_view
+                                            WHERE (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='"""
+                                            + cmte_id
+                                            + """' """
+                                            + param_string
+                                        ) 
+
+            # print("contacts trans_query_string: ",trans_query_string)
+            # import ipdb;ipdb.set_trace()
+            if sortcolumn and sortcolumn != "default":
+                trans_query_string = (
+                    trans_query_string
+                    + """ ORDER BY """
+                    + sortcolumn
+                    + """ """
+                    + descending
+                )
+            elif sortcolumn == "default":
+                trans_query_string = trans_query_string + """ ORDER BY name ASC"""
+            #: Set the offset and record count to start getting the data 
+            trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
+                )
+                for row in cursor.fetchall():
+                    data_row = list(row)
+                    forms_obj = data_row[0]
+                    forms_obj = data_row[0]
+                    if forms_obj is None:
+                        forms_obj = []
+                        status_value = status.HTTP_200_OK
+                    else:
+                        for d in forms_obj:
+                            for i in d:
+                                if not d[i]:
+                                    d[i] = ""
+
+                        status_value = status.HTTP_200_OK
+                #: run the record count query        
+                cursor.execute(
+                    """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
+                )
+                row1=cursor.fetchone()[0]
+                totalcount =  row1[0]['count']
+                #print(totalcount)
+            #: removed the paginator code references and replaced with custom pagination
+            # get the total records count
+            #print("my totalcount", totalcount)
+            # import ipdb; ipdb.set_trace()
+            # total_count = len(forms_obj)
+            # print("paginator total_count", total_count)
+            # paginator = Paginator(forms_obj, itemsperpage)
+            # if paginator.num_pages < page_num:
+            #     page_num = paginator.num_pages
+            # forms_obj = paginator.page(page_num)
+            numofpages = get_num_of_pages(totalcount, itemsperpage)
+            json_result = {
+                "contacts": list(forms_obj),
+                "totalcontactsCount": totalcount,
+                "itemsPerPage": itemsperpage,
+                "pageNumber": page_num,
+                "totalPages": numofpages,
+            }
+        return Response(json_result, status=status_value)
+
+    except Exception as e:
+        return Response(
+            "The contactsTable API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+#: build 
+def get_trans_query_for_total_count(trans_query_string):
+    temp_string = """select count(*) from """
+    i = trans_query_string.index(""" from """)
+    s = trans_query_string[ 0 : i+6]
+    final_query = trans_query_string.replace(s, temp_string,1)
+    return final_query
+
+#: build query offset and record count to start getting the data 
+def set_offset_n_fetch(trans_query_string, page_num, itemsperpage):
+    trans_query_string = trans_query_string + """ OFFSET """
+    if page_num > 0 : 
+        trans_query_string = trans_query_string + str((page_num-1) * itemsperpage) 
+    else:    
+        trans_query_string = trans_query_string + """ 0 """
+    trans_query_string = trans_query_string + """ ROWS """ + """ FETCH FIRST """ 
+    trans_query_string = trans_query_string + str( itemsperpage)
+    trans_query_string = trans_query_string + """ ROW ONLY """  
+    return trans_query_string
+
+#: get page count or number of pages for pagination
+def get_num_of_pages(totalcount, itemsperpage):
+    if (totalcount % itemsperpage) == 0:
+        numofpages = totalcount / itemsperpage
+    else:
+        numofpages = int(totalcount/itemsperpage) + 1                    
+    return numofpages
 
 
 @api_view(["GET"])

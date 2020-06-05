@@ -1250,8 +1250,8 @@ def schedC(request):
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
-
-@api_view(["GET"])
+#get_outstanding_loans before pagination implementation in DB as well as for front end
+'''@api_view(["GET"])
 def get_outstanding_loans(request):
     """
     Get all loans with an outstanding balance
@@ -1266,7 +1266,6 @@ def get_outstanding_loans(request):
     valid ransction_type values:
     LOANS_OWED_BY_CMTE
     LOANS_OWED_TO_CMTE
-
     a loan is outstanding if:
     1. it has a outstannding balance(>0) in current report
     2. it has live payment(even the balance become 0) in current report
@@ -1311,7 +1310,6 @@ def get_outstanding_loans(request):
             with connection.cursor() as cursor:
                 cursor.execute(_sql, [cmte_id, tran_type, report_id])
                 json_result = cursor.fetchone()[0]
-
         else:
             _sql = """
                 SELECT Json_agg(t) 
@@ -1366,7 +1364,6 @@ def get_outstanding_loans(request):
             with connection.cursor() as cursor:
                 cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
                 json_result = cursor.fetchone()[0]
-
         if not json_result:
             return Response([], status=status.HTTP_200_OK)
         else:
@@ -1394,9 +1391,282 @@ def get_outstanding_loans(request):
                 if loan_pyaments_obj:
                     tran["payments"] = loan_pyaments_obj
             return Response(json_result, status=status.HTTP_200_OK)
+    except:
+        raise
+'''
+
+@api_view(["GET"])
+def get_outstanding_loans(request):
+    """
+    Get all loans with an outstanding balance
+    this api is used to enable the sched_c summary page
+    need to return:
+    1. name/bank (this is the entity name)
+    2. original loan
+    3. cumulative payemnt to date
+    4. outstanding balance
+    5. due date
+    adding transaction_types to get transaction_type specific loans
+    valid ransction_type values:
+    LOANS_OWED_BY_CMTE
+    LOANS_OWED_TO_CMTE
+
+    a loan is outstanding if:
+    1. it has a outstannding balance(>0) in current report
+    2. it has live payment(even the balance become 0) in current report
+    """
+    #: adding pagination, sorting and dynamic fields listing funcitonality  
+    # URL coded for: GET /api/v1/sc/get_outstanding_loans?username=C00000935&report_id=737&page=1&itemsPerPage=5&sortColumnName=default&descending=false HTTP/1.1"
+    param_string = ""
+    query_params = request.query_params
+    page_num = int(query_params.get("page"))
+    descending = query_params.get("descending")#request.data.get("descending", "false")
+    if not (
+        "sortColumnName" in query_params
+        and check_null_value(query_params.get("sortColumnName"))
+    ):
+        sortcolumn = "name"
+    elif query_params.get("sortColumnName") == "default":
+        sortcolumn = "name"
+    else:
+        sortcolumn = query_params.get("sortColumnName")
+    itemsperpage = int(query_params.get("itemsPerPage"))
+    search_string = query_params.get("search")
+    params = query_params.get("filters", {})
+    keywords = params.get("keywords")
+    if str(descending).lower() == "true":
+        descending = "DESC"
+    else:
+        descending = "ASC"
+    trans_query_string_count = "" #get_trans_query_for_total_count(trans_query_string)
+    row1=""
+    totalcount=""
+
+    valid_transaction_types = ["LOANS_OWED_BY_CMTE", "LOANS_OWED_TO_CMTE"]
+    logger.debug("POST request received.")
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        report_id = query_params.get("report_id")
+        if not report_id:
+            raise Exception("report_id is required.")
+        do_loan_carryover(report_id, cmte_id)
+        _sql_prefix = """
+                SELECT Json_agg(t) 
+                FROM   ( """
+        _sql_suffix = """ ) t """
+
+        if "transaction_type_identifier" in query_params:
+            tran_type = query_params.get("transaction_type_identifier")
+            if not tran_type in valid_transaction_types:
+                raise Exception("Error: invalid transaction types.")
+            _sql = """
+                        SELECT 
+                            e.entity_name,
+                            e.entity_type, 
+                            e.last_name,
+                            e.first_name,
+                            e.middle_name,
+                            e.preffix as prefix,
+                            e.suffix, 
+                            c.transaction_id,
+                            c.loan_amount_original, 
+                            c.loan_payment_to_date, 
+                            c.loan_balance, 
+                            c.loan_due_date,
+                            c.transaction_type_identifier 
+                        FROM   public.sched_c c, 
+                            public.entity e 
+                        WHERE c.cmte_id = %s
+                        AND c.transaction_type_identifier = %s
+                        AND c.entity_id = e.entity_id
+                        AND c.report_id = %s 
+                        AND delete_ind is distinct from 'Y'
+            """
+            #: get the total count
+            trans_query_string_count = """ select count(*) FROM ( """ + _sql + """ ) AS CNT_TABLE """
+            #: set transaction query with offsets.
+            _sql = set_offset_n_fetch(_sql, page_num, itemsperpage)
+            #set prefix and suffix 
+            _sql = _sql_prefix + _sql + _sql_suffix
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, tran_type, report_id])
+                json_result = cursor.fetchone()[0]
+                #: run the record count query        
+                cursor.execute(
+                    """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
+                )
+                row1 = cursor.fetchone()[0]
+                totalcount =  row1[0]['count']
+        else:
+            _sql = """
+                        SELECT 
+                                e.entity_name,
+                                e.entity_type, 
+                                e.last_name,
+                                e.first_name,
+                                e.middle_name,
+                                e.preffix as prefix,
+                                e.suffix, 
+                                c.transaction_id,
+                                c.loan_amount_original, 
+                                c.loan_payment_to_date, 
+                                c.loan_balance, 
+                                c.loan_due_date,
+                                c.transaction_type_identifier
+                            FROM   public.sched_c c, 
+                                public.entity e 
+                            WHERE c.cmte_id = %s
+                            AND c.entity_id = e.entity_id
+                            AND c.report_id = %s 
+                            AND c.delete_ind is distinct from 'Y'
+                            UNION
+                            SELECT e.entity_name, 
+                                e.entity_type, 
+                                e.last_name, 
+                                e.first_name, 
+                                e.middle_name, 
+                                e.preffix AS prefix, 
+                                e.suffix, 
+                                c.transaction_id, 
+                                c.loan_amount_original, 
+                                c.loan_payment_to_date, 
+                                c.loan_balance, 
+                                c.loan_due_date, 
+                                c.transaction_type_identifier 
+                            FROM   PUBLIC.sched_c c, 
+                                PUBLIC.entity e 
+                            WHERE  c.entity_id = e.entity_id 
+                            AND    c.transaction_id IN 
+                            ( 
+                                    SELECT back_ref_transaction_id 
+                                    FROM   sched_b 
+                                    WHERE  cmte_id = %s 
+                                    AND    report_id = %s
+                                    AND    (transaction_type_identifier = 'LOAN_REPAY_MADE' OR
+                                    transaction_type_identifier = 'LOAN_REPAY_RCVD')
+                                    AND    delete_ind IS distinct from 'Y')
+                    """
+            #: get the total count
+            trans_query_string_count = """ select count(*) FROM ( """ + _sql + """ ) AS CNT_TABLE """
+            #: set transaction query with offsets.
+            _sql = set_offset_n_fetch(_sql, page_num, itemsperpage)
+            _sql = _sql_prefix + _sql + _sql_suffix
+            #print(_sql)
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, report_id, cmte_id, report_id])
+                json_result = cursor.fetchone()[0]
+            #: run the record count query        
+                #print(trans_query_string_count)
+                trans_query_string_count = """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
+                cursor.execute(trans_query_string_count, [cmte_id, report_id, cmte_id, report_id])
+                row1 = cursor.fetchone()[0]
+                totalcount =  row1[0]['count']
+
+        if not json_result:
+            return Response([], status=status.HTTP_200_OK)
+        else:
+            logger.debug("total outstanding loans:{}".format(len(json_result)))
+            for tran in json_result:
+                transaction_id = tran.get("transaction_id")
+                loan_pyaments_obj = get_sched_c_loan_payments(cmte_id, transaction_id)
+                for obj in loan_pyaments_obj:
+                    obj.update(API_CALL_SB)
+                logger.debug("getting all c1 childs...")
+                childC1_forms_obj = get_sched_c1_child(cmte_id, transaction_id)
+                # print(childC1_forms_obj)
+                for obj in childC1_forms_obj:
+                    obj.update(API_CALL_SC1)
+                    obj.update(TRAN_TYPE_ID_SC1)
+                logger.debug("getting all sched_c2 childs...")
+                childC2_forms_obj = get_sched_c2_child(cmte_id, transaction_id)
+                # print(childC2_forms_obj)
+                for obj in childC2_forms_obj:
+                    obj.update(API_CALL_SC2)
+                    obj.update(TRAN_TYPE_ID_SC2)
+                child_tran = childC1_forms_obj + childC2_forms_obj
+                if child_tran:
+                    tran["child"] = child_tran
+                if loan_pyaments_obj:
+                    tran["payments"] = loan_pyaments_obj
+            #return Response(json_result, status=status.HTTP_200_OK)
+
+
+#: Adding the pagination and composing response params
+        if totalcount > 0: 
+            numofpages = get_num_of_pages(totalcount, itemsperpage)
+        else:
+            numofpages = 0    
+        json_result = {
+            "items": list(json_result),
+            "totalItems": totalcount,
+            "itemsPerPage": itemsperpage,
+            "pageNumber": page_num,
+            "totalPages": numofpages,
+        }
+        return Response(json_result, status=status.HTTP_200_OK)
 
     except:
         raise
+
+
+#: build query to calculate total count
+def get_trans_query_for_total_count(trans_query_string):
+    temp_string = """SELECT COUNT(*) FROM """
+    i = trans_query_string.index(""" from """)
+    j = trans_query_string.index(""" FROM """)
+    if i > j:
+        i = j
+    s = trans_query_string[ 0 : i+6]
+    final_query = trans_query_string.replace(s, temp_string, 1)
+    return final_query
+
+#: build query offset and record count to start getting the data 
+def set_offset_n_fetch(trans_query_string, page_num, itemsperpage):
+    trans_query_string = trans_query_string + """ OFFSET """
+    if page_num > 0 : 
+        trans_query_string = trans_query_string + str((page_num-1) * itemsperpage) 
+    else:    
+        trans_query_string = trans_query_string + """ 0 """
+    trans_query_string = trans_query_string + """ ROWS """ + """ FETCH FIRST """ 
+    trans_query_string = trans_query_string + str( itemsperpage)
+    trans_query_string = trans_query_string + """ ROW ONLY """  
+    return trans_query_string
+
+#: get page count or number of pages for pagination
+def get_num_of_pages(totalcount, itemsperpage):
+    if (totalcount % itemsperpage) == 0:
+        numofpages = totalcount / itemsperpage
+    else:
+        numofpages = int(totalcount/itemsperpage) + 1                    
+    return numofpages
+
+
+#: get the paginator page with other details like  
+def get_pagination_dataset(json_res, itemsperpage, page_num):
+    if check_null_value(json_res) is False or json_res is None:
+        json_result = {
+            "transactions": "",
+            "totaltransactionsCount": "",
+            "itemsPerPage": "",
+            "pageNumber": "",
+            "totalPages": "",
+        }
+        return json_result
+    else:
+        total_count = len(json_res)
+        paginator = Paginator(json_res, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        json_res = paginator.page(page_num)
+        json_result = {
+            "transactions": list(json_res),
+            "totaltransactionsCount": total_count,
+            "itemsPerPage": itemsperpage,
+            "pageNumber": page_num,
+            "totalPages": paginator.num_pages,
+        }
+        return json_result
+
 
 
 @api_view(["GET"])
