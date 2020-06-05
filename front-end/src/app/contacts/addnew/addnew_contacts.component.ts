@@ -16,7 +16,7 @@ import { UtilService } from '../../shared/utils/util.service';
 import { ContactModel } from '../model/contacts.model';
 import { ContactsMessageService } from '../service/contacts-message.service';
 import { ContactsService } from '../service/contacts.service';
-
+import {CustomValidator} from '../../shared/validator/custom.validator';
 export enum ContactActions {
   add = 'add',
   edit = 'edit'
@@ -204,6 +204,7 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
         if (validation === 'required') {
           if (validators[validation]) {
             formValidators.push(Validators.required);
+            formValidators.push(CustomValidator.noBlankSpaces);
           }
         } else if (validation === 'min') {
           if (validators[validation] !== null) {
@@ -1425,4 +1426,10 @@ export class AddNewContactComponent implements OnInit, OnDestroy {
       return true;
   }
  }
+
+  public noWhitespaceValidator(control: FormControl) {
+    const isWhitespace = (control.value || '').trim().length === 0;
+    const isValid = !isWhitespace;
+    return isValid ? null : { 'whitespace': true };
+  }
 }
