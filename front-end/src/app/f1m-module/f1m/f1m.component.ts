@@ -56,12 +56,17 @@ export class F1mComponent implements OnInit, OnDestroy {
     private _activatedRoute: ActivatedRoute, 
     private _router: Router,
     private _reportsService: ReportsService,
-    public titlecasePipe:TitleCasePipe
+    public titlecasePipe:TitleCasePipe,
     ) { 
       this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(message =>{
         if(message && message.action === 'refreshScreen' && message.qualificationData){
           this.qualificationData = message.qualificationData;
           this.refreshAllComponents();
+        }
+        else if(message && message.action === 'showStep5' && message.data){
+          this.filingId = message.data.fecFilingId;
+          this.step = 'step_5';
+          this.refreshScreen();
         }
       });
     }
@@ -130,7 +135,7 @@ export class F1mComponent implements OnInit, OnDestroy {
       submission_date: res.submission_date,
       additionalEmail1: res.additional_email_1,
       confirmAdditionalEmail1: res.additional_email_1,
-      additionalEmail2: res.additional_email_1,
+      additionalEmail2: res.additional_email_2,
       confirmAdditionalEmail2: res.additional_email_2,
     }
     this.refreshScreen();
@@ -366,7 +371,7 @@ export class F1mComponent implements OnInit, OnDestroy {
     this.next();
   }
 
-  public submit(){
+  /* public submit(){
     if(this.signAndSubmitComp.form.valid){
       this._dialogService
       .confirm(
@@ -394,6 +399,18 @@ export class F1mComponent implements OnInit, OnDestroy {
     else{
       this.signAndSubmitComp.form.markAsDirty();
     }
+  } */
+
+  public submit(){
+    // if(this.signAndSubmitComp.form.valid){
+    /* if(true){
+      const modalRef = this.modalService.open(NgbdModalContent);
+      modalRef.componentInstance.name = 'World';
+    } */
+    /* else{
+      this.signAndSubmitComp.form.markAsDirty();
+    } */
+    this.signAndSubmitComp.openModal();
   }
 
   public next(){
