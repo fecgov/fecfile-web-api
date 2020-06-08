@@ -289,9 +289,10 @@
                       </button>
                     </span>
                     <span [title]="!trxChild.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                      <button [disabled]="!trxChild.iseditable" *ngIf="checkIfTrashable(trx)&& !_authService.isReadOnly()" class="dropdown-item"
+                      <button [disabled]="!trxChild.iseditable" *ngIf="checkIfTrashable(trx) && !_authService.isReadOnly()"
+                              class="dropdown-item"
                               (click)="trashTransaction(trxChild)">
-                        <i class="trash-icon"></i> Trash
+                              <i class="trash-icon"></i> Trash
                       </button>
                     </span>
                   </div>
@@ -721,7 +722,7 @@
                     <button class="dropdown-item" (click)="exportAllSelected()">
                       <i class="file-export-icon"></i> Export
                     </button>
-                    <button *ngIf="checkIfTrashable() || !_authService.isReadOnly()" class="dropdown-item" (click)="trashAllSelected()">
+                    <button *ngIf="checkIfTrashable() && !_authService.isReadOnly()" class="dropdown-item" (click)="trashAllSelected()">
                       <i class="trash-icon"></i> Trash
                     </button>
                   </div>
@@ -811,7 +812,8 @@
                         <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
                       </button>
                       <span [title]="!trx.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                          <button *ngIf="trx.iseditable && checkIfTrashable(trx)" class="dropdown-item"
+                          <button *ngIf="trx.iseditable && checkIfTrashable(trx) && !_authService.isReadOnly()"
+                                  class="dropdown-item"
                                   (click)="trashTransaction(trx)">
                             <i class="trash-icon"></i> Trash
                           </button>
@@ -931,8 +933,9 @@
                     <button class="dropdown-item" (click)="exportAllSelected()">
                       <i class="file-export-icon"></i> Export
                     </button>
-                    <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
-                      <i class="trash-icon"></i> Trash
+                    <button *ngIf="checkIfTrashable() && !_authService.isReadOnly()"
+                            class="dropdown-item" (click)="trashAllSelected()">
+                            <i class="trash-icon"></i> Trash
                     </button>
                   </div>
                 </div>
