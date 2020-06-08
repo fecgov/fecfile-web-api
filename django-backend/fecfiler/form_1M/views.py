@@ -22,11 +22,10 @@ logger = logging.getLogger(__name__)
 LIST_F1M_COLUMNS = ['report_id', 'est_status', 'cmte_id', 'aff_cmte_id', 'aff_date', 
 					'can1_id', 'can1_con', 'can2_id', 'can2_con', 'can3_id', 
 					'can3_con', 'can4_id', 'can4_con', 'can5_id', 'can5_con', 
-					'date_51', 'orig_date', 'metreq_date', 'sign_id', 'sign_date']
+					'date_51', 'orig_date', 'metreq_date', 'sign_date']
 
 DICT_F1M_COLUMNS_MAP_INPUT = {
 	'committee_id' : 'aff_cmte_id',
-	'sign' : 'sign_id',
 	'submission_date' : 'sign_date',
 	'reportId' : 'report_id',
 	'establishmentType' : 'est_status',
@@ -34,7 +33,6 @@ DICT_F1M_COLUMNS_MAP_INPUT = {
 	'fifty_first_contributor_date' : 'date_51',
 	'registration_date' : 'orig_date',
 	'requirements_met_date' : 'metreq_date',
-	'sign' : 'sign_id',
 	'submission_date' : 'sign_date',
 	'can1_id' : 'can1_id', 
 	'can1_con' : 'can1_con', 
@@ -102,12 +100,12 @@ def check_columns_f1M(step):
 		elif step == 'saveSignatureAndEmail':
 			key_list = ['report_id']
 		elif step == 'submit':
-			key_list = ['report_id', 'sign_id', 'sign_date']
+			key_list = ['report_id', 'sign_date']
 		elif step == 'None':
 			key_list = ['report_id']
 		elif step == 'All':
 			key_list = ['report_id', 'est_status', 'aff_cmte_id', 'aff_date',
-				'date_51', 'orig_date', 'metreq_date', 'sign_id', 'sign_date', 'can1_id', 
+				'date_51', 'orig_date', 'metreq_date', 'sign_date', 'can1_id', 
 				'can1_con', 'can2_id', 'can2_con', 'can3_id', 'can3_con', 'can4_id', 
 				'can4_con', 'can5_id', 'can5_con']
 		else:
@@ -554,7 +552,7 @@ def validate_before_submit(request_dict):
 	try:
 		if request_dict['establishmentType'] == "A":
 			noneCheckMissingParameters(['reportId', 'cmte_id', 'committee_id', 
-				'affiliation_date', 'sign_id', 'submission_date'], 
+				'affiliation_date',  'submission_date'], 
 				checking_dict=request_dict, value_dict=request_dict, 
 				function_name='validate_before_submit')
 		elif request_dict['establishmentType'] == "Q":
@@ -562,7 +560,7 @@ def validate_before_submit(request_dict):
 			if  cmte_type == "PAC":
 				noneCheckMissingParameters(['reportId', 'cmte_id', 
 					'fifty_first_contributor_date', 'registration_date', 
-					'requirements_met_date', 'sign_id', 'submission_date'
+					'requirements_met_date',  'submission_date'
 					'can1_id', 'can1_con', 'can2_id', 'can2_con', 'can3_id', 
 					'can3_con', 'can4_id', 'can4_con', 'can5_id'], 
 					checking_dict=request_dict, value_dict=request_dict, 
@@ -570,7 +568,7 @@ def validate_before_submit(request_dict):
 			else:
 				noneCheckMissingParameters(['reportId', 'cmte_id', 
 					'fifty_first_contributor_date', 'registration_date', 
-					'requirements_met_date', 'sign_id', 'submission_date'], 
+					'requirements_met_date', 'submission_date'], 
 					checking_dict=request_dict, value_dict=request_dict, 
 					function_name='validate_before_submit')
 		else:
@@ -722,7 +720,7 @@ def form1M(request):
 
 			# both step4 POST
 			elif step == 'submit':
-				noneCheckMissingParameters(['sign', 'submission_date', 'reportId'], 
+				noneCheckMissingParameters(['reportId','submission_date'], 
 					checking_dict=request.data, value_dict=request.data, 
 					function_name='form1M-POST: step-4 SUBMIT')
 				# password = request.data['filingPassword']

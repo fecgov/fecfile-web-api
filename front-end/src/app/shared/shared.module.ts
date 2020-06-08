@@ -25,7 +25,7 @@ import { ModalModule } from 'ngx-bootstrap';
     SignAndSubmitComponent,
     SubTransactionsTableComponent,
     SubmitComponent,
-    ValidateComponent
+    ValidateComponent,
   ],
   exports: [
     CommonModule,
