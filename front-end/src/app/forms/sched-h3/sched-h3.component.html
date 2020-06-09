@@ -207,6 +207,20 @@
                 <div class="text-error text-left" *ngIf="transferredAmountErr">
                   Please enter a valid amount.
                 </div>
+                <label>
+                  Memo (Optional)
+                  <button type="button" class="btn btn-info" ngbTooltip="Placeholder"
+                          tooltipClass="form-tooltip">
+                        <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <input class="form-control" type="text"
+                       [formControlName]="'memo_text'"
+                       [attr.name]="'memo_text'"
+                       [style.width]="'94%'"
+                       [style.height]="'30px'"
+                />
               </div>
             </div>
             <div *ngIf="showAggregateAmount" class="col col-md-4">
