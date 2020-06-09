@@ -174,7 +174,9 @@ def schedE_sql_dict(data):
         "cand_office_district",
         "cand_election_year",
         "aggregation_ind",
-        "associatedbydissemination"
+        "associatedbydissemination",
+        "mirror_report_id",
+        "mirror_transaction_id",
     ]
     try:
         datum = {k: v for k, v in data.items() if k in valid_fields}
@@ -278,6 +280,17 @@ def put_schedE(data):
                         data.get("expenditure_amount"),
                         existing_expenditure,
                     )
+            #for F24 editing a duplicate transaction
+            form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
+            se_data = {}
+            if form_type == 'F24' and data.get('mirror_report_id'):
+                se_data = data.copy()
+                get_data = get_schedE(data)[0]
+                logger.debug(get_data)
+                se_data['transaction_id'] = get_data["mirror_transaction_id"]
+                se_data['report_id'] = data['mirror_report_id']
+                logger.debug("editing F3X mirror sched_e item with data:{}".format(se_data))
+                put_sql_schedE(se_data)
         except Exception as e:
             # remove entiteis if saving sched_e fails
             if payee_rollback_flag:
@@ -289,10 +302,30 @@ def put_schedE(data):
                 "The put_sql_schedE function is throwing an error: " + str(e)
             )
         update_aggregate_amt_se(data)
+        if form_type == 'F24' and data.get('mirror_report_id'):
+            logger.debug('I am here')
+            update_aggregate_amt_se(se_data)
+            if str(get_data['mirror_report_id']) != data['mirror_report_id']:
+                logger.debug(get_data['mirror_report_id'])
+                logger.debug(data['mirror_report_id'])
+                update_mirror_report_id(data)
         return data
     except:
         raise
 
+def update_mirror_report_id(data):
+    try:
+        with connection.cursor() as cursor:
+            _sql = """UPDATE public.sched_e SET mirror_report_id = %s WHERE transaction_id = %s 
+            AND cmte_id = %s"""
+            values = [data.get('mirror_report_id'), data.get('transaction_id'), data.get('cmte_id')]
+            cursor.execute(_sql, values)
+            logger.debug(cursor.query)
+            if not cursor.rowcount:
+                raise Exception("""the transaction_id: {} for committee: {} could not be 
+                    found.""".format(data.get('transaction_id'), data.get('cmte_id')))
+    except Exception as e:
+        raise Exception('the update_mirror_report_id function is throwing an error: ' + str(e))
 
 def put_sql_schedE(data):
     """
@@ -486,8 +519,7 @@ def get_sched_e_ytd_amount(request):
     except:
         raise
 
-
-def get_transactions_election_and_office(start_date, end_date, data):
+def get_transactions_election_and_office(start_date, end_date, data, form_type='F3X'):
     """
     load all transactions by electtion code and office within the date range.
     - for president election: election_code + office
@@ -503,38 +535,42 @@ def get_transactions_election_and_office(start_date, end_date, data):
     if cand_office == "P":
         _sql = """
         SELECT  
-                transaction_id, 
-				expenditure_amount as transaction_amt,
-				COALESCE(dissemination_date, disbursement_date) as transaction_dt,
-                aggregation_ind
-        FROM public.sched_e
+                e.transaction_id, 
+				e.expenditure_amount as transaction_amt,
+				COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
+                e.aggregation_ind
+        FROM public.sched_e e
+        LEFT JOIN public.reports r ON r.report_id = e.report_id
         WHERE  
-            cmte_id = %s
-            AND COALESCE(dissemination_date, disbursement_date) >= %s
-            AND COALESCE(dissemination_date, disbursement_date) <= %s
-            AND election_code = %s
-            AND delete_ind is distinct FROM 'Y'
-            AND memo_code is null 
-            ORDER BY transaction_dt ASC, create_date ASC;
+            e.cmte_id = %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
+            AND e.election_code = %s
+            AND e.delete_ind is distinct FROM 'Y'
+            AND e.memo_code is null 
+            AND r.form_type = %s
+            ORDER BY transaction_dt ASC, e.create_date ASC;
         """
-        _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"))
+        _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"), form_type)
     elif cand_office == "S":
         _sql = """
         SELECT  
-                transaction_id, 
-				expenditure_amount as transaction_amt,
-                COALESCE(dissemination_date, disbursement_date) as transaction_dt,
-                aggregation_ind
-        FROM public.sched_e
+                e.transaction_id, 
+				e.expenditure_amount as transaction_amt,
+                COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
+                e.aggregation_ind
+        FROM public.sched_e e
+        LEFT JOIN public.reports r ON r.report_id = e.report_id
         WHERE  
-            cmte_id = %s
-            AND COALESCE(dissemination_date, disbursement_date) >= %s
-            AND COALESCE(dissemination_date, disbursement_date) <= %s
-            AND election_code = %s
-            AND so_cand_state = %s
-            AND delete_ind is distinct FROM 'Y' 
-            AND memo_code is null
-            ORDER BY transaction_dt ASC, create_date ASC; 
+            e.cmte_id = %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
+            AND e.election_code = %s
+            AND e.so_cand_state = %s
+            AND e.delete_ind is distinct FROM 'Y' 
+            AND e.memo_code is null
+            AND r.form_type = %s
+            ORDER BY transaction_dt ASC, e.create_date ASC; 
         """
         _params = (
             data.get("cmte_id"),
@@ -542,25 +578,28 @@ def get_transactions_election_and_office(start_date, end_date, data):
             end_date,
             data.get("election_code"),
             data.get("so_cand_state"),
+            form_type
         )
     elif cand_office == "H":
         _sql = """
         SELECT  
-                transaction_id, 
-				expenditure_amount as transaction_amt,
-				COALESCE(dissemination_date, disbursement_date) as transaction_dt,
-                aggregation_ind
-        FROM public.sched_e
+                e.transaction_id, 
+				e.expenditure_amount as transaction_amt,
+				COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
+                e.aggregation_ind
+        FROM public.sched_e e
+        LEFT JOIN public.reports r ON r.report_id = e.report_id
         WHERE  
-            cmte_id = %s
-            AND COALESCE(dissemination_date, disbursement_date) >= %s
-            AND COALESCE(dissemination_date, disbursement_date) <= %s
-            AND election_code = %s
-            AND so_cand_state = %s
-            AND so_cand_district = %s
-            AND delete_ind is distinct FROM 'Y' 
-            AND memo_code is null
-            ORDER BY transaction_dt ASC, create_date ASC;  
+            e.cmte_id = %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
+            AND e.election_code = %s
+            AND e.so_cand_state = %s
+            AND e.so_cand_district = %s
+            AND e.delete_ind is distinct FROM 'Y' 
+            AND e.memo_code is null
+            AND r.form_type = %s
+            ORDER BY transaction_dt ASC, e.create_date ASC;  
         """
         _params = (
             data.get("cmte_id"),
@@ -569,6 +608,7 @@ def get_transactions_election_and_office(start_date, end_date, data):
             data.get("election_code"),
             data.get("so_cand_state"),
             data.get("so_cand_district"),
+            form_type
         )
 
     try:
@@ -589,70 +629,71 @@ def update_aggregate_amt_se(data):
 
     """
     try:
-        # itemization_value = 200
-        cmte_id = data.get("cmte_id")
-        report_id = data.get("report_id")
-        form_type = find_form_type(report_id, cmte_id)
-        # dissemination_date take priority
-        if data.get("dissemination_date"):
-            trans_dt = date_format(data.get("dissemination_date"))
-        else:
-            trans_dt = date_format(data.get("disbursement_date"))
+        if data:
+            # itemization_value = 200
+            cmte_id = data.get("cmte_id")
+            report_id = data.get("report_id")
+            form_type = find_form_type(report_id, cmte_id)
+            # dissemination_date take priority
+            if data.get("dissemination_date"):
+                trans_dt = date_format(data.get("dissemination_date"))
+            else:
+                trans_dt = date_format(data.get("disbursement_date"))
 
-        # if isinstance(contribution_date, str):
-        # contribution_date = date_format(contribution_date)
-        aggregate_start_date, aggregate_end_date = find_aggregate_date(
-            form_type, trans_dt
-        )
-        # checking for child tranaction identifer for updating auto generated SB transactions
-        # if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
-        #     child_flag = True
-        #     child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
-        # make sure transaction list comes back sorted by contribution_date ASC
-        # transactions_list = list_all_transactions_entity(
-        #     aggregate_start_date,
-        #     aggregate_end_date,
-        #     transaction_type_identifier,
-        #     entity_id,
-        #     cmte_id,
-        # )
-        transaction_list = get_transactions_election_and_office(
-            aggregate_start_date, aggregate_end_date, data
-        )
-        aggregate_amount = 0
-        # dissemination_date, disbursement_date = data.get('dissemination_date'), data.get('disbursement_date')
-        # curr_tran_date = dissemination_date if dissemination_date else disbursement_date 
-        # curr_tran_date =  datetime.datetime.strptime(
-        #                     curr_tran_date, "%Y-%m-%d"
-        #                 ).date()
-        for transaction in transaction_list:
-            if transaction[3] != 'N':
-                aggregate_amount += transaction[1]
-            logger.debug(
-                "update aggregate amount for transaction:{}".format(transaction[0])
+            # if isinstance(contribution_date, str):
+            # contribution_date = date_format(contribution_date)
+            aggregate_start_date, aggregate_end_date = find_aggregate_date(
+                form_type, trans_dt
             )
-            logger.debug("current aggregate amount:{}".format(aggregate_amount))
-            # if curr_tran_date <= transaction[2]:
-            update_aggregate_on_transaction(
-                    cmte_id, report_id, transaction[0], aggregate_amount
+            # checking for child tranaction identifer for updating auto generated SB transactions
+            # if transaction_type_identifier in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.keys():
+            #     child_flag = True
+            #     child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(transaction_type_identifier)
+            # make sure transaction list comes back sorted by contribution_date ASC
+            # transactions_list = list_all_transactions_entity(
+            #     aggregate_start_date,
+            #     aggregate_end_date,
+            #     transaction_type_identifier,
+            #     entity_id,
+            #     cmte_id,
+            # )
+            transaction_list = get_transactions_election_and_office(
+                aggregate_start_date, aggregate_end_date, data, form_type
+            )
+            aggregate_amount = 0
+            # dissemination_date, disbursement_date = data.get('dissemination_date'), data.get('disbursement_date')
+            # curr_tran_date = dissemination_date if dissemination_date else disbursement_date 
+            # curr_tran_date =  datetime.datetime.strptime(
+            #                     curr_tran_date, "%Y-%m-%d"
+            #                 ).date()
+            for transaction in transaction_list:
+                if transaction[3] != 'N':
+                    aggregate_amount += transaction[1]
+                logger.debug(
+                    "update aggregate amount for transaction:{}".format(transaction[0])
                 )
-            # # checking in reports table if the delete_ind flag is false for the corresponding report
-            # if transaction[5] != 'Y':
-            #     # checking if the back_ref_transaction_id is null or not.
-            #     # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
-            #     if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
-            #         aggregate_amount += transaction[0]
-            #     # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
-            #     # if str(report_id) == str(transaction[2]):
-            #     if contribution_date <= transaction[4]:
-            #         line_number = get_linenumber_itemization(transaction_type_identifier, aggregate_amount, itemization_value, transaction[3])
-            #         put_sql_linenumber_schedA(cmte_id, line_number, transaction[1], entity_id, aggregate_amount)
+                logger.debug("current aggregate amount:{}".format(aggregate_amount))
+                # if curr_tran_date <= transaction[2]:
+                update_aggregate_on_transaction(
+                        cmte_id, report_id, transaction[0], aggregate_amount
+                    )
+                # # checking in reports table if the delete_ind flag is false for the corresponding report
+                # if transaction[5] != 'Y':
+                #     # checking if the back_ref_transaction_id is null or not.
+                #     # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
+                #     if (transaction[7]!= None or (transaction[7] == None and transaction[6] != 'X')):
+                #         aggregate_amount += transaction[0]
+                #     # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
+                #     # if str(report_id) == str(transaction[2]):
+                #     if contribution_date <= transaction[4]:
+                #         line_number = get_linenumber_itemization(transaction_type_identifier, aggregate_amount, itemization_value, transaction[3])
+                #         put_sql_linenumber_schedA(cmte_id, line_number, transaction[1], entity_id, aggregate_amount)
 
-            #     #Updating aggregate amount to child auto generate sched B transactions
-            #     if child_flag:
-            #         child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
-            #         for child_SB_transaction in child_SB_transaction_list:
-            #             put_sql_agg_amount_schedB(cmte_id, child_SB_transaction[0], aggregate_amount)
+                #     #Updating aggregate amount to child auto generate sched B transactions
+                #     if child_flag:
+                #         child_SB_transaction_list = get_list_child_transactionId_schedB(cmte_id, transaction[1])
+                #         for child_SB_transaction in child_SB_transaction_list:
+                #             put_sql_agg_amount_schedB(cmte_id, child_SB_transaction[0], aggregate_amount)
 
     except Exception as e:
         raise Exception(
@@ -765,6 +806,9 @@ def post_schedE(data):
         validate_negative_transaction(data)
         validate_parent_transaction_exist(data)
         data = schedE_sql_dict(data)
+        form_type = find_form_type(data.get("report_id"), data.get("cmte_id"))
+        if form_type == 'F24' and data.get('mirror_report_id'):
+            data["mirror_transaction_id"] = get_next_transaction_id("SE")
         # TODO: add code for saving completing_entity
 
         try:
@@ -778,6 +822,18 @@ def post_schedE(data):
                     data.get("back_ref_transaction_id"),
                     data.get("expenditure_amount"),
                 )
+
+            #for F24 creating a duplicate transaction
+            se_data = {}
+            if form_type == 'F24' and data.get('mirror_report_id'):
+                se_data = data.copy()
+                se_data['transaction_id'] = data["mirror_transaction_id"]
+                se_data['report_id'] = data['mirror_report_id']
+                se_data["mirror_transaction_id"] = data['transaction_id']
+                se_data['mirror_report_id'] = data['report_id']
+                logger.debug("saving new mirror sched_e item with data:{}".format(se_data))
+                post_sql_schedE(se_data)
+
         except Exception as e:
             # remove entiteis if saving sched_e fails
             if payee_rollback_flag:
@@ -813,10 +869,11 @@ def post_schedE(data):
             )
         
         update_aggregate_amt_se(data)
+        if form_type == 'F24' and data.get('mirror_report_id'):
+            update_aggregate_amt_se(se_data)
         return data
     except:
         raise
-
 
 def post_sql_schedE(data):
     """
@@ -858,11 +915,13 @@ def post_sql_schedE(data):
             line_number,
             aggregation_ind,
             associatedbydissemination,
-            create_date
+            create_date,
+            mirror_report_id,
+            mirror_transaction_id
             )
         VALUES ({})
         """.format(
-            ",".join(["%s"] * 34)
+            ",".join(["%s"] * 36)
         )
         _v = (
             data.get("cmte_id"),
@@ -899,6 +958,8 @@ def post_sql_schedE(data):
             data.get("aggregation_ind"),
             data.get("associatedbydissemination"),
             datetime.datetime.now(),
+            data.get('mirror_report_id'),
+            data.get('mirror_transaction_id')
         )
         logger.debug("sql:{}".format(_sql))
         logger.debug("parameters:{}".format(_v))
@@ -979,7 +1040,9 @@ def get_list_all_schedE(report_id, cmte_id):
             memo_text,
             line_number,
             create_date, 
-            last_update_date
+            last_update_date,
+            mirror_transaction_id,
+            mirror_report_id
             FROM public.sched_e
             WHERE report_id = %s AND cmte_id = %s
             AND delete_ind is distinct from 'Y') t
@@ -1078,7 +1141,9 @@ def get_list_schedE(report_id, cmte_id, transaction_id, is_back_ref=False):
             aggregation_ind,
             associatedbydissemination,
             create_date, 
-            last_update_date
+            last_update_date,
+            mirror_transaction_id,
+            mirror_report_id
             FROM public.sched_e
             WHERE 
             
@@ -1244,6 +1309,13 @@ def schedE(request):
                 associatedbydissemination = True
             # datum = schedE_sql_dict(request.data)
             datum = request.data.copy()
+            #handling F24
+            if find_form_type(report_id, cmte_id) == 'F24':
+                if 'mirror_report_id' not in request.data:
+                    raise Exception("Missing Input: mirror_report_id is mandatory")
+            else:
+                datum['mirror_report_id'] = None
+                datum['mirror_transaction_id'] = None
             datum["report_id"] = report_id
             datum["cmte_id"] = cmte_id
             datum["associatedbydissemination"] = associatedbydissemination
@@ -1344,6 +1416,10 @@ def schedE(request):
 
     elif request.method == "PUT":
         try:
+            cmte_id = get_comittee_id(request.user.username)
+            if find_form_type(request.data['report_id'], cmte_id) == 'F24':
+                if 'mirror_report_id' not in request.data:
+                    raise Exception("Missing Input: mirror_report_id is mandatory")
             datum = schedE_sql_dict(request.data)
             associatedbydissemination = False
 

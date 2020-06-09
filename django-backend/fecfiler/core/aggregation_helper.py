@@ -5,7 +5,7 @@ import requests
 # from functools import lru_cache
 from django.db import connection
 from fecfiler.core.transaction_util import do_transaction
-from fecfiler.core.views import cmte_type, update_F3X
+from fecfiler.core.views import cmte_type, update_F3X, find_form_type
 
 
 # from fecfiler.core.views import get_entities, NoOPError, superceded_report_id_list
@@ -158,34 +158,6 @@ def date_agg_format(cvg_date):
         return cvg_dt
     except:
         raise
-
-
-def find_form_type(report_id, cmte_id):
-    """
-    load form type based on report_id and cmte_id
-    """
-    try:
-        # handling cases where report_id is reported as 0
-        if report_id in ["0", "0", 0]:
-            return "F3X"
-        # end of error handling
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """SELECT form_type FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
-                [report_id, cmte_id],
-            )
-            form_types = cursor.fetchone()
-        if cursor.rowcount == 0:
-            raise Exception(
-                "The Report ID: {} is either already deleted or does not exist in reports table".format(
-                    report_id
-                )
-            )
-        else:
-            return form_types[0]
-    except Exception as e:
-        raise Exception("The form_type function is throwing an error:" + str(e))
-
 
 def list_all_transactions_entity_lb(
     aggregate_start_date, aggregate_end_date, entity_id, cmte_id, levin_account_id
@@ -630,7 +602,7 @@ def find_aggregate_date(form_type, contribution_date):
     """
     try:
         aggregate_start_date = None
-        if form_type == "F3X":
+        if form_type in ["F3X", "F24"]:
             year = contribution_date.year
             aggregate_start_date = datetime.date(year, 1, 1)
             aggregate_end_date = datetime.date(year, 12, 31)
@@ -641,7 +613,7 @@ def find_aggregate_date(form_type, contribution_date):
         )
 
 
-def get_transactions_election_and_office(start_date, end_date, data):
+def get_transactions_election_and_office(start_date, end_date, data, form_type='F3X'):
     """
     load all transactions by electtion code and office within the date range.
     - for president election: election_code + office
@@ -657,37 +629,42 @@ def get_transactions_election_and_office(start_date, end_date, data):
     if cand_office == "P":
         _sql = """
         SELECT  
-                transaction_id, 
-				expenditure_amount as transaction_amt,
-				COALESCE(dissemination_date, disbursement_date) as transaction_dt
-        FROM public.sched_e
+                e.transaction_id, 
+                e.expenditure_amount as transaction_amt,
+                COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
+                e.aggregation_ind
+        FROM public.sched_e e
+        LEFT JOIN public.reports r ON r.report_id = e.report_id
         WHERE  
-            cmte_id = %s
-            AND COALESCE(dissemination_date, disbursement_date) >= %s
-            AND COALESCE(dissemination_date, disbursement_date) <= %s
-            AND election_code = %s
-            AND delete_ind is distinct FROM 'Y' 
-            AND memo_code is null
-            ORDER BY transaction_dt ASC, create_date ASC;
+            e.cmte_id = %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
+            AND e.election_code = %s
+            AND e.delete_ind is distinct FROM 'Y'
+            AND e.memo_code is null 
+            AND r.form_type = %s
+            ORDER BY transaction_dt ASC, e.create_date ASC;
         """
-        _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"))
+        _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"), form_type)
     elif cand_office == "S":
         _sql = """
         SELECT  
-                transaction_id, 
-				expenditure_amount as transaction_amt,
-                COALESCE(dissemination_date, disbursement_date) as transaction_dt,
-                memo_code,
-        FROM public.sched_e
+                e.transaction_id, 
+                e.expenditure_amount as transaction_amt,
+                COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
+                e.aggregation_ind
+        FROM public.sched_e e
+        LEFT JOIN public.reports r ON r.report_id = e.report_id
         WHERE  
-            cmte_id = %s
-            AND COALESCE(dissemination_date, disbursement_date) >= %s
-            AND COALESCE(dissemination_date, disbursement_date) <= %s
-            AND election_code = %s
-            AND so_cand_state = %s
-            AND delete_ind is distinct FROM 'Y'
-            AND memo_code is null 
-            ORDER BY transaction_dt ASC, create_date ASC; 
+            e.cmte_id = %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
+            AND e.election_code = %s
+            AND e.so_cand_state = %s
+            AND e.delete_ind is distinct FROM 'Y' 
+            AND e.memo_code is null
+            AND r.form_type = %s
+            ORDER BY transaction_dt ASC, e.create_date ASC; 
         """
         _params = (
             data.get("cmte_id"),
@@ -695,25 +672,28 @@ def get_transactions_election_and_office(start_date, end_date, data):
             end_date,
             data.get("election_code"),
             data.get("so_cand_state"),
+            form_type
         )
     elif cand_office == "H":
         _sql = """
         SELECT  
-                transaction_id, 
-				expenditure_amount as transaction_amt,
-				COALESCE(dissemination_date, disbursement_date) as transaction_dt,
-                memo_code
-        FROM public.sched_e
+                e.transaction_id, 
+                e.expenditure_amount as transaction_amt,
+                COALESCE(e.dissemination_date, e.disbursement_date) as transaction_dt,
+                e.aggregation_ind
+        FROM public.sched_e e
+        LEFT JOIN public.reports r ON r.report_id = e.report_id
         WHERE  
-            cmte_id = %s
-            AND COALESCE(dissemination_date, disbursement_date) >= %s
-            AND COALESCE(dissemination_date, disbursement_date) <= %s
-            AND election_code = %s
-            AND so_cand_state = %s
-            AND so_cand_district = %s
-            AND delete_ind is distinct FROM 'Y' 
-            AND memo_code is null
-            ORDER BY transaction_dt ASC, create_date ASC;  
+            e.cmte_id = %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
+            AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
+            AND e.election_code = %s
+            AND e.so_cand_state = %s
+            AND e.so_cand_district = %s
+            AND e.delete_ind is distinct FROM 'Y' 
+            AND e.memo_code is null
+            AND r.form_type = %s
+            ORDER BY transaction_dt ASC, e.create_date ASC;  
         """
         _params = (
             data.get("cmte_id"),
@@ -722,6 +702,7 @@ def get_transactions_election_and_office(start_date, end_date, data):
             data.get("election_code"),
             data.get("so_cand_state"),
             data.get("so_cand_district"),
+            form_type
         )
 
     try:
@@ -734,7 +715,6 @@ def get_transactions_election_and_office(start_date, end_date, data):
             "Getting transactions for election and office is throwing an error: "
             + str(e)
         )
-
 
 def update_aggregate_on_transaction(
     cmte_id, report_id, transaction_id, aggregate_amount
@@ -795,7 +775,7 @@ def update_aggregate_se(data):
         #     cmte_id,
         # )
         transaction_list = get_transactions_election_and_office(
-            aggregate_start_date, aggregate_end_date, data
+            aggregate_start_date, aggregate_end_date, data, form_type
         )
         if not transaction_list:
             logger.debug("no SE transctions found.")
@@ -877,7 +857,9 @@ def load_schedE(cmte_id, report_id, transaction_id):
             memo_text,
             line_number,
             create_date, 
-            last_update_date
+            last_update_date,
+            mirror_transaction_id,
+            mirror_report_id
             FROM public.sched_e
             WHERE cmte_id = %s
             AND report_id = %s
