@@ -332,7 +332,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       category: new FormControl('', Validators.required),
       activity_event_name: new FormControl('', Validators.required),
       transferred_amount: new FormControl('', Validators.required),
-      aggregate_amount: new FormControl('')
+      aggregate_amount: new FormControl(''),
+      memo_text: new FormControl('')
     });
     this._prepareForUnsavedH3Changes();
   }
@@ -726,9 +727,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
       formObj['transaction_id'] = this.transaction_id;
       formObj['back_ref_transaction_id'] = this.back_ref_transaction_id;
-
       formObj['aggregate_amount'] = this.convertFormattedAmountToDecimal(formObj.aggregate_amount);
-
+      const MEMO_TEXT = this.schedH3.get('memo_text');
+      formObj['memo_text'] = MEMO_TEXT ? MEMO_TEXT.value : '';
       delete formObj.total_amount_transferred;
 
       //this.isSubmit = true;
@@ -1000,6 +1001,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH3.patchValue({ activity_event_name: item.activity_event_name }, { onlySelf: true });
     this.schedH3.patchValue({ transferred_amount: this._decPipe.transform(item.transferred_amount, '.2-2') }, { onlySelf: true });
     this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(item.aggregate_amount, '.2-2') }, { onlySelf: true });
+    this.schedH3.patchValue({ memo_text: item.memo_text ? item.memo_text : '' }, { onlySelf: true });
 
     this.transferred_amount_edit = item.transferred_amount;
     this.total_amount_edit = item.total_amount_transferred;
