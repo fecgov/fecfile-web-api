@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'fecfiler.sched_L',
     'storages',
     'fecfiler.form_1M',
+    'fecfiler.contacts'
 ]
 
 
