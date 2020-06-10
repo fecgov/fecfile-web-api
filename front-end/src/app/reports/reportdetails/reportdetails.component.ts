@@ -1694,7 +1694,8 @@ public printReport(report: reportModel): void{
   }
   public isUpload() {
     if (this.authService.isAdmin() ||
-        this.authService.isCommitteeAdmin()) {
+        this.authService.isCommitteeAdmin() ||
+        this.authService.isBackupCommitteeAdmin()) {
         return true;
     }
     return false;
