@@ -7579,6 +7579,27 @@ def put_contact_data(data):
         raise
 
 
+def check_mandatory_fields(data, list_mandatory_fields):
+    try:
+        error = []
+        for field in list_mandatory_fields:
+            if not (field in data and check_null_value(data.get(field).strip())):
+                error.append(field)
+        if len(error) > 0:
+            string = ""
+            for x in error:
+                string = string + x + ", "
+            string = string[0:-2]
+            raise Exception(
+                "The following mandatory fields are required in order to save data : {}".format(
+                    string
+                )
+            )
+
+    except Exception as e:
+        raise e
+
+
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def contacts(request):
     """
@@ -7590,6 +7611,19 @@ def contacts(request):
         if request.method == "POST":
             try:
                 # cmte_id = get_comittee_id(request.user.username)
+                mandatory_fields_list = ["entity_type", "street_1",
+                                         "city", "state", "zip_code"]
+                if check_null_value(request.data.get("entity_type")):
+                    if request.data.get("entity_type").upper() == 'IND':
+                        mandatory_fields_list.append("first_name")
+                        mandatory_fields_list.append("last_name")
+                    elif request.data.get("entity_type").upper() == 'ORG':
+
+                        mandatory_fields_list.append("entity_name")
+                else:
+                    raise Exception("Entity type is required.")
+
+                check_mandatory_fields(request.data, mandatory_fields_list)
                 datum = contact_sql_dict(request.data)
                 datum["cmte_id"] = get_comittee_id(request.user.username)
                 # datum['cmte_id'] = cmte_id
