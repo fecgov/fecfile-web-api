@@ -1,10 +1,10 @@
 <div class="form-sidebar" *ngIf="!allTransactions">
   <header>
     <h2 class="text-center">Transaction Categories</h2>
-    <!-- <ng-container *ngIf="step === 'step_2' || step === 'step_3'"> -->
+     <ng-container *ngIf="!_authService.isReadOnly()">
     <hr />
 
-    <div *ngIf="!_authService.isReadOnly() && formType !== '24'" class="search">
+    <div *ngIf="formType !== '24'" class="search">
 
       <button class="fa fa-search" (click)="selectedTypeAheadValue(itemSelected)"></button>
       <ng-template #rt let-r="result" let-t="term">
@@ -25,7 +25,7 @@
         />
       </div>
     </div>
-    <!-- </ng-container> -->
+     </ng-container>
   </header>
   <section class="paragraph">
     <!-- <ng-container *ngIf="step === 'step_2' || step === 'step_3'"> -->
