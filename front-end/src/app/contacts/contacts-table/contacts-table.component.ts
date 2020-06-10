@@ -286,7 +286,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
 
-        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1).sort((a, b) => b - a);
         this.allContactsSelected = false;
       });
   }
@@ -353,7 +353,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
 
-        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1).sort((a, b) => b - a);
         this.allContactsSelected = false;
 
 
