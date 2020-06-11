@@ -4078,6 +4078,8 @@ def get_all_transactions(request):
             param_string += " AND delete_ind = 'Y'"
         else:
             param_string += " AND delete_ind is distinct from 'Y'"
+        
+        param_string += " AND back_ref_transaction_id IS NULL"
 
         filters_post = request.data.get("filters", {})
         memo_code_d = filters_post.get("filterMemoCode", False)
@@ -4110,6 +4112,7 @@ def get_all_transactions(request):
         total_amount = 0.0
         #: set transaction query with offsets.
         trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
+        trans_query_string = "(" + trans_query_string + ") UNION (" + trans_query_string[0:trans_query_string.index(" from ")] + " from ( SELECT W.* FROM (" + trans_query_string + ") V join all_receipts_transactions_view W on V.transaction_id = W.back_ref_transaction_id) Z)"
 
         with connection.cursor() as cursor:
             # logger.debug('query all transactions with sql:{}'.format(trans_query_string))

@@ -9,6 +9,7 @@ from fecfiler.forms.serializers import CommitteeInfoSerializer
 import json
 import datetime
 import os
+import platform
 import requests
 from django.views.decorators.csrf import csrf_exempt
 import logging
@@ -700,7 +701,7 @@ def add_log(reportid,
             error_code,
             error_json,
             app_error,
-            host_name=os.uname()[1],
+            host_name=platform.uname()[1],
             process_name="create_json_builders"):
     with connection.cursor() as cursor:
         cursor.execute("""INSERT INTO public.upload_logs(

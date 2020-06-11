@@ -306,7 +306,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     );
 
     this._reportsService
-      .getReports(
+      .getParentReports(
         this.view,
         page,
         this.config.itemsPerPage,

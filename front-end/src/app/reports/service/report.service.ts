@@ -114,7 +114,7 @@ export class ReportsService {
     });
   }
 
-  public getReports(
+  public getParentReports(
     view: string,
     page: number,
     itemsPerPage: number,
@@ -240,6 +240,33 @@ export class ReportsService {
     );
   }
 
+  public getReports(
+    view: string,
+    page: number,
+    itemsPerPage: number,
+    sortColumnName: string,
+    descending: boolean,
+    filter: ReportFilterModel,
+    reportId: number
+  ): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    const url = '/f99/get_form99list';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('view', view);
+    params = params.append('reportId', reportId.toString());
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    });
+  }
+  
   public getTrashedReports(
     view: string,
     page: number,
