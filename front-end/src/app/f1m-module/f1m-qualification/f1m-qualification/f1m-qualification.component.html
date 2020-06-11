@@ -71,6 +71,7 @@
                                   (form?.touched || form?.dirty)
                                     ? 'input-field-error'
                                     : ''" [ngbTypeahead]="searchCandidateId" [focusFirst]=false
+                                    [maxlength]="9"
                   [resultTemplate]="rtCandidateId" [inputFormatter]="formatterCandidateId"
                   (selectItem)="handleSelectedCandidate($event)">
               </div>
@@ -90,6 +91,7 @@
                                   (form?.touched || form?.dirty)
                                     ? 'input-field-error'
                                     : ''" [ngbTypeahead]="searchCandLastName" [focusFirst]=false
+                                    [maxlength]="30"
                   [resultTemplate]="rtCandidate" [inputFormatter]="formatterCandLastName"
                   (selectItem)="handleSelectedCandidate($event)">
               </div>
@@ -109,6 +111,7 @@
                                     (form?.touched || form?.dirty)
                                       ? 'input-field-error'
                                       : ''" [ngbTypeahead]="searchCandFirstName" [focusFirst]=false
+                                      [maxlength]="20"
                   [resultTemplate]="rtCandidate" [inputFormatter]="formatterCandFirstName"
                   (selectItem)="handleSelectedCandidate($event)">
               </div>
@@ -126,6 +129,7 @@
               <div class="input-group transactions__filter-multi-input">
                 <input type="text" name="cand_middle_name" [formControlName]="'cand_middle_name'" class="form-control"
                   id="cand_middle_name" aria-label="candidate middle name" aria-describedby="cand_middle_name"
+                  [maxlength]="20"
                   [ngClass]=" form?.get('cand_middle_name')?.invalid &&
                                     (form?.touched || form?.dirty)
                                       ? 'input-field-error' : ''">
@@ -141,6 +145,7 @@
               </label>
               <div class="input-group transactions__filter-multi-input" style="width:35%">
                 <input type="text" name="cand_prefix" [formControlName]="'cand_prefix'" class="form-control"
+                [maxlength]="10"
                   id="cand_prefix" aria-label="Candidate Prefix" aria-describedby="cand_prefix" [ngClass]=" form?.get('cand_prefix')?.invalid &&
                                     (form?.touched || form?.dirty)
                                       ? 'input-field-error': ''">
@@ -156,6 +161,7 @@
               </label>
               <div class="input-group transactions__filter-multi-input" style="width:35%">
                 <input type="text" name="cand_suffix" [formControlName]="'cand_suffix'" class="form-control"
+                [maxlength]="10"
                   id="cand_suffix" aria-label="Candidate Suffix" aria-describedby="cand_suffix" [ngClass]=" form?.get('cand_suffix')?.invalid &&
                                       (form?.touched || form?.dirty)
                                         ? 'input-field-error' : ''">
@@ -208,6 +214,7 @@
               <div class="input-group transactions__filter-multi-input" style="width:35%">
                 <input type="text" name="cand_office_district" [formControlName]="'cand_office_district'"
                   class="form-control" id="cand_office_district" aria-label="Candidate District"
+                  [maxlength]="2"
                   aria-describedby="candidate office district" required [ngClass]=" form?.get('cand_office_district')?.invalid &&
                                       (form?.touched || form?.dirty)
                                         ? 'input-field-error' : ''">
