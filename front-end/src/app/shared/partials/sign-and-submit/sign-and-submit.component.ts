@@ -1,3 +1,4 @@
+import { ReportTypeService } from './../../../forms/form-3x/report-type/report-type.service';
 import { ActivatedRoute } from '@angular/router';
 import { TypeaheadService } from './../typeahead/typeahead.service';
 import { MessageService } from './../../services/MessageService/message.service';
@@ -45,7 +46,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   public saveSuccessful = false;
 
   public username: string = '';
-  accordionExpanded: boolean;
+  accordionExpanded: boolean = false;
   modalRef: any;
 
   constructor(
@@ -57,7 +58,8 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
     private _typeaheadService: TypeaheadService,
     config: NgbModalConfig, 
     private modalService: NgbModal,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private _reportTypeService: ReportTypeService
     ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -206,7 +208,18 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   }
 
   public printPreview(){
-    alert('Not implemented yet');
+    this._reportTypeService.printPreviewPdf(this.formType,'PrintPreviewPDF',undefined,this.reportId) .subscribe(res => {
+        if(res) {
+          if (res.hasOwnProperty('results')) {
+            if (res['results.pdf_url'] !== null) {
+              window.open(res.results.pdf_url, '_blank');
+            }
+          }
+        }
+    },
+    (error) => {
+      console.error('error: ', error);
+    });
   }
 
   public populateForm() {

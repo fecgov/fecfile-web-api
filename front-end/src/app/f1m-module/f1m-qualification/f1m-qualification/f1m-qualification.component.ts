@@ -13,7 +13,7 @@ import { F1mService } from './../../f1m/f1m-services/f1m.service';
   selector: 'app-f1m-qualification',
   templateUrl: './f1m-qualification.component.html',
   styleUrls: ['./f1m-qualification.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None
 })
 export class F1mQualificationComponent implements  OnInit , OnDestroy{
@@ -57,6 +57,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
         else if(message && message.formType === 'f1m-qualification' && message.action === 'showPart2'){
           this.showPart2 = true;
           this.setRegistrationDate();
+          this.setRequirementsMetDate();
           this.cd.detectChanges();
         }
         else if(message && message.formType === 'f1m-qualification' && message.action === 'editCandidate'){
@@ -188,14 +189,14 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
   public initForm() {
     this.form = this._fb.group({
       candidate_id: new FormControl(null, [Validators.required, Validators.maxLength(9)]),
-      cand_last_name: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
-      cand_first_name: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
-      cand_middle_name: new FormControl(null, [Validators.maxLength(100)]),
-      cand_prefix: new FormControl(null, [ Validators.maxLength(100)]),
-      cand_suffix: new FormControl(null, [ Validators.maxLength(100)]),
+      cand_last_name: new FormControl(null, [Validators.required, Validators.maxLength(30)]),
+      cand_first_name: new FormControl(null, [Validators.required, Validators.maxLength(20)]),
+      cand_middle_name: new FormControl(null, [Validators.maxLength(20)]),
+      cand_prefix: new FormControl(null, [ Validators.maxLength(10)]),
+      cand_suffix: new FormControl(null, [ Validators.maxLength(10)]),
       cand_office: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       cand_office_state: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
-      cand_office_district: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+      cand_office_district: new FormControl(null, [Validators.required, Validators.maxLength(2)]),
       contribution_date: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       candidate_number: new FormControl(this.candidateNumber.toString())
     });
