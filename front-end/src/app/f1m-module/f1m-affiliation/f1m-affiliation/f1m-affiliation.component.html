@@ -44,6 +44,7 @@
                               (form.touched || form.dirty)
                                 ? 'input-field-error'
                                 : ''"
+                  
                   id="affiliation_date" aria-label="Enter F1 affiliated date" aria-describedby="affiliation_date"
                   required>
               </div>
@@ -66,6 +67,7 @@
                               (form.touched || form.dirty)
                                 ? 'input-field-error'
                                 : ''"
+                                [maxlength]="200"
                   [ngbTypeahead]="searchCommitteeName" 
                   [focusFirst]=false
                   [resultTemplate]="rtCommitteeName" 
@@ -88,6 +90,7 @@
                               (form.touched || form.dirty)
                                 ? 'input-field-error'
                                 : ''"
+                  [maxlength]="9"
                   [ngbTypeahead]="searchCommitteeId" 
                   [focusFirst]=false
                   [resultTemplate]="rtCommitteeId" 
