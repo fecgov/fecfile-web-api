@@ -636,105 +636,132 @@ def form1M(request):
 						   value_dict=request.query_params, function_name='form1M-POST')
 			step = request.query_params['step']
 
-			# by affiliation step2 POST
-			if step == 'saveAffiliation':
-				try:
-					is_read_only_or_filer_reports(request)
-					noneCheckMissingParameters(['committee_id', 'affiliation_date'], checking_dict=request.data,
-							   value_dict=request.data, function_name='form1M-POST: step-2 Affiliation')
-					request_dict = f1m_sql_dict(cmte_id, step, request.data)
-					request_dict['est_status'] = 'A'
-					if 'report_id' in request_dict:
-						check_report_id_status(cmte_id, request_dict['report_id'])
-						previous_f1m_dict = get_sql_f1m(request_dict)
-						check_clear_establishment_status(cmte_id, request_dict['report_id'], 'Q')
-						f1m_flag, output_dict = f1m_put(request_dict)
-					else:
-						report_flag, request_dict['report_id'] = report_post(request)
-						f1m_flag, output_dict = f1m_post(request_dict)
+            # by affiliation step2 POST
+            if step == 'saveAffiliation':
+                try:
+                    is_read_only_or_filer_reports(request)
+                    noneCheckMissingParameters(['committee_id', 'affiliation_date'], checking_dict=request.data,
+                                               value_dict=request.data, function_name='form1M-POST: step-2 Affiliation')
+                    request_dict = f1m_sql_dict(cmte_id, step, request.data)
+                    request_dict['est_status'] = 'A'
+                    if 'report_id' in request_dict:
+                        check_report_id_status(cmte_id, request_dict['report_id'])
+                        previous_f1m_dict = get_sql_f1m(request_dict)
+                        check_clear_establishment_status(cmte_id, request_dict['report_id'], 'Q')
+                        f1m_flag, output_dict = f1m_put(request_dict)
+                    else:
+                        report_flag, request_dict['report_id'] = report_post(request)
+                        f1m_flag, output_dict = f1m_post(request_dict)
 
-				except Exception as e:
-					json_result = {'message': str(e)}
-					return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+                except Exception as e:
+                    json_result = {'message': str(e)}
+                    return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
-			# by qualification step2 POST - skipping candidates
-			elif step == 'saveQualification':
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				request_dict['est_status'] = 'Q'
-				if 'report_id' in request_dict:
-					check_report_id_status(cmte_id, request_dict['report_id'])
-					previous_f1m_dict = get_sql_f1m(request_dict)
-					check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
-					f1m_flag, output_dict = f1m_put(request_dict)
-				else:
-					report_flag, request_dict['report_id'] = report_post(request)
-					f1m_flag, output_dict = f1m_post(request_dict)
+            # by qualification step2 POST - skipping candidates
+            elif step == 'saveQualification':
+                try:
+                    is_read_only_or_filer_reports(request)
+                    request_dict = f1m_sql_dict(cmte_id, step, request.data)
+                    request_dict['est_status'] = 'Q'
+                    if 'report_id' in request_dict:
+                        check_report_id_status(cmte_id, request_dict['report_id'])
+                        previous_f1m_dict = get_sql_f1m(request_dict)
+                        check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
+                        f1m_flag, output_dict = f1m_put(request_dict)
+                    else:
+                        report_flag, request_dict['report_id'] = report_post(request)
+                        f1m_flag, output_dict = f1m_post(request_dict)
+                except Exception as e:
+                    json_result = {'message': str(e)}
+                    return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
-			# by qualification step2 POST
-			elif step == 'saveCandidate':
-				noneCheckMissingParameters(['candidate_id', 'contribution_date',
-					'candidate_number'],
-					checking_dict=request.data, value_dict=request.data,
-					function_name='form1M-POST: step-2 Qualification')
-				candidate_number = check_candidate_number(request.data['candidate_number'])
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				column_name = 'can'+candidate_number+'_id'
-				request_dict[column_name] = request.data['candidate_id']
-				request_dict[column_name[:-2]+'con'] = request.data['contribution_date']
-				if candidate_number == '1':
-					request_dict['est_status'] = 'Q'
-				if 'report_id' in request_dict:
-					check_report_id_status(cmte_id, request_dict['report_id'])
-					previous_f1m_dict = get_sql_f1m(request_dict)
-					if candidate_number == '1':
-						check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
-					f1m_flag, output_dict = f1m_put(request_dict)
-				elif candidate_number == '1':
-					report_flag, request_dict['report_id'] = report_post(request)
-					f1m_flag, output_dict = f1m_post(request_dict)
-				else:
-					raise Exception('reportId parameter is mandatory for this step.')
+            # by qualification step2 POST
+            elif step == 'saveCandidate':
+                try:
+                    is_read_only_or_filer_reports(request)
 
-			# by qualification step3 POST
-			elif step == 'saveDates':
-				noneCheckMissingParameters(['reportId', 'registration_date',
-					'fifty_first_contributor_date',
-					'requirements_met_date'], checking_dict=request.data, value_dict=request.data,
-					function_name='form1M-POST: step-3 Qualification')
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				check_report_id_status(cmte_id, request_dict['report_id'])
-				previous_f1m_dict = get_sql_f1m(request_dict)
-				check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
-				f1m_flag, output_dict = f1m_put(request_dict)
+                    noneCheckMissingParameters(['candidate_id', 'contribution_date',
+                                                'candidate_number'],
+                                               checking_dict=request.data, value_dict=request.data,
+                                               function_name='form1M-POST: step-2 Qualification')
+                    candidate_number = check_candidate_number(request.data['candidate_number'])
+                    request_dict = f1m_sql_dict(cmte_id, step, request.data)
+                    column_name = 'can' + candidate_number + '_id'
+                    request_dict[column_name] = request.data['candidate_id']
+                    request_dict[column_name[:-2] + 'con'] = request.data['contribution_date']
+                    if candidate_number == '1':
+                        request_dict['est_status'] = 'Q'
+                    if 'report_id' in request_dict:
+                        check_report_id_status(cmte_id, request_dict['report_id'])
+                        previous_f1m_dict = get_sql_f1m(request_dict)
+                        if candidate_number == '1':
+                            check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
+                        f1m_flag, output_dict = f1m_put(request_dict)
+                    elif candidate_number == '1':
+                        report_flag, request_dict['report_id'] = report_post(request)
+                        f1m_flag, output_dict = f1m_post(request_dict)
+                    else:
+                        raise Exception('reportId parameter is mandatory for this step.')
+                except Exception as e:
+                    json_result = {'message': str(e)}
+                    return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
-			# both step4 POST
-			elif step == 'saveSignatureAndEmail':
-				noneCheckMissingParameters(['reportId'],
-					checking_dict=request.data, value_dict=request.data,
-					function_name='form1M-POST: step-4 SAVE')
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				check_report_id_status(cmte_id, request_dict['report_id'])
-				previous_f1m_dict = get_sql_f1m(request_dict)
-				f1m_flag, output_dict = f1m_put(request_dict)
-				report_flag, previous_report_dict = step4_reports_put(request)
+            # by qualification step3 POST
+            elif step == 'saveDates':
+                try:
+                    is_read_only_or_filer_reports(request)
+                    noneCheckMissingParameters(['reportId', 'registration_date',
+                                                'fifty_first_contributor_date',
+                                                'requirements_met_date'], checking_dict=request.data,
+                                               value_dict=request.data,
+                                               function_name='form1M-POST: step-3 Qualification')
+                    request_dict = f1m_sql_dict(cmte_id, step, request.data)
+                    check_report_id_status(cmte_id, request_dict['report_id'])
+                    previous_f1m_dict = get_sql_f1m(request_dict)
+                    check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
+                    f1m_flag, output_dict = f1m_put(request_dict)
+                except Exception as e:
+                    json_result = {'message': str(e)}
+                    return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
-			# both step4 POST
-			elif step == 'submit':
-				noneCheckMissingParameters(['reportId','submission_date'], 
-					checking_dict=request.data, value_dict=request.data, 
-					function_name='form1M-POST: step-4 SUBMIT')
-				# password = request.data['filingPassword']
-				# password_authenticate(cmte_id, password)
-				request_dict = f1m_sql_dict(cmte_id, step, request.data)
-				check_report_id_status(cmte_id, request_dict['report_id'])
-				previous_f1m_dict = get_sql_f1m(request_dict)
-				f1m_flag, output_dict = f1m_put(request_dict)
-				report_flag, previous_report_dict = step4_reports_put(request)
-				validate_before_submit(output_dict)
-				submit_flag = submit_f1m_report(request)
-			else:
-				raise Exception("""Kindly provide a valid value for 'step' parameter.
-				Input received: {}""".format(step))
+            # both step4 POST
+            elif step == 'saveSignatureAndEmail':
+                try:
+                    is_read_only_or_filer_reports(request)
+                    noneCheckMissingParameters(['reportId'],
+                                               checking_dict=request.data, value_dict=request.data,
+                                               function_name='form1M-POST: step-4 SAVE')
+                    request_dict = f1m_sql_dict(cmte_id, step, request.data)
+                    check_report_id_status(cmte_id, request_dict['report_id'])
+                    previous_f1m_dict = get_sql_f1m(request_dict)
+                    f1m_flag, output_dict = f1m_put(request_dict)
+                    report_flag, previous_report_dict = step4_reports_put(request)
+                except Exception as e:
+                    json_result = {'message': str(e)}
+                    return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+            # both step4 POST
+            elif step == 'submit':
+                try:
+                    is_read_only_or_filer_submit(request)
+                    noneCheckMissingParameters(['reportId', 'submission_date'],
+                                               checking_dict=request.data, value_dict=request.data,
+                                               function_name='form1M-POST: step-4 SUBMIT')
+                    # password = request.data['filingPassword']
+                    # password_authenticate(cmte_id, password)
+                    request_dict = f1m_sql_dict(cmte_id, step, request.data)
+                    check_report_id_status(cmte_id, request_dict['report_id'])
+                    previous_f1m_dict = get_sql_f1m(request_dict)
+                    f1m_flag, output_dict = f1m_put(request_dict)
+                    report_flag, previous_report_dict = step4_reports_put(request)
+                    validate_before_submit(output_dict)
+                    submit_flag = submit_f1m_report(request)
+                except Exception as e:
+                    json_result = {'message': str(e)}
+                    return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+            else:
+                raise Exception("""Kindly provide a valid value for 'step' parameter.
+                Input received: {}""".format(step))
 
 			output_dict = get_sql_f1m(request_dict, True)
 			return JsonResponse(output_dict, status=status.HTTP_200_OK, safe=False)
@@ -757,12 +784,12 @@ def form1M(request):
 	"""
 	if request.method == "PUT":
 
-		try:
-			is_read_only_or_filer_reports(request)
-			try:
-				noneCheckMissingParameters(['step'], checking_dict=request.query_params,
-				   value_dict=request.query_params, function_name='form1M-PUT')
-				step = request.query_params['step']
+        try:
+            is_read_only_or_filer_reports(request)
+            try:
+                noneCheckMissingParameters(['step'], checking_dict=request.query_params,
+                                           value_dict=request.query_params, function_name='form1M-PUT')
+                step = request.query_params['step']
 
 				# by affiliation step2 PUT
 				if step == 'saveAffiliation':
@@ -856,28 +883,34 @@ def form1M(request):
 			return Response("The form1M API - GET is throwing an error: " + str(e), 
 				status=status.HTTP_400_BAD_REQUEST)
 
-	"""
-	************************************ DELETE Call - form 1M ******************************************
-	"""
-	if request.method == "DELETE":
-		try:
-			step = "None"
-			noneCheckMissingParameters(['reportId', 'delete_ind'], 
-				checking_dict=request.data,value_dict=request.data, 
-				function_name='form1M-DELETE')
-			request_dict = f1m_sql_dict(cmte_id, step, request.data)
-			check_report_id_status(cmte_id, request_dict['report_id'], False)
-			if request.data['delete_ind'] == 'Y':
-				request_dict['delete_ind'] = 'Y'
-			else:
-				request_dict['delete_ind'] = None
-			f1m_delete(request_dict)
-			report_delete(request_dict)
-			return JsonResponse(request_dict, status=status.HTTP_200_OK, safe=False)
-		except Exception as e:
-			logger.debug(e)
-			return Response("The form1M API - DELETE is throwing an error: " + str(e), 
-				status=status.HTTP_400_BAD_REQUEST)
+    """
+    ************************************ DELETE Call - form 1M ******************************************
+    """
+    if request.method == "DELETE":
+        try:
+            is_read_only_or_filer_reports(request)
+            try:
+                step = "None"
+                noneCheckMissingParameters(['reportId', 'delete_ind'],
+                                           checking_dict=request.data, value_dict=request.data,
+                                           function_name='form1M-DELETE')
+                request_dict = f1m_sql_dict(cmte_id, step, request.data)
+                check_report_id_status(cmte_id, request_dict['report_id'], False)
+                if request.data['delete_ind'] == 'Y':
+                    request_dict['delete_ind'] = 'Y'
+                else:
+                    request_dict['delete_ind'] = None
+                f1m_delete(request_dict)
+                report_delete(request_dict)
+                return JsonResponse(request_dict, status=status.HTTP_200_OK, safe=False)
+            except Exception as e:
+                logger.debug(e)
+                return Response("The form1M API - DELETE is throwing an error: " + str(e),
+                                status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            json_result = {'message': str(e)}
+            return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
 
 """
 ************************************** END OF FORM 1M API Call *********************************************
