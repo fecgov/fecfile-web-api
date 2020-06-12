@@ -899,11 +899,18 @@ export class TransactionsService {
     const request: any = {};
     const actions = [];
     for (const trx of transactions) {
-      actions.push({
+      let transactionObj :any = {
         action: action,
         report_id: trx.reportId && trx.reportId !== 'undefined'? trx.reportId :reportId, 
         transaction_id: trx.transactionId
-      });
+      };
+
+      if(trx.mirrorReportId){
+        transactionObj.mirror_report_id = trx.mirrorReportId;
+        transactionObj.mirror_transaction_id = trx.mirrorTransactionId;
+      }
+
+      actions.push(transactionObj);
     }
     request.actions = actions;
 
@@ -931,7 +938,7 @@ export class TransactionsService {
       );
   }
 
-  public cloneTransaction(transactionId: string) {
+   public cloneTransaction(transactionId: string, mirrorFlag: boolean = false, mirrorReportId: string = null) {
 
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
@@ -941,7 +948,7 @@ export class TransactionsService {
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
     return this._http
-      .post(`${environment.apiUrl}${url}`, { transaction_id: transactionId }, {
+    .post(`${environment.apiUrl}${url}`, { transaction_id: transactionId,mirror_transaction:mirrorFlag, mirror_report_id: mirrorReportId }, {
         headers: httpOptions
       })
       .pipe(
@@ -1003,5 +1010,7 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.originalAmount = row.original_amount;
   model.aggregation_ind = row.aggregation_ind;
   model.forceitemizable = row.forceitemizable;
+  model.mirrorReportId = row.mirror_report_id;
+  model.mirrorTransactionId = row.mirror_transaction_id;
 
 }
