@@ -610,6 +610,9 @@ def create_json_builders(request):
                                                 transaction['child'] = child_transactions
                             # pre-appending the purpose description
                             transaction = preappending_purpose_description(transaction)
+                            # Handling electionOtherDescription value for 'primary' and 'general'
+                            if 'electionOtherDescription' in transaction and transaction['electionOtherDescription'] in ['Primary', 'General']:
+                                transaction['electionOtherDescription'] = ""
                             if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
                                 if transaction.get('transactionTypeIdentifier') in list_of_SL_SA_transaction_types:
                                     if 'SL-A' not in output['data']['schedules']:
