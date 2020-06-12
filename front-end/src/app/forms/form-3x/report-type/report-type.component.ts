@@ -1,10 +1,9 @@
-import { UtilService } from './../../../shared/utils/util.service';
-import { IndividualReceiptService } from './../individual-receipt/individual-receipt.service';
 import { DatePipe } from '@angular/common';
-import { Component, EventEmitter, HostListener, Input, OnInit, Output, ViewEncapsulation, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
+import 'rxjs/add/operator/takeUntil';
 import { Subscription } from 'rxjs/Subscription';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
@@ -12,8 +11,9 @@ import { ReportsService } from '../../../reports/service/report.service';
 import { FormsService } from '../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../shared/services/MessageService/message.service';
 import { TransactionsMessageService } from '../../transactions/service/transactions-message.service';
+import { UtilService } from './../../../shared/utils/util.service';
+import { IndividualReceiptService } from './../individual-receipt/individual-receipt.service';
 import { ReportTypeService } from './report-type.service';
-import 'rxjs/add/operator/takeUntil';
 
 
 @Component({
@@ -51,7 +51,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   private _dueDate: string = null;
   private _daysUntilReportDue: number = null;
   private _formType: string = null;
-  private _form3xReportTypeDetails: any = null;
+  private _formReportTypeDetails: any = null;
   public fromDateSelected: string = null;
   public toDateSelected: string = null;
   private _reportTypeDescripton: string = null;
@@ -166,7 +166,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       reportTypeRadio: ['', Validators.required]
     });
 
-    this._form3xReportTypeDetails = {
+    this._formReportTypeDetails = {
       cmteId: '',
       reportId: '',
       formType: '3X',
@@ -425,7 +425,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       this.toDateSelected = null;
     }
     if (Array.isArray(currentReport)) {
-      this._form3xReportTypeDetails = JSON.parse(JSON.stringify(currentReport[0]))
+      this._formReportTypeDetails = JSON.parse(JSON.stringify(currentReport[0]))
       if (window.localStorage.getItem(`form_${this._formType}_report_type`)) {
         window.localStorage.removeItem(`form_${this._formType}_report_type`);
       }
@@ -500,7 +500,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   }
 
 
-  handleForm24() {
+/*   handleForm24() {
     this.optionFailed = false;
     this.isValidType = true;
     // this._reportTypeService.saveReport(this._formType, 'Saved').subscribe(res => { //uncomment this
@@ -529,8 +529,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
         let reportId = 0;
         if (Array.isArray(res) && !res[0].hasOwnProperty('create_date')) {
           reportId = res[0].report_id;
-          this._form3xReportTypeDetails.reportId = reportId;
-          window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
+          this._formReportTypeDetails.reportId = reportId;
+          window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._formReportTypeDetails));
           const cvgStartDate: any = res[0].cvg_start_date;
           let datearray: any = cvgStartDate.split('-');
           const newcvgStartDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
@@ -602,41 +602,86 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       }
     });
     return 0;
+  } */
+  
+  private handleForm24(editMode: boolean = false) {
+    this.optionFailed = false;
+    this.isValidType = true;
+    const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
+    if(!this._formReportTypeDetails){
+      this._formReportTypeDetails = {};
+    }
+    this._formReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
+    this._formReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
+    this._formReportTypeDetails.email1 = committeeDetails.email_on_file;
+    this._formReportTypeDetails.email2 = committeeDetails.email_on_file_1;
+    this._formReportTypeDetails.additionalEmail1 = '';
+    this._formReportTypeDetails.additionalEmail2 = '';
+    this._formReportTypeDetails.formType = '24';
+    this._formReportTypeDetails.reportId = '';
+    const today: any = new Date();
+
+    if(editMode){
+      this._formReportTypeDetails.report_id = this._activatedRoute.snapshot.queryParams.reportId;
+    }
+    
+    window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._formReportTypeDetails));
+    this._reportTypeService.saveReport(this._formType, 'Saved',editMode).subscribe(res => {
+      if (res) {
+        let reportId = 0;
+        if (Array.isArray(res) && !res[0].hasOwnProperty('create_date')) {
+          reportId = res[0].report_id;
+          this._formReportTypeDetails.reportId = reportId;
+          window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._formReportTypeDetails));
+          return 0;
+        }
+        this.status.emit({
+          form: this.frmReportType,
+          direction: 'next',
+          step: 'step_2',
+          previousStep: 'step_1',
+          transactionDetail: {
+            transactionModel: {reportId: res.reportid}
+          }
+        });
+      }
+    });
+    return 0;
   }
 
   private handleForm3X(editMode: boolean = false) {
     this.optionFailed = false;
     this.isValidType = true;
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
-    this._form3xReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
-    this._form3xReportTypeDetails.cvgStartDate = this._datePipe.transform(this.fromDateSelected, 'MM/dd/yyyy');
-    this._form3xReportTypeDetails.cvgEndDate = this._datePipe.transform(this.toDateSelected, 'MM/dd/yyyy');
-    this._form3xReportTypeDetails.dueDate = this._datePipe.transform(this._dueDate, 'MM/dd/yyyy');
-    this._form3xReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
-    this._form3xReportTypeDetails.election_state = this._selectedElectionState;
-    this._form3xReportTypeDetails.election_date = this._datePipe.transform(this._selectedElectionDate, 'MM/dd/yyyy');
-    this._form3xReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
-    this._form3xReportTypeDetails.daysUntilDue = this._calcDaysUntilReportDue(this._dueDate);
-    this._form3xReportTypeDetails.email1 = committeeDetails.email_on_file;
-    this._form3xReportTypeDetails.email2 = committeeDetails.email_on_file_1;
-    this._form3xReportTypeDetails.additionalEmail1 = '';
-    this._form3xReportTypeDetails.additionalEmail2 = '';
-    this._form3xReportTypeDetails.formType = '3X';
-    this._form3xReportTypeDetails.reportId = '';
+    this._formReportTypeDetails.reportType = this.frmReportType.get('reportTypeRadio').value;
+    this._formReportTypeDetails.cvgStartDate = this._datePipe.transform(this.fromDateSelected, 'MM/dd/yyyy');
+    this._formReportTypeDetails.cvgEndDate = this._datePipe.transform(this.toDateSelected, 'MM/dd/yyyy');
+    this._formReportTypeDetails.dueDate = this._datePipe.transform(this._dueDate, 'MM/dd/yyyy');
+    this._formReportTypeDetails.reportTypeDescription = this._reportTypeDescripton;
+    this._formReportTypeDetails.election_state = this._selectedElectionState;
+    this._formReportTypeDetails.election_date = this._datePipe.transform(this._selectedElectionDate, 'MM/dd/yyyy');
+    this._formReportTypeDetails.regular_special_report_ind = this.selectedReportInfo.regular_special_report_ind;
+    this._formReportTypeDetails.daysUntilDue = this._calcDaysUntilReportDue(this._dueDate);
+    this._formReportTypeDetails.email1 = committeeDetails.email_on_file;
+    this._formReportTypeDetails.email2 = committeeDetails.email_on_file_1;
+    this._formReportTypeDetails.additionalEmail1 = '';
+    this._formReportTypeDetails.additionalEmail2 = '';
+    this._formReportTypeDetails.formType = '3X';
+    this._formReportTypeDetails.reportId = '';
     const today: any = new Date();
     const formattedToday: any = this._datePipe.transform(today, 'MM/dd/yyyy');
     const reportDueDate: any = this._datePipe.transform(this._dueDate, 'MM/dd/yyyy');
 
     if(editMode){
-      this._form3xReportTypeDetails.report_id = this._activatedRoute.snapshot.queryParams.reportId;
+      this._formReportTypeDetails.report_id = this._activatedRoute.snapshot.queryParams.reportId;
     }
     if (reportDueDate < formattedToday) {
-      this._form3xReportTypeDetails.overDue = true;
+      this._formReportTypeDetails.overDue = true;
     }
     else {
-      this._form3xReportTypeDetails.overDue = false;
+      this._formReportTypeDetails.overDue = false;
     }
-    window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
+    window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._formReportTypeDetails));
     this._reportTypeService.saveReport(this._formType, 'Saved',editMode).subscribe(res => {
       if (res) {
         let reportId = 0;
@@ -703,8 +748,8 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   private showReportExistsWarningMessage(res: any, reportId: number) {
     res = res[0];
     reportId = res.report_id;
-    this._form3xReportTypeDetails.reportId = reportId;
-    window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
+    this._formReportTypeDetails.reportId = reportId;
+    window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._formReportTypeDetails));
     const cvgStartDate: any = res.cvg_start_date;
     let datearray: any = cvgStartDate.split('-');
     const newcvgStartDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
@@ -978,7 +1023,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   }
 
   public cancelAndReturnToReport(){
-    window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._form3xReportTypeDetails));
+    window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._formReportTypeDetails));
     this._router.navigate([`/forms/form/${this.formType}`], {
       queryParams: { step: 'transactions', reportId: this._activatedRoute.snapshot.queryParams.reportId, edit: true, transactionCategory: 'receipts', isFiled: false}
     });
