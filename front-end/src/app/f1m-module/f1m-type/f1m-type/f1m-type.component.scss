@@ -8,6 +8,47 @@
     margin: 0 auto 5px auto;
     width: 99%;
   }
+  header {    
+    .header-container {
+      display: block;
+      width: 100%;
+      border-bottom: 1px solid $bombay;
+      padding-bottom: .75em;
+      margin-bottom: 1em;
+      .header__text {
+        display: block;
+        float: none;
+        width: 100%;
+        @include media(tablet) {
+          display: block;
+          float: none;
+          width: 100%;
+        }
+        @include media(mediumDesktop) {
+          float: left;
+          width: 40%;
+        }         
+        @include media(largeDesktop) {
+          float: left;
+          width: 40%;
+        }         
+      }
+      .header__btns {
+        float: right;    
+        .btn-print-preview {
+          @extend .btn-secondary-gray;
+          margin-right: 5px;
+        }
+        .btn-validate {
+          @extend .btn-primary;
+        }
+        .btn {
+          padding-top: 10px;
+        }
+      }
+      @include clearfix();	
+  }
+}
 
   .form__type {
     float: left;
