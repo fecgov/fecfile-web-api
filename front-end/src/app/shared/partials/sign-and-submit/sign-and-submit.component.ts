@@ -1,3 +1,5 @@
+import { AuthService } from './../../services/AuthService/auth.service';
+import { ManageUserService } from './../../../admin/manage-user/service/manage-user-service/manage-user.service';
 import { ReportTypeService } from './../../../forms/form-3x/report-type/report-type.service';
 import { ActivatedRoute } from '@angular/router';
 import { TypeaheadService } from './../typeahead/typeahead.service';
@@ -11,6 +13,8 @@ import { F1mService } from './../../../f1m-module/f1m/f1m-services/f1m.service';
 import { mustMatch } from './../../utils/forms/validation/must-match.validator';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DatePipe } from '@angular/common';
+import { PhonePipe } from '../../pipes/phone-number/phone-number.pipe';
+import { Roles } from '../../enums/Roles';
 
 @Component({
   selector: 'app-sign-and-submit',
@@ -31,6 +35,8 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   @Input() treasurerData:any;
   @Input() formType:any;
 
+  public loggedInUserRole: Roles;
+
   public formMetaData:any = {};
   public treasurerToolTipText:string = '';
 
@@ -48,6 +54,9 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   public username: string = '';
   accordionExpanded: boolean = false;
   modalRef: any;
+  public submitterInfo: any = {};
+
+  private phonePipe:PhonePipe = new PhonePipe();
 
   constructor(
     public _config: NgbTooltipConfig,
@@ -59,7 +68,10 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
     config: NgbModalConfig, 
     private modalService: NgbModal,
     private datePipe: DatePipe,
-    private _reportTypeService: ReportTypeService
+    private _reportTypeService: ReportTypeService, 
+    private _userService: ManageUserService,
+    private _authService: AuthService
+
     ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -116,6 +128,20 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
     }
     this.populateFormMetadata();
     this.populateTreasurerToolTipText();
+    this.populateSubmitterInfo();
+    this.loggedInUserRole = this._authService.getUserRole();
+  }
+  
+  
+  populateSubmitterInfo() {
+    this._userService.getSignedInUserInfo().subscribe(res=>{
+      if(res){
+        this.submitterInfo = res;
+        if(this.submitterInfo && this.submitterInfo.phone){
+          this.submitterInfo.phone = this.phonePipe.transform(this.submitterInfo.phone, 'US');
+        }
+      }
+    })
   }
   
   populateTreasurerToolTipText() {
@@ -333,7 +359,13 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   }
 
   public openModal(){
-    this.open(this.content);
+    //first check permissions
+    if(this.loggedInUserRole === Roles.Editor || this.loggedInUserRole === Roles.Reviewer){
+      this._authService.showPermissionDeniedMessage();
+    }
+    else{
+      this.open(this.content);
+    }
   }
 
   public toggleAccordion($event:NgbPanelChangeEvent,acc){

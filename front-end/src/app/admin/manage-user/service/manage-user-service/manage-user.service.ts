@@ -120,4 +120,16 @@ export class ManageUserService {
             headers: httpOptions,
         });
     }
+
+    getSignedInUserInfo(): Observable<any> {
+      const token: string = JSON.parse(this._cookieService.get('user'));
+      const url = `${environment.apiUrl}/user/info`;
+      let httpOptions = new HttpHeaders();
+
+      httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+      httpOptions = httpOptions.append('Content-Type', 'application/json');
+      return this._http.get(url, {
+          headers: httpOptions,
+      });
+  }
 }

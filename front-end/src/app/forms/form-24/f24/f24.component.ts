@@ -66,7 +66,7 @@ export class F24Component implements OnInit {
   private forceChangeDetectionFDebtPayment: Date;
   private forceChangeDetectionDebtSummary: Date;
   private forceChangeDetectionH1: Date;
-  @Input() scheduleType = 'sched_e';
+  public scheduleType: string = '';
 
   public allTransactions: boolean = false;
 
@@ -338,6 +338,7 @@ export class F24Component implements OnInit {
 
       this.setCloneFlag(e);
       this.setScheduleAction(e);
+      this.scheduleType = 'sched_e';
       
       if (this.scheduleAction === ScheduleActions.edit || this.scheduleAction === ScheduleActions.view) {
         this._populateFormForEditOrView(e, AbstractScheduleParentEnum.schedEComponent);

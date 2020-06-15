@@ -246,7 +246,7 @@
     width: 550px;
     margin-bottom: 1rem;
     color: #212529;
-    border: 1px solid black;
+    border: 1px solid $bombay;
     height:30px;
   }
   .alert {
@@ -265,4 +265,7 @@
 .custom-class .modal-content .modal-header {
   // color: black;
   background-color:$blueZodiac;
+}
+.bottom-separator{
+  border-bottom:1px solid $bombay;
 }

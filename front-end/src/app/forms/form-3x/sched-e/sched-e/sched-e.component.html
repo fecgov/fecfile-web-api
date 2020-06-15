@@ -25,7 +25,7 @@
       <div class="header-content">
         <div class="float-left">
           <h2>
-            Form 3X
+            Form {{formType}}
             <ng-container *ngIf="transactionTypeText && !mainTransactionTypeText"> / {{ transactionTypeText }} </ng-container>
             <ng-container *ngIf="transactionTypeText && mainTransactionTypeText"> / 
               {{ mainTransactionTypeText }} / {{ transactionTypeText }}

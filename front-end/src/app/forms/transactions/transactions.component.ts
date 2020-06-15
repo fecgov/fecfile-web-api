@@ -1,3 +1,7 @@
+import { ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { ReportsService } from 'src/app/reports/service/report.service';
+import { ReportService } from './../../reports/reports.service';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, OnInit, ViewEncapsulation, OnDestroy, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,6 +17,7 @@ import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.
 import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { FilterTypes } from './enums/filterTypes.enum';
+import { ConfirmModalComponent } from '../../shared/partials/confirm-modal/confirm-modal.component';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -121,7 +126,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private _fb: FormBuilder,
     private _f3xMessageService: F3xMessageService,
     private _receiptService: IndividualReceiptService,
-    private _messageService: MessageService
+    private _messageService: MessageService,
+    private _dialogService: DialogService,
+    private _reportsService: ReportsService
   ) {
     this.applyFiltersSubscription = this._transactionsMessageService
       .getApplyFiltersMessage()
@@ -996,37 +1003,49 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         emitObj.mainTransactionTypeText = 'Loans and Debts';
       }
     }
-    this.showTransaction.emit(emitObj);
+    if(this.transactionToEdit.mirrorReportId && !this.transactionToEdit.cloned){ //cloned check is done because the modal is already shown for clone before this point.
+      this.handleMirrorTransactionIfApplicable(this.transactionToEdit,emitObj);
+    }
+    else{
 
-    this.showCategories();
+      this.showTransaction.emit(emitObj);
 
-    // let accessedByRoute = false;
-    // if (this.routeData) {
-    //   if (this.routeData.accessedByRoute && this.routeData.reportId) {
-    //     accessedByRoute = true;
-    //   }
-    // }
+      this.showCategories();
+    }
+  }
 
-    // // TODO remove for edit route and accessedByRoute if not used.  Does not appear to be.
-    // if (accessedByRoute) {
-    //   // this._router.navigate([`/forms/form/${this.formType}`], {
-    //   //   queryParams: { step: 'step_3' }
-    //   // });
-
-    //   this._router.navigate([`/forms/form/edit/${this.formType}/${this.routeData.reportId}`]);
-    //   const editOrView = { action: ScheduleActions.edit, transactionModel: this.transactionToEdit };
-    //   this._f3xMessageService.sendPopulateFormMessage(editOrView);
-    //   // this.showEditTransaction = true;
-    // } else {
-    //   const emptyValidForm = this._fb.group({});
-    //   this.showTransaction.emit({
-    //     form: emptyValidForm,
-    //     direction: 'next',
-    //     step: 'step_3',
-    //     previousStep: 'transactions',
-    //     editOrView: { action: ScheduleActions.edit, transactionModel: this.transactionToEdit }
-    //   });
-    // }
+  handleMirrorTransactionIfApplicable(transactionToEdit: TransactionModel, emitObj: any) {
+    let mirrorForm = '';
+    if(transactionToEdit.formType === 'F3X'){
+      mirrorForm = '24';
+    }
+    else if(transactionToEdit.formType === 'F24'){
+      mirrorForm = '3X';
+    }
+    this._dialogService
+        .confirm('Please note that if you modify this transaction it will be updated in Form ' + mirrorForm,ConfirmModalComponent, 'Warning!', true,ModalHeaderClassEnum.warningHeader,null,'Cancel')
+        .then(res => {
+          if (res === 'okay') {
+            //make sure modifying is permitted based on mirrorReportId !== Filed/Submitted
+            this._reportsService
+              .getReportInfo(transactionToEdit.formType, transactionToEdit.reportId)
+              .subscribe((res: any) => {
+                if(res && res.reportstatus === 'Submitted'){
+                  this._dialogService
+                  .confirm('This transaction cannot be modified since the mirrored transaction in Form ' + mirrorForm + 'is already filed. You will have to amend that report', ConfirmModalComponent, 'Error!', false)
+                  .then(res => {
+                    if (res === 'okay') {
+                    }
+                  });
+                }
+                else{
+                  this.showTransaction.emit(emitObj);
+                  this.showCategories();
+                }
+              });
+          } else if (res === 'cancel') {
+          }
+        });
   }
 
   /**
