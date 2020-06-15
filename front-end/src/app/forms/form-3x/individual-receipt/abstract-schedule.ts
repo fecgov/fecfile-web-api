@@ -2621,7 +2621,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
    */
   public saveAndReturnToParent(): void {
     if(this.frmIndividualReceipt.status === 'INVALID') {
-      this.viewTransactions();
+      // this.viewTransactions();
     }else {
       if(this._cloned) {
         this._cloned = false;
