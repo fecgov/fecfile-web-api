@@ -352,7 +352,7 @@ def schedD(request):
     if request.method == "POST":
         logger.debug("POST request received:{}".format(request.data))
         try:
-            cmte_id = request.user.username
+            cmte_id = get_comittee_id(request.user.username)
             if not ("report_id" in request.data):
                 raise Exception("Missing Input: report_id is mandatory")
             # handling null,none value of report_id
@@ -430,8 +430,13 @@ def schedD(request):
             #     )
             datum = get_schedD(data)
 
-            # : insert pagination functionality
-            json_result = get_pagination_dataset(datum, itemsperpage, page_num)
+            if "transaction_id" in request.query_params and check_null_value(
+                request.query_params.get("transaction_id")
+            ):
+                json_result = datum
+            else:
+                # : insert pagination functionality
+                json_result = get_pagination_dataset(datum, itemsperpage, page_num)
             return Response(json_result, status=status.HTTP_200_OK)
 
         except NoOPError as e:
@@ -449,7 +454,7 @@ def schedD(request):
 
     elif request.method == "DELETE":
         try:
-            data = {"cmte_id": request.user.username}
+            data = {"cmte_id": get_comittee_id(request.user.username)}
             if "report_id" in request.query_params:
                 data["report_id"] = check_report_id(
                     request.query_params.get("report_id")
@@ -496,7 +501,7 @@ def schedD(request):
                 report_id = check_report_id(request.data.get("report_id"))
             # end of handling
             datum["report_id"] = report_id
-            datum["cmte_id"] = request.user.username
+            datum["cmte_id"] = get_comittee_id(request.user.username)
 
             # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
             #     datum['entity_id'] = request.data.get('entity_id')
@@ -579,6 +584,8 @@ def schedD_sql_dict(data):
         "cand_office_district",
         "cand_election_year",
         "phone_number",
+        "memo_code",
+        "memo_text"
     ]
     try:
         valid_data = {k: v for k, v in data.items() if k in valid_fields}
@@ -902,8 +909,10 @@ def post_sql_schedD(data):
                                     balance_at_close,
                                     back_ref_transaction_id,
                                     back_ref_sched_name,
+                                    memo_code,
+                                    memo_text,
                                     create_date)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         _v = (
             data.get("cmte_id"),
@@ -919,6 +928,8 @@ def post_sql_schedD(data):
             data.get("balance_at_close"),
             data.get("back_ref_transaction_id"),
             data.get("back_ref_sched_name"),
+            data.get("memo_code"),
+            data.get("memo_text"),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -943,6 +954,8 @@ def put_sql_schedD(data):
                 payment_amount = %s,
                 back_ref_transaction_id = %s,
                 back_ref_sched_name = %s,
+                memo_code = %s,
+                memo_text = %s,
                 last_update_date = %s
             WHERE transaction_id = %s 
             AND report_id = %s 
@@ -960,6 +973,8 @@ def put_sql_schedD(data):
         data.get("payment_amount"),
         data.get("back_ref_transaction_id"),
         data.get("back_ref_sched_name"),
+        data.get("memo_code"),
+        data.get("memo_text"),
         datetime.datetime.now(),
         data.get("transaction_id"),
         data.get("report_id"),
@@ -1315,6 +1330,8 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
                     back_ref_transaction_id,
                     back_ref_sched_name,
                     balance_at_close,
+                    memo_code,
+                    memo_text,
                     last_update_date
             FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
             AND transaction_id = %s AND delete_ind is distinct from 'Y'

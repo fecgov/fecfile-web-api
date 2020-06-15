@@ -650,7 +650,7 @@ def get_committee_details(request):
                 cm.cmte_filing_freq, cm.cmte_filed_type, 
                 cm.treasurer_last_name AS "treasurerlastname", cm.treasurer_first_name AS "treasurerfirstname", cm.treasurer_middle_name AS "treasurermiddlename", 
                 cm.treasurer_prefix AS "treasurerprefix", cm.treasurer_suffix AS "treasurersuffix", cm.create_date AS "created_at", cm.cmte_type_category, f1.fax, 
-                f1.tphone as "treasurerphone", f1.url as "website"
+                f1.tphone as "treasurerphone", f1.url as "website", f1.email as "treasureremail"
                 FROM public.committee_master cm
                 LEFT JOIN public.form_1 f1 ON f1.comid=cmte_id
                 WHERE cm.cmte_id = %s ORDER BY cm.create_date, f1.sub_date DESC, f1.create_date DESC LIMIT 1"""

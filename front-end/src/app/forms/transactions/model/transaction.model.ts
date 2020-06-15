@@ -89,6 +89,8 @@ export class TransactionModel {
 
   aggregation_ind: string;
   forceitemizable: boolean;
+  mirrorReportId:string;
+  mirrorTransactionId:string;
 
 
   constructor(transaction: any) {
@@ -99,6 +101,8 @@ export class TransactionModel {
     this.scheduleType = transaction.scheduleType ? transaction.scheduleType : '';
     this.transactionId = transaction.transactionId ? transaction.transactionId : '';
     this.backRefTransactionId = transaction.backRefTransactionId ? transaction.backRefTransactionId : '';
+    this.mirrorReportId = transaction.mirrorReportId ? transaction.mirrorReportId : '';
+    this.mirrorTransactionId = transaction.mirrorTransactionId ? transaction.mirrorTransactionId : '';
     this.transactionTypeIdentifier = transaction.transactionTypeIdentifier ? transaction.transactionTypeIdentifier : '';
     this.name = transaction.name ? transaction.name : '';
     this.street = transaction.street ? transaction.street : '';
