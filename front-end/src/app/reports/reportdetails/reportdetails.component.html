@@ -249,7 +249,7 @@
                             <button *ngIf="report.amend_ind === 'N' || report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item"  (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
-                            <button  *ngIf="report.amend_ind === 'N' ||report.amend_max === 'up' || report.amend_max === 'down' && !authService.isReadOnly()" class="dropdown-item" (click)="amendReport(report)">
+                            <button  *ngIf="(report.amend_ind === 'N' ||report.amend_max === 'up' || report.amend_max === 'down') && !authService.isReadOnly()" class="dropdown-item" (click)="amendReport(report)">
                                 <i class="fas fa-edit"></i> Amend
                             </button>
                             <button class="dropdown-item" (click)="downloadReport(report)">
