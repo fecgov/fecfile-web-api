@@ -150,8 +150,16 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
 
   private resetFormAndIncrementCandidate() {
     this.form.reset();
-    this.candidateNumber++;
-    this.form.patchValue({candidate_number:this.candidateNumber.toString()},{onlySelf:true});
+    if(this.qualificationData.candidates && this.qualificationData.candidates.length < 5){
+      if(this.candidateNumber < 5){
+        this.candidateNumber++;
+      }
+      this.form.patchValue({candidate_number:this.candidateNumber.toString()},{onlySelf:true});
+    }
+    else{
+      this.isEditCandidateMode = false;
+    }
+
   }
 
   public isShowChildTransactions(){

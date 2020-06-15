@@ -103,9 +103,10 @@ export class F1mComponent implements OnInit, OnDestroy {
         this.refreshScreen();
 
         this.validateForm();
+
       })
     }
-    
+    this._messageService.sendMessage({action:'updateHeaderInfo', data: {formType: 'F1M'}});
   }
   
 
@@ -146,6 +147,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this._messageService.clearMessage();
     this.onDestroy$.next(true);
+    this._messageService.sendMessage({action:'updateHeaderInfo', data:{formType:null}});
   }
 
   public getPartyType() {
@@ -233,6 +235,14 @@ export class F1mComponent implements OnInit, OnDestroy {
         }
         else if(this.qualificationComp  && !this.qualificationComp.showPart2){
           return !this.editMode;
+        }
+        return true;
+      }
+      else if(this.type === 'affiliation'){
+        //check query params to see if a form of this type has already been created and a report id generate
+        //if so, then return false
+        if(this._activatedRoute.snapshot.queryParams.reportId){
+          return false;
         }
         return true;
       }
