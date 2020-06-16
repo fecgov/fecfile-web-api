@@ -596,7 +596,7 @@ def validate_before_submit(request_dict):
             if cmte_type == "PAC":
                 noneCheckMissingParameters(['reportId', 'cmte_id',
                                             'fifty_first_contributor_date', 'registration_date',
-                                            'requirements_met_date', 'submission_date'
+                                            'requirements_met_date', 'submission_date',
                                                                      'can1_id', 'can1_con', 'can2_id', 'can2_con',
                                             'can3_id',
                                             'can3_con', 'can4_id', 'can4_con', 'can5_id'],
