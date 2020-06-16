@@ -1952,4 +1952,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       return true;
     }
   }
+
+  /**
+   * Checks a transaction in the transactionModel array and returns true if report is filed
+   * based on the first transaction
+   *  @Return boolean
+   */
+  isReportFiled() {
+    if (this.transactionsModel) {
+      if (!this.transactionsModel[0].iseditable && this.transactionsModel[0].reportstatus.toUpperCase() === 'FILED') {
+        return true;
+      }
+    }
+    return false;
+  }
 }
