@@ -53,44 +53,44 @@ export class ReportTypeService {
 
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+    let formReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
 
-    if (form3xReportType === null) {
+    if (formReportType === null) {
       let form3xReportType: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
     }
 
     formData.append('form_type', `F${formType}`);
 
-    if(form3xReportType){
+    if(formReportType){
 
-      if (form3xReportType.hasOwnProperty('reportType')) {
-        formData.append('report_type', form3xReportType.reportType);
-      } else if (form3xReportType.hasOwnProperty('reporttype')) {
-        formData.append('report_type', form3xReportType.reporttype);
+      if (formReportType.hasOwnProperty('reportType')) {
+        formData.append('report_type', formReportType.reportType);
+      } else if (formReportType.hasOwnProperty('reporttype')) {
+        formData.append('report_type', formReportType.reporttype);
       }
   
-      if (form3xReportType.hasOwnProperty('cvgStartDate')) {
-        formData.append('cvg_start_dt', form3xReportType.cvgStartDate);
-      } else if (form3xReportType.hasOwnProperty('cvgstartdate')) {
-        formData.append('cvg_start_dt', form3xReportType.cvgstartdate);
+      if (formReportType.hasOwnProperty('cvgStartDate')) {
+        formData.append('cvg_start_dt', formReportType.cvgStartDate);
+      } else if (formReportType.hasOwnProperty('cvgstartdate')) {
+        formData.append('cvg_start_dt', formReportType.cvgstartdate);
       }
   
-      if (form3xReportType.hasOwnProperty('cvgEndDate')) {
-        formData.append('cvg_end_dt', form3xReportType.cvgEndDate);
-      } else if (form3xReportType.hasOwnProperty('cvgenddate')) {
-        formData.append('cvg_end_dt', form3xReportType.cvgenddate);
+      if (formReportType.hasOwnProperty('cvgEndDate')) {
+        formData.append('cvg_end_dt', formReportType.cvgEndDate);
+      } else if (formReportType.hasOwnProperty('cvgenddate')) {
+        formData.append('cvg_end_dt', formReportType.cvgenddate);
       }
   
-      if (form3xReportType.hasOwnProperty('dueDate')) {
-        formData.append('due_dt', form3xReportType.dueDate);
-      } else if (form3xReportType.hasOwnProperty('duedate')) {
-        formData.append('due_dt', form3xReportType.duedate);
+      if (formReportType.hasOwnProperty('dueDate')) {
+        formData.append('due_dt', formReportType.dueDate);
+      } else if (formReportType.hasOwnProperty('duedate')) {
+        formData.append('due_dt', formReportType.duedate);
       }
   
-      if (form3xReportType.hasOwnProperty('amend_Indicator')) {
-        if (typeof form3xReportType.amend_Indicator === 'string') {
-          if (form3xReportType.amend_Indicator.length >= 1) {
-            formData.append('amend_ind', form3xReportType.amend_Indicator);
+      if (formReportType.hasOwnProperty('amend_Indicator')) {
+        if (typeof formReportType.amend_Indicator === 'string') {
+          if (formReportType.amend_Indicator.length >= 1) {
+            formData.append('amend_ind', formReportType.amend_Indicator);
           } else {
             formData.append('amend_ind', 'N');
           }
@@ -99,10 +99,10 @@ export class ReportTypeService {
         formData.append('amend_ind', 'N');
       }
   
-      if (form3xReportType.hasOwnProperty('coh_bop')) {
-        if (typeof form3xReportType.coh_bop === 'string') {
-          if (form3xReportType.coh_bop.length >= 1) {
-            formData.append('coh_bop', form3xReportType.coh_bop);
+      if (formReportType.hasOwnProperty('coh_bop')) {
+        if (typeof formReportType.coh_bop === 'string') {
+          if (formReportType.coh_bop.length >= 1) {
+            formData.append('coh_bop', formReportType.coh_bop);
           }
         } else {
           formData.append('coh_bop', '0');
@@ -111,56 +111,56 @@ export class ReportTypeService {
         formData.append('coh_bop', '0');
       }
   
-      if (typeof form3xReportType.electionCode === 'string') {
-        if (form3xReportType.electionCode.length >= 1) {
-          formData.append('election_code', form3xReportType.electionCode);
+      if (typeof formReportType.electionCode === 'string') {
+        if (formReportType.electionCode.length >= 1) {
+          formData.append('election_code', formReportType.electionCode);
         }
       }
   
-      if (form3xReportType.election_date !== null) {
-        if (typeof form3xReportType.election_date === 'string') {
-          if (form3xReportType.election_date.length >= 1) {
-            formData.append('date_of_election', this._datePipe.transform(form3xReportType.election_date, 'MM/dd/yyyy'));
+      if (formReportType.election_date !== null) {
+        if (typeof formReportType.election_date === 'string') {
+          if (formReportType.election_date.length >= 1) {
+            formData.append('date_of_election', this._datePipe.transform(formReportType.election_date, 'MM/dd/yyyy'));
           }
         }
       }
   
-      if (form3xReportType.election_state !== null) {
-        if (typeof form3xReportType.election_state === 'string') {
-          if (form3xReportType.election_state.length >= 1) {
-            formData.append('state_of_election', form3xReportType.election_state);
+      if (formReportType.election_state !== null) {
+        if (typeof formReportType.election_state === 'string') {
+          if (formReportType.election_state.length >= 1) {
+            formData.append('state_of_election', formReportType.election_state);
           }
         }
       }
   
-      if (form3xReportType.email1 !== null) {
-        if (typeof form3xReportType.email1 === 'string') {
-          if (form3xReportType.email1.length >= 1) {
-            formData.append('email_1', form3xReportType.email1);
+      if (formReportType.email1 !== null) {
+        if (typeof formReportType.email1 === 'string') {
+          if (formReportType.email1.length >= 1) {
+            formData.append('email_1', formReportType.email1);
           }
         }
       }
   
-      if (form3xReportType.email2 !== null) {
-        if (typeof form3xReportType.email2 === 'string') {
-          if (form3xReportType.email2.length >= 1) {
-            formData.append('email_2', form3xReportType.email2);
+      if (formReportType.email2 !== null) {
+        if (typeof formReportType.email2 === 'string') {
+          if (formReportType.email2.length >= 1) {
+            formData.append('email_2', formReportType.email2);
           }
         }
       }
   
-      if (form3xReportType.additionalEmail1 !== null) {
-        if (typeof form3xReportType.additionalEmail1 === 'string') {
-          if (form3xReportType.additionalEmail1.length >= 1) {
-            formData.append('additional_email_1', form3xReportType.additionalEmail1);
+      if (formReportType.additionalEmail1 !== null) {
+        if (typeof formReportType.additionalEmail1 === 'string') {
+          if (formReportType.additionalEmail1.length >= 1) {
+            formData.append('additional_email_1', formReportType.additionalEmail1);
           }
         }
       }
   
-      if (form3xReportType.additionalEmail2 !== null) {
-        if (typeof form3xReportType.additionalEmail2 === 'string') {
-          if (form3xReportType.additionalEmail2.length >= 1) {
-            formData.append('additional_email_2', form3xReportType.additionalEmail2);
+      if (formReportType.additionalEmail2 !== null) {
+        if (typeof formReportType.additionalEmail2 === 'string') {
+          if (formReportType.additionalEmail2.length >= 1) {
+            formData.append('additional_email_2', formReportType.additionalEmail2);
           }
         }
       }
@@ -197,7 +197,7 @@ export class ReportTypeService {
         );
     }
     else {
-      formData.append('report_id',form3xReportType.report_id);
+      formData.append('report_id',formReportType.report_id);
       return this._http
         .put(`${environment.apiUrl}${url}`, formData, {
           headers: httpOptions

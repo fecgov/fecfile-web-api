@@ -56,8 +56,8 @@
     </section>
   </div> <!-- ./form__container -->
 </div> <!-- ./forms__wizard -->
-<footer>
-  <div class="row pl-2 py-2">
+<footer >
+  <div class="row f1mFooter">
     <div class="forms__btn-container">
       <button id="previous" class="btn btn-previous btn-left" *ngIf="showPreviousButton()"
         (click)="previous()">Previous</button>
@@ -65,7 +65,7 @@
         *ngIf="showSaveAndContinueButton()"
         class="btn btn-primary btn-right"
         (click)="saveAndContinue()">Save &amp; Continue </button>
-      <button id="skip" *ngIf="(step === 'step_2' && type === 'qualification' && qualificationComp && !qualificationComp.showPart2 && partyType === 'PTY') && scheduleAction !== 'view'"  class="btn btn-previous btn-right mr-3"
+      <button id="skip" *ngIf="showSkipButton()"  class="btn btn-previous btn-right mr-3"
         (click)="skip()">Skip</button>
       <button id="signAndsubmit" *ngIf="step === 'step_3' && scheduleAction !== 'view'" class="btn btn-primary btn-right"
         (click)="signAndSubmit()">Sign &amp; Submit </button>

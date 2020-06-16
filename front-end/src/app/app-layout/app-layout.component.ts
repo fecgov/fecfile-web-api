@@ -124,6 +124,9 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
         this.currentReportData = message.data;
         this.populateHeaderData(this.currentReportData);
       }
+      else if(message && message.action === 'updateHeaderInfo' && message.data){
+        this.formType = message.data.formType;
+      }
     });
 
   }

@@ -1086,6 +1086,21 @@ public printReport(report: reportModel): void{
           queryParams: { step: 'step_2', edit: true, reportId: report.report_id}
         });
     }
+    else if (report.form_type === 'F24') {
+      this._reportsService
+        .getReportInfo(report.form_type, report.report_id)
+        .subscribe((res: form3xReportTypeDetails) => {
+          localStorage.setItem('form_24_details', JSON.stringify(res[0]));
+          localStorage.setItem(`form_24_report_type`, JSON.stringify(res[0]));
+        });
+      setTimeout(() => {
+        const formType =
+          report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
+        this._router.navigate([`/forms/form/${formType}`], {
+          queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'disbursements', isFiled: false  }
+        });
+      }, 1500);
+    }
   }
 
   /**

@@ -103,6 +103,7 @@ import * as AWS from 'aws-sdk/global';
 import * as S3 from 'aws-sdk/clients/s3';
 import {AppMainLoginModule} from './app-main-login/app-main-login.module';
 import {AdminModule} from './admin/admin.module';
+import { PhonePipe } from './shared/pipes/phone-number/phone-number.pipe';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -160,6 +161,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     ReportdetailsComponent,
     SafeHTMLPipe,
     OrderByPipe,
+    // PhonePipe,
     ReportsFilterTypeComponent,
     ContactsComponent,
     ContactsTableComponent,
@@ -231,6 +233,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     DatePipe,
     UtilService,
     OrderByPipe,
+    PhonePipe,
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptorService, multi: true }
   ],
   exports:[

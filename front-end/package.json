@@ -43,6 +43,7 @@
     "hammerjs": "^2.0.8",
     "json-server": "^0.14.0",
     "jsonwebtoken": "^8.3.0",
+    "libphonenumber-js": "^1.7.52",
     "ngx-bootstrap": "^3.0.1",
     "ngx-cookie-service": "^1.0.10",
     "ngx-editor": "^3.3.0",

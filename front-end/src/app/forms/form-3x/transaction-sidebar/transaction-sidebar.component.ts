@@ -1,6 +1,6 @@
 import { Subscription } from 'rxjs/Subscription';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation , ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeahead } from '@ng-bootstrap/ng-bootstrap';
@@ -109,38 +109,41 @@ export class TransactionSidebarComponent implements OnInit {
       this.isFiled = this.editMode;
     }
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
-    this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
-    if (res) {
-        this.transactionCategories = res.data.transactionCategories;
-        this.cashOnHand = res.data.cashOnHand;
-        // this.reportId = res.data.id ? res.data.id : 0;
-      }
-      for (
-        let transactionCategorieIndex = 0;
-        transactionCategorieIndex < this.transactionCategories.length;
-        transactionCategorieIndex++
-      ) {
-        for (
-          let transactionCategoryOptionIndex = 0;
-          transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
-          transactionCategoryOptionIndex++
-        ) {
-          for (
-            let transactionCategoryOptionOptionsIndex = 0;
-            transactionCategoryOptionOptionsIndex <
-            this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
-              .length;
-            transactionCategoryOptionOptionsIndex++
-          ) {
-            transactionCategoryOptions.push(
-              this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options[
-                transactionCategoryOptionOptionsIndex
-              ]
-            );
+    if(this._formType !== '24'){
+      this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
+        if (res) {
+            this.transactionCategories = res.data.transactionCategories;
+            this.cashOnHand = res.data.cashOnHand;
+            // this.reportId = res.data.id ? res.data.id : 0;
           }
-        }
-      }
-    })
+          for (
+            let transactionCategorieIndex = 0;
+            transactionCategorieIndex < this.transactionCategories.length;
+            transactionCategorieIndex++
+          ) {
+            for (
+              let transactionCategoryOptionIndex = 0;
+              transactionCategoryOptionIndex < this.transactionCategories[transactionCategorieIndex].options.length;
+              transactionCategoryOptionIndex++
+            ) {
+              for (
+                let transactionCategoryOptionOptionsIndex = 0;
+                transactionCategoryOptionOptionsIndex <
+                this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options
+                  .length;
+                transactionCategoryOptionOptionsIndex++
+              ) {
+                transactionCategoryOptions.push(
+                  this.transactionCategories[transactionCategorieIndex].options[transactionCategoryOptionIndex].options[
+                    transactionCategoryOptionOptionsIndex
+                  ]
+                );
+              }
+            }
+          }
+        })
+    }
+ 
   }
 
   ngDoCheck(): void {

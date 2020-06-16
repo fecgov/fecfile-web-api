@@ -11,7 +11,7 @@ import { TypeaheadService } from './../../../shared/partials/typeahead/typeahead
   selector: 'app-f1m-affiliation',
   templateUrl: './f1m-affiliation.component.html',
   styleUrls: ['./f1m-affiliation.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class F1mAffiliationComponent implements OnInit, OnDestroy {
 
@@ -50,7 +50,7 @@ export class F1mAffiliationComponent implements OnInit, OnDestroy {
     this.form = this._fb.group({
       affiliation_date: new FormControl({value:null,disabled:this.disableEdit}, [Validators.required, Validators.maxLength(100)]),
       committee_id: new FormControl({value:null,disabled:this.disableEdit}, [Validators.required, Validators.maxLength(9)]),
-      committee_name: new FormControl({value:null,disabled:this.disableEdit}, [Validators.required, Validators.maxLength(100)])
+      committee_name: new FormControl({value:null,disabled:this.disableEdit}, [Validators.required, Validators.maxLength(200)])
     });
   }
 
@@ -112,7 +112,7 @@ export class F1mAffiliationComponent implements OnInit, OnDestroy {
       distinctUntilChanged(),
       switchMap(searchText => {
         if (searchText) {
-          return this._typeaheadService.getContacts(searchText, 'cmte_name');
+          return this._typeaheadService.getContacts(searchText, 'entity_name');
         } else {
           return Observable.of([]);
         }

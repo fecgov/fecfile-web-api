@@ -113,7 +113,8 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     # Removing 'EAR_MEMO' from below as it being populated from front-end
     'Total Earmarked through Conduit': ['EAR_REC_CONVEN_ACC_MEMO', 'EAR_REC_HQ_ACC_MEMO', 'EAR_REC_RECNT_ACC_MEMO',
                                         'PAC_EAR_MEMO'],
-    'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO']
+    'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO'],
+    'Bounced': ['PARTY_RET', 'PAC_RET', 'RET_REC'],
     }
 
 logger = logging.getLogger(__name__)
@@ -611,6 +612,9 @@ def create_json_builders(request):
                                                 transaction['child'] = child_transactions
                             # pre-appending the purpose description
                             transaction = preappending_purpose_description(transaction)
+                            # Handling electionOtherDescription value for 'primary' and 'general'
+                            if 'electionOtherDescription' in transaction and transaction['electionOtherDescription'] in ['Primary', 'General']:
+                                transaction['electionOtherDescription'] = ""
                             if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
                                 if transaction.get('transactionTypeIdentifier') in list_of_SL_SA_transaction_types:
                                     if 'SL-A' not in output['data']['schedules']:

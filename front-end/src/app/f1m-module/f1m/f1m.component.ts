@@ -16,7 +16,7 @@ import { Subject } from 'rxjs';
   selector: 'app-f1m',
   templateUrl: './f1m.component.html',
   styleUrls: ['./f1m.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class F1mComponent implements OnInit, OnDestroy {
 
@@ -103,9 +103,10 @@ export class F1mComponent implements OnInit, OnDestroy {
         this.refreshScreen();
 
         this.validateForm();
+
       })
     }
-    
+    this._messageService.sendMessage({action:'updateHeaderInfo', data: {formType: 'F1M'}});
   }
   
 
@@ -146,6 +147,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this._messageService.clearMessage();
     this.onDestroy$.next(true);
+    this._messageService.sendMessage({action:'updateHeaderInfo', data:{formType:null}});
   }
 
   public getPartyType() {
@@ -204,6 +206,9 @@ export class F1mComponent implements OnInit, OnDestroy {
   } */
 
   public showSaveAndContinueButton(){
+    if(this.scheduleAction === ScheduleActions.view){
+      return false;
+    }
     if(this.step === 'step_2'){
       if(this.type === 'qualification'){
         if(this.partyType === 'PTY'){
@@ -233,6 +238,14 @@ export class F1mComponent implements OnInit, OnDestroy {
         }
         return true;
       }
+      else if(this.type === 'affiliation'){
+        //check query params to see if a form of this type has already been created and a report id generate
+        //if so, then return false
+        if(this._activatedRoute.snapshot.queryParams.reportId){
+          return false;
+        }
+        return true;
+      }
         return !this.editMode;
       }
     return true;
@@ -255,10 +268,12 @@ export class F1mComponent implements OnInit, OnDestroy {
   private saveAffiliationData() {
     if (this.affiliationComp.form.valid) {
       this.step2data = this.affiliationComp.form.value;
-      if (this.scheduleAction === ScheduleActions.edit && this.reportId) {
+      let tempScheduleAction : ScheduleActions = this.scheduleAction;
+      if (this.reportId) {
         this.step2data.reportId = this.reportId;
+        tempScheduleAction = ScheduleActions.edit;
       }
-      this._f1mService.saveForm(this.step2data, this.scheduleAction, 'saveAffiliation').subscribe(res => {
+      this._f1mService.saveForm(this.step2data, tempScheduleAction, 'saveAffiliation').subscribe(res => {
         this.reportId = res.reportId;
         this.updateQueryParams();
         this.setAffiliationInfo(res);
@@ -266,6 +281,10 @@ export class F1mComponent implements OnInit, OnDestroy {
         this.next();
       });
     }
+  }
+
+  public showSkipButton(){
+    return (this.step === 'step_2' && this.type === 'qualification' && this.qualificationComp && !this.qualificationComp.showPart2 && this.partyType === 'PTY') && this.scheduleAction !== 'view';
   }
 
   private saveDates() {
@@ -292,7 +311,11 @@ export class F1mComponent implements OnInit, OnDestroy {
         if (this.reportId) {
           this.step2data.reportId = this.reportId;
         }
-        this.step2data.candidate_number = this.qualificationComp.getNextCandidateNumber().toString();
+        if(action && action.action  === 'create'){
+          this.step2data.candidate_number = this.qualificationComp.getNextCandidateNumber().toString();
+        }else{
+          this.step2data.candidate_number = this.step2data.candidate_number.toString();
+        }
         let saveCandScheduleAction = action.action === 'update' ? ScheduleActions.edit : ScheduleActions.add;
         this._f1mService.saveForm(this.step2data, saveCandScheduleAction, 'saveCandidate').subscribe(res => {
           this.qualificationData.candidates = res.candidates;
