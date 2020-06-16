@@ -112,7 +112,8 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     # Removing 'EAR_MEMO' from below as it being populated from front-end
     'Total Earmarked through Conduit': ['EAR_REC_CONVEN_ACC_MEMO', 'EAR_REC_HQ_ACC_MEMO', 'EAR_REC_RECNT_ACC_MEMO',
                                         'PAC_EAR_MEMO'],
-    'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO']
+    'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO'],
+    'Bounced': ['PARTY_RET', 'PAC_RET', 'RET_REC'],
     }
 
 logger = logging.getLogger(__name__)
