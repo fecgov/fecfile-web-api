@@ -914,7 +914,8 @@ def get_list_all_report(cmte_id):
             fec_accepted_date, 
             fec_status, 
             create_date, 
-            last_update_date
+            last_update_date,
+            memo_text
             FROM public.reports WHERE delete_ind is distinct from 'Y' AND cmte_id = %s"""
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id]
@@ -951,6 +952,7 @@ def get_list_report(report_id, cmte_id):
                                         rp.due_date                   AS duedate, 
                                         rp.amend_ind                  AS amend_indicator, 
                                         0                             AS coh_bop, 
+                                        rp.memo_text,
                                         ( 
                                                 SELECT 
                                                         CASE 
@@ -10766,3 +10768,35 @@ def find_form_type(report_id, cmte_id):
             return form_types[0]
     except Exception as e:
         raise Exception("The form_type function is throwing an error:" + str(e))
+
+@api_view(['PUT'])
+def reports_memo_text(request):
+    is_read_only_or_filer_reports(request)
+    cmte_id = get_comittee_id(request.user.username)
+    try:
+        if 'report_id' in request.data and request.data.get('report_id') not in [None, '', 'null']:
+            report_id = request.data['report_id']
+        else:
+            raise Exception('reportId is a mandatory field')
+        if 'memo_text' in request.data and request.data.get('memo_text') not in [None, '', 'null']:
+            memo_text = request.data['memo_text']
+        else:
+            raise Exception('memo_text is a mandatory field')
+        _sql = """UPDATE public.reports SET memo_text = %s WHERE report_id=%s AND cmte_id=%s AND
+              status in ('', null, 'Saved')"""
+        value_list = [memo_text, report_id, cmte_id]
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, value_list)
+            logger.debug(cursor.query)
+            if not cursor.rowcount:
+                raise Exception("""This report_id: {} for cmte_id: {} is either submitted or 
+                  does not exist""".format(report_id, cmte_id))
+        data = {'report_id': report_id, 'cmte_id': cmte_id}
+        output = get_reports(data)
+        return JsonResponse(output[0], status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+            "The reports_memo_text API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+            )

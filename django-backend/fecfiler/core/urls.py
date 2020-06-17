@@ -197,4 +197,9 @@ urlpatterns = [
         views.get_coverage_dates,
         name="get_coverage_dates",
     ),
+    url(
+        r"^core/reports_memo_text$",
+        views.reports_memo_text,
+        name="reports_memo_text",
+    ),
 ]
