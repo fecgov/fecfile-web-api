@@ -6,6 +6,8 @@ WORKDIR /opt/nxg_fec
 ADD . /opt/nxg_fec/
 RUN pip3 install -r requirements.txt
 
+RUN mv /etc/localtime /etc/localtime.backup && ln -s /usr/share/zoneinfo/EST5EDT /etc/localtime
+
 RUN useradd nxgu --no-create-home --home /opt/nxg_fec && chown -R nxgu:nxgu /opt/nxg_fec
 user nxgu
 
