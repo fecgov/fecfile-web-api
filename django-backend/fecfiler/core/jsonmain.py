@@ -205,7 +205,7 @@ def get_data_details(report_id, cmte_id):
         string_1 = "Committee Master"
 
         query_3 = """SELECT COALESCE(amend_number, 0) AS "amendmentNumber", COALESCE(to_char(cvg_start_date,'MM/DD/YYYY'),'') AS "coverageStartDate", COALESCE(to_char(cvg_end_date,'MM/DD/YYYY'),'') AS "coverageEndDate",
-                                form_type AS "formType", report_id AS "reportId"
+                                form_type AS "formType", report_id AS "reportId", memo_text as "memoText" 
                                 FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'"""
         values_3 = [report_id, cmte_id]
         string_3 = "Reports"
