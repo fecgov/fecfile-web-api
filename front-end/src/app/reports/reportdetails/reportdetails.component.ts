@@ -28,6 +28,8 @@ import {
 import { TransactionsMessageService } from 'src/app/forms/transactions/service/transactions-message.service';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
 import { FormsService } from '../../shared/services/FormsService/forms.service';
+import {SaveDialogAction} from '../../shared/partials/input-modal/input-modal.component';
+import {InputDialogService} from '../../shared/service/InputDialogService/input-dialog.service';
 @Component({
   selector: 'app-reportdetails',
   templateUrl: './reportdetails.component.html',
@@ -146,6 +148,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _reportTypeService: ReportTypeService,
     private _formsService: FormsService,
     private authService: AuthService,
+    private inputDialogService: InputDialogService,
   ) {
     this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
@@ -1680,5 +1683,34 @@ public printReport(report: reportModel): void{
         return true;
     }
     return false;
+  }
+
+  /**
+   *
+   * @param report
+   */
+  addMemo(report: reportModel) {
+    const memoText = report.memo_text ? report.memo_text : '';
+    const title = memoText ? 'Edit Memo' : 'Add Memo';
+    const dialogData = {
+      content: memoText,
+      saveAction: SaveDialogAction.saveReportMemo,
+      title: title,
+    };
+    this.inputDialogService.openFormModal(dialogData).then((res) => {
+      if (res.saveAction === SaveDialogAction.saveReportMemo) {
+        const updateData = {
+          report_id: report.report_id,
+          memo_text: res.content
+        };
+        this._reportsService.updateMemo(updateData).subscribe(updateRes => {
+          if (updateRes) {
+            this.getReportsPage(this.config.currentPage);
+          }
+        });
+      }
+    }).catch((e) => {
+      // clicked other than save
+    });
   }
 }

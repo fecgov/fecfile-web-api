@@ -1,0 +1,29 @@
+@import '../../../shared/scss/global';
+.modal-title{
+  h4 {
+    color: black;
+  }
+}
+.modal-body {
+  textarea {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 400px;
+    height: 150px;
+    resize: none;
+  }
+  .char-info {
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    color: #6c757d;
+    font-size: smaller;
+    .align-left {
+      float: left;
+    }
+    .align-right {
+      float: right;
+    }
+  }
+}

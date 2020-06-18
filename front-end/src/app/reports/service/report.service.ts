@@ -589,4 +589,27 @@ export class ReportsService {
         }
       );
   }
+
+  public updateMemo(data: any): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions =  new HttpHeaders();
+
+    const url = '/core/reports_memo_text';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http
+        .put(`${environment.apiUrl}${url}`, data, {
+          headers: httpOptions
+        })
+        .pipe(
+            map(res => {
+              if (res) {
+                return res;
+              }
+              return false;
+            })
+        );
+  }
 }

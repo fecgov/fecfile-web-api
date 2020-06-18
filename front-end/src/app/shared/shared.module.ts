@@ -13,6 +13,7 @@ import { SubTransactionsTableComponent } from './components/sub-transactions-tab
 import { UtilService } from './utils/util.service';
 import { OrderByPipe } from 'ngx-pipes';
 import { ModalModule } from 'ngx-bootstrap';
+import { InputModalComponent } from './partials/input-modal/input-modal.component';
 
 @NgModule({
   imports: [
@@ -27,7 +28,8 @@ import { ModalModule } from 'ngx-bootstrap';
     SubTransactionsTableComponent,
     SubmitComponent,
     ValidateComponent,
-    PhonePipe
+    PhonePipe,
+    InputModalComponent
   ],
   exports: [
     CommonModule,
@@ -39,9 +41,10 @@ import { ModalModule } from 'ngx-bootstrap';
     ModalModule,
     StepsComponent,
     SignAndSubmitComponent,
-    SubTransactionsTableComponent, 
-    SubmitComponent
-  ], 
+    SubTransactionsTableComponent,
+    SubmitComponent,
+    InputModalComponent,
+  ],
   providers: [
     DecimalPipe,
     DatePipe,
@@ -50,5 +53,6 @@ import { ModalModule } from 'ngx-bootstrap';
     PhonePipe,
     CurrencyPipe
   ],
+  entryComponents: [InputModalComponent]
 })
 export class SharedModule { }

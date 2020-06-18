@@ -1,0 +1,32 @@
+<div class="modal-header">
+    <h4 class="modal-title">
+        {{titleText}}
+    </h4>
+    <button type="button" class="close"
+            (click)="closeModal()">
+        <i class="fas fa-times"></i>
+    </button>
+</div>
+<div class="modal-body">
+ <textarea
+         maxlength="4000"
+         name = "text-content"
+         [(ngModel)]="inputContent">
+ </textarea>
+    <div class="char-info"><div class="align-left">
+        <p>4000 Characters limit</p>
+    </div>
+        <div class="align-right">
+            <p>Characters count {{inputContent?.length ? inputContent.length : '0'}}</p>
+        </div>
+        <div style="clear: both;"> </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary btn-right"
+            (click)="save()">
+        Save
+    </button>
+</div>
+
+
