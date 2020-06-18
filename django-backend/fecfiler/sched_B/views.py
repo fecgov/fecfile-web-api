@@ -865,15 +865,16 @@ def post_schedB(datum):
                 )
 
             # do aggregation: regular sb transactions
-            if not transaction_id.startswith("LB"):
-                update_schedB_aggamt_transactions(
+            update_schedB_aggamt_transactions(
                     datum.get("expenditure_date"),
                     datum.get("transaction_type_identifier"),
                     entity_id,
                     datum.get("cmte_id"),
                     datum.get("report_id"),
                 )
-            else:  # do aggregation: levin account transactions
+
+            # do aggregation: levin account transactions
+            if transaction_id.startswith("LB"):
                 update_aggregate_lb(datum)
                 update_sl_summary(datum)
 
