@@ -196,6 +196,7 @@ export class ReportsService {
       model.previous_report_id = row.previous_report_id;
       model.amend_show = true;
       model.amend_max = row.amend_max;
+      model.memo_text = row.memo_text;
       modelArray.push(model);
     }
 
