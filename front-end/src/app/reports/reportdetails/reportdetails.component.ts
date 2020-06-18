@@ -1705,12 +1705,12 @@ public printReport(report: reportModel): void{
         };
         this._reportsService.updateMemo(updateData).subscribe(updateRes => {
           if (updateRes) {
-            // TODO: reload the reports table
+            this.getReportsPage(this.config.currentPage);
           }
         });
       }
     }).catch((e) => {
-      console.log(e);
+      // clicked other than save
     });
   }
 }
