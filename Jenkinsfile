@@ -42,7 +42,7 @@ pipeline {
             //Deploy backend
             deployToK8s("${VERSION}", "dev","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
-            deployToK8s("${VERSION}", "dev", "fecfile-frontend","fecnxg-frontend")
+            deployToK8s16("${VERSION}", "dev", "fecfile-frontend","fecnxg-frontend")
           }
         }
         stage('Code Quality') {
@@ -210,7 +210,14 @@ def deployToK8s(String version, String environment, String deployment, String re
       --namespace=${environment} \
       set image deployment/${deployment} ${deployment}=813218302951.dkr.ecr.us-east-1.amazonaws.com/${repo}:${version}
   """
-
+}
+def deployToK8s16(String version, String environment, String deployment, String repo) {
+  sh """ 
+    kubectl \
+      --context=arn:aws:eks:us-east-1:813218302951:cluster/fecnxg-dev1 \
+      --namespace=${environment} \
+      set image deployment/${deployment} ${deployment}=813218302951.dkr.ecr.us-east-1.amazonaws.com/${repo}:${version}
+  """
 }
 
 
