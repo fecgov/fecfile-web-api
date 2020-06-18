@@ -190,6 +190,9 @@
 
 
                         <div id="forms__trx-dropdown-action1" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
+                            <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="addMemo(report)">
+                                <i class="fas fa-sticky-note"></i> {{report.memo_text ? 'Edit ' : 'Add '}} Memo
+                            </button>
                             <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="editReport(report)">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
@@ -217,6 +220,9 @@
                         </button>
 
                         <div id="forms__trx-dropdown-action5" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
+                            <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="addMemo(report)">
+                                <i class="fas fa-sticky-note"></i> {{report.memo_text ? 'Edit ' : 'Add '}} Memo
+                            </button>
                             <button *ngIf="(report.amend_max === 'up' || report.amend_max === 'down')
                              && !authService.isReadOnly()" class="dropdown-item"
                                     (click)="editReport(report)">

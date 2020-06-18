@@ -26,6 +26,7 @@ export class reportModel {
     deleteddate: string;
     amend_show: boolean;
     amend_max: string;
+    memo_text: string;
     constructor(report: any) {
       this.id = report.id ? report.id : '';
       this.report_id = report.report_id ? report.report_id: '';
@@ -52,6 +53,7 @@ export class reportModel {
       this.deleteddate= report.deleteddate? report.deleteddate : '';
       this.selected = report.selected;
       this.amend_show = report.amend_show;
-      this.amend_max = report.amend_max;     
+      this.amend_max = report.amend_max;
+      this.memo_text = report.memo_text;
     }
    }
