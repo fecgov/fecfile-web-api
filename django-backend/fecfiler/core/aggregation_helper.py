@@ -1683,14 +1683,14 @@ def update_linenumber_aggamt_transactions_SA(
                     "OTH_DISB_NP_RECNT_TRIB_REF",
                     "OTH_DISB_NP_RECNT_IND_REF",
                 ]:
-                    if not transaction[11] in ["FU", "FI"]:  # if not forced
 
-                        line_number, itemized_ind = get_linenumber_itemization(
+                    line_number, itemized_ind = get_linenumber_itemization(
                             transaction[8],
                             aggregate_amount,
                             itemization_value,
                             transaction[3],
                         )
+                    if not transaction[11] in ["FU", "FI"]:  # if not forced
                         put_sql_linenumber_schedA(
                             cmte_id,
                             line_number,
@@ -1699,6 +1699,16 @@ def update_linenumber_aggamt_transactions_SA(
                             entity_id,
                             aggregate_amount,
                         )
+                    else:
+                        put_sql_linenumber_schedA(
+                            cmte_id,
+                            line_number,
+                            transaction[11],
+                            transaction[1],
+                            entity_id,
+                            aggregate_amount,
+                        )
+
 
                 # Updating aggregate amount to child auto generate sched A transactions
                 if child_flag_SA:
