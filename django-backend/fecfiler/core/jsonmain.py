@@ -112,7 +112,8 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     # Removing 'EAR_MEMO' from below as it being populated from front-end
     'Total Earmarked through Conduit': ['EAR_REC_CONVEN_ACC_MEMO', 'EAR_REC_HQ_ACC_MEMO', 'EAR_REC_RECNT_ACC_MEMO',
                                         'PAC_EAR_MEMO'],
-    'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO']
+    'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO'],
+    'Bounced': ['PARTY_RET', 'PAC_RET', 'RET_REC'],
     }
 
 logger = logging.getLogger(__name__)
@@ -204,7 +205,7 @@ def get_data_details(report_id, cmte_id):
         string_1 = "Committee Master"
 
         query_3 = """SELECT COALESCE(amend_number, 0) AS "amendmentNumber", COALESCE(to_char(cvg_start_date,'MM/DD/YYYY'),'') AS "coverageStartDate", COALESCE(to_char(cvg_end_date,'MM/DD/YYYY'),'') AS "coverageEndDate",
-                                form_type AS "formType", report_id AS "reportId"
+                                form_type AS "formType", report_id AS "reportId", memo_text as "memoText" 
                                 FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'"""
         values_3 = [report_id, cmte_id]
         string_3 = "Reports"
@@ -610,6 +611,9 @@ def create_json_builders(request):
                                                 transaction['child'] = child_transactions
                             # pre-appending the purpose description
                             transaction = preappending_purpose_description(transaction)
+                            # Handling electionOtherDescription value for 'primary' and 'general'
+                            if 'electionOtherDescription' in transaction and transaction['electionOtherDescription'] in ['Primary', 'General']:
+                                transaction['electionOtherDescription'] = ""
                             if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
                                 if transaction.get('transactionTypeIdentifier') in list_of_SL_SA_transaction_types:
                                     if 'SL-A' not in output['data']['schedules']:

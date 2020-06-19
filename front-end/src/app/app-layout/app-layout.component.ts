@@ -7,6 +7,7 @@ import { ApiService } from '../shared/services/APIService/api.service';
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { UtilService } from '../shared/utils/util.service';
+import {AuthService} from '../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-app-layout',
@@ -60,7 +61,8 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     private _utilService: UtilService,
     private _router: Router,
     private _modalService: NgbModal,
-    public _activatedRoute: ActivatedRoute, 
+    public _activatedRoute: ActivatedRoute,
+    public _authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -121,6 +123,9 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       if(message && message.action === 'updateCurrentReportHeaderData' && message.data){
         this.currentReportData = message.data;
         this.populateHeaderData(this.currentReportData);
+      }
+      else if(message && message.action === 'updateHeaderInfo' && message.data){
+        this.formType = message.data.formType;
       }
     });
 

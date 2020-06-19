@@ -650,7 +650,7 @@ def get_committee_details(request):
                 cm.cmte_filing_freq, cm.cmte_filed_type, 
                 cm.treasurer_last_name AS "treasurerlastname", cm.treasurer_first_name AS "treasurerfirstname", cm.treasurer_middle_name AS "treasurermiddlename", 
                 cm.treasurer_prefix AS "treasurerprefix", cm.treasurer_suffix AS "treasurersuffix", cm.create_date AS "created_at", cm.cmte_type_category, f1.fax, 
-                f1.tphone as "treasurerphone", f1.url as "website"
+                f1.tphone as "treasurerphone", f1.url as "website", f1.email as "treasureremail"
                 FROM public.committee_master cm
                 LEFT JOIN public.form_1 f1 ON f1.comid=cmte_id
                 WHERE cm.cmte_id = %s ORDER BY cm.create_date, f1.sub_date DESC, f1.create_date DESC LIMIT 1"""
@@ -920,28 +920,30 @@ def get_form99list(request):
                 if reportid in ["None", "null", " ", "","0"]:    
                     query_string =  """SELECT json_agg(t) FROM 
                                     (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype, 
-                                            deleteddate    
+                                            deleteddate, memo_text
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
                                             WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
                                             WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
                                             ELSE 'current'
                                         END AS viewtype,
-                                            deleteddate
+                                            deleteddate,
+                                            memo_text
                                          FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
                                     ) t1
                                     WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
                 else:
                     query_string =  """SELECT json_agg(t) FROM 
                                     (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype,
-                                            deleteddate    
+                                            deleteddate, memo_text
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
                                             WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
                                             WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
                                             ELSE 'current'
                                         END AS viewtype,
-                                            deleteddate
+                                            deleteddate,
+                                            memo_text
                                          FROM public.reports_view WHERE cmte_id = %s AND delete_ind is distinct from 'Y'
                                     ) t1
                                     WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """

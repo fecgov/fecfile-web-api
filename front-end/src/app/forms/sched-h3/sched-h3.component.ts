@@ -28,6 +28,7 @@ import { GetTransactionsResponse, TransactionsService } from '../transactions/se
 import { SchedH3Service } from './sched-h3.service';
 import { debounceTime, distinctUntilChanged, switchMap, delay, pairwise } from 'rxjs/operators';
 import {AuthService} from '../../shared/services/AuthService/auth.service';
+import { PaginationInstance } from 'ngx-pagination';
 
 @Component({
   selector: 'app-sched-h3',
@@ -74,8 +75,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public h3Subscription: Subscription;
   public saveHRes: any;
 
-  public h3TableConfig: any;
-  public h3EntryTableConfig: any;
+  //public h3EntryTableConfig: any;
 
   public receiptDateErr = false;
 
@@ -105,7 +105,17 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public restoreSubscription: Subscription;
   public trashSubscription: Subscription;
 
-
+  // ngx-pagination config
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
+  public config: PaginationInstance;
+  public pageNumbers: number[] = [];
+  private firstItemOnPage = 0;
+  private lastItemOnPage = 0;
+  
   constructor(
     _http: HttpClient,
     _fb: FormBuilder,
@@ -174,6 +184,13 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     _dlService;
     _tranMessageService;
 
+    const paginateConfig: PaginationInstance = {
+      id: 'forms__sched-h3-table-pagination',
+      itemsPerPage: this.maxItemsPerPage,
+      currentPage: 1
+    };
+    this.config = paginateConfig;
+
     this._schedHMessageServiceService.getpopulateHFormForEditMessage().takeUntil(this._h3OnDestroy$)
       .subscribe(p => {
         if (p.scheduleType === 'Schedule H3') {
@@ -190,7 +207,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       .subscribe(
         message => {
           if (message.scheduleType === 'Schedule H3') {
-            this.setH3Sum();
+            this.setH3Sum(this.config.currentPage);
           }
         }
       )
@@ -200,7 +217,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       .subscribe(
         message => {
           if (message.scheduleType === 'Schedule H3') {
-            this.setH3Sum();
+            this.setH3Sum(this.config.currentPage);
           }
         }
       )
@@ -226,21 +243,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       this.loaded = true;
     }, 2000);
 
-    this.setH3();
+    this.setH3(this.config.currentPage);
     this.setCategory();
     //this.setActivityOrEventIdentifier();
-
-    this.h3TableConfig = {
-      itemsPerPage: 8,
-      currentPage: 1,
-      totalItems: 8
-    };
-    this.h3EntryTableConfig = {
-      itemsPerPage: 3,
-      currentPage: 1,
-      totalItems: 3
-    };
-
 
     //this.setH3Sum();
     //this.setH3SumP();
@@ -252,6 +257,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.schedH3.patchValue({ category: ''}, { onlySelf: true });
     this.sendPopulateMessageIfApplicable();
+
+    this.getPage(this.config.currentPage);
   }
 
   public ngOnChanges(changes: SimpleChanges) {
@@ -260,11 +267,11 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.showPart2 = false;
 
     if (this.transactionType === 'ALLOC_H3_RATIO' && this.scheduleAction !== ScheduleActions.edit) {
-      this.setH3();
+      this.setH3(this.config.currentPage);
     }
 
     if (this.transactionType === 'ALLOC_H3_SUM') {
-      this.setH3Sum();
+      this.setH3Sum(this.config.currentPage);
     }
 
     if (this.transactionType === 'ALLOC_H3_SUM_P') {
@@ -284,13 +291,6 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.restoreSubscription.unsubscribe();
     this.trashSubscription.unsubscribe();
     super.ngOnDestroy();
-  }
-
-  pageChanged(event) {
-    this.h3TableConfig.currentPage = event;
-  }
-  entryPageChanged(event) {
-    this.h3EntryTableConfig.currentPage = event;
   }
 
   /**
@@ -323,7 +323,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   }
 
-  public setH3() {
+  public setH3(page: number) {
 
     this.schedH3 = new FormGroup({
       account_name: new FormControl('', [Validators.maxLength(40), Validators.required]),
@@ -332,7 +332,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       category: new FormControl('', Validators.required),
       activity_event_name: new FormControl('', Validators.required),
       transferred_amount: new FormControl('', Validators.required),
-      aggregate_amount: new FormControl('')
+      aggregate_amount: new FormControl(''),
+      memo_text: new FormControl('')
     });
     this._prepareForUnsavedH3Changes();
   }
@@ -438,7 +439,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
     this.isSubmit = false;
     this.schedH3.reset();
-    this.setH3();
+    this.setH3(this.config.currentPage);
     //this.schedH3.patchValue({ transferred_amount: 0}, { onlySelf: true });
 
     this.schedH3 = this._formBuilder.group({
@@ -470,7 +471,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.showIdentifer = false;
 
     this.schedH3.reset();
-    this.setH3();
+    this.setH3(this.config.currentPage);
 
     this.transactionType = 'ALLOC_H3_RATIO';
     this.receiptDateErr = false;
@@ -583,21 +584,24 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     }
   }
 
-  public setH3Sum() {
-
+  public setH3Sum(page: number) {
+    this.config.currentPage = page;
     this.h3Sum = [];
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
     //this.h3Subscription = this._schedH3Service.getSummary(this.getReportId()).subscribe(res =>
-    this.h3Subscription = this._schedH3Service.getSummary(reportId).subscribe(res => {
-      if (res) {
-        //this.h3Sum = [];
-        this.h3Sum = res;
-        this.h3TableConfig.totalItems = res.length;
-      }
+    this.h3Subscription = this._schedH3Service.getSummary(
+      reportId,
+      page,
+      this.config.itemsPerPage,
+      'default',
+      false
+    ).subscribe(res => {
+      const pagedResponse = this._utilService.pageResponse(res, this.config);
+      this.h3Sum = pagedResponse.items;
+      this.pageNumbers = pagedResponse.pageNumbers;
     });
-
   }
 
   public setH3SumP() {
@@ -723,9 +727,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
       formObj['transaction_id'] = this.transaction_id;
       formObj['back_ref_transaction_id'] = this.back_ref_transaction_id;
-
       formObj['aggregate_amount'] = this.convertFormattedAmountToDecimal(formObj.aggregate_amount);
-
+      const MEMO_TEXT = this.schedH3.get('memo_text');
+      formObj['memo_text'] = MEMO_TEXT ? MEMO_TEXT.value : '';
       delete formObj.total_amount_transferred;
 
       //this.isSubmit = true;
@@ -746,7 +750,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         */
         if (this.scheduleAction !== ScheduleActions.edit) {
           this.h3Entries.push(formObj);
-          this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+          //this.h3EntryTableConfig.totalItems = this.h3Entries.length;
           this.h3Ratios.child.push(formObj);
 
           this.h3Ratios.child.filter(obj => obj.activity_event_name === formObj.activity_event_name)
@@ -755,6 +759,9 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         } else {
           this.h3EntrieEdit = formObj;
         }
+
+        const serializedForm = JSON.stringify(formObj);
+        this.saveH3Ratio(serializedForm, this.scheduleAction);
 
         this.schedH3.reset();
         this.isSubmit = false;
@@ -796,17 +803,24 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
 
   public saveAndGetSummary(ratio: any, scheduleAction: any) {
     //this.h3Sum = [];
+    let page = 1;
+    this.config.currentPage = page;
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
 
-    this._schedH3Service.saveAndGetSummary(ratio, reportId, scheduleAction).subscribe(res => {
-      if (res) {
-        //this.saveHRes = res;
-        this.h3Sum = [];
+    this._schedH3Service.saveAndGetSummary(
+        ratio, 
+        reportId, 
+        scheduleAction,
+        page,
+        this.config.itemsPerPage,
+        'default',
+        false
+      ).subscribe(res => {
         this.h3Entries = [];
-        this.h3Sum = res;
-        this.h3TableConfig.totalItems = res.length;
-      }
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.h3Sum = pagedResponse.items;
+        this.pageNumbers = pagedResponse.pageNumbers;
 
       // Update third navigation totals
       const report = {
@@ -938,7 +952,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   }
 
   public clearFormValues() {
-    this.setH3();
+    this.setH3(this.config.currentPage);
     this.h3Entries = [];
     this.h3Ratios = {};
     this.h3Ratios['child'] = [];
@@ -987,6 +1001,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH3.patchValue({ activity_event_name: item.activity_event_name }, { onlySelf: true });
     this.schedH3.patchValue({ transferred_amount: this._decPipe.transform(item.transferred_amount, '.2-2') }, { onlySelf: true });
     this.schedH3.patchValue({ aggregate_amount: this._decPipe.transform(item.aggregate_amount, '.2-2') }, { onlySelf: true });
+    this.schedH3.patchValue({ memo_text: item.memo_text ? item.memo_text : '' }, { onlySelf: true });
 
     this.transferred_amount_edit = item.transferred_amount;
     this.total_amount_edit = item.total_amount_transferred;
@@ -1057,7 +1072,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this.h3Entries = this.h3Entries.filter(obj => obj !== item);
     this.h3Ratios.child = this.h3Ratios.child.filter(obj => obj !== item);
 
-    this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+    //this.h3EntryTableConfig.totalItems = this.h3Entries.length;
 
     let sum = 0;
     this.h3Entries.forEach(obj => {
@@ -1147,7 +1162,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
             .trashOrRestoreTransactions(this.formType, 'trash', trx.report_id, [trx])
             .subscribe((res: GetTransactionsResponse) => {
               //this.getTransactionsPage(this.config.currentPage);
-              this.setH3Sum();
+              this.setH3Sum(this.config.currentPage);
               this._dlService.confirm(
                 'Transaction has been successfully deleted and sent to the recycle bin. ' + trx.transaction_id,
                 ConfirmModalComponent,
@@ -1168,7 +1183,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         if (res === 'okay') {
           this.h3Entries = this.h3Entries.filter(obj => obj !== trx);
           this.h3Ratios.child = this.h3Ratios.child.filter(obj => obj !== trx);
-          this.h3EntryTableConfig.totalItems = this.h3Entries.length;
+          //this.h3EntryTableConfig.totalItems = this.h3Entries.length;
 
           let sum = 0;
           this.h3Entries.forEach(obj => {
@@ -1285,4 +1300,84 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
   }
 
+    /**
+   * The Transactions for a given page.
+   *
+   * @param page the page containing the transactions to get
+   */
+  public getPage(page: number): void {
+    switch (this.transactionType) {
+      case 'ALLOC_H3_SUM':
+        this.setH3Sum(page);
+        break;
+      case 'ALLOC_H3_RATIO':
+        this.setH3(page);
+        break;
+    }
+  }
+
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
+  }  
+
+  /**
+   * Determine if pagination should be shown.
+   */
+  public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
+    if (this.config.totalItems > this.config.itemsPerPage) {
+      return true;
+    }
+    // otherwise, no show.
+    return false;
+  }  
+
+  /**
+   * Determine the item range shown by the server-side pagination.
+   */
+  public determineItemRange(): string {
+    let items: any[];
+    switch (this.transactionType) {
+      case 'ALLOC_H3_SUM':
+        items = this.h3Sum;
+        break;
+      case 'ALLOC_H3_RATIO':
+        items = this.h3Entries;
+        break;
+    }
+
+    let range: {
+      firstItemOnPage: number, lastItemOnPage: number, itemRange: string
+    } = this._utilService.determineItemRange(this.config, items);
+
+    this.firstItemOnPage = range.firstItemOnPage;
+    this.lastItemOnPage = range.lastItemOnPage;
+    return range.itemRange;
+  }
+  
+  public showPageSizes(): boolean {
+    if (this.config && this.config.totalItems && this.config.totalItems > 0){
+      return true;
+    }
+    return false;
+  }
 }

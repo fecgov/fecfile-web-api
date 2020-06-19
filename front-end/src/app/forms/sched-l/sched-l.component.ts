@@ -75,16 +75,25 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   public lSum: any;
   public saveLRes: any;
 
-  public tableConfig: any;
-
   public showSelectType = true;
 
   public schedLsModel: Array<SchedLModel>;
-  public schedLsModelL: Array<SchedLModel>;
   private clonedTransaction: any;
   public bulkActionDisabled = true;
   public bulkActionCounter = 0;
   private allTransactionsSelected: boolean;
+
+  // ngx-pagination config
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
+  public config: PaginationInstance;
+  public numberOfPages: number = 0;
+  public pageNumbers: number[] = [];
+  private firstItemOnPage = 0;
+  private lastItemOnPage = 0;
 
   constructor(
     _http: HttpClient,
@@ -144,6 +153,13 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     _schedLService;
     _individualReceiptService;
     _tranMessageService;
+
+    const paginateConfig: PaginationInstance = {
+      id: 'forms__sched-l-table-pagination',
+      itemsPerPage: this.maxItemsPerPage,
+      currentPage: 1
+    };
+    this.config = paginateConfig;
   }
 
 
@@ -161,13 +177,6 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     //this.getH4Sum(this._individualReceiptService.getReportIdFromStorage(this.formType));
     
     //this.setSchedH4();
-
-    this.tableConfig = {
-      itemsPerPage: 8,
-      currentPage: 1,
-      totalItems: 10
-    };
-
     //this.setDefaultValues();
 
     /*
@@ -178,11 +187,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     */
 
     this.setSchedL();
-
-  }
-
-  pageChanged(event){
-    this.tableConfig.currentPage = event;
+    this.getPage(this.config.currentPage);
   }
 
   public ngOnChanges(changes: SimpleChanges) {
@@ -206,6 +211,9 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public ngOnDestroy(): void {
+    if (this.lSubscription) {
+      this.lSubscription.unsubscribe();
+    }
     super.ngOnDestroy();
   }
 
@@ -243,22 +251,22 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     this.transactionType = transactionType;
   }
  
-  public getTransactions(reportId: string, levinType: string) {
+  public getTransactions(reportId: string, levinType: string, page: number = 1) {
+    this.config.currentPage = page;
     this.schedLsModel = [];
 	
-    this.lSubscription = this._schedLService.getTransactions(reportId, levinType).subscribe(res =>
-      {
-        if (res) {
-          /*this.lSum = [];
-          this.lSum =  res;
-          this.tableConfig.totalItems = res.length;*/
-          this.schedLsModelL = this.mapFromServerFields(res);
-          this.schedLsModel = this.mapFromServerFields(res);
-          this.setArrow(this.schedLsModel);
-
-          //this.schedLsModel = this.schedLsModel .filter(obj => obj.memo_code !== 'X');
-          this.tableConfig.totalItems = this.schedLsModel.length;
-        }
+    this.lSubscription = this._schedLService.getTransactions(
+        reportId, 
+        levinType,
+        page,
+        this.config.itemsPerPage,
+        'default',
+        false
+      ).subscribe(res => {
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.schedLsModel = this.mapFromServerFields(pagedResponse.items);
+        this.pageNumbers = pagedResponse.pageNumbers;
+        this.setArrow(this.schedLsModel);
       });
   }
 
@@ -312,13 +320,13 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     if(item.arrow_dir === 'down') {
       let indexRep = this.schedLsModel.indexOf(item);
       if (indexRep > -1) {
-        let tmp: Array<SchedLModel> = this.schedLsModelL.filter(obj => obj.back_ref_transaction_id === item.transaction_id);
+        let tmp: Array<SchedLModel> = this.schedLsModel.filter(obj => obj.back_ref_transaction_id === item.transaction_id);
         for(let entry of tmp) {
           entry.arrow_dir = 'show';
           this.schedLsModel.splice(indexRep + 1, 0, entry);
           indexRep++;
         }
-        this.tableConfig.totalItems = this.schedLsModel.length;
+        this.config.totalItems = this.schedLsModel.length;
       }
       this.schedLsModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'up';
 
@@ -328,7 +336,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     }else if(item.arrow_dir === 'up') {
       //this.schedH4sModel = this.schedH4sModel.filter(obj => obj.memo_code !== 'X');
       this.schedLsModel = this.schedLsModel.filter(obj => obj.back_ref_transaction_id !== item.transaction_id);
-      this.tableConfig.totalItems = this.schedLsModel.length;
+      this.config.totalItems = this.schedLsModel.length;
 
       this.schedLsModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'down';
     }
@@ -463,7 +471,7 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
   }
 
   public checkIfTrashable(trx: any): boolean {
-    if (this.schedLsModelL.filter(obj => obj.back_ref_transaction_id === trx.transaction_id).length !== 0) {
+    if (this.schedLsModel.filter(obj => obj.back_ref_transaction_id === trx.transaction_id).length !== 0) {
       return false;
     }
     return true;
@@ -499,5 +507,69 @@ export class SchedLComponent extends AbstractSchedule implements OnInit, OnDestr
     return this.tableType === this.transactionsView ? true : false;
   }
 
+ /**
+   * The records for a given page.
+   *
+   * @param page the page containing the records to get
+   */
+  public getPage(page: number): void {
+    this.getTransactions(this._individualReceiptService.getReportIdFromStorage(this.formType), 
+      this.transactionType, page);
+  }
+
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
+  }  
+
+  /**
+   * Determine if pagination should be shown.
+   */
+  public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
+    if (this.config.totalItems > this.config.itemsPerPage) {
+      return true;
+    }
+    // otherwise, no show.
+    return false;
+  }  
+
+  /**
+   * Determine the item range shown by the server-side pagination.
+   */
+  public determineItemRange(): string {
+    let range: {
+      firstItemOnPage: number, lastItemOnPage: number, itemRange: string
+    } = this._utilService.determineItemRange(this.config, this.schedLsModel);
+
+    this.firstItemOnPage = range.firstItemOnPage;
+    this.lastItemOnPage = range.lastItemOnPage;
+    return range.itemRange;
+  }    
+
+  public showPageSizes(): boolean {
+    if (this.config && this.config.totalItems && this.config.totalItems > 0){
+      return true;
+    }
+    return false;
+  }
 }
 

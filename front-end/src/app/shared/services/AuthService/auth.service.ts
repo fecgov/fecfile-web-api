@@ -1,8 +1,11 @@
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import {Injectable} from '@angular/core';
 import {CookieService} from 'ngx-cookie-service';
 import {SessionService} from '../SessionService/session.service';
 import * as jwt_decode from 'jwt-decode';
 import {Roles} from '../../enums/Roles';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../partials/confirm-modal/confirm-modal.component';
+import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable({
     providedIn: 'root'
@@ -11,7 +14,8 @@ export class AuthService {
 
     constructor(
         private _session: SessionService,
-        private _cookieService: CookieService
+        private _cookieService: CookieService,
+        private _dialogService: DialogService
     ) {
     }
 
@@ -112,4 +116,15 @@ export class AuthService {
         console.error('Session not found !!!');
         this._session.destroy();
     }
+
+    public showPermissionDeniedMessage(){
+        this._dialogService.confirm(
+            'You do not have sufficient privileges to perform the requested action.',
+            ConfirmModalComponent,
+            'Error!',
+            false,
+            ModalHeaderClassEnum.errorHeader
+          );
+    }
+    
 }

@@ -6,12 +6,14 @@ import { Subject } from 'rxjs';
 import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/takeUntil';
 import { Subscription } from 'rxjs/Subscription';
+import { ReportsService } from 'src/app/reports/service/report.service';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { SortableColumnModel } from 'src/app/shared/services/TableService/sortable-column.model';
 import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { UtilService } from 'src/app/shared/utils/util.service';
 import { ReportTypeService } from '../../../forms/form-3x/report-type/report-type.service';
+import { AuthService } from '../../../shared/services/AuthService/auth.service';
 import { IndividualReceiptService } from '../../form-3x/individual-receipt/individual-receipt.service';
 import { TransactionTypeService } from '../../form-3x/transaction-type/transaction-type.service';
 import { FilterTypes } from '../enums/filterTypes.enum';
@@ -20,7 +22,6 @@ import { TransactionModel } from '../model/transaction.model';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { GetTransactionsResponse, TransactionsService } from '../service/transactions.service';
 import { ActiveView } from '../transactions.component';
-import { AuthService} from '../../../shared/services/AuthService/auth.service';
 
 const transactionCategoryOptions = [];
 
@@ -72,11 +73,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public editMode: boolean = false;
 
   // ngx-pagination config
-  public maxItemsPerPage = 10;
-  public directionLinks = false;
-  public autoHide = true;
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
   public config: PaginationInstance;
-  public numberOfPages = 0;
+  public numberOfPages: number = 0;
+  public pageNumbers: number[] = [];
+  public gotoPage: number = 1;
 
   private filters: TransactionFilterModel;
   // private keywords = [];
@@ -195,6 +200,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _receiptService: IndividualReceiptService,
     private _transactionTypeService: TransactionTypeService,
     private _authService: AuthService,
+    private _reportsService: ReportsService
   ) {
 
     const paginateConfig: PaginationInstance = {
@@ -357,6 +363,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   public getPage(page: number): void {
     this.bulkActionCounter = 0;
     this.bulkActionDisabled = true;
+    this.gotoPage = page;
 
     switch (this.tableType) {
       case this.transactionsView:
@@ -367,6 +374,31 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.getRecyclingPage(page);
         break;
     }
+  }
+
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.gotoPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    if (this.config.currentPage == page) {
+      return;
+    }
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
   }
 
   getSubTransactions(transactionId, apiCall) {
@@ -501,6 +533,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         this.totalAmount = res.totalAmount ? res.totalAmount : 0;
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
         this.numberOfPages = res.totalPages;
+
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
         this.allTransactionsSelected = false;
       }, error => {
         //console.log('API Error occured: ' + error);
@@ -654,6 +688,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
         this.numberOfPages = res.totalPages;
+
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
         this.allTransactionsSelected = false;
       });
   }
@@ -835,6 +871,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Determine if pagination should be shown.
    */
   public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
     if (this.config.totalItems > this.config.itemsPerPage) {
       return true;
     }
@@ -1031,8 +1070,21 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to clone
    */
   public cloneTransaction(trx: TransactionModel): void {
+    if(trx.mirrorReportId){
+      this.warnUserIfMirrorTransaction(trx, 'clone');
+    }
+    else{
+      this.cloneTransactionAfterCheck(trx);
+    }
+  }
+
+  private cloneTransactionAfterCheck(trx: TransactionModel) {
+    let mirrorFlag = false;
+    if(trx.mirrorReportId){
+      mirrorFlag = true;
+    }
     this._transactionsService
-      .cloneTransaction(trx.transactionId)
+      .cloneTransaction(trx.transactionId,mirrorFlag,trx.mirrorReportId ? trx.mirrorReportId.toString(): null)
       .subscribe((cloneTransactionResponse: TransactionModel) => {
         if (cloneTransactionResponse[0] && cloneTransactionResponse[0].hasOwnProperty('transaction_id')) {
           this.getTransactionsPage(this.config.currentPage);
@@ -1040,6 +1092,45 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         }
       });
   }
+
+  warnUserIfMirrorTransaction(trx: TransactionModel, action:string) {
+    let mirrorForm = '';
+    if(trx.formType === 'F3X'){
+      mirrorForm = '24';
+    }
+    else if(trx.formType === 'F24'){
+      mirrorForm = '3X';
+    }
+    this._dialogService
+        .confirm('Please note that if you modify this transaction it will be updated in Form ' + mirrorForm,ConfirmModalComponent, 'Warning!', true,ModalHeaderClassEnum.warningHeader,null,'Cancel')
+        .then(res => {
+          if (res === 'okay') {
+            //make sure modifying is permitted based on mirrorReportId !== Filed/Submitted
+            this._reportsService
+              .getReportInfo(trx.formType, trx.reportId)
+              .subscribe((res: any) => {
+                if(res && res.reportstatus === 'Submitted'){
+                  this._dialogService
+                  .confirm('This transaction cannot be modified since the mirrored transaction in Form ' + mirrorForm + 'is already filed. You will have to amend that report', ConfirmModalComponent, 'Error!', false)
+                  .then(res => {
+                    if (res === 'okay') {
+                    }
+                  });
+                }
+                else{
+                  if(action === 'clone'){
+                    this.cloneTransactionAfterCheck(trx);
+                  }
+                  else if(action === 'trash'){
+                    this.trashOrRestoreAfterCheck(trx);
+                  }
+                }
+              });
+          } else if (res === 'cancel') {
+          }
+        });
+  }
+
 
   /**
    * Link the transaction selected by the user.
@@ -1105,6 +1196,18 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .confirm('You are about to delete this transaction ' + trx.transactionId + '.', ConfirmModalComponent, 'Caution!')
       .then(res => {
         if (res === 'okay') {
+          if(trx.mirrorReportId){
+              this.warnUserIfMirrorTransaction(trx,'trash');
+            }
+          else{
+            this.trashOrRestoreAfterCheck(trx);
+          }
+        } else if (res === 'cancel') {
+        }
+      });
+  }
+
+  private trashOrRestoreAfterCheck(trx: TransactionModel) {
           if (trx.child && trx.child.length > 0) {
             this._dialogService
               .confirm('WARNING: There are child transactions associated with this transaction. This action will delete all child transactions as well. Are you sure you want to continue? ', ConfirmModalComponent, 'Caution!')
@@ -1112,13 +1215,12 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
                 this.trashOrRestoreAfterConfirmation(res, trx);
               })
           }
-          else {
+/*           else {
             this.trashOrRestoreAfterConfirmation(res, trx);
-          }
-        } else if (res === 'cancel') {
-        }
-      });
-  }
+          } */
+        } 
+      // });
+  // }
 
   private trashOrRestoreAfterConfirmation(res: any, trx: TransactionModel) {
     if (res === 'okay') {
@@ -1334,6 +1436,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.firstItemOnPage = start;
     this.lastItemOnPage = end;
     return start + ' - ' + end;
+  }
+      
+  public showPageSizes(): boolean {
+    if (this.config && this.config.totalItems && this.config.totalItems > 0){
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -1842,5 +1951,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     } else {
       return true;
     }
+  }
+
+  /**
+   * Checks a transaction in the transactionModel array and returns true if report is filed
+   * based on the first transaction
+   *  @Return boolean
+   */
+  isReportFiled() {
+    if (this.transactionsModel) {
+      if (!this.transactionsModel[0].iseditable && this.transactionsModel[0].reportstatus.toUpperCase() === 'FILED') {
+        return true;
+      }
+    }
+    return false;
   }
 }

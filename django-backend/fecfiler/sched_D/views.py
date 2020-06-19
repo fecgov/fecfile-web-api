@@ -10,6 +10,7 @@ from django.db import connection
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -84,6 +85,7 @@ def check_transaction_id(transaction_id):
     except Exception:
         raise
 
+'''
 
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedD(request):
@@ -257,6 +259,271 @@ def schedD(request):
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
 
 
+'''
+
+'''
+#http://localhost:8080/api/v1/sd/schedD?report_id=737&transaction_type_identifier=DEBT_TO_VENDOR
+#http://localhost:8080/api/v1/sd/schedD?username=C00000935&report_id=737&page=1&itemsPerPage=20&sortColumnName=default&descending=false&transaction_type_identifier=DEBT_TO_VENDOR
+
+#GET /api/v1/sd/schedD?
+# report_id=111321&
+# page=1&
+# itemsPerPage=20&
+# sortColumnName=default&
+# descending=false&
+# transaction_type_identifier=DEBT_TO_VENDOR 
+#New URI GET /api/v1/sd/schedD?report_id=737&page=1&itemsPerPage=20&sortColumnName=default&descending=false&transaction_type_identifier=DEBT_TO_VENDOR HTTP/1.1"
+#http://localhost:8080/api/v1/sd/schedD?report_id=737&page=1&itemsPerPage=20&sortColumnName=default&descending=false&transaction_type_identifier=DEBT_TO_VENDOR
+
+'''
+
+def get_int_value(num):
+    if num is not None: 
+        num = int(num)
+    else:
+        num = 1 
+    return int(num)          
+
+#: get the paginator page with other details like  
+def get_pagination_dataset(json_res, itemsperpage, page_num):
+    if check_null_value(json_res) is False or json_res is None:
+        json_result = {
+            "items": "",
+            "totalItems": "",
+            "itemsPerPage": "",
+            "pageNumber": "",
+            "totalPages": "",
+        }
+        return json_result
+    else:
+        total_count = len(json_res)
+        paginator = Paginator(json_res, itemsperpage)
+        if paginator.num_pages < page_num:
+            page_num = paginator.num_pages
+        json_res = paginator.page(page_num)
+        json_result = {
+            "items": list(json_res),
+            "totalItems": total_count,
+            "itemsPerPage": itemsperpage,
+            "pageNumber": page_num,
+            "totalPages": paginator.num_pages,
+        }
+        return json_result
+
+
+
+@api_view(["POST", "GET", "DELETE", "PUT"])
+def schedD(request):
+    """
+    sched_a api supporting POST, GET, DELETE, PUT
+    """
+    #: Get the request parameters and set for Pagination
+    query_params = request.query_params
+    page_num = get_int_value(query_params.get("page"))
+    # if query_params.get("page") is not None: 
+    #     page_num = int(page_num)
+    # else:
+    #     page_num = 1       
+
+    descending = query_params.get("descending")
+    if not (
+        "sortColumnName" in query_params
+        and check_null_value(query_params.get("sortColumnName"))
+    ):
+        sortcolumn = "name"
+    elif query_params.get("sortColumnName") == "default":
+        sortcolumn = "name"
+    else:
+        sortcolumn = query_params.get("sortColumnName")
+    itemsperpage =  get_int_value(query_params.get("itemsPerPage"))
+    search_string = query_params.get("search")
+    params = query_params.get("filters", {})
+    keywords = params.get("keywords")
+    if str(descending).lower() == "true":
+        descending = "DESC"
+    else:
+        descending = "ASC"
+    trans_query_string_count = "" #get_trans_query_for_total_count(trans_query_string)
+    row1=""
+    totalcount=""
+
+
+    # create new sched_d transaction
+    if request.method == "POST":
+        logger.debug("POST request received:{}".format(request.data))
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            if not ("report_id" in request.data):
+                raise Exception("Missing Input: report_id is mandatory")
+            # handling null,none value of report_id
+            if not (check_null_value(request.data.get("report_id"))):
+                report_id = "0"
+            else:
+                report_id = check_report_id(request.data.get("report_id"))
+            # end of handling
+            # save entoty first
+            logger.debug("checking and filtering reqt data...")
+            datum = schedD_sql_dict(request.data)
+            logger.debug("valid data set:{}".format(datum))
+            datum["report_id"] = report_id
+            datum["cmte_id"] = cmte_id
+
+            # if 'creditor_entity_id' in request.data and check_null_value(
+            #         request.data.get('creditor_entity_id')):
+            #     datum['creditor_entity_id'] = request.data.get(
+            #         'creditor_entity_id')
+            if "transaction_id" in request.data and check_null_value(
+                request.data.get("transaction_id")
+            ):
+                datum["transaction_id"] = check_transaction_id(
+                    request.data.get("transaction_id")
+                )
+                logger.debug(
+                    "update transaction {} with data:{}".format(
+                        datum.get("transaction_id", datum)
+                    )
+                )
+                data = put_schedD(datum)
+            else:
+                logger.debug("saving new sd transaction:{}".format(datum))
+                data = post_schedD(datum)
+            # Associating child transactions to parent and storing them to DB
+
+            output = get_schedD(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                "The schedD API - POST is throwing an exception: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    elif request.method == "GET":
+        try:
+            #: Hardcode cmte value for now and remove after dev complete
+            #data = {"cmte_id": "C00000935"} 
+            data =  {"cmte_id": get_comittee_id(request.user.username)}
+     
+            if "report_id" in request.query_params:
+                data["report_id"] = check_report_id(
+                    request.query_params.get("report_id")
+                )
+            # elif "report_id" in request.query_params:
+            #     data["report_id"] = check_report_id(
+            #         request.query_params.get("report_id")
+            #     )
+            else:
+                raise Exception("Missing Input: report_id is mandatory")
+            if "transaction_id" in request.query_params and check_null_value(
+                request.query_params.get("transaction_id")
+            ):
+                data["transaction_id"] = check_transaction_id(
+                    request.query_params.get("transaction_id")
+                )
+            if 'transaction_type_identifier' in request.query_params:
+                data['transaction_type_identifier'] = request.query_params.get(
+                    'transaction_type_identifier')
+            # if "transaction_id" in request.data and check_null_value(
+            #     request.data.get("transaction_id")
+            # ):
+            #     data["transaction_id"] = check_transaction_id(
+            #         request.data.get("transaction_id")
+            #     )
+            datum = get_schedD(data)
+
+            if "transaction_id" in request.query_params and check_null_value(
+                request.query_params.get("transaction_id")
+            ):
+                json_result = datum
+            else:
+                # : insert pagination functionality
+                json_result = get_pagination_dataset(datum, itemsperpage, page_num)
+            return Response(json_result, status=status.HTTP_200_OK)
+
+        except NoOPError as e:
+            logger.debug(e)
+            forms_obj = []
+            return JsonResponse(
+                forms_obj, status=status.HTTP_204_NO_CONTENT, safe=False
+            )
+        except Exception as e:
+            logger.debug(e)
+            return Response(
+                "The schedD API - GET is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    elif request.method == "DELETE":
+        try:
+            data = {"cmte_id": get_comittee_id(request.user.username)}
+            if "report_id" in request.query_params:
+                data["report_id"] = check_report_id(
+                    request.query_params.get("report_id")
+                )
+            else:
+                raise Exception("Missing Input: report_id is mandatory")
+            if "transaction_id" in request.query_params and check_null_value(
+                request.query_params.get("transaction_id")
+            ):
+                data["transaction_id"] = check_transaction_id(
+                    request.query_params.get("transaction_id")
+                )
+            else:
+                raise Exception("Missing Input: transaction_id is mandatory")
+            delete_schedD(data)
+            return Response(
+                "The Transaction ID: {} has been successfully deleted".format(
+                    data.get("transaction_id")
+                ),
+                status=status.HTTP_201_CREATED,
+            )
+        except Exception as e:
+            return Response(
+                "The schedD API - DELETE is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    elif request.method == "PUT":
+        try:
+            datum = schedD_sql_dict(request.data)
+            if "transaction_id" in request.data and check_null_value(
+                request.data.get("transaction_id")
+            ):
+                datum["transaction_id"] = request.data.get("transaction_id")
+            else:
+                raise Exception("Missing Input: transaction_id is mandatory")
+
+            if not ("report_id" in request.data):
+                raise Exception("Missing Input: Report_id is mandatory")
+            # handling null,none value of report_id
+            if not (check_null_value(request.data.get("report_id"))):
+                report_id = "0"
+            else:
+                report_id = check_report_id(request.data.get("report_id"))
+            # end of handling
+            datum["report_id"] = report_id
+            datum["cmte_id"] = get_comittee_id(request.user.username)
+
+            # if 'entity_id' in request.data and check_null_value(request.data.get('entity_id')):
+            #     datum['entity_id'] = request.data.get('entity_id')
+            # if request.data.get('transaction_type') in CHILD_SCHED_B_TYPES:
+            #     data = put_schedB(datum)
+            #     output = get_schedB(data)
+            # else:
+            data = put_schedD(datum)
+            output = get_schedD(data)
+            # output = get_schedA(data)
+            return JsonResponse(output[0], status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.debug(e)
+            return Response(
+                "The schedD API - PUT is throwing an error: " + str(e),
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    else:
+        raise NotImplementedError
+
+
 def delete_schedD(data):
 
     try:
@@ -317,6 +584,8 @@ def schedD_sql_dict(data):
         "cand_office_district",
         "cand_election_year",
         "phone_number",
+        "memo_code",
+        "memo_text"
     ]
     try:
         valid_data = {k: v for k, v in data.items() if k in valid_fields}
@@ -640,8 +909,10 @@ def post_sql_schedD(data):
                                     balance_at_close,
                                     back_ref_transaction_id,
                                     back_ref_sched_name,
+                                    memo_code,
+                                    memo_text,
                                     create_date)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);
         """
         _v = (
             data.get("cmte_id"),
@@ -657,6 +928,8 @@ def post_sql_schedD(data):
             data.get("balance_at_close"),
             data.get("back_ref_transaction_id"),
             data.get("back_ref_sched_name"),
+            data.get("memo_code"),
+            data.get("memo_text"),
             datetime.datetime.now(),
         )
         with connection.cursor() as cursor:
@@ -681,6 +954,8 @@ def put_sql_schedD(data):
                 payment_amount = %s,
                 back_ref_transaction_id = %s,
                 back_ref_sched_name = %s,
+                memo_code = %s,
+                memo_text = %s,
                 last_update_date = %s
             WHERE transaction_id = %s 
             AND report_id = %s 
@@ -698,6 +973,8 @@ def put_sql_schedD(data):
         data.get("payment_amount"),
         data.get("back_ref_transaction_id"),
         data.get("back_ref_sched_name"),
+        data.get("memo_code"),
+        data.get("memo_text"),
         datetime.datetime.now(),
         data.get("transaction_id"),
         data.get("report_id"),
@@ -757,7 +1034,6 @@ def get_child_transactions(report_id, cmte_id, transaction_id):
     # child_forms_obj = childA_forms_obj + childB_forms_obj
     # # for obj in childB_forms_obj:
     # #     obj.update({'api_call':''})
-
 
 def get_schedD(data):
     """"
@@ -1054,6 +1330,8 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
                     back_ref_transaction_id,
                     back_ref_sched_name,
                     balance_at_close,
+                    memo_code,
+                    memo_text,
                     last_update_date
             FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
             AND transaction_id = %s AND delete_ind is distinct from 'Y'

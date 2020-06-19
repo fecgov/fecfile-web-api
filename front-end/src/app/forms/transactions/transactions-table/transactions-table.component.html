@@ -30,17 +30,25 @@
       </button>
     </nav>
   </div>
-  <div class="grid-row float-right transactions__page-item-range">
-    <div *ngIf="isTransactionViewActive() || isRecycleBinViewActive()"
-      class="float-right transactions__item-range">
-      {{determineItemRange()}} of {{config.totalItems}}
-    </div>
-  </div>
+  
   <div *ngIf="apiError" class="text-error text-center">
       There was an unexpected error. Please try again. 
   </div> 
 
   <ng-container *ngIf="!apiError">
+    <div class="grid-row d-flex justify-content-between">
+      <div class="d-flex ml-3" *ngIf="showPageSizes()">
+        <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>    
+        <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
+          (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage"
+          class="border border-light">
+        </ng-select>
+      </div>
+      <div *ngIf="showPageSizes() && (isTransactionViewActive() || isRecycleBinViewActive())" class="transactions__item-range mr-2">
+        {{determineItemRange()}} of {{config.totalItems}}
+      </div>
+    </div>
+
   <!--Receipt transaction table-->
     <table class="table table-striped table-hover table__sortable transactions__table" *ngIf="transactionCategory === 'receipts'">
       <thead>
@@ -116,7 +124,24 @@
                 </div>
               </div>
             </div>
-            <div *ngIf="!editMode && !_allTransactions">
+            <div *ngIf="!editMode && !_allTransactions && !isReportFiled()">
+                <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                      aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
+                          [disabled]="bulkActionDisabled">
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="printAllSelected()">
+                      <i class="print-icon"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="exportAllSelected()">
+                      <i class="file-export-icon"></i> Export
+                    </button>
+                  </div>
+              </div>
+            </div>
+            <div *ngIf="!editMode && !_allTransactions && isReportFiled()">
               <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                 <i class="ellipsis-icon"></i>
               </button>
@@ -163,8 +188,10 @@
             <td>
               <div  *ngIf="isRecycleBinViewActive()">
                 <span [title]="!trx.iseditable ? 'This transaction cannot be restored because it is auto generated.': ''">
-                  <button class="btn btn-sm btn-primary" [disabled]="!trx.iseditable" (click)="restoreTransaction(trx)">
-                    <i class="undo-icon"></i>
+                  <button class="btn btn-sm btn-primary"
+                          [disabled]="!trx.iseditable || _authService.isReadOnly()"
+                          (click)="restoreTransaction(trx)">
+                          <i class="undo-icon"></i>
                   </button>
                 </span>
               </div>
@@ -242,8 +269,10 @@
             <td>
               <div  *ngIf="isRecycleBinViewActive()">
                 <span [title]="!trxChild.iseditable ? 'This transaction cannot be restored because it is either auto-generated or its parent is in deleted state.': ''">
-                  <button *ngIf="!_authService.isReadOnly()" class="btn btn-sm btn-primary" [disabled]="!trxChild.isEditable" (click)="restoreTransaction(trxChild)">
-                    <i class="undo-icon"></i>
+                  <button *ngIf="!_authService.isReadOnly()" class="btn btn-sm btn-primary"
+                          [disabled]="!trxChild.iseditable || _authService.isReadOnly()"
+                          (click)="restoreTransaction(trxChild)">
+                          <i class="undo-icon"></i>
                   </button>
                 </span>
               </div>
@@ -277,9 +306,10 @@
                       </button>
                     </span>
                     <span [title]="!trxChild.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                      <button [disabled]="!trxChild.iseditable" *ngIf="checkIfTrashable(trx)&& !_authService.isReadOnly()" class="dropdown-item"
+                      <button [disabled]="!trxChild.iseditable" *ngIf="checkIfTrashable(trx) && !_authService.isReadOnly()"
+                              class="dropdown-item"
                               (click)="trashTransaction(trxChild)">
-                        <i class="trash-icon"></i> Trash
+                              <i class="trash-icon"></i> Trash
                       </button>
                     </span>
                   </div>
@@ -414,7 +444,24 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="!editMode && !_allTransactions">
+              <div *ngIf="!editMode && !_allTransactions && !isReportFiled()">
+                <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                      aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
+                          [disabled]="bulkActionDisabled">
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="printAllSelected()">
+                      <i class="print-icon"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="exportAllSelected()">
+                      <i class="file-export-icon"></i> Export
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!editMode && !_allTransactions && isReportFiled()">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
                   <i class="ellipsis-icon"></i>
                 </button>
@@ -462,8 +509,10 @@
               <td>
                 <div  *ngIf="isRecycleBinViewActive()">
                   <span [title]="!trx.iseditable ? 'This transaction cannot be restored because it is auto generated.': ''">
-                    <button class="btn btn-sm btn-primary" [disabled]="!trx.iseditable" (click)="restoreTransaction(trx)">
-                      <i class="undo-icon"></i>
+                    <button class="btn btn-sm btn-primary"
+                            [disabled]="!trx.iseditable || _authService.isReadOnly()"
+                            (click)="restoreTransaction(trx)">
+                            <i class="undo-icon"></i>
                     </button>
                   </span>
                 </div>
@@ -541,8 +590,10 @@
               <td>
                 <div  *ngIf="isRecycleBinViewActive()">
                   <span [title]="!trxChild.iseditable ? 'This transaction cannot be restored because it is either auto-generated or its parent is in deleted state.': ''">
-                    <button class="btn btn-sm btn-primary" [disabled]="!trxChild.isEditable" (click)="restoreTransaction(trxChild)">
-                      <i class="undo-icon"></i>
+                    <button class="btn btn-sm btn-primary"
+                            [disabled]="!trxChild.iseditable || _authService.isReadOnly()"
+                            (click)="restoreTransaction(trxChild)">
+                            <i class="undo-icon"></i>
                     </button>
                   </span>
                 </div>
@@ -705,16 +756,28 @@
                     <button class="dropdown-item" (click)="exportAllSelected()">
                       <i class="file-export-icon"></i> Export
                     </button>
-                    <button *ngIf="checkIfTrashable() || !_authService.isReadOnly()" class="dropdown-item" (click)="trashAllSelected()">
+                    <button *ngIf="checkIfTrashable() && !_authService.isReadOnly()" class="dropdown-item" (click)="trashAllSelected()">
                       <i class="trash-icon"></i> Trash
                     </button>
                   </div>
                 </div>
               </div>
-              <div *ngIf="!editMode && !_allTransactions">
-                <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
-                  <i class="ellipsis-icon"></i>
-                </button>
+              <div *ngIf="!editMode && !_allTransactions && !isReportFiled()">
+                <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                      aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
+                          [disabled]="bulkActionDisabled">
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="printAllSelected()">
+                      <i class="print-icon"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="exportAllSelected()">
+                      <i class="file-export-icon"></i> Export
+                    </button>
+                  </div>
+                </div>
               </div>
               <div  *ngIf="isRecycleBinViewActive()">
                 <button class="btn btn-sm btn-primary transactions__bulk_action_btn" 
@@ -764,8 +827,10 @@
               <td  *ngIf="isColumnVisible('loanDueDate')">{{trx.loanDueDate}}</td>
               <td>
                 <div  *ngIf="isRecycleBinViewActive()">
-                  <button class="btn btn-sm btn-primary" (click)="restoreTransaction(trx)">
-                    <i class="undo-icon"></i>
+                  <button class="btn btn-sm btn-primary"
+                          [disabled]="_authService.isReadOnly()"
+                          (click)="restoreTransaction(trx)">
+                          <i class="undo-icon"></i>
                   </button>
                 </div>
                 <!--trx.reportstatus is filed and isEditable flag is false the report is filed-->
@@ -793,7 +858,8 @@
                         <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
                       </button>
                       <span [title]="!trx.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                          <button *ngIf="trx.iseditable && checkIfTrashable(trx)" class="dropdown-item"
+                          <button *ngIf="trx.iseditable && checkIfTrashable(trx) && !_authService.isReadOnly()"
+                                  class="dropdown-item"
                                   (click)="trashTransaction(trx)">
                             <i class="trash-icon"></i> Trash
                           </button>
@@ -913,13 +979,31 @@
                     <button class="dropdown-item" (click)="exportAllSelected()">
                       <i class="file-export-icon"></i> Export
                     </button>
-                    <button *ngIf="checkIfTrashable()" class="dropdown-item" (click)="trashAllSelected()">
-                      <i class="trash-icon"></i> Trash
+                    <button *ngIf="checkIfTrashable() && !_authService.isReadOnly()"
+                            class="dropdown-item" (click)="trashAllSelected()">
+                            <i class="trash-icon"></i> Trash
                     </button>
                   </div>
                 </div>
               </div>
-              <div *ngIf="!editMode && !_allTransactions">
+              <div *ngIf="!editMode && !_allTransactions && !isReportFiled()">
+                <div  *ngIf="isTransactionViewActive()" class="btn-group" ngbDropdown role="group"
+                      aria-label="Action dropdown">
+                  <button class="btn btn-sm btn-primary transactions__bulk_action_btn" ngbDropdownToggle
+                          [disabled]="bulkActionDisabled">
+                    <i class="ellipsis-icon"></i>
+                  </button>
+                  <div id="transactions__dropdown-action" class="dropdown-menu" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="printAllSelected()">
+                      <i class="print-icon"></i> Print
+                    </button>
+                    <button class="dropdown-item" (click)="exportAllSelected()">
+                      <i class="file-export-icon"></i> Export
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!editMode && !_allTransactions && isReportFiled()">
                   <div  *ngIf="isTransactionViewActive()" class="btn-group"role="group"
                   aria-label="Action dropdown">
                 <button class="btn btn-sm btn-primary" (click)="checkIfEditMode()">
@@ -969,8 +1053,10 @@
                 <div  *ngIf="isRecycleBinViewActive()">
                   <span [title]="!trx.iseditable ? 'This transaction cannot be restored because a linked transaction is also in deleted state. 
                   Please restore the linked transaction first.': ''">
-                    <button class="btn btn-sm btn-primary" [disabled]="!trx.iseditable" (click)="restoreTransaction(trx)">
-                      <i class="undo-icon"></i>
+                    <button class="btn btn-sm btn-primary"
+                            [disabled]="!trx.iseditable || _authService.isReadOnly()"
+                            (click)="restoreTransaction(trx)">
+                            <i class="undo-icon"></i>
                     </button>
                   </span>
                 </div>
@@ -1042,8 +1128,10 @@
               <td>
                 <div  *ngIf="isRecycleBinViewActive()">
                   <span [title]="!trxChild.iseditable ? 'This transaction cannot be restored because it is either auto-generated or its parent is in deleted state.': ''">
-                    <button class="btn btn-sm btn-primary" [disabled]="!trxChild.isEditable" (click)="restoreTransaction(trxChild)">
-                      <i class="undo-icon"></i>
+                    <button class="btn btn-sm btn-primary"
+                            [disabled]="!trxChild.isEditable || _authService.isReadOnly()"
+                            (click)="restoreTransaction(trxChild)">
+                            <i class="undo-icon"></i>
                     </button>
                   </span>
                 </div>
@@ -1131,8 +1219,20 @@
     </table>
     <hr/>
     <div *ngIf="showPagination()" class="d-flex justify-content-center transactions__table-pagination-container">
-      <pagination-controls [id]="config.id" (pageChange)="getPage($event)">
-      </pagination-controls>
+      <div class="my-auto">
+        <pagination-controls [id]="config.id" (pageChange)="getPage($event)" [maxSize]="paginationControlsMaxSize">
+        </pagination-controls>
+      </div>
+      <div *ngIf="pageNumbers.length > 1" class="d-flex ml-1">
+        <div class="mr-1 my-auto text-muted">Go to page:</div>
+        <ng-select #pageNumber [items]="pageNumbers" [clearable]="false" [hideSelected]="true"
+          (change)="onGotoPageChange($event)" [(ngModel)]="gotoPage"
+          class="border border-light">
+        </ng-select>
+      </div>
+    </div>
+    <div *ngIf="!showPageSizes()" class="d-flex justify-content-center reports__table-pagination-container">
+      <div class="text-muted">No records found</div>
     </div>
   </ng-container>
   <div bsModal #columnOptionsModal="bs-modal" class="modal fade column-options-modal" tabindex="-1" role="dialog"

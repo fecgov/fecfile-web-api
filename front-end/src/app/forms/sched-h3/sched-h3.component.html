@@ -18,6 +18,7 @@
 </ng-template>
 <div class="sched-h3-container">
   <form [formGroup]="schedH3">
+    <!-- Page - header -->
     <header>
       <div class="header-content">
         <div class="float-left">
@@ -43,7 +44,8 @@
             <span class="sr-only">Click for more options</span>
           </button>
           <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button *ngIf="false" class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i> Print</button>
+            <button *ngIf="false" class="dropdown-item" (click)="printPreview()"><i class="print-icon"></i>
+              Print</button>
             <button class="dropdown-item">
               <i class="file-import-icon" (click)="ImportTransactions()"></i> Import
             </button>
@@ -57,263 +59,438 @@
       </div>
     </header>
 
-    <section *ngIf="transactionType === 'ALLOC_H3_RATIO'">
-      <div [hidden]="showPart2" class="paragraph">
-        <div class="row">
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="account_name">
-                Account Name
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <input class="form-control" type="text" [formControlName]="'account_name'" [attr.name]="'account_name'"
-                [style.width]="'90%'" [style.height]="'30px'" [ngClass]="
+    <!-- Page - body (before table) -->
+    <ng-container>
+      <section *ngIf="transactionType === 'ALLOC_H3_RATIO'">
+        <div [hidden]="showPart2" class="paragraph">
+          <div class="row">
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="account_name">
+                  Account Name
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <input class="form-control" type="text" [formControlName]="'account_name'" [attr.name]="'account_name'"
+                  [style.width]="'90%'" [style.height]="'30px'" [ngClass]="
                   schedH3.get('account_name')?.invalid && (schedH3.touched || schedH3.dirty) && isSubmit
                     ? 'input-field-error'
                     : ''
                 " [ngbTypeahead]="searchAccountName" [resultTemplate]="rt" [inputFormatter]="formatterAccountName" />
+              </div>
             </div>
-          </div>
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="">
-                Date
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="row input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="filter-max-amount">
-                    <i class="calendar-icon" aria-hidden="true"></i>
-                  </span>
-                </div>
-                <input class="form-control" type="date" [formControlName]="'receipt_date'" [attr.name]="'receipt_date'"
-                  [style.width]="'50%'" [style.height]="'30px'" (change)="receiptDateChanged($event.target.value)"
-                  [ngClass]="
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="">
+                  Date
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="row input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="filter-max-amount">
+                      <i class="calendar-icon" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" type="date" [formControlName]="'receipt_date'"
+                    [attr.name]="'receipt_date'" [style.width]="'50%'" [style.height]="'30px'"
+                    (change)="receiptDateChanged($event.target.value)" [ngClass]="
                     schedH3.get('receipt_date')?.invalid && (schedH3.touched || schedH3.dirty) && isSubmit
                       ? 'input-field-error'
                       : ''
                   " />
-              </div>
-              <div class="text-error text-left" *ngIf="receiptDateErr">
-                The date entered falls outside of the report coverage period. Transactions for this report should fall
-                within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you need to add a
-                transaction with a date that falls outside of the coverage period for this report, you will need to
-                check the memo code box.
-              </div>
-            </div>
-          </div>
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="">
-                Total Amount of Transfer
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="row input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="filter-max-amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
-                  </span>
                 </div>
-                <input class="form-control" type="text" [formControlName]="'total_amount_transferred'"
-                  [attr.name]="'total_amount_transferred'" [style.width]="'50%'" [style.height]="'30px'"
-                  [attr.readonly]="true" />
+                <div class="text-error text-left" *ngIf="receiptDateErr">
+                  The date entered falls outside of the report coverage period. Transactions for this report should fall
+                  within {{ cvgStartDate }} and {{ cvgEndDate }} (Coverage Dates of Report). If you need to add a
+                  transaction with a date that falls outside of the coverage period for this report, you will need to
+                  check the memo code box.
+                </div>
+              </div>
+            </div>
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="">
+                  Total Amount of Transfer
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="row input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="filter-max-amount">
+                      <i class="dollar-sign-icon" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" type="text" [formControlName]="'total_amount_transferred'"
+                    [attr.name]="'total_amount_transferred'" [style.width]="'50%'" [style.height]="'30px'"
+                    [attr.readonly]="true" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col col-md-6 col-md-offset-2">
-            <div class="form-group">
-              <label for=""> </label>
+          <div class="row">
+            <div class="col col-md-6 col-md-offset-2">
+              <div class="form-group">
+                <label for=""> </label>
 
-              <select id="" formControlName="category" class="form-control" (change)="selectCategoryChange($event)">
-                <option value="" selected>Select Category</option>
-                <option *ngFor="let category of categories" [value]="category.id">
-                  {{ category.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div [hidden]="showPart2" class="paragraph">
-        <div *ngIf="showIdentifer" class="row">
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="account_name">
-                {{ totalName }}
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div *ngIf="showIdentiferSelect">
-                <select id="" formControlName="activity_event_name" class="form-control"
-                  (change)="selectActivityOrEventChange($event)" [ngClass]="
-                    schedH3.get('activity_event_name')?.invalid && (schedH3.touched || schedH3.dirty) && isSubmit
-                      ? 'input-field-error'
-                      : ''
-                  ">
-                  <option value="" selected>Activity or Event Identifier</option>
-                  <option *ngFor="let identifier of identifiers" [value]="identifier.activity_event_name">
-                    {{ identifier.activity_event_name }}
+                <select id="" formControlName="category" class="form-control" (change)="selectCategoryChange($event)">
+                  <option value="" selected>Select Category</option>
+                  <option *ngFor="let category of categories" [value]="category.id">
+                    {{ category.name }}
                   </option>
                 </select>
               </div>
             </div>
           </div>
-          <div class="col col-md-4">
-            <div class="form-group">
-              <label for="">
-                Amount
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="row input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="filter-max-amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
-                  </span>
+        </div>
+
+        <div [hidden]="showPart2" class="paragraph">
+          <div *ngIf="showIdentifer" class="row">
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="account_name">
+                  {{ totalName }}
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div *ngIf="showIdentiferSelect">
+                  <select id="" formControlName="activity_event_name" class="form-control"
+                    (change)="selectActivityOrEventChange($event)" [ngClass]="
+                    schedH3.get('activity_event_name')?.invalid && (schedH3.touched || schedH3.dirty) && isSubmit
+                      ? 'input-field-error'
+                      : ''
+                  ">
+                    <option value="" selected>Activity or Event Identifier</option>
+                    <option *ngFor="let identifier of identifiers" [value]="identifier.activity_event_name">
+                      {{ identifier.activity_event_name }}
+                    </option>
+                  </select>
                 </div>
-                <input class="form-control" type="text" [formControlName]="'transferred_amount'"
-                  [attr.name]="'transferred_amount'" [style.width]="'50%'" [style.height]="'30px'"
-                  (blur)="handleOnBlurEvent($event, col)" [ngClass]="
+              </div>
+            </div>
+            <div class="col col-md-4">
+              <div class="form-group">
+                <label for="">
+                  Amount
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="row input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="filter-max-amount">
+                      <i class="dollar-sign-icon" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" type="text" [formControlName]="'transferred_amount'"
+                    [attr.name]="'transferred_amount'" [style.width]="'50%'" [style.height]="'30px'"
+                    (blur)="handleOnBlurEvent($event, col)" [ngClass]="
                     schedH3.get('transferred_amount')?.invalid && (schedH3.touched || schedH3.dirty) && isSubmit
                       ? 'input-field-error'
                       : ''
                   " />
-              </div>
-              <div class="text-error text-left" *ngIf="transferredAmountErr">
-                Please enter a valid amount.
+                </div>
+                <div class="text-error text-left" *ngIf="transferredAmountErr">
+                  Please enter a valid amount.
+                </div>
+                <label>
+                  Memo Text (Optional)
+                  <button type="button" class="btn btn-info" ngbTooltip="Placeholder"
+                          tooltipClass="form-tooltip">
+                        <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <input class="form-control" type="text"
+                       [formControlName]="'memo_text'"
+                       [attr.name]="'memo_text'"
+                       [style.width]="'94%'"
+                       [style.height]="'30px'"
+                />
               </div>
             </div>
-          </div>
-          <div *ngIf="showAggregateAmount" class="col col-md-4">
-            <div class="form-group">
-              <label for="">
-                Total Amount of {{ totalName }}
-                <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="row input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="filter-max-amount">
-                    <i class="dollar-sign-icon" aria-hidden="true"></i>
-                  </span>
-                </div>
-                <input class="form-control" type="text" [formControlName]="'aggregate_amount'"
-                  [attr.name]="'aggregate_amount'" [style.width]="'50%'" [style.height]="'30px'" [attr.readonly]="true"
-                  [attr.value]="0.0" [ngClass]="
+            <div *ngIf="showAggregateAmount" class="col col-md-4">
+              <div class="form-group">
+                <label for="">
+                  Total Amount of {{ totalName }}
+                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                    tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="row input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="filter-max-amount">
+                      <i class="dollar-sign-icon" aria-hidden="true"></i>
+                    </span>
+                  </div>
+                  <input class="form-control" type="text" [formControlName]="'aggregate_amount'"
+                    [attr.name]="'aggregate_amount'" [style.width]="'50%'" [style.height]="'30px'"
+                    [attr.readonly]="true" [attr.value]="0.0" [ngClass]="
                     frmIndividualReceipt.get('date')?.invalid &&
                     (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
                       ? 'input-field-error'
                       : ''
                   " />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+    </ng-container>
 
-      <div *ngIf="scheduleAction !== editScheduleAction" class="paragraph">
-        <ng-container>
-          <table class="table table-striped table-hover table__sortable">
+    <!-- Pagination - selection -->
+    <ng-container>
+      <section *ngIf="transactionType === 'ALLOC_H3_SUM'">
+        <div class="grid-row d-flex justify-content-between sched-h3__page-range">
+          <div class="d-flex ml-3" *ngIf="showPageSizes()">
+            <div class="d-inline mr-1 my-auto text-muted">Items per page:</div>
+            <ng-select #pageNumber [items]="pageSizes" [clearable]="false" [hideSelected]="true"
+              (change)="onMaxItemsPerPageChanged($event)" [(ngModel)]="maxItemsPerPage" class="border border-light"
+              [ngModelOptions]="{standalone: true}">
+            </ng-select>
+          </div>
+          <div class="sched-h3__item-range" *ngIf="showPageSizes()">
+            {{determineItemRange()}} of {{config.totalItems}}
+          </div>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- Page - body (table) -->
+    <ng-container>
+      <section *ngIf="transactionType === 'ALLOC_H3_RATIO'">
+        <div *ngIf="scheduleAction !== editScheduleAction" class="paragraph">
+          <ng-container>
+            <table class="table table-striped table-hover table__sortable">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th (click)="changeSortDirection('account_name')">
+                    Account Name
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+                  <th (click)="changeSortDirection('activity')">
+                    Transfer Type
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+                  <th (click)="changeSortDirection('activity_event_name')">
+                    Activity or Event Identifier
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+                  <th (click)="changeSortDirection('receipt_date')">
+                    Date
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+                  <th (click)="changeSortDirection('ratio_code')">
+                    Amount
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+                  <th (click)="changeSortDirection('federal_percent')">
+                    Total Amount
+                    <i class="fa fa-sort" aria-hidden="false"></i>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container>
+                  <tr *ngFor="let item of h3Entries | paginate: config">
+                    <td>
+                      <input type="checkbox" (click)="checkForMultiChecked($event)" />
+                    </td>
+                    <td>{{ item.account_name }}</td>
+                    <td>
+                      <div *ngIf="item.activity_event_type == 'AD'">Administrative</div>
+                      <div *ngIf="item.activity_event_type == 'GV'">Generic Voter Drive</div>
+                      <div *ngIf="item.activity_event_type == 'EA'">Exempt Activities</div>
+                      <div *ngIf="item.activity_event_type == 'DF'">Direct Fundraising</div>
+                      <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Suppot</div>
+                      <div *ngIf="item.activity_event_type == 'PC'">
+                        Public Communications Referring Only to Party(Made by PAC)
+                      </div>
+                    </td>
+                    <td>{{ item.activity_event_name }}</td>
+                    <td>{{ item.receipt_date | date: 'MM/dd/yyyy' }}</td>
+                    <td class="summary_text_amt">
+                      {{ item.transferred_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
+                    </td>
+                    <td class="summary_text_amt">
+                      {{ item.aggregate_amount === 0 ? '' : (item.aggregate_amount | currency: 'USD':'symbol-narrow':'1.2-2') }}
+                    </td>
+
+                    <td class="bulk_action">
+                      <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                        <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                          <i class="fas fa-ellipsis-h"></i>
+                        </button>
+
+                        <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
+                          <button class="dropdown-item" (click)="editH3Sub(item)"><i class="fas fa-edit"></i>
+                            Edit</button>
+                          <button class="dropdown-item" (click)="trashSubTransaction(item)">
+                            <i class="fas fa-trash"></i> Trash
+                          </button>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </ng-container>
+        </div>
+      </section>
+
+      <section *ngIf="transactionType === 'ALLOC_H3_SUM'">
+        <table class="table table-striped table-hover table__sortable">
+          <thead>
+            <tr>
+              <th></th>
+              <th (click)="changeSortDirection('activity')">
+                Transfer Type
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+              <th (click)="changeSortDirection('activity_event_name')">
+                Activity or Event Identifier
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+              <th (click)="changeSortDirection('receipt_date')">
+                Date
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+              <th (click)="changeSortDirection('ratio_code')">
+                Amount
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+              <th (click)="changeSortDirection('federal_percent')">
+                Total Amount
+                <i class="fa fa-sort" aria-hidden="false"></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container>
+              <tr *ngFor="let item of h3Sum | paginate: config">
+                <td>
+                  <input type="checkbox" (click)="checkForMultiChecked($event)" />
+                </td>
+                <td>
+                  <div *ngIf="item.activity_event_type == 'AD'">Administrative</div>
+                  <div *ngIf="item.activity_event_type == 'GV'">Generic Voter Drive</div>
+                  <div *ngIf="item.activity_event_type == 'EA'">Exempt Activities</div>
+                  <div *ngIf="item.activity_event_type == 'DF'">Direct Fundraising</div>
+                  <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Suppot</div>
+                  <div *ngIf="item.activity_event_type == 'PC'">
+                    Public Communications Referring Only to Party(Made by PAC)
+                  </div>
+                </td>
+                <td>{{ item.activity_event_name }}</td>
+                <td>{{ item.receipt_date | date: 'MM/dd/yyyy' }}</td>
+                <td class="summary_text_amt">{{ item.transferred_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
+                </td>
+                <td class="summary_text_amt">
+                  {{ item.aggregate_amount === 0 ? '' : (item.aggregate_amount | currency: 'USD':'symbol-narrow':'1.2-2') }}
+                </td>
+
+                <td class="bulk_action">
+                  <div class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+                    <button class="btn btn-sm btn-primary" ngbDropdownToggle>
+                      <i class="fas fa-ellipsis-h"></i>
+                    </button>
+
+                    <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
+                      <button class="dropdown-item" (click)="editH3(item)"><i class="fas fa-edit"></i> Edit</button>
+                      <button class="dropdown-item" (click)="printTransaction(item)"><i class="fas fa-print"></i>
+                        Print</button>
+                      <button class="dropdown-item" (click)="trashTransaction(item)"><i class="fas fa-trash"></i>
+                        Trash</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </section>
+
+      <section *ngIf="transactionType === 'ALLOC_H3_SUM_P'">
+        <div id="sumary">
+          <table class="table table-striped summary_table_text">
             <thead>
-              <tr>
-                <th ></th>
-                <th  (click)="changeSortDirection('account_name')">
-                  Account Name
-                  <i class="fa fa-sort" aria-hidden="false"></i>
+              <tr class="summary_text_amt_level_1">
+                <th>
+                  <h3>Categories</h3>
                 </th>
-                <th  (click)="changeSortDirection('activity')">
-                  Transfer Type
-                  <i class="fa fa-sort" aria-hidden="false"></i>
-                </th>
-                <th  (click)="changeSortDirection('activity_event_name')">
-                  Activity or Event Identifier
-                  <i class="fa fa-sort" aria-hidden="false"></i>
-                </th>
-                <th  (click)="changeSortDirection('receipt_date')">
-                  Date
-                  <i class="fa fa-sort" aria-hidden="false"></i>
-                </th>
-                <th  (click)="changeSortDirection('ratio_code')">
-                  Amount
-                  <i class="fa fa-sort" aria-hidden="false"></i>
-                </th>
-                <th  (click)="changeSortDirection('federal_percent')">
-                  Total Amount
-                  <i class="fa fa-sort" aria-hidden="false"></i>
+                <th>
+                  <h3>Total Breakdown of Transfer Received (This Period)</h3>
                 </th>
               </tr>
             </thead>
             <tbody>
-              <ng-container>
-                <tr *ngFor="let item of h3Entries | paginate: h3EntryTableConfig">
-                  <td>
-                    <input type="checkbox" (click)="checkForMultiChecked($event)" />
+              <ng-container *ngFor="let item of h3SumP">
+                <tr>
+                  <td class="summary_text_level_3" [ngClass]="item.category === 'Total Amount Transferred' ?
+                    'totalRow' : 'summary_text_level_3'">
+                    {{ item.category }}
+                    <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                      tooltipClass="form-tooltip">
+                      <i class="info-icon" aria-hidden="true"></i>
+                      <span class="sr-only">Click here for more information</span>
+                    </button>
                   </td>
-                  <td>{{ item.account_name }}</td>
-                  <td>
-                    <div *ngIf="item.activity_event_type == 'AD'">Administrative</div>
-                    <div *ngIf="item.activity_event_type == 'GV'">Generic Voter Drive</div>
-                    <div *ngIf="item.activity_event_type == 'EA'">Exempt Activities</div>
-                    <div *ngIf="item.activity_event_type == 'DF'">Direct Fundraising</div>
-                    <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Suppot</div>
-                    <div *ngIf="item.activity_event_type == 'PC'">
-                      Public Communications Referring Only to Party(Made by PAC)
-                    </div>
-                  </td>
-                  <td>{{ item.activity_event_name }}</td>
-                  <td>{{ item.receipt_date | date: 'MM/dd/yyyy' }}</td>
-                  <td class="summary_text_amt">
-                    {{ item.transferred_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}
-                  </td>
-                  <td class="summary_text_amt">
-                    {{ item.aggregate_amount === 0 ? '' : (item.aggregate_amount | currency: 'USD':'symbol-narrow':'1.2-2') }}
-                  </td>
-
-                  <td class="bulk_action">
-                    <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-                      <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-                        <i class="fas fa-ellipsis-h"></i>
-                      </button>
-
-                      <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
-                        <button class="dropdown-item" (click)="editH3Sub(item)"><i class="fas fa-edit"></i>
-                          Edit</button>
-                        <button class="dropdown-item" (click)="trashSubTransaction(item)">
-                          <i class="fas fa-trash"></i> Trash
-                        </button>
-                      </div>
-                    </div>
+                  <td class="summary_text_amt" [ngClass]="item.category === 'Total Amount Transferred' ?
+                    'totalRow' : 'summary_text_level_3'">{{ item.amount | currency:'USD':'symbol-narrow':'1.2-2' }}
                   </td>
                 </tr>
               </ng-container>
             </tbody>
           </table>
-          <hr />
-          <div class="d-flex justify-content-center pagination-controls">
-            <pagination-controls (pageChange)="entryPageChanged($event)"></pagination-controls>
-          </div>
-        </ng-container>
-      </div>
+        </div>
+      </section>
+    </ng-container>
 
-      <footer>
+    <!-- Pagination - paging -->
+    <ng-container>
+      <section *ngIf="transactionType === 'ALLOC_H3_SUM'">
+        <hr />
+        <div *ngIf="showPagination()" class="d-flex justify-content-center sched-h3__table-pagination-container">
+          <div class="my-auto">
+            <pagination-controls [id]="config.id" (pageChange)="getPage($event)" [maxSize]="paginationControlsMaxSize">
+            </pagination-controls>
+          </div>
+          <div *ngIf="pageNumbers.length > 1" class="d-flex ml-1">
+            <div class="mr-1 my-auto text-muted">Go to page:</div>
+            <ng-select #pageNumber [items]="pageNumbers" [clearable]="false" [hideSelected]="true"
+              (change)="onGotoPageChange($event)" [(ngModel)]="config.currentPage" class="border border-light" 
+              [ngModelOptions]="{standalone: true}">
+            </ng-select>
+          </div>
+        </div>
+        <div *ngIf="!showPageSizes()" class="d-flex justify-content-center reports__table-pagination-container">
+          <div class="text-muted">No records found</div>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- Page - footer -->
+    <ng-container>
+      <section *ngIf="transactionType === 'ALLOC_H3_RATIO'">
         <footer>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
@@ -322,9 +499,9 @@
                   <button class="btn btn-previous btn-left" type="button" (click)="previousStep()">
                     Previous
                   </button>
-                  <button *ngIf="scheduleAction !== viewScheduleAction" class="btn btn-secondary btn-right" type="button" [disabled]="saveAndAddDisabled"
-                  (click)="saveAndAddMore()">
-                  Save &amp; Add Transaction
+                  <button *ngIf="scheduleAction !== viewScheduleAction" class="btn btn-secondary btn-right"
+                    type="button" [disabled]="saveAndAddDisabled" (click)="saveAndAddMore()">
+                    Save &amp; Add Transaction
                   </button>
                   <a class="btn btn-previous btn-right" (click)="goSummary()">
                     Summary
@@ -342,84 +519,9 @@
             </div>
           </div>
         </footer>
-      </footer>
-    </section>
+      </section>
 
-    <section *ngIf="transactionType === 'ALLOC_H3_SUM'">
-      <table class="table table-striped table-hover table__sortable">
-        <thead>
-          <tr>
-            <th ></th>
-            <th  (click)="changeSortDirection('activity')">
-              Transfer Type
-              <i class="fa fa-sort" aria-hidden="false"></i>
-            </th>
-            <th  (click)="changeSortDirection('activity_event_name')">
-              Activity or Event Identifier
-              <i class="fa fa-sort" aria-hidden="false"></i>
-            </th>
-            <th  (click)="changeSortDirection('receipt_date')">
-              Date
-              <i class="fa fa-sort" aria-hidden="false"></i>
-            </th>
-            <th  (click)="changeSortDirection('ratio_code')">
-              Amount
-              <i class="fa fa-sort" aria-hidden="false"></i>
-            </th>
-            <th  (click)="changeSortDirection('federal_percent')">
-              Total Amount
-              <i class="fa fa-sort" aria-hidden="false"></i>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <ng-container>
-            <tr *ngFor="let item of h3Sum | paginate: h3TableConfig">
-              <td>
-                <input type="checkbox" (click)="checkForMultiChecked($event)" />
-              </td>
-              <td>
-                <div *ngIf="item.activity_event_type == 'AD'">Administrative</div>
-                <div *ngIf="item.activity_event_type == 'GV'">Generic Voter Drive</div>
-                <div *ngIf="item.activity_event_type == 'EA'">Exempt Activities</div>
-                <div *ngIf="item.activity_event_type == 'DF'">Direct Fundraising</div>
-                <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Suppot</div>
-                <div *ngIf="item.activity_event_type == 'PC'">
-                  Public Communications Referring Only to Party(Made by PAC)
-                </div>
-              </td>
-              <td>{{ item.activity_event_name }}</td>
-              <td>{{ item.receipt_date | date: 'MM/dd/yyyy' }}</td>
-              <td class="summary_text_amt">{{ item.transferred_amount | currency: 'USD':'symbol-narrow':'1.2-2' }}</td>
-              <td class="summary_text_amt">
-                {{ item.aggregate_amount === 0 ? '' : (item.aggregate_amount | currency: 'USD':'symbol-narrow':'1.2-2') }}
-              </td>
-
-              <td class="bulk_action">
-                <div  class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
-                  <button class="btn btn-sm btn-primary" ngbDropdownToggle>
-                    <i class="fas fa-ellipsis-h"></i>
-                  </button>
-
-                  <div id="forms__trx-dropdown-action1" ngbDropdownToggle class="dropdown-menu" ngbDropdownMenu>
-                    <button class="dropdown-item" (click)="editH3(item)"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="dropdown-item" (click)="printTransaction(item)"><i class="fas fa-print"></i>
-                      Print</button>
-                    <button class="dropdown-item" (click)="trashTransaction(item)"><i class="fas fa-trash"></i>
-                      Trash</button>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </ng-container>
-        </tbody>
-      </table>
-      <hr />
-      <div class="d-flex justify-content-center pagination">
-        <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
-      </div>
-
-      <footer *ngIf="transactionType === 'ALLOC_H3_SUM'">
+      <section *ngIf="transactionType === 'ALLOC_H3_SUM'">
         <footer>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
@@ -435,44 +537,9 @@
             </div>
           </div>
         </footer>
-      </footer>
-    </section>
+      </section>
 
-    <section *ngIf="transactionType === 'ALLOC_H3_SUM_P'">
-      <div id="sumary">
-        <table class="table table-striped summary_table_text">
-          <thead>
-            <tr class="summary_text_amt_level_1">
-              <th>
-                <h3>Categories</h3>
-              </th>
-              <th>
-                <h3>Total Breakdown of Transfer Received (This Period)</h3>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <ng-container *ngFor="let item of h3SumP">
-              <tr>
-                <td class="summary_text_level_3" [ngClass]="item.category === 'Total Amount Transferred' ?
-                    'totalRow' : 'summary_text_level_3'">
-                  {{ item.category }}
-                  <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
-                    tooltipClass="form-tooltip">
-                    <i class="info-icon" aria-hidden="true"></i>
-                    <span class="sr-only">Click here for more information</span>
-                  </button>
-                </td>
-                <td class="summary_text_amt" [ngClass]="item.category === 'Total Amount Transferred' ?
-                    'totalRow' : 'summary_text_level_3'">{{ item.amount | currency:'USD':'symbol-narrow':'1.2-2' }}
-                </td>
-              </tr>
-            </ng-container>
-          </tbody>
-        </table>
-      </div>
-
-      <footer *ngIf="transactionType === 'ALLOC_H3_SUM_P'">
+      <section *ngIf="transactionType === 'ALLOC_H3_SUM_P'">
         <footer>
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
@@ -484,7 +551,7 @@
             </div>
           </div>
         </footer>
-      </footer>
-    </section>
+      </section>
+    </ng-container>
   </form>
 </div>

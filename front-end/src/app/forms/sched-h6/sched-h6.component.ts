@@ -26,6 +26,7 @@ import { SchedHMessageServiceService } from './../sched-h-service/sched-h-messag
 import { SchedH6Model } from './sched-h6.model';
 import { SchedH6Service } from './sched-h6.service';
 import {AuthService} from '../../shared/services/AuthService/auth.service';
+import { PaginationInstance } from 'ngx-pagination';
 
 
 @Component({
@@ -63,8 +64,6 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
   public h6Sum: any;
   public saveHRes: any;
 
-  public tableConfig: any;
-
   public showSelectType = true;
 
   public schedH6sModel: Array<SchedH6Model>;
@@ -74,6 +73,18 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
 
   public restoreSubscription: Subscription;
   public trashSubscription: Subscription;
+
+  // ngx-pagination config
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
+  public config: PaginationInstance;
+  public numberOfPages: number = 0;
+  public pageNumbers: number[] = [];
+  private firstItemOnPage = 0;
+  private lastItemOnPage = 0;
 
   constructor(
     _http: HttpClient,
@@ -137,6 +148,13 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     _rt;
     _dlService;
 
+    const paginateConfig: PaginationInstance = {
+      id: 'forms__sched-h6-table-pagination',
+      itemsPerPage: this.maxItemsPerPage,
+      currentPage: 1
+    };
+    this.config = paginateConfig;
+
     this.restoreSubscription = this._tranMessageService
         .getRestoreTransactionsMessage()
         .subscribe(
@@ -170,19 +188,9 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     }, 2000);
 
     this.formType = this._actRoute.snapshot.paramMap.get('form_id');    
-
-    this.tableConfig = {
-      itemsPerPage: 8,
-      currentPage: 1,
-      totalItems: 10
-    };
  
     this.setSchedH6();
-
-  }
-
-  pageChanged(event){
-    this.tableConfig.currentPage = event;
+    this.getPage(this.config.currentPage);
   }
 
   public ngOnChanges(changes: SimpleChanges) {
@@ -240,22 +248,21 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     this.transactionType = e.currentTarget.value;
   }
  
-  public getH6Sum(reportId: string) {
+  public getH6Sum(reportId: string, page: number = 1) {
+    this.config.currentPage = page;
     this.schedH6sModel = [];
     
-    this.h6Subscription = this._schedH6Service.getSummary(reportId).subscribe(res =>
-      {        
-        if(res) {          
-          //this.h6Sum =  res;
-          this.schedH6sModelL = this.mapFromServerFields(res);
-          this.schedH6sModel = this.mapFromServerFields(res);
-          this.setArrow(this.schedH6sModel);
-
-          //this.schedH6sModel = this.schedH6sModel .filter(obj => obj.memo_code !== 'X');
-          this.schedH6sModel = this.schedH6sModel .filter(obj => obj.back_ref_transaction_id === null);
-
-          this.tableConfig.totalItems = this.schedH6sModel.length;
-        }
+    this.h6Subscription = this._schedH6Service.getSummary(
+        reportId,
+        page,
+        this.config.itemsPerPage,
+        'default',
+        false
+      ).subscribe(res =>
+      {           
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.schedH6sModel = pagedResponse.items;
+        this.pageNumbers = pagedResponse.pageNumbers;    
       });        
   }
  
@@ -293,7 +300,7 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
           this.schedH6sModel[indexRep].child.push(entry);
           //indexRep++;
         }
-        this.tableConfig.totalItems = this.schedH6sModel.length;
+        this.config.totalItems = this.schedH6sModel.length;
       }
 
       this.schedH6sModel.find(function(obj) { return obj.transaction_id === item.transaction_id}).arrow_dir = 'up';
@@ -320,42 +327,6 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
         }        
       }
     }
-  }
-
-  public mapFromServerFields(serverData: any) {
-    if (!serverData || !Array.isArray(serverData)) {
-      return;
-    }
-
-    const modelArray: any = [];
-
-    for (const row of serverData) {
-      const model = new SchedH6Model({});
-
-      model.cmte_id = row.cmte_id;
-      model.report_id = row.report_id;
-      model.transaction_type_identifier = row.transaction_type_identifier;
-      model.transaction_id = row.transaction_id;
-      model.back_ref_transaction_id = row.back_ref_transaction_id;
-      model.activity_event_identifier = row.activity_event_identifier;
-      model.activity_event_type = row.activity_event_type;
-      model.expenditure_date = row.expenditure_date;
-      model.expenditure_purpose = row.expenditure_purpose;
-      model.fed_share_amount = row.fed_share_amount;
-      model.non_fed_share_amount = row.non_fed_share_amount;
-      model.levin_share = row.levin_share;
-      model.memo_code = row.memo_code;
-      model.first_name = row.first_name;
-      model.last_name = row.last_name;
-      model.entity_name = row.entity_name;
-      model.entity_type = row.entity_type;
-      model.aggregation_ind = row.aggregation_ind;
-
-      modelArray.push(model);
-
-    }
-
-    return modelArray;
   }
 
   public editTransaction(trx: any): void {
@@ -444,5 +415,68 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
     this._reportTypeService.printPreview('transaction_table_screen', '3X', trx.transaction_id);
   }
   
+  /**
+   * The records for a given page.
+   *
+   * @param page the page containing the records to get
+   */
+  public getPage(page: number): void {
+    this.getH6Sum(this._individualReceiptService.getReportIdFromStorage(this.formType), page);
+  }
+
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
+  }  
+
+  /**
+   * Determine if pagination should be shown.
+   */
+  public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
+    if (this.config.totalItems > this.config.itemsPerPage) {
+      return true;
+    }
+    // otherwise, no show.
+    return false;
+  }  
+
+  /**
+   * Determine the item range shown by the server-side pagination.
+   */
+  public determineItemRange(): string {
+    let range: {
+      firstItemOnPage: number, lastItemOnPage: number, itemRange: string
+    } = this._utilService.determineItemRange(this.config, this.schedH6sModel);
+
+    this.firstItemOnPage = range.firstItemOnPage;
+    this.lastItemOnPage = range.lastItemOnPage;
+    return range.itemRange;
+  }  
+  
+  public showPageSizes(): boolean {
+    if (this.config && this.config.totalItems && this.config.totalItems > 0){
+      return true;
+    }
+    return false;
+  }
 }
 

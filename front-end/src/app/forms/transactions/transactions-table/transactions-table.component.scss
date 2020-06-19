@@ -110,8 +110,18 @@
     border-radius: 0;
   }	
 
+  .ngx-pagination {
+    margin-bottom: 0;
+  }
+
   /* style ngx-pagination - end */
 
+  ng-select { 
+    .ng-dropdown-panel { 
+      width: auto !important; 
+      max-width: 550px; 
+    } 
+  }
 
   .column-options-modal {
 

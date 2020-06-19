@@ -1,3 +1,4 @@
+import { PhonePipe } from './pipes/phone-number/phone-number.pipe';
 import { ValidateComponent } from './partials/validate/validate.component';
 import { SubmitComponent } from './partials/submit/submit.component';
 import { NgModule } from '@angular/core';
@@ -25,7 +26,8 @@ import { ModalModule } from 'ngx-bootstrap';
     SignAndSubmitComponent,
     SubTransactionsTableComponent,
     SubmitComponent,
-    ValidateComponent
+    ValidateComponent,
+    PhonePipe
   ],
   exports: [
     CommonModule,
@@ -45,6 +47,7 @@ import { ModalModule } from 'ngx-bootstrap';
     DatePipe,
     UtilService,
     OrderByPipe,
+    PhonePipe,
     CurrencyPipe
   ],
 })

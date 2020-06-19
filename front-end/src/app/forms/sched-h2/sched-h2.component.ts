@@ -27,6 +27,7 @@ import { TransactionsMessageService } from '../transactions/service/transactions
 import { GetTransactionsResponse, TransactionsService } from '../transactions/service/transactions.service';
 import { SchedH2Service } from './sched-h2.service';
 import {AuthService} from '../../shared/services/AuthService/auth.service';
+import { PaginationInstance } from 'ngx-pagination';
 
 @Component({
   selector: 'app-sched-h2',
@@ -59,7 +60,7 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
   public h2Sum: any;
   public saveHRes: any;
 
-  public tableConfig: any;
+  // public tableConfig: any;
   public receiptDateErr = false;
 
   public cvgStartDate: any;
@@ -78,6 +79,17 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
   public restoreSubscription: Subscription;
   public trashSubscription: Subscription;
+
+  // ngx-pagination config
+  public pageSizes: number[] = UtilService.PAGINATION_PAGE_SIZES;
+  public maxItemsPerPage: number = this.pageSizes[0];
+  public paginationControlsMaxSize: number = 10;
+  public directionLinks: boolean = false;
+  public autoHide: boolean = true;
+  public config: PaginationInstance;
+  public pageNumbers: number[] = [];
+  private firstItemOnPage = 0;
+  private lastItemOnPage = 0;
 
   constructor(
     _http: HttpClient,
@@ -145,6 +157,13 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     _tranService;
     _dlService;
 
+    const paginateConfig: PaginationInstance = {
+      id: 'forms__sched-h2-table-pagination',
+      itemsPerPage: this.maxItemsPerPage,
+      currentPage: 1
+    };
+    this.config = paginateConfig;
+
     this._tranMessageService
       .getEditTransactionMessage()
       .takeUntil(this._H2onDestroy$)
@@ -196,11 +215,11 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
 
     this.setSchedH2();
 
-    this.tableConfig = {
-      itemsPerPage: 8,
-      currentPage: 1,
-      totalItems: 10
-    };
+    // this.tableConfig = {
+    //   itemsPerPage: 8,
+    //   currentPage: 1,
+    //   totalItems: 10
+    // };
 
     this.setDefaultValues();
 
@@ -209,11 +228,12 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH2.patchValue({ select_activity_function: ''}, { onlySelf: true });
     this.sendPopulateMessageIfApplicable();
    
+    this.getPage(this.config.currentPage);
   }
 
-  pageChanged(event) {
-    this.tableConfig.currentPage = event;
-  }
+  // pageChanged(event) {
+  //   this.tableConfig.currentPage = event;
+  // }
 
   public ngOnChanges(changes: SimpleChanges) {
     // OnChanges() can be triggered before OnInit().  Ensure formType is set.
@@ -346,13 +366,19 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     }
   }
 
-  public getH2Sum(reportId: string) {
-    this.h2Subscription = this._schedH2Service.getSummary(reportId).subscribe(res => {
-      if (res) {
-        this.h2Sum = [];
-        this.h2Sum = res;
-        this.tableConfig.totalItems = res.length;
-      }
+  public getH2Sum(reportId: string, page: number = 1) {
+    this.config.currentPage = page;
+    
+    this.h2Subscription = this._schedH2Service.getSummary(
+        reportId,
+        page,
+        this.config.itemsPerPage,
+        'default',
+        false
+      ).subscribe(res => {
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.h2Sum = pagedResponse.items;
+        this.pageNumbers = pagedResponse.pageNumbers;
     });
   }
 
@@ -365,6 +391,13 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
           this._reportTypeService.printPreview('transaction_table_screen', '3X', res.transaction_id);
         }
       }
+    }, error => {
+      this._dialogService.confirm(
+          error.error,
+          ConfirmModalComponent,
+          'Error !!!',
+          false,
+          ModalHeaderClassEnum.errorHeader);
     });
   }
 
@@ -657,5 +690,69 @@ export class SchedH2Component extends AbstractSchedule implements OnInit, OnDest
     else{
       this.saveAndAddMore(true);
     }
+  }
+
+  /**
+   * The Transactions for a given page.
+   *
+   * @param page the page containing the transactions to get
+   */
+  public getPage(page: number): void {
+    this.getH2Sum(this._individualReceiptService.getReportIdFromStorage(this.formType), page);
+  }
+
+  /**
+   * onChange for maxItemsPerPage.
+   *
+   * @param pageSize the page size to get
+   */
+  public onMaxItemsPerPageChanged(pageSize: number): void {
+    this.config.currentPage = 1;
+    this.config.itemsPerPage = pageSize;
+    this.getPage(this.config.currentPage);
+  }
+
+  /**
+   * onChange for gotoPage.
+   *
+   * @param page the page to get
+   */
+  public onGotoPageChange(page: number): void {
+    this.config.currentPage = page;
+    this.getPage(this.config.currentPage);
+  }  
+
+  /**
+   * Determine if pagination should be shown.
+   */
+  public showPagination(): boolean {
+    if (!this.autoHide) {
+      return true;
+    }
+    if (this.config.totalItems > this.config.itemsPerPage) {
+      return true;
+    }
+    // otherwise, no show.
+    return false;
+  }  
+
+  /**
+   * Determine the item range shown by the server-side pagination.
+   */
+  public determineItemRange(): string {
+    let range: {
+      firstItemOnPage: number, lastItemOnPage: number, itemRange: string
+    } = this._utilService.determineItemRange(this.config, this.h2Sum);
+
+    this.firstItemOnPage = range.firstItemOnPage;
+    this.lastItemOnPage = range.lastItemOnPage;
+    return range.itemRange;
+  }
+  
+  public showPageSizes(): boolean {
+    if (this.config && this.config.totalItems && this.config.totalItems > 0){
+      return true;
+    }
+    return false;
   }
 }

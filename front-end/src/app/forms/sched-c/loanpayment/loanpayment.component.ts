@@ -129,7 +129,14 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
       this.form.control.patchValue({ 'zip': res.zip_code });
       this.form.control.patchValue({ 'state': res.state });
       this.form.control.patchValue({ 'entity_id': res.entity_id });
-      this.outstandingLoanBalance = Number(res.loan_balance);
+      
+      if(this.scheduleAction !== ScheduleActions.edit){
+        this.outstandingLoanBalance = Number(res.loan_balance);
+      }
+      else{
+        //if editing a current payment, outstanding balance should add the current payment's amount to the total amount
+        this.outstandingLoanBalance = Number(res.loan_balance) + Number(this.transactionDetail.amount);
+      }
 
       if(this.scheduleAction === ScheduleActions.edit){
          this.form.control.patchValue({ 'expenditure_date': this.transactionDetail.date });

@@ -568,3 +568,17 @@ def toggle_user(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+
+@api_view(["GET"])
+def current_user(request):
+    if request.method == "GET":
+        try:
+            user = {"first_name": request.user.first_name, "last_name": request.user.last_name,
+                    "email": request.user.email, "phone": request.user.contact}
+
+            return JsonResponse(user, status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            logger.debug("exception occurred while getting user information", str(e))
+            json_result = {'message': str(e)}
+            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)

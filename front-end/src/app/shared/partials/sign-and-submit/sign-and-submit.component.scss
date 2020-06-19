@@ -86,6 +86,73 @@
       display: block;
       position: relative;
       width: 100%;
+      // padding-left:10%;
+      .indented{
+				margin-left:10%;
+      }
+      .emailBox{
+        padding-left: 5%;
+        padding-right:25%;
+        padding-top:1%;
+        padding-bottom:1%;
+        margin-top:10px;
+      }
+      .saveBtnContainer{
+        position:relative;
+        top:30px;
+      }
+      .grid-col {
+				display: block;
+				max-width: 100%;
+				padding-left: 10px;
+				width: 100%;				
+				@include media(tablet) {
+					display: block;
+					padding-left: 10px;
+					max-width: 100%;
+					width: 100%;
+				}
+				@include media(mediumDesktop) {
+				    flex: 0 0 33.33333333%;
+				    max-width: 33.33333333%;
+				    min-height: 1px;
+				    padding-left: 0;
+					position: relative;
+					width: 100%;					
+				}         
+				@include media(largeDesktop) {
+				    flex: 0 0 33.33333333%;
+				    max-width: 33.33333333%;
+				    min-height: 1px;
+				    padding-left: 0;
+					position: relative;
+					width: 100%;				    				
+				} 
+				.label {
+					font-family: $mainFontFamily;
+					font-weight: bold;
+					margin: 1em;
+					margin-left: 0;
+				}				
+				.text {
+					font-family: $mainFontFamily;
+					margin-bottom: 1em;
+					margin-right: .75em;
+				}
+			} // .grid-col
+			.grid-row__col {
+				.text-content {
+		          ol,
+		          ul {
+		              display: block;
+		              margin-block-start: 1em;
+		              margin-block-end: 1em;
+		              margin-inline-start: 0px;
+		              margin-inline-end: 0px;
+		              padding-inline-start: 40px;            
+		          }					
+				}			
+			}
       .validate__form {
         &.show-alerts {
           display: block;
@@ -146,102 +213,59 @@
       }
     }
   }
+
+  .card {
+    margin-bottom: 20px;
+    width:95%;
+  }
+  
+  .card .card-header.active > a > span {
+    color: #1d2124;
+    width:95%;
+  }
+  
+  .btn-link:hover{
+    color:black;
+  }
+  
+  ul{
+    padding-left:10%;
+  }
+  li{
+    padding-bottom: 20px;
+  }
+  .forms__agreement-text{
+    padding-right:5%;
+    padding-left:5%;
+  }
+  .btn.btn-primary[disabled] {
+    background-color: $shuttleGray;
+    border-color: $shuttleGray;
+  }
+  .borderedTable {
+    width: 550px;
+    margin-bottom: 1rem;
+    color: #212529;
+    border: 1px solid $bombay;
+    height:30px;
+  }
+  .alert {
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+  
+  .alert-success {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #3c763d;
+  }
 } // .signee-container
 
-
-.alert {
-  padding: 12px;
-  border: 1px solid transparent;
-  border-radius: 4px;
+.custom-class .modal-content .modal-header {
+  // color: black;
+  background-color:$blueZodiac;
 }
-
-.alert h4 {
-  margin-top: 0;
-  color: inherit;
-}
-
-.alert .alert-link {
-  font-weight: bold;
-}
-
-.alert > p,
-.alert > ul {
-  margin-bottom: 0;
-}
-
-.alert > p + p {
-  margin-top: 5px;
-}
-
-.alert-dismissable,
-.alert-dismissible {
-  padding-right: 35px;
-}
-
-.alert-dismissable .close,
-.alert-dismissible .close {
-  position: relative;
-  top: -2px;
-  right: -21px;
-  color: inherit;
-}
-
-.alert-success {
-  background-color: #dff0d8;
-  border-color: #d6e9c6;
-  color: #3c763d;
-}
-
-.alert-success hr {
-  border-top-color: #c9e2b3;
-}
-
-.alert-success .alert-link {
-  color: #2b542c;
-}
-
-.alert-info {
-  background-color: #d9edf7;
-  border-color: #bce8f1;
-  color: #31708f;
-}
-
-.alert-info hr {
-  border-top-color: #a6e1ec;
-}
-
-.alert-info .alert-link {
-  color: #245269;
-}
-
-.alert-warning {
-  background-color: #fcf8e3;
-  border-color: #faebcc;
-  color: #8a6d3b;
-}
-
-.alert-warning hr {
-  border-top-color: #f7e1b5;
-}
-
-.alert-warning .alert-link {
-  color: #66512c;
-}
-
-.alert-danger {
-  background-color: #f2dede;
-  border-color: #ebccd1;
-  color: #a94442;
-}
-
-.alert-danger hr {
-  border-top-color: #e4b9c0;
-}
-
-.alert-danger .alert-link {
-  color: #843534;
-}
-
-input.filingPassword[readonly] {
-  background-color: white;
+.bottom-separator{
+  border-bottom:1px solid $bombay;
 }

@@ -269,13 +269,16 @@ export class SchedFCoreComponent extends AbstractSchedule implements OnInit, OnD
    * @param name
    */
   public handleSelectedSFCommittee($event: NgbTypeaheadSelectItemEvent, name: string) {
+    $event.preventDefault(); 
     const entity = $event.item;
 
     const fieldNames = [];
     if (name === 'designating_cmte_id' || name === 'designating_cmte_name') {
       if (name === 'designating_cmte_id') {
         fieldNames.push({ formName: 'designating_cmte_name', entityFieldName: 'cmte_name' });
+        fieldNames.push({ formName: 'designating_cmte_id', entityFieldName: 'cmte_id' });
       } else {
+        fieldNames.push({ formName: 'designating_cmte_name', entityFieldName: 'cmte_name' });
         fieldNames.push({ formName: 'designating_cmte_id', entityFieldName: 'cmte_id' });
       }
     } else if (name === 'subordinate_cmte_id' || name === 'subordinate_cmte_name') {

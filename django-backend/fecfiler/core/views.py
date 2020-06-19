@@ -196,9 +196,10 @@ def update_F3X(func):
         logger.debug("update f3X {}".format(func.__name__))
         report_id = res.get("report_id")
         cmte_id = res.get("cmte_id")
-        res['update_F3X'] = update_f3x_details(report_id, cmte_id)
-        res['update_F3X'] += update_f3x_coh_cop_subsequent_report(report_id, cmte_id)
-        logger.debug("F3X data updated")
+        if find_form_type(report_id, cmte_id) == 'F3X':
+            res['update_F3X'] = update_f3x_details(report_id, cmte_id)
+            res['update_F3X'] += update_f3x_coh_cop_subsequent_report(report_id, cmte_id)
+            logger.debug("F3X data updated")
         return res
     return wrapper
 
@@ -642,7 +643,7 @@ REPORTS API- CORE APP - SPRINT 7 - FNE 555 - BY PRAVEEN JINKA
 
 
 def check_form_type(form_type):
-    form_list = ["F3X"]
+    form_list = ["F3X", "F24"]
 
     if not (form_type in form_list):
         raise Exception(
@@ -913,7 +914,8 @@ def get_list_all_report(cmte_id):
             fec_accepted_date, 
             fec_status, 
             create_date, 
-            last_update_date
+            last_update_date,
+            memo_text
             FROM public.reports WHERE delete_ind is distinct from 'Y' AND cmte_id = %s"""
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id]
@@ -950,6 +952,7 @@ def get_list_report(report_id, cmte_id):
                                         rp.due_date                   AS duedate, 
                                         rp.amend_ind                  AS amend_indicator, 
                                         0                             AS coh_bop, 
+                                        rp.memo_text,
                                         ( 
                                                 SELECT 
                                                         CASE 
@@ -1235,10 +1238,11 @@ def post_reports(data, reportid=None):
         cvg_start_dt = data.get("cvg_start_dt")
         cvg_end_dt = data.get("cvg_end_dt")
         due_dt = data.get("due_dt")
-        if cvg_start_dt is None:
-            raise Exception("The cvg_start_dt is null.")
-        if cvg_end_dt is None:
-            raise Exception("The cvg_end_dt is null.")
+        if form_type == 'F3X':
+            if cvg_start_dt is None:
+                raise Exception("The cvg_start_dt is null.")
+            if cvg_end_dt is None:
+                raise Exception("The cvg_end_dt is null.")
         check_form_type(form_type)
         args = [cmte_id, form_type, cvg_start_dt, cvg_end_dt]
         forms_obj = []
@@ -1295,7 +1299,12 @@ def post_reports(data, reportid=None):
                         data.get("cvg_end_dt"),
                         data.get("coh_bop"),
                     )
-                update_transactions_change_cvg_dates(cmte_id, report_id, cvg_start_dt, cvg_end_dt, True)
+                    update_transactions_change_cvg_dates(cmte_id, report_id, cvg_start_dt, cvg_end_dt, True)
+                elif data.get("form_type") == "F24":
+                    post_sql_form24(
+                        report_id,
+                        data.get("cmte_id"),
+                        )
                 # print('here4')
             except Exception as e:
                 # Resetting Report ID
@@ -1913,7 +1922,7 @@ def reports(request):
                       "cvg_start_dt": date_format(request.data.get("cvg_start_dt")),
                       "cvg_end_dt": date_format(request.data.get("cvg_end_dt")),
                       "due_dt": date_format(request.data.get("due_dt")),
-                      "coh_bop": int(request.data.get("coh_bop")),
+                      "coh_bop": int(request.data.get("coh_bop", '0')),
                       "status": f_status,
                       "email_1": email_1,
                       "email_2": email_2,
@@ -1922,15 +1931,16 @@ def reports(request):
                   }
                 data = post_reports(datum)
                 if type(data) is dict:
-                    # print(data)
-                    # do h1 carryover if new report created
-                    do_h1_carryover(data.get("cmteid"), data.get("reportid"))
-                    do_h2_carryover(data.get("cmteid"), data.get("reportid"))
-                    do_loan_carryover(data.get("cmteid"), data.get("reportid"))
-                    do_debt_carryover(data.get("cmteid"), data.get("reportid"))
-                    do_levin_carryover(data.get("cmteid"), data.get("reportid"))
-                    do_in_between_report_carryover(data.get("cmteid"), data.get("reportid"))
-                    function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
+                    if datum.get("form_type") == "F3X":
+                        # print(data)
+                        # do h1 carryover if new report created
+                        do_h1_carryover(data.get("cmteid"), data.get("reportid"))
+                        do_h2_carryover(data.get("cmteid"), data.get("reportid"))
+                        do_loan_carryover(data.get("cmteid"), data.get("reportid"))
+                        do_debt_carryover(data.get("cmteid"), data.get("reportid"))
+                        do_levin_carryover(data.get("cmteid"), data.get("reportid"))
+                        do_in_between_report_carryover(data.get("cmteid"), data.get("reportid"))
+                        function_to_call_wrapper_update_F3X(data.get("cmteid"), data.get("reportid"))
 
                     data['status'] = "success"
                     return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
@@ -3501,7 +3511,8 @@ def get_trans_query(category_type, cmte_id, param_string):
                 """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
-                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isredesignatable, "isRedesignation" 
+                                election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isredesignatable, "isRedesignation",
+                                mirror_report_id, mirror_transaction_id 
                                 from all_disbursements_transactions_view
                             where cmte_id='"""
                 + cmte_id
@@ -4078,6 +4089,8 @@ def get_all_transactions(request):
             )
 
         trans_query_string = get_trans_query(ctgry_type, cmte_id, param_string)
+        #: get the total count
+        trans_query_string_count = get_trans_query_for_total_count(trans_query_string)
 
         # transactions ordering ASC or DESC
         if ctgry_type == "loans_tran":
@@ -4097,6 +4110,9 @@ def get_all_transactions(request):
 
         output_list = []
         total_amount = 0.0
+        #: set transaction query with offsets.
+        trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
+
         with connection.cursor() as cursor:
             # logger.debug('query all transactions with sql:{}'.format(trans_query_string))
             cursor.execute(
@@ -4104,7 +4120,7 @@ def get_all_transactions(request):
             )
             print(cursor.query)
             data_row = cursor.fetchone()
-            print(data_row)
+#            print(data_row)
             if data_row and data_row[0]:
                 transaction_list = data_row[0]
                 logger.debug(
@@ -4169,24 +4185,38 @@ def get_all_transactions(request):
                             output_list.append(transaction)
             else:
                 status_value = status.HTTP_200_OK
+            #: run the record count query        
+            cursor.execute(
+                """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
+            )
+            row1=cursor.fetchone()[0]
+            totalcount =  row1[0]['count']
+        
         # logger.debug(output_list)
-        total_count = len(output_list)
+#: tweak the query to get the transactions count as per page
+#       set the pagination and page details
+        # total_count = len(output_list)
+        # :tweaked and using the paginator class for now as need more time to research on the page usage in UI, need to revisit !!! 
+        numofpages = get_num_of_pages(totalcount, itemsperpage)
         paginator = Paginator(output_list, itemsperpage)
-        if paginator.num_pages < page_num:
-            forms_obj = []
+        if paginator.num_pages > 0:
+             forms_obj = paginator.page(1)
         else:
-            forms_obj = paginator.page(page_num)
+            forms_obj = []
+        print("total form objects : ", len(list(forms_obj)))     
         json_result = {
             "transactions": list(forms_obj),
-            "totalTransactionCount": total_count,
+            "totalTransactionCount": totalcount,
             "itemsPerPage": itemsperpage,
             "pageNumber": page_num,
-            "totalPages": paginator.num_pages,
+            "totalPages": numofpages,
         }
+        #print("""aaaaaaaaa""")
         if total_amount:
             json_result["totalAmount"] = total_amount
         return Response(json_result, status=status_value)
     except Exception as e:
+        print(e)
         return Response(
             "The get_all_transactions API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
@@ -6203,7 +6233,8 @@ def get_report_info(request):
                                          (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
                                          email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
                                          additional_email_2 as additionalEmail2, 
-                                         (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue
+                                         (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue,
+                                         rp.status AS reportStatus
                                       FROM public.reports rp 
                                       LEFT JOIN form_3x x ON rp.report_id = x.report_id
                                       LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
@@ -6283,6 +6314,8 @@ end print priview api
 Create Contacts API - CORE APP - SPRINT 16 - FNE 1248 - BY  Yeswanth Kumar Tella
 **********************************************************************************************************************************************
 """
+'''
+Old Code 
 
 
 @api_view(["GET", "POST"])
@@ -6290,7 +6323,6 @@ def contactsTable(request):
     try:
 
         if request.method == "POST":
-            # print("request.data: ", request.data)
             cmte_id = get_comittee_id(request.user.username)
             param_string = ""
             page_num = int(request.data.get("page", 1))
@@ -6427,8 +6459,9 @@ def contactsTable(request):
                 trans_query_string = trans_query_string + """ ORDER BY name ASC"""
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
+                    """SELECT  w(t) FROM (""" + trans_query_string + """) t"""
                 )
+                print("contacts trans_query_string: ",trans_query_string)                
                 for row in cursor.fetchall():
                     data_row = list(row)
                     forms_obj = data_row[0]
@@ -6464,6 +6497,239 @@ def contactsTable(request):
             "The contactsTable API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+'''
+
+@api_view(["GET", "POST"])
+def contactsTable(request):
+    try:
+
+        if request.method == "POST":
+            # print("request.data: ", request.data)
+            cmte_id = get_comittee_id(request.user.username)
+            param_string = ""
+            page_num = int(request.data.get("page", 1))
+            descending = request.data.get("descending", "false")
+            sortcolumn = request.data.get("sortColumnName")
+            itemsperpage = request.data.get("itemsPerPage", 5)
+            search_string = request.data.get("search")
+            # import ipdb;ipdb.set_trace()
+            params = request.data.get("filters", {})
+            keywords = params.get("keywords")
+            if str(descending).lower() == "true":
+                descending = "DESC"
+            else:
+                descending = "ASC"
+
+            keys = [
+                "id",
+                "entity_type",
+                "name",
+                "street1",
+                "street2",
+                "city",
+                "state",
+                "zip",
+                "occupation",
+                "employer",
+                "candOfficeState",
+                "candOfficeDistrict",
+                "candCmteId",
+                "phone_number",
+                "deleteddate",
+            ]
+            search_keys = [
+                "id",
+                "entity_type",
+                "name",
+                "street1",
+                "street2",
+                "city",
+                "state",
+                "zip",
+                "occupation",
+                "employer",
+                "candOfficeState",
+                "candOfficeDistrict",
+                "candCmteId",
+                "phone_number",
+                "deleteddate",
+            ]
+            if search_string:
+                for key in search_keys:
+                    if not param_string:
+                        param_string = (
+                            param_string
+                            + " AND (CAST("
+                            + key
+                            + " as CHAR(100)) ILIKE '%"
+                            + str(search_string)
+                            + "%'"
+                        )
+                    else:
+                        param_string = (
+                            param_string
+                            + " OR CAST("
+                            + key
+                            + " as CHAR(100)) ILIKE '%"
+                            + str(search_string)
+                            + "%'"
+                        )
+                param_string = param_string + " )"
+            keywords_string = ""
+            if keywords:
+                for key in keys:
+                    for word in keywords:
+                        if '"' in word:
+                            continue
+                        elif "'" in word:
+                            if not keywords_string:
+                                keywords_string = (
+                                    keywords_string
+                                    + " AND ( CAST("
+                                    + key
+                                    + " as CHAR(100)) = "
+                                    + str(word)
+                                )
+                            else:
+                                keywords_string = (
+                                    keywords_string
+                                    + " OR CAST("
+                                    + key
+                                    + " as CHAR(100)) = "
+                                    + str(word)
+                                )
+                        else:
+                            if not keywords_string:
+                                keywords_string = (
+                                    keywords_string
+                                    + " AND ( CAST("
+                                    + key
+                                    + " as CHAR(100)) ILIKE '%"
+                                    + str(word)
+                                    + "%'"
+                                )
+                            else:
+                                keywords_string = (
+                                    keywords_string
+                                    + " OR CAST("
+                                    + key
+                                    + " as CHAR(100)) ILIKE '%"
+                                    + str(word)
+                                    + "%'"
+                                )
+                keywords_string = keywords_string + " )"
+            param_string = param_string + keywords_string
+
+            trans_query_string = (
+                """SELECT id, entity_type, name, street1, street2, city, state, zip, occupation, employer, candOffice, candOfficeState, candOfficeDistrict, candCmteId, phone_number, deleteddate, active_transactions_cnt from all_contacts_view
+                                        where (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='"""
+                + cmte_id
+                + """' """
+                + param_string
+            )
+            #: get the total count
+            trans_query_string_count = ("""SELECT count(*) 
+                                            FROM all_contacts_view
+                                            WHERE (deletedFlag <> 'Y' OR deletedFlag is NULL) AND cmte_id='"""
+                                            + cmte_id
+                                            + """' """
+                                            + param_string
+                                        ) 
+
+            # print("contacts trans_query_string: ",trans_query_string)
+            # import ipdb;ipdb.set_trace()
+            if sortcolumn and sortcolumn != "default":
+                trans_query_string = (
+                    trans_query_string
+                    + """ ORDER BY """
+                    + sortcolumn
+                    + """ """
+                    + descending
+                )
+            elif sortcolumn == "default":
+                trans_query_string = trans_query_string + """ ORDER BY name ASC"""
+            #: Set the offset and record count to start getting the data 
+            trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
+                )
+                for row in cursor.fetchall():
+                    data_row = list(row)
+                    forms_obj = data_row[0]
+                    forms_obj = data_row[0]
+                    if forms_obj is None:
+                        forms_obj = []
+                        status_value = status.HTTP_200_OK
+                    else:
+                        for d in forms_obj:
+                            for i in d:
+                                if not d[i]:
+                                    d[i] = ""
+
+                        status_value = status.HTTP_200_OK
+                #: run the record count query        
+                cursor.execute(
+                    """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
+                )
+                row1=cursor.fetchone()[0]
+                totalcount =  row1[0]['count']
+                #print(totalcount)
+            #: removed the paginator code references and replaced with custom pagination
+            # get the total records count
+            #print("my totalcount", totalcount)
+            # import ipdb; ipdb.set_trace()
+            # total_count = len(forms_obj)
+            # print("paginator total_count", total_count)
+            # paginator = Paginator(forms_obj, itemsperpage)
+            # if paginator.num_pages < page_num:
+            #     page_num = paginator.num_pages
+            # forms_obj = paginator.page(page_num)
+            numofpages = get_num_of_pages(totalcount, itemsperpage)
+            json_result = {
+                "contacts": list(forms_obj),
+                "totalcontactsCount": totalcount,
+                "itemsPerPage": itemsperpage,
+                "pageNumber": page_num,
+                "totalPages": numofpages,
+            }
+        return Response(json_result, status=status_value)
+
+    except Exception as e:
+        return Response(
+            "The contactsTable API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+#: build 
+def get_trans_query_for_total_count(trans_query_string):
+    temp_string = """select count(*) from """
+    i = trans_query_string.index(""" from """)
+    s = trans_query_string[ 0 : i+6]
+    final_query = trans_query_string.replace(s, temp_string,1)
+    return final_query
+
+#: build query offset and record count to start getting the data 
+def set_offset_n_fetch(trans_query_string, page_num, itemsperpage):
+    trans_query_string = trans_query_string + """ OFFSET """
+    if page_num > 0 : 
+        trans_query_string = trans_query_string + str((page_num-1) * itemsperpage) 
+    else:    
+        trans_query_string = trans_query_string + """ 0 """
+    trans_query_string = trans_query_string + """ ROWS """ + """ FETCH FIRST """ 
+    trans_query_string = trans_query_string + str( itemsperpage)
+    trans_query_string = trans_query_string + """ ROW ONLY """  
+    return trans_query_string
+
+#: get page count or number of pages for pagination
+def get_num_of_pages(totalcount, itemsperpage):
+    if (totalcount % itemsperpage) == 0:
+        numofpages = totalcount / itemsperpage
+    else:
+        numofpages = int(totalcount/itemsperpage) + 1                    
+    return numofpages
 
 
 @api_view(["GET"])
@@ -7315,6 +7581,27 @@ def put_contact_data(data):
         raise
 
 
+def check_mandatory_fields(data, list_mandatory_fields):
+    try:
+        error = []
+        for field in list_mandatory_fields:
+            if not (field in data and check_null_value(data.get(field).strip())):
+                error.append(field)
+        if len(error) > 0:
+            string = ""
+            for x in error:
+                string = string + x + ", "
+            string = string[0:-2]
+            raise Exception(
+                "The following mandatory fields are required in order to save data : {}".format(
+                    string
+                )
+            )
+
+    except Exception as e:
+        raise e
+
+
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def contacts(request):
     """
@@ -7326,6 +7613,19 @@ def contacts(request):
         if request.method == "POST":
             try:
                 # cmte_id = get_comittee_id(request.user.username)
+                mandatory_fields_list = ["entity_type", "street_1",
+                                         "city", "state", "zip_code"]
+                if check_null_value(request.data.get("entity_type")):
+                    if request.data.get("entity_type").upper() == 'IND':
+                        mandatory_fields_list.append("first_name")
+                        mandatory_fields_list.append("last_name")
+                    elif request.data.get("entity_type").upper() == 'ORG':
+
+                        mandatory_fields_list.append("entity_name")
+                else:
+                    raise Exception("Entity type is required.")
+
+                check_mandatory_fields(request.data, mandatory_fields_list)
                 datum = contact_sql_dict(request.data)
                 datum["cmte_id"] = get_comittee_id(request.user.username)
                 # datum['cmte_id'] = cmte_id
@@ -8449,6 +8749,7 @@ def clone_a_transaction(request):
         }
         # cmte_id = get_comittee_id(request.user.username)
         transaction_id = request.data.get("transaction_id")
+        mirror_transaction_flag = request.data.get("mirror_transaction")
         if not transaction_id:
             raise Exception("Error: transaction_id is required for this api.")
 
@@ -8524,6 +8825,36 @@ def clone_a_transaction(request):
             # ).replace('create_date', '%s'
             # ).replace('last_update_date', '%s')
 
+            new_tran_id = get_next_transaction_id(transaction_id[0:2])
+            logger.debug("new transaction id:{}".format(new_tran_id))
+
+            if mirror_transaction_flag:
+                #this requires an additional transaction to be saved in the mirror report
+                duplicate_select_str = select_str
+                new_mirror_tran_id = get_next_transaction_id(transaction_id[0:2])
+                mirror_report_id = request.data.get("mirror_report_id")
+                if not mirror_report_id:
+                    raise Exception("Error: Mirror report id is missing.")
+                select_str = select_str.replace("mirror_transaction_id","'" + new_mirror_tran_id + "'")
+
+                duplicate_select_str = duplicate_select_str.replace(",report_id", ",'" + mirror_report_id + "'")
+                duplicate_select_str = duplicate_select_str.replace(",transaction_id", ",'" + new_mirror_tran_id + "'")
+                duplicate_select_str = duplicate_select_str.replace("mirror_transaction_id", "'" + new_tran_id + "'")
+
+                mirror_clone_sql = """
+                    INSERT INTO public.{table_name}({_insert})
+                    SELECT {_select}
+                    FROM public.{table_name}
+                """.format(
+                    table_name=transaction_table, _insert=insert_str, _select=duplicate_select_str
+                )
+                mirror_clone_sql = mirror_clone_sql + " WHERE transaction_id = %s;"
+                cursor.execute(
+                    mirror_clone_sql, (new_mirror_tran_id, datetime.datetime.now(), None, transaction_id)
+                )
+                if not cursor.rowcount:
+                    raise Exception("transaction clone error")
+
             clone_sql = """
                 INSERT INTO public.{table_name}({_insert})
                 SELECT {_select}
@@ -8533,9 +8864,6 @@ def clone_a_transaction(request):
             )
             clone_sql = clone_sql + " WHERE transaction_id = %s;"
             logger.debug("clone transaction with sql:{}".format(clone_sql))
-
-            new_tran_id = get_next_transaction_id(transaction_id[0:2])
-            logger.debug("new transaction id:{}".format(new_tran_id))
 
             cursor.execute(
                 clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id)
@@ -10389,3 +10717,83 @@ def get_year_reports(cmte_id, report_id):
 def function_to_call_wrapper_update_F3X(cmte_id, report_id):
     return {"report_id" : report_id,
             "cmte_id" : cmte_id}
+
+
+def post_sql_form24(
+        report_id,
+        cmte_id,
+):
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into Form 24 table
+            cursor.execute(
+                """INSERT INTO public.form_24 (report_id, cmte_id, create_date, last_update_date)
+                                            VALUES (%s,%s,%s,%s)""",
+                [
+                    report_id,
+                    cmte_id,
+                    datetime.datetime.now(),
+                    datetime.datetime.now()
+                ],
+            )
+    except Exception:
+        raise
+
+
+def find_form_type(report_id, cmte_id):
+    """
+    load form type based on report_id and cmte_id
+    """
+    try:
+        # handling cases where report_id is reported as 0
+        if report_id in ["0", "0", 0]:
+            return "F3X"
+        # end of error handling
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT form_type FROM public.reports WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                [report_id, cmte_id],
+            )
+            form_types = cursor.fetchone()
+        if cursor.rowcount == 0:
+            raise Exception(
+                "The Report ID: {} is either already deleted or does not exist in reports table".format(
+                    report_id
+                )
+            )
+        else:
+            return form_types[0]
+    except Exception as e:
+        raise Exception("The form_type function is throwing an error:" + str(e))
+
+@api_view(['PUT'])
+def reports_memo_text(request):
+    is_read_only_or_filer_reports(request)
+    cmte_id = get_comittee_id(request.user.username)
+    try:
+        if 'report_id' in request.data and request.data.get('report_id') not in [None, '', 'null']:
+            report_id = request.data['report_id']
+        else:
+            raise Exception('reportId is a mandatory field')
+        if 'memo_text' in request.data and request.data.get('memo_text') not in [None, '', 'null']:
+            memo_text = request.data['memo_text']
+        else:
+            raise Exception('memo_text is a mandatory field')
+        _sql = """UPDATE public.reports SET memo_text = %s WHERE report_id=%s AND cmte_id=%s AND
+              status in ('', null, 'Saved')"""
+        value_list = [memo_text, report_id, cmte_id]
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, value_list)
+            logger.debug(cursor.query)
+            if not cursor.rowcount:
+                raise Exception("""This report_id: {} for cmte_id: {} is either submitted or 
+                  does not exist""".format(report_id, cmte_id))
+        data = {'report_id': report_id, 'cmte_id': cmte_id}
+        output = get_reports(data)
+        return JsonResponse(output[0], status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+            "The reports_memo_text API is throwing an error: " + str(e),
+            status=status.HTTP_400_BAD_REQUEST,
+            )
