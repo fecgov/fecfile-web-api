@@ -53,7 +53,7 @@
     <section *ngIf="showSelectType && transactionType !== 'ALLOC_H4_SUM'">
       <div class="subtitle">
         <h2>
-            <b>What Type of Disbursement are you adding?</b>
+            <b>What type of disbursement are you adding?</b>
         </h2>
       </div>
       
@@ -87,7 +87,7 @@
               <tr>                
                 <td class="summary_text_level_3">                
                   <input type="radio" formControlName="type" value="ALLOC_EXP_STAF_REIM" id="h4Opt3" (click)="selectTypeChange($event)">
-                  <label for="h4Opt3">Allocated Staff Reimbusement</label>
+                  <label for="h4Opt3">Allocated Staff Reimbursement</label>
                   <button type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
                       tooltipClass="form-tooltip">
                       <i class="info-icon" aria-hidden="true"></i>
@@ -206,7 +206,7 @@
                     <div *ngIf="item.activity_event_type == 'GV'">Generic Voter Drive</div>
                     <div *ngIf="item.activity_event_type == 'EA'">Exempt Activities</div>
                     <div *ngIf="item.activity_event_type == 'DF'">Direct Fundraising</div>
-                    <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Suppot</div>
+                    <div *ngIf="item.activity_event_type == 'DC'">Direct Candidate Support</div>
                     <div *ngIf="item.activity_event_type == 'PC'">Public Communications Referring Only to Party(Made by PAC)
                     </div>
                   </td>
@@ -264,7 +264,7 @@
                     <div *ngIf="itemChild.activity_event_type == 'GV'">Generic Voter Drive</div>
                     <div *ngIf="itemChild.activity_event_type == 'EA'">Exempt Activities</div>
                     <div *ngIf="itemChild.activity_event_type == 'DF'">Direct Fundraising</div>
-                    <div *ngIf="itemChild.activity_event_type == 'DC'">Direct Candidate Suppot</div>
+                    <div *ngIf="itemChild.activity_event_type == 'DC'">Direct Candidate Support</div>
                     <div *ngIf="itemChild.activity_event_type == 'PC'">Public Communications Referring Only to Party(Made by
                       PAC)</div>
                   </td>
