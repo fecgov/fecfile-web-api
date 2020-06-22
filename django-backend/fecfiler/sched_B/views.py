@@ -1163,14 +1163,13 @@ def put_schedB(datum):
                     transaction_data.get("donor_cmte_name"),
                     transaction_data.get("transaction_type_identifier"),
                 )
-            if not datum.get("transaction_id").startswith("LB"):
-                update_schedB_aggamt_transactions(
-                    datum.get("expenditure_date"),
-                    datum.get("transaction_type_identifier"),
-                    entity_id,
-                    datum.get("cmte_id"),
-                    datum.get("report_id"),
-                )
+            update_schedB_aggamt_transactions(
+                datum.get("expenditure_date"),
+                datum.get("transaction_type_identifier"),
+                entity_id,
+                datum.get("cmte_id"),
+                datum.get("report_id"),
+            )
             if datum["transaction_type_identifier"] in [
                 "OPEXP_HQ_ACC_REG_REF",
                 "OPEXP_HQ_ACC_IND_REF",
@@ -1678,7 +1677,6 @@ def put_sql_linenumber_schedB(
                     entity_id,
                 ],
             )
-            # print(cursor.query)
             if cursor.rowcount == 0:
                 raise Exception(
                     "put_sql_linenumber_schedB function: The Transaction ID: {} does not exist in schedB table".format(
