@@ -444,7 +444,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     const accountName = this.schedH5.get('account_name').value;
     const receipt_date = this.schedH5.get('receipt_date').value;
-
+    let memo_text = this.schedH5.get('memo_text').value;
     this.isSaveAndAdd = true;
 
     const reportId = this._individualReceiptService.getReportIdFromStorage(this.formType);
@@ -472,7 +472,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
 
     const transferred_amount = this.convertFormattedAmountToDecimal(this.schedH5.get('transferred_amount').value);
 
-    //set corresponding amount value    
+    memo_text = memo_text ? memo_text : '';
+    // set corresponding amount value
     if (this.schedH5.get('category').value === 'voter_id') {
       formObj['voter_id_amount'] = transferred_amount;
     } else if (this.schedH5.get('category').value === 'voter_registration') {
@@ -486,6 +487,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     formObj['receipt_date'] = this.schedH5.get('receipt_date').value;
 
     formObj['transaction_id'] = this.transaction_id;
+
+    formObj['memo_text'] = memo_text;
 
     const serializedForm = JSON.stringify(formObj);
 
@@ -532,7 +535,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       receipt_date: new FormControl('', Validators.required),
       total_amount_transferred: new FormControl(''),
       category: new FormControl('', Validators.required),
-      transferred_amount: new FormControl('', Validators.required)
+      transferred_amount: new FormControl('', Validators.required),
+      memo_text: new FormControl(),
       // activity_event_name: new FormControl(''),
       // amount: new FormControl(''),
       // total_amount: new FormControl('')
@@ -875,8 +879,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
     this.schedH5.patchValue({ receipt_date: item.receipt_date }, { onlySelf: true });
     this.schedH5.patchValue({ transferred_amount: this._decPipe.transform(item.transfer_amount, '.2-2') }, { onlySelf: true });
     this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(item.total_amount_transferred, '.2-2') }, { onlySelf: true });
-
-    this.transferred_amount_edit = item.transfer_amount
+    this.schedH5.patchValue({ memo_text: item.memo_text }, { onlySelf: true });
+    this.transferred_amount_edit = item.transfer_amount;
     this.total_amount_edit = item.total_amount_transferred;
 
   }
@@ -915,7 +919,7 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       transferred_amount: this._decPipe.transform(
         this.convertFormattedAmountToDecimal(item.transferred_amount), '.2-2')
     }, { onlySelf: true });
-
+    this.schedH5.patchValue({ memo_text: item.meo_text }, { onlySelf: true });
     this.h5Entries = this.h5Entries.filter(obj => obj !== item);
     this.h5Ratios.child = this.h5Ratios.child.filter(obj => obj !== item);
 
