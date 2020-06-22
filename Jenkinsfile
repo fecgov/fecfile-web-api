@@ -40,7 +40,7 @@ pipeline {
             //sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev")
             //deployToK8s(String version, String environment, String deployment, String repo)
             //Deploy backend
-            deployToK8s("${VERSION}", "dev","fecfile-backend-api","fecnxg-django-backend")
+            deployToK8s16("${VERSION}", "dev","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
             deployToK8s16("${VERSION}", "dev", "fecfile-frontend","fecnxg-frontend")
           }
