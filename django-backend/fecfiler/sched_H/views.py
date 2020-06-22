@@ -3967,7 +3967,8 @@ def update_h5_total_amount(data):
     """
     back_ref_transaction_id = data.get("back_ref_transaction_id")
     _v = [back_ref_transaction_id] * 3
-    do_transaction(_sql, _v)
+    if back_ref_transaction_id:
+        do_transaction(_sql, _v)
 
 
 @update_F3X
