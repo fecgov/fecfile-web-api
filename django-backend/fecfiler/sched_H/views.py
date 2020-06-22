@@ -4370,6 +4370,7 @@ def get_h5_summary(request):
             account_name,
             receipt_date,
             total_amount_transferred,
+            memo_text,
             coalesce(
                 voter_registration_amount,
                 voter_id_amount,

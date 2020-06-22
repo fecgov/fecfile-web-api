@@ -174,6 +174,21 @@
                 </div>
               </div>
             </div>
+          <div class="col col-md-4">
+            <div class="form-group">
+              <label for="">
+                Memo
+                <button type="button" class="btn btn-info" ngbTooltip="Place Holder" tooltipClass="form-tooltip">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">Click here for more information</span>
+                </button>
+              </label>
+              <div class="row input-group">
+                <input class="form-control" type="text" [formControlName]="'memo_text'"
+                       [attr.name]="'memo_text'" [style.width]="'50%'" [style.height]="'30px'">
+              </div>
+            </div>
+          </div>
           </div>
         </div>
       </section>
