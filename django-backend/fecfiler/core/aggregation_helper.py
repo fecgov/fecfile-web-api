@@ -499,20 +499,20 @@ def update_aggregate_lb(datum):
                     if aggregate_amount <= 200:
                         itemized_ind = "U"
                     else:
-                        itemzied_ind = "I"
+                        itemized_ind = "I"
 
                 # if transaction[7] != None or (
                 #     transaction[7] == None and transaction[6] != "X"
                 # ):
                 # aggregate_amount += transaction[0]
-
                 if expenditure_date <= transaction[4]:
                     transaction_id = transaction[1]
                     put_sql_agg_amount_LB(
                         cmte_id,
                         transaction_id,
                         aggregate_amount,
-                        itemized_ind                    )
+                        itemized_ind
+                        )
 
                     # child_SA_transaction_list = get_list_agg_child_schedA(report_id, cmte_id, transaction[1])
                     # for child_SA_transaction in child_SA_transaction_list:
