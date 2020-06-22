@@ -60,6 +60,10 @@
               <div class="grid-col">
                 <div class="label">
                   Submission Date
+                  <div type="button" class="btn btn-info" ngbTooltip="{{submissionDateToolTipText}}" tooltipClass="form-tooltip" >
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </div>
                 </div>
                 <div class="text">
                   {{today | date: 'MM/dd/yyyy' }}

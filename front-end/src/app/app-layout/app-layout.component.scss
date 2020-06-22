@@ -248,7 +248,7 @@
     color: $black;
     height: $footerMobileHeight;
     margin-top: 5px;
-    overflow-y: hidden;
+    // overflow-y: hidden;
     padding-left: 80px;
     @include media(tablet) {
       height: $footerMobileHeight;
