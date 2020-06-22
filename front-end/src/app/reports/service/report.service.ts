@@ -114,6 +114,132 @@ export class ReportsService {
     });
   }
 
+  public getParentReports(
+    view: string,
+    page: number,
+    itemsPerPage: number,
+    sortColumnName: string,
+    descending: boolean,
+    filter: ReportFilterModel,
+    reportId: number
+  ): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    const url = '/f99/get_form99list';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('view', view);
+    params = params.append('reportId', reportId.toString());
+
+    return this._http.get<GetReportsResponse>(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    })
+    .pipe(map(res => {
+      if (res) {
+        this.mockApplyFilters(res, filter);
+        const reportsModelL = this.mapFromServerFields(res.reports);
+        let reports: reportModel[] = this.sortReports(
+          reportsModelL,
+          sortColumnName,
+          descending
+        );
+        this.setAmendmentIndicator(reports);
+        this.setAmendmentShow(reports);
+        reports = reports.filter(report => {
+          if (!report.superceded_report_id) {
+            return true;
+          }
+          return false;
+        })
+        const totalItems = reports.length;
+        const items = reports.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
+        return {
+          items: items,
+          totalItems: totalItems
+        };
+      } else {
+        return {
+          items: null,
+          totalItems: 0
+        };
+      }
+    })
+    );
+  }
+
+  public getChildReports(
+    view: string,
+    page: number,
+    itemsPerPage: number,
+    sortColumnName: string,
+    descending: boolean,
+    filter: ReportFilterModel,
+    reportId: number,
+    parentReportId: string
+  ): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let params = new HttpParams();
+
+    const url = '/f99/get_form99list';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    params = params.append('view', view);
+    params = params.append('reportId', reportId.toString());
+
+    return this._http.get<GetReportsResponse>(`${environment.apiUrl}${url}`, {
+      headers: httpOptions,
+      params
+    })
+    .pipe(map(res => {
+      if (res) {
+        this.mockApplyFilters(res, filter);
+        const reportsModelL = this.mapFromServerFields(res.reports);
+        let reports: reportModel[] = this.sortReports(
+          reportsModelL,
+          sortColumnName,
+          descending
+        );
+        this.setAmendmentIndicator(reports);
+        this.setAmendmentShow(reports);
+        reports = reports.filter(report => {
+          if (report.superceded_report_id === parentReportId) {
+            return true;
+          }
+          if (!report.superceded_report_id) {
+            return true;
+          }
+          return false;
+        })
+        var totalChildItems = reports.reduce(function(n, report) {
+          return n + ((report.superceded_report_id === parentReportId) ? 1 : 0);
+        }, 0);
+
+        const totalItems = reports.length - totalChildItems;
+        const items = reports.slice((page - 1) * itemsPerPage, page * itemsPerPage + totalChildItems);
+
+        return {
+          items: items,
+          totalItems: totalItems
+        };
+      } else {
+        return {
+          items: null,
+          totalItems: 0
+        };
+      }
+    })
+    );
+  }
+
   public getReports(
     view: string,
     page: number,
@@ -140,7 +266,7 @@ export class ReportsService {
       params
     });
   }
-
+  
   public getTrashedReports(
     view: string,
     page: number,
@@ -194,6 +320,7 @@ export class ReportsService {
       model.delete_ind = row.delete_ind;
       model.amend_number = row.amend_number;
       model.previous_report_id = row.previous_report_id;
+      model.superceded_report_id = row.superceded_report_id;
       model.amend_show = true;
       model.amend_max = row.amend_max;
       model.memo_text = row.memo_text;
@@ -214,6 +341,52 @@ export class ReportsService {
     this._orderByPipe.transform(array, { property: sortColumnName, direction: direction });
     return array;
   }
+
+  public setAmendmentIndicator(reports: reportModel[]) {
+    if(reports) {
+      for(const report of reports) {        
+        if(report.form_type !== 'F99') {
+          if(report.amend_ind === 'N' && reports.find(function(obj) { return obj.previous_report_id === report.report_id})) {
+          //&& this.reportsModel.filter(rp => rp.previous_report_id == report.report_id)) {
+            report.amend_ind = 'Original';           
+          }else if(report.amend_ind === 'A') {        
+            report.amend_ind = report.amend_ind.concat(report.amend_number.toString());            
+          }
+        }        
+      }
+    }
+  }
+
+  public setAmendmentShow(reports: reportModel[]) {
+
+    let reportId = 0;
+    let next: reportModel;
+    let max: reportModel;
+    
+    if(reports) {
+      for(const report of reports) {
+        
+        if(report.amend_ind === 'Original') {
+          report.amend_show = false;
+          
+          next = reports.find(function(obj) { return obj.previous_report_id === report.report_id});
+          //if(next) 
+          next.amend_show = false;
+
+          while(next) {
+            next.amend_show = false;
+            max = next;
+            next = reports.find(function(obj) { return obj.previous_report_id === next.report_id});
+          }
+ 
+          //if(next) {
+            max.amend_show = true;
+            max.amend_max = 'down'; //'up';
+          //}
+
+        }
+      }
+    }  }
 
   /**
    * Some data from the server is formatted for display in the UI.  Users will search

@@ -178,7 +178,7 @@ export class UtilService {
     }
   }
 
-  public static PAGINATION_PAGE_SIZES: number[] = [2,10,20,50];
+  public static PAGINATION_PAGE_SIZES: number[] = [2,10,20,30,40,50];
 
   public pageResponse(response: any, config: PaginationInstance)
     : { items: any[], pageNumbers: number[] } {
