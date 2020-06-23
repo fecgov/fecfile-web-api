@@ -42,11 +42,14 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
 
   checked = false;
 
+
   public additionalEmailsArray: any = [];
   public today:Date = new Date();
 
   
   public form: FormGroup;
+  
+  public submissionDateToolTipText : string = 'Placeholder text';
   public tooltipPlaceholder : string = 'Placeholder text';
   private onDestroy$ = new Subject();
   public saveSuccessful = false;

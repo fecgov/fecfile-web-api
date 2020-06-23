@@ -16,6 +16,8 @@ export class F1mPreviewComponent implements OnInit {
   @Input() treasurerData: any;
   @Input() type: string;
   @Input() step: string;
+
+  public tooltipPlaceholder = 'Placeholder text';
   
   public reportInfo: any;
 
