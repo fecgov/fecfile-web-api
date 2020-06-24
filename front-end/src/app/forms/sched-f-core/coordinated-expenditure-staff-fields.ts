@@ -11,7 +11,7 @@ export class CoordinatedExpenditureStaffFields {
           {
             preText: null,
             setEntityIdTo: 'entity_id',
-            isReadonly: false,
+            isReadonly: true,
             entityGroup: null,
             toggle: false,
             inputGroup: false,
