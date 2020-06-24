@@ -505,7 +505,7 @@ export class CoordinatedExpenditureStaffMemoFields {
               height: '30px',
               width: '197px',
               validation: {
-                required: true,
+                required: false,
                 max: 9,
                 alphaNumeric: true
               }

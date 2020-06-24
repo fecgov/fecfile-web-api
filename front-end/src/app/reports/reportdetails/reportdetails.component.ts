@@ -28,6 +28,8 @@ import {
 import { TransactionsMessageService } from 'src/app/forms/transactions/service/transactions-message.service';
 import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
 import { FormsService } from '../../shared/services/FormsService/forms.service';
+import {SaveDialogAction} from '../../shared/partials/input-modal/input-modal.component';
+import {InputDialogService} from '../../shared/service/InputDialogService/input-dialog.service';
 @Component({
   selector: 'app-reportdetails',
   templateUrl: './reportdetails.component.html',
@@ -146,6 +148,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     private _reportTypeService: ReportTypeService,
     private _formsService: FormsService,
     private authService: AuthService,
+    private inputDialogService: InputDialogService,
   ) {
     this.showPinColumnsSubscription = this._reportsMessageService.getShowPinColumnMessage().subscribe(message => {
       this.showPinColumns();
@@ -306,7 +309,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     );
 
     this._reportsService
-      .getReports(
+      .getParentReports(
         this.view,
         page,
         this.config.itemsPerPage,
@@ -317,27 +320,31 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
       )
 
       .subscribe((res: GetReportsResponse) => {
-        this.reportsModel = [];
-        this._reportsService.mockApplyFilters(res, this.filters);
-        const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
+        // this.reportsModel = [];
+        // this._reportsService.mockApplyFilters(res, this.filters);
+        // const reportsModelL = this._reportsService.mapFromServerFields(res.reports);
 
-        this.config.totalItems = this.reportsModel.length;
-        this.reportsModel = this._reportsService.sortReports(
-          reportsModelL,
-          this.currentSortedColumnName,
-          sortedCol.descending
-        );
+        // this.config.totalItems = this.reportsModel.length;
+        // this.reportsModel = this._reportsService.sortReports(
+        //   reportsModelL,
+        //   this.currentSortedColumnName,
+        //   sortedCol.descending
+        // );
 
-        this.setAmendmentIndicator(this.reportsModel);
-        this.setAmendmentShow(this.reportsModel);
+        // this.setAmendmentIndicator(this.reportsModel);
+        // this.setAmendmentShow(this.reportsModel);
 
-        //console.log(' getReportsPage this.reportsModel= ', this.reportsModel);
-        this.config.totalItems = res.totalreportsCount ? res.totalreportsCount : 0;
-        this.numberOfPages =
-          res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
+        // //console.log(' getReportsPage this.reportsModel= ', this.reportsModel);
+        // this.config.totalItems = res.totalreportsCount ? res.totalreportsCount : 0;
+        // this.numberOfPages =
+        //   res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
         
-        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
-        this.allReportsSelected = false;
+        // this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1).sort((a, b) => b - a);
+        // this.allReportsSelected = false;
+
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.reportsModel = pagedResponse.items;
+        this.pageNumbers = pagedResponse.pageNumbers;
       });
   }
 
@@ -377,7 +384,7 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.numberOfPages =
           res.totalreportsCount > this.maxItemsPerPage ? Math.round(this.config.totalItems / this.maxItemsPerPage) : 1;
 
-        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1);
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1).sort((a, b) => b - a);
         this.allReportsSelected = false;
       });
   }
@@ -414,88 +421,118 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
   
-  public setAmendmentIndicator(reports: any) {
-    if(reports) {
-      for(const report of reports) {        
-        if(report.form_type !== 'F99') {
-          if(report.amend_ind === 'N' && this.reportsModel.find(function(obj) { return obj.previous_report_id === report.report_id})) {
-          //&& this.reportsModel.filter(rp => rp.previous_report_id == report.report_id)) {
-            report.amend_ind = 'Original';           
-          }else if(report.amend_ind === 'A') {        
-            report.amend_ind = report.amend_ind.concat(report.amend_number.toString());            
-          }
-        }        
-      }
-    }
-  }
+  // public setAmendmentIndicator(reports: any) {
+  //   if(reports) {
+  //     for(const report of reports) {        
+  //       if(report.form_type !== 'F99') {
+  //         if(report.amend_ind === 'N' && this.reportsModel.find(function(obj) { return obj.previous_report_id === report.report_id})) {
+  //         //&& this.reportsModel.filter(rp => rp.previous_report_id == report.report_id)) {
+  //           report.amend_ind = 'Original';           
+  //         }else if(report.amend_ind === 'A') {        
+  //           report.amend_ind = report.amend_ind.concat(report.amend_number.toString());            
+  //         }
+  //       }        
+  //     }
+  //   }
+  // }
 
-  public setAmendmentShow(reports: any) {
+  // public setAmendmentShow(reports: any) {
 
-    let reportId = 0;
-    let next: reportModel;
-    let max: reportModel;
+  //   let reportId = 0;
+  //   let next: reportModel;
+  //   let max: reportModel;
     
-    if(reports) {
-      for(const report of reports) {
+  //   if(reports) {
+  //     for(const report of reports) {
         
-        if(report.amend_ind === 'Original') {
-          report.amend_show = false;
+  //       if(report.amend_ind === 'Original') {
+  //         report.amend_show = false;
           
-          next = this.reportsModel.find(function(obj) { return obj.previous_report_id === report.report_id});
-          //if(next) 
-          next.amend_show = false;
+  //         next = this.reportsModel.find(function(obj) { return obj.previous_report_id === report.report_id});
+  //         //if(next) 
+  //         next.amend_show = false;
 
-          while(next) {
-            next.amend_show = false;
-            max = next;
-            next = this.reportsModel.find(function(obj) { return obj.previous_report_id === next.report_id});
-          }
+  //         while(next) {
+  //           next.amend_show = false;
+  //           max = next;
+  //           next = this.reportsModel.find(function(obj) { return obj.previous_report_id === next.report_id});
+  //         }
  
-          //if(next) {
-            max.amend_show = true;
-            max.amend_max = 'down'; //'up';
-          //}
+  //         //if(next) {
+  //           max.amend_show = true;
+  //           max.amend_max = 'down'; //'up';
+  //         //}
 
-        }
-      }
-    }  }
+  //       }
+  //     }
+  //   }  }
   
   public amendArrow(report: reportModel) {
-    
     report.amend_max === 'up' ? this.reportsModel.find(function(obj) { return obj.report_id === report.report_id}).amend_max = 'down'
       : this.reportsModel.find(function(obj) { return obj.report_id === report.report_id}).amend_max = 'up';
 
-    let pre = report;
-    pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
+    const sortedCol: SortableColumnModel = this._tableService.getColumnByName(
+      this.currentSortedColumnName,
+      this.sortableColumns
+    );
 
-    if(pre && report.amend_max === 'up') {
-      this.reportsModel = this.reportsModel.filter(function(item) {
-        return item !== pre
-      })
+    this._reportsService
+      .getChildReports(
+        this.view,
+        this.config.currentPage,
+        this.config.itemsPerPage,
+        this.currentSortedColumnName,
+        sortedCol.descending,
+        this.filters,
+        this.existingReportId,
+        report.report_id
+      )
+      .subscribe((res: GetReportsResponse) => { 
+        const pagedResponse = this._utilService.pageResponse(res, this.config);
+        this.reportsModel = pagedResponse.items;
+        this.reportsModel = this.reportsModel.map(item => {
+          if (item.superceded_report_id === report.report_id) {
+            item.amend_show = (report.amend_max === 'up');
+          } 
+          if (item.report_id === report.report_id) {
+            item.amend_max = report.amend_max;
+          }
+          return item;
+        });
+        this.pageNumbers = pagedResponse.pageNumbers;
+      });
 
-      let indexReport = this.reportsModel.indexOf(report);
-      if (indexReport > -1) {
-        this.reportsModel.splice(indexReport + 1, 0, pre);
-      }
-    }
+    // let pre = report;
+    // pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
 
-    while(pre) {
-      let rop = pre;
+    // if(pre && report.amend_max === 'up') {
+    //   this.reportsModel = this.reportsModel.filter(function(item) {
+    //     return item !== pre
+    //   })
 
-      pre.amend_show = !pre.amend_show;
-      pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
+    //   let indexReport = this.reportsModel.indexOf(report);
+    //   if (indexReport > -1) {
+    //     this.reportsModel.splice(indexReport + 1, 0, pre);
+    //   }
+    // }
 
-      if(pre && report.amend_max === 'up') {
-        this.reportsModel = this.reportsModel.filter(function(item) {
-          return item !== pre
-        })
+    // while(pre) {
+    //   let rop = pre;
 
-        let indexRep = this.reportsModel.indexOf(rop);
-        if (indexRep > -1) {
-          this.reportsModel.splice(indexRep + 1, 0, pre);
-        }
-      }
-    }
+    //   pre.amend_show = !pre.amend_show;
+    //   pre = this.reportsModel.find(function(obj) { return obj.report_id === pre.previous_report_id});
+
+    //   if(pre && report.amend_max === 'up') {
+    //     this.reportsModel = this.reportsModel.filter(function(item) {
+    //       return item !== pre
+    //     })
+
+    //     let indexRep = this.reportsModel.indexOf(rop);
+    //     if (indexRep > -1) {
+    //       this.reportsModel.splice(indexRep + 1, 0, pre);
+    //     }
+    //   }
+    // }
     
   }
 
@@ -1680,5 +1717,34 @@ public printReport(report: reportModel): void{
         return true;
     }
     return false;
+  }
+
+  /**
+   *
+   * @param report
+   */
+  addMemo(report: reportModel) {
+    const memoText = report.memo_text ? report.memo_text : '';
+    const title = memoText ? 'Edit Memo' : 'Add Memo';
+    const dialogData = {
+      content: memoText,
+      saveAction: SaveDialogAction.saveReportMemo,
+      title: title,
+    };
+    this.inputDialogService.openFormModal(dialogData).then((res) => {
+      if (res.saveAction === SaveDialogAction.saveReportMemo) {
+        const updateData = {
+          report_id: report.report_id,
+          memo_text: res.content
+        };
+        this._reportsService.updateMemo(updateData).subscribe(updateRes => {
+          if (updateRes) {
+            this.getReportsPage(this.config.currentPage);
+          }
+        });
+      }
+    }).catch((e) => {
+      // clicked other than save
+    });
   }
 }

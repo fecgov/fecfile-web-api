@@ -230,6 +230,12 @@ export class F1mComponent implements OnInit, OnDestroy {
     }
     else if(this.step === 'step_2'){
       if(this.type === 'qualification'){
+        //check query params to see if a form of this type has already been created and a report id generate
+        //if so, then return false
+        if(this._activatedRoute.snapshot.queryParams.reportId){
+          return false;
+        }
+        
         if(this.qualificationComp && this.qualificationComp.showPart2){
           return true;
         }

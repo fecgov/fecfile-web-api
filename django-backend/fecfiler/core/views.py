@@ -3504,6 +3504,16 @@ TRANSACTIONS TABLE ENHANCE- GET ALL TRANSACTIONS API - CORE APP - SPRINT 11 - FN
 **********************************************************************************************************************************************
 """
 
+def get_trans_view_name(category_type):
+    if category_type == "disbursements_tran":
+        view_name = "all_disbursements_transactions_view"
+    elif category_type == "loans_tran":
+        view_name = "all_loans_debts_transactions_view"
+    elif category_type == "other_tran":
+        view_name = "all_other_transactions_view"
+    else:
+        view_name = "all_receipts_transactions_view"
+    return view_name    
 
 def get_trans_query(category_type, cmte_id, param_string):
     if category_type == "disbursements_tran":
@@ -4080,6 +4090,9 @@ def get_all_transactions(request):
             param_string += " AND delete_ind = 'Y'"
         else:
             param_string += " AND delete_ind is distinct from 'Y'"
+        
+        if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
+            param_string += " AND back_ref_transaction_id IS NULL"
 
         filters_post = request.data.get("filters", {})
         memo_code_d = filters_post.get("filterMemoCode", False)
@@ -4112,9 +4125,11 @@ def get_all_transactions(request):
         total_amount = 0.0
         #: set transaction query with offsets.
         trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
+        if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
+            trans_query_string = "(" + trans_query_string + ") UNION (" + trans_query_string[0:trans_query_string.index(" from ")] + " from ( SELECT W.* FROM (" + trans_query_string + ") V join " + get_trans_view_name(ctgry_type) + " W on V.transaction_id = W.back_ref_transaction_id) Z)"
 
         with connection.cursor() as cursor:
-            # logger.debug('query all transactions with sql:{}'.format(trans_query_string))
+            logger.debug('query all transactions with sql:{}'.format(trans_query_string))
             cursor.execute(
                 """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
             )

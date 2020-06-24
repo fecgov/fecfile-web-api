@@ -3074,6 +3074,7 @@ def schedH4_sql_dict(data):
         "last_name",
         "middle_name",
         "preffix",
+        "prefix",
         "suffix",
         "street_1",
         "street_2",
@@ -3966,7 +3967,8 @@ def update_h5_total_amount(data):
     """
     back_ref_transaction_id = data.get("back_ref_transaction_id")
     _v = [back_ref_transaction_id] * 3
-    do_transaction(_sql, _v)
+    if back_ref_transaction_id:
+        do_transaction(_sql, _v)
 
 
 @update_F3X
@@ -4370,6 +4372,7 @@ def get_h5_summary(request):
             account_name,
             receipt_date,
             total_amount_transferred,
+            memo_text,
             coalesce(
                 voter_registration_amount,
                 voter_id_amount,
@@ -4688,6 +4691,7 @@ def schedH6_sql_dict(data):
         "last_name",
         "middle_name",
         "preffix",
+        "prefix",
         "suffix",
         "street_1",
         "street_2",

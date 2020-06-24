@@ -40,7 +40,7 @@ pipeline {
             //sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-dev-db.casvptvnuxni.us-east-1.rds.amazonaws.com dev")
             //deployToK8s(String version, String environment, String deployment, String repo)
             //Deploy backend
-            deployToK8s("${VERSION}", "dev","fecfile-backend-api","fecnxg-django-backend")
+            deployToK8s16("${VERSION}", "dev","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
             deployToK8s16("${VERSION}", "dev", "fecfile-frontend","fecnxg-frontend")
           }
@@ -160,17 +160,17 @@ def code_quality() {
         
 def imageBuild(String version, String frontend_env) {
   if(frontend_env == "awsdev"){
-    sh("sed -i 's/local/${frontend_env}/g' front-end/Dockerfile")
+    sh("sed -i 's/=local/=${frontend_env}/g' front-end/Dockerfile")
     sh("sed -i 's/VERDEPLOYED/${version}/g' front-end/Dockerfile")
   }
   if (frontend_env == "awsqa") {
-    sh("sed -i 's/local/${frontend_env}/g' front-end/Dockerfile")
+    sh("sed -i 's/=local/=${frontend_env}/g' front-end/Dockerfile")
     sh("sed -i 's/awsdev/${frontend_env}/g' front-end/Dockerfile")
     sh("sed -i 's/VERDEPLOYED/${version}/g' front-end/Dockerfile")
 
   }
   if (frontend_env == "awsuat") {
-    sh("sed -i 's/local/${frontend_env}/g'  front-end/Dockerfile")
+    sh("sed -i 's/=local/=${frontend_env}/g'  front-end/Dockerfile")
     sh("sed -i 's/awsdev/${frontend_env}/g' front-end/Dockerfile")
     sh("sed -i 's/awsqa/${frontend_env}/g'  front-end/Dockerfile")
     sh("sed -i 's/VERDEPLOYED/${version}/g' front-end/Dockerfile")
@@ -213,7 +213,7 @@ def deployToK8s(String version, String environment, String deployment, String re
 }
 def deployToK8s16(String version, String environment, String deployment, String repo) {
   sh """ 
-    kubectl \
+    kubectl16 \
       --context=arn:aws:eks:us-east-1:813218302951:cluster/fecnxg-dev1 \
       --namespace=${environment} \
       set image deployment/${deployment} ${deployment}=813218302951.dkr.ecr.us-east-1.amazonaws.com/${repo}:${version}

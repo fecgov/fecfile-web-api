@@ -112,8 +112,8 @@
 
   ng-select { 
     .ng-dropdown-panel { 
-      width: auto !important; 
-      max-width: 550px; 
+      width: auto;
+      min-width: 100%; 
     } 
   }
 

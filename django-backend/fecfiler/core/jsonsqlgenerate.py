@@ -1823,8 +1823,8 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                     COALESCE(t1.presidential_and_senate, '''') AS "presidentialAndSenate",
                     COALESCE(t1.senate_only, '''') AS "senateOnly",
                     COALESCE(t1.non_pres_and_non_senate, '''') AS "nonPresidentialAndNonSenate",
-                    COALESCE(t1.federal_percent, 0.0) AS "federalPercent",
-                    COALESCE(t1.non_federal_percent, 0.0) AS "nonFederalPercent",
+                    COALESCE(t1.federal_percent, 0.0)*100::double precision AS "federalPercent",
+                    COALESCE(t1.non_federal_percent, 0.0)*100::double precision AS "nonFederalPercent",
                     COALESCE(t1.administrative, '''') AS "administrative",
                     COALESCE(t1.generic_voter_drive, '''') AS "genericVoterDrive",
                     COALESCE(t1.public_communications, '''') AS "publicCommunications"
@@ -1847,8 +1847,8 @@ VALUES ('F3X', 'SH1', '{0}', '{1}');\n""".format(tran, query)
                     COALESCE(t1.fundraising, '''') AS "fundraising",
                     COALESCE(t1.direct_cand_support, '''') AS "directCandidateSupport",
                     COALESCE(t1.ratio_code, '''') AS "ratioCode",
-                    COALESCE(t1.federal_percent, 0.0) AS "federalPercent",
-                    COALESCE(t1.non_federal_percent, 0.0) AS "nonFederalPercent"
+                    COALESCE(t1.federal_percent, 0.0)*100::double precision AS "federalPercent",
+                    COALESCE(t1.non_federal_percent, 0.0)*100::double precision AS "nonFederalPercent"
                     FROM public.sched_h2 t1
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
