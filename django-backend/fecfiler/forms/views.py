@@ -909,18 +909,21 @@ def get_form99list(request):
             cmte_id = get_comittee_id(request.user.username)
             viewtype = request.query_params.get('view')
             reportid = request.query_params.get('reportId')
+            parentid = request.query_params.get('parentId')
 
             #commented by Mahendra 10052019
             #print ("[cmte_id]", cmte_id)
             print ("[viewtype]", viewtype)
             print ("[reportid]", reportid)
+            print ("[parentid]", parentid)
 
             forms_obj = None
             with connection.cursor() as cursor:
                 if reportid in ["None", "null", " ", "","0"]:    
                     query_string =  """SELECT json_agg(t) FROM 
                                     (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype, 
-                                            deleteddate, memo_text
+                                            deleteddate, memo_text,
+                                            (select count(1) from public.reports_view c where c.superceded_report_id = t1.report_id) as child_records_count
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
                                             WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
@@ -929,13 +932,14 @@ def get_form99list(request):
                                         END AS viewtype,
                                             deleteddate,
                                             memo_text
-                                         FROM public.reports_view WHERE cmte_id = %s AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
+                                         FROM public.reports_view WHERE cmte_id = %s AND COALESCE(superceded_report_id, 0) = COALESCE(%s, 0) AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
                                     ) t1
                                     WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
                 else:
                     query_string =  """SELECT json_agg(t) FROM 
                                     (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype,
-                                            deleteddate, memo_text
+                                            deleteddate, memo_text,
+                                            (select count(1) from public.reports_view c where c.superceded_report_id = t1.report_id) as child_records_count
                                      FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
                                          CASE
                                             WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
@@ -946,7 +950,7 @@ def get_form99list(request):
                                             memo_text
                                          FROM public.reports_view WHERE cmte_id = %s AND delete_ind is distinct from 'Y'
                                     ) t1
-                                    WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
+                                    WHERE report_id = %s AND COALESCE(superceded_report_id, 0) = COALESCE(%s, 0) AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
 
                 #commented by Mahendra 10052019
                 #print("query_string =", query_string)
@@ -955,9 +959,9 @@ def get_form99list(request):
                 # Pull reports from reports_view
                 #query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
                 if reportid in ["None", "null", " ", "","0"]:  
-                    cursor.execute(query_string, [cmte_id, viewtype])
+                    cursor.execute(query_string, [cmte_id, parentid, viewtype])
                 else:
-                    cursor.execute(query_string, [cmte_id, reportid, viewtype])
+                    cursor.execute(query_string, [cmte_id, reportid, parentid, viewtype])
 
                 for row in cursor.fetchall():
                     data_row = list(row)

@@ -252,7 +252,7 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
-                            <button *ngIf="report.amend_ind === 'N' || report.amend_max === 'up' || report.amend_max === 'down'" class="dropdown-item"  (click)="viewReport(report)">
+                            <button *ngIf="(report.amend_ind === 'N' || report.amend_max === 'up' || report.amend_max === 'down')" class="dropdown-item"  (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
                             <button  *ngIf="(report.amend_ind === 'N' ||report.amend_max === 'up' || report.amend_max === 'down') && !authService.isReadOnly()" class="dropdown-item" (click)="amendReport(report)">
@@ -312,7 +312,170 @@
                     </div>
                 </td>
 
-            </tr>
+                </tr>
+                <ng-container *ngFor="let child of report.children">                
+                    <tr *ngIf="child.amend_show" [ngStyle]="{'background-color':'#D9EDF6'}">
+                    <td *ngIf="isColumnVisible('form_type')">{{child.form_type}}</td>
+                    <td *ngIf="isColumnVisible('status')">{{child.status}}</td>
+                    <td *ngIf="isColumnVisible('fec_id')">{{child.status === 'Filed' ? child.fec_id : '' }}</td>
+                    <td *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())">
+                        <div class="row td-amend">
+                            {{(child.amend_ind === 'N' || child.amend_ind === 'T') ? '' : child.amend_ind}}
+                            <div >
+                                <i *ngIf="child.amend_max === 'down'" class="fas fa-angle-down amend-arrow" (click)="amendArrow(child)"></i>
+                                <i *ngIf="child.amend_max === 'up'" class="fas fa-angle-up amend-arrow" (click)="amendArrow(child)"></i>
+                            </div>
+                        </div>
+                    </td>
+                    <td *ngIf="isColumnVisible('cvg_start_date')">
+                        {{(child.form_type !== 'F99' && child.form_type !== 'F1M')? ( (child.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (child.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
+                    </td>
+                    <td *ngIf="isColumnVisible('report_type_desc')">{{child.report_type_desc}}</td>
+                    <td *ngIf="isColumnVisible('filed_date')">
+                        {{child.status === 'Filed'? (child.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss a') : (child.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
+                    </td>
+                    <td *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())">
+                        {{(child.deleteddate| date: 'MM/dd/yyyy @ hh:mm:ss a') }}
+                    </td>
+                    <td class="bulk_action" >
+                        <div *ngIf="isRecycleBinViewActive()">
+                            <button *ngIf="!authService.isReadOnly()" class="btn btn-sm btn-primary" (click)="restoreReport(report)">
+                                <i class="undo-icon"></i>
+                            </button>
+                        </div>
+                        <div 
+                            *ngIf="isReportViewActive() && child.form_type !== 'F99' && child.status === 'Saved' && (child.amend_ind === 'N' || child.amend_ind === 'T')"
+                            class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+    
+                            <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+    
+    
+                            <div id="forms__trx-dropdown-action1" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
+                                <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="addMemo(report)">
+                                    <i class="fas fa-sticky-note"></i> {{child.memo_text ? 'Edit ' : 'Add '}} Memo
+                                </button>
+                                <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="editReport(report)">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button *ngIf="authService.isReadOnly()" class="dropdown-item" (click)="viewReport(report)">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="dropdown-item" (click)="printReport(report)">
+                                    <i class="fas fa-print"></i> Print
+                                </button>
+                                <button  *ngIf="isUpload()" class="dropdown-item" (click)="uploadReport(report)">
+                                    <i class="fas fa-upload"></i> Upload
+                                </button>
+                                <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="trashReport(report)">
+                                    <i class="fas fa-trash"></i> Trash
+                                </button>
+                            </div>
+                        </div>
+    
+                        <div 
+                            *ngIf="isReportViewActive() && child.form_type !== 'F99' && child.status !== 'Filed' && !(child.amend_ind === 'N' || child.amend_ind === 'T')"
+                            class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+    
+                            <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+    
+                            <div id="forms__trx-dropdown-action5" ngbDropdownToggle   class="dropdown-menu" ngbDropdownMenu>
+                                <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="addMemo(report)">
+                                    <i class="fas fa-sticky-note"></i> {{child.memo_text ? 'Edit ' : 'Add '}} Memo
+                                </button>
+                                <button *ngIf="(child.amend_max === 'up' || child.amend_max === 'down')
+                                 && !authService.isReadOnly()" class="dropdown-item"
+                                        (click)="editReport(report)">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button *ngIf="authService.isReadOnly()" class="dropdown-item" (click)="viewReport(report)">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="dropdown-item" (click)="printReport(report)">
+                                    <i class="fas fa-print"></i> Print
+                                </button>                            
+                                <button *ngIf="isUpload()" class="dropdown-item" (click)="uploadReport(report)">
+                                    <i class="fas fa-upload"></i> Upload
+                                </button>
+                                <button *ngIf="(child.amend_max === 'up' || child.amend_max === 'down') &&
+                                    !authService.isReadOnly()" class="dropdown-item" (click)="trashReport(report)">
+                                    <i class="fas fa-trash"></i> Trash
+                                </button>
+                            </div>
+                        </div>
+    
+                        <div 
+                            *ngIf="isReportViewActive() && child.form_type !== 'F99' && child.status === 'Filed'"
+                            class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+    
+                            <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
+                                <button *ngIf="(child.amend_ind === 'N' || child.amend_max === 'up' || child.amend_max === 'down')" class="dropdown-item"  (click)="viewReport(report)">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button  *ngIf="(child.amend_ind === 'N' ||child.amend_max === 'up' || child.amend_max === 'down') && !authService.isReadOnly()" class="dropdown-item" (click)="amendReport(report)">
+                                    <i class="fas fa-edit"></i> Amend
+                                </button>
+                                <button class="dropdown-item" (click)="downloadReport(report)">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                                <!--<button class="dropdown-item" (click)="printReport(report)">
+                                    <i class="fas fa-print"></i> Print
+                                </button> -->
+                            </div>
+                        </div>
+    
+                        <div 
+                            *ngIf="isReportViewActive() && child.form_type === 'F99' && child.status === 'Filed'"
+                            class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+    
+                            <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <div id="forms__trx-dropdown-action3" class="dropdown-menu" ngbDropdownMenu>
+                                <button class="dropdown-item" *ngIf="child.status === 'Filed'" (click)="viewReport(report)">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="dropdown-item" (click)="downloadReport(report)">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                              <!---  <button class="dropdown-item" (click)="printReport(report)">
+                                    <i class="fas fa-print"></i> Print
+                                </button> -->
+                            </div>
+                        </div>
+    
+                        <div 
+                            *ngIf="isReportViewActive() && child.form_type === 'F99' && child.status !== 'Filed'"
+                            class="btn-group" ngbDropdown role="group" aria-label="Action dropdown">
+    
+                            <button class="btn btn-sm btn-primary" ngbDropdownToggle [disabled]="!bulkActionDisabled">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <div id="forms__trx-dropdown-action4" class="dropdown-menu" ngbDropdownMenu>
+                                <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="editReport(report)">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="dropdown-item" (click)="printReport(report)">
+                                    <i class="fas fa-print"></i> Print
+                                </button>                            
+                                <button *ngIf="isUpload()" class="dropdown-item" (click)="uploadReport(report)">
+                                    <i class="fas fa-upload"></i> Upload
+                                </button>
+                                <button *ngIf="!authService.isReadOnly()" class="dropdown-item" (click)="trashReport(report)">
+                                    <i class="fas fa-trash"></i> Trash
+                                </button>
+                            </div>
+    
+                        </div>
+                    </td>
+                    </tr>
+                </ng-container>
             </ng-container>
         </tbody>
     </table>
