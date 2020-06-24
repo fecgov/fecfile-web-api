@@ -59,7 +59,7 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
   @Output() status: EventEmitter<any> = new EventEmitter<any>();
 
   //TODO-ZS -- change "any" to LoanModel when using actual data
-  public LoanModel: Array<any>;
+  public LoanModel: Array<LoanModel>;
 
   public totalAmount: number;
   public LoanView = ActiveView.loanSummary;
@@ -1006,4 +1006,21 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  public showRow(trx: any, sched: string): boolean {
+      let childArray;
+      if (trx && trx.entity_type === 'ORG' &&
+          (trx.transaction_type_identifier === 'LOANS_OWED_BY_CMTE' || trx.transaction_type_identifier === 'LOANS_OWED_TO_CMTE')) {
+        if (trx.child && trx.child.length > 0) {
+          childArray = trx.child.filter(element => {
+            return element.transaction_type_identifier === sched;
+          });
+          if (childArray.length > 0) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
 }

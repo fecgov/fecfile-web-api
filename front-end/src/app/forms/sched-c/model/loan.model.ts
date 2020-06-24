@@ -48,6 +48,8 @@ export class LoanModel {
   child: any[];
   hasC1: any;
   hasC2: any;
+  toggleChild: boolean;
+  togglePayments: boolean;
     constructor(loan: any) {
         this.cmte_id = loan.cmte_id ? loan.cmte_id : '';
         this.report_id = loan.report_id ? loan.report_id : 0;
@@ -58,9 +60,9 @@ export class LoanModel {
         this.entity_id = loan.entity_id ? loan.entity_id : '';
         this.name = loan.name ? loan.name : '';
         this.entity_name = loan.entity_name ? loan.entity_name : '';
-        this.lastName = loan.lastName ? loan.lastName : '';
-        this.firstName = loan.firstName ? loan.firstName : '';
-        this.middleName = loan.middleName ? loan.middleName : '';
+        this.lastName = loan.last_Name ? loan.last_Name : '';
+        this.firstName = loan.first_name ? loan.first_name : '';
+        this.middleName = loan.middle_ame ? loan.middle_name : '';
         this.suffix = loan.suffix ? loan.suffix : '';
         this.prefix = loan.prefix ? loan.prefix : '';
         this.street1 = loan.street1 ? loan.street1 : '';
@@ -87,13 +89,14 @@ export class LoanModel {
         this.lender_cand_district = loan.lender_cand_district ? loan.lender_cand_district : '';
         this.memo_code = loan.memo_code ? loan.memo_code : '';
         this.memo_text = loan.memo_text ? loan.memo_text : '';
-        this.delete_ind = loan.delete_ind ? loan.delete_ind : '';        
+        this.delete_ind = loan.delete_ind ? loan.delete_ind : '';
         this.selected = loan.selected;
         this.child = loan.child;
         this.payments = loan.payments;
         this.hasC1 = loan.hasC1;
         this.hasC2 = loan.hasC2;
- 
+        this.toggleChild = loan.toggleChild || false;
+        this.togglePayments = loan.togglePayments || false;
 
     }
 }
