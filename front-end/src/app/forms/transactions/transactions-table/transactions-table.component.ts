@@ -1864,7 +1864,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       return false;
     }
     if (trx) {
-      if (trx.reportstatus.toUpperCase() === 'FILED') {
+      if (trx.reportstatus && trx.reportstatus.toUpperCase() === 'FILED') {
         return (trx.forceitemizable && trx.iseditable);
       }
       return trx.forceitemizable;
