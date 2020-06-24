@@ -434,24 +434,24 @@ export class CoordinatedExpenditureStaffMemoFields {
           seperator: true,
           cols: [
             {
-              preText: null,
+              preText: 'Staff Reimbursement Memo',
               setEntityIdTo: 'entity_id',
-              isReadonly: true,
+              isReadonly: false,
               entityGroup: null,
               toggle: false,
-              inputGroup: false,
-              inputIcon: null,
+              inputGroup: true,
+              inputIcon: '',
               text: 'Purpose of Disbursement',
               infoIcon: true,
               infoText: 'Request language from RAD',
               name: 'purpose',
               type: 'text',
-              value: 'Staff Reimbursement Memo',
+              value: null,
               scroll: true,
               height: '30px',
-              width: '380px',
+              width: '340px',
               validation: {
-                required: true,
+                required: false,
                 max: 100,
                 alphaNumeric: true
               }
