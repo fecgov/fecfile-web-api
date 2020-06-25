@@ -436,7 +436,7 @@ export class CoordinatedExpenditurePayrollMemoFields {
             {
               preText: null,
               setEntityIdTo: 'entity_id',
-              isReadonly: true,
+              isReadonly: false,
               entityGroup: null,
               toggle: false,
               inputGroup: false,
@@ -446,7 +446,7 @@ export class CoordinatedExpenditurePayrollMemoFields {
               infoText: 'Request language from RAD',
               name: 'purpose',
               type: 'text',
-              value: 'Payroll Payment Memo',
+              value: null,
               scroll: true,
               height: '30px',
               width: '380px',

@@ -187,6 +187,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     "COEXP_PMT_PROL_MEMO",
     "COEXP_PARTY_DEBT"
   ];
+
+  //this array can be used to override the logic where some transactions will always have the purpose description required regardless of expenditure amount
+  private disbursementTransactionsWithPurposeAlwaysRequired = ["FEA_CC_PAY_MEMO"];
+  
   private staticEntityTypes =  [{entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: false}, {entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: false}];
   
   //this dummy subject is used only to let the activatedRoute subscription know to stop upon ngOnDestroy.
@@ -822,7 +826,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     else if (this.isFieldName(fieldName, 'expenditure_purpose')) {
       // Expenditure  description is required for H4/H6
+      //as well as some disbursement memos
       if (
+        //h4/h6 list
         this.transactionType === 'ALLOC_EXP' ||
         this.transactionType === 'ALLOC_EXP_CC_PAY' ||
         this.transactionType === 'ALLOC_EXP_CC_PAY_MEMO' ||
@@ -837,6 +843,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         // this.transactionType === 'ALLOC_FEA_STAF_REIM' ||    commented due to FNE-2624
         this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
         this.transactionType === 'ALLOC_FEA_VOID'
+
+        //disbursement transactions
+        || this.disbursementTransactionsWithPurposeAlwaysRequired.includes(this.transactionType)
       ) {
         formValidators.push(Validators.required);
       }
@@ -1042,9 +1051,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     } else if (this.frmIndividualReceipt.get('expenditure_amount') != null) {
       this.frmIndividualReceipt.get('expenditure_amount').valueChanges.takeUntil(this.onDestroy$)
         .subscribe(value => {
-          const expenditurePurposeDesc = this.frmIndividualReceipt.get('expenditure_purpose');
-          expenditurePurposeDesc.setValidators([validateAggregate(value, true, 'expenditure_purpose')]);
-          expenditurePurposeDesc.updateValueAndValidity();
+          if(!this.disbursementTransactionsWithPurposeAlwaysRequired.includes(this.transactionType)){
+            const expenditurePurposeDesc = this.frmIndividualReceipt.get('expenditure_purpose');
+            expenditurePurposeDesc.setValidators([validateAggregate(value, true, 'expenditure_purpose')]);
+            expenditurePurposeDesc.updateValueAndValidity();
+          }
         });
     }
   }
