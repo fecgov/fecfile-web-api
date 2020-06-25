@@ -2834,6 +2834,66 @@ def get_h3_aggregate_amount(request):
         raise
 
 
+def get_amount_type(category):
+    category_val = ''
+
+    if check_null_value(category):
+        if category.lower() == 'voter_id':
+            category_val = "SELECT sum(voter_id_amount) as aggregate_amount"
+        elif category.lower() == 'voter_registration':
+            category_val = "SELECT sum(voter_registration_amount) as aggregate_amount"
+        elif category.lower() == 'generic_campaign':
+            category_val = "SELECT sum(generic_campaign_amount) as aggregate_amount"
+        elif category.lower() == 'gotv':
+            category_val = "SELECT sum(gotv_amount) as aggregate_amount"
+
+    return category_val
+
+
+@api_view(["GET"])
+def get_h5_aggregate_amount(request):
+    """
+    get h5 aggregate_amount based on account and category type
+
+    """
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        report_id = request.query_params.get("report_id")
+        account_name = request.query_params.get("account_name")
+        category = request.query_params.get("category")
+        logger.debug("get_h5_aggregate_amount with request:{}".format(request.query_params))
+
+        query_sql = get_amount_type(category)
+
+        if check_null_value(report_id) and check_null_value(account_name) and check_null_value(category):
+
+            _sql = """
+            SELECT json_agg(t) from(
+            """
+            _sql += query_sql
+
+            _sql += """           
+            FROM   public.sched_h5 
+            WHERE  cmte_id = %s
+                AND report_id = %s
+                    AND account_name = %s
+                    AND delete_ind is distinct from 'Y'
+            ) t
+            """
+            with connection.cursor() as cursor:
+                logger.debug("query with _sql:{}".format(_sql))
+                # logger.debug('query with cmte_id:{}, report_id:{}'.format(cmte_id, report_id))
+                cursor.execute(_sql, (cmte_id, report_id, account_name))
+                json_res = cursor.fetchone()[0]
+        else:
+            raise Exception("Please provide report_id, account name and category type.")
+
+        return Response(json_res[0], status=status.HTTP_200_OK)
+    except Exception as e:
+        json_result = {'message': str(e)}
+        return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
+
+
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def schedH3(request):
     try:
