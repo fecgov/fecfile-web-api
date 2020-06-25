@@ -291,11 +291,12 @@ export class LoanService {
       model.payments = row.payments;
       model.hasC1 = row.hasC1;
       model.hasC2 = row.hasC2;
-      model.firstName = row.first_name;
-      model.lastName = row.last_name;
-      model.middleName = row.middle_name;
+      model.firstName = row.first_name ? row.first_name : '';
+      model.lastName = row.last_name ? row.last_name : '';
+      model.middleName = row.middle_name ? row.middle_name : '';
       model.entity_name = row.entity_name;
-
+      model.suffix = row.suffix ? row.suffix : '';
+      model.prefix = row.prefix ? row.prefix : '';
       modelArray.push(model);
     }
     return modelArray;
