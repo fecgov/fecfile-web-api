@@ -84,6 +84,7 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     'Convention Account': ['IND_NP_CONVEN_ACC', 'PAC_NP_CONVEN_ACC', 'PARTY_NP_CONVEN_ACC', 'TRIB_NP_CONVEN_ACC'],
     'Convention Account - JF Memo for': ['JF_TRAN_NP_CONVEN_IND_MEMO', 'JF_TRAN_NP_CONVEN_PAC_MEMO',
                                          'JF_TRAN_NP_CONVEN_TRIB_MEMO'],
+    'Convention: Refund': ['OPEXP_CONV_ACC_TRIB_REF', 'OPEXP_CONV_ACC_IND_REF'],
     'Credit Card Payment': ['IE_CC_PAY_MEMO'],
     'Credit Card: See Below': ['IE_CC_PAY'],
     'Earmark for': ['PAC_CON_EAR_DEP', 'PAC_CON_EAR_UNDEP'],
@@ -92,6 +93,7 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     'Headquarters Account': ['IND_NP_HQ_ACC', 'PAC_NP_HQ_ACC', 'PARTY_NP_HQ_ACC', 'TRIB_NP_HQ_ACC'],
     'Headquarters Account - JF Memo for': ['JF_TRAN_NP_HQ_IND_MEMO', 'JF_TRAN_NP_HQ_PAC_MEMO',
                                            'JF_TRAN_NP_HQ_TRIB_MEMO'],
+    'Headquarters: Refund': ['OPEXP_HQ_ACC_TRIB_REF', 'OPEXP_HQ_ACC_IND_REF'],
     'In-kind': ['IK_REC', 'IK_TRAN', 'IK_TRAN_FEA', 'PAC_IK_BC_OUT', 'PAC_IK_BC_REC', 'PAC_IK_REC', 'PARTY_IK_BC_OUT',
                 'PARTY_IK_REC'],
     'JF Memo for': ['JF_TRAN_IND_MEMO', 'JF_TRAN_PAC_MEMO', 'JF_TRAN_PARTY_MEMO', 'JF_TRAN_TRIB_MEMO'],
@@ -101,13 +103,17 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     'JF Transfer Recount Account': ['JF_TRAN_NP_RECNT_ACC'],
     'Loan From Ind': ['LOAN_FROM_IND'],
     'Non-Contribution Account Receipt': ['BUS_LAB_NON_CONT_ACC', 'IND_REC_NON_CONT_ACC', 'OTH_CMTE_NON_CONT_ACC'],
+    'Non-Contribution Account': ['OTH_DISB_NC_ACC_STAF_REIM', 'OTH_DISB_NC_ACC_CC_PAY', 'OTH_DISB_NC_ACC_PMT_TO_PROL',
+                                    'OTH_DISB_NC_ACC_PMT_TO_PROL_MEMO'],
     'Partnership Memo': ['LEVIN_PARTN_MEMO', 'PARTN_MEMO'],
     'Payroll: See Below': ['IE_PMT_TO_PROL'],
     'Recount Account': ['IND_NP_RECNT_ACC', 'PAC_NP_RECNT_ACC', 'PARTY_NP_RECNT_ACC', 'TRIB_NP_RECNT_ACC'],
     'Recount Account - JF Memo for': ['JF_TRAN_NP_RECNT_PAC_MEMO', 'JF_TRAN_NP_RECNT_TRIB_MEMO',
                                       'JF_TRAN_NP_RECNT_IND_MEMO'],
     'Recount Receipt': ['IND_RECNT_REC', 'PAC_RECNT_REC', 'PARTY_RECNT_REC', 'TRIB_RECNT_REC'],
-    'Reimbursement: See Below': ['IE_STAF_REIM'],
+    'Recount: Refund': ['OTH_DISB_NP_RECNT_TRIB_REF', 'OTH_DISB_NP_RECNT_REG_REF', 'OTH_DISB_NP_RECNT_IND_REF'],
+    'Recount: Purpose of Disbursement' : ['OTH_DISB_RECNT'],
+    'Reimbursement: See Below': ['IE_STAF_REIM', 'ALLOC_FEA_STAF_REIM'],
     'Return/Void': ['PAC_NON_FED_RET', 'PAC_RET'],
     'See Memos Below': ['LEVIN_PARTN_REC', 'PARTN_REC'],
     # Removing 'EAR_MEMO' from below as it being populated from front-end
@@ -115,6 +121,7 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
                                         'PAC_EAR_MEMO'],
     'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO'],
     'Bounced': ['PARTY_RET', 'PAC_RET', 'RET_REC'],
+    'Staff Reimbursement Memo': ['COEXP_STAF_REIM_MEMO']
     }
 
 logger = logging.getLogger(__name__)

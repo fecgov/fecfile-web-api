@@ -257,7 +257,7 @@ export class LoanService {
       model.transaction_type_identifier = row.transaction_type_identifier;
       model.transaction_id = row.transaction_id;
       model.entity_id = row.entity_id;
-      model.name = row.entity_name;
+      model.name = row.name;
       model.street1 = row.street1;
       model.street2 = row.street2;
       model.city = row.city;
@@ -287,10 +287,15 @@ export class LoanService {
       model.memo_code = row.memo_code;
       model.memo_text = row.memo_text;
       model.delete_ind = row.delete_ind;
-      model.child = row.child
+      model.child = row.child;
       model.payments = row.payments;
       model.hasC1 = row.hasC1;
       model.hasC2 = row.hasC2;
+      model.firstName = row.first_name;
+      model.lastName = row.last_name;
+      model.middleName = row.middle_name;
+      model.entity_name = row.entity_name;
+
       modelArray.push(model);
     }
     return modelArray;

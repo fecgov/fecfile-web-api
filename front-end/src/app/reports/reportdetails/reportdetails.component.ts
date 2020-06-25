@@ -421,55 +421,14 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
     }
   }
   
-  // public setAmendmentIndicator(reports: any) {
-  //   if(reports) {
-  //     for(const report of reports) {        
-  //       if(report.form_type !== 'F99') {
-  //         if(report.amend_ind === 'N' && this.reportsModel.find(function(obj) { return obj.previous_report_id === report.report_id})) {
-  //         //&& this.reportsModel.filter(rp => rp.previous_report_id == report.report_id)) {
-  //           report.amend_ind = 'Original';           
-  //         }else if(report.amend_ind === 'A') {        
-  //           report.amend_ind = report.amend_ind.concat(report.amend_number.toString());            
-  //         }
-  //       }        
-  //     }
-  //   }
-  // }
-
-  // public setAmendmentShow(reports: any) {
-
-  //   let reportId = 0;
-  //   let next: reportModel;
-  //   let max: reportModel;
-    
-  //   if(reports) {
-  //     for(const report of reports) {
-        
-  //       if(report.amend_ind === 'Original') {
-  //         report.amend_show = false;
-          
-  //         next = this.reportsModel.find(function(obj) { return obj.previous_report_id === report.report_id});
-  //         //if(next) 
-  //         next.amend_show = false;
-
-  //         while(next) {
-  //           next.amend_show = false;
-  //           max = next;
-  //           next = this.reportsModel.find(function(obj) { return obj.previous_report_id === next.report_id});
-  //         }
- 
-  //         //if(next) {
-  //           max.amend_show = true;
-  //           max.amend_max = 'down'; //'up';
-  //         //}
-
-  //       }
-  //     }
-  //   }  }
-  
   public amendArrow(report: reportModel) {
     report.amend_max === 'up' ? this.reportsModel.find(function(obj) { return obj.report_id === report.report_id}).amend_max = 'down'
       : this.reportsModel.find(function(obj) { return obj.report_id === report.report_id}).amend_max = 'up';
+
+    if (report.amend_max === 'down') {
+      report.children = [];
+      return;
+    } 
 
     const sortedCol: SortableColumnModel = this._tableService.getColumnByName(
       this.currentSortedColumnName,
@@ -487,19 +446,8 @@ export class ReportdetailsComponent implements OnInit, OnDestroy {
         this.existingReportId,
         report.report_id
       )
-      .subscribe((res: GetReportsResponse) => { 
-        const pagedResponse = this._utilService.pageResponse(res, this.config);
-        this.reportsModel = pagedResponse.items;
-        this.reportsModel = this.reportsModel.map(item => {
-          if (item.superceded_report_id === report.report_id) {
-            item.amend_show = (report.amend_max === 'up');
-          } 
-          if (item.report_id === report.report_id) {
-            item.amend_max = report.amend_max;
-          }
-          return item;
-        });
-        this.pageNumbers = pagedResponse.pageNumbers;
+      .subscribe((res: any) => { 
+        report.children = res.items;
       });
 
     // let pre = report;

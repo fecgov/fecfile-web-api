@@ -194,6 +194,7 @@ export class ReportsService {
 
     params = params.append('view', view);
     params = params.append('reportId', reportId.toString());
+    params = params.append('parentId', parentReportId.toString());
 
     return this._http.get<GetReportsResponse>(`${environment.apiUrl}${url}`, {
       headers: httpOptions,
@@ -210,25 +211,10 @@ export class ReportsService {
         );
         this.setAmendmentIndicator(reports);
         this.setAmendmentShow(reports);
-        reports = reports.filter(report => {
-          if (report.superceded_report_id === parentReportId) {
-            return true;
-          }
-          if (!report.superceded_report_id) {
-            return true;
-          }
-          return false;
-        })
-        var totalChildItems = reports.reduce(function(n, report) {
-          return n + ((report.superceded_report_id === parentReportId) ? 1 : 0);
-        }, 0);
-
-        const totalItems = reports.length - totalChildItems;
-        const items = reports.slice((page - 1) * itemsPerPage, page * itemsPerPage + totalChildItems);
 
         return {
-          items: items,
-          totalItems: totalItems
+          items: reports,
+          totalItems: reports.length
         };
       } else {
         return {
@@ -324,6 +310,7 @@ export class ReportsService {
       model.amend_show = true;
       model.amend_max = row.amend_max;
       model.memo_text = row.memo_text;
+      model.child_records_count = row.child_records_count;
       modelArray.push(model);
     }
 
@@ -365,12 +352,12 @@ export class ReportsService {
     
     if(reports) {
       for(const report of reports) {
-        
+        report.amend_max = (report.child_records_count > 0 ? 'down' : '');
+
         if(report.amend_ind === 'Original') {
           report.amend_show = false;
           
           next = reports.find(function(obj) { return obj.previous_report_id === report.report_id});
-          //if(next) 
           next.amend_show = false;
 
           while(next) {
@@ -379,11 +366,8 @@ export class ReportsService {
             next = reports.find(function(obj) { return obj.previous_report_id === next.report_id});
           }
  
-          //if(next) {
-            max.amend_show = true;
-            max.amend_max = 'down'; //'up';
-          //}
-
+          max.amend_show = true;
+          max.amend_max = 'down'; //'up';
         }
       }
     }  }
