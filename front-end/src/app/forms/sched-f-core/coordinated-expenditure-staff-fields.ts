@@ -434,7 +434,7 @@ export class CoordinatedExpenditureStaffFields {
         seperator: true,
         cols: [
           {
-            preText: 'Staff Reimbursement',
+            preText: 'Reimbursement: See below',
             setEntityIdTo: 'entity_id',
             isReadonly: true,
             entityGroup: null,
@@ -446,7 +446,7 @@ export class CoordinatedExpenditureStaffFields {
             infoText: 'Request language from RAD',
             name: 'purpose',
             type: 'text',
-            value: 'Staff Reimbursement',
+            value: 'Reimbursement: See below',
             scroll: true,
             height: '30px',
             width: '380px',
