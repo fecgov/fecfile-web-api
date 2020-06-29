@@ -4265,16 +4265,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         break;
       case 'COEXP_CC_PAY_MEMO':
         res = new CoordinatedExpenditureCcMemoFields().coordinatedExpenditureCCMemoFields;
+        this.isAggregate = false;
         this.loaded = false;
         this.showPart2 = true;
         break;
       case 'COEXP_STAF_REIM_MEMO':
         res = new CoordinatedExpenditureStaffMemoFields().coordinatedExpenditureStaffMemoFields;
+        this.isAggregate = false;
         this.loaded = false;
         this.showPart2 = true;
         break;
       case 'COEXP_PMT_PROL_MEMO':
         res = new CoordinatedExpenditurePayrollMemoFields().coordinatedExpenditurePayrollMemoFields;
+        this.isAggregate = false;
         this.loaded = false;
         this.showPart2 = true;
         break;
