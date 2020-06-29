@@ -2428,15 +2428,17 @@ def get_list_schedH3(report_id, cmte_id, transaction_id):
                 )
             if schedH3_list:
                 for _rec in schedH3_list:
-                    if _rec["activity_event_name"]:
-                        aggregate_dic = load_h3_aggregate_amount(
+                    aggregate_dic = load_h3_aggregate_amount(
                             cmte_id, report_id, _rec.get("back_ref_transaction_id")
                         )
+                    if _rec["activity_event_name"]:
                         _rec["aggregate_amount"] = aggregate_dic.get(
                             _rec["activity_event_name"], 0
                         )
                     else:
-                        _rec["aggregate_amount"] = 0
+                        _rec["aggregate_amount"] = aggregate_dic.get(
+                            _rec["activity_event_type"], 0
+                        )
                         # pass
             merged_list = []
             for dictH3 in schedH3_list:
@@ -2541,6 +2543,15 @@ def load_h3_aggregate_amount(cmte_id, report_id, back_ref_transaction_id):
                 AND back_ref_transaction_id = %s
                 AND delete_ind is distinct from 'Y'
             GROUP BY activity_event_name
+    UNION
+    SELECT activity_event_type as event,
+                   SUM(transferred_amount) as sum
+            FROM   public.sched_h3
+            WHERE  cmte_id = %s
+                AND report_id = %s
+                AND back_ref_transaction_id = %s
+                AND delete_ind is distinct from 'Y'
+           GROUP BY activity_event_type
             ) t
     """
     # _sql = """
@@ -2562,7 +2573,8 @@ def load_h3_aggregate_amount(cmte_id, report_id, back_ref_transaction_id):
     # """.format(cmte_id, report_id, cmte_id, report_id)
     try:
         with connection.cursor() as cursor:
-            cursor.execute(_sql, [cmte_id, report_id, back_ref_transaction_id])
+            cursor.execute(_sql, [cmte_id, report_id, back_ref_transaction_id,
+                cmte_id, report_id, back_ref_transaction_id])
             # cursor.execute(_sql)
             records = cursor.fetchone()[0]
             if records:
@@ -2685,7 +2697,7 @@ def get_h3_summary(request):
             last_update_date
             FROM public.sched_h3
             WHERE (report_id = %s or report_id = 0) AND cmte_id = %s 
-            --AND back_ref_transaction_id is not null
+            AND back_ref_transaction_id is not null
             AND delete_ind is distinct from 'Y'
             ) t
             """
@@ -2693,19 +2705,22 @@ def get_h3_summary(request):
             # print(_sql)
             # cursor.execute(_sql)
             _sum = cursor.fetchone()[0]
+            # print(cursor.query)
             if _sum:
                 for _rec in _sum:
-                    if _rec["activity_event_name"]:
-                        aggregate_dic = load_h3_aggregate_amount(
+                    aggregate_dic = load_h3_aggregate_amount(
                             cmte_id, report_id, _rec.get("back_ref_transaction_id")
                         )
+                    if _rec["activity_event_name"] not in [None, '']:
                         _rec["aggregate_amount"] = aggregate_dic.get(
                             _rec["activity_event_name"], 0
                         )
                     # elif _rec['activity_event_type']:
                     #     _rec['aggregate_amount'] = aggregate_dic.get(_rec['activity_event_type'], 0)
                     else:
-                        _rec["aggregate_amount"] = 0
+                        _rec["aggregate_amount"] = aggregate_dic.get(
+                            _rec["activity_event_type"], 0
+                        )
                         # pass
 
             json_result = get_pagination_dataset(_sum, itemsperpage, page_num)

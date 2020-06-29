@@ -834,7 +834,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         this.transactionType === 'ALLOC_FEA_DISB' ||
         this.transactionType === 'ALLOC_FEA_CC_PAY' ||
         this.transactionType === 'ALLOC_FEA_CC_PAY_MEMO' ||
-        this.transactionType === 'ALLOC_FEA_STAF_REIM' ||
+        // this.transactionType === 'ALLOC_FEA_STAF_REIM' ||    commented due to FNE-2624
         this.transactionType === 'ALLOC_FEA_STAF_REIM_MEMO' ||
         this.transactionType === 'ALLOC_FEA_VOID'
       ) {

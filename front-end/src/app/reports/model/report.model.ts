@@ -27,6 +27,8 @@ export class reportModel {
     amend_show: boolean;
     amend_max: string;
     memo_text: string;
+    child_records_count: number;
+    children: reportModel[] = [];
     constructor(report: any) {
       this.id = report.id ? report.id : '';
       this.report_id = report.report_id ? report.report_id: '';
@@ -55,5 +57,6 @@ export class reportModel {
       this.amend_show = report.amend_show;
       this.amend_max = report.amend_max;
       this.memo_text = report.memo_text;
+      this.child_records_count = report.child_records_count;
     }
    }

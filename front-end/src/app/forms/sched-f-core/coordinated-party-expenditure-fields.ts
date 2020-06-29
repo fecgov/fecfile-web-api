@@ -434,13 +434,13 @@ export class CoordinatedPartyExpenditureFields {
           seperator: true,
           cols: [
             {
-              preText: null,
+              preText: 'Test',
               setEntityIdTo: 'entity_id',
               isReadonly: false,
               entityGroup: null,
               toggle: false,
-              inputGroup: false,
-              inputIcon: null,
+              inputGroup: true,
+              inputIcon: '',
               text:  'Purpose of Disbursement',
               infoIcon: true,
               infoText: 'Request language from RAD',
