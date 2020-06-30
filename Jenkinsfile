@@ -80,9 +80,9 @@ pipeline {
             //Deploy functions
             //sh("bash scripts/lambda/deploy.sh ${VERSION} fecfile-frontend-qa-db.casvptvnuxni.us-east-1.rds.amazonaws.com qa ")
             //Deploy backend
-            deployToK8s("${VERSION}", "qa","fecfile-backend-api","fecnxg-django-backend")
+            deployToK8s16("${VERSION}", "qa","fecfile-backend-api","fecnxg-django-backend")
             //Deploy frontend
-            deployToK8s("${VERSION}qa", "qa", "fecfile-frontend","fecnxg-frontend")
+            deployToK8s16("${VERSION}qa", "qa", "fecfile-frontend","fecnxg-frontend")
           }
         }
       }

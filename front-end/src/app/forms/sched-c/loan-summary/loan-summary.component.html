@@ -80,7 +80,7 @@
           <!-- <td  *ngIf="isColumnVisible('name')">{{ln.entity_type === 'IND' ? ln.last_name + ', ' + ln.first_name : ln.entity_nm}}</td> -->
           <td  [ngClass]=" (showRow(ln,'SC1') || showRow(ln,'SC2')) ? 'parent': ''"
             (click)="ln.entity_type === 'ORG' ? ln.toggleChild = !ln.toggleChild : ''" *ngIf="isColumnVisible('name')">
-            {{ln.entity_type === 'ORG' ? ln.entity_name :  ln.lastName + ', ' + ln.firstName + ' ' + ln.middleName}}
+            {{ln.entity_type === 'ORG' ? ln.entity_name :  getIndName(ln)}}
             <div *ngIf="ln.entity_type === 'ORG'" class="align_right arrow"
               [ngClass]="ln.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
           </td>

@@ -1023,4 +1023,19 @@ export class LoanSummaryComponent implements OnInit, OnDestroy {
       return false;
     }
 
+  /**
+   *  Takes loan model and returns name
+   * @param ln
+   */
+  getIndName(ln: LoanModel) {
+    let name = '';
+    if (ln.firstName && ln.lastName) {
+      name = ln.lastName;
+      name += ', ' + ln.firstName;
+      name += ', ' + ln.middleName;
+      name += ', ' + ln.prefix;
+      name += ', ' + ln.suffix;
+    }
+    return name;
+  }
 }
