@@ -113,7 +113,7 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     'Recount Receipt': ['IND_RECNT_REC', 'PAC_RECNT_REC', 'PARTY_RECNT_REC', 'TRIB_RECNT_REC'],
     'Recount: Refund': ['OTH_DISB_NP_RECNT_TRIB_REF', 'OTH_DISB_NP_RECNT_REG_REF', 'OTH_DISB_NP_RECNT_IND_REF'],
     'Recount: Purpose of Disbursement' : ['OTH_DISB_RECNT'],
-    'Reimbursement: See Below': ['IE_STAF_REIM', 'ALLOC_FEA_STAF_REIM'],
+    'Reimbursement: See Below': ['IE_STAF_REIM'],
     'Return/Void': ['PAC_NON_FED_RET', 'PAC_RET'],
     'See Memos Below': ['LEVIN_PARTN_REC', 'PARTN_REC'],
     # Removing 'EAR_MEMO' from below as it being populated from front-end
