@@ -68,7 +68,7 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
 
     this.routeSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
 	
-      const setTargetVal = { value: null, placeholder: null, text: null };
+      const setTargetVal = { value: null, placeholder: null, text: null, category:null };
       this.frmOption = this._fb.group({
         secondaryOption: ['', Validators.required]
       });
@@ -76,6 +76,10 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
         setTargetVal.value = this._activatedRoute.snapshot.queryParams.transactionSubCategory;
         setTargetVal.placeholder = this._activatedRoute.snapshot.queryParams.transactionSubCategoryText;
         setTargetVal.text = this._activatedRoute.snapshot.queryParams.transactionSubCategoryText;
+        setTargetVal.category = this._activatedRoute.snapshot.queryParams.transactionCategory;
+        if(this._activatedRoute.snapshot.queryParams.transactionCategoryText){
+          this._mainTransactionTypeText = this._activatedRoute.snapshot.queryParams.transactionCategoryText;
+        }
         this._toggle(this._activatedRoute.snapshot.queryParams.transactionSubCategoryType);
         this.updateTypeSelected(setTargetVal);
         this.childOptionsListClick(setTargetVal.value);
@@ -258,6 +262,7 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
     const val: string = selectedOption.value;
     this.transactionType = val;
     this.transactionTypeText = selectedOption.text;
+    this.transactionCategory = this._transactionCategory = selectedOption.category;
     this.frmOption.controls['secondaryOption'].setValue(val);
     this.transactionTypeFailed = false;
     this.scheduleType = selectedOption ? selectedOption.scheduleType : null;
