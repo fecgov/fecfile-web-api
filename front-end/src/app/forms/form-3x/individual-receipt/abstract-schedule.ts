@@ -189,7 +189,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   ];
 
   //this array can be used to override the logic where some transactions will always have the purpose description required regardless of expenditure amount
-  private disbursementTransactionsWithPurposeAlwaysRequired = ["FEA_CC_PAY_MEMO"];
+  private disbursementTransactionsWithPurposeAlwaysRequired = ["FEA_CC_PAY_MEMO", "OTH_DISB"];
   
   private staticEntityTypes =  [{entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: false}, {entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: false}];
   
