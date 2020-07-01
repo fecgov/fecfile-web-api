@@ -67,6 +67,7 @@
                               type="button"
                               class="btn-info"
                               ngbTooltip=" {{ option?.info }}"
+                              container="body"
                               (click)="$event.stopPropagation();$event.preventDefault();"
                             >
                               <i class="info-icon" aria-hidden="true"></i>
@@ -133,6 +134,7 @@
                               class="btn-info"
                               ngbTooltip=" {{ childOption?.info }}"
                               (click)="$event.stopPropagation()"
+                              container="body"
                             >
                               <i class="info-icon" aria-hidden="true"></i>
                               <span class="sr-only">
