@@ -518,8 +518,8 @@ export class SchedH5Component extends AbstractSchedule implements OnInit, OnDest
       this.schedH5.patchValue({ transferred_amount: '' }, { onlySelf: true });
       this.schedH5.patchValue({ total_amount_transferred: this._decPipe.transform(total_amount_transferred, '.2-2') }, { onlySelf: true });
 
-      this.saveH5(serializedForm);
-      this.schedH5.reset();
+      // this.saveH5(serializedForm);
+      // this.schedH5.reset();
 
       // Note: Do after all patching to avoid form change detection which will set to false
       localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));

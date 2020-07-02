@@ -186,26 +186,11 @@ export class SchedH5Service {
           }
         )
         .pipe(map(res => {
-            if (res) {
-              //console.log('Save H5Ratio res: ', res);
-
-              //get summary
-              //this.getSummary(reportId);
-
-              let sub: Subscription;
-              let sum: any;
-              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
+              return this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).pipe(map(res =>
                 {
-                  if(res) {
-                    sum =  res;
-                  }
-                });
-
-              return sum;
-            }
-            return false;
-        })
-        );
+                  return res;
+                }));
+        }));
       }else if(scheduleAction === SchedHActions.edit) {
         return this._http
         .put(
@@ -215,24 +200,10 @@ export class SchedH5Service {
           }
         )
         .pipe(map(res => {
-            if (res) {
-              //console.log('Edit H5Ratio res: ', res);
-
-              //get summary
-              //this.getSummary(reportId);
-
-              let sub: Subscription;
-              let sum: any;
-              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
+              return this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).pipe(res =>
                 {
-                  if(res) {
-                    sum =  res;
-                  }
+                  return res;
                 });
-
-              return sum;
-            }
-            return false;
         })
         );
       }
