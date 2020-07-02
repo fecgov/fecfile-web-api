@@ -120,8 +120,8 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     'Return/Void': ['PAC_NON_FED_RET', 'PAC_RET'],
     'See Memos Below': ['LEVIN_PARTN_REC', 'PARTN_REC'],
     # Removing 'EAR_MEMO' from below as it being populated from front-end
-    'Total Earmarked through Conduit': ['EAR_REC_CONVEN_ACC_MEMO', 'EAR_REC_HQ_ACC_MEMO', 'EAR_REC_RECNT_ACC_MEMO',
-                                        'PAC_EAR_MEMO'],
+    # 'Total Earmarked through Conduit': ['EAR_REC_CONVEN_ACC_MEMO', 'EAR_REC_HQ_ACC_MEMO', 'EAR_REC_RECNT_ACC_MEMO',
+    #                                     'PAC_EAR_MEMO'],
     'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO'],
     'Bounced': ['PARTY_RET', 'PAC_RET', 'RET_REC'],
     'Staff Reimbursement Memo': ['COEXP_STAF_REIM_MEMO']
