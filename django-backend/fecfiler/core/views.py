@@ -10812,3 +10812,26 @@ def reports_memo_text(request):
             "The reports_memo_text API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
             )
+
+@api_view(['GET'])
+def get_child_max_transaction_amount(request):
+    try:
+        if 'transactionId' in request.data and request.data.get('transactionId') not in [None, '', 'null']:
+            transaction_id = request.data['transactionId']
+        else:
+            raise Exception('transactionId is a mandatory field')
+        with connection.cursor() as cursor:
+            _sql = """SELECT (transaction_amount - (SELECT COALESCE(SUM(transaction_amount), 0.0)
+                    FROM public.all_transactions_view WHERE back_ref_transaction_id = %s and delete_ind is DISTINCT FROM 'Y')) as amount
+                    FROM public.all_transactions_view WHERE transaction_id = %s and delete_ind is DISTINCT FROM 'Y'"""
+            cursor.execute(_sql, [transaction_id,transaction_id])
+            result = cursor.fetchone()
+            if result:
+                return Response({'amount': result[0]}, status=status.HTTP_200_OK)
+            else:
+              raise Exception('The transaction_id: {} does not exist or is deleted'.format(transaction_id))
+    except Exception as e:
+        return Response(
+          "The get_child_max_transaction_amount API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )

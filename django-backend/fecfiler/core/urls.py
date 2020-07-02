@@ -202,4 +202,9 @@ urlpatterns = [
         views.reports_memo_text,
         name="reports_memo_text",
     ),
+    url(
+        r"^core/get_child_max_transaction_amount$",
+        views.get_child_max_transaction_amount,
+        name="get_child_max_transaction_amount",
+    ),
 ]
