@@ -121,7 +121,7 @@
                 "election_date": null,
                 "cvg_start_date": "YYYY-10-01",
                 "cvg_end_date": "YYYY-12-31",
-                "due_date": "YYYY-01-15"
+                "due_date": "YYYY-01-31"
               }
             ]
           }
@@ -717,7 +717,7 @@
                 "election_date": null,
                 "cvg_start_date": "YYYY-12-01",
                 "cvg_end_date": "YYYY-12-31",
-                "due_date": "YYYY-01-20"
+                "due_date": "YYYY-01-31"
               }
             ]
           }
@@ -994,7 +994,7 @@
                 "election_date": null,
                 "cvg_start_date": "YYYY-12-01",
                 "cvg_end_date": "YYYY-12-31",
-                "due_date": "YYYY-01-20"
+                "due_date": "YYYY-01-31"
               }
             ]
           }
