@@ -38,7 +38,7 @@ export class SchedH4Service {
     params = params.append('descending', `${descending}`);
     
     return this._http
-      .get<{items: any[], totalItems: number}>(
+      .get<any>(
         `${environment.apiUrl}${url}`,      
         {
           params,
@@ -46,18 +46,18 @@ export class SchedH4Service {
         }
       )
       .pipe(map(res => {
-        if (res) {
+        // if (res) {
           return {
             //items: this.mapFromServerFields(res.items),
-            items: res.items,
-            totalItems: res.totalItems
+            items: res,
+            totalItems: res.length
           };
-        } else {
-          return {
-            items: null,
-            totalItems: 0
-          };
-        }
+        // } else {
+        //   return {
+        //     items: null,
+        //     totalItems: 0
+        //   };
+        // }
       })
       );
   }
