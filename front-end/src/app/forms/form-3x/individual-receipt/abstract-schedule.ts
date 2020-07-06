@@ -115,8 +115,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _parentTransactionModel: TransactionModel;
   protected _rollbackAfterUnsuccessfulSave = false;
   protected _prePopulateFromSchedHData: any;
-  protected _prePopulateFromSchedPARTNData : any;
-
+  protected _prePopulateFromSchedPARTNData: any;
+  protected _maxChildAmount: string = null;
   /**
    * For toggling between 2 screens of Sched F Debt Payment.
    */
@@ -1136,6 +1136,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   public handleOnBlurEvent($event: any, col: any) {
+
+    this.handleMemoAmount(col);
     if (this.isFieldName(col.name, 'contribution_amount') || this.isFieldName(col.name, 'expenditure_amount')) {
       this.contributionAmountChange($event, col.name, col.validation.dollarAmountNegative);
     } else if (this.isFieldName(col.name, 'total_amount') || this.isFieldName(col.name, 'incurred_amount')) {
@@ -4574,6 +4576,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           }
         }
         // this.transactionType = formData.transactionTypeIdentifier;
+
+        // reset maxChildAmount on form load for edit
+        this._maxChildAmount = null;
+
         this._setFormDataValues(formData.transactionId, formData.apiCall, formData.reportId);
       }
     }
@@ -6062,5 +6068,24 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       };
       this._messageService.sendMessage(message);
     });
+  }
+
+  private handleMemoAmount(col: any) {
+    // check if the transaction is a child and if it has to have memo amount lesser than that of parent
+    // update the max amount validity for the field
+    // TODO: Bug - Edit might not allow maximum memo amount to be entered
+    if (this.transactionType === 'PARTN_MEMO' && this.isFieldName(col.name, 'contribution_amount')) {
+      // TO AVOID EXCESSIVE API CALLS
+      if (this._maxChildAmount === null || this._maxChildAmount === '') {
+        this._receiptService.getChildMaxAmt(this._parentTransactionModel.transactionId).subscribe(res => {
+          const maxAmount = Number(res.amount);
+          this._maxChildAmount = res.amount;
+          if (this.isFieldName(col.name, 'contribution_amount')) {
+            this.frmIndividualReceipt.controls['contribution_amount'].setValidators(Validators.max(maxAmount));
+            this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
+          }
+        });
+      }
+    }
   }
 }
