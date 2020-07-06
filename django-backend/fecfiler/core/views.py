@@ -10819,11 +10819,15 @@ def get_child_max_transaction_amount(request):
         transaction_id = request.query_params.get("transactionId")
         if not transaction_id:
             raise Exception('transactionId is a mandatory field')
+        child_transaction_id = request.query_params.get("childTransactionId")
         with connection.cursor() as cursor:
             _sql = """SELECT (transaction_amount - (SELECT COALESCE(SUM(transaction_amount), 0.0)
-                    FROM public.all_transactions_view WHERE back_ref_transaction_id = %s and delete_ind is DISTINCT FROM 'Y')) as amount
+                    FROM public.all_transactions_view WHERE back_ref_transaction_id = %s and delete_ind is DISTINCT FROM 'Y')
+                    + (SELECT COALESCE(SUM(transaction_amount), 0.0) FROM public.all_transactions_view 
+                    WHERE (transaction_id IS NULL OR transaction_id = %s) and delete_ind is DISTINCT FROM 'Y')
+                    ) as amount
                     FROM public.all_transactions_view WHERE transaction_id = %s and delete_ind is DISTINCT FROM 'Y'"""
-            cursor.execute(_sql, [transaction_id,transaction_id])
+            cursor.execute(_sql, [transaction_id, child_transaction_id, transaction_id])
             result = cursor.fetchone()
             if result:
                 return Response({'amount': result[0]}, status=status.HTTP_200_OK)
