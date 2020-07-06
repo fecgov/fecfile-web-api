@@ -4091,8 +4091,8 @@ def get_all_transactions(request):
         else:
             param_string += " AND delete_ind is distinct from 'Y'"
         
-        if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
-            param_string += " AND back_ref_transaction_id IS NULL"
+        # if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
+        #     param_string += " AND back_ref_transaction_id IS NULL"
 
         filters_post = request.data.get("filters", {})
         memo_code_d = filters_post.get("filterMemoCode", False)
