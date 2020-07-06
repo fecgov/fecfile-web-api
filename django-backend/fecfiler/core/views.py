@@ -10816,9 +10816,8 @@ def reports_memo_text(request):
 @api_view(['GET'])
 def get_child_max_transaction_amount(request):
     try:
-        if 'transactionId' in request.data and request.data.get('transactionId') not in [None, '', 'null']:
-            transaction_id = request.data['transactionId']
-        else:
+        transaction_id = request.query_params.get("transactionId")
+        if not transaction_id:
             raise Exception('transactionId is a mandatory field')
         with connection.cursor() as cursor:
             _sql = """SELECT (transaction_amount - (SELECT COALESCE(SUM(transaction_amount), 0.0)
