@@ -326,6 +326,12 @@
                         </ng-container>
                         <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
                           <div class="text-error text-left"
+                               *ngIf="frmIndividualReceipt.get(col?.name).errors?.max">
+                            Exceeds maximum amount {{this._maxChildAmount}}$
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
                             *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonAlphaNumeric">
                             Alphanumeric characters only.
                           </div>
