@@ -6070,14 +6070,20 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     });
   }
 
+  /**
+   * Sets memo amount max validation
+   * @param col
+   */
   private handleMemoAmount(col: any) {
     // check if the transaction is a child and if it has to have memo amount lesser than that of parent
-    // update the max amount validity for the field
-    // TODO: Bug - Edit might not allow maximum memo amount to be entered
     if (this.transactionType === 'PARTN_MEMO' && this.isFieldName(col.name, 'contribution_amount')) {
       // TO AVOID EXCESSIVE API CALLS
+      let childTransactionId = null;
+      if (this.scheduleAction === ScheduleActions.edit && this._transactionToEdit) {
+        childTransactionId = this._transactionToEdit.transactionId;
+      }
       if (this._maxChildAmount === null || this._maxChildAmount === '') {
-        this._receiptService.getChildMaxAmt(this._parentTransactionModel.transactionId).subscribe(res => {
+        this._receiptService.getChildMaxAmt(this._parentTransactionModel.transactionId, childTransactionId).subscribe(res => {
           const maxAmount = Number(res.amount);
           this._maxChildAmount = res.amount;
           if (this.isFieldName(col.name, 'contribution_amount')) {

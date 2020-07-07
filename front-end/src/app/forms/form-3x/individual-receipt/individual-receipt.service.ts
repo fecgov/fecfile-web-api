@@ -634,7 +634,7 @@ export class IndividualReceiptService {
     });
   }
 
-  public getChildMaxAmt(transactionId: string): Observable<any> {
+  public getChildMaxAmt(transactionId: string, childTransactionId: string = null): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     const url = '/core/get_child_max_transaction_amount';
     let httpOptions = new HttpHeaders();
@@ -642,7 +642,9 @@ export class IndividualReceiptService {
 
 
     params = params.append('transactionId', transactionId);
-
+    if (childTransactionId) {
+      params = params.append('childTransactionId', childTransactionId);
+    }
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
