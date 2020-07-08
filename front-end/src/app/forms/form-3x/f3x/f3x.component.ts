@@ -110,7 +110,7 @@ export class F3xComponent implements OnInit, OnDestroy {
     this._config.placement = 'right';
     this._config.triggers = 'click';
 
-    this.queryParamsSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
+    this.queryParamsSubscription = _activatedRoute.queryParams.subscribe(p => {
       this.transactionCategory = p.transactionCategory;
       if (p.edit === 'true' || p.edit === true) {
         this.editMode = true;

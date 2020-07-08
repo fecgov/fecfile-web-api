@@ -217,6 +217,7 @@
       <section *ngIf="transactionType === 'ALLOC_H5_RATIO'">
         <div *ngIf="scheduleAction !== editScheduleAction">
           <ng-container>
+              <span class="saveMessage" *ngIf="h5Entries && h5Entries.length > 0">Note: You must click on "Save All Added Transactions & Proceed to Summary" button in order to save any added transactions. Otherwise they will be lost upon navigating away from this screen.</span>
             <table class="table table-striped table-hover table__sortable">
               <thead>
                 <tr>
@@ -421,10 +422,10 @@
                   </button>
                   <button *ngIf="scheduleAction !== viewScheduleAction" class="btn btn-secondary btn-right" type="button" [disabled]="saveAndAddDisabled"
                     (click)="saveAddMore()">
-                    Save &amp; Add Transaction
+                    Add Transaction
                   </button>
                   <a class="btn btn-previous btn-right" (click)="goSummary()">
-                    Summary
+                    Save All Added Transactions & Proceed to Summary
                   </a>
                 </div>
                 <div *ngIf="scheduleAction === editScheduleAction">

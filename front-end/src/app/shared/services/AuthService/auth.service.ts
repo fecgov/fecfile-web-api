@@ -6,6 +6,7 @@ import * as jwt_decode from 'jwt-decode';
 import {Roles} from '../../enums/Roles';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from '../../partials/confirm-modal/confirm-modal.component';
 import { ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
@@ -15,7 +16,8 @@ export class AuthService {
     constructor(
         private _session: SessionService,
         private _cookieService: CookieService,
-        private _dialogService: DialogService
+        private _dialogService: DialogService,
+        private _router: Router
     ) {
     }
 
@@ -113,8 +115,8 @@ export class AuthService {
     }
 
     private destroySession() {
-        console.error('Session not found !!!');
         this._session.destroy();
+        this._router.navigate(['']);
     }
 
     public showPermissionDeniedMessage(){
