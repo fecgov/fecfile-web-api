@@ -243,27 +243,13 @@ export class SchedH3Service {
             headers: httpOptions
           }
         )
-        .pipe(map(res => {
-            if (res) {
-              //console.log('Save H3Ratio res: ', res);
-
-              //get summary
-              //this.getSummary(reportId);
-
-              let sub: Subscription;
-              let sum: any;
-              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
-                {
-                  if(res) {
-                    sum =  res;
-                  }
-                });
-
-              return sum;
-            }
-            return false;
-        })
-        );
+        // .pipe(map(res => {
+        //       return this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).pipe(map(res =>
+        //         {
+        //             return  res;
+        //         }));
+        // })
+        // );
       }else if(scheduleAction === SchedHActions.edit) {
         return this._http
         .put(
@@ -272,27 +258,13 @@ export class SchedH3Service {
             headers: httpOptions
           }
         )
-        .pipe(map(res => {
-            if (res) {
-              //console.log('Edit H3Ratio res: ', res);
-
-              //get summary
-              //this.getSummary(reportId);
-
-              let sub: Subscription;
-              let sum: any;
-              sub = this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).subscribe(res =>
-                {
-                  if(res) {
-                    sum =  res;
-                  }
-                });
-
-              return sum;
-            }
-            return false;
-        })
-        );
+        // .pipe(map(res => {
+        //       return this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).pipe(map(res =>
+        //         {
+        //            return  res;
+        //         }));
+        // })
+        // );
       }
 
 

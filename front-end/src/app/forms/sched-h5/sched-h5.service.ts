@@ -52,13 +52,8 @@ export class SchedH5Service {
         }
       )
       .pipe(map(res => {
-        if (res) {
-          //console.log('H5 Summary Table res: ', res);
           return res;
-        }
-        return false;
-      })
-      );
+      }));
   }
 
   public getBreakDown(reportId: string): Observable<any> {
@@ -81,13 +76,8 @@ export class SchedH5Service {
         }
       )
       .pipe(map(res => {
-        if (res) {
-          //console.log('H5 Breakdown res: ', res);
           return res;
-        }
-        return false;
-      })
-      );
+        }));
   }
 
 
@@ -119,7 +109,6 @@ export class SchedH5Service {
       )
       .pipe(map(res => {
         if (res) {
-          //console.log('Save H5 res: ', res);
           return res;
         }
         return false;
@@ -144,7 +133,6 @@ export class SchedH5Service {
       )
       .pipe(map(res => {
         if (res) {
-          //console.log('Levin Accounts res: ', res);
           return res;
         }
         return false;
@@ -184,27 +172,15 @@ export class SchedH5Service {
           {
             headers: httpOptions
           }
-        )
-        .pipe(map(res => {
-              return this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).pipe(map(res =>
-                {
-                  return res;
-                }));
-        }));
-      }else if(scheduleAction === SchedHActions.edit) {
+        );
+      }
+      else if(scheduleAction === SchedHActions.edit) {
         return this._http
         .put(
           `${environment.apiUrl}${url}`, ratio,
           {
             headers: httpOptions
           }
-        )
-        .pipe(map(res => {
-              return this.getSummary(reportId, page, itemsPerPage, sortColumnName, descending).pipe(res =>
-                {
-                  return res;
-                });
-        })
         );
       }
 
