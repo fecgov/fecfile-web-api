@@ -1,3 +1,4 @@
+import { OrderByPipe } from './../../pipes/order-by/order-by.pipe';
 import { Injectable } from '@angular/core';
 import { SortableColumnModel } from './sortable-column.model';
 
@@ -8,7 +9,7 @@ import { SortableColumnModel } from './sortable-column.model';
 })
 export class TableService {
 
-  constructor() { }
+  constructor(private _orderByPipe: OrderByPipe) { }
 
 
   /**
@@ -107,6 +108,18 @@ export class TableService {
         return col.descending;
       }
     }
+  }
+
+  /**
+ *
+ * @param array
+ * @param sortColumnName
+ * @param descending
+ */
+  public sort(array: any, sortColumnName: string, descending: boolean) {
+    const direction = descending ? -1 : 1;
+    this._orderByPipe.transform(array, { property: sortColumnName, direction: direction });
+    return array;
   }
 
 }

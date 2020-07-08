@@ -5416,6 +5416,8 @@ def schedH6(request):
                 )
 
                 datum = get_schedH6(data)
+                if query_params.get("page") is None and query_params.get("itemsPerPage") is None: 
+                    return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)
 
                 #: update for pagination
                 json_result = get_pagination_dataset(datum, itemsperpage, page_num)

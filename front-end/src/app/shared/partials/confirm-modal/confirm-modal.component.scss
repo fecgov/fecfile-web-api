@@ -9,8 +9,10 @@
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+  z-index: 1075 !important;
 }
 .modal {
+  z-index: 1080 !important;
   .modal-dialog {
     .modal-content {
       margin-left: auto;
