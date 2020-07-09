@@ -4503,21 +4503,26 @@ def schedH5(request):
                 else:
                     # print('---')
                     # print(datum)
-                    data = post_schedH5(datum)
-                    logger.debug("parent data saved:{}".format(data))
                     if "child" in request.data:
                         for _c in request.data["child"]:
-                            child_data = data.copy()
-                            child_data.update(_c)
-                            child_data["back_ref_transaction_id"] = data["transaction_id"]
-                            child_data = schedH5_sql_dict(child_data)
-                            child_data["cmte_id"] = cmte_id
-                            child_data["report_id"] = report_id
-                            logger.debug(
-                                "saving child transaction with data {}".format(child_data)
-                            )
-                            post_schedH5(child_data)
-                # Associating child transactions to parent and storing them to DB
+                            datum = schedH5_sql_dict(_c)
+                            datum["report_id"] = report_id
+                            datum["cmte_id"] = cmte_id
+                            data = post_schedH5(datum)
+                            logger.debug("parent data saved:{}".format(data))
+                    # if "child" in request.data:
+                    #     for _c in request.data["child"]:
+                    #         child_data = data.copy()
+                    #         child_data.update(_c)
+                    #         child_data["back_ref_transaction_id"] = data["transaction_id"]
+                    #         child_data = schedH5_sql_dict(child_data)
+                    #         child_data["cmte_id"] = cmte_id
+                    #         child_data["report_id"] = report_id
+                    #         logger.debug(
+                    #             "saving child transaction with data {}".format(child_data)
+                    #         )
+                    #         post_schedH5(child_data)
+                    # Associating child transactions to parent and storing them to DB
 
                 output = get_schedH5(data)
                 return JsonResponse(output[0], status=status.HTTP_201_CREATED)
