@@ -29,6 +29,11 @@ urlpatterns = [
         views.get_h3_account_names,
         name="get_h3_account_names",
     ),
+    url(
+        r"^sh5/get_h5_aggregate_amount$",
+        views.get_h5_aggregate_amount,
+        name="get_h3_aggregate_amount",
+    ),
     url(r"^sh5/get_h5_summary$", views.get_h5_summary, name="get_h5_summary"),
     url(r"^sh3/schedH3$", views.schedH3, name="schedH3"),
     url(r"^sh4/schedH4$", views.schedH4, name="schedH4"),

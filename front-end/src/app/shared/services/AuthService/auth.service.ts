@@ -113,7 +113,6 @@ export class AuthService {
     }
 
     private destroySession() {
-        console.error('Session not found !!!');
         this._session.destroy();
     }
 

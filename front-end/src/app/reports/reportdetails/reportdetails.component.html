@@ -167,10 +167,10 @@
                 </td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
                 <td *ngIf="isColumnVisible('filed_date')">
-                    {{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss a') : (report.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
+                    {{report.status === 'Filed'? (report.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss a'  : 'GMT') : (report.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss a' : 'GMT')}}
                 </td>
                 <td *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())">
-                    {{(report.deleteddate| date: 'MM/dd/yyyy @ hh:mm:ss a') }}
+                    {{(report.deleteddate| date: 'MM/dd/yyyy @ hh:mm:ss a'  : 'GMT') }}
                 </td>
 
                 <td class="bulk_action" >
@@ -332,10 +332,10 @@
                     </td>
                     <td *ngIf="isColumnVisible('report_type_desc')">{{child.report_type_desc}}</td>
                     <td *ngIf="isColumnVisible('filed_date')">
-                        {{child.status === 'Filed'? (child.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss a') : (child.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss a')}}
+                        {{child.status === 'Filed'? (child.filed_date| date: 'MM/dd/yyyy @ hh:mm:ss a'  : 'GMT') : (child.last_update_date| date: 'MM/dd/yyyy @ hh:mm:ss a'  : 'GMT')}}
                     </td>
                     <td *ngIf="(isColumnVisible('deleted_date') && isRecycleBinViewActive())">
-                        {{(child.deleteddate| date: 'MM/dd/yyyy @ hh:mm:ss a') }}
+                        {{(child.deleteddate| date: 'MM/dd/yyyy @ hh:mm:ss a'  : 'GMT') }}
                     </td>
                     <td class="bulk_action" >
                         <div *ngIf="isRecycleBinViewActive()">

@@ -1215,9 +1215,9 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
                 this.trashOrRestoreAfterConfirmation(res, trx);
               })
           }
-/*           else {
-            this.trashOrRestoreAfterConfirmation(res, trx);
-          } */
+           else {
+            this.trashOrRestoreAfterConfirmation('okay', trx);
+          }
         } 
       // });
   // }

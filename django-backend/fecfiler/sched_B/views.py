@@ -1603,27 +1603,52 @@ def list_all_sb_transactions_entity(
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-            SELECT t1.expenditure_amount, 
-                t1.transaction_id, 
-                t1.report_id, 
-                t1.line_number, 
-                t1.expenditure_date, 
-                (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
-                t1.memo_code, 
-                t1.back_ref_transaction_id,
-                t1.transaction_type_identifier,
-                t1.redesignation_ind, 
-                t1.aggregation_ind,
-                t1.itemized_ind
-            FROM public.sched_b t1 
-            WHERE entity_id = %s 
-            AND cmte_id = %s 
-            AND expenditure_date >= %s 
-            AND expenditure_date <= %s 
-            AND delete_ind is distinct FROM 'Y' 
-            ORDER BY expenditure_date ASC, create_date ASC
-            """,
-                [entity_id, cmte_id, aggregate_start_date, aggregate_end_date],
+                SELECT t1.expenditure_amount, 
+                    t1.transaction_id, 
+                    t1.report_id, 
+                    t1.line_number, 
+                    t1.expenditure_date, 
+                    (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = t1.report_id), 
+                    t1.memo_code, 
+                    t1.back_ref_transaction_id,
+                    t1.transaction_type_identifier,
+                    t1.redesignation_ind, 
+                    t1.aggregation_ind,
+                    t1.itemized_ind, 
+                    'sched_b' as sched_type,
+                    t1.create_date
+                    FROM public.sched_b t1 
+                    WHERE entity_id = %s 
+                    AND cmte_id = %s 
+                    AND expenditure_date >= %s 
+                    AND expenditure_date <= %s 
+                    AND delete_ind is distinct FROM 'Y'  
+                UNION
+                SELECT h4.total_amount as expenditure_amount,
+                    h4.transaction_id,
+                    h4.report_id,
+                    h4.line_number, 
+                    h4.expenditure_date, 
+                    (SELECT t2.delete_ind FROM public.reports t2 WHERE t2.report_id = h4.report_id), 
+                    h4.memo_code, 
+                    h4.back_ref_transaction_id,
+                    h4.transaction_type_identifier,
+                    null as redesignation_ind, 
+                    'Y' as aggregation_ind,
+                    'I' as itemized_ind,
+                    'sched_h4' as sched_type,
+                    h4.create_date
+                    FROM public.sched_h4 h4 
+                    WHERE payee_entity_id = %s  
+                    AND cmte_id = %s 
+                    AND expenditure_date >= %s 
+                    AND expenditure_date <= %s 
+                    AND delete_ind is distinct FROM 'Y' 
+                    AND transaction_type_identifier = 'ALLOC_EXP_DEBT'
+                ORDER BY expenditure_date ASC, create_date ASC
+                """,
+                [entity_id, cmte_id, aggregate_start_date, aggregate_end_date,
+                entity_id, cmte_id, aggregate_start_date, aggregate_end_date],
             )
             # print(cursor.query)
             transactions_list = cursor.fetchall()
@@ -1733,7 +1758,7 @@ def update_schedB_aggamt_transactions(
                 # ):
                 if transaction[10] != "N":
                     aggregate_amount += transaction[0]
-                if expenditure_date <= transaction[4]:
+                if expenditure_date <= transaction[4] or transaction[12] == 'sched_b':
                     line_number, itemized_ind = transaction[3], transaction[11]
                     if itemized_ind and itemized_ind.startswith(
                         "F"

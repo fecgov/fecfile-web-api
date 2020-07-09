@@ -439,6 +439,7 @@ export class TransactionSidebarComponent implements OnInit {
                     step: 'step_2',
                     edit: this.editMode,
                     transactionCategory: this.transactionCategories[transactionCategorieIndex].value,
+                    transactionCategoryText: this.transactionCategories[transactionCategorieIndex].text,
                     transactionSubCategoryType: this.transactionCategories[transactionCategorieIndex].options[
                       transactionCategoryOptionIndex
                     ].value,
