@@ -262,7 +262,9 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
     const val: string = selectedOption.value;
     this.transactionType = val;
     this.transactionTypeText = selectedOption.text;
-    this.transactionCategory = this._transactionCategory = selectedOption.category;
+    if(selectedOption.category){
+      this.transactionCategory = this._transactionCategory = selectedOption.category;
+    }
     this.frmOption.controls['secondaryOption'].setValue(val);
     this.transactionTypeFailed = false;
     this.scheduleType = selectedOption ? selectedOption.scheduleType : null;
