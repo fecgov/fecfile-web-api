@@ -677,9 +677,9 @@ def put_schedD(datum):
         try:
             put_sql_schedD(datum)
             # do downstream proprgation if necessary
-            if not existing_close_balance == current_close_balance:
-                do_downstream_propagation(
-                    transaction_id, current_close_balance)
+            # if not existing_close_balance == current_close_balance:
+            do_downstream_propagation(
+                transaction_id, current_close_balance, datum)
         except Exception as e:
             if entity_flag:
                 entity_data = put_entities(prev_entity_list[0])
@@ -731,7 +731,7 @@ def has_downstream_child(transaction_id):
         raise
 
 
-def update_child(transaction_id, new_beginning_balance, new_close_balance):
+def update_child(transaction_id, new_beginning_balance, new_close_balance, data):
     """
     update child transaction beginning balance and close balance
     """
@@ -739,17 +739,22 @@ def update_child(transaction_id, new_beginning_balance, new_close_balance):
             UPDATE public.sched_d
             SET beginning_balance = %s,
                 balance_at_close = %s,
-                last_update_date = %s
+                last_update_date = %s,
+                entity_id = %s,
+                purpose = %s,
+                memo_text = %s
             WHERE transaction_id = %s 
             AND delete_ind is distinct from 'Y';
         """
     _v = (new_close_balance, new_close_balance,
-          datetime.datetime.now(), transaction_id)
+            datetime.datetime.now(), data.get("entity_id"),
+            data.get("purpose"), data.get("memo_text"),
+            transaction_id)
     logger.debug("update child sched_d with values: {}".format(_v))
     do_transaction(_sql, _v)
 
 
-def do_downstream_propagation(transaction_id, new_balance):
+def do_downstream_propagation(transaction_id, new_balance, data):
     """
 
     1. query child amount fileds
@@ -791,9 +796,9 @@ def do_downstream_propagation(transaction_id, new_balance):
                 float(incurred_amt) - float(payment_amt)
             )
             logger.debug("new close balance:{}".format(new_close_balance))
-            update_child(child_id, new_beginning_balance, new_close_balance)
+            update_child(child_id, new_beginning_balance, new_close_balance, data)
             # recrusive update
-            do_downstream_propagation(child_id, new_close_balance)
+            do_downstream_propagation(child_id, new_close_balance, data)
     except:
         raise
 
@@ -1257,6 +1262,7 @@ def get_list_all_schedD(report_id, cmte_id, transaction_type_identifier):
                     payment_amount, 
                     back_ref_transaction_id,
                     back_ref_sched_name,
+                    purpose,
                     last_update_date
             FROM public.sched_d 
             WHERE report_id = %s 
@@ -1332,6 +1338,7 @@ def get_list_schedD(report_id, cmte_id, transaction_id):
                     balance_at_close,
                     memo_code,
                     memo_text,
+                    purpose,
                     last_update_date
             FROM public.sched_d WHERE report_id = %s AND cmte_id = %s
             AND transaction_id = %s AND delete_ind is distinct from 'Y'
