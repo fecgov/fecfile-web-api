@@ -618,6 +618,7 @@ def auto_generate_sched_a(data):
         data.get("memo_code"),
         data.get("memo_text"),
         data.get("election_code"),
+        data.get("election_year"),
         data.get("election_other_description"),
         data.get("donor_cmte_id"),
         data.get("donor_cmte_name"),
