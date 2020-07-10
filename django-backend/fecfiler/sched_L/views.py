@@ -1151,7 +1151,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
                     SELECT COALESCE(coh_cop, 0) 
                     FROM public.sched_l 
                     WHERE cmte_id = %s 
-                    AND cvg_end_date = %s 
+                    AND cvg_end_date <= %s 
                     AND record_id = %s::varchar(9)
                     AND delete_ind is distinct from 'Y'
                     """,
@@ -1164,7 +1164,7 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
                     SELECT SUM(COALESCE(coh_cop, 0))
                     FROM public.sched_l 
                     WHERE cmte_id = %s 
-                    AND cvg_end_date = %s 
+                    AND cvg_end_date <= %s 
                     AND delete_ind is distinct from 'Y'
                     """,
                     [cmte_id, prev_cvg_end_dt],
