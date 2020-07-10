@@ -64,69 +64,82 @@ def update_sched_c_parent(cmte_id, transaction_id, new_payment, old_payment=0):
     """
     update parent sched_c transaction when a child payemnt transaction saved
     """
-    logger.debug("update_sched_c_parent...")
-    _sql1 = """
-        SELECT loan_payment_to_date, loan_balance
-        FROM public.sched_c 
-        WHERE transaction_id = '{}'
-        AND cmte_id = '{}'
-        AND delete_ind is distinct from 'Y'
-    """.format(
-        transaction_id, cmte_id
-    )
-
-    _sql2 = """
-            UPDATE public.sched_c
-            SET loan_payment_to_date = %s,
-                loan_balance = %s,
-                last_update_date = %s
-            WHERE transaction_id = %s 
-            AND cmte_id = %s
+    while 1:
+        logger.debug("update_sched_c_parent...")
+        _sql1 = """
+            SELECT loan_payment_to_date, loan_balance
+            FROM public.sched_c 
+            WHERE transaction_id = '{}'
+            AND cmte_id = '{}'
             AND delete_ind is distinct from 'Y'
-        """
+        """.format(
+            transaction_id, cmte_id
+        )
 
-    try:
-        # new_beginning_balance = new_balance
+        _sql2 = """
+                UPDATE public.sched_c
+                SET loan_payment_to_date = %s,
+                    loan_balance = %s,
+                    last_update_date = %s
+                WHERE transaction_id = %s 
+                AND cmte_id = %s
+                AND delete_ind is distinct from 'Y'
+            """
+
+        try:
+            # new_beginning_balance = new_balance
+            with connection.cursor() as cursor:
+                cursor.execute(_sql1)
+
+                # no child found anymore, return; propagation update done
+                if cursor.rowcount == 0:
+                    logger.debug("parent not found")
+                    raise Exception("error: sched_c parent missing")
+                data = cursor.fetchone()
+
+                # beginning_balance = data[0]
+                payment_amount = data[0]
+                # take care of null value issue for new loan
+                if not payment_amount:
+                    payment_amount = 0
+                balance_at_close = data[1]
+                logger.debug("loan current payment amt:{}".format(payment_amount))
+                logger.debug("loan current payment amt:{}".format(balance_at_close))
+                new_payment_amount = (
+                    float(payment_amount) + float(new_payment) - float(old_payment)
+                )
+                new_balance_at_close = (
+                    float(balance_at_close) - float(new_payment) + float(old_payment)
+                )
+            logger.debug(
+                "update parent with new payment {}, new balance {}".format(
+                    new_payment_amount, new_balance_at_close
+                )
+            )
+            _v = (
+                new_payment_amount,
+                new_balance_at_close,
+                datetime.datetime.now(),
+                transaction_id,
+                cmte_id,
+            )
+            logger.debug("update sched_c with values: {}".format(_v))
+            do_transaction(_sql2, _v)
+            logger.debug("loan {} update successful.".format(transaction_id))
+        except:
+            raise
+        _sql3 = """SELECT json_agg(t) FROM (SELECT ch.transaction_id
+                FROM public.sched_c ch WHERE ch.back_ref_transaction_id = %s
+                AND delete_ind IS DISTINCT FROM 'Y') t"""
         with connection.cursor() as cursor:
-            cursor.execute(_sql1)
-
-            # no child found anymore, return; propagation update done
-            if cursor.rowcount == 0:
-                logger.debug("parent not found")
-                raise Exception("error: sched_c parent missing")
-            data = cursor.fetchone()
-
-            # beginning_balance = data[0]
-            payment_amount = data[0]
-            # take care of null value issue for new loan
-            if not payment_amount:
-                payment_amount = 0
-            balance_at_close = data[1]
-            logger.debug("loan current payment amt:{}".format(payment_amount))
-            logger.debug("loan current payment amt:{}".format(balance_at_close))
-            new_payment_amount = (
-                float(payment_amount) + float(new_payment) - float(old_payment)
-            )
-            new_balance_at_close = (
-                float(balance_at_close) - float(new_payment) + float(old_payment)
-            )
-        logger.debug(
-            "update parent with new payment {}, new balance {}".format(
-                new_payment_amount, new_balance_at_close
-            )
-        )
-        _v = (
-            new_payment_amount,
-            new_balance_at_close,
-            datetime.datetime.now(),
-            transaction_id,
-            cmte_id,
-        )
-        logger.debug("update sched_c with values: {}".format(_v))
-        do_transaction(_sql2, _v)
-        logger.debug("loan {} update successful.".format(transaction_id))
-    except:
-        raise
+            cursor.execute(_sql3, [transaction_id])
+            json_result = cursor.fetchone()[0]
+        if json_result:
+            json_result = json_result[0]
+            transaction_id = json_result['transaction_id']
+            logger.debug("found duplicate record in next report with transaction_id: {}".format(transaction_id))
+        else:
+            break
 
 
 def update_sched_d_parent(cmte_id, transaction_id, new_payment, old_payment=0):
