@@ -1,3 +1,4 @@
+import { TableService } from 'src/app/shared/services/TableService/table.service';
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
@@ -115,6 +116,51 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
   public pageNumbers: number[] = [];
   private firstItemOnPage = 0;
   private lastItemOnPage = 0;
+  public sortableColumns: any = [
+    {
+      "colName": "account_name",
+      "descending": false,
+      "visible": true,
+      "checked": true,
+      "disabled": false
+    },
+    {
+      "colName": "activity_event_type",
+      "descending": false,
+      "visible": true,
+      "checked": true,
+      "disabled": false
+    },
+    {
+      "colName": "activity_event_name",
+      "descending": false,
+      "visible": true,
+      "checked": true,
+      "disabled": false
+    },
+    {
+      "colName": "receipt_date",
+      "descending": false,
+      "visible": true,
+      "checked": true,
+      "disabled": false
+    },
+    {
+      "colName": "transferred_amount",
+      "descending": true,
+      "visible": true,
+      "checked": true,
+      "disabled": false
+    },
+    {
+      "colName": "aggregate_amount",
+      "descending": false,
+      "visible": true,
+      "checked": true,
+      "disabled": false
+    },
+  ];
+  currentSortedColumnName: any;
   
   constructor(
     _http: HttpClient,
@@ -150,6 +196,7 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
     private _changeDet: ChangeDetectorRef,
     private _tranMessageService: TransactionsMessageService,
     _authService: AuthService,
+    private _tableService: TableService
   ) {
     super(
       _http,
@@ -760,8 +807,8 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
           this.h3EntrieEdit = formObj;
         }
 
-        const serializedForm = JSON.stringify(formObj);
-        this.saveH3Ratio(serializedForm, this.scheduleAction);
+        // const serializedForm = JSON.stringify(formObj);
+        // this.saveH3Ratio(serializedForm, this.scheduleAction);
 
         this.schedH3.reset();
         this.isSubmit = false;
@@ -817,10 +864,12 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
         'default',
         false
       ).subscribe(res => {
-        this.h3Entries = [];
-        const pagedResponse = this._utilService.pageResponse(res, this.config);
-        this.h3Sum = pagedResponse.items;
-        this.pageNumbers = pagedResponse.pageNumbers;
+
+        this.setH3Sum(this.config.currentPage);
+        // this.h3Entries = [];
+        // const pagedResponse = this._utilService.pageResponse(res, this.config);
+        // this.h3Sum = pagedResponse.items;
+        // this.pageNumbers = pagedResponse.pageNumbers;
 
       // Update third navigation totals
       const report = {
@@ -1379,5 +1428,34 @@ export class SchedH3Component extends AbstractSchedule implements OnInit, OnDest
       return true;
     }
     return false;
+  }
+
+   /**
+	 * Change the sort direction of the table column.
+	 *
+	 * @param colName the column name of the column to sort
+	 */
+  public changeSortDirection(colName: string,table:string): void {
+    let dataset = null;
+    
+    this.currentSortedColumnName = this._tableService.changeSortDirection(colName, this.sortableColumns);
+    const direction = this._tableService.getBinarySortDirection(colName, this.sortableColumns);
+
+    if(table === 'summary'){
+      this.h3Sum = this._tableService.sort(this.h3Sum, this.currentSortedColumnName, direction);
+    }
+    else if(table === 'entry'){
+      this.h3Entries = this._tableService.sort(this.h3Entries, this.currentSortedColumnName, direction);
+    }
+  }
+
+  /**
+   * Wrapper method for the table service to set the class for sort column styling.
+   *
+   * @param colName the column to apply the class
+   * @returns string of classes for CSS styling sorted/unsorted classes
+   */
+  public getSortClass(colName: string): string {
+    return this._tableService.getSortClass(colName, this.currentSortedColumnName, this.sortableColumns);
   }
 }

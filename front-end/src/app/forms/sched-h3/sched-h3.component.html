@@ -278,33 +278,28 @@
       <section *ngIf="transactionType === 'ALLOC_H3_RATIO'">
         <div *ngIf="scheduleAction !== editScheduleAction" class="paragraph">
           <ng-container>
+            <span class="saveMessage" *ngIf="h3Entries && h3Entries.length > 0">Note: You must click on "Save All Added Transactions & Proceed to Summary" button in order to save any added transactions. Otherwise they will be lost upon navigating away from this screen.</span>
             <table class="table table-striped table-hover table__sortable">
               <thead>
                 <tr>
                   <th></th>
-                  <th (click)="changeSortDirection('account_name')">
+                  <th (click)="changeSortDirection('account_name','entry')" [class]="getSortClass('account_name')">
                     Account Name
-                    <i class="fa fa-sort" aria-hidden="false"></i>
                   </th>
-                  <th (click)="changeSortDirection('activity')">
+                  <th (click)="changeSortDirection('activity_event_type','entry')" [class]="getSortClass('activity_event_type')">
                     Transfer Type
-                    <i class="fa fa-sort" aria-hidden="false"></i>
                   </th>
-                  <th (click)="changeSortDirection('activity_event_name')">
+                  <th (click)="changeSortDirection('activity_event_name','entry')" [class]="getSortClass('activity_event_name')">
                     Activity or Event Identifier
-                    <i class="fa fa-sort" aria-hidden="false"></i>
                   </th>
-                  <th (click)="changeSortDirection('receipt_date')">
+                  <th (click)="changeSortDirection('receipt_date','entry')" [class]="getSortClass('receipt_date')">
                     Date
-                    <i class="fa fa-sort" aria-hidden="false"></i>
                   </th>
-                  <th (click)="changeSortDirection('ratio_code')">
+                  <th (click)="changeSortDirection('transferred_amount','entry')" [class]="getSortClass('transferred_amount')">
                     Amount
-                    <i class="fa fa-sort" aria-hidden="false"></i>
                   </th>
-                  <th (click)="changeSortDirection('federal_percent')">
+                  <th (click)="changeSortDirection('aggregate_amount','entry')" [class]="getSortClass('aggregate_amount')">
                     Total Amount
-                    <i class="fa fa-sort" aria-hidden="false"></i>
                   </th>
                 </tr>
               </thead>
@@ -362,25 +357,20 @@
           <thead>
             <tr>
               <th></th>
-              <th (click)="changeSortDirection('activity')">
+              <th (click)="changeSortDirection('activity_event_type','summary')" [class]="getSortClass('activity_event_type')">
                 Transfer Type
-                <i class="fa fa-sort" aria-hidden="false"></i>
               </th>
-              <th (click)="changeSortDirection('activity_event_name')">
+              <th (click)="changeSortDirection('activity_event_name','summary')" [class]="getSortClass('activity_event_name')">
                 Activity or Event Identifier
-                <i class="fa fa-sort" aria-hidden="false"></i>
               </th>
-              <th (click)="changeSortDirection('receipt_date')">
+              <th (click)="changeSortDirection('receipt_date','summary')" [class]="getSortClass('receipt_date')">
                 Date
-                <i class="fa fa-sort" aria-hidden="false"></i>
               </th>
-              <th (click)="changeSortDirection('ratio_code')">
+              <th (click)="changeSortDirection('transferred_amount','summary')" [class]="getSortClass('transferred_amount')">
                 Amount
-                <i class="fa fa-sort" aria-hidden="false"></i>
               </th>
-              <th (click)="changeSortDirection('federal_percent')">
+              <th (click)="changeSortDirection('aggregate_amount','summary')" [class]="getSortClass('aggregate_amount')">
                 Total Amount
-                <i class="fa fa-sort" aria-hidden="false"></i>
               </th>
             </tr>
           </thead>
@@ -501,10 +491,10 @@
                   </button>
                   <button *ngIf="scheduleAction !== viewScheduleAction" class="btn btn-secondary btn-right"
                     type="button" [disabled]="saveAndAddDisabled" (click)="saveAndAddMore()">
-                    Save &amp; Add Transaction
+                    Add Transaction
                   </button>
                   <a class="btn btn-previous btn-right" (click)="goSummary()">
-                    Summary
+                    Save All Added Transactions & Proceed to Summary
                   </a>
                 </div>
                 <div *ngIf="scheduleAction === editScheduleAction">

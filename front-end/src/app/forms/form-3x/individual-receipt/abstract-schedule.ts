@@ -39,6 +39,7 @@ import { AbstractScheduleParentEnum } from './abstract-schedule-parent.enum';
 import { IndividualReceiptService } from './individual-receipt.service';
 import { ScheduleActions } from './schedule-actions.enum';
 import {AuthService} from '../../../shared/services/AuthService/auth.service';
+import {CustomValidator} from '../../../shared/validator/custom.validator';
 
 
 
@@ -4278,16 +4279,19 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         break;
       case 'COEXP_CC_PAY_MEMO':
         res = new CoordinatedExpenditureCcMemoFields().coordinatedExpenditureCCMemoFields;
+        this.isAggregate = false;
         this.loaded = false;
         this.showPart2 = true;
         break;
       case 'COEXP_STAF_REIM_MEMO':
         res = new CoordinatedExpenditureStaffMemoFields().coordinatedExpenditureStaffMemoFields;
+        this.isAggregate = false;
         this.loaded = false;
         this.showPart2 = true;
         break;
       case 'COEXP_PMT_PROL_MEMO':
         res = new CoordinatedExpenditurePayrollMemoFields().coordinatedExpenditurePayrollMemoFields;
+        this.isAggregate = false;
         this.loaded = false;
         this.showPart2 = true;
         break;
@@ -6087,8 +6091,9 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           const maxAmount = Number(res.amount);
           this._maxChildAmount = res.amount;
           if (this.isFieldName(col.name, 'contribution_amount')) {
-            this.frmIndividualReceipt.controls['contribution_amount'].setValidators(Validators.max(maxAmount));
-            this.frmIndividualReceipt.controls['contribution_amount'].updateValueAndValidity();
+            const control =  this.frmIndividualReceipt.controls['contribution_amount'];
+            control.setValidators([control.validator, CustomValidator.maxAmount(maxAmount)]);
+            control.updateValueAndValidity();
           }
         });
       }
