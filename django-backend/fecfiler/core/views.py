@@ -867,8 +867,10 @@ def post_sql_report(
         with connection.cursor() as cursor:
             # INSERT row into Reports table
             cursor.execute(
-                """INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, amend_number, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                """INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, amend_number, 
+                    report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, 
+                    additional_email_1, additional_email_2, create_date, last_update_date)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 [
                     report_id,
                     cmte_id,
@@ -884,6 +886,8 @@ def post_sql_report(
                     email_2,
                     additional_email_1,
                     additional_email_2,
+                    datetime.datetime.now(),
+                    datetime.datetime.now()
                 ],
             )
     except Exception:
