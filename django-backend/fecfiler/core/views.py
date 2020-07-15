@@ -10842,3 +10842,37 @@ def get_child_max_transaction_amount(request):
           "The get_child_max_transaction_amount API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
+
+@api_view(['POST', 'PUT'])
+def save_additional_email(request):
+    try:
+        error_list = []
+        output_dict = {}
+        for field in ['reportId', 'formType']:
+            if field not in request.data:
+                error_list.append[field]
+            else:
+                output_dict[field] = request.data[field]
+        if error_list:
+            raise Exception("""The following parameter are mandatory: {}""".format(", ".join(error_list)))
+        output_dict['additionalEmail1'] = request.data.get('additionalEmail1') if request.data.get('additionalEmail1') else None
+        output_dict['additionalEmail2'] = request.data.get('additionalEmail2') if request.data.get('additionalEmail2') else None
+
+        if request.data['formType'] == 'F99':
+            _sql = """UPDATE public.forms_committeeinfo SET additional_email_1 = %s, additional_email_2 = %s
+                      WHERE id = %s AND form_type = %s"""
+        else:
+            _sql = """UPDATE public.reports SET additional_email_1 = %s, additional_email_2 = %s
+                      WHERE report_id = %s AND form_type = %s"""
+        _value_list = [output_dict['additionalEmail1'], output_dict['additionalEmail2'], request.data['reportId'], request.data['formType']]
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _value_list)
+            if not cursor.rowcount:
+                raise Exception("""The report_id: {}, form_type: {} does not match the records""".format(
+                      request.data['reportId'], request.data['formType']))
+        return Response(output_dict, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The save_additional_email API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
