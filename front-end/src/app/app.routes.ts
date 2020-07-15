@@ -1,3 +1,4 @@
+import { SignAndSubmitComponent } from './shared/partials/sign-and-submit/sign-and-submit.component';
 import {RouterModule, Routes} from '@angular/router';
 import {CanActivateGuard} from './shared/utils/can-activate/can-activate.guard';
 import {CanDeactivateGuardService} from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -140,7 +141,7 @@ export const AppRoutes: Routes = [
 
       {
         path: 'signandSubmit/:form_id',
-        component: SignComponent,
+        component: SignAndSubmitComponent,
         pathMatch: 'full',
         canActivate: [CanActivateGuard],
         canDeactivate: [CanDeactivateGuardService],

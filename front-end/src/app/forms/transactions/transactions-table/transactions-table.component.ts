@@ -1954,6 +1954,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * enables/disables edit/clone/trash actions on a transaction
+   * @param trx
+   * @return {boolean} true disabled trx action else false
+   */
+  private isLoanDisabled(trx: TransactionModel): boolean {
+    if (trx && trx.reportstatus) {
+    return !trx.isTrashable;
+    } else {
+      return true;
+    }
+  }
+
+  /**
    * Checks a transaction in the transactionModel array and returns true if report is filed
    * based on the first transaction
    *  @Return boolean
