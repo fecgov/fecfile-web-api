@@ -42,17 +42,17 @@
     </div>
   </div>
   <div [hidden]="showUpload" class="upload_contacts__progress_container">
-    <div>Upload Progress</div>
+    <!-- <div>Upload Progress</div> -->
     <ngb-progressbar type="dark" textType="white" animated="true" [value]="progressPercent" showValue="true"
       height="2rem">
     </ngb-progressbar>
   </div>
   <!-- This may have to go in the config or clean component as config will need to be completed before we can
   process the file in API -->
-  <div [hidden]="hideProcessingProgress" class="upload_contacts__progress_container">
+  <!-- <div [hidden]="hideProcessingProgress" class="upload_contacts__progress_container">
     <div>File Processing Progress</div>
     <ngb-progressbar type="dark" textType="white" animated="true" [value]="processingPercent" showValue="true"
       height="2rem">
     </ngb-progressbar>
-  </div>
+  </div> -->
 </div>
