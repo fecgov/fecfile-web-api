@@ -68,7 +68,7 @@ export class TransactionSidebarComponent implements OnInit {
     private _config: NgbTooltipConfig,
     private _http: HttpClient,
     private _transactionTypeService: TransactionTypeService,
-    private _activatedRoute: ActivatedRoute,
+    public _activatedRoute: ActivatedRoute,
     private _messageService: MessageService,
     private _router: Router,
     private _formsService: FormsService,
@@ -551,4 +551,5 @@ export class TransactionSidebarComponent implements OnInit {
       return true;
     }
   }
+
 }

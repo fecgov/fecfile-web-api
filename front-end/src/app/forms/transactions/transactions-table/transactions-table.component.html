@@ -858,7 +858,7 @@
                         <i class="fas fa-calculator"></i>{{getItemizationInd(trx)}}
                       </button>
                       <span [title]="!trx.iseditable ? 'This transaction cannot be deleted because it is auto generated.':''">
-                          <button *ngIf="trx.iseditable && checkIfTrashable(trx) && !_authService.isReadOnly()"
+                          <button *ngIf="trx.isTrashable && checkIfTrashable(trx) && !_authService.isReadOnly()"
                                   class="dropdown-item"
                                   (click)="trashTransaction(trx)">
                             <i class="trash-icon"></i> Trash

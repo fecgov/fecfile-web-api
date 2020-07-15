@@ -1,7 +1,8 @@
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { AuthService } from './../../services/AuthService/auth.service';
 import { ManageUserService } from './../../../admin/manage-user/service/manage-user-service/manage-user.service';
 import { ReportTypeService } from './../../../forms/form-3x/report-type/report-type.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TypeaheadService } from './../typeahead/typeahead.service';
 import { MessageService } from './../../services/MessageService/message.service';
 import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, ChangeDetectorRef, OnChanges, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
@@ -15,6 +16,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DatePipe } from '@angular/common';
 import { PhonePipe } from '../../pipes/phone-number/phone-number.pipe';
 import { Roles } from '../../enums/Roles';
+import { ConfirmModalComponent, ModalHeaderClassEnum } from '../confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-sign-and-submit',
@@ -23,7 +25,7 @@ import { Roles } from '../../enums/Roles';
   providers: [NgbTooltipConfig], 
   encapsulation:ViewEncapsulation.None
 })
-export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
+export class SignAndSubmitComponent implements OnInit, OnDestroy{
 
  @ViewChild('content') content:any;
 
@@ -46,13 +48,14 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   public additionalEmailsArray: any = [];
   public today:Date = new Date();
 
-  
+  public showFooter: boolean = false;
   public form: FormGroup;
   
   public submissionDateToolTipText : string = 'Placeholder text';
   public tooltipPlaceholder : string = 'Placeholder text';
   private onDestroy$ = new Subject();
   public saveSuccessful = false;
+  public editMode: boolean;
 
   public username: string = '';
   accordionExpanded: boolean = false;
@@ -60,6 +63,8 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   public submitterInfo: any = {};
 
   private phonePipe:PhonePipe = new PhonePipe();
+  committeeDetailsFromLocalStorage: any;
+  _form_details: any;
 
   constructor(
     public _config: NgbTooltipConfig,
@@ -73,8 +78,10 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
     private datePipe: DatePipe,
     private _reportTypeService: ReportTypeService, 
     private _userService: ManageUserService,
-    private _authService: AuthService
-
+    private _authService: AuthService,
+    private _activatedRoute: ActivatedRoute,
+    private _router: Router,
+    private _dialogService: DialogService
     ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -120,6 +127,10 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   }
 
   ngOnInit() {
+    this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
+
+    //if @Inputs are null, they will be present in the route data, so get them from there. 
+    this.populateInputsFromRouteIfNeeded();
     this.initForm();
     if(this.scheduleAction === ScheduleActions.edit){
       this.populateForm();
@@ -133,6 +144,61 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
     this.populateTreasurerToolTipText();
     this.populateSubmitterInfo();
     this.loggedInUserRole = this._authService.getUserRole();
+  }
+  
+  populateInputsFromRouteIfNeeded() {
+
+    if(this.formType !== '1M'){
+      this.showFooter = true;
+    }
+
+    if(!this.formTitle){
+      this.getTitleAndFormTypeByRouteParam(this._activatedRoute.snapshot.paramMap.get('form_id'));
+    }
+    if(!this.emailsOnFile){
+      this.getEmailsOnFileFromLocalStorage();
+    }
+    if(!this.reportId){
+      this.reportId = this._activatedRoute.snapshot.queryParams.reportId;
+    }
+    if(!this.scheduleAction){
+      this.scheduleAction = ScheduleActions.add;
+    }
+    if(!this.formData){
+      this.formData = {};
+      this.formData.additionalEmail1 = this.committeeDetailsFromLocalStorage.additionalemail1;
+      this.formData.additionalEamil2 = this.committeeDetailsFromLocalStorage.additionalemail2;
+    }
+
+    if(!this.formType){
+
+    }
+  }
+  getEmailsOnFileFromLocalStorage() {
+    if(localStorage.getItem('committee_details')){
+      this.committeeDetailsFromLocalStorage = JSON.parse(localStorage.getItem('committee_details'));
+      this.emailsOnFile = [];
+      if(this.committeeDetailsFromLocalStorage.email_on_file){
+        this.emailsOnFile.push(this.committeeDetailsFromLocalStorage.email_on_file);
+      }
+      if(this.committeeDetailsFromLocalStorage.email_on_file_1){
+        this.emailsOnFile.push(this.committeeDetailsFromLocalStorage.email_on_file_1);
+      }
+    }
+  }
+
+  getTitleAndFormTypeByRouteParam(formType: string) {
+    switch(formType){
+      case '3X':
+        if(localStorage.getItem('form_3X_report_type')){
+          const reportObj: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
+          this.formTitle = `Form 3X / ${reportObj.reporttype} (${reportObj.reporttypedescription})  `;
+        }
+        if(!this.formType){
+          this.formType = '3X';
+        }
+        break;
+    }
   }
   
   
@@ -201,28 +267,13 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   }
 
   isSaveBtnDisabled(){
-    if(!this.confirmAdditionalEmail1.valid || !this.confirmAdditionalEmail2.valid){
+    if(!this.confirmAdditionalEmail1 || !this.confirmAdditionalEmail2 || !this.confirmAdditionalEmail1.valid || !this.confirmAdditionalEmail2.valid){
       return false;
     }
     else{
       return (this.confirmAdditionalEmail1 && this.confirmAdditionalEmail1.value && this.confirmAdditionalEmail1.valid) || (this.confirmAdditionalEmail2 && this.confirmAdditionalEmail2.value && this.confirmAdditionalEmail2.valid);
     }
   }
-
-  submit(){
-    let saveObj = this.form.value;
-    saveObj.submission_date = this.datePipe.transform(this.today,'yyyy-MM-dd');
-    saveObj.reportId = this.reportId ;
-    this._f1mService.saveForm(saveObj,ScheduleActions.add, 'submit').subscribe(res =>{
-      this.modalRef.close();
-      this._messageService.sendMessage({action:'showStep5', data: res});
-    });
-  }
-
-
-  ngOnChanges(changes:SimpleChanges): void {
-    console.log('changes' + changes);
-  } 
 
   public initForm() {
     this.form = this._fb.group({
@@ -252,8 +303,8 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   }
 
   public populateForm() {
-    this.form.patchValue({sign: this.formData.sign},{onlySelf:true});
-    this.form.patchValue({submission_date: this.formData.submission_date},{onlySelf:true});
+    // this.form.patchValue({sign: this.formData.sign},{onlySelf:true});
+    // this.form.patchValue({submission_date: this.formData.submission_date},{onlySelf:true});
     this.form.patchValue({additionalEmail1: this.formData.additionalEmail1},{onlySelf:true});
     this.form.patchValue({confirmAdditionalEmail1: this.formData.confirmAdditionalEmail1},{onlySelf:true});
     this.form.patchValue({additionalEmail2: this.formData.additionalEmail2},{onlySelf:true});
@@ -278,19 +329,34 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
   }
 
   private saveEmails(saveObj: any) {
-    this._f1mService.saveForm(saveObj, this.scheduleAction, 'saveSignatureAndEmail').subscribe(res => {
-      this.saveSuccessful = true;
-      if (res) {
+    if(this.formType === '1M'){
+      this._f1mService.saveForm(saveObj, this.scheduleAction, 'saveSignatureAndEmail').subscribe(res => {
+        this.saveSuccessful = true;
+        if (res) {
+          this.additionalEmailsArray = [];
+          if (res.additional_email_1) {
+            this.additionalEmailsArray.push(res.additional_email_1);
+          }
+          if (res.additional_email_2) {
+            this.additionalEmailsArray.push(res.additional_email_2);
+          }
+          // this._cd.detectChanges();
+        }
+      });
+    }
+
+    else if(this.formType === '3X'){
+      of({saveObj}).subscribe(res => {
         this.additionalEmailsArray = [];
-        if (res.additional_email_1) {
-          this.additionalEmailsArray.push(res.additional_email_1);
+        if(saveObj.additionalEmail1){
+          this.additionalEmailsArray.push(saveObj.additionalEmail1);
         }
-        if (res.additional_email_2) {
-          this.additionalEmailsArray.push(res.additional_email_2);
+        if(saveObj.additionalEmail2){
+          this.additionalEmailsArray.push(saveObj.additionalEmail2);
         }
-        this._cd.detectChanges();
-      }
-    });
+      })
+    }
+
   }
 
   public removeEmail(email:string){
@@ -378,6 +444,247 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy, OnChanges{
     else{
       this.accordionExpanded = false;
     }
+  }
+
+  submit(){
+    if(this.formType === '1M'){
+      let saveObj = this.form.value;
+      saveObj.submission_date = this.datePipe.transform(this.today,'yyyy-MM-dd');
+      saveObj.reportId = this.reportId ;
+      this._f1mService.saveForm(saveObj,ScheduleActions.add, 'submit').subscribe(res =>{
+        this.modalRef.close();
+        this._messageService.sendMessage({action:'showStep5', data: res});
+      });
+    }
+    else if(this.formType === '3X' || this.formType === '99'){
+      this.submit3xOr99();
+    }
+  }
+
+  public submit3xOr99(): void {
+    if (this.editMode) {
+      // let doSubmitFormSaved: boolean = false;
+      if (this.formType === '3X') {
+        let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
+
+        if (this._form_details === null || typeof this._form_details === 'undefined') {
+          this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+        }
+        // doSubmitFormSaved = formSaved;
+      } 
+      // else if (this.formType === '99') {
+      //   let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
+      //   this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+      //   doSubmitFormSaved = formSaved.form_saved;
+      // }
+
+      // if (this.formType === '99') {
+      //   this._form_details.file = '';
+
+      //   if (this._form_details.additional_email_1 === '') {
+      //     this._form_details.additional_email_1 = '-';
+      //   }
+
+      //   if (this._form_details.additional_email_2 === '') {
+      //     this._form_details.additional_email_2 = '-';
+      //   }
+      // }
+
+      // this.validateAdditionalEmails();
+
+      // if (!this.additionalEmail1Invalid && !this.additionalEmail2Invalid) {
+        // if (this.formType === '99') {
+          // localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
+          // localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
+        // }
+
+        // if (this.frmSignee.invalid) {
+        //   if (this.frmSignee.get('agreement').value) {
+        //     this.signFailed = false;
+        //   } else {
+        //     this.signFailed = true;
+        //   }
+        // } else if (this.frmSignee.valid) {
+          // this.signFailed = false;
+
+          // if (!doSubmitFormSaved) {
+            if (this.formType === '99') {
+              // this._formsService.Signee_SaveForm({}, this.formType).subscribe(
+              //   saveResponse => {
+              //     if (saveResponse) {
+              //       this._formsService.submitForm({}, this.formType).subscribe(res => {
+              //         if (res) {
+              //           //console.log(' response = ', res);
+              //           this.status.emit({
+              //             form: this.frmSignee,
+              //             direction: 'next',
+              //             step: 'step_5',
+              //             fec_id: res.fec_id,
+              //             previousStep: this._step
+              //           });
+
+              //           this._messageService.sendMessage({
+              //             form_submitted: true
+              //           });
+
+              //           this._messageService.sendMessage({
+              //             validateMessage: {
+              //               validate: 'All required fields have passed validation.',
+              //               showValidateBar: true
+              //             }
+              //           });
+              //         }
+              //       });
+              //     }
+              //   },
+              //   error => {
+              //     //console.log('error: ', error);
+              //   }
+              // );
+            } else if (this.formType === '3X') {
+              this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
+                if (res) {
+                  const frmSaved: any = {
+                    saved: true
+                  };
+
+                  localStorage.setItem('form_3X_saved', JSON.stringify(frmSaved));
+
+                  this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode, 
+                                        fec_id: res.fec_id } });
+
+                  this._messageService.sendMessage({
+                    form_submitted: true
+                  });
+                } else {
+                  this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode } });
+                  this._messageService.sendMessage({
+                    form_submitted: false
+                  });
+                }
+              });
+            }
+            // upto here
+          // } else {
+          //   this._messageService.sendMessage({
+          //     validateMessage: {
+          //       validate: '',
+          //       showValidateBar: false
+          //     }
+          //   });
+          //   if (this.formType === '99') {
+          //     this._formsService.submitForm({}, this.formType).subscribe(res => {
+          //       if (res) {
+          //         //console.log(' response = ', res);
+          //         this.status.emit({
+          //           form: this.frmSignee,
+          //           direction: 'next',
+          //           step: 'step_5',
+          //           fec_id: res.fec_id,
+          //           previousStep: this._step
+          //         });
+
+
+          //         this._messageService.sendMessage({
+          //           form_submitted: true
+          //         });
+          //       }
+          //     });
+          //   } else if (this.formType === '3X') {
+          //     this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
+          //       if (res) {
+          //         //console.log(' response = ', res);
+          //         this.fec_id = res.fec_id;
+          //         /*this.frmSaved = true;
+          
+          //               let formSavedObj: any = {
+          //                 'saved': this.frmSaved
+          //               };*/
+
+          //         /*this.status.emit({
+          //                 form: this.frmSignee,
+          //                 direction: 'next',
+          //                 step: 'step_5',
+          //                 previousStep: this._step
+          //               });*/
+          //         this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode,
+          //         fec_id: res.fec_id } });
+          //         //this._router.navigate(['/submitform/3X']);
+
+          //         this._messageService.sendMessage({
+          //           form_submitted: true
+          //         });
+          //       }
+          //     });
+          //   }
+          // }
+        // }
+      // }
+    } else {
+      if (this.formType === '3X') {
+        this._dialogService
+          .confirm(
+            'This report has been filed with the FEC. If you want to change, you must Amend the report',
+            ConfirmModalComponent,
+            'Warning',
+            true,
+            ModalHeaderClassEnum.warningHeader,
+            null,
+            'Return to Reports'
+          )
+          .then(res => {
+            if (res === 'okay') {
+              this.ngOnInit();
+            } else if (res === 'cancel') {
+              this._router.navigate(['/reports']);
+            }
+          });
+      } else if (this.formType === '99') {
+        this._dialogService
+          .newReport(
+            'This report has been filed with the FEC. If you want to change, you must file a new report.',
+            ConfirmModalComponent,
+            'Warning',
+            true,
+            false,
+            true
+          )
+          .then(res => {
+            if (res === 'okay') {
+              this.ngOnInit();
+            } else if (res === 'NewReport') {
+              localStorage.removeItem('form_99_details');
+              localStorage.removeItem('form_99_saved');
+              this._setF99Details();
+              this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', refresh: true } });
+            }
+          });
+      }
+    }
+  }
+
+  private _setF99Details(): void {
+    // if (this.committee_details) {
+    //   if (this.committee_details.committeeid) {
+    //     this._form99Details = this.committee_details;
+
+    //     this._form99Details.reason = '';
+    //     this._form99Details.text = '';
+    //     this._form99Details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
+    //     this._form99Details.additional_email_1 = '-';
+    //     this._form99Details.additional_email_2 = '-';
+    //     this._form99Details.created_at = '';
+    //     this._form99Details.is_submitted = false;
+    //     this._form99Details.id = '';
+
+    //     let formSavedObj: any = {
+    //       saved: false
+    //     };
+    //     localStorage.setItem(`form_99_details`, JSON.stringify(this._form99Details));
+    //     localStorage.setItem(`form_99_saved`, JSON.stringify(formSavedObj));
+    //   }
+    // }
   }
 }
 
