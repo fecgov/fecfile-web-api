@@ -80,11 +80,16 @@ def custom_validate_df(uploaded_df_orig, cmte_id):
         test_data_ind = test_data_temp.ENTITY_TYPE.str.contains('IND', case=False)
         test_data_ind1 = test_data_temp[test_data_ind]
 
+        test_data_ind_temp = test_data_ind_diff = test_data_org_temp = test_data_org_diff = pd.DataFrame(columns=['COMMITTEE_ID', 'ENTITY_TYPE', 'STREET_1',
+                                                                        'STREET_2', 'CITY', 'STATE', 'ZIP', 'EMPLOYER',
+                                                                        'OCCUPATION',
+                                                                        'ORGANIZATION_NAME', 'LASTNAME', 'FIRSTNAME',
+                                                                        'MIDDLENAME', 'PREFIX', 'SUFFIX'])
+
         if not test_data_ind1.empty:
             test_data_ind_temp = test_data_ind1.dropna(how='any',
                                                        subset=['LASTNAME', 'FIRSTNAME'])
-
-        test_data_ind_diff = pd.concat([test_data_ind1, test_data_ind_temp]).drop_duplicates(keep=False)
+            test_data_ind_diff = pd.concat([test_data_ind1, test_data_ind_temp]).drop_duplicates(keep=False)
 
         test_data_org = test_data_temp.ENTITY_TYPE.str.contains('ORG', case=False)
         test_data_org1 = test_data_temp[test_data_org]
@@ -92,8 +97,7 @@ def custom_validate_df(uploaded_df_orig, cmte_id):
         if not test_data_org1.empty:
             test_data_org_temp = test_data_org1.dropna(how='any',
                                                        subset=['ORGANIZATION_NAME'])
-
-        test_data_org_diff = pd.concat([test_data_org1, test_data_org_temp]).drop_duplicates(keep=False)
+            test_data_org_diff = pd.concat([test_data_org1, test_data_org_temp]).drop_duplicates(keep=False)
 
         test_data_final = pd.concat([test_data_ind_temp, test_data_org_temp]).reset_index(drop=True)
         test_data_null_final = pd.concat([test_data_ind_diff, test_data_org_diff, test_data_diff,
@@ -136,29 +140,33 @@ def reorder_user_data(contacts_added, contact_list):
                                   'occupation', 'entity_name', 'last_name', 'first_name', 'middle_name', 'preffix',
                                   'suffix']
         print(type(contacts_added))
-        contacts_list_dict = pd.DataFrame.from_records(contact_list)
-        contacts_list_dict['street_1'] = contacts_list_dict['street_1'].str.strip()
-        contacts_added.zip_code = contacts_added.zip_code.astype(str)
-        contacts_added.reset_index(drop=True, inplace=True)
+        if contact_list is not ['None', 'none', '', ' ']:
+            contacts_list_dict = pd.DataFrame.from_records(contact_list)
+            contacts_list_dict['street_1'] = contacts_list_dict['street_1'].str.strip()
+            contacts_list_dict.zip_code = contacts_list_dict.zip_code.astype(str)
+            contacts_added.reset_index(drop=True, inplace=True)
 
-        json_added = contacts_added.to_json(orient='records')
-        json_contact = contacts_list_dict.to_json(orient='records')
-        contacts_added_dict = pd.read_json(json_added)
-        contact_list_dict = pd.read_json(json_contact)
-        contact_list_dict.fillna(value=pd.np.nan, inplace=True)
-        contact_list_dict1 = contact_list_dict.replace(np.nan, '', regex=True)
-        contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(str)
-        contacts_added_dict1 = contacts_added_dict.replace(np.nan, '', regex=True)
-        print(contacts_added_dict1.dtypes)
-        print(contact_list_dict.dtypes)
+            json_added = contacts_added.to_json(orient='records')
+            json_contact = contacts_list_dict.to_json(orient='records')
+            contacts_added_dict = pd.read_json(json_added)
+            contact_list_dict = pd.read_json(json_contact)
+            contact_list_dict.fillna(value=pd.np.nan, inplace=True)
+            contact_list_dict1 = contact_list_dict.replace(np.nan, '', regex=True)
+            contacts_added_dict.zip_code = contacts_added_dict.zip_code.astype(str)
+            contact_list_dict1.zip_code = contact_list_dict1.zip_code.astype(str)
+            contacts_added_dict1 = contacts_added_dict.replace(np.nan, '', regex=True)
+            print(contacts_added_dict1.dtypes)
+            print(contact_list_dict1.dtypes)
 
-        contact_final_dict = contacts_added_dict1.merge(contact_list_dict1, how='outer', indicator=True).loc[
-            lambda x: x['_merge'] == 'left_only']
+            contact_final_dict = contacts_added_dict1.merge(contact_list_dict1, how='outer', indicator=True).loc[
+                lambda x: x['_merge'] == 'left_only']
 
-        contact_duplicate_dict = contacts_added_dict1.merge(contact_list_dict1, how='inner', indicator=False)
-        print(type(contact_duplicate_dict))
-        del contact_final_dict['_merge']
-        data = {"final_contact_df": contact_final_dict, "duplicate_contact_df": contact_duplicate_dict}
+            contact_duplicate_dict = contacts_added_dict1.merge(contact_list_dict1, how='inner', indicator=False)
+            print(type(contact_duplicate_dict))
+            del contact_final_dict['_merge']
+            data = {"final_contact_df": contact_final_dict, "duplicate_contact_df": contact_duplicate_dict}
+        else:
+            data = {"final_contact_df": contact_list, "duplicate_contact_df": ""}
         return data
     except Exception as e:
         logger.debug(e)
@@ -242,7 +250,8 @@ def upload_contact(request):
                 final_contact_list = save_data.get("final_contact_df")
                 final_contact_list_dict = final_contact_list.to_dict(orient='records')
 
-                duplicates = pd.concat([data.get("duplicates_files"), save_data.get("duplicate_contact_df")]).reset_index(
+                duplicates = pd.concat(
+                    [data.get("duplicates_files"), save_data.get("duplicate_contact_df")]).reset_index(
                     drop=True).replace(np.nan, '', regex=True)
                 duplicate_dict = duplicates.to_dict(orient='records')
                 contacts_temp = {"contacts": final_contact_list_dict, "contacts_failed_validation": contacts_null_dict,
@@ -258,4 +267,3 @@ def upload_contact(request):
     except Exception as e:
         json_result = {'message': str(e)}
         return JsonResponse(json_result, status=status.HTTP_403_FORBIDDEN, safe=False)
-
