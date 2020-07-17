@@ -40,12 +40,14 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.steps = [
       { text: 'Upload', step: this.step1Upload },
-      { text: 'Configure', step: this.step2Configure },
-      { text: 'Clean', step: this.step3Clean },
+      // { text: 'Configure', step: this.step2Configure },
+      // { text: 'Clean', step: this.step3Clean },
       { text: 'Import', step: this.step4ImportDone }
     ];
     this.currentStep = this.step1Upload;
-    this.unsavedData = true;
+    // removing warning until fix is made for not showing it when the system navigates
+    // to login screen on session timeout.
+    // this.unsavedData = true;
     this.onDestroy$ = new Subject();
     this.validationErrorsExist = false;
     this.duplicatesExist = false;
