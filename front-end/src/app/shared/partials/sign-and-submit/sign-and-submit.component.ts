@@ -130,11 +130,11 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
 
     //if @Inputs are null, they will be present in the route data, so get them from there. 
-    this.populateInputsFromRouteIfNeeded();
     this.initForm();
-    if(this.scheduleAction === ScheduleActions.edit){
+    this.populateInputsFromRouteIfNeeded();
+    // if(this.scheduleAction === ScheduleActions.edit){
       this.populateForm();
-    }
+    // }
     
     if(localStorage.getItem('committee_details')){
       this.username = JSON.parse(localStorage.getItem('committee_details')).committeeid;
@@ -155,7 +155,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     if(!this.formTitle){
       this.getTitleAndFormTypeByRouteParam(this._activatedRoute.snapshot.paramMap.get('form_id'));
     }
-    if(!this.emailsOnFile){
+    if(!this.emailsOnFile || (this.emailsOnFile && this.emailsOnFile.length === 0)){
       this.getEmailsOnFileFromLocalStorage();
     }
     if(!this.reportId){
@@ -165,15 +165,25 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
       this.scheduleAction = ScheduleActions.add;
     }
     if(!this.formData){
-      this.formData = {};
-      this.formData.additionalEmail1 = this.committeeDetailsFromLocalStorage.additionalemail1;
-      this.formData.additionalEamil2 = this.committeeDetailsFromLocalStorage.additionalemail2;
+      
+      this.formData = this.getReportInfoFromLocalStorage();
+      this.formData.additionalEmail1 = this.formData.confirmAdditionalEmail1 = this.formData.additionalemail1;
+      this.formData.additionalEmail2 = this.formData.confirmAdditionalEmail2 = this.formData.additionalemail2;
+      
     }
 
     if(!this.formType){
 
     }
   }
+
+  getReportInfoFromLocalStorage(): any {
+    if(localStorage.getItem(`form_${this.formType}_report_type`)){
+      return JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+    }
+    return null;
+  }
+
   getEmailsOnFileFromLocalStorage() {
     if(localStorage.getItem('committee_details')){
       this.committeeDetailsFromLocalStorage = JSON.parse(localStorage.getItem('committee_details'));
@@ -324,11 +334,13 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
       saveObj.additionalEmail1 = this.additionalEmail1.value;
       saveObj.additionalEmail2 = this.additionalEmail2.value;
       saveObj.reportId = this.reportId;
+      saveObj.formType = this.formType;
       this.saveEmails(saveObj);
     }
   }
 
   private saveEmails(saveObj: any) {
+
     if(this.formType === '1M'){
       this._f1mService.saveForm(saveObj, this.scheduleAction, 'saveSignatureAndEmail').subscribe(res => {
         this.saveSuccessful = true;
@@ -346,7 +358,8 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     }
 
     else if(this.formType === '3X'){
-      of({saveObj}).subscribe(res => {
+      this._reportTypeService.saveAdditionalEmails(saveObj, this.scheduleAction).subscribe(res =>{
+          // of({saveObj}).subscribe(res => {
         this.additionalEmailsArray = [];
         if(saveObj.additionalEmail1){
           this.additionalEmailsArray.push(saveObj.additionalEmail1);
@@ -363,7 +376,14 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     this.additionalEmailsArray.splice(this.additionalEmailsArray.indexOf(email),1);
     let saveObj :any = {};
     saveObj.additionalEmail1 = this.additionalEmailsArray[0];
+    if(!saveObj.additionalEmail1){
+      saveObj.additionalEmail1 = '';
+    }
     saveObj.additionalEmail2 = this.additionalEmailsArray[1];
+    if(!saveObj.additionalEmail2){
+      saveObj.additionalEmail2 = '';
+    }
+    saveObj.formType = this.formType;
     saveObj.reportId = this.reportId;
     this.saveEmails(saveObj);
 
