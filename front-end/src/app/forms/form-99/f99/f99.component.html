@@ -54,10 +54,13 @@
       <div
         [hidden]="step!=='step_4'"
       >
-        <app-sign
+        <!-- <app-sign
           [comittee_details]="comittee_details"
           (status)='onNotify($event)'
-        ></app-sign>
+        ></app-sign> -->
+      <app-sign-and-submit [formTitle]="'Form 99 / Miscellaneous Reports to the FEC'"  [reportId]="reportId"  [formType]="'99'">
+
+      </app-sign-and-submit>
       </div>
       <div
         [hidden]="step!=='step_5'"
