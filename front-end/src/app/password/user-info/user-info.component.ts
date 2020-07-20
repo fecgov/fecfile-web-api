@@ -35,7 +35,9 @@ export class UserInfoComponent implements OnInit {
 
   resetNextPage() {
     if (this.frmUserInfo.valid) {
-
+    this.router.navigate(['/reset-selector']).then(r => {
+      // handle it
+    });
     } else {
       this.frmUserInfo.markAsTouched();
     }
