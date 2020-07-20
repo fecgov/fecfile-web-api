@@ -577,7 +577,7 @@ export class ReportsService {
     
     params = params.append('reportid', report_id);
 
-    if (form_type === 'F99') {
+    if (form_type === 'F99' || form_type === '99') {
       url = '/f99/get_f99_report_info';
     } else if (form_type === 'F3X' || form_type === '3X' || form_type === 'F24' || form_type === '24') {
       url = '/core/get_report_info';
@@ -593,7 +593,7 @@ export class ReportsService {
 
     //params = params.append('committeeid', committee_id);
 
-    if (form_type === 'F99') {
+    if (form_type === 'F99' || form_type === '99') {
       return this._http.get(`${environment.apiUrl}${url}`, {
         headers: httpOptions,
         params

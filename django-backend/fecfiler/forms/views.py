@@ -1753,7 +1753,11 @@ def get_f99_report_info(request):
                 comm_info = CommitteeInfo.objects.filter(committeeid=get_comittee_id(request.user.username), id=request.query_params.get('reportid')).last()
                 serializer = CommitteeInfoSerializer(comm_info)
                 if comm_info:
-                    return JsonResponse(serializer.data, status=status.HTTP_200_OK)
+                    # add additional attributes as attribute names being used are inconsistent
+                    response = serializer.data
+                    response['additionalemail1']= response['additional_email_1']
+                    response['additionalemail2']= response['additional_email_2']
+                    return JsonResponse(response, status=status.HTTP_200_OK)
     except CommitteeInfo.DoesNotExist:
             return Response({"FEC Error 004":"There is no submitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
 
