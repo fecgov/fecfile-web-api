@@ -14,6 +14,7 @@ import { UtilService } from './utils/util.service';
 import { OrderByPipe } from 'ngx-pipes';
 import { ModalModule } from 'ngx-bootstrap';
 import { InputModalComponent } from './partials/input-modal/input-modal.component';
+import { ExportDirective } from './directives/export.directive';
 
 @NgModule({
   imports: [
@@ -51,7 +52,8 @@ import { InputModalComponent } from './partials/input-modal/input-modal.componen
     UtilService,
     OrderByPipe,
     PhonePipe,
-    CurrencyPipe
+    CurrencyPipe,
+    ExportDirective
   ],
   entryComponents: [InputModalComponent]
 })

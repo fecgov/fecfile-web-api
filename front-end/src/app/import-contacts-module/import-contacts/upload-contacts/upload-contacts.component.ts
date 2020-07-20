@@ -199,6 +199,10 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     this.selectFileInput.nativeElement.click();
   }
 
+  public onClick(event) {
+    event.target.value = '';
+  }
+
   public fileSelected() {
     this.progressPercent = 0;
     this.showUpload = false;

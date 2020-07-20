@@ -10,7 +10,8 @@
         or
         <br>
         <span><a (click)="triggerSelectFileInputClick()">Select a file</a></span>
-        <input style="display:none" #selectFileInput type="file" accept=".json, .xls, .csv" (change)="fileSelected()" />
+        <input style="display:none" #selectFileInput type="file" accept=".json, .xls, .csv" (change)="fileSelected()"
+          (click)="onClick($event)" />
       </div>
     </div>
     <div id="upload_contacts__info-area">
