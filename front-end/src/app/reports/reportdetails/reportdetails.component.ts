@@ -846,7 +846,7 @@ public printReport(report: reportModel): void{
         localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
       });
       setTimeout(() => {
-        this._router.navigate(['/signandSubmit/99']);
+        this._router.navigate(['/signandSubmit/99'],{ queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
       }, 1500);
     } else if (report.form_type === 'F3X') {
       this._reportsService
@@ -864,7 +864,7 @@ public printReport(report: reportModel): void{
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          this._router.navigate(['/signandSubmit/3X'], { queryParams: { step: 'step_4' } });
+          this._router.navigate(['/signandSubmit/3X'], { queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
 
       }, 1500);
     } else if(report.form_type === 'F1M'){

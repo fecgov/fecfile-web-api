@@ -242,7 +242,7 @@ def get_data_details(report_id, cmte_id):
                             THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", aff_cmte_id AS "affiliatedCommitteeId", 
                             (SELECT cmte.cmte_name FROM committee_master cmte WHERE cmte.cmte_id = aff_cmte_id) AS "affiliatedCommitteeName", 
                             COALESCE(to_char(aff_date,'MM/DD/YYYY'),'') AS "affiliatedDate", sign_id AS "signatureId", 
-                            COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate" 
+                            COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate", committee_type AS "committeeType"
                               FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
                           WHEN (SELECT est_status FROM public.form_1m WHERE report_id=%s and cmte_id=%s) = 'Q'
                             THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", can1_id, 
@@ -250,7 +250,7 @@ def get_data_details(report_id, cmte_id):
                             can3_id, COALESCE(to_char(can3_con,'MM/DD/YYYY'),'') AS "can3_con", can4_id, COALESCE(to_char(can4_con,'MM/DD/YYYY'),'') AS "can4_con", 
                             can5_id, COALESCE(to_char(can5_con,'MM/DD/YYYY'),'') AS "can5_con", COALESCE(to_char(date_51,'MM/DD/YYYY'),'') AS "51stContributorDate", 
                             COALESCE(to_char(orig_date,'MM/DD/YYYY'),'') AS "registrationDate", COALESCE(to_char(metreq_date,'MM/DD/YYYY'),'') AS "requirementsMetDate", 
-                            sign_id AS "signatureId", COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate"  
+                            sign_id AS "signatureId", COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate", committee_type AS "committeeType"
                               FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
                           END AS "output" """
             values_2 = [report_id, cmte_id, report_id, cmte_id, report_id, cmte_id, report_id, cmte_id]

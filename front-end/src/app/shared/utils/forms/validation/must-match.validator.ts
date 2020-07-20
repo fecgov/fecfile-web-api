@@ -22,11 +22,11 @@ import { FormGroup } from '@angular/forms';
         let controlStr = control.value;
         let matchingControlStr = matchingControl.value;
 
-        if(controlStr === null){
+        if(controlStr === null || controlStr === undefined){
             controlStr = '';
         }
 
-        if(matchingControlStr === null){
+        if(matchingControlStr === null || matchingControlStr === undefined){
             matchingControlStr = '';
         }
 
