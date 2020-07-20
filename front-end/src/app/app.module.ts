@@ -104,6 +104,7 @@ import * as S3 from 'aws-sdk/clients/s3';
 import {AppMainLoginModule} from './app-main-login/app-main-login.module';
 import {AdminModule} from './admin/admin.module';
 import { PhonePipe } from './shared/pipes/phone-number/phone-number.pipe';
+import { ExportDirective } from './shared/directives/export.directive';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -191,6 +192,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     SchedFCoreComponent,
     HelpComponent,
     F24Component,
+    ExportDirective,
   ],
   entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
