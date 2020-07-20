@@ -637,7 +637,8 @@ export class ReasonComponent implements OnInit , OnDestroy{
             res => {
               if (res) {
                 this._form99Details.id = res.id;
-
+                this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: {reportId: this._form99Details.id}, queryParamsHandling:'merge'});
+                this._messageService.sendMessage({action:'updateForm99ReportId', reportId: this._form99Details.id});
                 if (!res.file) {
                   localStorage.removeItem('orm_99_details.org_fileurl');
                 } else if (res.file && (Object.entries(res.file).length || res.file !== '')) {

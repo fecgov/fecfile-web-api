@@ -1,3 +1,4 @@
+import { FormsService } from './../../services/FormsService/forms.service';
 import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { AuthService } from './../../services/AuthService/auth.service';
 import { ManageUserService } from './../../../admin/manage-user/service/manage-user-service/manage-user.service';
@@ -17,6 +18,7 @@ import { DatePipe } from '@angular/common';
 import { PhonePipe } from '../../pipes/phone-number/phone-number.pipe';
 import { Roles } from '../../enums/Roles';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from '../confirm-modal/confirm-modal.component';
+import { ReportsService } from '../../../reports/service/report.service';
 
 @Component({
   selector: 'app-sign-and-submit',
@@ -81,7 +83,10 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     private _authService: AuthService,
     private _activatedRoute: ActivatedRoute,
     private _router: Router,
-    private _dialogService: DialogService
+    private _dialogService: DialogService,
+    private _reportService: ReportsService,
+    private _formsService: FormsService
+
     ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -166,9 +171,11 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     }
     if(!this.formData){
       
-      this.formData = this.getReportInfoFromLocalStorage();
-      this.formData.additionalEmail1 = this.formData.confirmAdditionalEmail1 = this.formData.additionalemail1;
-      this.formData.additionalEmail2 = this.formData.confirmAdditionalEmail2 = this.formData.additionalemail2;
+      this.formData = this.getReportInfo().subscribe(res => {
+        this.formData.additionalEmail1 = this.formData.confirmAdditionalEmail1 = res.additionalemail1;
+        this.formData.additionalEmail2 = this.formData.confirmAdditionalEmail2 = res.additionalemail2;
+        this.populateForm();
+      });
       
     }
 
@@ -177,11 +184,17 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     }
   }
 
-  getReportInfoFromLocalStorage(): any {
+  getReportInfo(): Observable<any> {
     if(localStorage.getItem(`form_${this.formType}_report_type`)){
-      return JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+      return of(JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`)));
     }
-    return null;
+    else{
+      return this.getReportInfoFromApi(this.formType);
+    };
+  }
+
+  getReportInfoFromApi(formType: any): Observable<any> {
+    return this._reportService.getReportInfo(formType,this.reportId);
   }
 
   getEmailsOnFileFromLocalStorage() {
@@ -206,6 +219,15 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
         }
         if(!this.formType){
           this.formType = '3X';
+        }
+        break;
+      case '99':
+        if(localStorage.getItem('form_99_details')){
+          const reportObj: any = JSON.parse(localStorage.getItem('form_99_details'));
+          this.formTitle = 'Form 99 / Miscellaneous Reports to the FEC';
+        }
+        if(!this.formType){
+          this.formType = '99';
         }
         break;
     }
@@ -357,7 +379,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
       });
     }
 
-    else if(this.formType === '3X'){
+    else{
       this._reportTypeService.saveAdditionalEmails(saveObj, this.scheduleAction).subscribe(res =>{
           // of({saveObj}).subscribe(res => {
         this.additionalEmailsArray = [];
@@ -493,11 +515,11 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
         }
         // doSubmitFormSaved = formSaved;
       } 
-      // else if (this.formType === '99') {
-      //   let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
-      //   this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
-      //   doSubmitFormSaved = formSaved.form_saved;
-      // }
+      else if (this.formType === '99') {
+        let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
+        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
+        // doSubmitFormSaved = formSaved.form_saved;
+      }
 
       // if (this.formType === '99') {
       //   this._form_details.file = '';
@@ -530,38 +552,50 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
 
           // if (!doSubmitFormSaved) {
             if (this.formType === '99') {
-              // this._formsService.Signee_SaveForm({}, this.formType).subscribe(
-              //   saveResponse => {
-              //     if (saveResponse) {
-              //       this._formsService.submitForm({}, this.formType).subscribe(res => {
-              //         if (res) {
-              //           //console.log(' response = ', res);
-              //           this.status.emit({
-              //             form: this.frmSignee,
-              //             direction: 'next',
-              //             step: 'step_5',
-              //             fec_id: res.fec_id,
-              //             previousStep: this._step
-              //           });
+              this._formsService.Signee_SaveForm({}, this.formType).subscribe(
+                saveResponse => {
+                  if (saveResponse) {
+                    this._formsService.submitForm({}, this.formType).subscribe(res => {
+                      if (res) {
+                        //console.log(' response = ', res);
+                        // this.status.emit({
+                        //   form: this.frmSignee,
+                        //   direction: 'next',
+                        //   step: 'step_5',
+                        //   fec_id: res.fec_id,
+                        //   previousStep: this._step
+                        // });
 
-              //           this._messageService.sendMessage({
-              //             form_submitted: true
-              //           });
+                        const frmSaved: any = {
+                          saved: true
+                        };
+      
+                        // localStorage.setItem('form_3X_saved', JSON.stringify(frmSaved)); ?? is this needed?
+      
+                        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_6', edit: this.editMode, 
+                                              fec_id: res.fec_id } });
+      
+                        this._messageService.sendMessage({
+                          form_submitted: true
+                        });
+                        // this._messageService.sendMessage({
+                        //   form_submitted: true
+                        // });
 
-              //           this._messageService.sendMessage({
-              //             validateMessage: {
-              //               validate: 'All required fields have passed validation.',
-              //               showValidateBar: true
-              //             }
-              //           });
-              //         }
-              //       });
-              //     }
-              //   },
-              //   error => {
-              //     //console.log('error: ', error);
-              //   }
-              // );
+                        // this._messageService.sendMessage({
+                        //   validateMessage: {
+                        //     validate: 'All required fields have passed validation.',
+                        //     showValidateBar: true
+                        //   }
+                        // });
+                      }
+                    });
+                  }
+                },
+                error => {
+                  //console.log('error: ', error);
+                }
+              );
             } else if (this.formType === '3X') {
               this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
                 if (res) {
