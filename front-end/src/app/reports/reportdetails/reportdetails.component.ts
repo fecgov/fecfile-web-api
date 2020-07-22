@@ -846,7 +846,7 @@ public printReport(report: reportModel): void{
         localStorage.setItem('form_99_saved', JSON.stringify(formSavedObj));
       });
       setTimeout(() => {
-        this._router.navigate(['/signandSubmit/99'],{ queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
+        this._router.navigate(['/forms/form/99'],{ queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
       }, 1500);
     } else if (report.form_type === 'F3X') {
       this._reportsService
