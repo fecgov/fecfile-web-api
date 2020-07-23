@@ -547,7 +547,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
             AND e.election_code = %s
             AND e.delete_ind is distinct FROM 'Y'
-            AND e.memo_code is null 
+            AND e.transaction_type_identifier in ('IE_MULTI', 'IE_STAF_REIM', 'IE_PMT_TO_PROL', 'IE_VOID', 'IE_CC_PAY', 'IE')
             AND r.form_type = %s
             ORDER BY transaction_dt ASC, e.create_date ASC;
         """
@@ -568,7 +568,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             AND e.election_code = %s
             AND e.so_cand_state = %s
             AND e.delete_ind is distinct FROM 'Y' 
-            AND e.memo_code is null
+            AND e.transaction_type_identifier in ('IE_MULTI', 'IE_STAF_REIM', 'IE_PMT_TO_PROL', 'IE_VOID', 'IE_CC_PAY', 'IE')
             AND r.form_type = %s
             ORDER BY transaction_dt ASC, e.create_date ASC; 
         """
@@ -597,7 +597,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             AND e.so_cand_state = %s
             AND e.so_cand_district = %s
             AND e.delete_ind is distinct FROM 'Y' 
-            AND e.memo_code is null
+            AND e.transaction_type_identifier in ('IE_MULTI', 'IE_STAF_REIM', 'IE_PMT_TO_PROL', 'IE_VOID', 'IE_CC_PAY', 'IE')
             AND r.form_type = %s
             ORDER BY transaction_dt ASC, e.create_date ASC;  
         """
