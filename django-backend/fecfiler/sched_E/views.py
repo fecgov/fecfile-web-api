@@ -25,7 +25,7 @@ from fecfiler.core.views import (
     post_entities,
     put_entities,
     remove_entities,
-
+    function_to_call_wrapper_update_F3X,
     undo_delete_entities,
     get_comittee_id,
     update_F3X
@@ -305,6 +305,7 @@ def put_schedE(data):
         if form_type == 'F24' and data.get('mirror_report_id'):
             logger.debug('I am here')
             update_aggregate_amt_se(se_data)
+            function_to_call_wrapper_update_F3X(data.get("cmte_id"), se_data['report_id'])
             if str(get_data['mirror_report_id']) != data['mirror_report_id']:
                 logger.debug(get_data['mirror_report_id'])
                 logger.debug(data['mirror_report_id'])
@@ -871,6 +872,7 @@ def post_schedE(data):
         update_aggregate_amt_se(data)
         if form_type == 'F24' and data.get('mirror_report_id'):
             update_aggregate_amt_se(se_data)
+            function_to_call_wrapper_update_F3X(data.get("cmte_id"), se_data['report_id'])
         return data
     except:
         raise
