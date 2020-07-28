@@ -1013,9 +1013,9 @@ def update_aggregate_general_elec_exp(cmte_id, beneficiary_cand_id, expenditure_
             cvg_start_date, cvg_end_date, beneficiary_cand_id
         )
         for transaction in transaction_list:
-            # memo_code checking removed
-            if transaction["aggregation_ind"] != 'N':
-                aggregate_amount += float(transaction["expenditure_amount"])
+            if transaction["memo_code"] != 'X':
+                if transaction["aggregation_ind"] != 'N':
+                    aggregate_amount += float(transaction["expenditure_amount"])
             if transaction["expenditure_date"] >= expenditure_date:
                 put_aggregate_SF(aggregate_amount, transaction["transaction_id"])
     except Exception as e:

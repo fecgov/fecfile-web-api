@@ -867,8 +867,10 @@ def post_sql_report(
         with connection.cursor() as cursor:
             # INSERT row into Reports table
             cursor.execute(
-                """INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, amend_number, report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, additional_email_1, additional_email_2)
-                                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                """INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, amend_number, 
+                    report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, 
+                    additional_email_1, additional_email_2, create_date, last_update_date)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 [
                     report_id,
                     cmte_id,
@@ -884,6 +886,8 @@ def post_sql_report(
                     email_2,
                     additional_email_1,
                     additional_email_2,
+                    datetime.datetime.now(),
+                    datetime.datetime.now()
                 ],
             )
     except Exception:
@@ -3535,7 +3539,7 @@ def get_trans_query(category_type, cmte_id, param_string):
         query_string = (
                 """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, occupation, employer, 
                           purpose_description, loan_amount, loan_payment_to_date, loan_incurred_date, loan_due_date, loan_beginning_balance, loan_incurred_amt, loan_payment_amt, 
-                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild 
+                          loan_closing_balance, memo_code, memo_text, transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, hasChild, istrashable 
                           from all_loans_debts_transactions_view
                             where cmte_id='"""
                 + cmte_id
@@ -3873,362 +3877,395 @@ def get_core_sched_c2(cmte_id, back_ref_transaction_id):
             "The get_core_sched_c2 function is throwing an error: " + str(e)
         )
 
+def get_transactions(request, transaction_id):
+    # print("request.data: ", request.data)
+    logger.debug("get_all_transactions with {}".format(request.data))
+    cmte_id = get_comittee_id(request.user.username)
+    ctgry_type = request.data.get("category_type")
+    param_string = ""
+    page_num = int(request.data.get("page", 1))
+    descending = request.data.get("descending", "false")
+    if not (
+            "sortColumnName" in request.data
+            and check_null_value(request.data.get("sortColumnName"))
+    ):
+        sortcolumn = "name"
+    elif request.data.get("sortColumnName") == "default":
+        sortcolumn = "name"
+    else:
+        sortcolumn = request.data.get("sortColumnName")
+    itemsperpage = request.data.get("itemsPerPage", 5)
+    search_string = request.data.get("search")
+    params = request.data.get("filters", {})
+    keywords = params.get("keywords")
+    if str(descending).lower() == "true":
+        descending = "DESC"
+    else:
+        descending = "ASC"
+
+    # Search and Key word string Handling
+    keys = [
+        "transaction_type",
+        "transaction_type_desc",
+        "transaction_id",
+        "name",
+        "street_1",
+        "street_2",
+        "city",
+        "state",
+        "zip_code",
+        "purpose_description",
+        "occupation",
+        "employer",
+        "memo_text",
+    ]
+    search_keys = [
+        "transaction_type",
+        "transaction_type_desc",
+        "transaction_id",
+        "name",
+        "street_1",
+        "street_2",
+        "city",
+        "state",
+        "zip_code",
+        "purpose_description",
+        "occupation",
+        "employer",
+        "memo_text",
+    ]
+    if search_string:
+        for key in search_keys:
+            if not param_string:
+                param_string = (
+                        param_string
+                        + " AND (CAST("
+                        + key
+                        + " as CHAR(100)) ILIKE '%"
+                        + str(search_string)
+                        + "%'"
+                )
+            else:
+                param_string = (
+                        param_string
+                        + " OR CAST("
+                        + key
+                        + " as CHAR(100)) ILIKE '%"
+                        + str(search_string)
+                        + "%'"
+                )
+        param_string = param_string + " )"
+    keywords_string = ""
+    if keywords:
+        for key in keys:
+            for word in keywords:
+                if '"' in word:
+                    continue
+                elif "'" in word:
+                    if not keywords_string:
+                        keywords_string = (
+                                keywords_string
+                                + " AND ( CAST("
+                                + key
+                                + " as CHAR(100)) = "
+                                + str(word)
+                        )
+                    else:
+                        keywords_string = (
+                                keywords_string
+                                + " OR CAST("
+                                + key
+                                + " as CHAR(100)) = "
+                                + str(word)
+                        )
+                else:
+                    if not keywords_string:
+                        keywords_string = (
+                                keywords_string
+                                + " AND ( CAST("
+                                + key
+                                + " as CHAR(100)) ILIKE '%"
+                                + str(word)
+                                + "%'"
+                        )
+                    else:
+                        keywords_string = (
+                                keywords_string
+                                + " OR CAST("
+                                + key
+                                + " as CHAR(100)) ILIKE '%"
+                                + str(word)
+                                + "%'"
+                        )
+        keywords_string = keywords_string + " )"
+    param_string = param_string + keywords_string
+    param_string = filter_get_all_trans(request, param_string)
+
+    # ADDED the below code to access transactions across reports
+    if "reportid" in request.data and str(request.data.get("reportid")) not in [
+        "",
+        "",
+        "null",
+        "none",
+    ]:
+        # add carryover code here so that carryover can be triggered by get_all_transactions
+        if int(request.data.get("reportid")) != 0:
+            # disable h1 carryover triggered by this API call
+            # do_h1_carryover(cmte_id, request.data.get('reportid'))
+            do_h2_carryover(cmte_id, request.data.get("reportid"))
+            do_loan_carryover(cmte_id, request.data.get("reportid"))
+            do_debt_carryover(cmte_id, request.data.get("reportid"))
+        report_list = superceded_report_id_list(request.data.get("reportid"))
+        if ctgry_type != "other_tran":
+            param_string += " AND report_id in ('{}')".format(
+                "', '".join(report_list)
+            )
+        else:
+            if cmte_type(cmte_id) == "PTY":
+                logger.debug("pty cmte all_other transactions")
+                param_string = (
+                        param_string
+                        + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
+                                                OR 
+                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
+                                                OR
+                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
+                                                SELECT h4.activity_event_identifier FROM public.sched_h4 h4
+                                                WHERE  h4.report_id = '{0}'
+                                                AND h4.cmte_id = '{1}'
+                                                UNION
+                                                SELECT h3.activity_event_name
+                                                FROM   public.sched_h3 h3
+                                                WHERE  h3.report_id = '{0}'
+                                                AND h3.cmte_id = '{1}')))""".format(
+                    request.data.get("reportid"), cmte_id
+                )
+                )
+            else:
+                # for PAC, h1 and h2 will show up only when there are transactions tied to it
+                logger.debug("pac cmte all_other transactions")
+                param_string = (
+                        param_string
+                        + """AND (((transaction_table = 'sched_h3' or transaction_table = 'sched_h4') AND report_id = '{0}')
+                                                OR
+                                                (transaction_table = 'sched_h1' AND report_id = '{0}' AND back_ref_transaction_id is null)
+                                                OR
+                                                (transaction_table = 'sched_h1' AND report_id = '{0}' AND transaction_id IN (
+                                                with h1_set as (select  (
+                                                case when administrative is true then 'AD'
+                                                when public_communications is true then 'PC'
+                                                when generic_voter_drive is true then 'GV'
+                                                end) as event_type, transaction_id, cmte_id, report_id
+                                                from sched_h1 where delete_ind is distinct from 'Y' and report_id = '{0}')
+                                                select distinct t.transaction_id from h1_set t
+                                                join sched_h4 h4 on t.event_type = h4.activity_event_type and h4.report_id = t.report_id
+                                                where h4.delete_ind is distinct from 'Y'
+                                                union
+                                                select distinct t.transaction_id from h1_set t
+                                                join sched_h3 h3 on t.event_type = h3.activity_event_type and h3.report_id = t.report_id
+                                                where h3.delete_ind is distinct from 'Y'
+                                                ))
+                                                OR 
+                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
+                                                OR
+                                                (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
+                                                SELECT h4.activity_event_identifier FROM public.sched_h4 h4
+                                                WHERE  h4.report_id = '{0}'
+                                                AND h4.cmte_id = '{1}'
+                                                AND h4.delete_ind is distinct from 'Y'
+                                                UNION
+                                                SELECT h3.activity_event_name
+                                                FROM   public.sched_h3 h3
+                                                WHERE  h3.report_id = '{0}'
+                                                AND h3.delete_ind is distinct from 'Y'
+                                                AND h3.cmte_id = '{1}')))""".format(
+                    request.data.get("reportid"), cmte_id
+                )
+                )
+
+    # To determine if we are searching for regular or trashed transactions
+    if (
+            "trashed_flag" in request.data
+            and str(request.data.get("trashed_flag")).lower() == "true"
+    ):
+        param_string += " AND delete_ind = 'Y'"
+    else:
+        param_string += " AND delete_ind is distinct from 'Y'"
+    
+    if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
+        parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
+        param_string += " AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(" + parent_transaction_id + ", 'NONE')"
+        if transaction_id is not None:
+            param_string += " OR  transaction_id = '" + transaction_id + "'"
+        param_string += " ) "
+
+    filters_post = request.data.get("filters", {})
+    memo_code_d = filters_post.get("filterMemoCode", False)
+    if str(memo_code_d).lower() == "true":
+        param_string = (
+                param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
+        )
+
+    trans_query_string = get_trans_query(ctgry_type, cmte_id, param_string)       
+    #: get the total count
+    trans_query_string_count = get_trans_query_for_total_count(trans_query_string)
+
+    # transactions ordering ASC or DESC
+    if ctgry_type == "loans_tran":
+        trans_query_string = (
+                trans_query_string
+                + """ ORDER BY {} {}, loan_incurred_date  ASC, create_date ASC""".format(
+            sortcolumn, descending
+        )
+        )
+    else:
+        trans_query_string = (
+                trans_query_string
+                + """ ORDER BY {} {}, transaction_date  ASC, create_date ASC""".format(
+            sortcolumn, descending
+        )
+        )
+
+    output_list = []
+    total_amount = 0.0
+    #: set transaction query with offsets.
+    if transaction_id is None:
+        trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
+    #if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
+    #    trans_query_string = "(" + trans_query_string + ") UNION (" + trans_query_string[0:trans_query_string.index(" from ")] + " from ( SELECT W.* FROM (" + trans_query_string + ") V join " + get_trans_view_name(ctgry_type) + " W on V.transaction_id = W.back_ref_transaction_id) Z)"
+
+    with connection.cursor() as cursor:
+        logger.debug('query all transactions with sql:{}'.format(trans_query_string))
+        cursor.execute(
+            """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
+        )
+        print(cursor.query)
+        data_row = cursor.fetchone()
+#            print(data_row)
+        if data_row and data_row[0]:
+            transaction_list = data_row[0]
+            logger.debug(
+                "total transactions loaded:{}".format(len(transaction_list))
+            )
+            status_value = status.HTTP_200_OK
+            # Sorting parents and child transactions
+            if ctgry_type == "loans_tran":
+                for transaction in transaction_list:
+                    c1_list = get_core_sched_c1(
+                        cmte_id, transaction.get("transaction_id")
+                    )
+                    # print(c1_list)
+                    for c1 in c1_list:
+                        c1["schedule"] = "sched_c1"
+                        c1["api_call"] = "/sc/schedC1"
+                    c2_list = get_core_sched_c2(
+                        cmte_id, transaction.get("transaction_id")
+                    )
+                    for c2 in c2_list:
+                        c2["schedule"] = "sched_c2"
+                        c2["api_call"] = "/sc/schedC2"
+                    if c1_list or c2_list:
+                        transaction["child"] = []
+                        transaction["child"].extend(c1_list + c2_list)
+                output_list = transaction_list
+                logger.debug("loans_transactions:")
+            else:
+                if ctgry_type == "disbursements_tran":
+                    for transaction in transaction_list:
+                        if transaction["isRedesignation"] is True:
+                            original_amount = get_original_amount_by_redesignation_id(
+                                transaction["transaction_id"]
+                            )
+                            if original_amount is not None:
+                                transaction["original_amount"] = original_amount[0]
+                transaction_dict = {
+                    trans.get("transaction_id"): trans for trans in transaction_list
+                }
+                for tran_id, transaction in transaction_dict.items():
+                    if transaction.get("memo_code") != "X":
+                        total_amount += transaction.get("transaction_amount", 0.0)
+                    # if transaction.get('transaction_type_identifier') in NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER:
+                    #     transaction['isEditable'] = Falseet
+
+                    if (
+                            transaction.get("back_ref_transaction_id") is not None
+                            and transaction.get("back_ref_transaction_id")
+                            in transaction_dict
+                    ):
+                        if not transaction.get("transaction_type_identifier") in [
+                            "ALLOC_H1",
+                            "ALLOC_H2_RATIO",
+                        ]:
+                            parent = transaction_dict.get(
+                                transaction.get("back_ref_transaction_id")
+                            )
+                            if "child" not in parent:
+                                parent["child"] = []
+                            parent["child"].append(transaction)
+                    else:
+                        output_list.append(transaction)
+        else:
+            status_value = status.HTTP_200_OK
+        #: run the record count query        
+        cursor.execute(
+            """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
+        )
+        row1=cursor.fetchone()[0]
+        totalcount =  row1[0]['count']
+    
+    # logger.debug(output_list)
+#: tweak the query to get the transactions count as per page
+#       set the pagination and page details
+    # total_count = len(output_list)
+    # :tweaked and using the paginator class for now as need more time to research on the page usage in UI, need to revisit !!! 
+    if transaction_id is None:
+        numofpages = get_num_of_pages(totalcount, itemsperpage)
+        paginator = Paginator(output_list, itemsperpage)
+        if paginator.num_pages > 0:
+                forms_obj = paginator.page(1)
+        else:
+            forms_obj = []
+    else:
+        numofpages = 1
+        forms_obj = output_list
+
+    print("total form objects : ", len(list(forms_obj)))     
+    json_result = {
+        "transactions": list(forms_obj),
+        "totalTransactionCount": totalcount,
+        "itemsPerPage": itemsperpage,
+        "pageNumber": page_num,
+        "totalPages": numofpages,
+    }
+    #print("""aaaaaaaaa""")     
+
+    if total_amount:
+        json_result["totalAmount"] = total_amount
+    
+    return json_result, status_value
 
 @api_view(["GET", "POST"])
 def get_all_transactions(request):
     try:
-        # print("request.data: ", request.data)
-        logger.debug("get_all_transactions with {}".format(request.data))
-        cmte_id = get_comittee_id(request.user.username)
-        ctgry_type = request.data.get("category_type")
-        param_string = ""
-        page_num = int(request.data.get("page", 1))
-        descending = request.data.get("descending", "false")
-        if not (
-                "sortColumnName" in request.data
-                and check_null_value(request.data.get("sortColumnName"))
-        ):
-            sortcolumn = "name"
-        elif request.data.get("sortColumnName") == "default":
-            sortcolumn = "name"
-        else:
-            sortcolumn = request.data.get("sortColumnName")
-        itemsperpage = request.data.get("itemsPerPage", 5)
-        search_string = request.data.get("search")
-        params = request.data.get("filters", {})
-        keywords = params.get("keywords")
-        if str(descending).lower() == "true":
-            descending = "DESC"
-        else:
-            descending = "ASC"
+        json_result, status_value = get_transactions(request, None)
 
-        # Search and Key word string Handling
-        keys = [
-            "transaction_type",
-            "transaction_type_desc",
-            "transaction_id",
-            "name",
-            "street_1",
-            "street_2",
-            "city",
-            "state",
-            "zip_code",
-            "purpose_description",
-            "occupation",
-            "employer",
-            "memo_text",
-        ]
-        search_keys = [
-            "transaction_type",
-            "transaction_type_desc",
-            "transaction_id",
-            "name",
-            "street_1",
-            "street_2",
-            "city",
-            "state",
-            "zip_code",
-            "purpose_description",
-            "occupation",
-            "employer",
-            "memo_text",
-        ]
-        if search_string:
-            for key in search_keys:
-                if not param_string:
-                    param_string = (
-                            param_string
-                            + " AND (CAST("
-                            + key
-                            + " as CHAR(100)) ILIKE '%"
-                            + str(search_string)
-                            + "%'"
-                    )
-                else:
-                    param_string = (
-                            param_string
-                            + " OR CAST("
-                            + key
-                            + " as CHAR(100)) ILIKE '%"
-                            + str(search_string)
-                            + "%'"
-                    )
-            param_string = param_string + " )"
-        keywords_string = ""
-        if keywords:
-            for key in keys:
-                for word in keywords:
-                    if '"' in word:
-                        continue
-                    elif "'" in word:
-                        if not keywords_string:
-                            keywords_string = (
-                                    keywords_string
-                                    + " AND ( CAST("
-                                    + key
-                                    + " as CHAR(100)) = "
-                                    + str(word)
-                            )
-                        else:
-                            keywords_string = (
-                                    keywords_string
-                                    + " OR CAST("
-                                    + key
-                                    + " as CHAR(100)) = "
-                                    + str(word)
-                            )
-                    else:
-                        if not keywords_string:
-                            keywords_string = (
-                                    keywords_string
-                                    + " AND ( CAST("
-                                    + key
-                                    + " as CHAR(100)) ILIKE '%"
-                                    + str(word)
-                                    + "%'"
-                            )
-                        else:
-                            keywords_string = (
-                                    keywords_string
-                                    + " OR CAST("
-                                    + key
-                                    + " as CHAR(100)) ILIKE '%"
-                                    + str(word)
-                                    + "%'"
-                            )
-            keywords_string = keywords_string + " )"
-        param_string = param_string + keywords_string
-        param_string = filter_get_all_trans(request, param_string)
+        # Add child transactions
+        transactions = json_result["transactions"].copy()
+        offset = 0
+        for i in range(len(transactions)):
+            j = i + offset
+            offset = 0
 
-        # ADDED the below code to access transactions across reports
-        if "reportid" in request.data and str(request.data.get("reportid")) not in [
-            "",
-            "",
-            "null",
-            "none",
-        ]:
-            # add carryover code here so that carryover can be triggered by get_all_transactions
-            if int(request.data.get("reportid")) != 0:
-                # disable h1 carryover triggered by this API call
-                # do_h1_carryover(cmte_id, request.data.get('reportid'))
-                do_h2_carryover(cmte_id, request.data.get("reportid"))
-                do_loan_carryover(cmte_id, request.data.get("reportid"))
-                do_debt_carryover(cmte_id, request.data.get("reportid"))
-            report_list = superceded_report_id_list(request.data.get("reportid"))
-            if ctgry_type != "other_tran":
-                param_string += " AND report_id in ('{}')".format(
-                    "', '".join(report_list)
-                )
-            else:
-                if cmte_type(cmte_id) == "PTY":
-                    logger.debug("pty cmte all_other transactions")
-                    param_string = (
-                            param_string
-                            + """AND ((transaction_table != 'sched_h2' AND report_id = '{0}')
-                                                    OR 
-                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
-                                                    OR
-                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
-                                                    SELECT h4.activity_event_identifier FROM public.sched_h4 h4
-                                                    WHERE  h4.report_id = '{0}'
-                                                    AND h4.cmte_id = '{1}'
-                                                    UNION
-                                                    SELECT h3.activity_event_name
-                                                    FROM   public.sched_h3 h3
-                                                    WHERE  h3.report_id = '{0}'
-                                                    AND h3.cmte_id = '{1}')))""".format(
-                        request.data.get("reportid"), cmte_id
-                    )
-                    )
-                else:
-                    # for PAC, h1 and h2 will show up only when there are transactions tied to it
-                    logger.debug("pac cmte all_other transactions")
-                    param_string = (
-                            param_string
-                            + """AND (((transaction_table = 'sched_h3' or transaction_table = 'sched_h4') AND report_id = '{0}')
-                                                    OR
-                                                    (transaction_table = 'sched_h1' AND report_id = '{0}' AND back_ref_transaction_id is null)
-                                                    OR
-                                                    (transaction_table = 'sched_h1' AND report_id = '{0}' AND transaction_id IN (
-                                                    with h1_set as (select  (
-                                                    case when administrative is true then 'AD'
-                                                    when public_communications is true then 'PC'
-                                                    when generic_voter_drive is true then 'GV'
-                                                    end) as event_type, transaction_id, cmte_id, report_id
-                                                    from sched_h1 where delete_ind is distinct from 'Y' and report_id = '{0}')
-                                                    select distinct t.transaction_id from h1_set t
-                                                    join sched_h4 h4 on t.event_type = h4.activity_event_type and h4.report_id = t.report_id
-                                                    where h4.delete_ind is distinct from 'Y'
-                                                    union
-                                                    select distinct t.transaction_id from h1_set t
-                                                    join sched_h3 h3 on t.event_type = h3.activity_event_type and h3.report_id = t.report_id
-                                                    where h3.delete_ind is distinct from 'Y'
-                                                    ))
-                                                    OR 
-                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND ratio_code = 'n')
-                                                    OR
-                                                    (transaction_table = 'sched_h2' AND report_id = '{0}' AND name IN (
-                                                    SELECT h4.activity_event_identifier FROM public.sched_h4 h4
-                                                    WHERE  h4.report_id = '{0}'
-                                                    AND h4.cmte_id = '{1}'
-                                                    AND h4.delete_ind is distinct from 'Y'
-                                                    UNION
-                                                    SELECT h3.activity_event_name
-                                                    FROM   public.sched_h3 h3
-                                                    WHERE  h3.report_id = '{0}'
-                                                    AND h3.delete_ind is distinct from 'Y'
-                                                    AND h3.cmte_id = '{1}')))""".format(
-                        request.data.get("reportid"), cmte_id
-                    )
-                    )
+            transaction = transactions[i]
+            if transaction["haschild"]:
+                transaction_id = transaction["transaction_id"]
+                c_json_result, c_status_value = get_transactions(request, transaction_id)
+                c_transactions = c_json_result["transactions"]
+                if len(c_transactions) > 0:
+                    del json_result["transactions"][j]
+                    json_result["transactions"][j:j] = c_transactions
+                    offset = len(c_transactions) - 1
 
-        # To determine if we are searching for regular or trashed transactions
-        if (
-                "trashed_flag" in request.data
-                and str(request.data.get("trashed_flag")).lower() == "true"
-        ):
-            param_string += " AND delete_ind = 'Y'"
-        else:
-            param_string += " AND delete_ind is distinct from 'Y'"
-        
-        # if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
-        #     param_string += " AND back_ref_transaction_id IS NULL"
-
-        filters_post = request.data.get("filters", {})
-        memo_code_d = filters_post.get("filterMemoCode", False)
-        if str(memo_code_d).lower() == "true":
-            param_string = (
-                    param_string + " AND memo_code IS NOT NULL AND memo_code != ''"
-            )
-
-        trans_query_string = get_trans_query(ctgry_type, cmte_id, param_string)
-        #: get the total count
-        trans_query_string_count = get_trans_query_for_total_count(trans_query_string)
-
-        # transactions ordering ASC or DESC
-        if ctgry_type == "loans_tran":
-            trans_query_string = (
-                    trans_query_string
-                    + """ ORDER BY {} {}, loan_incurred_date  ASC, create_date ASC""".format(
-                sortcolumn, descending
-            )
-            )
-        else:
-            trans_query_string = (
-                    trans_query_string
-                    + """ ORDER BY {} {}, transaction_date  ASC, create_date ASC""".format(
-                sortcolumn, descending
-            )
-            )
-
-        output_list = []
-        total_amount = 0.0
-        #: set transaction query with offsets.
-        trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
-        if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
-            trans_query_string = "(" + trans_query_string + ") UNION (" + trans_query_string[0:trans_query_string.index(" from ")] + " from ( SELECT W.* FROM (" + trans_query_string + ") V join " + get_trans_view_name(ctgry_type) + " W on V.transaction_id = W.back_ref_transaction_id) Z)"
-
-        with connection.cursor() as cursor:
-            logger.debug('query all transactions with sql:{}'.format(trans_query_string))
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
-            )
-            print(cursor.query)
-            data_row = cursor.fetchone()
-#            print(data_row)
-            if data_row and data_row[0]:
-                transaction_list = data_row[0]
-                logger.debug(
-                    "total transactions loaded:{}".format(len(transaction_list))
-                )
-                status_value = status.HTTP_200_OK
-                # Sorting parents and child transactions
-                if ctgry_type == "loans_tran":
-                    for transaction in transaction_list:
-                        c1_list = get_core_sched_c1(
-                            cmte_id, transaction.get("transaction_id")
-                        )
-                        # print(c1_list)
-                        for c1 in c1_list:
-                            c1["schedule"] = "sched_c1"
-                            c1["api_call"] = "/sc/schedC1"
-                        c2_list = get_core_sched_c2(
-                            cmte_id, transaction.get("transaction_id")
-                        )
-                        for c2 in c2_list:
-                            c2["schedule"] = "sched_c2"
-                            c2["api_call"] = "/sc/schedC2"
-                        if c1_list or c2_list:
-                            transaction["child"] = []
-                            transaction["child"].extend(c1_list + c2_list)
-                    output_list = transaction_list
-                    logger.debug("loans_transactions:")
-                else:
-                    if ctgry_type == "disbursements_tran":
-                        for transaction in transaction_list:
-                            if transaction["isRedesignation"] is True:
-                                original_amount = get_original_amount_by_redesignation_id(
-                                    transaction["transaction_id"]
-                                )
-                                if original_amount is not None:
-                                    transaction["original_amount"] = original_amount[0]
-                    transaction_dict = {
-                        trans.get("transaction_id"): trans for trans in transaction_list
-                    }
-                    for tran_id, transaction in transaction_dict.items():
-                        if transaction.get("memo_code") != "X":
-                            total_amount += transaction.get("transaction_amount", 0.0)
-                        # if transaction.get('transaction_type_identifier') in NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER:
-                        #     transaction['isEditable'] = Falseet
-
-                        if (
-                                transaction.get("back_ref_transaction_id") is not None
-                                and transaction.get("back_ref_transaction_id")
-                                in transaction_dict
-                        ):
-                            if not transaction.get("transaction_type_identifier") in [
-                                "ALLOC_H1",
-                                "ALLOC_H2_RATIO",
-                            ]:
-                                parent = transaction_dict.get(
-                                    transaction.get("back_ref_transaction_id")
-                                )
-                                if "child" not in parent:
-                                    parent["child"] = []
-                                parent["child"].append(transaction)
-                        else:
-                            output_list.append(transaction)
-            else:
-                status_value = status.HTTP_200_OK
-            #: run the record count query        
-            cursor.execute(
-                """SELECT json_agg(t) FROM (""" + trans_query_string_count + """) t"""
-            )
-            row1=cursor.fetchone()[0]
-            totalcount =  row1[0]['count']
-        
-        # logger.debug(output_list)
-#: tweak the query to get the transactions count as per page
-#       set the pagination and page details
-        # total_count = len(output_list)
-        # :tweaked and using the paginator class for now as need more time to research on the page usage in UI, need to revisit !!! 
-        numofpages = get_num_of_pages(totalcount, itemsperpage)
-        paginator = Paginator(output_list, itemsperpage)
-        if paginator.num_pages > 0:
-             forms_obj = paginator.page(1)
-        else:
-            forms_obj = []
-        print("total form objects : ", len(list(forms_obj)))     
-        json_result = {
-            "transactions": list(forms_obj),
-            "totalTransactionCount": totalcount,
-            "itemsPerPage": itemsperpage,
-            "pageNumber": page_num,
-            "totalPages": numofpages,
-        }
-        #print("""aaaaaaaaa""")
-        if total_amount:
-            json_result["totalAmount"] = total_amount
         return Response(json_result, status=status_value)
     except Exception as e:
         print(e)
@@ -4236,7 +4273,6 @@ def get_all_transactions(request):
             "The get_all_transactions API is throwing an error: " + str(e),
             status=status.HTTP_400_BAD_REQUEST,
         )
-
 
 """
 *****************************************************************************************************************************
@@ -10836,5 +10872,39 @@ def get_child_max_transaction_amount(request):
     except Exception as e:
         return Response(
           "The get_child_max_transaction_amount API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['POST', 'PUT'])
+def save_additional_email(request):
+    try:
+        error_list = []
+        output_dict = {}
+        for field in ['reportId', 'formType']:
+            if field not in request.data:
+                error_list.append[field]
+            else:
+                output_dict[field] = request.data[field]
+        if error_list:
+            raise Exception("""The following parameter are mandatory: {}""".format(", ".join(error_list)))
+        output_dict['additionalEmail1'] = request.data.get('additionalEmail1') if request.data.get('additionalEmail1') else None
+        output_dict['additionalEmail2'] = request.data.get('additionalEmail2') if request.data.get('additionalEmail2') else None
+
+        if request.data['formType'] == 'F99':
+            _sql = """UPDATE public.forms_committeeinfo SET additional_email_1 = %s, additional_email_2 = %s
+                      WHERE id = %s AND form_type = %s"""
+        else:
+            _sql = """UPDATE public.reports SET additional_email_1 = %s, additional_email_2 = %s
+                      WHERE report_id = %s AND form_type = %s"""
+        _value_list = [output_dict['additionalEmail1'], output_dict['additionalEmail2'], request.data['reportId'], request.data['formType']]
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _value_list)
+            if not cursor.rowcount:
+                raise Exception("""The report_id: {}, form_type: {} does not match the records""".format(
+                      request.data['reportId'], request.data['formType']))
+        return Response(output_dict, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The save_additional_email API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )

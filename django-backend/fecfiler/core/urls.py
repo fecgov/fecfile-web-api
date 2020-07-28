@@ -89,6 +89,11 @@ urlpatterns = [
         jsonsqlgenerate.sample_sql_generate,
         name="sample_sql_generate",
     ),
+    url(
+        r"^core/print_query$",
+        jsonsqlgenerate.print_query,
+        name="print_query",
+    ),
     url(r"^core/print_preview_pdf$", views.print_preview_pdf, name="print_preview_pdf"),
     url(r"^core/reports$", views.reports, name="reports"),
     url(r"^core/submit_report$", views.submit_report, name="submit_report"),
@@ -206,5 +211,10 @@ urlpatterns = [
         r"^core/get_child_max_transaction_amount$",
         views.get_child_max_transaction_amount,
         name="get_child_max_transaction_amount",
+    ),
+    url(
+        r"^core/report/additionalEmails$",
+        views.save_additional_email,
+        name="save_additional_email",
     ),
 ]

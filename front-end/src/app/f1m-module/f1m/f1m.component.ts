@@ -47,6 +47,7 @@ export class F1mComponent implements OnInit, OnDestroy {
     type:'qualification',
     candidates: []
   };
+  committeeType: any;
 
   constructor(
     private _cd: ChangeDetectorRef,
@@ -167,6 +168,9 @@ export class F1mComponent implements OnInit, OnDestroy {
       if ($event.type) {
         this.type = $event.type;
       }
+      if($event.committeeType){
+        this.committeeType = $event.committeeType;
+      }
     }
     this.refreshScreen();
   }
@@ -274,6 +278,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   private saveAffiliationData() {
     if (this.affiliationComp.form.valid) {
       this.step2data = this.affiliationComp.form.value;
+      this.step2data.committeeType = this.committeeType;
       let tempScheduleAction : ScheduleActions = this.scheduleAction;
       if (this.reportId) {
         this.step2data.reportId = this.reportId;
@@ -296,6 +301,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   private saveDates() {
     if(this.qualificationComp.formPart2.valid){
       this.step2data = this.qualificationComp.formPart2.getRawValue(); //.getRawValue() is used instead of .value to include disabled fields too
+      this.step2data.committeeType = this.committeeType;
       this.step2data.reportId = this.reportId;
       this._f1mService.saveForm(this.step2data, this.scheduleAction, 'saveDates').subscribe(res => {
         this.reportId = res.reportId;
@@ -314,6 +320,7 @@ export class F1mComponent implements OnInit, OnDestroy {
     if (this.qualificationData.candidates.length < 5 || (action && action.action === 'update')) {
       if(this.qualificationComp.form.valid){
         this.step2data = this.qualificationComp.form.value;
+        this.step2data.committeeType = this.committeeType;
         if (this.reportId) {
           this.step2data.reportId = this.reportId;
         }

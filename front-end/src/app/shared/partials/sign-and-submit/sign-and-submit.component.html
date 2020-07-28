@@ -95,154 +95,161 @@
                 </div>
               </div>
         </div>
-        <div class="grid-row py-3">
+        <div [ngClass]="formType === '1M' ? '' : 'bottom-separator'">
+          <div class="grid-row py-3">
             <h3>
               Notification Emails
             </h3>
           </div>
-        <div>If you would like to add two additional emails to be notified of this transaction, you can add them here.</div>
-        <div class="indented">
-          <div class="grid-row  pt-3" style="width:93%">
-            <div class="col col-md-3">
-              <label for="additionalEmail1">Additional Email 1
-                <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="input-group transactions__filter-multi-input">
-                <input type="text" name="additionalEmail1" [formControlName]="'additionalEmail1'" class="form-control"
-                  id="additionalEmail1" aria-label="additional Email 1" aria-describedby="additionalEmail1" 
-                  [ngClass]=" form.get('additionalEmail1')?.invalid &&
-                            (form.touched || form.dirty)
-                              ? 'input-field-error'
-                              : ''" >
-              </div>
-              <div class="text-error text-left"
-                *ngIf="form.controls?.additionalEmail1?.errors && form.controls?.additionalEmail1?.errors['email']">
-                Must be a valid email address
-              </div>
-              <div class="text-error text-left"
-                *ngIf="form.controls?.confirmAdditionalEmail1?.errors && form.controls?.confirmAdditionalEmail1?.errors['mustMatch']">
-                Emails in both fields must match
-              </div>
-            </div>
-            <div class="col col-md-3">
-              <label for="confirmAdditionalEmail1">Confirm Additional Email 1
-                <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="input-group transactions__filter-multi-input">
-                <input type="text" name="confirmAdditionalEmail1" [formControlName]="'confirmAdditionalEmail1'"
-                  class="form-control" id="confirmAdditionalEmail1" aria-label="confirm AdditionalEmail 1"
-                  aria-describedby="confirmAdditionalEmail1" [ngClass]=" form.get('confirmAdditionalEmail1')?.invalid &&
-                            (form.touched || form.dirty)
-                              ? 'input-field-error'
-                              : ''">
-              </div>
-              <div class="text-error text-left"
-                *ngIf="form.controls?.confirmAdditionalEmail1?.errors && form.controls?.confirmAdditionalEmail1?.errors['email']">
-                Must be a valid email address
-              </div>
-              <div class="text-error text-left"
-                *ngIf="form.controls?.confirmAdditionalEmail1?.errors && form.controls?.confirmAdditionalEmail1?.errors['mustMatch']">
-                Emails in both fields must match
-              </div>
-            </div>
-          </div>
-          <div class="grid-row py-3" style="width:93%">
-            <div class="col col-md-3">
-              <label for="additionalEmail2">Additional Email 2
-                <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="input-group transactions__filter-multi-input">
-                <input type="text" name="additionalEmail2" [formControlName]="'additionalEmail2'" class="form-control"
-                  id="additionalEmail2" aria-label="additional Email 2" aria-describedby="additionalEmail2"
-                  [ngClass]=" form.get('additionalEmail2')?.invalid &&
-                            (form.touched || form.dirty)
-                              ? 'input-field-error'
-                              : ''">
-              </div>
-              <div class="text-error text-left"
-                *ngIf="form.controls?.additionalEmail2?.errors && form.controls?.additionalEmail2?.errors['email']">
-                Must be a valid email address
-              </div>
-              <div class="text-error text-left"
-                *ngIf="form.controls?.confirmAdditionalEmail2?.errors && form.controls?.confirmAdditionalEmail2?.errors['mustMatch']">
-                Emails in both fields must match
-              </div>
-            </div>
-            <div class="col col-md-3">
-              <label for="confirmAdditionalEmail2">Confirm Additional Email 2
-                <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
-                  <i class="info-icon" aria-hidden="true"></i>
-                  <span class="sr-only">Click here for more information</span>
-                </button>
-              </label>
-              <div class="input-group transactions__filter-multi-input">
-                <input type="text" name="confirmAdditionalEmail2" [formControlName]="'confirmAdditionalEmail2'"
-                  class="form-control" id="confirmAdditionalEmail2" aria-label="confirm AdditionalEmail 2"
-                  aria-describedby="confirmAdditionalEmail2" [ngClass]=" form.get('confirmAdditionalEmail2')?.invalid &&
-                            (form.touched || form.dirty)
-                              ? 'input-field-error'
-                              : ''">
-              </div>
-              <div class="text-error text-left"
-                *ngIf="form.controls?.confirmAdditionalEmail2?.errors && form.controls?.confirmAdditionalEmail2?.errors['email']">
-                Must be a valid email address
-              </div>
-              <div class="text-error text-left"
-                *ngIf="form.controls?.confirmAdditionalEmail2?.errors && form.controls?.confirmAdditionalEmail2?.errors['mustMatch']">
-                Emails in both fields must match
-              </div>
-            </div>
-            <div class="col col-md-1 saveBtnContainer">
-                <button type="button" class="btn btn-primary" (click)="updateInfo()" [disabled] = "!isSaveBtnDisabled()">Save</button>
-            </div>
-            <!-- <div class="grid-row pr-3 mt-3" *ngIf="saveSuccessful"> -->
-            <div class="col col-md-3 pt-4" *ngIf="saveSuccessful">
-                <div class="alert alert-success">
-                    <strong>Your request was successfully saved</strong>
+          <div>If you would like to add two additional emails to be notified of this transaction, you can add them here.</div>
+          <div class="indented">
+            <div class="grid-row  pt-3" style="width:93%">
+              <div class="col col-md-3 pl-0">
+                <label for="additionalEmail1">Additional Email 1
+                  <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="input-group transactions__filter-multi-input">
+                  <input type="text" name="additionalEmail1" formControlName="additionalEmail1" class="form-control"
+                    id="additionalEmail1" aria-label="additional Email 1" aria-describedby="additionalEmail1" 
+                    [ngClass]=" form?.get('additionalEmail1')?.invalid &&
+                              (form?.touched || form?.dirty)
+                                ? 'input-field-error'
+                                : ''" >
                 </div>
+                <div class="text-error text-left"
+                  *ngIf="form?.controls?.additionalEmail1?.errors && form?.controls?.additionalEmail1?.errors['email']">
+                  Must be a valid email address
+                </div>
+                <div class="text-error text-left"
+                  *ngIf="form?.controls?.confirmAdditionalEmail1?.errors && form?.controls?.confirmAdditionalEmail1?.errors['mustMatch']">
+                  Emails in both fields must match
+                </div>
+              </div>
+              <div class="col col-md-3">
+                <label for="confirmAdditionalEmail1">Confirm Additional Email 1
+                  <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="input-group transactions__filter-multi-input">
+                  <input type="text" name="confirmAdditionalEmail1" formControlName="confirmAdditionalEmail1"
+                    class="form-control" id="confirmAdditionalEmail1" aria-label="confirm AdditionalEmail 1"
+                    aria-describedby="confirmAdditionalEmail1" [ngClass]=" form?.get('confirmAdditionalEmail1')?.invalid &&
+                              (form?.touched || form?.dirty)
+                                ? 'input-field-error'
+                                : ''">
+                </div>
+                <div class="text-error text-left"
+                  *ngIf="form?.controls?.confirmAdditionalEmail1?.errors && form?.controls?.confirmAdditionalEmail1?.errors['email']">
+                  Must be a valid email address
+                </div>
+                <div class="text-error text-left"
+                  *ngIf="form?.controls?.confirmAdditionalEmail1?.errors && form?.controls?.confirmAdditionalEmail1?.errors['mustMatch']">
+                  Emails in both fields must match
+                </div>
+              </div>
             </div>
-          </div>
-          <div *ngIf="additionalEmailsArray?.length > 0">
-            <div class="grid-row py-3">
-              <h3>Added Notification Emails</h3>
-            </div>
-            <div class="grid-row pt-2">
-                <!-- <div class="emailBox border border-dark">
-                  <div *ngFor="let emailOnFile of additionalEmailsArray" class="pb-2">
-                      <span for="filingPassword">{{emailOnFile}}
-                          <button type="button" class="btn text-right" >
-                            <i class="trash-icon" aria-hidden="true"></i>
-                            <span class="sr-only">Click here to remove email</span>
-                          </button>
-                      </span>
+            <div class="grid-row py-3" style="width:93%">
+              <div class="col col-md-3 pl-0">
+                <label for="additionalEmail2">Additional Email 2
+                  <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="input-group transactions__filter-multi-input">
+                  <input type="text" name="additionalEmail2" formControlName="additionalEmail2" class="form-control"
+                    id="additionalEmail2" aria-label="additional Email 2" aria-describedby="additionalEmail2"
+                    [ngClass]=" form?.get('additionalEmail2')?.invalid &&
+                              (form?.touched || form?.dirty)
+                                ? 'input-field-error'
+                                : ''">
+                </div>
+                <div class="text-error text-left"
+                  *ngIf="form?.controls?.additionalEmail2?.errors && form?.controls?.additionalEmail2?.errors['email']">
+                  Must be a valid email address
+                </div>
+                <div class="text-error text-left"
+                  *ngIf="form?.controls?.confirmAdditionalEmail2?.errors && form?.controls?.confirmAdditionalEmail2?.errors['mustMatch']">
+                  Emails in both fields must match
+                </div>
+              </div>
+              <div class="col col-md-3">
+                <label for="confirmAdditionalEmail2">Confirm Additional Email 2
+                  <button type="button" class="btn btn-info" tooltipClass="form-tooltip">
+                    <i class="info-icon" aria-hidden="true"></i>
+                    <span class="sr-only">Click here for more information</span>
+                  </button>
+                </label>
+                <div class="input-group transactions__filter-multi-input">
+                  <input type="text" name="confirmAdditionalEmail2" formControlName="confirmAdditionalEmail2"
+                    class="form-control" id="confirmAdditionalEmail2" aria-label="confirm AdditionalEmail 2"
+                    aria-describedby="confirmAdditionalEmail2" [ngClass]=" form?.get('confirmAdditionalEmail2')?.invalid &&
+                              (form?.touched || form?.dirty)
+                                ? 'input-field-error'
+                                : ''">
+                </div>
+                <div class="text-error text-left"
+                  *ngIf="form?.controls?.confirmAdditionalEmail2?.errors && form?.controls?.confirmAdditionalEmail2?.errors['email']">
+                  Must be a valid email address
+                </div>
+                <div class="text-error text-left"
+                  *ngIf="form?.controls?.confirmAdditionalEmail2?.errors && form?.controls?.confirmAdditionalEmail2?.errors['mustMatch']">
+                  Emails in both fields must match
+                </div>
+              </div>
+              <div class="col col-md-1 saveBtnContainer">
+                  <button type="button" class="btn btn-primary" (click)="updateInfo()" [disabled] = "!isSaveBtnDisabled()">Save</button>
+              </div>
+              <!-- <div class="grid-row pr-3 mt-3" *ngIf="saveSuccessful"> -->
+              <div class="col col-md-3 pt-4" *ngIf="saveSuccessful">
+                  <div class="alert alert-success">
+                      <strong>Your request was successfully saved</strong>
                   </div>
-                </div> -->
-                <div >
-                  <table class="table borderedTable">
-                    <tr *ngFor="let emailOnFile of additionalEmailsArray">
-                      <td style="width:550px;">{{emailOnFile}}</td>
-                      <td>
-                        <button type="button" class="btn text-right" (click)="removeEmail(emailOnFile)">
-                            <i class="trash-icon" aria-hidden="true"></i>
-                            <span class="sr-only">Click here to remove email</span>
-                        </button>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
+              </div>
+            </div>
+            <div *ngIf="additionalEmailsArray?.length > 0">
+              <div class="grid-row py-3">
+                <h3>Added Notification Emails</h3>
+              </div>
+              <div class="grid-row pt-2">
+                  <!-- <div class="emailBox border border-dark">
+                    <div *ngFor="let emailOnFile of additionalEmailsArray" class="pb-2">
+                        <span for="filingPassword">{{emailOnFile}}
+                            <button type="button" class="btn text-right" >
+                              <i class="trash-icon" aria-hidden="true"></i>
+                              <span class="sr-only">Click here to remove email</span>
+                            </button>
+                        </span>
+                    </div>
+                  </div> -->
+                  <div >
+                    <table class="table borderedTable">
+                      <tr *ngFor="let emailOnFile of additionalEmailsArray">
+                        <td style="width:550px;">{{emailOnFile}}</td>
+                        <td>
+                          <button type="button" class="btn text-right" (click)="removeEmail(emailOnFile)">
+                              <i class="trash-icon" aria-hidden="true"></i>
+                              <span class="sr-only">Click here to remove email</span>
+                          </button>
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="showFooter" class="row justify-content-between">
+            <div class="f1mFooter">
+              <button id="previous" class="btn btn-previous btn-left" (click)="previous()">Previous</button>
+              <button id="submit" class="btn btn-primary btn-right" (click)="openModal()">Submit</button>
             </div>
           </div>
         </div>
-      
       </form>
     </div> <!-- ./content -->
   </section>
@@ -285,7 +292,7 @@
                     name="agreement"
                     [(ngModel)]="checked" />
                   </div>
-                  <div class="col">
+                  <div class="col" style="margin-right: 35px;">
                       I, {{submitterInfo.first_name}} {{submitterInfo.last_name}} - {{submitterInfo.email}} - {{submitterInfo.phone}},  am filing this report on behalf of
                       {{formMetaData.treasurerfirstname}} {{formMetaData.treasurerlastname}} - {{formMetaData.treasurerphone | phone:'US'}} - {{formMetaData.treasureremail}}, 
                       and certify that I have examined this statement and to the best of my knowledge and 

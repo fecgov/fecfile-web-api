@@ -190,7 +190,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   ];
 
   //this array can be used to override the logic where some transactions will always have the purpose description required regardless of expenditure amount
-  private disbursementTransactionsWithPurposeAlwaysRequired = ["FEA_CC_PAY_MEMO", "OTH_DISB"];
+  private disbursementTransactionsWithPurposeAlwaysRequired = ["FEA_CC_PAY_MEMO", "OTH_DISB","OTH_DISB_PMT_TO_PROL_MEMO","ALLOC_EXP_PMT_TO_PROL_MEMO",
+  "IE_PMT_TO_PROL_MEMO","OPEXP_PMT_TO_PROL_MEMO","FEA_PAY_TO_PROL_MEMO"];
   
   private staticEntityTypes =  [{entityType: "IND", entityTypeDescription: "Individual", group: "ind-group", selected: false}, {entityType: "ORG", entityTypeDescription: "Organization", group: "org-group", selected: false}];
   
@@ -2186,7 +2187,11 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         } else if (field === 'election_code' && this.frmIndividualReceipt 
                     && this.frmIndividualReceipt.get(field) && this.frmIndividualReceipt.get(field).value) {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value[0];
-        } else {
+        } else if (field === 'election_year' && this.frmIndividualReceipt && this.frmIndividualReceipt.get(field) 
+                    && this.frmIndividualReceipt.get(field).value){
+              receiptObj[field] = this.frmIndividualReceipt.get(field).value.toString();        
+        }
+        else {
           receiptObj[field] = this.frmIndividualReceipt.get(field).value;
         }
 

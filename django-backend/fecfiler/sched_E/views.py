@@ -25,7 +25,7 @@ from fecfiler.core.views import (
     post_entities,
     put_entities,
     remove_entities,
-
+    function_to_call_wrapper_update_F3X,
     undo_delete_entities,
     get_comittee_id,
     update_F3X
@@ -305,6 +305,7 @@ def put_schedE(data):
         if form_type == 'F24' and data.get('mirror_report_id'):
             logger.debug('I am here')
             update_aggregate_amt_se(se_data)
+            function_to_call_wrapper_update_F3X(data.get("cmte_id"), se_data['report_id'])
             if str(get_data['mirror_report_id']) != data['mirror_report_id']:
                 logger.debug(get_data['mirror_report_id'])
                 logger.debug(data['mirror_report_id'])
@@ -547,7 +548,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
             AND e.election_code = %s
             AND e.delete_ind is distinct FROM 'Y'
-            AND e.memo_code is null 
+            AND e.transaction_type_identifier in ('IE_MULTI', 'IE_STAF_REIM', 'IE_PMT_TO_PROL', 'IE_VOID', 'IE_CC_PAY', 'IE')
             AND r.form_type = %s
             ORDER BY transaction_dt ASC, e.create_date ASC;
         """
@@ -568,7 +569,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             AND e.election_code = %s
             AND e.so_cand_state = %s
             AND e.delete_ind is distinct FROM 'Y' 
-            AND e.memo_code is null
+            AND e.transaction_type_identifier in ('IE_MULTI', 'IE_STAF_REIM', 'IE_PMT_TO_PROL', 'IE_VOID', 'IE_CC_PAY', 'IE')
             AND r.form_type = %s
             ORDER BY transaction_dt ASC, e.create_date ASC; 
         """
@@ -597,7 +598,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             AND e.so_cand_state = %s
             AND e.so_cand_district = %s
             AND e.delete_ind is distinct FROM 'Y' 
-            AND e.memo_code is null
+            AND e.transaction_type_identifier in ('IE_MULTI', 'IE_STAF_REIM', 'IE_PMT_TO_PROL', 'IE_VOID', 'IE_CC_PAY', 'IE')
             AND r.form_type = %s
             ORDER BY transaction_dt ASC, e.create_date ASC;  
         """
@@ -871,6 +872,7 @@ def post_schedE(data):
         update_aggregate_amt_se(data)
         if form_type == 'F24' and data.get('mirror_report_id'):
             update_aggregate_amt_se(se_data)
+            function_to_call_wrapper_update_F3X(data.get("cmte_id"), se_data['report_id'])
         return data
     except:
         raise

@@ -10,6 +10,7 @@ import { ManagedUpload, SelectObjectContentEventStream } from 'aws-sdk/clients/s
 import { StreamingEventStream } from 'aws-sdk/lib/event-stream/event-stream';
 import { ERROR_COMPONENT_TYPE } from '@angular/compiler';
 import { map } from 'rxjs/operators';
+import { CookieService } from 'ngx-cookie-service';
 
 
 /**
@@ -24,7 +25,9 @@ export class UploadContactsService {
    * Constructor will obtain credentials for AWS S3 Bucket.
    * @param _http
    */
-  constructor(private _http: HttpClient) {
+  constructor(
+    private _http: HttpClient,
+    private _cookieService: CookieService) {
 
     AWS.config.region = environment.awsRegion;
     AWS.config.credentials = new AWS.CognitoIdentityCredentials({
@@ -63,6 +66,7 @@ export class UploadContactsService {
     // Bind the function to the 'this' for this component as it will
     // be called from a callback function where its 'this' is not the component this.
     const _setPercentage = this._setPercentage.bind(this);
+    // const _uploadComplete = this.uploadComplete.bind(this);
     // const listObjects = this.listObjects.bind(this);
     // const getObject = this.getObject.bind(this);
     // const _readFileHeader = this._readFileHeader.bind(this);
@@ -71,7 +75,7 @@ export class UploadContactsService {
       this.bucket.upload(params).on('httpUploadProgress', function (evt: S3.ManagedUpload.Progress) {
         // console.log(evt.loaded + ' of ' + evt.total + ' Bytes');
         const progressPercent = Math.trunc((evt.loaded / evt.total) * 100);
-        // console.log('progressPercent = ' + progressPercent);
+        console.log('progressPercent = ' + progressPercent);
         // this.progressPercentSubject.next(this.progressPercent);
         _setPercentage(progressPercent);
       }).send(function (err: AWSError, data: ManagedUpload.SendData) {
@@ -91,11 +95,58 @@ export class UploadContactsService {
         observer.next(data);
         observer.complete();
 
+        // _uploadComplete(file.name).subscribe((res: any) => {
+        //   console.log();
+        // });
+
         // getObject(file);
         // listObjects();
 
       });
     });
+  }
+
+  /**
+   * Inform the backend the upload is complete.
+   */
+  public uploadComplete(fileName: string): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/contact/upload';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    const request: any = {};
+    request.fileName = fileName;
+
+    if (fileName === 'test_errors.csv') {
+      return this._http
+        .get('assets/mock-data/import-contacts/upload_response.json', {
+          headers: httpOptions
+        })
+        .pipe(
+          map(res => {
+            if (res) {
+              return res;
+            }
+            return false;
+          })
+        );
+    } else {
+      return this._http
+        .post(`${environment.apiUrl}${url}`, request, {
+          headers: httpOptions
+        })
+        .pipe(
+          map(res => {
+            if (res) {
+              return res;
+            }
+            return false;
+          })
+        );
+    }
   }
 
   /**

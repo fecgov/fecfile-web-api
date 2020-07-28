@@ -1,3 +1,4 @@
+import { ScheduleActions } from './../individual-receipt/schedule-actions.enum';
 import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, identity } from 'rxjs';
@@ -13,6 +14,7 @@ import {TransactionModel} from '../../transactions/model/transaction.model';
   providedIn: 'root'
 })
 export class ReportTypeService {
+
   constructor(private _http: HttpClient, private _cookieService: CookieService) {
     this._datePipe = new DatePipe('en-US');
   }
@@ -220,6 +222,46 @@ export class ReportTypeService {
             return false;
           })
         );
+    }
+  }
+
+  saveAdditionalEmails(saveObj: any, scheduleAction: ScheduleActions) : Observable<any>{
+    let token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let url = '/core/report/additionalEmails';
+
+    let params = new HttpParams();
+    let formData: FormData = new FormData();
+    
+    formData.append('reportId', saveObj.reportId);
+    formData.append('formType', `F${saveObj.formType}`);
+    formData.append('additionalEmail1', saveObj.additionalEmail1);
+    formData.append('additionalEmail2', saveObj.additionalEmail2);
+
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+
+    if (scheduleAction === ScheduleActions.add) {
+      return this._http
+        .post(`${environment.apiUrl}${url}`, formData, {
+          headers: httpOptions
+        }).pipe(map(data=>{
+          this.updateLocalStorageWithEmails(data, saveObj.formType);
+        }))
+    } else if (scheduleAction === ScheduleActions.edit) {
+      return this._http
+        .put(`${environment.apiUrl}${url}`, formData, {
+          headers: httpOptions
+        })
+    }
+  }
+
+  updateLocalStorageWithEmails(data: any, formType: string) {
+    if(localStorage.getItem(`form_${formType}_report_type`)){
+      let reportTypeObj = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+      reportTypeObj.additionalemail1 = data.additionalEmail1;
+      reportTypeObj.additionalemail2 = data.additionalEmail2;
+      localStorage.setItem(`form_${formType}_report_type`, JSON.stringify(reportTypeObj));
     }
   }
 

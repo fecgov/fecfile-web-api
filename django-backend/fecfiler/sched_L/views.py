@@ -29,7 +29,9 @@ from fecfiler.core.views import (
     post_entities,
     put_entities,
     remove_entities,
-    undo_delete_entities, get_comittee_id,
+    undo_delete_entities, 
+    get_comittee_id,
+    get_report_ids,
 )
 
 from fecfiler.core.transaction_util import (
@@ -1151,9 +1153,10 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
                     SELECT COALESCE(coh_cop, 0) 
                     FROM public.sched_l 
                     WHERE cmte_id = %s 
-                    AND cvg_end_date = %s 
+                    AND cvg_end_date <= %s 
                     AND record_id = %s::varchar(9)
                     AND delete_ind is distinct from 'Y'
+                    ORDER BY cvg_end_date DESC
                     """,
                     [cmte_id, prev_cvg_end_dt, levin_account_id],
                 )
@@ -1161,11 +1164,12 @@ def get_cash_on_hand_cop(report_id, cmte_id, prev_yr, levin_account_id=None):
             else:
                 cursor.execute(
                     """
-                    SELECT SUM(COALESCE(coh_cop, 0))
+                    SELECT COALESCE(coh_cop, 0)
                     FROM public.sched_l 
                     WHERE cmte_id = %s 
-                    AND cvg_end_date = %s 
+                    AND cvg_end_date <= %s 
                     AND delete_ind is distinct from 'Y'
+                    ORDER BY cvg_end_date DESC, record_id ASC
                     """,
                     [cmte_id, prev_cvg_end_dt],
                 )
@@ -1587,14 +1591,14 @@ def get_sl_summary_table(request):
             raise Exception("Missing Input: calendar_year is mandatory")
 
         report_id = check_report_id(request.query_params.get("report_id"))
-        calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
+        # calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
 
         # period_args = [
-        cal_start = (datetime.date(int(calendar_year), 1, 1),)
         # cal_end = (datetime.date(int(calendar_year), 12, 31),)
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
         cal_end = cvg_end_date
-
+        calendar_year = cvg_start_date.year
+        cal_start = (datetime.date(int(calendar_year), 1, 1),)
         # cmte_id,
         # report_id,
         # ]
@@ -1759,10 +1763,9 @@ def update_sl_summary(data):
     """
     logger.debug("update levin summary ...")
     logger.debug("with data:{}".format(data))
-    sl_data = {}
     try:
         cmte_id = data.get("cmte_id")
-        report_id = data.get("report_id")
+        original_report_id = data.get("report_id")
         levin_account_id = data.get("levin_account_id")
 
         # if not (
@@ -1783,109 +1786,113 @@ def update_sl_summary(data):
 
         # period_args = [
         # cal_end = (datetime.date(int(calendar_year), 12, 31),)
-        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        cvg_start_date, cvg_end_date = get_cvg_dates(original_report_id, cmte_id)
         calendar_year = cvg_start_date.year
         cal_start = (datetime.date(int(calendar_year), 1, 1),)
         cal_end = cvg_end_date
-
+        report_id_list = get_report_ids(cmte_id, cvg_start_date, False, True)
         # create a levin summary recvord if not exist yet
         # if not sl_record_exist(levin_account_id):
-        dummy_data = {
-            "cmte_id": cmte_id,
-            "report_id": report_id,
-            "record_id": levin_account_id,
-            "account_name": get_levin_account(cmte_id, levin_account_id)[0][
-                "levin_account_name"
-            ],
-            "cvg_from_date": cvg_start_date,
-            "cvg_end_date": cvg_end_date,
-            "transaction_type_identifier": "SCHED_L_SUM",
-        }
-        sl_data.update(dummy_data)
-        # post_schedL(dummy_rec)
+        for report_id in report_id_list:
+            sl_data = {}
+            report_cvg_start_date, report_cvg_end_date = get_cvg_dates(report_id, cmte_id)
+            dummy_data = {
+                "cmte_id": cmte_id,
+                "report_id": report_id,
+                "record_id": levin_account_id,
+                "account_name": get_levin_account(cmte_id, levin_account_id)[0][
+                    "levin_account_name"
+                ],
+                "cvg_from_date": report_cvg_start_date,
+                "cvg_end_date": report_cvg_end_date,
+                "transaction_type_identifier": "SCHED_L_SUM",
+            }
+            sl_data.update(dummy_data)
+            # post_schedL(dummy_rec)
 
-        # cmte_id,
-        # report_id,
-        # ]
-        # query and calculate receipt amount for current report
-        # levin_account_id = request.query_params.get('levin_account_id')
-        logger.debug("sl_data {}".format(sl_data))
-        # if levin_account_id:
-        sl_data.update(
-            load_report_receipts_summary(cmte_id, report_id, levin_account_id)
-        )
-        sl_data.update(
-            load_report_disbursements_sumamry(cmte_id, report_id, levin_account_id)
-        )
-        sl_data.update(
-            load_ytd_receipts_summary(cmte_id, cal_start, cal_end, levin_account_id)
-        )
-        sl_data.update(
-            load_ytd_disbursements_summary(
-                cmte_id, cal_start, cal_end, levin_account_id
+            # cmte_id,
+            # report_id,
+            # ]
+            # query and calculate receipt amount for current report
+            # levin_account_id = request.query_params.get('levin_account_id')
+            logger.debug("sl_data {} for report id: {}".format(sl_data, report_id))
+            # if levin_account_id:
+            sl_data.update(
+                load_report_receipts_summary(cmte_id, report_id, levin_account_id)
             )
-        )
-        coh_bop_report = get_cash_on_hand_cop(
-            report_id, cmte_id, False, levin_account_id
-        )
-        coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True, levin_account_id)
-        # else:
-        #     response.update(load_report_receipts_summary(cmte_id, report_id))
-        #     response.update(
-        #         load_report_disbursements_sumamry(cmte_id, report_id))
-        #     response.update(load_ytd_receipts_summary(
-        #         cmte_id, cal_start, cal_end))
-        #     response.update(load_ytd_disbursements_summary(
-        #         cmte_id, cal_start, cal_end))
-        #     coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
-        #     coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
+            sl_data.update(
+                load_report_disbursements_sumamry(cmte_id, report_id, levin_account_id)
+            )
+            sl_data.update(
+                load_ytd_receipts_summary(cmte_id, cal_start, report_cvg_end_date, levin_account_id)
+            )
+            sl_data.update(
+                load_ytd_disbursements_summary(
+                    cmte_id, cal_start, report_cvg_end_date, levin_account_id
+                )
+            )
+            coh_bop_report = get_cash_on_hand_cop(
+                report_id, cmte_id, False, levin_account_id
+            )
+            coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True, levin_account_id)
+            # else:
+            #     response.update(load_report_receipts_summary(cmte_id, report_id))
+            #     response.update(
+            #         load_report_disbursements_sumamry(cmte_id, report_id))
+            #     response.update(load_ytd_receipts_summary(
+            #         cmte_id, cal_start, cal_end))
+            #     response.update(load_ytd_disbursements_summary(
+            #         cmte_id, cal_start, cal_end))
+            #     coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
+            #     coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
 
-        # # query and calculate disbursement amount for current report
-        # response.update(load_report_disbursements_sumamry(cmte_id, report_id))
+            # # query and calculate disbursement amount for current report
+            # response.update(load_report_disbursements_sumamry(cmte_id, report_id))
 
-        # # query and calcualte YTD receipt amount
-        # response.update(load_ytd_receipts_summary(cmte_id, cal_start, cal_end))
-        # # query and calculate YTD disbursement amount
-        # response.update(load_ytd_disbursements_summary(
-        #     cmte_id, cal_start, cal_end))
+            # # query and calcualte YTD receipt amount
+            # response.update(load_ytd_receipts_summary(cmte_id, cal_start, cal_end))
+            # # query and calculate YTD disbursement amount
+            # response.update(load_ytd_disbursements_summary(
+            #     cmte_id, cal_start, cal_end))
 
-        # # calculate cash summary
-        # coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
-        # coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
-        # print(response)
-        coh_cop_report = (
-            coh_bop_report
-            + float(sl_data.get("total_receipts"))
-            - float(sl_data.get("total_disb"))
-        )
-        logger.debug("coh_cop_report:{}".format(coh_cop_report))
-        coh_cop_ytd = (
-            coh_bop_ytd
-            + float(sl_data.get("total_receipts_ytd"))
-            - float(sl_data.get("total_disb_ytd"))
-        )
-        logger.debug("coh_cop_ytd:{}".format(coh_cop_ytd))
-        cash_summary = {
-            "coh_bop": coh_bop_report,
-            "coh_coy": coh_bop_ytd,
-            "coh_cop": coh_cop_report,
-            "coh_cop_ytd": coh_cop_ytd,
-        }
-        sl_data.update(cash_summary)
-        logger.debug("sl_data after calculation:{}".format(sl_data))
-        sl_data = schedL_sql_dict(sl_data)
-        logger.debug("sl data after screening:{}".format(sl_data))
-        transaction_id = get_sl_transaction_id(cmte_id, report_id, levin_account_id)
-        # print(transaction_id)
-        if not transaction_id:
-            logger.debug("no transaction_id found. Saving a new record.")
-            post_schedL(sl_data)
-        else:
-            logger.debug("sl transaction_id identified:{}".format(transaction_id))
-            sl_data["transaction_id"] = transaction_id
-            put_schedL(sl_data)
-            # sl_data.update({'transaction_id':})
-        logger.debug("update sl done.")
+            # # calculate cash summary
+            # coh_bop_report = get_cash_on_hand_cop(report_id, cmte_id, False)
+            # coh_bop_ytd = get_cash_on_hand_cop(report_id, cmte_id, True)
+            # print(response)
+            coh_cop_report = (
+                coh_bop_report
+                + float(sl_data.get("total_receipts"))
+                - float(sl_data.get("total_disb"))
+            )
+            logger.debug("coh_cop_report:{}".format(coh_cop_report))
+            coh_cop_ytd = (
+                coh_bop_ytd
+                + float(sl_data.get("total_receipts_ytd"))
+                - float(sl_data.get("total_disb_ytd"))
+            )
+            logger.debug("coh_cop_ytd:{}".format(coh_cop_ytd))
+            cash_summary = {
+                "coh_bop": coh_bop_report,
+                "coh_coy": coh_bop_ytd,
+                "coh_cop": coh_cop_report,
+                "coh_cop_ytd": coh_cop_ytd,
+            }
+            sl_data.update(cash_summary)
+            logger.debug("sl_data after calculation:{}".format(sl_data))
+            sl_data = schedL_sql_dict(sl_data)
+            logger.debug("sl data after screening:{}".format(sl_data))
+            transaction_id = get_sl_transaction_id(cmte_id, report_id, levin_account_id)
+            # print(transaction_id)
+            if not transaction_id:
+                if int(report_id) == int(original_report_id):
+                    logger.debug("no transaction_id found. Saving a new record.")
+                    post_schedL(sl_data)
+            else:
+                logger.debug("sl transaction_id identified:{}".format(transaction_id))
+                sl_data["transaction_id"] = transaction_id
+                put_schedL(sl_data)
+                # sl_data.update({'transaction_id':})
+            logger.debug("update sl done.")
 
         """
         calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]

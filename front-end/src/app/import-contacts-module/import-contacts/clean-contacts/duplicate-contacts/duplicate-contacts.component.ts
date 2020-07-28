@@ -98,7 +98,7 @@ export class DuplicateContactsComponent implements OnInit, OnDestroy {
 
   public checkDuplicates(page: number) {
     this.config.currentPage = page;
-    this._importContactsService.checkDuplicates(page).takeUntil(this.onDestroy$).subscribe((res: any) => {
+    this._importContactsService.checkDuplicates(page).takeUntil(this.contactsSubject).subscribe((res: any) => {
       this.contactsSubject.next(res.duplicates);
       this.config.totalItems = res.totalCount ? res.totalCount : 0;
       this.config.itemsPerPage = res.itemsPerPage ? res.itemsPerPage : this.maxItemsPerPage;

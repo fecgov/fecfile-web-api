@@ -113,6 +113,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
   public addCandidate(){
     if(this.isEditCandidateMode){
       this.addCandidateEvent.emit({action:'update'});
+      this.isEditCandidateMode = false;
     }
     else{
       this.addCandidateEvent.emit({action:'create'});

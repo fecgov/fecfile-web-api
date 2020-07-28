@@ -262,6 +262,9 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
       {           
         const pagedResponse = this._utilService.pageResponse(res, this.config);
         this.schedH6sModel = pagedResponse.items;
+        this.schedH6sModelL = pagedResponse.items;
+
+        this.setArrow(this.schedH6sModel);
         this.pageNumbers = pagedResponse.pageNumbers;    
       });        
   }
@@ -322,9 +325,12 @@ export class SchedH6Component extends AbstractSchedule implements OnInit, OnDest
   public setArrow(items: SchedH6Model[]) {
     if(items) {
       for(const item of items) {        
-        if(item.memo_code !== 'X' && this.schedH6sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id})) {
+        /* if(item.memo_code !== 'X' && this.schedH6sModel.find(function(obj) { return obj.back_ref_transaction_id === item.transaction_id})) {
             item.arrow_dir = 'down';           
-        }        
+        }         */
+        if(item.child && item.child.length > 0){
+          item.arrow_dir = 'down';
+        }
       }
     }
   }

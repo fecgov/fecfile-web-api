@@ -81,7 +81,10 @@ list_of_SL_SA_transaction_types = ['LEVIN_TRIB_REC', 'LEVIN_PARTN_REC', 'LEVIN_O
 list_of_SL_SB_transaction_types = ['LEVIN_VOTER_ID', 'LEVIN_GOTV', 'LEVIN_GEN', 'LEVIN_OTH_DISB', 'LEVIN_VOTER_REG']
 
 DICT_PURPOSE_DESCRIPTION_VALUES = {
-    'Convention Account': ['IND_NP_CONVEN_ACC', 'PAC_NP_CONVEN_ACC', 'PARTY_NP_CONVEN_ACC', 'TRIB_NP_CONVEN_ACC'],
+    'Bounced': ['PARTY_RET', 'PAC_RET', 'RET_REC'],
+    'Convention Account': ['IND_NP_CONVEN_ACC', 'PAC_NP_CONVEN_ACC', 'PARTY_NP_CONVEN_ACC', 'TRIB_NP_CONVEN_ACC',
+                            'OPEXP_CONV_ACC_OP_EXP_NP'],
+    'Convention Account Earmarked Through': ['EAR_REC_CONVEN_ACC'],
     'Convention Account - JF Memo for': ['JF_TRAN_NP_CONVEN_IND_MEMO', 'JF_TRAN_NP_CONVEN_PAC_MEMO',
                                          'JF_TRAN_NP_CONVEN_TRIB_MEMO'],
     'Convention: Refund': ['OPEXP_CONV_ACC_TRIB_REF', 'OPEXP_CONV_ACC_IND_REF'],
@@ -89,9 +92,8 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     'Credit Card: See Below': ['IE_CC_PAY'],
     'Earmark for': ['PAC_CON_EAR_DEP', 'PAC_CON_EAR_UNDEP'],
     'Earmarked for': ['CON_EAR_DEP', 'CON_EAR_UNDEP', 'CON_EAR_UNDEP_BKP', 'CON_EAR_UNDEP_BKP'],
+    'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO'],
     'Earmarked through': ['EAR_REC', 'PAC_EAR_REC'],
-    'Recount Account Earmarked Through': ['EAR_REC_RECNT_ACC'],
-    'Convention Account Earmarked Through': ['EAR_REC_CONVEN_ACC'],
     'Headquarters Account Earmarked Through': ['EAR_REC_HQ_ACC'],
     'Headquarters Account': ['IND_NP_HQ_ACC', 'PAC_NP_HQ_ACC', 'PARTY_NP_HQ_ACC', 'TRIB_NP_HQ_ACC'],
     'Headquarters Account - JF Memo for': ['JF_TRAN_NP_HQ_IND_MEMO', 'JF_TRAN_NP_HQ_PAC_MEMO',
@@ -115,6 +117,7 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     'Recount Account': ['IND_NP_RECNT_ACC', 'PAC_NP_RECNT_ACC', 'PARTY_NP_RECNT_ACC', 'TRIB_NP_RECNT_ACC'],
     'Recount Account - JF Memo for': ['JF_TRAN_NP_RECNT_PAC_MEMO', 'JF_TRAN_NP_RECNT_TRIB_MEMO',
                                       'JF_TRAN_NP_RECNT_IND_MEMO'],
+    'Recount Account Earmarked Through': ['EAR_REC_RECNT_ACC'],
     'Recount Receipt': ['IND_RECNT_REC', 'PAC_RECNT_REC', 'PARTY_RECNT_REC', 'TRIB_RECNT_REC'],
     'Recount: Refund': ['OTH_DISB_NP_RECNT_TRIB_REF', 'OTH_DISB_NP_RECNT_REG_REF', 'OTH_DISB_NP_RECNT_IND_REF'],
     'Recount: Purpose of Disbursement' : ['OTH_DISB_RECNT'],
@@ -124,8 +127,6 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     # Removing 'EAR_MEMO' from below as it being populated from front-end
     # 'Total Earmarked through Conduit': ['EAR_REC_CONVEN_ACC_MEMO', 'EAR_REC_HQ_ACC_MEMO', 'EAR_REC_RECNT_ACC_MEMO',
     #                                     'PAC_EAR_MEMO'],
-    'Earmarked from': ['CON_EAR_DEP_MEMO', 'CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_UNDEP_MEMO', 'PAC_CON_EAR_DEP_MEMO'],
-    'Bounced': ['PARTY_RET', 'PAC_RET', 'RET_REC'],
     'Staff Reimbursement Memo': ['COEXP_STAF_REIM_MEMO']
     }
 
@@ -241,7 +242,7 @@ def get_data_details(report_id, cmte_id):
                             THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", aff_cmte_id AS "affiliatedCommitteeId", 
                             (SELECT cmte.cmte_name FROM committee_master cmte WHERE cmte.cmte_id = aff_cmte_id) AS "affiliatedCommitteeName", 
                             COALESCE(to_char(aff_date,'MM/DD/YYYY'),'') AS "affiliatedDate", sign_id AS "signatureId", 
-                            COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate" 
+                            COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate", committee_type AS "committeeType"
                               FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
                           WHEN (SELECT est_status FROM public.form_1m WHERE report_id=%s and cmte_id=%s) = 'Q'
                             THEN (SELECT json_agg(t) FROM (SELECT est_status AS "establishmentStatus", can1_id, 
@@ -249,7 +250,7 @@ def get_data_details(report_id, cmte_id):
                             can3_id, COALESCE(to_char(can3_con,'MM/DD/YYYY'),'') AS "can3_con", can4_id, COALESCE(to_char(can4_con,'MM/DD/YYYY'),'') AS "can4_con", 
                             can5_id, COALESCE(to_char(can5_con,'MM/DD/YYYY'),'') AS "can5_con", COALESCE(to_char(date_51,'MM/DD/YYYY'),'') AS "51stContributorDate", 
                             COALESCE(to_char(orig_date,'MM/DD/YYYY'),'') AS "registrationDate", COALESCE(to_char(metreq_date,'MM/DD/YYYY'),'') AS "requirementsMetDate", 
-                            sign_id AS "signatureId", COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate"  
+                            sign_id AS "signatureId", COALESCE(to_char(sign_date,'MM/DD/YYYY'),'') AS "signatureDate", committee_type AS "committeeType"
                               FROM public.form_1m WHERE report_id=%s and cmte_id=%s AND delete_ind is distinct from 'Y') t)
                           END AS "output" """
             values_2 = [report_id, cmte_id, report_id, cmte_id, report_id, cmte_id, report_id, cmte_id]

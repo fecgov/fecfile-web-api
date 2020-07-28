@@ -2664,3 +2664,20 @@ VALUES ('F3X', 'SL-B', '{0}', '{1}');\n""".format(tran, query)
                 return Response('Success', status=status.HTTP_201_CREATED)
         except Exception as e:
                 return Response('Error: ' + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def print_query(request):
+    data = request.data['data']
+    output= ""
+    _sql = """select query_string from tran_query_string WHERE tran_type_identifier in ('{}')""".format("', '".join(data))
+    with connection.cursor() as cursor:
+        cursor.execute(_sql)
+        result = cursor.fetchall()
+        if result:
+            for i,item in enumerate(result):
+                output += item[0] + " \n\n\n "
+    file = open("/tmp/print_query.txt", 'w')
+    file.write(output)
+    file.close()
+    return Response('Success', status=status.HTTP_200_OK)

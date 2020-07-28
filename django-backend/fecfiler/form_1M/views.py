@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 LIST_F1M_COLUMNS = ['report_id', 'est_status', 'cmte_id', 'aff_cmte_id', 'aff_date',
                     'can1_id', 'can1_con', 'can2_id', 'can2_con', 'can3_id',
                     'can3_con', 'can4_id', 'can4_con', 'can5_id', 'can5_con',
-                    'date_51', 'orig_date', 'metreq_date', 'sign_date']
+                    'date_51', 'orig_date', 'metreq_date', 'sign_date', 'committee_type']
 
 DICT_F1M_COLUMNS_MAP_INPUT = {
     'committee_id': 'aff_cmte_id',
@@ -45,6 +45,7 @@ DICT_F1M_COLUMNS_MAP_INPUT = {
     'can4_con': 'can4_con',
     'can5_id': 'can5_id',
     'can5_con': 'can5_con',
+    'committeeType': 'committee_type',
 }
 
 """
@@ -61,7 +62,7 @@ def noneCheckMissingParameters(parameter_name_list, checking_dict=None,
         for item in parameter_name_list:
             if checking_dict is not None and item not in checking_dict:
                 missing_list.append(item)
-            if value_dict is not None and value_dict.get(item) in [None, '', " ", 'null']:
+            if value_dict is not None and not value_dict.get(item):
                 if item not in missing_list:
                     none_list.append(item)
         if missing_list:
@@ -85,7 +86,7 @@ def f1m_sql_dict(cmte_id, step, request_dict):
         for key, value in request_dict.items():
             if key in DICT_F1M_COLUMNS_MAP_INPUT:
                 if DICT_F1M_COLUMNS_MAP_INPUT[key] in db_key_list:
-                    output_dict[DICT_F1M_COLUMNS_MAP_INPUT[key]] = value
+                    output_dict[DICT_F1M_COLUMNS_MAP_INPUT[key]] = value if value else None
         logger.debug(output_dict)
         return output_dict
     except Exception as e:
@@ -96,8 +97,10 @@ def f1m_sql_dict(cmte_id, step, request_dict):
 def check_columns_f1M(step):
     try:
         if step == 'saveAffiliation':
-            key_list = ['report_id', 'aff_cmte_id', 'aff_date']
-        elif step == 'saveCandidate' or step == 'saveQualification':
+            key_list = ['report_id', 'aff_cmte_id', 'aff_date', 'committee_type']
+        elif step == 'saveQualification':
+            key_list = ['report_id', 'committee_type']
+        elif step == 'saveCandidate':
             key_list = ['report_id']
         elif step == 'saveDates':
             key_list = ['report_id', 'date_51', 'orig_date', 'metreq_date']
@@ -111,7 +114,7 @@ def check_columns_f1M(step):
             key_list = ['report_id', 'est_status', 'aff_cmte_id', 'aff_date',
                         'date_51', 'orig_date', 'metreq_date', 'sign_date', 'can1_id',
                         'can1_con', 'can2_id', 'can2_con', 'can3_id', 'can3_con', 'can4_id',
-                        'can4_con', 'can5_id', 'can5_con']
+                        'can4_con', 'can5_id', 'can5_con', 'committee_type']
         else:
             raise Exception('The step value provided {} is invalid'.format(step))
         return key_list
@@ -560,7 +563,7 @@ def get_sql_f1m(request_dict, complete=False):
                 cm.treasurer_prefix AS "sign_prefix", cm.treasurer_suffix AS "sign_suffix", 
                 m.sign_date AS "submission_date", rp.email_1, rp.email_2, rp.additional_email_1, 
                 rp.additional_email_2, cm.treasurer_last_name, cm.treasurer_first_name, 
-                cm.treasurer_middle_name, cm.treasurer_prefix, cm.treasurer_suffix
+                cm.treasurer_middle_name, cm.treasurer_prefix, cm.treasurer_suffix, m.committee_type
                 FROM public.form_1m m 
                 JOIN public.reports rp ON m.cmte_id=rp.cmte_id AND m.report_id=rp.report_id
                 LEFT JOIN public.entity e ON e.entity_id = m.sign_id
@@ -588,7 +591,7 @@ def validate_before_submit(request_dict):
     try:
         if request_dict['establishmentType'] == "A":
             noneCheckMissingParameters(['reportId', 'cmte_id', 'committee_id',
-                                        'affiliation_date', 'submission_date'],
+                                        'affiliation_date', 'submission_date', 'committee_type'],
                                        checking_dict=request_dict, value_dict=request_dict,
                                        function_name='validate_before_submit')
         elif request_dict['establishmentType'] == "Q":
@@ -599,13 +602,13 @@ def validate_before_submit(request_dict):
                                             'requirements_met_date', 'submission_date',
                                                                      'can1_id', 'can1_con', 'can2_id', 'can2_con',
                                             'can3_id',
-                                            'can3_con', 'can4_id', 'can4_con', 'can5_id'],
+                                            'can3_con', 'can4_id', 'can4_con', 'can5_id', 'committee_type'],
                                            checking_dict=request_dict, value_dict=request_dict,
                                            function_name='validate_before_submit')
             else:
                 noneCheckMissingParameters(['reportId', 'cmte_id',
                                             'fifty_first_contributor_date', 'registration_date',
-                                            'requirements_met_date', 'submission_date'],
+                                            'requirements_met_date', 'submission_date', 'committee_type'],
                                            checking_dict=request_dict, value_dict=request_dict,
                                            function_name='validate_before_submit')
         else:
@@ -684,7 +687,7 @@ def form1M(request):
             if step == 'saveAffiliation':
                 try:
                     is_read_only_or_filer_reports(request)
-                    noneCheckMissingParameters(['committee_id', 'affiliation_date'], checking_dict=request.data,
+                    noneCheckMissingParameters(['committee_id', 'affiliation_date', 'committeeType'], checking_dict=request.data,
                                                value_dict=request.data, function_name='form1M-POST: step-2 Affiliation')
                     request_dict = f1m_sql_dict(cmte_id, step, request.data)
                     request_dict['est_status'] = 'A'
@@ -705,6 +708,9 @@ def form1M(request):
             elif step == 'saveQualification':
                 try:
                     is_read_only_or_filer_reports(request)
+                    noneCheckMissingParameters(['committeeType'],
+                                               checking_dict=request.data, value_dict=request.data,
+                                               function_name='form1M-POST: step-2 Qualification Skipping')
                     request_dict = f1m_sql_dict(cmte_id, step, request.data)
                     request_dict['est_status'] = 'Q'
                     if 'report_id' in request_dict:
@@ -742,6 +748,10 @@ def form1M(request):
                             check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
                         f1m_flag, output_dict = f1m_put(request_dict)
                     elif candidate_number == '1':
+                        noneCheckMissingParameters(['committeeType'],
+                                               checking_dict=request.data, value_dict=request.data,
+                                               function_name='form1M-POST: step-2 Qualification cmtetype')
+                        request_dict['committee_type'] = request.data.get('committeeType')
                         report_flag, request_dict['report_id'] = report_post(request)
                         f1m_flag, output_dict = f1m_post(request_dict)
                     else:
@@ -837,7 +847,7 @@ def form1M(request):
 
                 # by affiliation step2 PUT
                 if step == 'saveAffiliation':
-                    noneCheckMissingParameters(['reportId', 'committee_id', 'affiliation_date'],
+                    noneCheckMissingParameters(['reportId', 'committee_id', 'affiliation_date', 'committeeType'],
                                                checking_dict=request.data, value_dict=request.data,
                                                function_name='form1M-PUT: step-2 Affiliation')
                     request_dict = f1m_sql_dict(cmte_id, step, request.data)
@@ -861,6 +871,8 @@ def form1M(request):
                     request_dict[column_name[:-2] + 'con'] = request.data['contribution_date']
                     previous_f1m_dict = get_sql_f1m(request_dict)
                     if candidate_number == '1':
+                        if 'committeeType' in request.data: 
+                            request_dict['committee_type'] = request.data.get('committeeType') if request.data['committeeType'] else None
                         check_clear_establishment_status(cmte_id, request_dict['report_id'], 'A')
                         request_dict['est_status'] = 'Q'
                     f1m_flag, output_dict = f1m_put(request_dict)

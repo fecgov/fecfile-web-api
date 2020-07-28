@@ -266,6 +266,20 @@
   // color: black;
   background-color:$blueZodiac;
 }
+
+.modal-body{
+  font-family: 'Lato','sans-serif';
+}
+
 .bottom-separator{
   border-bottom:1px solid $bombay;
 }
+.f1mFooter{
+  border-top: 1px solid $bombay;
+  padding-top: 1%;
+  margin:2%;
+  width:100%;
+}
+
+
+.accordion div.card:only-child { border-bottom: 1px solid rgba(0, 0, 0, 0.125); border-radius: calc(0.25rem - 1px); }

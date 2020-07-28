@@ -214,8 +214,8 @@ TWO_TRANSACTIONS_ONE_SCREEN_SA_SB_TRANSTYPE_DICT = {
 
 API_CALL_SA = {"api_call": "/sa/schedA"}
 API_CALL_SB = {"api_call": "/sb/schedB"}
-REQ_ELECTION_YR = ""
-ELECTION_YR = {"election_year": REQ_ELECTION_YR}
+# REQ_ELECTION_YR = ""
+# ELECTION_YR = {"election_year": REQ_ELECTION_YR}
 
 # a list of treansaction types for sched_l(levin funds report) contribuitions
 SCHED_L_A_TRAN_TYPES = [
@@ -339,6 +339,7 @@ def post_sql_schedA(
     memo_code,
     memo_text,
     election_code,
+    election_year,
     election_other_description,
     donor_cmte_id,
     donor_cmte_name,
@@ -368,6 +369,7 @@ def post_sql_schedA(
                 memo_code, 
                 memo_text, 
                 election_code, 
+                election_year,
                 election_other_description, 
                 create_date, 
                 last_update_date, 
@@ -377,7 +379,7 @@ def post_sql_schedA(
                 transaction_type_identifier,
                 aggregation_ind
             )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
                 [
                     cmte_id,
@@ -394,6 +396,7 @@ def post_sql_schedA(
                     memo_code,
                     memo_text,
                     election_code,
+                    election_year,
                     election_other_description,
                     datetime.datetime.now(),
                     datetime.datetime.now(),
@@ -428,12 +431,12 @@ def get_list_schedA(
             # GET single row from schedA table
             if transaction_id:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind
                                     FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format(
                         "', '".join(report_list)
                     )
                 else:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind
                                     FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format(
                         "', '".join(report_list)
                     )
@@ -444,12 +447,12 @@ def get_list_schedA(
                 )
             else:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
                                 FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC""".format(
                         "', '".join(report_list)
                     )
                 else:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
                                 FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s ORDER BY transaction_id DESC""".format(
                         "', '".join(report_list)
                     )
@@ -488,7 +491,7 @@ def get_list_child_schedA(report_id, cmte_id, transaction_id):
 
             # GET child rows from schedA table
             query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, 
-            contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, 
+            contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year,
             election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
                             FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND back_ref_transaction_id = %s AND 
                             delete_ind is distinct from 'Y'""".format(
@@ -539,6 +542,7 @@ def put_sql_schedA(
     levin_account_id,
     transaction_type_identifier,
     aggregation_ind,
+    election_year = None,
 ):
     """
     update a schedule_a item
@@ -561,6 +565,7 @@ def put_sql_schedA(
                     memo_code = %s, 
                     memo_text = %s, 
                     election_code = %s, 
+                    election_year = %s,
                     election_other_description = %s, 
                     donor_cmte_id = %s, 
                     donor_cmte_name = %s, 
@@ -584,6 +589,7 @@ def put_sql_schedA(
                     memo_code,
                     memo_text,
                     election_code,
+                    election_year,
                     election_other_description,
                     donor_cmte_id,
                     donor_cmte_name,
@@ -799,6 +805,7 @@ def post_schedA(datum):
                 datum.get("memo_code"),
                 datum.get("memo_text"),
                 datum.get("election_code"),
+                datum.get("election_year"),
                 datum.get("election_other_description"),
                 datum.get("donor_cmte_id"),
                 datum.get("donor_cmte_name"),
@@ -932,7 +939,7 @@ def get_schedA(data):
             forms_obj = get_list_schedA(report_id, cmte_id, transaction_id)
             for obj in forms_obj:
                 obj.update(API_CALL_SA)
-                obj.update({"election_year": REQ_ELECTION_YR})
+                # obj.update({"election_year": REQ_ELECTION_YR})
 
             childA_forms_obj = get_list_child_schedA(report_id, cmte_id, transaction_id)
             for obj in childA_forms_obj:
@@ -941,7 +948,7 @@ def get_schedA(data):
                 obj.update(
                     {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
                 )
-                obj.update({"election_year": REQ_ELECTION_YR})
+                # obj.update({"election_year": REQ_ELECTION_YR})
                 # obj.update(ELECTION_YR)
 
             childB_forms_obj = get_list_child_schedB(report_id, cmte_id, transaction_id)
@@ -951,7 +958,7 @@ def get_schedA(data):
                     {"transaction_type_description": tran_desc_dic.get(tran_id, "")}
                 )
                 obj.update(API_CALL_SB)
-                obj.update({"election_year": REQ_ELECTION_YR})
+                # obj.update({"election_year": REQ_ELECTION_YR})
                 # obj.update(ELECTION_YR)
 
             child_forms_obj = childA_forms_obj + childB_forms_obj
@@ -963,7 +970,7 @@ def get_schedA(data):
             forms_obj = get_list_schedA(report_id, cmte_id)
             for obj in forms_obj:
                 obj.update(API_CALL_SA)
-                obj.update({"election_year": REQ_ELECTION_YR})
+                # obj.update({"election_year": REQ_ELECTION_YR})
                 # obj.update(ELECTION_YR)
 
         return forms_obj
@@ -1031,6 +1038,7 @@ def put_schedA(datum):
                 datum.get("levin_account_id"),
                 datum.get("transaction_type_identifier"),
                 datum.get("aggregation_ind"),
+                datum.get("election_year"),
             )
             try:
                 if (
@@ -1475,6 +1483,7 @@ def schedA_sql_dict(data):
             "memo_code": data.get("memo_code"),
             "memo_text": data.get("memo_text"),
             "election_code": data.get("election_code"),
+            "election_year": data.get("election_year") if data.get("election_year") != 'YYYY' else None,
             "election_other_description": data.get("election_other_description"),
             "entity_type": data.get("entity_type"),
             "entity_name": data.get("entity_name"),
@@ -1916,12 +1925,13 @@ def schedA(request):
     try:
         is_read_only_or_filer_reports(request)
     # POST api: create new transactions and children transactions if any
-        global REQ_ELECTION_YR
+        # global REQ_ELECTION_YR
         if request.method == "POST":
-            if "election_year" in request.data:
-                REQ_ELECTION_YR = request.data.get("election_year")
-            if "election_year" in request.query_params:
-                REQ_ELECTION_YR = request.query_params.get("election_year")
+            # if "election_year" in request.data:
+            #     REQ_ELECTION_YR = request.data.get("election_year")
+            # if "election_year" in request.query_params:
+            #     REQ_ELECTION_YR = request.query_params.get("election_year")
+
             try:
                 # checking if reattribution is triggered for a transaction
                 reattribution_flag = False
@@ -1964,10 +1974,10 @@ def schedA(request):
 
         # Get records from schedA table
         if request.method == "GET":
-            if "election_year" in request.data:
-                REQ_ELECTION_YR = request.data.get("election_year")
-            if "election_year" in request.query_params:
-                REQ_ELECTION_YR = request.query_params.get("election_year")
+            # if "election_year" in request.data:
+            #     REQ_ELECTION_YR = request.data.get("election_year")
+            # if "election_year" in request.query_params:
+            #     REQ_ELECTION_YR = request.query_params.get("election_year")
 
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}
@@ -2006,10 +2016,10 @@ def schedA(request):
 
         # PUT api call handled here
         if request.method == "PUT":
-            if "election_year" in request.data:
-                REQ_ELECTION_YR = request.data.get("election_year")
-            if "election_year" in request.query_params:
-                REQ_ELECTION_YR = request.query_params.get("election_year")
+            # if "election_year" in request.data:
+            #     REQ_ELECTION_YR = request.data.get("election_year")
+            # if "election_year" in request.query_params:
+            #     REQ_ELECTION_YR = request.query_params.get("election_year")
             try:
                 # checking if reattribution is triggered for a transaction
                 reattribution_flag = False
@@ -2028,6 +2038,8 @@ def schedA(request):
                             )
                 validate_sa_data(request.data)
                 datum = schedA_sql_dict(request.data)
+                if not datum['election_year']:
+                    datum['election_year'] = None
                 if "transaction_id" in request.data and check_null_value(
                     request.data.get("transaction_id")
                 ):
@@ -2073,10 +2085,10 @@ def schedA(request):
 
         # delete api call handled here
         if request.method == "DELETE":
-            if "election_year" in request.data:
-                REQ_ELECTION_YR = request.data.get("election_year")
-            if "election_year" in request.query_params:
-                REQ_ELECTION_YR = request.query_params.get("election_year")
+            # if "election_year" in request.data:
+            #     REQ_ELECTION_YR = request.data.get("election_year")
+            # if "election_year" in request.query_params:
+            #     REQ_ELECTION_YR = request.query_params.get("election_year")
 
             try:
                 data = {"cmte_id": get_comittee_id(request.user.username)}

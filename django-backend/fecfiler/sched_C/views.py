@@ -361,6 +361,8 @@ def put_schedC(data):
             data_copy = data.copy()
             if initial_loan(data.get("transaction_id")):
                 update_auto_sched_a(data_copy)
+            child_data = data.copy()
+            put_duplicate_future_reports(child_data)
 
         except Exception as e:
             # rollback entity data
@@ -618,6 +620,7 @@ def auto_generate_sched_a(data):
         data.get("memo_code"),
         data.get("memo_text"),
         data.get("election_code"),
+        data.get("election_year"),
         data.get("election_other_description"),
         data.get("donor_cmte_id"),
         data.get("donor_cmte_name"),
@@ -3211,3 +3214,26 @@ def get_endorser_summary(request):
 
     except:
         raise
+
+def put_duplicate_future_reports(data):
+    try:
+        transaction_id = data.get("transaction_id")
+        while 1:
+            _sql = """SELECT json_agg(t) FROM (SELECT ch.transaction_id, ch.loan_payment_to_date
+                    FROM public.sched_c ch WHERE ch.back_ref_transaction_id = %s
+                    AND delete_ind IS DISTINCT FROM 'Y') t"""
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [transaction_id])
+                json_result = cursor.fetchone()[0]
+            if json_result:
+                json_result = json_result[0]
+                transaction_id = json_result['transaction_id']
+                data['transaction_id'] = transaction_id
+                data['loan_payment_to_date'] = json_result['loan_payment_to_date']
+                data['loan_balance'] = float(data['loan_amount_original']) - json_result['loan_payment_to_date']
+                put_sql_schedC(data)
+                print(json_result)
+            else:
+                break
+    except Exception as e:
+        raise Exception("""The put_duplicate_future_reports function is throwing an error: """+ str(e))

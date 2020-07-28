@@ -13,34 +13,57 @@
         </div>
       </header>
       <section>
-        <div class="content">
-          <div class="grid-row">
-            <div class="grid-row__col space-bottom pt-5">
-              <h3>
-                Committee Type
-              </h3>
-            </div>
-          </div>
-          <div class="grid-row">
-            <div class="grid-row__col space-bottom pt-5 pl-5">
-              <span>
-                Multicandidate status is established by?
-              </span>
-            </div>
-          </div>
-          <div class="row pt-5">
-            <div class="col-md-2 offset-md-1 ">
-              <button type="button" class="btn btn-outline-dark" (click)="next('affiliation')">
-                  By Affiliation
-              </button>
-            </div>
-              <div class="col-md-2">
-              <button type="button" class="btn btn-outline-dark" (click)="next('qualification')">
-                  By Qualification
-              </button>
-            </div>
-          </div>
-        </div>
+        <form  [formGroup]="form"> 
+            <div class="content">
+                <div class="grid-row">
+                  <div class="grid-row__col space-bottom pt-5">
+                    <h3>
+                      Committee Type
+                    </h3>
+                  </div>
+                </div>
+                <div class="grid-row">
+                  <div class="grid-row__col space-bottom pt-5 pl-5">
+                    <span>
+                      Type of committee
+                    </span>
+                  </div>
+                </div>
+                <div class="row pt-5">
+                  <div class="col-md-1 offset-md-1 ">
+                    <label [ngClass]="form?.get('committeeType')?.invalid && form?.get('committeeType')?.touched ? 'input-field-label-error' : ''">
+                        <input formControlName="committeeType"  id="stateParty" type="radio" value="S">
+                          State Party
+                    </label>
+                  </div>
+                  <div class="col-md-1">
+                    <label [ngClass]="form?.get('committeeType')?.invalid && form?.get('committeeType')?.touched ? 'input-field-label-error' : ''">
+                        <input formControlName="committeeType"  id="other" type="radio" value="O">
+                          Other
+                    </label>
+                  </div>
+                </div>
+                <div class="grid-row">
+                  <div class="grid-row__col space-bottom pt-5 pl-5">
+                    <span>
+                      Multicandidate status is established by?
+                    </span>
+                  </div>
+                </div>
+                <div class="row pt-5">
+                  <div class="col-md-2 offset-md-1 ">
+                    <button type="button" class="btn btn-outline-dark" (click)="next('affiliation')" [disabled]="!(form?.get('committeeType')?.value)">
+                        By Affiliation
+                    </button>
+                  </div>
+                    <div class="col-md-2">
+                    <button type="button" class="btn btn-outline-dark" (click)="next('qualification')" [disabled]="!(form?.get('committeeType')?.value)">
+                        By Qualification
+                    </button>
+                  </div>
+                </div>
+              </div>
+        </form>
       </section>
       <footer>
         <div class="grid-row">

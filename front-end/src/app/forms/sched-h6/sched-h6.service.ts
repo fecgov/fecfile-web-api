@@ -91,6 +91,7 @@ export class SchedH6Service {
       model.entity_name = row.entity_name;
       model.entity_type = row.entity_type;
       model.aggregation_ind = row.aggregation_ind;
+      model.child = row.child;
 
       modelArray.push(model);
 

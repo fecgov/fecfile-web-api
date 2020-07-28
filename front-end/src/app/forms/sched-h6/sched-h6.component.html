@@ -178,16 +178,12 @@
                     <input type="checkbox" (click)="checkForMultiChecked($event)">
                   </td>
                   <td>
-                    <div class="row td-arrow">
+                    <div [ngClass]="item.child ? 'parent': ''" (click)="item.toggleChild = !item.toggleChild">
                       {{ item.entity_type == 'IND' ?
                                           item.first_name + ' ' + item.last_name :
                                           item.entity_name
                                       }}
-                      <div>
-                        <i *ngIf="item.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow"
-                          (click)="clickArrow(item)"></i>
-                        <i *ngIf="item.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(item)"></i>
-                      </div>
+                      <span *ngIf="item.child" class="align_right arrow" [ngClass]="item.toggleChild ? 'arrow-top' : 'arrow-bottom'"></span>
                     </div>
                   </td>
                   <td>
@@ -224,7 +220,7 @@
                   </td>
                 </tr>
         
-                <tr [ngStyle]="{'background-color': '#D9EDF6'}" *ngFor="let itemChild of item.child;">
+                <tr [ngbCollapse]="item?.child?.length > 0 ? !item.toggleChild : ''" class="child-bg" *ngFor="let itemChild of item.child;">
                   <td>
                     <input type="checkbox" (click)="checkForMultiChecked($event)">
                   </td>

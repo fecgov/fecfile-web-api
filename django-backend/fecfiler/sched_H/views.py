@@ -905,6 +905,8 @@ def get_fed_nonfed_share(request):
         transaction_type_identifier = request.query_params.get(
             "transaction_type_identifier"
         )
+        if "MEMO" in transaction_type_identifier:
+            aggregation_ind = "N"
         if transaction_type_identifier.startswith("ALLOC_FEA"):
             tran_tbl = "public.sched_h6"
             f_ytd = "activity_event_total_ytd"
@@ -3473,6 +3475,40 @@ def update_transaction_ytd_amount(cmte_id, transaction_id, aggregate_amount):
         raise
 
 
+def list_all_sub_transaction(start_dt, end_dt, transaction_id, cmte_id):
+    _sql = """
+                SELECT t1.activity_event_amount_ytd, 
+                    t1.transaction_id,
+                    t1.aggregation_ind
+                FROM public.sched_h4 t1 
+                WHERE cmte_id = %s
+                AND expenditure_date >= %s
+                AND expenditure_date <= %s 
+                AND back_ref_transaction_id = %s
+                AND delete_ind is distinct FROM 'Y' 
+                ORDER BY expenditure_date ASC, create_date ASC
+        """
+    # .format(activity_event_type, cmte_id, start_dt, end_dt)
+    logger.debug(_sql)
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, (cmte_id, start_dt, end_dt, transaction_id))
+            # , [
+            #         activity_event_type,
+            #         cmte_id,
+            #         start_dt,
+            #         end_dt,
+            #     ])
+            transactions_list = cursor.fetchall()
+            logger.debug("transaction fetched:{}".format(transactions_list))
+        return transactions_list
+    except Exception as e:
+        raise Exception(
+            "The list_all_transactions_event_type function is throwing an error: "
+            + str(e)
+        )
+
+
 def update_activity_event_amount_ytd(data):
     """
     aggregate and update 'activity_event_amount_ytd' for all h4 transactions
@@ -3505,6 +3541,12 @@ def update_activity_event_amount_ytd(data):
             if transaction[2] != "N":
                 aggregate_amount += transaction[0]
             transaction_id = transaction[1]
+            list_sub_transaction = list_all_sub_transaction(aggregate_start_date,aggregate_end_date,transaction_id,data.get("cmte_id"))
+            for sub_transaction in list_sub_transaction:
+                sub_transaction_id = sub_transaction[1]
+                update_transaction_ytd_amount(
+                    data.get("cmte_id"), sub_transaction_id, aggregate_amount
+                )
             update_transaction_ytd_amount(
                 data.get("cmte_id"), transaction_id, aggregate_amount
             )
@@ -3952,6 +3994,8 @@ def schedH4(request):
                 #     output = get_schedB(data)
                 # else:
                 data = put_schedH4(datum)
+                if not data.get("transaction_type_identifier").endswith("_MEMO"):
+                    update_activity_event_amount_ytd(data)
                 output = get_schedH4(data)[0]
                 # output = get_schedA(data)
                 return JsonResponse(output, status=status.HTTP_201_CREATED)
@@ -4578,21 +4622,26 @@ def schedH5(request):
                 else:
                     # print('---')
                     # print(datum)
-                    data = post_schedH5(datum)
-                    logger.debug("parent data saved:{}".format(data))
                     if "child" in request.data:
                         for _c in request.data["child"]:
-                            child_data = data.copy()
-                            child_data.update(_c)
-                            child_data["back_ref_transaction_id"] = data["transaction_id"]
-                            child_data = schedH5_sql_dict(child_data)
-                            child_data["cmte_id"] = cmte_id
-                            child_data["report_id"] = report_id
-                            logger.debug(
-                                "saving child transaction with data {}".format(child_data)
-                            )
-                            post_schedH5(child_data)
-                # Associating child transactions to parent and storing them to DB
+                            datum = schedH5_sql_dict(_c)
+                            datum["report_id"] = report_id
+                            datum["cmte_id"] = cmte_id
+                            data = post_schedH5(datum)
+                            logger.debug("parent data saved:{}".format(data))
+                    # if "child" in request.data:
+                    #     for _c in request.data["child"]:
+                    #         child_data = data.copy()
+                    #         child_data.update(_c)
+                    #         child_data["back_ref_transaction_id"] = data["transaction_id"]
+                    #         child_data = schedH5_sql_dict(child_data)
+                    #         child_data["cmte_id"] = cmte_id
+                    #         child_data["report_id"] = report_id
+                    #         logger.debug(
+                    #             "saving child transaction with data {}".format(child_data)
+                    #         )
+                    #         post_schedH5(child_data)
+                    # Associating child transactions to parent and storing them to DB
 
                 output = get_schedH5(data)
                 return JsonResponse(output[0], status=status.HTTP_201_CREATED)
@@ -5232,6 +5281,7 @@ def get_list_all_schedH6(report_id, cmte_id):
             last_update_date
             FROM public.sched_h6
             WHERE report_id = %s AND cmte_id = %s
+            AND back_ref_transaction_id IS NULL
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
@@ -5283,6 +5333,7 @@ def get_list_schedH6(report_id, cmte_id, transaction_id):
             last_update_date
             FROM public.sched_h6
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
+            AND back_ref_transaction_id IS NULL
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
