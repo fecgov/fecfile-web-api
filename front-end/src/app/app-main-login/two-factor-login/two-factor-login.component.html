@@ -1,0 +1,58 @@
+<style>
+  @import url('https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i&display=swap&subset=latin-ext');
+</style>
+<div class="main-box">
+  <div class="main-content">
+    <form [formGroup]="twoFactInfo">
+      <header>
+        <div class="text-center">
+          <img class="fec-title" src="assets/img/FECtitleNew.png" draggable="false" alt="FECTitle" />
+        </div>
+        <div class="title-front-main">Electronic Filing Sign in</div>
+        <div class="title-front-sub">
+          Please choose one of the three options for code verification.
+        </div>
+        <br><br><hr>
+      </header>
+
+      <div class="form-group radio">
+        <div class="user-info form-check-inline">
+
+          <div class="radio-options">
+            <label for="email">
+            <input type="radio"
+                   formControlName="twoFactOption"
+                   id="email"
+                   value="email"/>
+            Email
+          </label>
+          </div>
+
+          <div class="radio-options">
+            <label for="phone_number_text">
+            <input type="radio"
+                   formControlName="twoFactOption"
+                   id="phone_number_text"
+                   value="phone_text" />
+            Phone Number(Text)
+          </label>
+          </div>
+          <div class="radio-options">
+            <label for="phone_number_text">
+            <input type="radio"
+                   formControlName="twoFactOption"
+                   id="phone_number_call"
+                   value="phone_call"/>
+            Phone Number(Call)
+          </label>
+          </div>
+
+        </div>
+        <div class="user-info-actions">
+          <button class="action__btn clear" (click)="back()"> Back</button>
+          <button class="action__btn next" (click)="submit()"> Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
