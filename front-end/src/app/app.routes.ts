@@ -28,13 +28,17 @@ import {HelpComponent} from './help/help.component';
 // import { ImportContactsComponent } from './contacts/import/import-contacts/import-contacts.component';
 import {ManageUserComponent} from './admin/manage-user/manage-user.component';
 import {Roles} from './shared/enums/Roles';
+import {TwoFactorLoginComponent} from './app-main-login/two-factor-login/two-factor-login.component';
+import {ConfirmTwoFactorComponent} from './app-main-login/confirm-two-factor/confirm-two-factor.component';
 
 export const AppRoutes: Routes = [
   {
     path: '',
     component: LoginComponent,
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
+  { path: 'twoFactLogin', component: TwoFactorLoginComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
+  { path: 'confirm-2f', component: ConfirmTwoFactorComponent, pathMatch: 'full', canActivate: [CanActivateGuard] },
   {
     path: '',
     component: AppLayoutComponent,

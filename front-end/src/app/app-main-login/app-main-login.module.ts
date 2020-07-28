@@ -4,6 +4,8 @@ import {LoginComponent} from './login/login.component';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
+import { TwoFactorLoginComponent } from './two-factor-login/two-factor-login.component';
+import { ConfirmTwoFactorComponent } from './confirm-two-factor/confirm-two-factor.component';
 
 @NgModule({
   imports: [
@@ -13,9 +15,9 @@ import {RouterModule} from '@angular/router';
     ReactiveFormsModule,
     RouterModule
   ],
-  declarations: [LoginComponent],
+  declarations: [LoginComponent, TwoFactorLoginComponent, ConfirmTwoFactorComponent],
   exports: [
-      LoginComponent
+      LoginComponent, TwoFactorLoginComponent
   ],
   entryComponents: [LoginComponent]
 })
