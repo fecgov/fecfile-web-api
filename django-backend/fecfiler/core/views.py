@@ -4098,9 +4098,17 @@ def get_transactions(request, transaction_id):
     else:
         param_string += " AND delete_ind is distinct from 'Y'"
     
-    if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
+    if ctgry_type == "receipts_tran" or ctgry_type == "other_tran":
         parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
         param_string += " AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(" + parent_transaction_id + ", 'NONE')"
+        if transaction_id is not None:
+            param_string += " OR  transaction_id = '" + transaction_id + "'"
+        param_string += " ) "
+
+    if ctgry_type == "disbursements_tran":
+        parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
+        param_string += """ AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(""" + parent_transaction_id + """, 'NONE') 
+            OR transaction_type_identifier in ('IK_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT','PARTY_IK_OUT','PAC_IK_OUT')"""
         if transaction_id is not None:
             param_string += " OR  transaction_id = '" + transaction_id + "'"
         param_string += " ) "
