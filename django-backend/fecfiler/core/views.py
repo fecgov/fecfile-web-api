@@ -10921,3 +10921,23 @@ def save_additional_email(request):
           "The save_additional_email API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
+
+@api_view(['GET'])
+def get_f24_reports(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        _sql = """SELECT json_agg(t) FROM (SELECT report_id AS "reportId", last_update_date::date AS "lastUpdatedDate", 
+                  CASE WHEN UPPER(status) IN (null, 'SAVED') THEN 'SAVED' WHEN UPPER(status) IN ('SUBMITTED')
+                  THEN 'SUBMITTED' ELSE 'FILED' END AS status
+                  FROM public.reports WHERE cmte_id = %s AND delete_ind IS DISTINCT FROM 'Y') t"""
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id])
+            result = cursor.fetchall()
+            output = [] if not result[0][0] else result[0][0]
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The get_f24_reports API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
