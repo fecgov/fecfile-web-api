@@ -320,18 +320,23 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
   }
 
   public printPreview(){
-    this._reportTypeService.printPreviewPdf(this.formType,'PrintPreviewPDF',undefined,this.reportId) .subscribe(res => {
-        if(res) {
-          if (res.hasOwnProperty('results')) {
-            if (res['results.pdf_url'] !== null) {
-              window.open(res.results.pdf_url, '_blank');
+    if(this.formType === '99'){
+      this._messageService.sendMessage({action:'print', formType:'F99'});
+    }
+    else{
+      this._reportTypeService.printPreviewPdf(this.formType,'PrintPreviewPDF',undefined,this.reportId) .subscribe(res => {
+          if(res) {
+            if (res.hasOwnProperty('results')) {
+              if (res['results.pdf_url'] !== null) {
+                window.open(res.results.pdf_url, '_blank');
+              }
             }
           }
-        }
-    },
-    (error) => {
-      console.error('error: ', error);
-    });
+      },
+      (error) => {
+        console.error('error: ', error);
+      });
+    }
   }
 
   public populateForm() {
@@ -715,6 +720,14 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
             }
           });
       }
+    }
+  }
+
+  public previous(){
+    if (this.formType === '99') {
+      this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: {step:'step_3'}, queryParamsHandling:'merge'});
+    } else if (this.formType === '3X') {
+      this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: 'step_2', edit: this.editMode } });
     }
   }
 

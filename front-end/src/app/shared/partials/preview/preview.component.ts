@@ -54,6 +54,12 @@ export class PreviewComponent implements OnInit , OnDestroy{
         this.ngOnInit();
       }
     });
+
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(msg => {
+      if(msg && msg.action === 'print' && msg.formType === 'F99'){
+        this.printPreview();
+      }
+    })
   }
 
   ngOnInit(): void {
