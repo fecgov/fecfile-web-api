@@ -1475,3 +1475,57 @@ def schedE(request):
 
     else:
         raise NotImplementedError
+
+@api_view(['POST'])
+def mirror_to_F24(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        for param in ['transactionId','reportId']:
+            if not request.data.get(param): raise Exception('The parameter {} is mandatory.'.format(param))
+
+        transaction_id = get_next_transaction_id("SE")
+        _sql = """INSERT INTO public.sched_e(
+            cmte_id, report_id, transaction_type_identifier, transaction_id, 
+            back_ref_transaction_id, back_ref_sched_name, payee_entity_id, 
+            election_code, election_other_desc, dissemination_date, expenditure_amount, 
+            disbursement_date, calendar_ytd_amount, purpose, category_code, 
+            payee_cmte_id, support_oppose_code, so_cand_id, so_cand_last_name, 
+            so_cand_first_name, so_cand_middle_name, so_cand_prefix, so_cand_suffix, 
+            so_cand_office, so_cand_district, so_cand_state, completing_entity_id, 
+            date_signed, memo_code, memo_text, delete_ind, create_date, last_update_date, 
+            line_number, aggregation_ind, associatedbydissemination, mirror_report_id, 
+            mirror_transaction_id)
+            SELECT cmte_id, %s, transaction_type_identifier, %s, 
+            back_ref_transaction_id, back_ref_sched_name, payee_entity_id, 
+            election_code, election_other_desc, dissemination_date, expenditure_amount, 
+            disbursement_date, calendar_ytd_amount, purpose, category_code, 
+            payee_cmte_id, support_oppose_code, so_cand_id, so_cand_last_name, 
+            so_cand_first_name, so_cand_middle_name, so_cand_prefix, so_cand_suffix, 
+            so_cand_office, so_cand_district, so_cand_state, completing_entity_id, 
+            date_signed, memo_code, memo_text, delete_ind, %s, %s, 
+            line_number, aggregation_ind, associatedbydissemination, report_id, 
+            transaction_id
+            FROM public.sched_e WHERE cmte_id=%s AND transaction_id=%s AND delete_ind IS DISTINCT FROM 'Y'"""
+        _value_list = [request.data['reportId'], transaction_id, datetime.datetime.now(),
+              datetime.datetime.now(), cmte_id, request.data['transactionId']] 
+
+        _sql2 = """UPDATE public.sched_e SET mirror_report_id = %s, mirror_transaction_id = %s
+                WHERE transaction_id = %s"""
+        _value_list2 = [request.data['reportId'], transaction_id, request.data['transactionId']]
+
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, _value_list)
+            if not cursor.rowcount: raise Exception('failed to create new transaction')
+            cursor.execute(_sql2, _value_list2)
+            if not cursor.rowcount: raise Exception('failed to update transaction: {}'.format(
+                request.data['transactionId']))
+        data = {"cmte_id": cmte_id,
+                "report_id": request.data['reportId'],
+                "transaction_id": transaction_id}
+        get_data = get_schedE(data)[0]
+        return Response(get_data, status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response(
+          "The mirror_to_F24 API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )

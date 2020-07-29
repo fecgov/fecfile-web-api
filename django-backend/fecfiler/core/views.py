@@ -4098,9 +4098,17 @@ def get_transactions(request, transaction_id):
     else:
         param_string += " AND delete_ind is distinct from 'Y'"
     
-    if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
+    if ctgry_type == "receipts_tran" or ctgry_type == "other_tran":
         parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
         param_string += " AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(" + parent_transaction_id + ", 'NONE')"
+        if transaction_id is not None:
+            param_string += " OR  transaction_id = '" + transaction_id + "'"
+        param_string += " ) "
+
+    if ctgry_type == "disbursements_tran":
+        parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
+        param_string += """ AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(""" + parent_transaction_id + """, 'NONE') 
+            OR transaction_type_identifier in ('IK_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT','PARTY_IK_OUT','PAC_IK_OUT')"""
         if transaction_id is not None:
             param_string += " OR  transaction_id = '" + transaction_id + "'"
         param_string += " ) "
@@ -10911,5 +10919,24 @@ def save_additional_email(request):
     except Exception as e:
         return Response(
           "The save_additional_email API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def get_f24_reports(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        _sql = """SELECT json_agg(t) FROM (SELECT report_id AS "reportId", last_update_date::date AS "lastUpdatedDate", 
+                  CASE WHEN UPPER(status) IN (null, 'SAVED') THEN 'SAVED' WHEN UPPER(status) IN ('SUBMITTED')
+                  THEN 'SUBMITTED' ELSE 'FILED' END FROM public.reports WHERE cmte_id = %s AND delete_ind IS DISTINCT FROM 'Y') t"""
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id])
+            result = cursor.fetchall()
+            output = [] if not result[0][0] else result[0][0]
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The get_f24_reports API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
