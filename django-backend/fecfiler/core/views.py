@@ -1283,7 +1283,6 @@ def post_reports(data, reportid=None):
                 raise Exception(
                     "The post_sql_report function is throwing an error: " + str(e)
                 )
-
             try:
                 # Insert data into Form 3X table
                 if data.get("form_type") == "F3X":
@@ -1547,7 +1546,7 @@ def count_orphaned_transactions(report_id, cmte_id):
 """
 
 
-def reposit_f3x_data(cmte_id, report_id):
+def reposit_f3x_data(cmte_id, report_id, form_type='F3X'):
     """
     helper funcrtion to move current F3X report data from efiling front db to backend db
     """
@@ -1556,25 +1555,32 @@ def reposit_f3x_data(cmte_id, report_id):
         "reposit f3x data with cmte_id {} and report_id {}".format(cmte_id, report_id)
     )
     # transaction_tables = ['sched_a']
-    transaction_tables = [
-        "reports",
-        "sched_a",
-        "sched_b",
-        "sched_c",
-        "sched_c1",
-        "sched_c2",
-        "sched_d",
-        "sched_e",
-        "sched_f",
-        "sched_h1",
-        "sched_h2",
-        "sched_h3",
-        "sched_h4",
-        "sched_h5",
-        "sched_h6",
-        "sched_l",
-        "form_3x",
-    ]
+    if form_type == 'F3X':
+        transaction_tables = [
+            "reports",
+            "sched_a",
+            "sched_b",
+            "sched_c",
+            "sched_c1",
+            "sched_c2",
+            "sched_d",
+            "sched_e",
+            "sched_f",
+            "sched_h1",
+            "sched_h2",
+            "sched_h3",
+            "sched_h4",
+            "sched_h5",
+            "sched_h6",
+            "sched_l",
+            "form_3x",
+        ]
+    else:
+        transaction_tables = [
+            "reports",
+            "sched_e",
+            "form_24",
+        ]
     # transaction_tables = ['sched_b']
     backend_connection = psycopg2.connect(
         "dbname={} user={} host={} password={} connect_timeout=3000".format(
@@ -1761,7 +1767,7 @@ def submit_report(request):
         if not report_id:
             raise Exception()
         fec_id = report_id
-        if form_tp == "F3X":
+        if form_tp in ["F3X", "F24"]:
             update_tbl = "public.reports"
             f_id = "report_id"
         elif form_tp == "F99":
@@ -1770,7 +1776,7 @@ def submit_report(request):
         else:
             raise Exception("Error: invalid form type.")
 
-        if form_tp == "F3X":
+        if form_tp in ["F3X", "F24"]:
             _sql_update = (
                     """
                 UPDATE {}""".format(
@@ -1808,8 +1814,8 @@ def submit_report(request):
             if cursor.rowcount == 0:
                 raise Exception("report {} update failed".format(report_id))
 
-        if form_tp == "F3X":
-            reposit_f3x_data(cmte_id, report_id)
+        if form_tp in ["F3X", "F24"]:
+            reposit_f3x_data(cmte_id, report_id, form_tp)
         elif form_tp == "F99":
             reposit_f99_data(cmte_id, report_id)
         else:
@@ -1833,7 +1839,7 @@ def submit_report(request):
         email(True, email_data)
         logger.debug("email success.")
 
-        if form_tp == "F3X":
+        if form_tp in ["F3X", "F24"]:
             _sql_response = """
             SELECT json_agg(t) FROM (
                 SELECT 'FEC-' || fec_id as fec_id, status, filed_date, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
@@ -9048,7 +9054,6 @@ def create_amended(reportid):
                         [reportid, created_data["reportid"]],
                     )
                 return data
-
         else:
             return False
 
