@@ -17,7 +17,7 @@
 
       <div class="form-group">
         <p>
-          We sent (a/an) {{option === 'email' ? 'email': 'text'}} to the {{option}} on file.
+          We sent (a/an) code to the {{option}} on file.
           Enter the Security Code from that message here.
         </p>
         <div class="user-info">
@@ -29,15 +29,18 @@
                      formControlName="securityCode"
                     >
             </div>
+            <div class="text-error" *ngIf="!twoFactInfo.valid && twoFactInfo.touched">
+              <span>Please enter the security code received</span>
+            </div>
             <br>
             <br>
           </div>
           <div class="container">
-            <label>Didn't receive a code?</label> <a>
-            Resend Security Code
-          </a>
+            <label>Didn't receive a code?</label>
+            <a (click)="resend()"> Resend Security Code</a>
           </div>
         </div>
+
         <div class="user-info-actions">
           <button class="action__btn next" (click)="next()"> Next</button>
         </div>

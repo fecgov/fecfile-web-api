@@ -46,7 +46,9 @@
             Phone Number(Call)
           </label>
           </div>
-
+        </div>
+        <div class="text-error" *ngIf="!twoFactInfo.valid && twoFactInfo.touched">
+          <span>Please select a option to continue</span>
         </div>
         <div class="user-info-actions">
           <button class="action__btn clear" (click)="back()"> Back</button>

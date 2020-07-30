@@ -6,6 +6,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {RouterModule} from '@angular/router';
 import { TwoFactorLoginComponent } from './two-factor-login/two-factor-login.component';
 import { ConfirmTwoFactorComponent } from './confirm-two-factor/confirm-two-factor.component';
+import { ConsentModalComponent } from './consent-modal/consent-modal.component';
 
 @NgModule({
   imports: [
@@ -15,10 +16,10 @@ import { ConfirmTwoFactorComponent } from './confirm-two-factor/confirm-two-fact
     ReactiveFormsModule,
     RouterModule
   ],
-  declarations: [LoginComponent, TwoFactorLoginComponent, ConfirmTwoFactorComponent],
+  declarations: [LoginComponent, TwoFactorLoginComponent, ConfirmTwoFactorComponent, ConsentModalComponent],
   exports: [
       LoginComponent, TwoFactorLoginComponent
   ],
-  entryComponents: [LoginComponent]
+  entryComponents: [LoginComponent, ConsentModalComponent]
 })
 export class AppMainLoginModule { }

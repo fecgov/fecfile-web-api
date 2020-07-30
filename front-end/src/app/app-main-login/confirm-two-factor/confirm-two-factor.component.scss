@@ -82,6 +82,13 @@
       input:focus {
         border-color: green
       }
+      a{
+        color: #0000FF;
+        cursor:pointer;
+      }
+     a:hover{
+       text-decoration: underline;
+     }
       .input-field-error{
         border: 1px solid red;
       }

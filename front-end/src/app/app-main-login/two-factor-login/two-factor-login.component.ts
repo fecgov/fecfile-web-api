@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
+import {MessageService} from '../../shared/services/MessageService/message.service';
 
 @Component({
   selector: 'app-two-factor-login',
@@ -13,7 +14,8 @@ export class TwoFactorLoginComponent implements OnInit {
 
   constructor(
       private router: Router,
-      private _fb: FormBuilder
+      private _fb: FormBuilder,
+      private _messageService: MessageService,
   ) {
     this.twoFactInfo = _fb.group({
       twoFactOption: ['', Validators.required],
@@ -31,20 +33,18 @@ export class TwoFactorLoginComponent implements OnInit {
   }
 
   submit() {
-    // TODO: submit the form and do not navigate anywhere
     // Check requirements
     // for now navigate to two factor code verify screen
-    // if (this.frmUserInfo.valid) {
-    if (true) {
-      this.router.navigate(['/confirm-2f']).then(r => {
-        // handle it
-      });
-    } /*else {
-      this.frmUserInfo.markAsTouched();
-    }*/
+    this.twoFactInfo.markAsTouched();
+    if (this.twoFactInfo.valid) {
+      const option = this.twoFactInfo.get('twoFactOption').value;
+      this._messageService.sendMessage(
+          { selectedOption: option }
+          );
+        this.router.navigate(['/confirm-2f']).then(r => {
+          // handle it
+        });
+    }
   }
-  handleOptionChange() {
-    // Handle the validator change when option changes
-    // remove unwanted validators
-  }
+
 }
