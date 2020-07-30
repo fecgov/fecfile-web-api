@@ -118,7 +118,7 @@ export class LoginComponent implements OnInit {
           this._authService
               .doSignIn(res.token);
 
-          this._router.navigate(['dashboard']);
+          this._router.navigate(['twoFactLogin']);
         }
       },
       (error) => {
