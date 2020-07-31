@@ -552,7 +552,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       //schedE is set up differently, causing ngOnChange to fire everytime, so need to explicily check the component against the transactionType to prevent
       //unnecessary calls. This may need to be cleaned up later. 
       if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedEComponent) {
-        if (!changes.transactionType.currentValue.startsWith('IE')) {
+        if (changes.transactionType.currentValue && !changes.transactionType.currentValue.startsWith('IE')) {
           return false;
         }
         return true;

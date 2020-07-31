@@ -994,7 +994,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       scheduleType: this.transactionToEdit.scheduleType,
       transactionDetail: {
         transactionModel: this.transactionToEdit
-      }
+      },
+      formType: this.transactionToEdit.formType
     };
     if (debtSummary) {
       if (debtSummary.returnToDebtSummary) {
@@ -1003,7 +1004,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         emitObj.mainTransactionTypeText = 'Loans and Debts';
       }
     }
-    if(this.transactionToEdit.mirrorReportId && !this.transactionToEdit.cloned){ //cloned check is done because the modal is already shown for clone before this point.
+    if((this.formType === 'F24' || this.formType === '24') && this.transactionToEdit.mirrorReportId && !this.transactionToEdit.cloned){ //cloned check is done because the modal is already shown for clone before this point.
       this.handleMirrorTransactionIfApplicable(this.transactionToEdit,emitObj);
     }
     else{
@@ -1023,14 +1024,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       mirrorForm = '3X';
     }
     this._dialogService
-        .confirm('Please note that if you modify this transaction it will be updated in Form ' + mirrorForm,ConfirmModalComponent, 'Warning!', true,ModalHeaderClassEnum.warningHeader,null,'Cancel')
+        .confirm(`Please note that if you modify this transaction it will be updated in Form ${mirrorForm}. Please acknowledge this change by clicking the OK button.`,ConfirmModalComponent, 'Warning!', true,ModalHeaderClassEnum.warningHeader,null,'Cancel')
         .then(res => {
           if (res === 'okay') {
             //make sure modifying is permitted based on mirrorReportId !== Filed/Submitted
             this._reportsService
-              .getReportInfo(transactionToEdit.formType, transactionToEdit.reportId)
+              .getReportInfo('F3X', transactionToEdit.mirrorReportId)
               .subscribe((res: any) => {
-                if(res && res.reportstatus === 'Submitted'){
+                if(res && res[0] && res[0].reportstatus === 'Submitted'){
                   this._dialogService
                   .confirm('This transaction cannot be modified since the mirrored transaction in Form ' + mirrorForm + 'is already filed. You will have to amend that report', ConfirmModalComponent, 'Error!', false)
                   .then(res => {

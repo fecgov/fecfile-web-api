@@ -960,7 +960,26 @@ export class TransactionsService {
         })
       );
   }
+
+  public mirrorIEtoF24(request: any): Observable<any> {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    const url = '/se/mirror_to_F24';
+    
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+  
+    const formData: FormData = new FormData();
+    formData.append('reportId', request.reportId);
+    formData.append('transactionId', request.transactionId);
+  
+    return this._http
+      .post(`${environment.apiUrl}${url}`, formData, {
+        headers: httpOptions
+      })
+  }
+  
 }
+
 function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.reportId = row.report_id;
   model.reportType = row.report_type;

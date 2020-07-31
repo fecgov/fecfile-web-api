@@ -105,6 +105,7 @@ import {AppMainLoginModule} from './app-main-login/app-main-login.module';
 import {AdminModule} from './admin/admin.module';
 import { PhonePipe } from './shared/pipes/phone-number/phone-number.pipe';
 import { ExportDirective } from './shared/directives/export.directive';
+import { F24LinkModalComponent } from './forms/transactions/transactions-table/f24-link-modal/f24-link-modal.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -193,8 +194,9 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     HelpComponent,
     F24Component,
     ExportDirective,
+    F24LinkModalComponent,
   ],
-  entryComponents: [ConfirmModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
+  entryComponents: [ConfirmModalComponent,F24LinkModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
     SharedModule,
     AdminModule,
