@@ -848,15 +848,12 @@ public printReport(report: reportModel): void{
       setTimeout(() => {
         this._router.navigate(['/forms/form/99'],{ queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
       }, 1500);
-    } else if (report.form_type === 'F3X') {
+    } else if (report.form_type === 'F3X' || report.form_type === 'F24') {
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
-          //console.log('getReportInfo res =', res);
-          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
-          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
-
-          //return false;
+          localStorage.setItem(`form_${report.form_type.substr(1)}_details`, JSON.stringify(res[0]));
+          localStorage.setItem(`form_${report.form_type.substr(1)}_report_type`, JSON.stringify(res[0]));
         });
 
       setTimeout(() => {
@@ -864,7 +861,7 @@ public printReport(report: reportModel): void{
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          this._router.navigate(['/signandSubmit/3X'], { queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
+          this._router.navigate([`/signandSubmit/${report.form_type.substr(1)}`], { queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
 
       }, 1500);
     } else if(report.form_type === 'F1M'){

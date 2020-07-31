@@ -121,7 +121,7 @@ export class FormsComponent implements OnInit, OnDestroy {
 
   public onNotify(e: any): void {
     // this.returnToGlobalAllTransaction = true;
-    const formType = this.getFormType(e.form);
+    const formType = this.getFormType(e);
     if(e.transactionDetail.transactionModel.reportId){
       this.setReportSpecificMetaDataAndProceed(e.transactionDetail.transactionModel.reportId,e,formType);
     }
@@ -177,9 +177,6 @@ export class FormsComponent implements OnInit, OnDestroy {
    * @param form 
    */
   private getFormType(form: any):string {
-    
-    //returning hardcoded F3X for now but logic should be added to this method later on.
-    return "3X";
-    
+      return form.formType.substr(1);
   }
 }
