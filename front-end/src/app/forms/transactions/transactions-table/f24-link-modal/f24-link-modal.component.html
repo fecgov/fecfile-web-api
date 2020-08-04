@@ -12,6 +12,8 @@
             <ng-select 
             [items]="f24List"
             (change)="handleF24Select($event)"
+            [disabled]="true"
+            placeholder="Select a report"
             bindValue="reportId"
             bindLabel="displayText">
           </ng-select>
@@ -22,7 +24,7 @@
       <button type="button" class="btn btn-right btn-secondary-gray" (click)="closeModal()">
         Cancel
       </button>
-      <button type="button" class="btn btn-primary btn-right" (click)="save()">
+      <button type="button" class="btn btn-primary btn-right" (click)="save()" [disabled]='!selectedReportId'>
         Save
       </button>
     </div>

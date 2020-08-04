@@ -252,6 +252,7 @@ export class F24Component implements OnInit {
           window.scrollTo(0, 0);
         }
       }
+      
     });
 
     //jumpToTransaction is used to pass transaction info from the "Global" All Transactions component 
@@ -261,12 +262,14 @@ export class F24Component implements OnInit {
       this.returnToGlobalAllTransaction = true;
       this.onNotify(this.jumpToTransaction);
     }
+    this._messageService.sendMessage({action:'updateHeaderInfo', data: {formType: 'F24'}});
   }
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
     this.queryParamsSubscription.unsubscribe();
     this.routerEventsSubscription.unsubscribe();
+    this._messageService.sendMessage({action:'updateHeaderInfo', data: {formType: null}});
   }
 
    /**
