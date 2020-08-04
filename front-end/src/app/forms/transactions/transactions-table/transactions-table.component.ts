@@ -1,5 +1,7 @@
+import { DatePipe } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { PaginationInstance } from 'ngx-pagination';
 import { Subject } from 'rxjs';
@@ -22,10 +24,7 @@ import { TransactionModel } from '../model/transaction.model';
 import { TransactionsMessageService } from '../service/transactions-message.service';
 import { GetTransactionsResponse, TransactionsService } from '../service/transactions.service';
 import { ActiveView } from '../transactions.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { F24LinkModalComponent } from './f24-link-modal/f24-link-modal.component';
-import { NgModuleRef } from '@angular/core/src/render3';
-import { DatePipe } from '@angular/common';
 
 const transactionCategoryOptions = [];
 
@@ -370,9 +369,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this._reportsService.getAllF24Reports().subscribe(res => {
       res.map((report:any) =>{
         report.displayText = `${report.reportType} Hour Report - (Last Updated: ${this._datePipe.transform(report.lastUpdatedDate, 'short', 'GMT')})`;
+        if(report.status === 'SUBMITTED'){
+          report.disabled = true;
+        }
+        else{
+          report.disabled = false;
+        }
       })
     const modalRef = this.modalService.open(F24LinkModalComponent);
-    modalRef.componentInstance.f24List = res;
+    modalRef.componentInstance.f24List = res; 
     modalRef.result.then(result => {
       this._transactionsService.mirrorIEtoF24({reportId: result, transactionId: trx.transactionId}).subscribe(res => {
         if(res){
@@ -1115,7 +1120,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * @param trx the Transaction to clone
    */
   public cloneTransaction(trx: TransactionModel): void {
-    if(trx.mirrorReportId && this.formType === '24'){
+    if(trx.mirrorReportId){
       this.warnUserIfMirrorTransaction(trx, 'clone');
     }
     else{
@@ -1139,15 +1144,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   }
 
   warnUserIfMirrorTransaction(trx: TransactionModel, action:string) {
-    let mirrorForm = '';
+    let dialogMsg = '';
     if(trx.formType === 'F3X'){
-      mirrorForm = '24';
+      dialogMsg = `Please note that this change will not automatcally reflect in the F24 report. You will have to make this change separately in F24.`;
     }
     else if(trx.formType === 'F24'){
-      mirrorForm = '3X';
+      dialogMsg = `Please note that if you update this transaction it will be updated in Form F3X. Please acknowledge this change by clicking the OK button.`;
     }
     this._dialogService
-        .confirm(`Please note that if you update this transaction it will be updated in Form ${mirrorForm}. Please acknowledge this change by clicking the OK button.`,ConfirmModalComponent, 'Warning!', true,ModalHeaderClassEnum.warningHeader,null,'Cancel')
+        .confirm(dialogMsg,ConfirmModalComponent, 'Warning!', true,ModalHeaderClassEnum.warningHeader,null,'Cancel')
         .then(res => {
           if (res === 'okay') {
             //make sure modifying is permitted based on mirrorReportId !== Filed/Submitted
@@ -1156,7 +1161,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
               .subscribe((res: any) => {
                 if(res && res[0] && res[0].reportstatus === 'Submitted'){
                   this._dialogService
-                  .confirm('This transaction cannot be modified since the mirrored transaction in Form ' + mirrorForm + ' is already filed. You will have to amend that report', ConfirmModalComponent, 'Error!', false)
+                  .confirm('This transaction cannot be modified since the mirrored transaction in Form F3X is already filed. You will have to amend that report', ConfirmModalComponent, 'Error!', false)
                   .then(res => {
                     if (res === 'okay') {
                     }
@@ -1241,7 +1246,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .confirm('You are about to delete this transaction ' + trx.transactionId + '.', ConfirmModalComponent, 'Caution!')
       .then(res => {
         if (res === 'okay') {
-          if(trx.mirrorReportId && this.formType === '24'){
+          if(trx.mirrorReportId){
               this.warnUserIfMirrorTransaction(trx,'trash');
             }
           else{
