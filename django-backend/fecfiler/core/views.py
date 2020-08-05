@@ -10926,10 +10926,10 @@ def save_additional_email(request):
 def get_f24_reports(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
-        _sql = """SELECT json_agg(t) FROM (SELECT report_id AS "reportId", last_update_date::date AS "lastUpdatedDate", 
+        _sql = """SELECT json_agg(t) FROM (SELECT report_id AS "reportId", last_update_date::timestamp AS "lastUpdatedDate", report_type AS "reportType", 
                   CASE WHEN UPPER(status) IN (null, 'SAVED') THEN 'SAVED' WHEN UPPER(status) IN ('SUBMITTED')
                   THEN 'SUBMITTED' ELSE 'FILED' END AS status
-                  FROM public.reports WHERE cmte_id = %s AND delete_ind IS DISTINCT FROM 'Y') t"""
+                  FROM public.reports WHERE cmte_id = %s AND form_type = 'F24' AND delete_ind IS DISTINCT FROM 'Y') t"""
         with connection.cursor() as cursor:
             cursor.execute(_sql, [cmte_id])
             result = cursor.fetchall()

@@ -1,28 +1,28 @@
 <div class="transactions__table-container">
   <div class="grid-row">
     <nav class="navbar navbar-light width-100">
-      <button [ngClass]="{
+      <button *ngIf = "showReceiptsTab" [ngClass]="{
                                     'btn btn-primary': transactionCategory === 'receipts',
                                     'btn btn-secondary-gray': transactionCategory !== 'receipts'
                                   }" class="btn-lg width-25" type="button"
         (click)="changeTransactionCategory('receipts')">
         Receipts
       </button>
-      <button [ngClass]="{
+      <button  *ngIf = "showDisbursementsTab" [ngClass]="{
                             'btn btn-primary': transactionCategory === 'disbursements',
                             'btn btn-secondary-gray': transactionCategory !== 'disbursements'
                           }" class="btn-lg width-25" type="button"
         (click)="changeTransactionCategory('disbursements')">
         Disbursements
       </button>
-      <button [ngClass]="{
+      <button *ngIf = "showLoansTab" [ngClass]="{
                             'btn btn-primary': transactionCategory === 'loans-and-debts',
                             'btn btn-secondary-gray': transactionCategory !== 'loans-and-debts'
                           }" class="btn-lg width-25" type="button"
         (click)="changeTransactionCategory('loans-and-debts')">
         Loans and Debts
       </button>
-      <button [ngClass]="{
+      <button *ngIf="showOthersTab" [ngClass]="{
                       'btn btn-primary': transactionCategory === 'other',
                       'btn btn-secondary-gray': transactionCategory !== 'other'
                       }" class="btn-lg width-25" type="button" (click)="changeTransactionCategory('other')">
@@ -483,7 +483,7 @@
               <td>
                 <input [(ngModel)]="trx.selected" type="checkbox" (click)="checkForMultiChecked($event, trx)">
               </td>
-              <td  *ngIf="_allTransactions">{{trx.reportType}}</td>
+              <td  *ngIf="_allTransactions">{{trx.formType}} - {{trx.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')">
                 {{!getCurrentItemizationStatus(trx) ? trx.type +' (U) ' : trx.type}}</td>
               <td  [ngClass]="trx.child ? 'parent': ''" (click)="trx.child? trx.toggleChild = !trx.toggleChild: ''"
@@ -554,6 +554,11 @@
                           <i class="trash-icon"></i> Trash
                         </button>
                       </span>
+                      <button class="dropdown-item"  [disabled]="isDisabled(trx)" (click)="linkToF24(trx)"
+                        *ngIf="trx.transactionTypeIdentifier === 'IE' && _allTransactions && trx.formType === 'F3X' && !trx.mirrorReportId && !trx.mirrorTransactionId"
+                      >
+                        <i class="fas link-icon"></i> Link to F24
+                      </button>
                     </div>
                   </div>
                 </div>

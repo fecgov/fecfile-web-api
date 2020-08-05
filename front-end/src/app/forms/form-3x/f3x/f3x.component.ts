@@ -244,6 +244,7 @@ export class F3xComponent implements OnInit, OnDestroy {
       this.routerEventsSubscription.unsubscribe();
     }
     this._messageService.clearUpdateReportTypeMessage();
+    this._messageService.sendMessage({action:'updateHeaderInfo', data: {formType: null}});
   }
 
   ngDoCheck(): void {

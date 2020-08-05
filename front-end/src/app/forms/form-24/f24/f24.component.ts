@@ -13,6 +13,7 @@ import { TransactionTypeService } from '../../form-3x/transaction-type/transacti
 import { LoanMessageService } from '../../sched-c/service/loan-message.service';
 import { SchedHMessageServiceService } from '../../sched-h-service/sched-h-message-service.service';
 import { SchedHServiceService } from '../../sched-h-service/sched-h-service.service';
+import { MessageService } from '../../../shared/services/MessageService/message.service';
 
 @Component({
   selector: 'app-f24',
@@ -94,6 +95,7 @@ export class F24Component implements OnInit {
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
     private _f3xMessageService: F3xMessageService,
+    private _messageService: MessageService,
     private _loanMessageService: LoanMessageService,
     private _schedHMessageServce: SchedHMessageServiceService,
     private _schedHService: SchedHServiceService
@@ -157,7 +159,7 @@ export class F24Component implements OnInit {
     this.transactionCategories = {
         "transactionCategories": [
           {
-            "text": "Disbursements",
+            "text": "Independent Expenditures",
             "value": "disbursements",
             "options": [
               {
@@ -250,6 +252,7 @@ export class F24Component implements OnInit {
           window.scrollTo(0, 0);
         }
       }
+      
     });
 
     //jumpToTransaction is used to pass transaction info from the "Global" All Transactions component 
@@ -259,12 +262,14 @@ export class F24Component implements OnInit {
       this.returnToGlobalAllTransaction = true;
       this.onNotify(this.jumpToTransaction);
     }
+    this._messageService.sendMessage({action:'updateHeaderInfo', data: {formType: 'F24'}});
   }
 
   ngOnDestroy(): void {
     this.onDestroy$.next(true);
     this.queryParamsSubscription.unsubscribe();
     this.routerEventsSubscription.unsubscribe();
+    this._messageService.sendMessage({action:'updateHeaderInfo', data: {formType: null}});
   }
 
    /**
@@ -362,6 +367,9 @@ export class F24Component implements OnInit {
     if (!this.scheduleAction) {
       this.scheduleAction = ScheduleActions.add;
     }
+
+    //this is a workaround since for some reason, f24 component is not sending the scheduleAction to schedE component during ngOnChange trigger 
+    this._messageService.sendMessage({action:'forceUpdateSchedEScheduleAction', scheduleAction: this.scheduleAction});
   }
 
    /**
