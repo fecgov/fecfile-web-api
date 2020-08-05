@@ -207,6 +207,7 @@ AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, tur
 # add the credentials from IAM and bucket name
 AWS_STORAGE_BUCKET_NAME = 'fecfile-filing' # or None if using service role
 AWS_STORAGE_UPLOAD_BUCKET_NAME = 'fecfile-filing-uploads' # or None if using service role
+AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME = 'fecfile-filing-frontend'
 #AWS_ACCESS_KEY_ID = '<aws access key >' # or None if using service role
 #AWS_SECRET_ACCESS_KEY = '<aws secret access key>'
 
