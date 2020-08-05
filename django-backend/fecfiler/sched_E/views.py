@@ -452,73 +452,118 @@ def get_sched_e_ytd_amount(request):
         need election_code, so_cand_state and so_cand_dsitrict
     """
     try:
+        trans_dt = None
         cmte_id = get_comittee_id(request.user.username)
         cand_office = request.query_params.get("cand_office")
         if not cand_office:
-            raise Exception("so_cand_office is required for this api.")
+            raise Exception("cand_office is required for this api.")
         election_code = request.query_params.get("election_code")
         if not election_code:
             raise Exception("election_code is required for this api.")
-        if cand_office == "P":
-            _sql = """
-            SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
-            FROM public.sched_e
-            WHERE cmte_id = %s
-            AND so_cand_office = %s 
-            AND election_code = %s 
-            AND delete_ind is distinct from 'Y'
-            ORDER BY transaction_dt DESC, create_date DESC; 
-            """
-            _v = (cmte_id, cand_office, election_code)
-        elif cand_office == "S":
+        form_type = request.query_params.get("form_type")
+        if not form_type:
+            raise Exception("form_type is required for this api.")
+
+        if request.query_params.get("disbursement_date"):
+            trans_dt = date_format(request.query_params.get("disbursement_date"))
+        if request.query_params.get("dissemination_date"):
+            trans_dt = date_format(request.query_params.get("dissemination_date"))
+        if not trans_dt:
+            raise Exception("disbursement date or dissemination date is required for this api.")
+
+        data = {"cmte_id": cmte_id,
+                "election_code": election_code,
+                "so_cand_office": cand_office,
+                }
+        if cand_office == "S":
             cand_state = request.query_params.get("cand_state")
             if not cand_state:
                 raise Exception("cand_state is required for cand_office S")
-            _sql = """
-            SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
-            FROM public.sched_e
-            WHERE cmte_id = %s
-            AND so_cand_office = %s 
-            AND election_code = %s 
-            AND so_cand_state = %s 
-            AND delete_ind is distinct from 'Y'
-            ORDER BY transaction_dt DESC, create_date DESC; 
-            """
-            _v = (cmte_id, cand_office, election_code, cand_state)
-        elif cand_office == "H":
+            data['so_cand_state'] = cand_state
+
+        if cand_office == "H":
             cand_state = request.query_params.get("cand_state")
-            cand_district = request.query_params.get("cand_district")
             if not cand_state:
                 raise Exception("cand_state is required for cand_office H")
+            cand_district = request.query_params.get("cand_district")
             if not cand_district:
                 raise Exception("cand_district is required for cand_office H")
-            _sql = """
-            SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt
-            FROM public.sched_e
-            WHERE cmte_id = %s
-            AND so_cand_office = %s 
-            AND election_code = %s 
-            AND so_cand_state = %s 
-            AND so_cand_district = %s 
-            AND delete_ind is distinct from 'Y'
-            ORDER BY transaction_dt DESC, create_date DESC; 
-            """
-            _v = (cmte_id, cand_office, election_code, cand_state, cand_district)
-        else:
-            raise Exception("invalid cand_office value.")
-        with connection.cursor() as cursor:
-            cursor.execute(_sql, _v)
-            if not cursor.rowcount:
-                logger.debug("no valid ytd value found.")
-                ytd_amt = 0
-            else:
-                ytd_amt = cursor.fetchone()[0]
-                logger.debug("ytd_amt fetched:{}".format(ytd_amt))
+            data['so_cand_state'] = cand_state
+            data['so_cand_district'] = cand_district
+
+        aggregate_start_date, aggregate_end_date = find_aggregate_date(
+                form_type, trans_dt
+            )
+        transaction_list = get_transactions_election_and_office(
+            aggregate_start_date, trans_dt, data, form_type
+        )
+        ytd_amt = 0
+        for transaction in transaction_list:
+            if transaction[3] != 'N':
+                ytd_amt += transaction[1]
+
+        # if cand_office == "P":
+        #     _sql = """
+        #     SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
+        #     FROM public.sched_e
+        #     WHERE cmte_id = %s
+        #     AND so_cand_office = %s 
+        #     AND election_code = %s 
+        #     AND delete_ind is distinct from 'Y'
+        #     ORDER BY transaction_dt DESC, create_date DESC; 
+        #     """
+        #     _v = (cmte_id, cand_office, election_code)
+        # elif cand_office == "S":
+        #     cand_state = request.query_params.get("cand_state")
+        #     if not cand_state:
+        #         raise Exception("cand_state is required for cand_office S")
+        #     _sql = """
+        #     SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt 
+        #     FROM public.sched_e
+        #     WHERE cmte_id = %s
+        #     AND so_cand_office = %s 
+        #     AND election_code = %s 
+        #     AND so_cand_state = %s 
+        #     AND delete_ind is distinct from 'Y'
+        #     ORDER BY transaction_dt DESC, create_date DESC; 
+        #     """
+        #     _v = (cmte_id, cand_office, election_code, cand_state)
+        # elif cand_office == "H":
+        #     cand_state = request.query_params.get("cand_state")
+        #     cand_district = request.query_params.get("cand_district")
+        #     if not cand_state:
+        #         raise Exception("cand_state is required for cand_office H")
+        #     if not cand_district:
+        #         raise Exception("cand_district is required for cand_office H")
+        #     _sql = """
+        #     SELECT calendar_ytd_amount, COALESCE(dissemination_date, disbursement_date) as transaction_dt
+        #     FROM public.sched_e
+        #     WHERE cmte_id = %s
+        #     AND so_cand_office = %s 
+        #     AND election_code = %s 
+        #     AND so_cand_state = %s 
+        #     AND so_cand_district = %s 
+        #     AND delete_ind is distinct from 'Y'
+        #     ORDER BY transaction_dt DESC, create_date DESC; 
+        #     """
+        #     _v = (cmte_id, cand_office, election_code, cand_state, cand_district)
+        # else:
+        #     raise Exception("invalid cand_office value.")
+        # with connection.cursor() as cursor:
+        #     cursor.execute(_sql, _v)
+        #     if not cursor.rowcount:
+        #         logger.debug("no valid ytd value found.")
+        #         ytd_amt = 0
+        #     else:
+        #         ytd_amt = cursor.fetchone()[0]
+        #         logger.debug("ytd_amt fetched:{}".format(ytd_amt))
         return JsonResponse(
             {"ytd_amount": ytd_amt}, status=status.HTTP_200_OK, safe=False
         )
-    except:
-        raise
+    except Exception as e:
+        return Response(
+            """The get_sched_e_ytd_amount API is throwing following error: """ + str(e)
+        )
 
 def get_transactions_election_and_office(start_date, end_date, data, form_type='F3X'):
     """
@@ -547,12 +592,13 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
             AND e.election_code = %s
+            AND e.so_cand_office = %s
             AND e.delete_ind is distinct FROM 'Y'
             AND e.transaction_type_identifier in ('IE_MULTI', 'IE_STAF_REIM', 'IE_PMT_TO_PROL', 'IE_VOID', 'IE_CC_PAY', 'IE')
             AND r.form_type = %s
             ORDER BY transaction_dt ASC, e.create_date ASC;
         """
-        _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"), form_type)
+        _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"), cand_office, form_type)
     elif cand_office == "S":
         _sql = """
         SELECT  
@@ -567,6 +613,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
             AND e.election_code = %s
+            AND e.so_cand_office = %s
             AND e.so_cand_state = %s
             AND e.delete_ind is distinct FROM 'Y' 
             AND e.transaction_type_identifier in ('IE_MULTI', 'IE_STAF_REIM', 'IE_PMT_TO_PROL', 'IE_VOID', 'IE_CC_PAY', 'IE')
@@ -578,6 +625,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             start_date,
             end_date,
             data.get("election_code"),
+            cand_office,
             data.get("so_cand_state"),
             form_type
         )
@@ -595,6 +643,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             AND COALESCE(e.dissemination_date, e.disbursement_date) >= %s
             AND COALESCE(e.dissemination_date, e.disbursement_date) <= %s
             AND e.election_code = %s
+            AND e.so_cand_office = %s
             AND e.so_cand_state = %s
             AND e.so_cand_district = %s
             AND e.delete_ind is distinct FROM 'Y' 
@@ -607,6 +656,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             start_date,
             end_date,
             data.get("election_code"),
+            cand_office,
             data.get("so_cand_state"),
             data.get("so_cand_district"),
             form_type
