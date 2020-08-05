@@ -12,7 +12,7 @@ export class F24LinkModalComponent implements OnInit {
   @Input()
   public f24List;
 
-  private _selectedReportId;
+  public selectedReportId;
 
   constructor(private _reportsService: ReportsService, 
     public activeModal: NgbActiveModal) {
@@ -22,7 +22,7 @@ export class F24LinkModalComponent implements OnInit {
   }
 
   handleF24Select($event:any) {
-    this._selectedReportId = $event.reportId;
+    this.selectedReportId = $event.reportId;
   }
 
   closeModal() {
@@ -30,7 +30,7 @@ export class F24LinkModalComponent implements OnInit {
   }
 
   save() {
-    this.activeModal.close(this._selectedReportId);
+    this.activeModal.close(this.selectedReportId);
   }
 
 }
