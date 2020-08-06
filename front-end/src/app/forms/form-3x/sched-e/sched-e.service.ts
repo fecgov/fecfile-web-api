@@ -6,31 +6,37 @@ import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
 import { environment } from 'src/environments/environment';
 import { map } from 'rxjs/operators';
+import { DatePipe } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SchedEService {
 
+  private _datePipe: DatePipe;
+
   constructor(private _http: HttpClient,
     private _cookieService: CookieService) {
+      this._datePipe = new DatePipe('en-US');
   }
 
-  public getAggregate(formData: any): Observable<any> {
+  public getAggregate(formData: any, formType: string): Observable<any> {
     let allRequiredFieldsPresent = false;
-    if(formData.cand_office && formData.cand_office === 'P'){
-      if(formData.election_code && formData.cand_election_year){
-        allRequiredFieldsPresent = true;
+    if(formData.dissemination_date || formData.disbursement_date){
+      if(formData.cand_office && formData.cand_office === 'P'){
+        if(formData.election_code && formData.cand_election_year){
+          allRequiredFieldsPresent = true;
+        }
       }
-    }
-    else if(formData.cand_office && formData.cand_office === 'S'){
-      if(formData.election_code && formData.cand_election_year && formData.cand_office_state){
-        allRequiredFieldsPresent = true;
+      else if(formData.cand_office && formData.cand_office === 'S'){
+        if(formData.election_code && formData.cand_election_year && formData.cand_office_state){
+          allRequiredFieldsPresent = true;
+        }
       }
-    }
-    else if(formData.cand_office && formData.cand_office === 'H'){
-      if(formData.election_code && formData.cand_election_year && formData.cand_office_state && formData.cand_office_district){
-        allRequiredFieldsPresent = true;
+      else if(formData.cand_office && formData.cand_office === 'H'){
+        if(formData.election_code && formData.cand_election_year && formData.cand_office_state && formData.cand_office_district){
+          allRequiredFieldsPresent = true;
+        }
       }
     }
 
@@ -55,6 +61,15 @@ export class SchedEService {
       }
 
       params = params.append('election_code', `${formData.election_code}${formData.cand_election_year}`);
+      
+      if(formData.dissemination_date){
+        params = params.append('dissemination_date', this._datePipe.transform(formData.dissemination_date, 'MM/dd/yyyy'));
+      }
+      if(formData.disbursement_date){
+        params = params.append('disbursement_date', this._datePipe.transform(formData.disbursement_date, 'MM/dd/yyyy'));
+      }
+
+      params = params.append('form_type', `F${formType}`);
 
       return this._http
         .get(

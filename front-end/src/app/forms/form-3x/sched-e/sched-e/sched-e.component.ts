@@ -48,7 +48,6 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   public coverageEndDate = '';
   private _currentAggregate = null;
   private _reportId;
-  public candOfficeStatesByTransactionType: any;
   public displayCandStateField = false;
   private _minStateSelectionForMultistate = 6;
   
@@ -480,7 +479,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
             {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
       }
     } else  {
-      this._schedEService.getAggregate(this.frmIndividualReceipt.value).subscribe(res => {
+      this._schedEService.getAggregate(this.frmIndividualReceipt.value, this.formType).subscribe(res => {
 
         this._currentAggregate = '0';
         if (!this.isAggregate) {
@@ -673,6 +672,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
         this.applyValidationByCoverageDate(this.frmIndividualReceipt.controls[fieldName].value,fieldName);
       }
     }
+    this.updateYTDAmount();
   }
 
   /**

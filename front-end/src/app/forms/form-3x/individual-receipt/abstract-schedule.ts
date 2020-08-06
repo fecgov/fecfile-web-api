@@ -201,6 +201,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public priviousTransactionType = '';
   public currentTransactionType = '';
+  public candOfficeStatesByTransactionType: any;
 
   constructor(
     private _http: HttpClient,
@@ -5461,6 +5462,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             if (res.data.hasOwnProperty('officeSought')) {
               if (Array.isArray(res.data.officeSought)) {
                 this.candidateOfficeTypes = res.data.officeSought;
+                this.candOfficeStatesByTransactionType = res.data.officeSought;
               }
             }
           }
