@@ -11,7 +11,8 @@
  <textarea
          maxlength="4000"
          name = "text-content"
-         [(ngModel)]="inputContent">
+         [(ngModel)]="inputContent"
+         [disabled]="viewOnlyFlag">
  </textarea>
     <div class="char-info"><div class="align-left">
         <p>4000 Characters limit</p>
@@ -24,7 +25,7 @@
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary btn-right"
-            (click)="save()">
+            (click)="save()" [disabled]="viewOnlyFlag">
         Save
     </button>
 </div>

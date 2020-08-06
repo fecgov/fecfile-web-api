@@ -10848,7 +10848,7 @@ def reports_memo_text(request):
             report_id = request.data['report_id']
         else:
             raise Exception('reportId is a mandatory field')
-        if 'memo_text' in request.data and request.data.get('memo_text') not in [None, '', 'null']:
+        if 'memo_text' in request.data and request.data.get('memo_text') not in [None, 'null']:
             memo_text = request.data['memo_text']
         else:
             raise Exception('memo_text is a mandatory field')

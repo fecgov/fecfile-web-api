@@ -252,6 +252,9 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="addMemo(report,true)">
+                                <i class="fas fa-sticky-note"></i> View Memo
+                            </button>
                             <button *ngIf="(report.amend_ind === 'N' || report.amend_max === 'up' || report.amend_max === 'down')" class="dropdown-item"  (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
