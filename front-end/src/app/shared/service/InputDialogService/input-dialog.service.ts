@@ -19,6 +19,8 @@ export class InputDialogService {
 
     modalRef.componentInstance.setSaveAction(data.saveAction);
 
+    modalRef.componentInstance.setViewOnlyFlag(data.viewOnly);
+
     modalRef.componentInstance.setDialogTitle(data.title);
 
 
