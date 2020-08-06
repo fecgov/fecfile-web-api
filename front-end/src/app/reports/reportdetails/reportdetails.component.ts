@@ -1668,13 +1668,14 @@ public printReport(report: reportModel): void{
    *
    * @param report
    */
-  addMemo(report: reportModel) {
+  addMemo(report: reportModel, viewOnly : boolean = false) {
     const memoText = report.memo_text ? report.memo_text : '';
     const title = memoText ? 'Edit Memo' : 'Add Memo';
     const dialogData = {
       content: memoText,
       saveAction: SaveDialogAction.saveReportMemo,
       title: title,
+      viewOnly
     };
     this.inputDialogService.openFormModal(dialogData).then((res) => {
       if (res.saveAction === SaveDialogAction.saveReportMemo) {
