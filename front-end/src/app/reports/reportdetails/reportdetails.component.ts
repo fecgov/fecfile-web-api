@@ -830,7 +830,7 @@ public printReport(report: reportModel): void{
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          this._reportTypeService.printPreview('dashboard_report_screen', report.form_type);
+          this._reportTypeService.printPreview('dashboard_report_screen', report.form_type.substr(1));
       }, 1500);
     }
   }
