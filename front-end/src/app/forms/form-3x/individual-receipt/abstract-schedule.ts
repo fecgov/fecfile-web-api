@@ -2224,10 +2224,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       // Otherwise it will create a new Entity.  Since there may be more than 1 entity
       // saved in a form, entity IDs must be unique for each.  The name of the property
 
-      this._setReceiptObjectEntityId(this._selectedEntity, receiptObj, false);
-      this._setReceiptObjectEntityId(this._selectedEntityChild, receiptObj, true);
-      this._setReceiptObjectEntityId(this._selectedCandidate, receiptObj, false);
-      this._setReceiptObjectEntityId(this._selectedCandidateChild, receiptObj, true);
+      if(!this.transactionType.startsWith('IE')){ //schedE doesn't have an 'entity_id' attribute. it is being mapped to payee_entity_id so no need to set it. 
+        this._setReceiptObjectEntityId(this._selectedEntity, receiptObj, false);
+        this._setReceiptObjectEntityId(this._selectedEntityChild, receiptObj, true);
+        this._setReceiptObjectEntityId(this._selectedCandidate, receiptObj, false);
+        this._setReceiptObjectEntityId(this._selectedCandidateChild, receiptObj, true);
+      }
 
       if (this._transactionToEdit) {
         if (receiptObj['entity_id'] === null || receiptObj['entity_id'] === undefined) {
