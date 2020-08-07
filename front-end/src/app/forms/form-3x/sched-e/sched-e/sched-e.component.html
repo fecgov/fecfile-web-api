@@ -44,13 +44,13 @@
             <button class="dropdown-item"  (click)="ImportTransactions()">
               <i class="file-import-icon"></i> Import
             </button>
-            <button class="dropdown-item" (click)="toggleAggregation()">
+            <button class="dropdown-item" (click)="toggleAggregation()" *ngIf="formType.endsWith('3X')">
               <i class="calculator-icon" *ngIf="isShowForceAggregate()"></i> {{isAggregate?' Un-Aggregate':' Aggregate'}}
             </button>
-            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf="!addByDissemination && (disseminationDate !== null && disseminationDate !== '') && (disbursementDate !== null && disbursementDate !== '')">
+            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf="formType.endsWith('3X') && !addByDissemination && (disseminationDate !== null && disseminationDate !== '') && (disbursementDate !== null && disbursementDate !== '')">
               <i class="calendar-icon" ></i> Add by Dissemination date
             </button>
-            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf="addByDissemination && (disbursementDate !== null && disbursementDate !== '')">
+            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf=" formType.endsWith('3X') && addByDissemination && (disbursementDate !== null && disbursementDate !== '')">
               <i class="calendar-icon" ></i> Add by Disbursement date
             </button>
           </div>

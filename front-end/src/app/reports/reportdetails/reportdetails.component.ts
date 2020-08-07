@@ -815,13 +815,13 @@ public printReport(report: reportModel): void{
           }
         );
       }, 1500);
-    } else if (report.form_type === 'F3X') {
+    } else if (report.form_type === 'F3X' || report.form_type === 'F24') {
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
           //console.log('getReportInfo res =', res);
-          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
-          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+          localStorage.setItem(`form_${report.form_type.substr(1)}_details`, JSON.stringify(res[0]));
+          localStorage.setItem(`form_${report.form_type.substr(1)}_report_type`, JSON.stringify(res[0]));
 
           //return false;
         });
@@ -830,7 +830,7 @@ public printReport(report: reportModel): void{
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          this._reportTypeService.printPreview('dashboard_report_screen', '3X');
+          this._reportTypeService.printPreview('dashboard_report_screen', report.form_type);
       }, 1500);
     }
   }
