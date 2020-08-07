@@ -351,7 +351,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     this._originalExpenditureAmount = trx.expenditure_amount;
     this._originalExpenditureAggregate = trx.expenditure_aggregate;
 
-    this.updateDateValidators();
+    this.updateDateValidators(trx);
 
     if (trx.transaction_type_identifier === 'IE_MULTI') {
       let memoText = trx.memo_text.substring(trx.memo_text.indexOf(this.multistateMemoTextDelimiter.trim()) + 1).trim();
@@ -679,9 +679,17 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
    * This method will run through the dateChange event on both fields and based on which fields are present
    * it will update the validators. 
    */
-  private updateDateValidators() {
+  private updateDateValidators(trx:any) {
     this.dateChange('disbursement_date');
     this.dateChange('dissemination_date');
+
+    //if current transaction is a F3X transaction but is a mirror transaction for a F24, then disbursement date doesnt not need
+    //coverage validation
+    if(trx.mirror_report_id && trx.mirror_transaction_id && this.formType.endsWith('3X')){
+      this.frmIndividualReceipt.controls['disbursement_date'].clearValidators();
+      this.frmIndividualReceipt.controls['disbursement_date'].setValidators([Validators.required]);
+      this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
+    }
   }
 
   private removeCommas(amount: string): string {
