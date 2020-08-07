@@ -103,10 +103,10 @@ export class TransactionSidebarComponent implements OnInit {
     // edit mode is set based on the action performed on the report
     // Edit mode does not say if its filed or saved
     // on ViewReport isFiled is passed in query params from report details component
-    if (typeof this._activatedRoute.snapshot.queryParams.isFiled !== 'undefined') {
+    if (typeof this._activatedRoute.snapshot.queryParams.isFiled !== 'undefined' && typeof this._activatedRoute.snapshot.queryParams.isFiled !== undefined) {
       this.isFiled = this._activatedRoute.snapshot.queryParams.isFiled === 'true' ? true : false;
     } else {
-      this.isFiled = this.editMode;
+      this.isFiled = !this.editMode;
     }
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
     if(this._formType !== '24'){
@@ -409,6 +409,7 @@ export class TransactionSidebarComponent implements OnInit {
         if (!transactionCategory) {
           transactionCategory = 'receipts';
         }
+        this._messageService.sendMessage({action:'clearGlobalAllTransactionsFlag'});
         this._transactionMessageService.sendLoadDefaultTabMessage({
           step: 'transactions',
           reportId: this.reportId,

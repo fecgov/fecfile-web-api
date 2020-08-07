@@ -114,6 +114,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   private getReattributeTransactionSubscription: Subscription;
   private getRedesignateTransactionSubscription: Subscription;
   activatedRouteSubscription: Subscription;
+  getMessageSubscription: Subscription;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -193,6 +194,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.showView();
       });
 
+    this.getMessageSubscription = this._messageService.getMessage().subscribe(message => {
+        if(message && message.action === 'clearGlobalAllTransactionsFlag'){
+          this.allTransactions = false;
+        }
+      }); 
     }
 
   private removeFilterAndTag(message: any) {
@@ -284,6 +290,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.viewTransactionSubscription.unsubscribe();
     this.getRedesignateTransactionSubscription.unsubscribe();
     this.getReattributeTransactionSubscription.unsubscribe();
+    this.getMessageSubscription.unsubscribe();
     this.activatedRouteSubscription.unsubscribe();
     localStorage.removeItem('transactions.filters');
   }
@@ -1110,7 +1117,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public printPreview(): void {
     //console.log('TransactionsTableComponent printPreview...!');
 
-    this._reportTypeService.printPreview('transaction_table_screen', '3X');
+    this._reportTypeService.printPreview('transaction_table_screen', this.formType);
   }
 
   /**
