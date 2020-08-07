@@ -1117,7 +1117,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public printPreview(): void {
     //console.log('TransactionsTableComponent printPreview...!');
 
-    this._reportTypeService.printPreview('transaction_table_screen', '3X');
+    this._reportTypeService.printPreview('transaction_table_screen', this.formType);
   }
 
   /**
