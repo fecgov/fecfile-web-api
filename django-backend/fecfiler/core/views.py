@@ -5967,6 +5967,7 @@ def get_F24_data(cmte_id, report_id):
     try:
         _sql = """SELECT SUM(expenditure_amount) AS total_amount 
                       FROM public.sched_e WHERE cmte_id = %s AND report_id = %s
+                      AND memo_code IS DISTINCT FROM 'X'
                       AND delete_ind IS DISTINCT FROM 'Y'"""
         with connection.cursor() as cursor:
             cursor.execute(
