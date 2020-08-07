@@ -638,7 +638,7 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
         this.status.emit({
           form: this.frmReportType,
           direction: 'next',
-          step: 'transactions',
+          step: 'step_2',
           transactionCategory:'disbursements',
           previousStep: 'step_1',
           transactionDetail: {

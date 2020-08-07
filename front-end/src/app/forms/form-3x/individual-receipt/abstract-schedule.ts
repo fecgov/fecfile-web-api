@@ -3904,42 +3904,46 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   protected applyValidationByCoverageDate(dateValue: any, fieldName: string) {
-    this._receiptService.getReportIdByTransactionDate(this._utilService.formatDate(dateValue)).subscribe(res => {
-      if (res) {
-        if (res.reportId) {
-          if (res.status && res.status !== 'Filed') {
-            this.getContributionAggregate(dateValue, fieldName);
-            let elementName = null;
-            if(this.formType === '3X'){
-              if (this.reattributionTransactionId) {
-                elementName = 'reattribution_report_id';
+    //api call was being triggered on every keystroke even when the full date is not entered, so putting a check
+    //on the year, making sure its greater than 1900 before triggering.
+    if(dateValue && dateValue.substr(0,4) && Number(dateValue.substr(0,4)) > 1900){
+      this._receiptService.getReportIdByTransactionDate(this._utilService.formatDate(dateValue)).subscribe(res => {
+        if (res) {
+          if (res.reportId) {
+            if (res.status && res.status !== 'Filed') {
+              this.getContributionAggregate(dateValue, fieldName);
+              let elementName = null;
+              if(this.formType === '3X'){
+                if (this.reattributionTransactionId) {
+                  elementName = 'reattribution_report_id';
+                }
+                else if (this.redesignationTransactionId) {
+                  elementName = 'redesignation_report_id';
+                }
               }
-              else if (this.redesignationTransactionId) {
-                elementName = 'redesignation_report_id';
+              else if(this.formType === '24'){
+                elementName = 'mirror_report_id';
+              }
+              if (elementName) {
+                let field = this.hiddenFields.find(element => element.name === elementName);
+                if (field) {
+                  field.value = res.reportId.toString();
+                }
+                else {
+                  this.hiddenFields.push({ type: 'hidden', name: elementName, value: res.reportId.toString() });
+                }
               }
             }
-            else if(this.formType === '24'){
-              elementName = 'mirror_report_id';
-            }
-            if (elementName) {
-              let field = this.hiddenFields.find(element => element.name === elementName);
-              if (field) {
-                field.value = res.reportId.toString();
-              }
-              else {
-                this.hiddenFields.push({ type: 'hidden', name: elementName, value: res.reportId.toString() });
-              }
+            else if (res.status && res.status === 'Filed') {
+              this.frmIndividualReceipt.controls[fieldName].setErrors({ reportFiled: true });
             }
           }
-          else if (res.status && res.status === 'Filed') {
-            this.frmIndividualReceipt.controls[fieldName].setErrors({ reportFiled: true });
+          else {
+            this.frmIndividualReceipt.controls[fieldName].setErrors({ reportNotFound: true });
           }
         }
-        else {
-          this.frmIndividualReceipt.controls[fieldName].setErrors({ reportNotFound: true });
-        }
-      }
-    });
+      });
+    }
   }
 
   private getContributionAggregate(dateValue: any, fieldName: string) {
