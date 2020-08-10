@@ -103,7 +103,10 @@ export class F1mComponent implements OnInit, OnDestroy {
         }
         this.refreshScreen();
 
-        this.validateForm();
+
+        if(this._activatedRoute.snapshot.queryParams.step && this._activatedRoute.snapshot.queryParams.step === 'step_4'){
+          this.validateForm();
+        }
 
       })
     }
@@ -236,9 +239,9 @@ export class F1mComponent implements OnInit, OnDestroy {
       if(this.type === 'qualification'){
         //check query params to see if a form of this type has already been created and a report id generate
         //if so, then return false
-        if(this._activatedRoute.snapshot.queryParams.reportId){
-          return false;
-        }
+        // if(this._activatedRoute.snapshot.queryParams.reportId){
+        //   return false;
+        // }
         
         if(this.qualificationComp && this.qualificationComp.showPart2){
           return true;
@@ -524,7 +527,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   }
   
   private validateQualificationForm() {
-    if(!this.qualificationComp.form.valid || this.qualificationComp.qualificationData.candidates.length < 5){
+    if(this.partyType !== 'PTY' && this.qualificationComp.qualificationData.candidates.length < 5){
       this.qualificationComp.showPart2 = false;
       this.step='step_2';
       this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: 
@@ -535,9 +538,18 @@ export class F1mComponent implements OnInit, OnDestroy {
       }});
       
     }
-    else if(this.qualificationComp.formPart2.valid){
+    else if(!this.qualificationComp.formPart2.valid){
       this.qualificationComp.showPart2 = true;
       this.step='step_2';
+      this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: 
+        {
+          step: this.step, 
+          reportId:this._activatedRoute.snapshot.queryParams.reportId,
+          edit:this._activatedRoute.snapshot.queryParams.edit
+      }});
+    }
+    else if(this.qualificationComp.formPart2.valid){
+      this.step = "step_4";
       this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: 
         {
           step: this.step, 

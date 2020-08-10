@@ -1,23 +1,21 @@
-import { ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
-import { ReportsService } from 'src/app/reports/service/report.service';
-import { ReportService } from './../../reports/reports.service';
-import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
-import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnInit, ViewEncapsulation, OnDestroy, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TransactionsMessageService } from './service/transactions-message.service';
-import { TransactionFilterModel } from './model/transaction-filter.model';
-import { Subscription } from 'rxjs/Subscription';
-import { TransactionModel } from './model/transaction.model';
-import { TransactionTypeService } from '../../forms/form-3x/transaction-type/transaction-type.service';
-import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { F3xMessageService } from '../form-3x/service/f3x-message.service';
-import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
-import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs/Subscription';
+import { ReportsService } from 'src/app/reports/service/report.service';
+import { ModalHeaderClassEnum } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
+import { DialogService } from 'src/app/shared/services/DialogService/dialog.service';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
-import { FilterTypes } from './enums/filterTypes.enum';
+import { ReportTypeService } from '../../forms/form-3x/report-type/report-type.service';
+import { TransactionTypeService } from '../../forms/form-3x/transaction-type/transaction-type.service';
 import { ConfirmModalComponent } from '../../shared/partials/confirm-modal/confirm-modal.component';
+import { IndividualReceiptService } from '../form-3x/individual-receipt/individual-receipt.service';
+import { ScheduleActions } from '../form-3x/individual-receipt/schedule-actions.enum';
+import { F3xMessageService } from '../form-3x/service/f3x-message.service';
+import { FilterTypes } from './enums/filterTypes.enum';
+import { TransactionFilterModel } from './model/transaction-filter.model';
+import { TransactionModel } from './model/transaction.model';
+import { TransactionsMessageService } from './service/transactions-message.service';
 
 export enum ActiveView {
   transactions = 'transactions',
@@ -116,6 +114,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   private getReattributeTransactionSubscription: Subscription;
   private getRedesignateTransactionSubscription: Subscription;
   activatedRouteSubscription: Subscription;
+  getMessageSubscription: Subscription;
 
   constructor(
     private _activatedRoute: ActivatedRoute,
@@ -195,6 +194,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.showView();
       });
 
+    this.getMessageSubscription = this._messageService.getMessage().subscribe(message => {
+        if(message && message.action === 'clearGlobalAllTransactionsFlag'){
+          this.allTransactions = false;
+        }
+      }); 
     }
 
   private removeFilterAndTag(message: any) {
@@ -286,6 +290,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.viewTransactionSubscription.unsubscribe();
     this.getRedesignateTransactionSubscription.unsubscribe();
     this.getReattributeTransactionSubscription.unsubscribe();
+    this.getMessageSubscription.unsubscribe();
     this.activatedRouteSubscription.unsubscribe();
     localStorage.removeItem('transactions.filters');
   }
@@ -994,7 +999,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       scheduleType: this.transactionToEdit.scheduleType,
       transactionDetail: {
         transactionModel: this.transactionToEdit
-      }
+      },
+      formType: this.transactionToEdit.formType
     };
     if (debtSummary) {
       if (debtSummary.returnToDebtSummary) {
@@ -1015,24 +1021,24 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   handleMirrorTransactionIfApplicable(transactionToEdit: TransactionModel, emitObj: any) {
-    let mirrorForm = '';
+    let dialogMsg = '';
     if(transactionToEdit.formType === 'F3X'){
-      mirrorForm = '24';
+      dialogMsg = `Please note that this change will not automatcally reflect in the F24 report. You will have to make this change separately in F24.`;
     }
     else if(transactionToEdit.formType === 'F24'){
-      mirrorForm = '3X';
+      dialogMsg = `Please note that if you update this transaction it will be updated in Form F3X. Please acknowledge this change by clicking the OK button.`;
     }
     this._dialogService
-        .confirm('Please note that if you modify this transaction it will be updated in Form ' + mirrorForm,ConfirmModalComponent, 'Warning!', true,ModalHeaderClassEnum.warningHeader,null,'Cancel')
+        .confirm(dialogMsg,ConfirmModalComponent, 'Warning!', true,ModalHeaderClassEnum.warningHeader,null,'Cancel')
         .then(res => {
           if (res === 'okay') {
             //make sure modifying is permitted based on mirrorReportId !== Filed/Submitted
             this._reportsService
-              .getReportInfo(transactionToEdit.formType, transactionToEdit.reportId)
+              .getReportInfo('F3X', transactionToEdit.mirrorReportId)
               .subscribe((res: any) => {
-                if(res && res.reportstatus === 'Submitted'){
+                if(res && res[0] && res[0].reportstatus === 'Submitted'){
                   this._dialogService
-                  .confirm('This transaction cannot be modified since the mirrored transaction in Form ' + mirrorForm + 'is already filed. You will have to amend that report', ConfirmModalComponent, 'Error!', false)
+                  .confirm('This transaction cannot be modified since the mirrored transaction in Form 3X is already filed. You will have to amend that report', ConfirmModalComponent, 'Error!', false)
                   .then(res => {
                     if (res === 'okay') {
                     }
@@ -1111,7 +1117,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   public printPreview(): void {
     //console.log('TransactionsTableComponent printPreview...!');
 
-    this._reportTypeService.printPreview('transaction_table_screen', '3X');
+    this._reportTypeService.printPreview('transaction_table_screen', this.formType);
   }
 
   /**

@@ -1,0 +1,32 @@
+  <div class="modal-content">
+    <div class="modal-header" id="transactions__pin-modal-header">
+      <h4 class="modal-title pull-left">Which F24 would you like to link this transaction to?</h4>
+      <button aria-label="Close" class="close btn btn-link" type="button" (click)="closeModal()">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container" >
+        <div class="row">
+          <div class="col-md-10">
+            <ng-select 
+            [items]="f24List"
+            (change)="handleF24Select($event)"
+            [disabled]="true"
+            placeholder="Select a report"
+            bindValue="reportId"
+            bindLabel="displayText">
+          </ng-select>
+          </div>
+        </div>
+    </div>
+    <div class="modal-footer mt-4 pb-0">
+      <button type="button" class="btn btn-right btn-secondary-gray" (click)="closeModal()">
+        Cancel
+      </button>
+      <button type="button" class="btn btn-primary btn-right" (click)="save()" [disabled]='!selectedReportId'>
+        Save
+      </button>
+    </div>
+  </div>
+</div>

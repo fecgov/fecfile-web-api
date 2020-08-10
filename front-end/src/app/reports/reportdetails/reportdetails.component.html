@@ -163,7 +163,7 @@
                     </div>
                 </td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">
-                    {{(report.form_type !== 'F99' && report.form_type !== 'F1M')? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
+                    {{(report.form_type !== 'F99' && report.form_type !== 'F1M' && report.form_type !== 'F24')? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
                 </td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
                 <td *ngIf="isColumnVisible('filed_date')">
@@ -252,6 +252,9 @@
                             <i class="fas fa-ellipsis-h"></i>
                         </button>
                         <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
+                            <button class="dropdown-item" (click)="addMemo(report,true)">
+                                <i class="fas fa-sticky-note"></i> View Memo
+                            </button>
                             <button *ngIf="(report.amend_ind === 'N' || report.amend_max === 'up' || report.amend_max === 'down')" class="dropdown-item"  (click)="viewReport(report)">
                                 <i class="fas fa-eye"></i> View
                             </button>
@@ -328,7 +331,7 @@
                         </div>
                     </td>
                     <td *ngIf="isColumnVisible('cvg_start_date')">
-                        {{(child.form_type !== 'F99' && child.form_type !== 'F1M')? ( (child.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (child.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
+                        {{(child.form_type !== 'F99' && child.form_type !== 'F1M' && child.form_type !== 'F24')? ( (child.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (child.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
                     </td>
                     <td *ngIf="isColumnVisible('report_type_desc')">{{child.report_type_desc}}</td>
                     <td *ngIf="isColumnVisible('filed_date')">

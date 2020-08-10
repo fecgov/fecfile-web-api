@@ -217,4 +217,9 @@ urlpatterns = [
         views.save_additional_email,
         name="save_additional_email",
     ),
+    url(
+        r"^core/get_f24_reports$",
+        views.get_f24_reports,
+        name="get_f24_reports",
+    ),
 ]

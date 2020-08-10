@@ -22,6 +22,7 @@ export interface GetReportsResponse {
   providedIn: 'root'
 })
 export class ReportsService {
+
   // only for mock data
   // only for mock data
   // only for mock data
@@ -98,6 +99,22 @@ export class ReportsService {
       headers: httpOptions
     });
   }
+
+  public getAllF24Reports() : Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let url = '';
+
+    url = '/core/get_f24_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
+  }
+
   public getAmendmentIndicators(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();

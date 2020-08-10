@@ -66,7 +66,6 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
 
   private phonePipe:PhonePipe = new PhonePipe();
   committeeDetailsFromLocalStorage: any;
-  _form_details: any;
 
   constructor(
     public _config: NgbTooltipConfig,
@@ -171,7 +170,8 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     }
     if(!this.formData){
       
-      this.formData = this.getReportInfo().subscribe(res => {
+      this.formData = {};
+      this.getReportInfo().subscribe(res => {
         this.formData.additionalEmail1 = this.formData.confirmAdditionalEmail1 = res.additionalemail1;
         this.formData.additionalEmail2 = this.formData.confirmAdditionalEmail2 = res.additionalemail2;
         this.populateForm();
@@ -212,6 +212,16 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
 
   getTitleAndFormTypeByRouteParam(formType: string) {
     switch(formType){
+
+      case '24':
+        if(localStorage.getItem('form_24_report_type')){
+          const reportObj: any = JSON.parse(localStorage.getItem('form_24_report_type'));
+          this.formTitle = `Form 24 / ${reportObj.reporttype} (${reportObj.reporttypedescription})  `;
+        }
+        if(!this.formType){
+          this.formType = '24';
+        }
+        break;
       case '3X':
         if(localStorage.getItem('form_3X_report_type')){
           const reportObj: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
@@ -320,18 +330,23 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
   }
 
   public printPreview(){
-    this._reportTypeService.printPreviewPdf(this.formType,'PrintPreviewPDF',undefined,this.reportId) .subscribe(res => {
-        if(res) {
-          if (res.hasOwnProperty('results')) {
-            if (res['results.pdf_url'] !== null) {
-              window.open(res.results.pdf_url, '_blank');
+    if(this.formType === '99'){
+      this._messageService.sendMessage({action:'print', formType:'F99'});
+    }
+    else{
+      this._reportTypeService.printPreviewPdf(this.formType,'PrintPreviewPDF',undefined,this.reportId) .subscribe(res => {
+          if(res) {
+            if (res.hasOwnProperty('results')) {
+              if (res['results.pdf_url'] !== null) {
+                window.open(res.results.pdf_url, '_blank');
+              }
             }
           }
-        }
-    },
-    (error) => {
-      console.error('error: ', error);
-    });
+      },
+      (error) => {
+        console.error('error: ', error);
+      });
+    }
   }
 
   public populateForm() {
@@ -341,10 +356,10 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     this.form.patchValue({confirmAdditionalEmail1: this.formData.confirmAdditionalEmail1},{onlySelf:true});
     this.form.patchValue({additionalEmail2: this.formData.additionalEmail2},{onlySelf:true});
     this.form.patchValue({confirmAdditionalEmail2: this.formData.confirmAdditionalEmail2},{onlySelf:true});
-    if(this.formData.additionalEmail1){
+    if(this.formData.additionalEmail1 && !this.additionalEmailsArray.includes(this.formData.additionalEmail1)){
       this.additionalEmailsArray.push(this.formData.additionalEmail1);
     }
-    if(this.formData.additionalEmail2){
+    if(this.formData.additionalEmail2 && !this.additionalEmailsArray.includes(this.formData.additionalEmail2)){
       this.additionalEmailsArray.push(this.formData.additionalEmail2);
     }
   }
@@ -498,185 +513,77 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
         this._messageService.sendMessage({action:'showStep5', data: res});
       });
     }
-    else if(this.formType === '3X' || this.formType === '99'){
-      this.submit3xOr99();
+    else if(this.formType === '3X' || this.formType === '99' || this.formType === '24'){
+      this.submit3xOr99Or24();
     }
   }
 
-  public submit3xOr99(): void {
+  public submit3xOr99Or24(): void {
     if (this.editMode) {
-      // let doSubmitFormSaved: boolean = false;
-      if (this.formType === '3X') {
-        let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved_backup`));
-        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
-
-        if (this._form_details === null || typeof this._form_details === 'undefined') {
-          this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
-        }
-        // doSubmitFormSaved = formSaved;
-      } 
-      else if (this.formType === '99') {
-        let formSaved: any = JSON.parse(localStorage.getItem(`form_${this.formType}_saved`));
-        this._form_details = JSON.parse(localStorage.getItem(`form_${this.formType}_details`));
-        // doSubmitFormSaved = formSaved.form_saved;
-      }
-
-      // if (this.formType === '99') {
-      //   this._form_details.file = '';
-
-      //   if (this._form_details.additional_email_1 === '') {
-      //     this._form_details.additional_email_1 = '-';
-      //   }
-
-      //   if (this._form_details.additional_email_2 === '') {
-      //     this._form_details.additional_email_2 = '-';
-      //   }
-      // }
-
-      // this.validateAdditionalEmails();
-
-      // if (!this.additionalEmail1Invalid && !this.additionalEmail2Invalid) {
-        // if (this.formType === '99') {
-          // localStorage.setItem(`form_${this.formType}_details`, JSON.stringify(this._form_details));
-          // localStorage.setItem(`form_${this.formType}_report_type_backup`, JSON.stringify(this._form_details));
-        // }
-
-        // if (this.frmSignee.invalid) {
-        //   if (this.frmSignee.get('agreement').value) {
-        //     this.signFailed = false;
-        //   } else {
-        //     this.signFailed = true;
-        //   }
-        // } else if (this.frmSignee.valid) {
-          // this.signFailed = false;
-
-          // if (!doSubmitFormSaved) {
-            if (this.formType === '99') {
-              this._formsService.Signee_SaveForm({}, this.formType).subscribe(
-                saveResponse => {
-                  if (saveResponse) {
-                    this._formsService.submitForm({}, this.formType).subscribe(res => {
-                      if (res) {
-                        //console.log(' response = ', res);
-                        // this.status.emit({
-                        //   form: this.frmSignee,
-                        //   direction: 'next',
-                        //   step: 'step_5',
-                        //   fec_id: res.fec_id,
-                        //   previousStep: this._step
-                        // });
-
-                        const frmSaved: any = {
-                          saved: true
-                        };
-      
-                        // localStorage.setItem('form_3X_saved', JSON.stringify(frmSaved)); ?? is this needed?
-      
-                        this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_6', edit: this.editMode, 
-                                              fec_id: res.fec_id } });
-      
-                        this._messageService.sendMessage({
-                          form_submitted: true
-                        });
-                        // this._messageService.sendMessage({
-                        //   form_submitted: true
-                        // });
-
-                        // this._messageService.sendMessage({
-                        //   validateMessage: {
-                        //     validate: 'All required fields have passed validation.',
-                        //     showValidateBar: true
-                        //   }
-                        // });
-                      }
-                    });
-                  }
-                },
-                error => {
-                  //console.log('error: ', error);
-                }
-              );
-            } else if (this.formType === '3X') {
-              this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
+      if (this.formType === '99') {
+        this._formsService.Signee_SaveForm({}, this.formType).subscribe(
+          saveResponse => {
+            if (saveResponse) {
+              this._formsService.submitForm({}, this.formType).subscribe(res => {
                 if (res) {
                   const frmSaved: any = {
                     saved: true
                   };
-
-                  localStorage.setItem('form_3X_saved', JSON.stringify(frmSaved));
-
-                  this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode, 
-                                        fec_id: res.fec_id } });
-
+                  this._router.navigate(['/forms/form/99'], 
+                    {queryParams: { 
+                      step: 'step_6', 
+                      edit: this.editMode, 
+                      fec_id: res.fec_id 
+                    } 
+                  });
                   this._messageService.sendMessage({
                     form_submitted: true
-                  });
-                } else {
-                  this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode } });
-                  this._messageService.sendMessage({
-                    form_submitted: false
                   });
                 }
               });
             }
-            // upto here
-          // } else {
-          //   this._messageService.sendMessage({
-          //     validateMessage: {
-          //       validate: '',
-          //       showValidateBar: false
-          //     }
-          //   });
-          //   if (this.formType === '99') {
-          //     this._formsService.submitForm({}, this.formType).subscribe(res => {
-          //       if (res) {
-          //         //console.log(' response = ', res);
-          //         this.status.emit({
-          //           form: this.frmSignee,
-          //           direction: 'next',
-          //           step: 'step_5',
-          //           fec_id: res.fec_id,
-          //           previousStep: this._step
-          //         });
+          },
+          error => {
+            console.error(error);
+          }
+        );
+      } else if (this.formType === '3X' || this.formType === '24') {
+        this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
+          if (res) {
+            const frmSaved: any = {
+              saved: true
+            };
 
+            localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify(frmSaved));
 
-          //         this._messageService.sendMessage({
-          //           form_submitted: true
-          //         });
-          //       }
-          //     });
-          //   } else if (this.formType === '3X') {
-          //     this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
-          //       if (res) {
-          //         //console.log(' response = ', res);
-          //         this.fec_id = res.fec_id;
-          //         /*this.frmSaved = true;
-          
-          //               let formSavedObj: any = {
-          //                 'saved': this.frmSaved
-          //               };*/
+            this._router.navigate([`/forms/form/${this.formType}`], 
+                { 
+                  queryParams: {
+                    step: 'step_6',
+                    edit: this.editMode, 
+                    fec_id: res.fec_id
+                  } 
+                });
 
-          //         /*this.status.emit({
-          //                 form: this.frmSignee,
-          //                 direction: 'next',
-          //                 step: 'step_5',
-          //                 previousStep: this._step
-          //               });*/
-          //         this._router.navigate(['/forms/form/3X'], { queryParams: { step: 'step_6', edit: this.editMode,
-          //         fec_id: res.fec_id } });
-          //         //this._router.navigate(['/submitform/3X']);
-
-          //         this._messageService.sendMessage({
-          //           form_submitted: true
-          //         });
-          //       }
-          //     });
-          //   }
-          // }
-        // }
-      // }
+            this._messageService.sendMessage({
+              form_submitted: true
+            });
+          } else {
+            this._router.navigate([`/forms/form/${this.formType}`], 
+            {
+              queryParams: {
+                step: 'step_6',
+                edit: this.editMode
+              } 
+            });
+            this._messageService.sendMessage({
+              form_submitted: false
+            });
+          }
+        });
+      }
     } else {
-      if (this.formType === '3X') {
+      if (this.formType === '3X' || this.formType === '24') {
         this._dialogService
           .confirm(
             'This report has been filed with the FEC. If you want to change, you must Amend the report',
@@ -710,7 +617,6 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
             } else if (res === 'NewReport') {
               localStorage.removeItem('form_99_details');
               localStorage.removeItem('form_99_saved');
-              this._setF99Details();
               this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', refresh: true } });
             }
           });
@@ -718,27 +624,12 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
     }
   }
 
-  private _setF99Details(): void {
-    // if (this.committee_details) {
-    //   if (this.committee_details.committeeid) {
-    //     this._form99Details = this.committee_details;
-
-    //     this._form99Details.reason = '';
-    //     this._form99Details.text = '';
-    //     this._form99Details.signee = `${this.committee_details.treasurerfirstname} ${this.committee_details.treasurerlastname}`;
-    //     this._form99Details.additional_email_1 = '-';
-    //     this._form99Details.additional_email_2 = '-';
-    //     this._form99Details.created_at = '';
-    //     this._form99Details.is_submitted = false;
-    //     this._form99Details.id = '';
-
-    //     let formSavedObj: any = {
-    //       saved: false
-    //     };
-    //     localStorage.setItem(`form_99_details`, JSON.stringify(this._form99Details));
-    //     localStorage.setItem(`form_99_saved`, JSON.stringify(formSavedObj));
-    //   }
-    // }
+  public previous(){
+    if (this.formType === '99') {
+      this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: {step:'step_3'}, queryParamsHandling:'merge'});
+    } else if (this.formType === '3X' || this.formType === '24') {
+      this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: 'step_2', edit: this.editMode }, queryParamsHandling:'merge' });
+    }
   }
 }
 

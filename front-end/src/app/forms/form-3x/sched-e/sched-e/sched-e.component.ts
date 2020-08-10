@@ -1,14 +1,14 @@
-import { SchedHMessageServiceService } from './../../../sched-h-service/sched-h-message-service.service';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit, SimpleChanges, ViewEncapsulation, Input , ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
 import { ReportsService } from 'src/app/reports/service/report.service';
+import { AuthService } from '../../../../shared/services/AuthService/auth.service';
 import { FormsService } from '../../../../shared/services/FormsService/forms.service';
 import { MessageService } from '../../../../shared/services/MessageService/message.service';
 import { MultiStateValidator } from '../../../../shared/utils/forms/validation/multistate.validator';
@@ -23,9 +23,9 @@ import { SchedEService } from '../sched-e.service';
 import { TypeaheadService } from './../../../../shared/partials/typeahead/typeahead.service';
 import { DialogService } from './../../../../shared/services/DialogService/dialog.service';
 import { ContributionDateValidator } from './../../../../shared/utils/forms/validation/contribution-date.validator';
+import { SchedHMessageServiceService } from './../../../sched-h-service/sched-h-message-service.service';
 import { IndividualReceiptComponent } from './../../individual-receipt/individual-receipt.component';
 import { ScheduleActions } from './../../individual-receipt/schedule-actions.enum';
-import {AuthService} from '../../../../shared/services/AuthService/auth.service';
 
 @Component({
   selector: 'app-sched-e',
@@ -48,7 +48,6 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
   public coverageEndDate = '';
   private _currentAggregate = null;
   private _reportId;
-  public candOfficeStatesByTransactionType: any;
   public displayCandStateField = false;
   private _minStateSelectionForMultistate = 6;
   
@@ -120,6 +119,9 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     _messageService.getMessage().takeUntil(this._schedEonDestroy$).subscribe(message => {
       if (message && message.parentFormPopulated && message.component === this.abstractScheduleComponent) {
         this.populateChildData();
+      }
+      else if(message && message.action === 'forceUpdateSchedEScheduleAction' && message.scheduleAction){
+        this.scheduleAction = message.scheduleAction;
       }
     });
 
@@ -349,7 +351,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     this._originalExpenditureAmount = trx.expenditure_amount;
     this._originalExpenditureAggregate = trx.expenditure_aggregate;
 
-    this.updateDateValidators();
+    this.updateDateValidators(trx);
 
     if (trx.transaction_type_identifier === 'IE_MULTI') {
       let memoText = trx.memo_text.substring(trx.memo_text.indexOf(this.multistateMemoTextDelimiter.trim()) + 1).trim();
@@ -373,6 +375,9 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
       this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','payee_entity_id',trx.payee_entity_id);
       if(trx.mirror_transaction_id){
         this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','mirror_transaction_id',trx.mirror_transaction_id);
+      }
+      if(trx.mirror_report_id){
+        this._utilService.addOrEditObjectValueInArray(this.hiddenFields,'hidden','mirror_report_id',trx.mirror_report_id);
       }
     }
 
@@ -474,7 +479,7 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
             {expenditure_aggregate: this._decimalPipe.transform(newAggregate, '.2-2')}, {onlySelf: true});
       }
     } else  {
-      this._schedEService.getAggregate(this.frmIndividualReceipt.value).subscribe(res => {
+      this._schedEService.getAggregate(this.frmIndividualReceipt.value, this.formType).subscribe(res => {
 
         this._currentAggregate = '0';
         if (!this.isAggregate) {
@@ -667,15 +672,24 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
         this.applyValidationByCoverageDate(this.frmIndividualReceipt.controls[fieldName].value,fieldName);
       }
     }
+    this.updateYTDAmount();
   }
 
   /**
    * This method will run through the dateChange event on both fields and based on which fields are present
    * it will update the validators. 
    */
-  private updateDateValidators() {
+  private updateDateValidators(trx:any) {
     this.dateChange('disbursement_date');
     this.dateChange('dissemination_date');
+
+    //if current transaction is a F3X transaction but is a mirror transaction for a F24, then disbursement date doesnt not need
+    //coverage validation
+    if(trx.mirror_report_id && trx.mirror_transaction_id && this.formType.endsWith('3X')){
+      this.frmIndividualReceipt.controls['disbursement_date'].clearValidators();
+      this.frmIndividualReceipt.controls['disbursement_date'].setValidators([Validators.required]);
+      this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
+    }
   }
 
   private removeCommas(amount: string): string {

@@ -87,6 +87,12 @@ export class TransactionTypeComponent implements OnInit, OnDestroy {
       }
       this._transactionCategory = p.transactionCategory ? p.transactionCategory : '';
     });
+
+    this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(msg => {
+      if(msg && msg.action === 'goDirectlyToSpecificTransaction' && msg.transaction){
+        this.updateTypeSelected(msg.transaction);
+      }
+    })
   }
 
   ngOnInit(): void {

@@ -1,0 +1,16 @@
+@import '../../../../shared/scss/global';
+
+.custom-class .modal-content .modal-header {
+    // color: black;
+    background-color:$blueZodiac;
+    border: none;
+  }
+  
+.modal-body{
+    font-family: 'Lato','sans-serif';
+    margin: 15px;
+}
+
+.modal-header{
+    background-color:$blueZodiac;
+}

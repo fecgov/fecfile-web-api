@@ -1283,7 +1283,6 @@ def post_reports(data, reportid=None):
                 raise Exception(
                     "The post_sql_report function is throwing an error: " + str(e)
                 )
-
             try:
                 # Insert data into Form 3X table
                 if data.get("form_type") == "F3X":
@@ -1547,7 +1546,7 @@ def count_orphaned_transactions(report_id, cmte_id):
 """
 
 
-def reposit_f3x_data(cmte_id, report_id):
+def reposit_f3x_data(cmte_id, report_id, form_type='F3X'):
     """
     helper funcrtion to move current F3X report data from efiling front db to backend db
     """
@@ -1556,25 +1555,32 @@ def reposit_f3x_data(cmte_id, report_id):
         "reposit f3x data with cmte_id {} and report_id {}".format(cmte_id, report_id)
     )
     # transaction_tables = ['sched_a']
-    transaction_tables = [
-        "reports",
-        "sched_a",
-        "sched_b",
-        "sched_c",
-        "sched_c1",
-        "sched_c2",
-        "sched_d",
-        "sched_e",
-        "sched_f",
-        "sched_h1",
-        "sched_h2",
-        "sched_h3",
-        "sched_h4",
-        "sched_h5",
-        "sched_h6",
-        "sched_l",
-        "form_3x",
-    ]
+    if form_type == 'F3X':
+        transaction_tables = [
+            "reports",
+            "sched_a",
+            "sched_b",
+            "sched_c",
+            "sched_c1",
+            "sched_c2",
+            "sched_d",
+            "sched_e",
+            "sched_f",
+            "sched_h1",
+            "sched_h2",
+            "sched_h3",
+            "sched_h4",
+            "sched_h5",
+            "sched_h6",
+            "sched_l",
+            "form_3x",
+        ]
+    else:
+        transaction_tables = [
+            "reports",
+            "sched_e",
+            "form_24",
+        ]
     # transaction_tables = ['sched_b']
     backend_connection = psycopg2.connect(
         "dbname={} user={} host={} password={} connect_timeout=3000".format(
@@ -1761,7 +1767,7 @@ def submit_report(request):
         if not report_id:
             raise Exception()
         fec_id = report_id
-        if form_tp == "F3X":
+        if form_tp in ["F3X", "F24"]:
             update_tbl = "public.reports"
             f_id = "report_id"
         elif form_tp == "F99":
@@ -1770,7 +1776,7 @@ def submit_report(request):
         else:
             raise Exception("Error: invalid form type.")
 
-        if form_tp == "F3X":
+        if form_tp in ["F3X", "F24"]:
             _sql_update = (
                     """
                 UPDATE {}""".format(
@@ -1808,8 +1814,8 @@ def submit_report(request):
             if cursor.rowcount == 0:
                 raise Exception("report {} update failed".format(report_id))
 
-        if form_tp == "F3X":
-            reposit_f3x_data(cmte_id, report_id)
+        if form_tp in ["F3X", "F24"]:
+            reposit_f3x_data(cmte_id, report_id, form_tp)
         elif form_tp == "F99":
             reposit_f99_data(cmte_id, report_id)
         else:
@@ -1833,7 +1839,7 @@ def submit_report(request):
         email(True, email_data)
         logger.debug("email success.")
 
-        if form_tp == "F3X":
+        if form_tp in ["F3X", "F24"]:
             _sql_response = """
             SELECT json_agg(t) FROM (
                 SELECT 'FEC-' || fec_id as fec_id, status, filed_date, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
@@ -4092,9 +4098,17 @@ def get_transactions(request, transaction_id):
     else:
         param_string += " AND delete_ind is distinct from 'Y'"
     
-    if ctgry_type == "receipts_tran" or ctgry_type == "disbursements_tran" or ctgry_type == "other_tran":
+    if ctgry_type == "receipts_tran" or ctgry_type == "other_tran":
         parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
         param_string += " AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(" + parent_transaction_id + ", 'NONE')"
+        if transaction_id is not None:
+            param_string += " OR  transaction_id = '" + transaction_id + "'"
+        param_string += " ) "
+
+    if ctgry_type == "disbursements_tran":
+        parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
+        param_string += """ AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(""" + parent_transaction_id + """, 'NONE') 
+            OR transaction_type_identifier in ('IK_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT','PARTY_IK_OUT','PAC_IK_OUT')"""
         if transaction_id is not None:
             param_string += " OR  transaction_id = '" + transaction_id + "'"
         param_string += " ) "
@@ -5924,56 +5938,50 @@ def get_thirdNavigationTransactionTypes(request):
             raise Exception("Missing Input: Report_id is mandatory")
         report_id = check_report_id(request.query_params.get("report_id"))
 
-        # period_args = [cmte_id, report_id]
-        # period_receipt = summary_receipts(period_args)
-        # period_disbursement = summary_disbursements(period_args)
+        report_type = get_reporttype(cmte_id, report_id)
 
-        # period_args = [datetime.date(2019, 1, 1), datetime.date(2019, 12, 31), cmte_id, report_id]
-        # period_receipt = summary_receipts_for_sumamry_table(period_args)
-        # period_disbursement = summary_disbursements_for_sumamry_table(period_args)
+        if report_type == 'F3X':
 
-        # period_receipt, period_disbursement, report_balance = getthirdnavamounts(
-        #     cmte_id, report_id
-        # )
-
-        # report_list = superceded_report_id_list(report_id)
-        # print(report_list)
-        # loans_and_debts = loansanddebts(report_list, cmte_id)
-
-        # loans_and_debts = loansanddebts(report_id, cmte_id)
-
-        # coh_bop = prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id)
-        # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
-        # coh_cop = coh_bop + report_balance
-
-        output_dict = get_F3X_data(cmte_id, report_id)
-        # forms_obj = { 'Receipts': period_receipt[0].get('amt'),
-        #                 'Disbursements': period_disbursement[0].get('amt'),
-        #                 'Loans/Debts': loans_and_debts,
-        #                 'Others': 0,
-        #                 'COH': coh_cop}
-
-        # forms_obj = {
-        #     "Receipts": output_dict['ttl_receipts_sum_page_per'],
-        #     "Disbursements": output_dict['ttl_disb_sum_page_per'],
-        #     "Loans/Debts": loans_and_debts[0]-loans_and_debts[1],
-        #     "Others": 0,
-        #     "COH": output_dict['coh_cop'],
-        # }
-
-        forms_obj = {
-            "Receipts": output_dict['ttl_receipts_sum_page_per'],
-            "Disbursements": output_dict['ttl_disb_sum_page_per'],
-            "Loans/Debts": output_dict['debts_owed_by_cmte'] - output_dict['debts_owed_to_cmte'],
-            "Others": 0,
-            "COH": output_dict['coh_cop'],
-        }
+            output_dict = get_F3X_data(cmte_id, report_id)
+            forms_obj = {
+                "Receipts": output_dict['ttl_receipts_sum_page_per'],
+                "Disbursements": output_dict['ttl_disb_sum_page_per'],
+                "Loans/Debts": output_dict['debts_owed_by_cmte'] - output_dict['debts_owed_to_cmte'],
+                "Others": 0,
+                "COH": output_dict['coh_cop'],
+            }
+        elif report_type == 'F24':
+            output_dict = get_F24_data(cmte_id, report_id)
+            forms_obj = {
+                "Disbursements": output_dict['total_amount'],
+            }
         return Response(forms_obj, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
             "The get_thirdNavigationTransactionTypes API is throwing an error: "
             + str(e),
             status=status.HTTP_400_BAD_REQUEST,
+        )
+
+def get_F24_data(cmte_id, report_id):
+    try:
+        _sql = """SELECT SUM(expenditure_amount) AS total_amount 
+                      FROM public.sched_e WHERE cmte_id = %s AND report_id = %s
+                      AND memo_code IS DISTINCT FROM 'X'
+                      AND delete_ind IS DISTINCT FROM 'Y'"""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+            )
+            output_dict = cursor.fetchone()[0]
+            if output_dict:
+                return output_dict[0]
+            else:
+                raise Exception("""The reportId: {} for committee Id: {} does not exist in 
+          sched_e table.""".format(report_id, cmte_id))
+    except Exception as e:
+        raise Exception(
+            "The get_F24_data function is throwing an error: " + str(e)
         )
 
 def get_F3X_data(cmte_id, report_id):
@@ -8219,6 +8227,22 @@ def trash_restore_sql_report(cmte_id, report_id, _delete="Y"):
                         _delete, datetime.datetime.now(), cmte_id, report_id
                     )
                 )
+                 cursor.execute(
+                    """UPDATE public.form_1m SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(
+                        _delete, datetime.datetime.now(), cmte_id, report_id
+                    )
+                )
+            if report_type == "F24":
+                 cursor.execute(
+                    """UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(
+                        _delete, datetime.datetime.now(), cmte_id, report_id
+                    )
+                )
+                 cursor.execute(
+                    """UPDATE public.form_24 SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(
+                        _delete, datetime.datetime.now(), cmte_id, report_id
+                    )
+                )
             if report_type == "F3X":
                 # form 3X report
                 cursor.execute(
@@ -9048,7 +9072,6 @@ def create_amended(reportid):
                         [reportid, created_data["reportid"]],
                     )
                 return data
-
         else:
             return False
 
@@ -10826,7 +10849,7 @@ def reports_memo_text(request):
             report_id = request.data['report_id']
         else:
             raise Exception('reportId is a mandatory field')
-        if 'memo_text' in request.data and request.data.get('memo_text') not in [None, '', 'null']:
+        if 'memo_text' in request.data and request.data.get('memo_text') not in [None, 'null']:
             memo_text = request.data['memo_text']
         else:
             raise Exception('memo_text is a mandatory field')
@@ -10906,5 +10929,25 @@ def save_additional_email(request):
     except Exception as e:
         return Response(
           "The save_additional_email API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def get_f24_reports(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        _sql = """SELECT json_agg(t) FROM (SELECT report_id AS "reportId", last_update_date::timestamp AS "lastUpdatedDate", report_type AS "reportType", 
+                  CASE WHEN UPPER(status) IN (null, 'SAVED') THEN 'SAVED' WHEN UPPER(status) IN ('SUBMITTED')
+                  THEN 'SUBMITTED' ELSE 'FILED' END AS status
+                  FROM public.reports WHERE cmte_id = %s AND form_type = 'F24' AND delete_ind IS DISTINCT FROM 'Y') t"""
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id])
+            result = cursor.fetchall()
+            output = [] if not result[0][0] else result[0][0]
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The get_f24_reports API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )

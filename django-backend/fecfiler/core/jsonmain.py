@@ -31,7 +31,8 @@ from fecfiler.core.views import (get_list_entity, NoOPError, get_cvg_dates, get_
 
 # Dictionary mapping form type value to form type in forms_and_schedules table
 FORMTYPE_FORM_DICT = {
-    'F3X': 'form_3x'
+    'F3X': 'form_3x',
+    'F24': 'form_24'
 }
 
 # Dictionary mapping schedules to schedule codes in forms_and_schedules table
@@ -263,6 +264,19 @@ def get_data_details(report_id, cmte_id):
             else:
                 raise Exception('There is no form 1m data for this report id: {} and cmte id: {}'.format(report_id, cmte_id))
 
+        elif output['formType'] == 'F24':
+            query_3 = """SELECT  cm.cmte_id AS "committeeId", COALESCE(cm.cmte_name,'') AS "committeeName", r.report_type AS "reportType", r.amend_ind AS "amendIndicator",
+                  COALESCE(to_char(filed_date,'MM/DD/YYYY'),'') AS "filedDate", COALESCE((CASE WHEN r.previous_report_id IS NOT null THEN 
+                  (SELECT COALESCE(to_char(pr.filed_date,'MM/DD/YYYY'),'') FROM reports pr WHERE pr.report_id=r.previous_report_id) ELSE '' END), '') AS "amendDate"
+                  FROM committee_master cm, reports r WHERE r.cmte_id = cm.cmte_id AND r.report_id=%s AND cm.cmte_id=%s"""
+            values_3 = [report_id, cmte_id]
+            string_3 = "Form 24"
+            f24_data = json_query(query_3, values_3, string_3, False)
+            if f24_data:
+              f24_data = f24_data[0]
+              output = {**output, **f24_data}
+            else:
+              raise Exception('There is no form 24 data for this report id: {} and cmte id: {}'.format(report_id, cmte_id))
         else:
             raise Exception('The JSON Builder has not been implemented for this report type: ' + output['formType'])
 
@@ -345,7 +359,6 @@ def get_f3x_summary_details(report_id, cmte_id):
             'The Committee ID: {} does not exist in Committee Master Table'.format(cmte_id))
     except Exception:
         raise
-
 
 def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, transaction_id_list):
     try:
@@ -546,7 +559,7 @@ def create_json_builders(request):
         # Figuring out the form type
         form_type = output.get('data').get('formType')
         # Adding Summary data to output based on form type
-        if form_type == 'F3X':
+        if form_type in ['F3X', 'F24']:
             full_form_type = FORMTYPE_FORM_DICT.get(form_type)
             # Figuring out what schedules are to be checked for the form type
             schedule_name_list = get_schedules_for_form_type(full_form_type)
@@ -554,16 +567,16 @@ def create_json_builders(request):
             ALL_CHILD_TRANSACTION_TYPES_LIST = get_all_child_transaction_identifers(form_type)
 
             # *******************************TEMPORARY MODIFICATION FTO CHECK ONLY SCHED A AND SCHED B TABLES************************************
-            schedule_name_list = [
-                {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_c'}, {'sched_type': 'sched_d'},
-                {'sched_type': 'sched_e'},
-                {'sched_type': 'sched_f'}, {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'},
-                {'sched_type': 'sched_c1'},
-                {'sched_type': 'sched_c2'}, {'sched_type': 'sched_h1'}, {'sched_type': 'sched_h2'},
-                {'sched_type': 'sched_h3'}, {'sched_type': 'sched_h5'},
-                {'sched_type': 'sched_l'}]
+            # schedule_name_list = [
+            #     {'sched_type': 'sched_a'}, {'sched_type': 'sched_b'}, {'sched_type': 'sched_c'}, {'sched_type': 'sched_d'},
+            #     {'sched_type': 'sched_e'},
+            #     {'sched_type': 'sched_f'}, {'sched_type': 'sched_h4'}, {'sched_type': 'sched_h6'},
+            #     {'sched_type': 'sched_c1'},
+            #     {'sched_type': 'sched_c2'}, {'sched_type': 'sched_h1'}, {'sched_type': 'sched_h2'},
+            #     {'sched_type': 'sched_h3'}, {'sched_type': 'sched_h5'},
+            #     {'sched_type': 'sched_l'}]
             # Iterating through schedules list and populating data into output
-            if (not transaction_flag):
+            if form_type == 'F3X' and (not transaction_flag):
                 output['data']['summary'] = get_f3x_summary_details(
                     report_id, cmte_id)
             output['data']['schedules'] = {}

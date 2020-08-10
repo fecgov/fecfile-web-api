@@ -18,5 +18,9 @@ urlpatterns = [
         views.force_unaggregate_se,
         name="force_unaggregate_se",
     ),
-    
+    url(
+        r"^se/mirror_to_F24$",
+        views.mirror_to_F24,
+        name="mirror_to_F24",
+    ),
 ]

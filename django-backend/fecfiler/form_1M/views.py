@@ -1056,11 +1056,15 @@ def get_original_registration_date(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
         sql = """SELECT sub_date AS "registration_date" FROM public.form_1 
-            WHERE comid = %s ORDER BY repid LIMIT 1"""
+                WHERE comid = %s 
+                UNION
+                SELECT sub_date AS "registration_date" FROM paper.form_1 
+                WHERE comid = %s 
+                ORDER BY registration_date LIMIT 1"""
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql), [cmte_id])
+            cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql), [cmte_id, cmte_id])
             logger.debug("get_original_registration")
-            logger.debug(cursor.query)
+            # logger.debug(cursor.query)
             output_dict = cursor.fetchone()[0]
             if output_dict:
                 output_dict = output_dict[0]
@@ -1090,7 +1094,7 @@ def get_committee_met_req_date(request):
         with connection.cursor() as cursor:
             cursor.execute(sql, [cmte_id, request.data['reportId']])
             logger.debug("get_committee_met_req_date")
-            logger.debug(cursor.query)
+            # logger.debug(cursor.query)
             output_list = cursor.fetchall()
             if output_list:
                 output_list = list(filter(None, output_list[0]))

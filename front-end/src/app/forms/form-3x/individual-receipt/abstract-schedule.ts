@@ -201,6 +201,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
   public priviousTransactionType = '';
   public currentTransactionType = '';
+  public candOfficeStatesByTransactionType: any;
 
   constructor(
     private _http: HttpClient,
@@ -552,7 +553,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       //schedE is set up differently, causing ngOnChange to fire everytime, so need to explicily check the component against the transactionType to prevent
       //unnecessary calls. This may need to be cleaned up later. 
       if (this.abstractScheduleComponent === AbstractScheduleParentEnum.schedEComponent) {
-        if (!changes.transactionType.currentValue.startsWith('IE')) {
+        if (changes.transactionType.currentValue && !changes.transactionType.currentValue.startsWith('IE')) {
           return false;
         }
         return true;
@@ -2223,10 +2224,12 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
       // Otherwise it will create a new Entity.  Since there may be more than 1 entity
       // saved in a form, entity IDs must be unique for each.  The name of the property
 
-      this._setReceiptObjectEntityId(this._selectedEntity, receiptObj, false);
-      this._setReceiptObjectEntityId(this._selectedEntityChild, receiptObj, true);
-      this._setReceiptObjectEntityId(this._selectedCandidate, receiptObj, false);
-      this._setReceiptObjectEntityId(this._selectedCandidateChild, receiptObj, true);
+      if(!this.transactionType.startsWith('IE')){ //schedE doesn't have an 'entity_id' attribute. it is being mapped to payee_entity_id so no need to set it. 
+        this._setReceiptObjectEntityId(this._selectedEntity, receiptObj, false);
+        this._setReceiptObjectEntityId(this._selectedEntityChild, receiptObj, true);
+        this._setReceiptObjectEntityId(this._selectedCandidate, receiptObj, false);
+        this._setReceiptObjectEntityId(this._selectedCandidateChild, receiptObj, true);
+      }
 
       if (this._transactionToEdit) {
         if (receiptObj['entity_id'] === null || receiptObj['entity_id'] === undefined) {
@@ -3903,42 +3906,46 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   }
 
   protected applyValidationByCoverageDate(dateValue: any, fieldName: string) {
-    this._receiptService.getReportIdByTransactionDate(this._utilService.formatDate(dateValue)).subscribe(res => {
-      if (res) {
-        if (res.reportId) {
-          if (res.status && res.status !== 'Filed') {
-            this.getContributionAggregate(dateValue, fieldName);
-            let elementName = null;
-            if(this.formType === '3X'){
-              if (this.reattributionTransactionId) {
-                elementName = 'reattribution_report_id';
+    //api call was being triggered on every keystroke even when the full date is not entered, so putting a check
+    //on the year, making sure its greater than 1900 before triggering.
+    if(dateValue && dateValue.substr(0,4) && Number(dateValue.substr(0,4)) > 1900){
+      this._receiptService.getReportIdByTransactionDate(this._utilService.formatDate(dateValue)).subscribe(res => {
+        if (res) {
+          if (res.reportId) {
+            if (res.status && res.status !== 'Filed') {
+              this.getContributionAggregate(dateValue, fieldName);
+              let elementName = null;
+              if(this.formType === '3X'){
+                if (this.reattributionTransactionId) {
+                  elementName = 'reattribution_report_id';
+                }
+                else if (this.redesignationTransactionId) {
+                  elementName = 'redesignation_report_id';
+                }
               }
-              else if (this.redesignationTransactionId) {
-                elementName = 'redesignation_report_id';
+              else if(this.formType === '24'){
+                elementName = 'mirror_report_id';
+              }
+              if (elementName) {
+                let field = this.hiddenFields.find(element => element.name === elementName);
+                if (field) {
+                  field.value = res.reportId.toString();
+                }
+                else {
+                  this.hiddenFields.push({ type: 'hidden', name: elementName, value: res.reportId.toString() });
+                }
               }
             }
-            else if(this.formType === '24'){
-              elementName = 'mirror_report_id';
-            }
-            if (elementName) {
-              let field = this.hiddenFields.find(element => element.name === elementName);
-              if (field) {
-                field.value = res.reportId.toString();
-              }
-              else {
-                this.hiddenFields.push({ type: 'hidden', name: elementName, value: res.reportId.toString() });
-              }
+            else if (res.status && res.status === 'Filed') {
+              this.frmIndividualReceipt.controls[fieldName].setErrors({ reportFiled: true });
             }
           }
-          else if (res.status && res.status === 'Filed') {
-            this.frmIndividualReceipt.controls[fieldName].setErrors({ reportFiled: true });
+          else {
+            this.frmIndividualReceipt.controls[fieldName].setErrors({ reportNotFound: true });
           }
         }
-        else {
-          this.frmIndividualReceipt.controls[fieldName].setErrors({ reportNotFound: true });
-        }
-      }
-    });
+      });
+    }
   }
 
   private getContributionAggregate(dateValue: any, fieldName: string) {
@@ -5461,6 +5468,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
             if (res.data.hasOwnProperty('officeSought')) {
               if (Array.isArray(res.data.officeSought)) {
                 this.candidateOfficeTypes = res.data.officeSought;
+                this.candOfficeStatesByTransactionType = res.data.officeSought;
               }
             }
           }
