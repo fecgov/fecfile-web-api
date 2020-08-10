@@ -830,7 +830,7 @@ public printReport(report: reportModel): void{
 
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          this._reportTypeService.printPreview('dashboard_report_screen', report.form_type);
+          this._reportTypeService.printPreview('dashboard_report_screen', report.form_type.substr(1));
       }, 1500);
     }
   }
@@ -958,12 +958,12 @@ public printReport(report: reportModel): void{
       setTimeout(() => {
         this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: false } });
       }, 1500);
-    } else if (report.form_type === 'F3X') {
+    } else if (report.form_type === 'F3X' || report.form_type === 'F24') {
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
-          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
-          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+          localStorage.setItem(`form_${report.form_type.substr(1)}_details`, JSON.stringify(res[0]));
+          localStorage.setItem(`form_${report.form_type.substr(1)}_report_type`, JSON.stringify(res[0]));
 
           //return false;
         });
@@ -976,7 +976,12 @@ public printReport(report: reportModel): void{
             this._router.navigate([`/forms/form/${formType}`], {
               queryParams: { step: 'financial_summary', reportId: report.report_id, edit: false, isFiled: isFiled }
             });
-          } else if(formType === 'F99') {
+          } else if(formType === '24'){
+            this._router.navigate([`/forms/form/${formType}`], {
+              queryParams: { step: 'transactions', reportId: report.report_id, edit: false, isFiled: isFiled, transactionCategory: 'disbursements' }
+            });
+          }
+          else if(formType === 'F99') {
             this._router.navigate([`/forms/form/${formType}`], {
               queryParams: { step: 'step_1', reportId: report.report_id, edit: false, isFiled: isFiled }
             });
