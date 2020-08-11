@@ -160,6 +160,7 @@ def schedE_sql_dict(data):
         "last_name",
         "middle_name",
         "preffix",
+        "prefix",
         "suffix",
         "street_1",
         "street_2",
