@@ -1058,7 +1058,7 @@ def get_original_registration_date(request):
         sql = """SELECT sub_date AS "registration_date" FROM public.form_1 
                 WHERE comid = %s 
                 UNION
-                SELECT sub_date AS "registration_date" FROM paper.form_1 
+                SELECT receipt_dt AS "registration_date" FROM paper.form_1
                 WHERE comid = %s 
                 ORDER BY registration_date LIMIT 1"""
         with connection.cursor() as cursor:
