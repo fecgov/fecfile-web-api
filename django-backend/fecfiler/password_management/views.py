@@ -318,7 +318,7 @@ def reset_options_password(request):
                     send_email(token_val, email)
 
                 response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
-                            'email': email, 'token_val': token_val}
+                            'email': email}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             except Exception as e:
                 logger.debug("exception occurred while generating token for email option.", str(e))
