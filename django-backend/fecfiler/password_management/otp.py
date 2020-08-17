@@ -85,12 +85,7 @@ class TOTPVerification:
         totp.time = time.time()
         est = pytz.timezone('US/Eastern')
         current_time_est = datetime.now(est)
-        # last_updated_time_end = last_updated_time.replace(tzinfo=pytz.utc)
-        # #last_updated_time_end1 = last_updated_time.replace(est)
-        # current_time = datetime.now()
-        #
-        # current_time_utc = datetime.now(pytz.utc)
-        # time1 = last_updated_time.astimezone(est)
+
         current_time_est1 = current_time_est.replace(tzinfo=None)
         upper_limit = last_updated_time + timedelta(minutes=30)
         upper_limit1 = upper_limit.replace(tzinfo=None)
