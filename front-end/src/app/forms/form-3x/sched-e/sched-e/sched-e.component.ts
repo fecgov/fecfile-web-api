@@ -670,6 +670,10 @@ export class SchedEComponent extends IndividualReceiptComponent implements OnIni
     else{
       if(fieldName === 'dissemination_date'){
         this.applyValidationByCoverageDate(this.frmIndividualReceipt.controls[fieldName].value,fieldName);
+        if (this.frmIndividualReceipt.controls[fieldName] && this.frmIndividualReceipt.controls[fieldName].value) {
+          this.frmIndividualReceipt.controls['disbursement_date'].clearValidators();
+          this.frmIndividualReceipt.controls['disbursement_date'].updateValueAndValidity();
+        }
       }
     }
     this.updateYTDAmount();
