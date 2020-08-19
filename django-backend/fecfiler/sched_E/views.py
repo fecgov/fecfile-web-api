@@ -710,7 +710,7 @@ def update_aggregate_amt_se(data):
             #     cmte_id,
             # )
             transaction_list = get_transactions_election_and_office(
-                aggregate_start_date, aggregate_end_date, data, form_type
+                aggregate_start_date, aggregate_end_date, data
             )
             aggregate_amount = 0
             # dissemination_date, disbursement_date = data.get('dissemination_date'), data.get('disbursement_date')
