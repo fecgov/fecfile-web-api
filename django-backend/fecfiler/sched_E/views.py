@@ -496,7 +496,7 @@ def get_sched_e_ytd_amount(request):
                 form_type, trans_dt
             )
         transaction_list = get_transactions_election_and_office(
-            aggregate_start_date, trans_dt, data, form_type
+            aggregate_start_date, trans_dt, data, 'F3X'
         )
         ytd_amt = 0
         for transaction in transaction_list:
