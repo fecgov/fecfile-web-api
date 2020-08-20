@@ -34,6 +34,12 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 TIME_ZONE = "America/New_York"
 
+OTP_MAX_RETRY = 20
+OTP_DIGIT = 6
+OTP_TIME_EXPIRY = 300
+JWT_PASSWORD_EXPIRY = 1800
+API_LOGIN = os.environ.get('API_LOGIN', None)
+API_PASSWORD = os.environ.get('API_PASSWORD', None)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
@@ -75,7 +81,10 @@ INSTALLED_APPS = [
     'fecfiler.sched_L',
     'storages',
     'fecfiler.form_1M',
-    'fecfiler.contacts'
+    'fecfiler.contacts',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'fecfiler.password_management'
 ]
 
 

@@ -403,6 +403,7 @@ def get_report_types(request):
         #         ),
         #         status=status.HTTP_400_BAD_REQUEST,
         #     )
+        form_type = request.query_params.get("form_type")
         cmte_id = get_comittee_id(request.user.username)
         with open('./fecfiler/core/report_types.json') as f:
             data = json.load(f)
@@ -442,20 +443,45 @@ def get_report_types(request):
                 parameter = "Monthly-Non-Election-Year"
             else:
                 parameter = "Monthly-Election-Year"
+        if form_type == 'F3X':
+            forms_obj = data['F3X'].get(parameter)
+            for report_type in forms_obj['report_type']:
+                for election_state in report_type['election_state']:
+                    for dates in election_state['dates']:
+                        if dates.get('cvg_start_date'):
+                            dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
+                        if dates.get('cvg_end_date'):
+                            dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
+                        if dates.get('due_date'):
+                            if "YYYY-01" in dates.get('due_date'):
+                                dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
+                            else:
+                                dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
+        elif form_type == 'F3L':
+            forms_obj = data['F3L'].get(parameter)
+            for dates in forms_obj['report_type']:
+                # Temporary fix till we get EFO dates
+                if dates.get('cvg_start_date') == 'EFO': dates['cvg_start_date'] = None
+                if dates.get('cvg_end_date') == 'EFO': dates['cvg_end_date'] = None
+                if dates.get('due_date') == 'EFO': dates['due_date'] = None
 
-        forms_obj = data.get(parameter)
-        for report_type in forms_obj['report_type']:
-            for election_state in report_type['election_state']:
-                for dates in election_state['dates']:
-                    if dates.get('cvg_start_date'):
-                        dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
-                    if dates.get('cvg_end_date'):
-                        dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
-                    if dates.get('due_date'):
-                        if "YYYY-01" in dates.get('due_date'):
-                            dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
-                        else:
-                            dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
+                if dates.get('cvg_start_date'):
+                    dates['cvg_start_date'] = dates.get('cvg_start_date').replace("YYYY", str(_year))
+                if dates.get('cvg_end_date'):
+                    dates['cvg_end_date'] = dates.get('cvg_end_date').replace("YYYY", str(_year))
+                if dates.get('due_date'):
+                    if "YYYY-01" in dates.get('due_date'):
+                        dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year+1))
+                    else:
+                        dates['due_date'] = dates.get('due_date').replace("YYYY", str(_year))
+                if dates.get('semi-annual_dates'):
+                    for item in dates.get('semi-annual_dates'):
+                        if item.get('start_date'):
+                            item['start_date'] = item.get('start_date').replace("YYYY", str(_year))
+                        if item.get('end_date'):
+                            item['end_date'] = item.get('end_date').replace("YYYY", str(_year))
+        else:
+            raise Exception('The form type passed is not yet implemented. Input received: {}'.format(form_type))
 
         return JsonResponse(forms_obj, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
