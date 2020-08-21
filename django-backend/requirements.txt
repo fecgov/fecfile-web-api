@@ -77,4 +77,4 @@ numpy==1.17.2
 pandas==0.25.1
 pandas-schema==0.3.5
 django-otp==0.9.3
-callfire-api-client-python==3.1.0
+callfire-api-client-python==0.0.9
