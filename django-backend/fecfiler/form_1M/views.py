@@ -16,7 +16,7 @@ from functools import wraps
 # Create your views here.
 from fecfiler.authentication.authorization import is_read_only_or_filer_reports, is_not_read_only_or_filer, \
     is_read_only_or_filer_submit
-from fecfiler.core.views import get_comittee_id, get_next_report_id
+from fecfiler.core.views import get_comittee_id, get_next_report_id, clone_fec_entity
 
 logger = logging.getLogger(__name__)
 
@@ -431,7 +431,7 @@ def get_candidate_details(request_dict):
             column_name = 'can' + str(i) + '_id'
             candidate_id = request_dict.get(column_name)
             if candidate_id:
-                candidate_dict = get_sql_candidate(candidate_id)
+                candidate_dict = get_sql_candidate(candidate_id, request_dict['cmte_id'])
                 candidate_dict['contribution_date'] = request_dict.get(column_name[:-2] + 'con')
                 candidate_dict['candidate_number'] = i
                 output_list.append(candidate_dict)
@@ -444,13 +444,16 @@ def get_candidate_details(request_dict):
             'The get_candidate_details function is throwing an error: ' + str(e))
 
 
-def get_sql_candidate(candidate_id):
+def get_sql_candidate(candidate_id, cmte_id):
     try:
-        sql = """SELECT cand_id AS "candidate_id", cand_last_name, cand_first_name, 
-        cand_middle_name, cand_prefix, cand_suffix, cand_office, cand_office_state, 
-        cand_office_district FROM public.candidate_master WHERE cand_id=%s"""
+        sql = """SELECT ref_cand_cmte_id AS "candidate_id", last_name AS "cand_last_name", 
+        first_name AS "cand_first_name", middle_name AS "cand_middle_name", 
+        preffix AS "cand_prefix", suffix AS "cand_suffix", cand_office, cand_office_state, 
+        cand_office_district, entity_id AS "beneficiary_cand_entity_id" 
+        FROM public.entity WHERE ref_cand_cmte_id=%s AND
+        cmte_id in (%s, 'C00000000') ORDER BY ref_entity_id LIMIT 1"""
         with connection.cursor() as cursor:
-            cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql), [candidate_id])
+            cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql), [candidate_id, cmte_id])
             logger.debug("CANDIDATE TABLE")
             logger.debug(cursor.query)
             output_dict = cursor.fetchone()[0]
@@ -618,7 +621,6 @@ def validate_before_submit(request_dict):
     except Exception as e:
         raise
 
-
 """
 ************************************ Form 1M CRUD Functions ******************************************
 """
@@ -729,11 +731,13 @@ def form1M(request):
             elif step == 'saveCandidate':
                 try:
                     is_read_only_or_filer_reports(request)
-
                     noneCheckMissingParameters(['candidate_id', 'contribution_date',
-                                                'candidate_number'],
+                                                'candidate_number', 'beneficiary_cand_entity_id'],
                                                checking_dict=request.data, value_dict=request.data,
                                                function_name='form1M-POST: step-2 Qualification')
+                    if request.data['beneficiary_cand_entity_id'].startswith("FEC"):
+                        new_entity_id = clone_fec_entity(cmte_id, 'CAN', request.data['beneficiary_cand_entity_id'])
+                        logger.debug('NEW candidate entity_id: '+new_entity_id)
                     candidate_number = check_candidate_number(request.data['candidate_number'])
                     request_dict = f1m_sql_dict(cmte_id, step, request.data)
                     column_name = 'can' + candidate_number + '_id'
@@ -860,9 +864,12 @@ def form1M(request):
                 # by qualification step2 PUT
                 elif step == 'saveCandidate':
                     noneCheckMissingParameters(['reportId', 'candidate_id', 'contribution_date',
-                                                'candidate_number'],
+                                                'candidate_number', 'beneficiary_cand_entity_id'],
                                                checking_dict=request.data, value_dict=request.data,
                                                function_name='form1M-PUT: step-2 Qualification')
+                    if request.data['beneficiary_cand_entity_id'].startswith("FEC"):
+                        new_entity_id = clone_fec_entity(cmte_id, 'CAN', request.data['beneficiary_cand_entity_id'])
+                        logger.debug('NEW candidate entity_id: '+new_entity_id)
                     request_dict = f1m_sql_dict(cmte_id, step, request.data)
                     check_report_id_status(cmte_id, request_dict['report_id'])
                     candidate_number = check_candidate_number(request.data['candidate_number'])

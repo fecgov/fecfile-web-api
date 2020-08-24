@@ -188,7 +188,7 @@
                   <td>
                     <input type="checkbox" (click)="checkForMultiChecked($event)">
                   </td>
-                  <td>
+                  <!-- <td>
                     <div class="row td-arrow">
                       {{ item.entity_type == 'IND' ?
                                           item.first_name + ' ' + item.last_name :
@@ -197,6 +197,21 @@
                       <div>
                         <i *ngIf="item.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow"
                           (click)="clickArrow(item)"></i>
+                        <i *ngIf="item.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(item)"></i>
+                      </div>
+                    </div>
+                  </td> -->
+                  <td [ngClass]="item.child.length > 0 ? 'parent': ''"
+                    (click)="item.child? item.toggleChild = !item.toggleChild: ''">
+                    <div class="row td-arrow">
+                      {{ item.entity_type == 'IND' ?
+                      item.first_name + ' ' + item.last_name :
+                      item.entity_name + item.child.length
+                                    }}
+                      &nbsp;&nbsp;<div *ngIf="item.child.length > 0" class="align_right arrow"
+                        [ngClass]="item.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
+                      <div>
+                        <i *ngIf="item.arrow_dir === 'down'" class="fas fa-angle-down amend-arrow" (click)="clickArrow(item)"></i>
                         <i *ngIf="item.arrow_dir === 'up'" class="fas fa-angle-up amend-arrow" (click)="clickArrow(item)"></i>
                       </div>
                     </div>
@@ -241,7 +256,9 @@
                   </td>
         
                 </tr>
-                <tr [ngStyle]="{'background-color': '#D9EDF6'}" *ngFor="let itemChild of item.child;">
+                <!-- <tr [ngStyle]="{'background-color': '#D9EDF6'}" *ngFor="let itemChild of item.child;"> -->
+                <tr [ngbCollapse]="item.child.length > 0? !item.toggleChild: ''" *ngFor="let itemChild of item.child;"
+                    class="child-bg">
                   <td>
                     <input type="checkbox" (click)="checkForMultiChecked($event)">
                   </td>

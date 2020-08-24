@@ -579,6 +579,8 @@ def create_json_builders(request):
             if form_type == 'F3X' and (not transaction_flag):
                 output['data']['summary'] = get_f3x_summary_details(
                     report_id, cmte_id)
+            if form_type == 'F24':
+                output['data']['reportPrint'] = False if transaction_flag else True
             output['data']['schedules'] = {}
             for schedule_name in schedule_name_list:
                 schedule = SCHED_SCHED_CODES_DICT.get(
