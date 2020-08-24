@@ -147,6 +147,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
     this.form.patchValue({ cand_office_district: candidate.cand_office_district }, { onlySelf: true });
     this.form.patchValue({ contribution_date: candidate.contribution_date }, { onlySelf: true });
     this.form.patchValue({ candidate_number: candidate.candidate_number }, { onlySelf: true });
+    this.form.patchValue({ beneficiary_cand_entity_id: candidate.beneficiary_cand_entity_id}, {onlySelf:true});
   }
 
   private resetFormAndIncrementCandidate() {
@@ -207,7 +208,8 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
       cand_office_state: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       cand_office_district: new FormControl(null, [Validators.required, Validators.maxLength(2)]),
       contribution_date: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
-      candidate_number: new FormControl(this.candidateNumber.toString())
+      candidate_number: new FormControl(this.candidateNumber.toString()),
+      beneficiary_cand_entity_id:new FormControl(null,[])
     });
   }
 
@@ -362,6 +364,7 @@ export class F1mQualificationComponent implements  OnInit , OnDestroy{
     this.form.patchValue({'cand_office':entity.cand_office}, {onlySelf:true});
     this.form.patchValue({'cand_office_state':entity.cand_office_state}, {onlySelf:true});
     this.form.patchValue({'cand_office_district':entity.cand_office_district}, {onlySelf:true});
+    this.form.patchValue({'beneficiary_cand_entity_id':entity.beneficiary_cand_entity_id}, {onlySelf:true});
   }
 
    /**
