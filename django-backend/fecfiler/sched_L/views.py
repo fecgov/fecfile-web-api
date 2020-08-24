@@ -2002,6 +2002,7 @@ def get_sla_summary_table(request):
             FROM public.sched_a a, public.levin_account l, public.entity e, public.ref_transaction_types tp
             WHERE a.cmte_id = %s
             AND a.report_id = %s
+            AND a.back_ref_transaction_id is null
             AND a.levin_account_id = l.levin_account_id
             AND a.entity_id = e.entity_id
             AND a.transaction_type_identifier = tp.tran_identifier 

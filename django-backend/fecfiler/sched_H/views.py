@@ -3739,6 +3739,7 @@ def get_list_all_schedH4(report_id, cmte_id):
             last_update_date
             FROM public.sched_h4
             WHERE report_id = %s AND cmte_id = %s
+            AND back_ref_transaction_id is null
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id))
@@ -5333,7 +5334,6 @@ def get_list_schedH6(report_id, cmte_id, transaction_id):
             last_update_date
             FROM public.sched_h6
             WHERE report_id = %s AND cmte_id = %s AND transaction_id = %s
-            AND back_ref_transaction_id IS NULL
             AND delete_ind is distinct from 'Y') t
             """
             cursor.execute(_sql, (report_id, cmte_id, transaction_id))
