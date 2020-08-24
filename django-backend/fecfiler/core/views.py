@@ -1839,7 +1839,18 @@ def submit_report(request):
             )
             if cursor.rowcount == 0:
                 raise Exception("report {} update failed".format(report_id))
-
+        if form_tp == "F3X":
+            _sql_F3X = """ UPDATE public.form_3x SET date_signed = %s WHERE report_id = %s"""
+            with connection.cursor() as cursor:
+                cursor.execute(_sql_F3X, [datetime.datetime.now(), report_id])
+                if cursor.rowcount == 0:
+                    raise Exception("F3X table {} update failed".format(report_id))
+        if form_tp == "F24":
+            _sql_F24 = """ UPDATE public.form_24 SET sign_date = %s WHERE report_id = %s"""
+            with connection.cursor() as cursor:
+                cursor.execute(_sql_F24, [datetime.datetime.now(), report_id])
+                if cursor.rowcount == 0:
+                    raise Exception("F24 table {} update failed".format(report_id))
         if form_tp in ["F3X", "F24"]:
             reposit_f3x_data(cmte_id, report_id, form_tp)
         elif form_tp == "F99":
