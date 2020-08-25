@@ -1,6 +1,7 @@
 import json
 import datetime
 import logging
+import secrets
 import warnings
 from calendar import timegm
 
@@ -20,6 +21,7 @@ from .authorization import is_not_treasurer
 from .models import Account
 import re
 from .permissions import IsAccountOwner
+from .register import send_email_register
 from .serializers import AccountSerializer
 from fecfiler.forms.models import Committee
 
@@ -250,7 +252,7 @@ def get_next_user_id():
         raise
 
 
-def add_new_user(data, cmte_id):
+def add_new_user(data, cmte_id, register_url_token):
     try:
         user_id = get_next_user_id()
         data["user_id"] = user_id
@@ -258,12 +260,11 @@ def add_new_user(data, cmte_id):
         with connection.cursor() as cursor:
             # Insert data into manage user table
             cursor.execute(
-                """INSERT INTO public.authentication_account (id,password, last_login, is_superuser, tagline, created_at, updated_at, is_staff, date_joined,username, first_name, last_name, email, contact, role, is_active,cmtee_id, delete_ind)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                """INSERT INTO public.authentication_account (id, last_login, is_superuser, tagline, created_at, updated_at, is_staff, date_joined,username, first_name, last_name, email, contact, role, is_active,cmtee_id, delete_ind, status, register_token)
+                VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                 """,
                 [
                     user_id,
-                    make_password("test"),
                     datetime.datetime.now(),
                     "false",
                     " ",
@@ -277,9 +278,11 @@ def add_new_user(data, cmte_id):
                     data.get("email"),
                     data.get("contact"),
                     (data.get("role")).upper(),
-                    "true",
+                    "false",
                     cmte_id,
-                    'N'
+                    'N',
+                    'Pending',
+                    register_url_token
                 ],
             )
             if cursor.rowcount != 1:
@@ -293,7 +296,7 @@ def add_new_user(data, cmte_id):
 def put_sql_user(data):
     try:
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET delete_ind = 'N', role = %s,is_active = %s,first_name = %s,last_name = %s,email = %s,contact = %s,username = %s WHERE id = %s AND cmtee_id = %s AND delete_ind != 'Y'"""
+            _sql = """UPDATE public.authentication_account SET delete_ind = 'N', role = %s,is_active = %s,first_name = %s,last_name = %s,email = %s,contact = %s,username = %s WHERE id = %s AND cmtee_id = %s AND delete_ind != 'Y' AND status != %s"""
             _v = (
                 data.get("role"),
                 "true",
@@ -304,6 +307,7 @@ def put_sql_user(data):
                 data.get("new_user_name"),
                 data.get("id"),
                 data.get("cmte_id"),
+                "Pending",
             )
             cursor.execute(_sql, _v)
             if cursor.rowcount != 1:
@@ -385,6 +389,20 @@ def backup_user_exist(data):
         raise e
 
 
+def get_registration_token():
+    register_url_token = secrets.token_urlsafe(20)
+
+    with connection.cursor() as cursor:
+        # check if user already exist
+        _sql = """Select * from public.authentication_account WHERE register_token = %s AND delete_ind !='Y' """
+        cursor.execute(_sql, [register_url_token])
+        user_list = cursor.fetchone()
+        if user_list is not None:
+            get_registration_token()
+        else:
+            return register_url_token
+
+
 @api_view(["POST", "GET", "DELETE", "PUT"])
 def manage_user(request):
     try:
@@ -448,12 +466,15 @@ def manage_user(request):
                 backup_admin_exist = backup_user_exist(data)
                 if data.get("role").upper() == Roles.BC_ADMIN.value and request.user.role != Roles.C_ADMIN.value:
                     raise NoOPError(
-                        "Current Role does not have authority to create Back Up Admin. Please reach out to Committee "
-                        "Admin."
-                        )
+                                    "Current Role does not have authority to create Back Up Admin. Please reach out "
+                                    "to Committee "
+                                    "Admin."
+                                    )
 
                 if not user_exist and not user_reactivated and not backup_admin_exist:
-                    data = add_new_user(data, cmte_id)
+                    register_url_token = get_registration_token()
+                    add_new_user(data, cmte_id, register_url_token)
+                    send_email_register(data, cmte_id, register_url_token)
 
                 output = get_users_list(cmte_id)
                 json_result = {'users': output}
@@ -530,8 +551,8 @@ def update_toggle_status(status, data):
     try:
         with connection.cursor() as cursor:
             # check if user already exist
-            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND upper(role) != %s """
-            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id"), Roles.C_ADMIN.value])
+            _sql = """UPDATE public.authentication_account SET is_active = %s where id = %s AND cmtee_id = %s AND delete_ind !='Y' AND upper(role) != %s AND status != %s"""
+            cursor.execute(_sql, [status, data.get("id"), data.get("cmte_id"), Roles.C_ADMIN.value, "Pending"])
 
             if cursor.rowcount != 1:
                 raise NoOPError(
