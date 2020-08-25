@@ -888,6 +888,8 @@ def post_sql_report(
         email_2,
         additional_email_1,
         additional_email_2,
+        semi_annual_start_date,
+        semi_annual_end_date
 ):
     try:
         with connection.cursor() as cursor:
@@ -895,8 +897,9 @@ def post_sql_report(
             cursor.execute(
                 """INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, amend_number, 
                     report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, 
-                    additional_email_1, additional_email_2, create_date, last_update_date)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    additional_email_1, additional_email_2, semi_annual_start_date, semi_annual_end_date, 
+                    create_date, last_update_date)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 [
                     report_id,
                     cmte_id,
@@ -912,6 +915,8 @@ def post_sql_report(
                     email_2,
                     additional_email_1,
                     additional_email_2,
+                    semi_annual_start_date,
+                    semi_annual_end_date,
                     datetime.datetime.now(),
                     datetime.datetime.now()
                 ],
@@ -933,6 +938,8 @@ def get_list_all_report(cmte_id):
             amend_number, 
             cvg_start_date, 
             cvg_end_date, 
+            semi_annual_start_date,
+            semi_annual_end_date,
             due_date, 
             superceded_report_id, 
             previous_report_id, 
@@ -993,6 +1000,8 @@ def get_list_report(report_id, cmte_id):
                                         email_2            AS    email2, 
                                         additional_email_1 AS    additionalemail1, 
                                         additional_email_2 AS    additionalemail2, 
+                                        semi_annual_start_date,
+                                        semi_annual_end_date,
                                         ( 
                                                 SELECT 
                                                         CASE 
@@ -1037,6 +1046,8 @@ def put_sql_report(
         email_2,
         additional_email_1,
         additional_email_2,
+        semi_annual_start_date,
+        semi_annual_end_date,
         status,
         report_id,
         cmte_id,
@@ -1049,7 +1060,10 @@ def put_sql_report(
 
             if status == "Saved":
                 cursor.execute(
-                    """UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                    """UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, 
+                    email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, 
+                    semi_annual_start_date = %s, semi_annual_end_date = %s,status = %s 
+                    WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                     [
                         report_type,
                         cvg_start_dt,
@@ -1059,6 +1073,8 @@ def put_sql_report(
                         email_2,
                         additional_email_1,
                         additional_email_2,
+                        semi_annual_start_date,
+                        semi_annual_end_date,
                         status,
                         report_id,
                         cmte_id,
@@ -1070,7 +1086,11 @@ def put_sql_report(
                 # print(status)
                 # print(report_type)
                 cursor.execute(
-                    """UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s, filed_date = last_update_date WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                    """UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, 
+                    email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, 
+                    semi_annual_start_date = %s, semi_annual_end_date = %s,
+                    status = %s, filed_date = last_update_date 
+                    WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                     [
                         report_type,
                         cvg_start_dt,
@@ -1080,6 +1100,8 @@ def put_sql_report(
                         email_2,
                         additional_email_1,
                         additional_email_2,
+                        semi_annual_start_date,
+                        semi_annual_end_date,
                         status,
                         report_id,
                         cmte_id,
@@ -1301,6 +1323,8 @@ def post_reports(data, reportid=None):
                     data.get("email_2"),
                     data.get("additional_email_1"),
                     data.get("additional_email_2"),
+                    data.get("semi_annual_start_date"),
+                    data.get("semi_annual_end_date"),
                 )
 
             except Exception as e:
@@ -1404,6 +1428,8 @@ def put_reports(data):
                 data.get("email_2"),
                 data.get("additional_email_1"),
                 data.get("additional_email_2"),
+                data.get("semi_annual_start_date"),
+                data.get("semi_annual_end_date"),
                 data.get("status"),
                 data.get("report_id"),
                 cmte_id,
@@ -1439,6 +1465,8 @@ def put_reports(data):
                     data.get("email_2"),
                     data.get("additional_email_1"),
                     data.get("additional_email_2"),
+                    data.get("semi_annual_start_date"),
+                    data.get("semi_annual_end_date"),
                     data.get("status"),
                     data.get("report_id"),
                     cmte_id,
@@ -1976,6 +2004,10 @@ def reports(request):
                       "additional_email_1": additional_email_1,
                       "additional_email_2": additional_email_2,
                   }
+
+                datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
+                datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
+
                 data = post_reports(datum)
                 if type(data) is dict:
                     if datum.get("form_type") == "F3X":
@@ -2096,6 +2128,9 @@ def reports(request):
 
                 if "election_code" in request.data:
                     datum["election_code"] = request.data.get("election_code")
+                
+                datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
+                datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
 
                 data = put_reports(datum)
                 orphanedTransactionsExist = count_orphaned_transactions(request.data.get("report_id"), cmte_id)
@@ -9090,6 +9125,10 @@ def create_amended(reportid):
                 data["cvg_end_dt"] = datetime.datetime.strptime(
                     data["cvg_end_date"], "%Y-%m-%d"
                 ).date()
+                if data.get('semi_annual_start_date'):
+                    data['semi_annual_start_date'] = datetime.datetime.strptime(data.get('semi_annual_start_date'), "%Y-%m-%d").date()
+                if data.get('semi_annual_end_date'):
+                    data['semi_annual_end_date'] = datetime.datetime.strptime(data.get('semi_annual_end_date'), "%Y-%m-%d").date()
                 # print('just before post_reports')
                 created_data = post_reports(data, reportid)
                 if type(created_data) is list:
