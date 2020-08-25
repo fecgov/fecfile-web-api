@@ -34,6 +34,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 TIME_ZONE = "America/New_York"
 
+REGISTER_USER_URL = "http://dev-fecfile.efdev.fec.gov/#/register?register_token="
 OTP_MAX_RETRY = 20
 OTP_DIGIT = 6
 OTP_TIME_EXPIRY = 300
