@@ -56,7 +56,7 @@ pipeline {
         stage("Build Images"){
           parallel {
             stage("Backend") {
-              steps { buildBack("${VERSION}") }
+              steps { buildBack("${VERSION}", "awsqa") }
             }
             stage("front-end") {
               steps { imageBuild("${VERSION}qa", "awsqa") }
@@ -89,7 +89,7 @@ pipeline {
         stage("Build Images"){
           parallel {
             stage("Backend") {
-              steps { buildBack("${VERSION}") }
+              steps { buildBack("${VERSION}", "awsuat") }
             }
             stage("front-end") {
               steps { imageBuild("${VERSION}uat", "awsuat") }
