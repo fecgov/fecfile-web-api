@@ -110,7 +110,7 @@ export class TransactionSidebarComponent implements OnInit {
     }
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
     if(this._formType !== '24'){
-      this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
+      this._transactionTypeService.getTransactionCategories("F"+this._formType).takeUntil(this.onDestroy$).subscribe(res => {
         if (res) {
             this.transactionCategories = res.data.transactionCategories;
             this.cashOnHand = res.data.cashOnHand;

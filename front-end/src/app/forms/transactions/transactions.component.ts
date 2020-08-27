@@ -225,7 +225,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
 
-    this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
+    this._transactionTypeService.getTransactionCategories("F"+this.formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
 

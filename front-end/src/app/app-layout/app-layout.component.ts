@@ -16,6 +16,7 @@ import {AuthService} from '../shared/services/AuthService/auth.service';
   encapsulation: ViewEncapsulation.None
 })
 export class AppLayoutComponent implements OnInit, OnDestroy {
+  
   ngOnDestroy(): void {
       this.onDestroy$.next(true);
       this.subscription.unsubscribe();
@@ -49,7 +50,8 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   public currentReportData:any = {};
   public electionDate: string = null;
   public electionState: string = null;
-
+  public semiAnnualStartDate: string;
+  public semiAnnualEndDate: string;
   private _step: string = null;
 
   private onDestroy$ = new Subject();
@@ -131,17 +133,10 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
 
   }
 
-
-  /**
-   * TODO: Figure out why this was placed here.
-   */
-  // @HostListener('window:beforeunload', ['$event'])
-  // unloadNotification($event: any) {
-  //   localStorage.clear();
-  // }
-
   ngDoCheck(): void {
     const route: string = this._router.url;
+    
+    let formType = this.extractFormType();
     // to refresh/clear Dash Board Filter options
     localStorage.removeItem('reports.filters');
     localStorage.removeItem('Reports.view');
@@ -158,18 +153,17 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       this.showFormDueDate = false;
     } else if (route === '/reports') {
       this.showFormDueDate = false;
-    } else if (
-      route.indexOf('/forms/form/3X') === 0 ||
-      route.indexOf('/forms/transactions/3X') === 0 ||
-      route.indexOf('/signandSubmit') === 0
+    } else if (formType && (
+      route.indexOf(`/forms/form/${formType}`) === 0  ||
+      route.indexOf(`/forms/transactions/${formType}`) === 0 ||
+      route.indexOf('/signandSubmit') === 0)
     ) {
-      if (localStorage.getItem('form_3X_report_type') !== null) {
-        formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
-      } else if (localStorage.getItem('form_3X_report_type_backup') !== null) {
-        formInfo = JSON.parse(localStorage.getItem('form_3X_report_type_backup'));
+      if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
+        formInfo = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+      } else if (localStorage.getItem(`form_${formType}_report_type_backup`) !== null) {
+        formInfo = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
       }
 
-      // //console.log(" formInfo = ", formInfo);
 
       if (typeof formInfo === 'object') {
         if(this.currentReportData && Array.isArray(this.currentReportData) && this.currentReportData.length > 0){
@@ -190,6 +184,19 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     }
   }
   
+  private extractFormType() {
+    let formType = null;
+    if (this.formType) {
+      if (this.formType.length === 3) {
+        formType = this.formType.substr(1, 3);
+      }
+      else if (this.formType.length === 2) {
+        formType = this.formType;
+      }
+    }
+    return formType;
+  }
+
   private populateHeaderData(formInfo: any) {
     if (formInfo.hasOwnProperty('formType')) {
       this.formType = formInfo.formType;
@@ -254,6 +261,14 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     }
     else if(formInfo.hasOwnProperty('electionstate')){
       this.electionState = formInfo.electionstate;
+    }
+
+    if(formInfo.hasOwnProperty('semi_annual_start_date')){
+      this.semiAnnualStartDate = formInfo.semi_annual_start_date;
+    }
+
+    if(formInfo.hasOwnProperty('semi_annual_end_date')){
+      this.semiAnnualEndDate = formInfo.semi_annual_end_date;
     }
   }
 
@@ -328,13 +343,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       reportId: this._activatedRoute.snapshot.queryParams.reportId
     };
 
-    let formType :string = '';
-    if(this.formType === 'F3X'){
-      formType='3X';
-    }
-    else if(this.formType === '3X'){
-      formType ='3X';
-    }
+    let formType :string = this.extractFormType();
     this._router.navigate([`/forms/form/${formType}`], {
       queryParams: queryParamsMap
     });
@@ -348,7 +357,9 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
         'currentDueDate' : this.dueDate,
         'currentReportType': this.reportType,
         'currentElectionDate':this.electionDate,
-        'currentElectionState':this.electionState
+        'currentElectionState':this.electionState,
+        'currentSemiAnnualStartDate': this.semiAnnualStartDate,
+        'currentSemiAnnualEndDate': this.semiAnnualEndDate
       }
     });
   }

@@ -272,6 +272,11 @@ def get_transaction_categories(request):
             forms_obj = {}
             form_type = request.query_params.get("form_type")
 
+            if(form_type == 'F3L'):
+                with open('./fecfiler/core/f3l_transaction_categories.json') as f:
+                    data = json.load(f)
+                return Response(data, status=status.HTTP_200_OK)
+
             if (
                     "cmte_type_category" in request.query_params
                     and request.query_params.get("cmte_type_category")
@@ -538,6 +543,12 @@ def get_dynamic_forms_fields(request):
     cmte_id = get_comittee_id(request.user.username)
     form_type = request.query_params.get("form_type")
     transaction_type = request.query_params.get("transaction_type")
+
+    if form_type == 'F3L' and transaction_type not in("", "", None, " ", "None", "null"):
+        with open('./fecfiler/core/f3l_dynamic_forms_json/ind_bndlr.json') as f:
+            data = json.load(f)
+        return Response(data, status=status.HTTP_200_OK)
+
     if "reportId" in request.query_params and request.query_params.get(
             "reportId"
     ) not in ("", "", None, " ", "None", "null"):
@@ -669,7 +680,7 @@ REPORTS API- CORE APP - SPRINT 7 - FNE 555 - BY PRAVEEN JINKA
 
 
 def check_form_type(form_type):
-    form_list = ["F3X", "F24"]
+    form_list = ["F3X", "F24", "F3L"]
 
     if not (form_type in form_list):
         raise Exception(
@@ -6360,7 +6371,7 @@ def get_report_info(request):
                                         rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
                                         rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState, 
                                         x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
-                                        rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
+                                        rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop, rp.semi_annual_start_date, rp.semi_annual_end_date,
                                          (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
                                          email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
                                          additional_email_2 as additionalEmail2, 
@@ -8315,7 +8326,7 @@ def trash_restore_sql_report(cmte_id, report_id, _delete="Y"):
                         _delete, datetime.datetime.now(), cmte_id, report_id
                     )
                 )
-            if report_type == "F3X":
+            if report_type == "F3X" or report_type == "F3L":
                 # form 3X report
                 cursor.execute(
                     """UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(

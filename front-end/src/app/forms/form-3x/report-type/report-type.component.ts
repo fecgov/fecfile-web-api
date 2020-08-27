@@ -66,6 +66,15 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
   public selectedState: string = null;
   public selectedElectionDate: string = null;
+  public showSemiAnnualDates: boolean;
+  public currentSemiAnnualDates: any[];
+  public coverageDatesMissing: boolean = false;
+  private selectedSemiAnnualDateObj: any;
+  public stateMissing: boolean = false;
+  public electionDateMissing: boolean = false;
+  public showErrors: boolean = false;
+  public semiAnnualStartDate: string;
+  public semiAnnualEndDate: string;
 
   constructor(
     private _fb: FormBuilder,
@@ -113,29 +122,65 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
 
     this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(res => {
           if (res && res.action === 'coverageDatesUpdated') {
-              this.fromDateSelected = res.selectedFromDate;
-              this.toDateSelected = res.selectedToDate;
-              this._dueDate = res.dueDate;
-              this._selectedElectionDate = res.selectedElectionDate;
-              this._selectedElectionState = res.selectedState
+              this.setData(res);
           }
-          if(this.frmReportType){
-            if (!this.reportEditMode) {
-                if(!this.fromDateSelected || !this.toDateSelected){
-                  this.frmReportType.setErrors({ invalid: true });
-                } else{
-                  this.frmReportType.setErrors(null);
-                }
+          else if(res && res.action === 'reportTypeSideBarUpdate'){
+            //missing dates
+            if(this.selectedReportInfo && !this.selectedReportInfo.disableCoverageDates && (!res.currentData.fromDate || !res.currentData.toDate)){
+              this.coverageDatesMissing = true;
             }
             else{
-              // this.invalidDates = false;
-              // this.optionFailed = true;
-              // this.frmReportType.setErrors(null);
-              // this.fromDateSelected = res.selectedFromDate;
-              // this.toDateSelected = res.selectedToDate;
+              this.coverageDatesMissing = false;
             }
+            
+            //missing state or election date
+            if(this.selectedReportInfo && this.selectedReportInfo.regular_special_report_ind === 'S'){
+              //missing state
+              if(!res.currentData.state){
+                this.stateMissing = true;
+              }
+              else{
+                this.stateMissing = false;
+              }
+              //missing electionDate
+              if(!res.currentData.election_date){
+                this.electionDateMissing = true;
+              }
+              else{
+                this.electionDateMissing = false;
+              }
+            }
+            this.setDataFor3L(res.currentData);
           }
     });
+  }
+
+  private setData(res: any) {
+    this.fromDateSelected = res.selectedFromDate;
+    this.toDateSelected = res.selectedToDate;
+    this._dueDate = res.dueDate;
+    this._selectedElectionDate = res.selectedElectionDate;
+    this._selectedElectionState = res.selectedState;
+    if (this.frmReportType) {
+      if (!this.reportEditMode) {
+        if (!this.fromDateSelected || !this.toDateSelected) {
+          this.frmReportType.setErrors({ invalid: true });
+        }
+        else {
+          this.frmReportType.setErrors(null);
+        }
+      }
+    }
+  }
+
+  private setDataFor3L(res: any) {
+    this.fromDateSelected = res.fromDate;
+    this.toDateSelected = res.toDate;
+    this._dueDate = res.dueDate;
+    this._selectedElectionDate = res.election_date;
+    this._selectedElectionState = res.state;
+    this.semiAnnualStartDate = res.semiAnnualFromDate;
+    this.semiAnnualEndDate = res.semiAnnualToDate;
   }
 
   ngOnInit(): void {
@@ -208,101 +253,6 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       }
     }
 
-//     this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(res => {
-//       /* if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
-//         if (res.type === this._formType) {
-//           if (res.reportType === 'S') {
-//             if (Array.isArray(res.electionDates)) {
-//               if (typeof res.electionDates[0] === 'object') {
-//                 this._fromDateSelected = res.electionDates[0].cvg_start_date;
-//                 this._toDateSelected = res.electionDates[0].cvg_end_date;
-//                 this._dueDate = res.electionDates[0].due_date;
-
-//                 if (this._fromDateSelected !== null && this._toDateSelected !== null) {
-//                   if (this._fromDateSelected.length >= 1 && this._toDateSelected.length >= 1) {
-//                     this.fromDateSelected = true;
-//                     this.toDateSelected = true;
-
-//                     this.frmReportType.markAsDirty();
-//                     this.frmReportType.markAsTouched();
-//                   }
-//                 }
-//               }
-//             }
-//           }
-//           if (!this.reportEditMode && res.hasOwnProperty('validDates')) {
-//             if (!res.validDates) {
-//               this.invalidDates = true;
-
-//               this.optionFailed = false;
-
-//               this.frmReportType.setErrors({ invalid: true });
-
-//               this.frmReportType.markAsDirty();
-//               this.frmReportType.markAsTouched();
-//             } else {
-//               this.frmReportType.setErrors(null);
-//               //this.frmReportType.setErrors({ status: 'VALID' });
-//               this.invalidDates = false;
-//             }
-//           }
-//           else if(this.reportEditMode && res.hasOwnProperty('validDates')){
-//             this.invalidDates = false;
-//             this.optionFailed = true;
-//             this.frmReportType.setErrors(null);
-//             this._fromDateSelected = res.selectedFromDate;
-//             this._toDateSelected = res.selectedToDate;
-//           }
-//         } // res.type === this._formType
-//       }  */// res.hasOwnProperty
-//       // if (res.hasOwnProperty('type') && res.hasOwnProperty('reportType') && res.hasOwnProperty('electionDates')) {
-//         // if (res.type === this._formType) {
-//           if (res) {
-//               this._fromDateSelected = res.selectedFromDate;
-//               this._toDateSelected = res.selectedToDate;
-//               this._dueDate = res.due_date;
-//             // if (Array.isArray(res.electionDates)) {
-//               // if (typeof res.electionDates[0] === 'object') {
-
-// /*                 if (this._fromDateSelected !== null && this._toDateSelected !== null) {
-//                   if (this._fromDateSelected.length >= 1 && this._toDateSelected.length >= 1) {
-//                     this.fromDateSelected = true;
-//                     this.toDateSelected = true;
-
-//                     this.frmReportType.markAsDirty();
-//                     this.frmReportType.markAsTouched();
-//                   }
-//                 }
-//  */              // }
-//             // }
-//           }
-//           if (!this.reportEditMode && res.hasOwnProperty('validDates')) {
-//             // if (!res.validDates) {
-//               // this.invalidDates = true;
-
-//               if(!this._fromDateSelected || !this._toDateSelected){
-//                 this.optionFailed = true;
-//                 this.frmReportType.setErrors({ invalid: true });
-//               } 
-//               // this.frmReportType.markAsDirty();
-//               // this.frmReportType.markAsTouched();
-
-//             /* } else {
-//               this.frmReportType.setErrors(null);
-//               //this.frmReportType.setErrors({ status: 'VALID' });
-//               this.invalidDates = false;
-//             } */
-//           }
-//           else if(this.reportEditMode && res.hasOwnProperty('validDates')){
-//             this.invalidDates = false;
-//             this.optionFailed = true;
-//             this.frmReportType.setErrors(null);
-//             this._fromDateSelected = res.selectedFromDate;
-//             this._toDateSelected = res.selectedToDate;
-//           }
-//         // } // res.type === this._formType
-//       // } 
-//     });
 
     this._setReportTypes();
   }
@@ -325,11 +275,16 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    *
    * @param      {Object}  e   The event object.
    */
-  public updateTypeSelected(e: { target: { checked: any; getAttribute: { (arg0: string): string; (arg0: string): string; }; }; }): void {
+  public updateTypeSelected(e: { target: { checked: any; getAttribute: { (arg0: string): string; (arg0: string): string; }; }; }, reportType:any): void {
+    if(reportType){
+      this.selectedReportInfo = reportType;
+    }
     if (this.editMode) {
       if (e.target.checked) {
-        //also send a message to sidebar to reset form first
-        this._messageService.sendMessage({action:'clearCoverageForm', component:'coverage-sidebar'});
+        //also send a message to sidebar to reset form first, but only reset if newly selected value is different from old 
+        if(this.selectedReportInfo.report_type !== reportType.report_type){
+          this._messageService.sendMessage({action:'clearCoverageForm', component:'coverage-sidebar'});
+        }
         this.fromDateSelected = null;
         this.toDateSelected = null;
         this.invalidDatesServerValidation = false;
@@ -388,44 +343,102 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
   }
 
   private setReportParams(dataReportType: string) {
-    const currentReport: any = this.committeeReportTypes.filter((el: { report_type: string; }) => {
-      return el.report_type === this.reportType;
-    });
-    if (dataReportType && dataReportType !== 'S') {
-      // this.toDateSelected = true;
-      // this.fromDateSelected = true;
-      if (Array.isArray(currentReport)) {
-        if (currentReport[0].hasOwnProperty('election_state')) {
-          const electionState: any = currentReport[0].election_state;
-          if (Array.isArray(electionState)) {
-            if (electionState[0].hasOwnProperty('dates')) {
-              const dates: any = electionState[0].dates;
-              if (Array.isArray(dates)) {
-                if (dates[0].hasOwnProperty('cvg_start_date')) {
-                  this.fromDateSelected = dates[0].cvg_start_date;
-                }
-                if (dates[0].hasOwnProperty('cvg_end_date')) {
-                  this.toDateSelected = dates[0].cvg_end_date;
-                }
-                if (dates[0].hasOwnProperty('election_date')) {
-                  this._selectedElectionDate = dates[0].election_date;
-                }
-                if (dates[0].hasOwnProperty('due_date')) {
-                  this._dueDate = dates[0].due_date;
+    if(this.formType === '3L'){
+      this.setReportParamsFor3L(dataReportType);
+    }
+    else{
+      const currentReport: any = this.committeeReportTypes.filter((el: { report_type: string; }) => {
+        return el.report_type === this.reportType;
+      });
+      if (dataReportType && dataReportType !== 'S') {
+        // this.toDateSelected = true;
+        // this.fromDateSelected = true;
+        if (Array.isArray(currentReport)) {
+          if (currentReport[0].hasOwnProperty('election_state')) {
+            const electionState: any = currentReport[0].election_state;
+            if (Array.isArray(electionState)) {
+              if (electionState[0].hasOwnProperty('dates')) {
+                const dates: any = electionState[0].dates;
+                if (Array.isArray(dates)) {
+                  if (dates[0].hasOwnProperty('cvg_start_date')) {
+                    this.fromDateSelected = dates[0].cvg_start_date;
+                  }
+                  if (dates[0].hasOwnProperty('cvg_end_date')) {
+                    this.toDateSelected = dates[0].cvg_end_date;
+                  }
+                  if (dates[0].hasOwnProperty('election_date')) {
+                    this._selectedElectionDate = dates[0].election_date;
+                  }
+                  if (dates[0].hasOwnProperty('due_date')) {
+                    this._dueDate = dates[0].due_date;
+                  }
                 }
               }
             }
           }
+          this._reportTypeDescripton = currentReport[0].report_type_desciption;
         }
-        this._reportTypeDescripton = currentReport[0].report_type_desciption;
       }
+      else {
+        this.fromDateSelected = null;
+        this.toDateSelected = null;
+      }
+      if (Array.isArray(currentReport)) {
+        this._formReportTypeDetails = JSON.parse(JSON.stringify(currentReport[0]))
+        if (window.localStorage.getItem(`form_${this._formType}_report_type`)) {
+          window.localStorage.removeItem(`form_${this._formType}_report_type`);
+        }
+      }
+      this.status.emit({
+        form: this._formType,
+        reportTypeRadio: this.reportTypeSelected
+      });
+    }
+    
+  }
+  setReportParamsFor3L(dataReportType: string) {
+    const currentReport: any = this.committeeReportTypes.filter((el: { report_type: string; }) => {
+      return el.report_type === this.reportType;
+    })[0];
+    if (dataReportType && dataReportType !== 'S') {
+        if (currentReport.hasOwnProperty('cvg_start_date')) {
+          this.fromDateSelected = currentReport.cvg_start_date;
+        }
+        if (currentReport.hasOwnProperty('cvg_end_date')) {
+          this.toDateSelected = currentReport.cvg_end_date;
+        }
+        /* if (dates[0].hasOwnProperty('election_date')) {
+          this._selectedElectionDate = dates[0].election_date;
+        } */
+        if (currentReport.hasOwnProperty('due_date')) {
+          this._dueDate = currentReport.due_date;
+        }
+        if (currentReport.hasOwnProperty('semi-annual_dates') && currentReport['semi-annual_dates'].length > 0){
+          this.showSemiAnnualDates = true;
+          this.currentSemiAnnualDates = currentReport['semi-annual_dates'];
+          this.selectedSemiAnnualDateObj = this.currentSemiAnnualDates.filter(obj => obj.selected );
+          if(this.selectedSemiAnnualDateObj && this.selectedSemiAnnualDateObj.length > 0){
+            this.selectedSemiAnnualDateObj = this.selectedSemiAnnualDateObj[0];
+            this.semiAnnualStartDate = this.selectedSemiAnnualDateObj.start_date;
+            this.semiAnnualEndDate = this.selectedSemiAnnualDateObj.end_date;
+          }else{
+            this.semiAnnualStartDate = null;
+            this.semiAnnualEndDate = null;
+          }
+          
+        }else{
+          this.showSemiAnnualDates = false;
+        }
+        this._reportTypeDescripton = currentReport.report_type_desciption;
     }
     else {
       this.fromDateSelected = null;
       this.toDateSelected = null;
+      this.semiAnnualStartDate = null;
+      this.semiAnnualEndDate = null;
     }
-    if (Array.isArray(currentReport)) {
-      this._formReportTypeDetails = JSON.parse(JSON.stringify(currentReport[0]))
+    if (currentReport) {
+      this._formReportTypeDetails = JSON.parse(JSON.stringify(currentReport))
       if (window.localStorage.getItem(`form_${this._formType}_report_type`)) {
         window.localStorage.removeItem(`form_${this._formType}_report_type`);
       }
@@ -442,9 +455,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
    */
   public doValidateReportType() {
     if(!this.reportEditMode){
-      if (this.frmReportType.valid) {
-        if(this.formType ==='3X'){
-          return this.handleForm3X();
+      if (this.frmReportType.valid && this.validationsPassed()) {
+        if(this.formType ==='3X' || this.formType === '3L'){
+          return this.handleForm(false,this.formType);
         }
         else if(this.formType === '24'){
           return this.handleForm24();
@@ -455,29 +468,12 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
           this.optionFailed = true;
         }
       }
-        /* else {
-        if (this.frmReportType.controls['reportTypeRadio'].invalid && !this.invalidDates) {
-          this.invalidDates = false;
-          this.optionFailed = true;
-          this.isValidType = false;
-          this.frmReportType.markAsDirty();
-          window.scrollTo(0, 0);
-  
-          return 0;
-        } else {
-          this.invalidDates = true;
-          this.optionFailed = false;
-          this.isValidType = false;
-  
-          window.scrollTo(0, 0);
-        }
-      } */
     }
     //For Editing report 
     else{
       if (this.frmReportType.valid) {
-        if(this.formType ==='3X'){
-          return this.handleForm3X(true);
+        if(this.formType ==='3X' || this.formType === '3L'){
+          return this.handleForm(true,this.formType);
         }
       } else {
         if (this.frmReportType.controls['reportTypeRadio'].invalid && !this.invalidDates) {
@@ -499,110 +495,22 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     }
   }
 
+  validationsPassed() : boolean{
+    if (this.optionFailed){
+      return false;
+    }
+    if (this.formType === '3X' && (!this.fromDateSelected || !this.toDateSelected)){
+      return false;
+    }
+    if (this.formType === '3L' && (this.coverageDatesMissing || this.electionDateMissing || this.stateMissing)){
+      return false;
+    }
+    
+    return true;
+  }
+ 
 
-/*   handleForm24() {
-    this.optionFailed = false;
-    this.isValidType = true;
-    // this._reportTypeService.saveReport(this._formType, 'Saved').subscribe(res => { //uncomment this
-    of({
-      additionalemail1: null,
-      additionalemail2: null,
-      amend_indicator: "N",
-      cmteid: "C00212423",
-      coh_bop: 0,
-      cvgenddate: null,
-      cvgstartdate: null,
-      daysuntildue: null,
-      duedate: "2020-10-15",
-      electioncode: "",
-      electiondate: "",
-      email1: "mkancherla.ctr@fec.gov",
-      email2: null,
-      formtype: "F24",
-      regularspecialreportind: "R",
-      reportid: 111018,
-      reporttype: "Q1",
-      reporttypedescription: "April 15 Quarterly",
-      stateofelection: ""
-    }).subscribe(res => {
-      if (res) {
-        let reportId = 0;
-        if (Array.isArray(res) && !res[0].hasOwnProperty('create_date')) {
-          reportId = res[0].report_id;
-          this._formReportTypeDetails.reportId = reportId;
-          window.localStorage.setItem(`form_${this._formType}_report_type`, JSON.stringify(this._formReportTypeDetails));
-          const cvgStartDate: any = res[0].cvg_start_date;
-          let datearray: any = cvgStartDate.split('-');
-          const newcvgStartDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
-          const cvgEndDate: any = res[0].cvg_end_date;
-          datearray = cvgEndDate.split('-');
-          const newcvgEndDate: string = datearray[1] + '/' + datearray[2] + '/' + datearray[0];
-          const alertStr: string = `The coverage dates entered overlap 
-                   with ${res[0].report_type} [ ${newcvgStartDate} ${newcvgEndDate} ]`;
-          let reportStatus = '';
-          this._reportService.getReports('current', 1, 1, '', true, null, reportId).subscribe(reportRes => {
-            if (reportRes) {
-              if (reportRes.reports[0] && reportRes.reports[0].status) {
-                reportStatus = reportRes.reports[0].status;
-                //console.log('Report %s is already %s', reportId, reportStatus);
-                this._dialogService
-                  .reportExist(alertStr, ConfirmModalComponent, 'Report already exists', true, false, true)
-                  .then((userRes: string) => {
-                    if (userRes === 'cancel') {
-                      this.optionFailed = true;
-                      this.isValidType = false;
-                      window.scrollTo(0, 0);
-                      this.status.emit({
-                        form: {},
-                        direction: 'previous',
-                        step: 'step_1'
-                      });
-                      return 0;
-                    }
-                    else if (userRes === 'ReportExist') {
-                      this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
-                      if (reportStatus.toLowerCase() === 'saved') {
-                        this._router.navigate([`/forms/form/${this._formType}`], {
-                          queryParams: { step: 'transactions', reportId: reportId, edit: true, transactionCategory: 'receipts' }
-                        });
-                      }
-                      else if (reportStatus.toLowerCase() === 'filed') {
-                        // navigate to summary page of the filed report
-                        this._router.navigate([`/forms/form/${this._formType}`], {
-                          queryParams: { step: 'financial_summary', reportId: reportId, edit: false, transactionCategory: '' }
-                        });
-                      }
-                      else {
-                        // navigate away to the reports view
-                        // this should not happen as a report with report id should be either saved or filed
-                        //console.log('report type Existing_Report_id', reportId.toString());
-                        const reporturl = '/reports?reportId=';
-                        this._router.navigateByUrl(`${reporturl}{reportId}`);
-                        localStorage.setItem('Existing_Report_id', reportId.toString());
-                        //this._router.navigate(['/reports`'], { queryParams: { reportId: reportId} });
-                        //localStorage.removeItem(`form_${this._formType}_saved`);
-                        localStorage.removeItem('reports.filters');
-                        localStorage.removeItem('Reports.view');
-                      }
-                    }
-                  });
-              }
-            }
-          });
-          // if (environment.name !== 'local') {
-          return 0;
-          // }
-        }
-        this.status.emit({
-          form: this.frmReportType,
-          direction: 'next',
-          step: 'step_2',
-          previousStep: 'step_1'
-        });
-      }
-    });
-    return 0;
-  } */
+
   
   private handleForm24(editMode: boolean = false) {
     this.optionFailed = false;
@@ -650,7 +558,10 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     return 0;
   }
 
-  private handleForm3X(editMode: boolean = false) {
+
+  private handleForm(editMode: boolean = false, formType:string) {
+    
+    this.showErrors = true;
     this.optionFailed = false;
     this.isValidType = true;
     const committeeDetails: any = JSON.parse(localStorage.getItem('committee_details'));
@@ -667,8 +578,14 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
     this._formReportTypeDetails.email2 = committeeDetails.email_on_file_1;
     this._formReportTypeDetails.additionalEmail1 = '';
     this._formReportTypeDetails.additionalEmail2 = '';
-    this._formReportTypeDetails.formType = '3X';
+    this._formReportTypeDetails.formType = formType;
     this._formReportTypeDetails.reportId = '';
+    if(this.semiAnnualStartDate){
+      this._formReportTypeDetails.semi_annual_start_date = this._datePipe.transform(this.semiAnnualStartDate, 'MM/dd/yyyy');
+    }
+    if(this.semiAnnualEndDate){
+      this._formReportTypeDetails.semi_annual_end_date = this._datePipe.transform(this.semiAnnualEndDate, 'MM/dd/yyyy');
+    }
     const today: any = new Date();
     const formattedToday: any = this._datePipe.transform(today, 'MM/dd/yyyy');
     const reportDueDate: any = this._datePipe.transform(this._dueDate, 'MM/dd/yyyy');
