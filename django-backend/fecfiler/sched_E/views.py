@@ -807,11 +807,11 @@ def post_schedE(data):
     try:
         # check_mandatory_fields_SA(datum, MANDATORY_FIELDS_SCHED_A)
         logger.debug("saving sched_e with data:{}".format(data))
-        if "entity_id" in data:
+        if "payee_entity_id" in data:
             logger.debug("update payee entity with data:{}".format(data))
             get_data = {
                 "cmte_id": data.get("cmte_id"),
-                "entity_id": data.get("entity_id"),
+                "entity_id": data.get("payee_entity_id"),
             }
 
             # need this update for FEC entity
