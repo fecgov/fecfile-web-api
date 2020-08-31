@@ -34,10 +34,13 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 TIME_ZONE = "America/New_York"
 
+LOGIN_TIMEOUT_TIME = 15
+LOGIN_MAX_RETRY = 3
 REGISTER_USER_URL = "http://dev-fecfile.efdev.fec.gov/#/register?register_token="
 OTP_MAX_RETRY = 20
 OTP_DIGIT = 6
 OTP_TIME_EXPIRY = 300
+OTP_TIMEOUT_TIME = 30
 JWT_PASSWORD_EXPIRY = 1800
 API_LOGIN = os.environ.get('API_LOGIN', None)
 API_PASSWORD = os.environ.get('API_PASSWORD', None)
