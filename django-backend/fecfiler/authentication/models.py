@@ -43,6 +43,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     delete_ind = models.CharField(max_length=1, blank=False, default='N')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    last_login = models.DateTimeField(auto_now=True)
     is_staff = models.BooleanField(_('staff status'), default=False,
                                    help_text=_('Designates whether the user can log into this admin '
                                                'site.'))
@@ -51,6 +52,12 @@ class Account(AbstractBaseUser, PermissionsMixin):
                                                 'active. Unselect this instead of deleting accounts.'))
 
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    login_code_counter = models.CharField(max_length=1, blank=False, default=0)
+    register_token = models.CharField(max_length=32, blank=True)
+    personal_key = models.CharField(max_length=64, blank=True)
+    status = models.CharField(max_length=15, blank=True)
+    code_generated_counter = models.CharField(max_length=2, blank=False, default=0)
+    secret_key = models.CharField(max_length=100, blank=True)
 
     class Meta:
         unique_together = (('username', 'email'),)
