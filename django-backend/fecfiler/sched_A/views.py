@@ -93,7 +93,6 @@ logger = logging.getLogger(__name__)
 MANDATORY_FIELDS_SCHED_A = [
     "report_id",
     "transaction_type_identifier",
-    "contribution_date",
     "contribution_amount",
     "entity_type",
 ]
@@ -346,6 +345,7 @@ def post_sql_schedA(
     transaction_type_identifier,
     levin_account_id,
     aggregation_ind,
+    semi_annual_refund_bundled_amount,
 ):
     """persist one sched_a item."""
     try:
@@ -377,9 +377,10 @@ def post_sql_schedA(
                 donor_cmte_name, 
                 levin_account_id, 
                 transaction_type_identifier,
-                aggregation_ind
+                aggregation_ind,
+                semi_annual_refund_bundled_amount
             )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
                 [
                     cmte_id,
@@ -405,6 +406,7 @@ def post_sql_schedA(
                     levin_account_id,
                     transaction_type_identifier,
                     aggregation_ind,
+                    semi_annual_refund_bundled_amount,
                 ],
             )
             if cursor.rowcount != 1:
@@ -431,12 +433,12 @@ def get_list_schedA(
             # GET single row from schedA table
             if transaction_id:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind, semi_annual_refund_bundled_amount
                                     FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s AND delete_ind is distinct from 'Y'""".format(
                         "', '".join(report_list)
                     )
                 else:
-                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, entity_id, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, aggregation_ind, reattribution_id, reattribution_ind, semi_annual_refund_bundled_amount
                                     FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND transaction_id = %s""".format(
                         "', '".join(report_list)
                     )
@@ -447,12 +449,12 @@ def get_list_schedA(
                 )
             else:
                 if not include_deleted_trans_flag:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind, semi_annual_refund_bundled_amount
                                 FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y' ORDER BY transaction_id DESC""".format(
                         "', '".join(report_list)
                     )
                 else:
-                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind
+                    query_string = """SELECT entity_id, cmte_id, report_id, line_number, transaction_type, transaction_id, back_ref_transaction_id, back_ref_sched_name, contribution_date, contribution_amount, aggregate_amt AS "contribution_aggregate", purpose_description, memo_code, memo_text, election_code, election_year, election_other_description, create_date, donor_cmte_id, donor_cmte_name, transaction_type_identifier, levin_account_id, itemized_ind, reattribution_id, reattribution_ind, semi_annual_refund_bundled_amount
                                 FROM public.sched_a WHERE report_id in ('{}') AND cmte_id = %s ORDER BY transaction_id DESC""".format(
                         "', '".join(report_list)
                     )
@@ -812,6 +814,7 @@ def post_schedA(datum):
                 datum.get("transaction_type_identifier"),
                 datum.get("levin_account_id"),
                 datum.get("aggregation_ind"),
+                datum.get("semi_annual_refund_bundled_amount"),
             )
             logger.debug("transaction saved...")
             try:
@@ -1478,6 +1481,7 @@ def schedA_sql_dict(data):
             "transaction_type_identifier": data.get("transaction_type_identifier"),
             "back_ref_sched_name": data.get("back_ref_sched_name"),
             "contribution_date": date_format(data.get("contribution_date")),
+            "semi_annual_refund_bundled_amount": data.get("semi_annual_refund_bundled_amount"),
             "contribution_amount": check_decimal(data.get("contribution_amount")),
             "purpose_description": data.get("purpose_description"),
             "memo_code": data.get("memo_code"),

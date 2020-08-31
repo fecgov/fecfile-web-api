@@ -669,7 +669,7 @@ REPORTS API- CORE APP - SPRINT 7 - FNE 555 - BY PRAVEEN JINKA
 
 
 def check_form_type(form_type):
-    form_list = ["F3X", "F24"]
+    form_list = ["F3X", "F24", "F3L"]
 
     if not (form_type in form_list):
         raise Exception(
@@ -1358,6 +1358,14 @@ def post_reports(data, reportid=None):
                         report_id,
                         data.get("cmte_id"),
                         )
+                elif data.get("form_type") == "F3L":
+                    post_sql_form3l(
+                        report_id,
+                        data.get("cmte_id"),
+                        data.get('election_date'),
+                        data.get('election_state')
+                        )
+
                 # print('here4')
             except Exception as e:
                 # Resetting Report ID
@@ -1453,8 +1461,15 @@ def put_reports(data):
                         data.get("report_id"),
                         cmte_id,
                     )
-                update_transactions_change_cvg_dates(cmte_id, report_id, data.get("cvg_start_dt"), prev_cvg_start_dt)
-                update_transactions_change_cvg_dates(cmte_id, report_id, prev_cvg_end_dt, data.get("cvg_end_dt"))
+                    update_transactions_change_cvg_dates(cmte_id, report_id, data.get("cvg_start_dt"), prev_cvg_start_dt)
+                    update_transactions_change_cvg_dates(cmte_id, report_id, prev_cvg_end_dt, data.get("cvg_end_dt"))
+                elif data.get("form_type") == "F3L":
+                    put_sql_form3l(
+                        data.get("report_id"),
+                        cmte_id,
+                        data.get('election_date'),
+                        data.get('election_state')
+                        )
             except Exception as e:
                 put_sql_report(
                     prev_report_type,
@@ -2007,6 +2022,8 @@ def reports(request):
 
                 datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
                 datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
+                datum['election_date'] = date_format(request.data.get('election_date')) if request.data.get('election_date') else None
+                datum['election_state'] = request.data.get('election_state') if request.data.get('election_state') else None
 
                 data = post_reports(datum)
                 if type(data) is dict:
@@ -2131,6 +2148,8 @@ def reports(request):
                 
                 datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
                 datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
+                datum['election_date'] = date_format(request.data.get('election_date')) if request.data.get('election_date') else None
+                datum['election_state'] = request.data.get('election_state') if request.data.get('election_state') else None
 
                 data = put_reports(datum)
                 orphanedTransactionsExist = count_orphaned_transactions(request.data.get("report_id"), cmte_id)
@@ -8316,6 +8335,17 @@ def trash_restore_sql_report(cmte_id, report_id, _delete="Y"):
                         _delete, datetime.datetime.now(), cmte_id, report_id
                     )
                 )
+            if report_type == "F3L":
+                 cursor.execute(
+                    """UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(
+                        _delete, datetime.datetime.now(), cmte_id, report_id
+                    )
+                )
+                 cursor.execute(
+                    """UPDATE public.form_3l SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(
+                        _delete, datetime.datetime.now(), cmte_id, report_id
+                    )
+                )
             if report_type == "F3X":
                 # form 3X report
                 cursor.execute(
@@ -10890,7 +10920,53 @@ def post_sql_form24(
     except Exception:
         raise
 
+def post_sql_form3l(
+        report_id,
+        cmte_id,
+        election_date,
+        election_state
+):
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into Form 24 table
+            cursor.execute(
+                """INSERT INTO public.form_24 (report_id, cmte_id, election_date, election_state, create_date, last_update_date)
+                                            VALUES (%s,%s,%s,%s,%s,%s)""",
+                [
+                    report_id,
+                    cmte_id,
+                    election_date,
+                    election_state,
+                    datetime.datetime.now(),
+                    datetime.datetime.now()
+                ],
+            )
+    except Exception:
+        raise
 
+
+def put_sql_form3l(
+        report_id,
+        cmte_id,
+        election_date,
+        election_state
+):
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into Form 24 table
+            cursor.execute(
+                """UPDATE public.form_24 SET election_date=%s, election_state=%s, last_update_date=%s WHERE report_id=%s, cmte_id=%s)""",
+                [
+                    election_date,
+                    election_state,
+                    datetime.datetime.now(),
+                    report_id,
+                    cmte_id
+                ],
+            )
+    except Exception:
+        raise
+                        
 def find_form_type(report_id, cmte_id):
     """
     load form type based on report_id and cmte_id

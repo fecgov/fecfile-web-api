@@ -1558,178 +1558,179 @@ def update_linenumber_aggamt_transactions_SA(
 
     """
     try:
-        child_flag_SB = False
-        child_flag_SA = False
-        itemization_value = 200
-        # itemized_transaction_list = []
-        # unitemized_transaction_list = []
-        form_type = find_form_type(report_id, cmte_id)
-        if isinstance(contribution_date, str):
-            contribution_date = date_agg_format(contribution_date)
-        aggregate_start_date, aggregate_end_date = find_aggregate_date(
-            form_type, contribution_date
-        )
-        # checking for child tranaction identifer for updating auto generated SB transactions
-        if (
-            transaction_type_identifier
-            in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT
-        ):
-            child_flag_SB = True
-            child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(
-                transaction_type_identifier
+        if transaction_type_identifier not in ('IND_BNDLR','REG_ORG_BNDLR'):
+            child_flag_SB = False
+            child_flag_SA = False
+            itemization_value = 200
+            # itemized_transaction_list = []
+            # unitemized_transaction_list = []
+            form_type = find_form_type(report_id, cmte_id)
+            if isinstance(contribution_date, str):
+                contribution_date = date_agg_format(contribution_date)
+            aggregate_start_date, aggregate_end_date = find_aggregate_date(
+                form_type, contribution_date
             )
-        # checking for child tranaction identifer for updating auto generated SA transactions
-        if (
-            transaction_type_identifier
-            in AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT
-        ):
-            child_flag_SA = True
-            child_transaction_type_identifier = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(
+            # checking for child tranaction identifer for updating auto generated SB transactions
+            if (
                 transaction_type_identifier
+                in AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT
+            ):
+                child_flag_SB = True
+                child_transaction_type_identifier = AUTO_GENERATE_SCHEDB_PARENT_CHILD_TRANSTYPE_DICT.get(
+                    transaction_type_identifier
+                )
+            # checking for child tranaction identifer for updating auto generated SA transactions
+            if (
+                transaction_type_identifier
+                in AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT
+            ):
+                child_flag_SA = True
+                child_transaction_type_identifier = AUTO_GENERATE_SCHEDA_PARENT_CHILD_TRANSTYPE_DICT.get(
+                    transaction_type_identifier
+                )
+            # make sure transaction list comes back sorted by contribution_date ASC
+            transactions_list = list_all_transactions_entity(
+                aggregate_start_date, aggregate_end_date, entity_id, cmte_id
             )
-        # make sure transaction list comes back sorted by contribution_date ASC
-        transactions_list = list_all_transactions_entity(
-            aggregate_start_date, aggregate_end_date, entity_id, cmte_id
-        )
-        aggregate_amount = 0
-        PAC_aggregate_amount = 0
-        HQ_aggregate_amount = 0
-        CO_aggregate_amount = 0
-        NPRE_aggregate_amount = 0
-        RE_aggregate_amount = 0
-        REMAIN_aggregate_amount = 0
-        committee_type = cmte_type(cmte_id)
-        for transaction in transactions_list:
-            # checking in reports table if the delete_ind flag is false for the corresponding report
-            if transaction[5] != "Y":
-                # checking if the back_ref_transaction_id is null or not.
-                # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
-                if (
-                    transaction[7] != None
-                    or (
-                        transaction[7] == None
-                        and (
-                            # transaction[6] != "X" or
-                            # (transaction[9] == "A" and transaction[0] < 0)
-                            # or transaction[9] == "R"
-                            not (
-                                transaction[6] == "X"
-                                and transaction[9] == "A"
-                                and transaction[0] > 0
+            aggregate_amount = 0
+            PAC_aggregate_amount = 0
+            HQ_aggregate_amount = 0
+            CO_aggregate_amount = 0
+            NPRE_aggregate_amount = 0
+            RE_aggregate_amount = 0
+            REMAIN_aggregate_amount = 0
+            committee_type = cmte_type(cmte_id)
+            for transaction in transactions_list:
+                # checking in reports table if the delete_ind flag is false for the corresponding report
+                if transaction[5] != "Y":
+                    # checking if the back_ref_transaction_id is null or not.
+                    # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
+                    if (
+                        transaction[7] != None
+                        or (
+                            transaction[7] == None
+                            and (
+                                # transaction[6] != "X" or
+                                # (transaction[9] == "A" and transaction[0] < 0)
+                                # or transaction[9] == "R"
+                                not (
+                                    transaction[6] == "X"
+                                    and transaction[9] == "A"
+                                    and transaction[0] > 0
+                                )
                             )
                         )
-                    )
-                ) and transaction[10] != "N":
-                    if (committee_type == "PAC") and transaction[
-                        8
-                    ] in PAC_AGGREGATE_TYPES_1:
-                        PAC_aggregate_amount += transaction[0]
-                        aggregate_amount = PAC_aggregate_amount
-                    elif (committee_type == "PTY") and transaction[
-                        8
-                    ] in PTY_AGGREGATE_TYPES_HQ:
-                        if transaction[8] in [
-                            "OPEXP_HQ_ACC_REG_REF",
-                            "OPEXP_HQ_ACC_IND_REF",
-                            "OPEXP_HQ_ACC_TRIB_REF",
-                        ]:
-                            HQ_aggregate_amount -= transaction[0]
+                    ) and transaction[10] != "N":
+                        if (committee_type == "PAC") and transaction[
+                            8
+                        ] in PAC_AGGREGATE_TYPES_1:
+                            PAC_aggregate_amount += transaction[0]
+                            aggregate_amount = PAC_aggregate_amount
+                        elif (committee_type == "PTY") and transaction[
+                            8
+                        ] in PTY_AGGREGATE_TYPES_HQ:
+                            if transaction[8] in [
+                                "OPEXP_HQ_ACC_REG_REF",
+                                "OPEXP_HQ_ACC_IND_REF",
+                                "OPEXP_HQ_ACC_TRIB_REF",
+                            ]:
+                                HQ_aggregate_amount -= transaction[0]
+                            else:
+                                HQ_aggregate_amount += transaction[0]
+                            aggregate_amount = HQ_aggregate_amount
+                        elif (committee_type == "PTY") and transaction[
+                            8
+                        ] in PTY_AGGREGATE_TYPES_CO:
+                            if transaction[8] in [
+                                "OPEXP_CONV_ACC_REG_REF",
+                                "OPEXP_CONV_ACC_TRIB_REF",
+                                "OPEXP_CONV_ACC_IND_REF",
+                            ]:
+                                CO_aggregate_amount -= transaction[0]
+                            else:
+                                CO_aggregate_amount += transaction[0]
+                            aggregate_amount = CO_aggregate_amount
+                        elif (committee_type == "PTY") and transaction[
+                            8
+                        ] in PTY_AGGREGATE_TYPES_NPRE:
+                            if transaction[8] in [
+                                "OTH_DISB_NP_RECNT_REG_REF",
+                                "OTH_DISB_NP_RECNT_TRIB_REF",
+                                "OTH_DISB_NP_RECNT_IND_REF",
+                            ]:
+                                NPRE_aggregate_amount -= transaction[0]
+                            else:
+                                NPRE_aggregate_amount += transaction[0]
+                            aggregate_amount = NPRE_aggregate_amount
+                        elif (committee_type == "PTY") and transaction[
+                            8
+                        ] in PTY_AGGREGATE_TYPES_RE:
+                            RE_aggregate_amount += transaction[0]
+                            aggregate_amount = RE_aggregate_amount
                         else:
-                            HQ_aggregate_amount += transaction[0]
-                        aggregate_amount = HQ_aggregate_amount
-                    elif (committee_type == "PTY") and transaction[
-                        8
-                    ] in PTY_AGGREGATE_TYPES_CO:
-                        if transaction[8] in [
-                            "OPEXP_CONV_ACC_REG_REF",
-                            "OPEXP_CONV_ACC_TRIB_REF",
-                            "OPEXP_CONV_ACC_IND_REF",
-                        ]:
-                            CO_aggregate_amount -= transaction[0]
+                            if transaction[8] != "CON_EAR_DEP":
+                                REMAIN_aggregate_amount += transaction[0]
+                            aggregate_amount = REMAIN_aggregate_amount
+                    # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
+                    # if str(report_id) == str(transaction[2]):
+                    if contribution_date <= transaction[4] and transaction[8] not in [
+                        "OPEXP_HQ_ACC_REG_REF",
+                        "OPEXP_HQ_ACC_IND_REF",
+                        "OPEXP_HQ_ACC_TRIB_REF",
+                        "OPEXP_CONV_ACC_REG_REF",
+                        "OPEXP_CONV_ACC_TRIB_REF",
+                        "OPEXP_CONV_ACC_IND_REF",
+                        "OTH_DISB_NP_RECNT_REG_REF",
+                        "OTH_DISB_NP_RECNT_TRIB_REF",
+                        "OTH_DISB_NP_RECNT_IND_REF",
+                    ]:
+
+                        line_number, itemized_ind = get_linenumber_itemization(
+                                transaction[8],
+                                aggregate_amount,
+                                itemization_value,
+                                transaction[3],
+                            )
+                        if not transaction[11] in ["FU", "FI"]:  # if not forced
+                            put_sql_linenumber_schedA(
+                                cmte_id,
+                                line_number,
+                                itemized_ind,
+                                transaction[1],
+                                entity_id,
+                                aggregate_amount,
+                            )
                         else:
-                            CO_aggregate_amount += transaction[0]
-                        aggregate_amount = CO_aggregate_amount
-                    elif (committee_type == "PTY") and transaction[
-                        8
-                    ] in PTY_AGGREGATE_TYPES_NPRE:
-                        if transaction[8] in [
-                            "OTH_DISB_NP_RECNT_REG_REF",
-                            "OTH_DISB_NP_RECNT_TRIB_REF",
-                            "OTH_DISB_NP_RECNT_IND_REF",
-                        ]:
-                            NPRE_aggregate_amount -= transaction[0]
-                        else:
-                            NPRE_aggregate_amount += transaction[0]
-                        aggregate_amount = NPRE_aggregate_amount
-                    elif (committee_type == "PTY") and transaction[
-                        8
-                    ] in PTY_AGGREGATE_TYPES_RE:
-                        RE_aggregate_amount += transaction[0]
-                        aggregate_amount = RE_aggregate_amount
-                    else:
-                        if transaction[8] != "CON_EAR_DEP":
-                            REMAIN_aggregate_amount += transaction[0]
-                        aggregate_amount = REMAIN_aggregate_amount
-                # Removed report_id constraint as we have to modify aggregate amount irrespective of report_id
-                # if str(report_id) == str(transaction[2]):
-                if contribution_date <= transaction[4] and transaction[8] not in [
-                    "OPEXP_HQ_ACC_REG_REF",
-                    "OPEXP_HQ_ACC_IND_REF",
-                    "OPEXP_HQ_ACC_TRIB_REF",
-                    "OPEXP_CONV_ACC_REG_REF",
-                    "OPEXP_CONV_ACC_TRIB_REF",
-                    "OPEXP_CONV_ACC_IND_REF",
-                    "OTH_DISB_NP_RECNT_REG_REF",
-                    "OTH_DISB_NP_RECNT_TRIB_REF",
-                    "OTH_DISB_NP_RECNT_IND_REF",
-                ]:
-
-                    line_number, itemized_ind = get_linenumber_itemization(
-                            transaction[8],
-                            aggregate_amount,
-                            itemization_value,
-                            transaction[3],
-                        )
-                    if not transaction[11] in ["FU", "FI"]:  # if not forced
-                        put_sql_linenumber_schedA(
-                            cmte_id,
-                            line_number,
-                            itemized_ind,
-                            transaction[1],
-                            entity_id,
-                            aggregate_amount,
-                        )
-                    else:
-                        put_sql_linenumber_schedA(
-                            cmte_id,
-                            line_number,
-                            transaction[11],
-                            transaction[1],
-                            entity_id,
-                            aggregate_amount,
-                        )
+                            put_sql_linenumber_schedA(
+                                cmte_id,
+                                line_number,
+                                transaction[11],
+                                transaction[1],
+                                entity_id,
+                                aggregate_amount,
+                            )
 
 
-                # Updating aggregate amount to child auto generate sched A transactions
-                if child_flag_SA:
-                    child_SA_transaction_list = get_list_agg_child_schedA(
-                        report_id, cmte_id, transaction[1]
-                    )
-                    for child_SA_transaction in child_SA_transaction_list:
-                        put_sql_agg_amount_schedA(
-                            cmte_id,
-                            child_SA_transaction.get("transaction_id"),
-                            aggregate_amount
+                    # Updating aggregate amount to child auto generate sched A transactions
+                    if child_flag_SA:
+                        child_SA_transaction_list = get_list_agg_child_schedA(
+                            report_id, cmte_id, transaction[1]
                         )
-                # Updating aggregate amount to child auto generate sched B transactions
-                if child_flag_SB:
-                    child_SB_transaction_list = get_list_child_transactionId_schedB(
-                        cmte_id, transaction[1]
-                    )
-                    for child_SB_transaction in child_SB_transaction_list:
-                        put_sql_agg_amount_schedB(
-                            cmte_id, child_SB_transaction[0], aggregate_amount
+                        for child_SA_transaction in child_SA_transaction_list:
+                            put_sql_agg_amount_schedA(
+                                cmte_id,
+                                child_SA_transaction.get("transaction_id"),
+                                aggregate_amount
+                            )
+                    # Updating aggregate amount to child auto generate sched B transactions
+                    if child_flag_SB:
+                        child_SB_transaction_list = get_list_child_transactionId_schedB(
+                            cmte_id, transaction[1]
                         )
+                        for child_SB_transaction in child_SB_transaction_list:
+                            put_sql_agg_amount_schedB(
+                                cmte_id, child_SB_transaction[0], aggregate_amount
+                            )
 
     except Exception as e:
         raise Exception(
