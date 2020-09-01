@@ -1,4 +1,4 @@
-import codecs
+
 import datetime
 
 from binascii import unhexlify
@@ -13,7 +13,7 @@ from django_otp.util import random_hex
 from unittest import mock
 import time
 
-from fecfiler.settings import OTP_DIGIT, OTP_TIME_EXPIRY, logger, OTP_MAX_RETRY
+from fecfiler.settings import OTP_DIGIT, OTP_TIME_EXPIRY, logger, OTP_MAX_RETRY, OTP_TIMEOUT_TIME
 
 
 def save_key_datbase(username, key_val, counter):
@@ -87,7 +87,7 @@ class TOTPVerification:
         current_time_est = datetime.now(est)
 
         current_time_est1 = current_time_est.replace(tzinfo=None)
-        upper_limit = last_updated_time + timedelta(minutes=30)
+        upper_limit = last_updated_time + timedelta(minutes=OTP_TIMEOUT_TIME)
         upper_limit1 = upper_limit.replace(tzinfo=None)
         if counter <= OTP_MAX_RETRY:
             save_key_datbase(username, key_val, counter)
