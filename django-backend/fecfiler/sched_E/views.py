@@ -813,11 +813,11 @@ def post_schedE(data):
                 "cmte_id": data.get("cmte_id"),
                 "entity_id": data.get("payee_entity_id"),
             }
-
             # need this update for FEC entity
-            if get_data["entity_id"].startswith("FEC"):
-                get_data["cmte_id"] = "C00000000"
+            # if get_data["entity_id"].startswith("FEC"):
+            #     get_data["cmte_id"] = "C00000000"
             old_entity = get_entities(get_data)[0]
+            data['entity_id'] = old_entity['entity_id']
             new_entity = put_entities(data)
             payee_rollback_flag = True
         else:
