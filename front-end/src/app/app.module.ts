@@ -15,8 +15,10 @@ import { CookieService } from 'ngx-cookie-service';
 import { NgxEditorModule } from 'ngx-editor';
 import { NgPipesModule } from 'ngx-pipes';
 import { AccountComponent } from './account/account.component';
+import { AdminModule } from './admin/admin.module';
 import { AppConfigService } from './app-config.service';
 import { AppLayoutComponent } from './app-layout/app-layout.component';
+import { AppMainLoginModule } from './app-main-login/app-main-login.module';
 import { AppComponent } from './app.component';
 import { routing } from './app.routes';
 import { AddNewContactComponent } from './contacts/addnew/addnew_contacts.component';
@@ -28,11 +30,10 @@ import { ContactsFilterTypeComponent } from './contacts/filter/filter-type/conta
 import { ContributorsComponent } from './contributors/contributors.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { F24Component } from './forms/form-24/f24/f24.component';
+import { F3lComponent } from './forms/form-3l/f3l/f3l.component';
 import { F3xComponent } from './forms/form-3x/f3x/f3x.component';
 import { FinancialSummaryComponent } from './forms/form-3x/financial-summary/financial-summary.component';
 import { IndividualReceiptComponent } from './forms/form-3x/individual-receipt/individual-receipt.component';
-import { ReportTypeSidebarComponent } from './forms/form-3x/report-type-sidebar/report-type-sidebar.component';
-import { ReportTypeComponent } from './forms/form-3x/report-type/report-type.component';
 import { SchedEComponent } from './forms/form-3x/sched-e/sched-e/sched-e.component';
 import { SchedH1Component } from './forms/form-3x/sched-h1/sched-h1.component';
 import { SchedH5Component_TOBEDELETED } from './forms/form-3x/sched-h5/sched-h5.component';
@@ -63,6 +64,7 @@ import { SchedLComponent } from './forms/sched-l/sched-l.component';
 import { TransactionsFilterTypeComponent } from './forms/transactions/filter/filter-type/transactions-filter-type.component';
 import { TransactionsFilterComponent } from './forms/transactions/filter/transactions-filter.component';
 import { SubTransactionsTableComponent } from './forms/transactions/sub-transactions-table/sub-transactions-table.component';
+import { F24LinkModalComponent } from './forms/transactions/transactions-table/f24-link-modal/f24-link-modal.component';
 import { TransactionsTableComponent } from './forms/transactions/transactions-table/transactions-table.component';
 import { TrashConfirmComponent1 } from './forms/transactions/transactions-table/trash-confirm/trash-confirm.component';
 import { TransactionsComponent } from './forms/transactions/transactions.component';
@@ -74,6 +76,7 @@ import { ReportsComponent } from './reports/reports.component';
 import { ReportsFilterTypeComponent } from './reports/reportsidebar/filter-type/reports-filter-type.component';
 import { ReportsidebarComponent } from './reports/reportsidebar/reportsidebar.component';
 import { SettingsComponent } from './settings/settings.component';
+import { ExportDirective } from './shared/directives/export.directive';
 import { ConfirmModalComponent } from './shared/partials/confirm-modal/confirm-modal.component';
 import { HeaderComponent } from './shared/partials/header/header.component';
 import { PreviewComponent } from './shared/partials/preview/preview.component';
@@ -82,6 +85,7 @@ import { SignComponent } from './shared/partials/sign/sign.component';
 import { TypeaheadComponent } from './shared/partials/typeahead/typeahead.component';
 import { FilterPipe } from './shared/pipes/filter/filter.pipe';
 import { OrderByPipe } from './shared/pipes/order-by/order-by.pipe';
+import { PhonePipe } from './shared/pipes/phone-number/phone-number.pipe';
 import { SafeHTMLPipe } from './shared/pipes/safeHTML/safe-html.pipe';
 import { ZipCodePipe } from './shared/pipes/zip-code/zip-code.pipe';
 import { CanDeactivateGuardService } from './shared/services/CanDeactivateGuard/can-deactivate-guard.service';
@@ -97,15 +101,8 @@ import { ToolsImportTransactionsComponent } from './tools-import-transactions/to
 import { ToolsMergeNamesComponent } from './tools-merge-names/tools-merge-names.component';
 import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
+import { FormEntryComponent } from './forms/form-3l/f3l/form-entry/form-entry.component';
 
-// import * as AWS from 'aws-sdk';
-import * as AWS from 'aws-sdk/global';
-import * as S3 from 'aws-sdk/clients/s3';
-import {AppMainLoginModule} from './app-main-login/app-main-login.module';
-import {AdminModule} from './admin/admin.module';
-import { PhonePipe } from './shared/pipes/phone-number/phone-number.pipe';
-import { ExportDirective } from './shared/directives/export.directive';
-import { F24LinkModalComponent } from './forms/transactions/transactions-table/f24-link-modal/f24-link-modal.component';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -152,11 +149,12 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     TransactionSidebarComponent,
     F3xComponent,
     TransactionTypeComponent,
-    ReportTypeComponent,
-    ReportTypeSidebarComponent,
+    // ReportTypeComponent,
+    // ReportTypeSidebarComponent,
     FinancialSummaryComponent,
     ZipCodePipe,
     FilterPipe,
+    F3lComponent,
     IndividualReceiptComponent,
     ReportsidebarComponent,
     ReportheaderComponent,
@@ -195,6 +193,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
     F24Component,
     ExportDirective,
     F24LinkModalComponent,
+    FormEntryComponent,
   ],
   entryComponents: [ConfirmModalComponent,F24LinkModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
