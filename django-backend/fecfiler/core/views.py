@@ -6395,11 +6395,13 @@ def get_report_info(request):
                                       email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
                                       additional_email_2 as additionalEmail2, 
                                       (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue,
-                                      rp.status AS reportStatus, rp.semi_annual_start_date, rp.semi_annual_end_date, f3l.election_date, f3l.election_state
+                                      rp.status AS reportStatus, rp.semi_annual_start_date, rp.semi_annual_end_date, f3l.election_date, f3l.election_state,
+                                      COALESCE(max.max_threshold_amount,0.0) AS "maximumThresholdAmount"
                                       FROM public.reports rp 
                                       LEFT JOIN form_3x x ON rp.report_id = x.report_id
                                       LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
                                       LEFT JOIN public.form_3l f3l ON f3l.report_id = rp.report_id
+                                      LEFT JOIN public.ref_max_threshold_amount max ON max.form_type=rp.form_type AND date_part('year',cvg_start_date)=max.year
                                       WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id = %s AND rp.report_id = %s"""
                     # print("query_string", query_string)
 
@@ -8982,9 +8984,9 @@ def clone_a_transaction(request):
             # set transaction date to today's date and transaction amount to 0
             from datetime import date
 
-            _today = date.today().strftime("%m/%d/%Y")
+            _today = date.today().strftime("%Y-%m-%d")
             if transaction_id.startswith("SA") or transaction_id.startswith("LA"):
-                select_str = select_str.replace("contribution_date", "'" + _today + "'")
+                select_str = select_str.replace("contribution_date", "CASE WHEN contribution_date is not null THEN '" + _today + "' ELSE contribution_date END")
                 select_str = select_str.replace("contribution_amount", "'" + "0.00" + "'")
             if (
                     transaction_id.startswith("SB")
@@ -9053,11 +9055,13 @@ def clone_a_transaction(request):
             )
             clone_sql = clone_sql + " WHERE transaction_id = %s;"
             logger.debug("clone transaction with sql:{}".format(clone_sql))
-
-            cursor.execute(
-                clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id)
-            )
-
+            try:
+                cursor.execute(
+                    clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id)
+                )
+            except Exception as e:
+                print(cursor.query)
+                raise Exception(e)
             if not cursor.rowcount:
                 raise Exception("transaction clone error")
 
