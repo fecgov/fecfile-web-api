@@ -55,14 +55,15 @@
                 Form {{ formType }} | {{ formDescription }} | {{ formStartDate | date: 'MM/dd/yyyy' }} -
                 {{ formEndDate | date: 'MM/dd/yyyy' }}
               </div>              
-              <ng-container *ngIf="reportOverDue">
+              <ng-container *ngIf="reportOverDue && dueDate">
                 <span class="text-error">
                   Overdue by {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
                 </span>
               </ng-container>
-              <ng-container *ngIf="!reportOverDue">
+              <ng-container *ngIf="!reportOverDue && dueDate">
                 Due in {{ formDaysUntilDue }} days ({{ dueDate | date: 'MM/dd/yyyy' }})
               </ng-container>
+              <span *ngIf="!dueDate">Edit Report</span>
               <a class="btn btn-link btn-edit" (click)="editFrom()"
                  [style.pointer-events]="_authService.isReadOnly() ?'none':'auto'"
                  tabindex="{{_authService.isReadOnly()?-1:0}}">

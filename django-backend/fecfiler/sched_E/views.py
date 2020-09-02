@@ -304,8 +304,6 @@ def put_schedE(data):
             )
         update_aggregate_amt_se(data)
         if form_type == 'F24' and data.get('mirror_report_id'):
-            logger.debug('I am here')
-            update_aggregate_amt_se(se_data)
             function_to_call_wrapper_update_F3X(data.get("cmte_id"), se_data['report_id'])
             if str(get_data['mirror_report_id']) != data['mirror_report_id']:
                 logger.debug(get_data['mirror_report_id'])
@@ -426,12 +424,16 @@ def update_aggregate_on_transaction(
     # print(aggregate_amount)
     try:
         _sql = """
-        UPDATE public.sched_e
+        WITH subquery AS (SELECT transaction_id, mirror_transaction_id FROM sched_e 
+        WHERE transaction_id = %s AND cmte_id=%s AND delete_ind is distinct from 'Y')
+        UPDATE public.sched_e e
         SET calendar_ytd_amount= %s
-        WHERE transaction_id = %s AND cmte_id = %s 
+        FROM subquery
+        WHERE e.transaction_id in (subquery.transaction_id, subquery.mirror_transaction_id) 
+        AND cmte_id = %s 
         AND delete_ind is distinct from 'Y'
         """
-        do_transaction(_sql, (aggregate_amount, transaction_id, cmte_id))
+        do_transaction(_sql, (transaction_id, cmte_id, aggregate_amount, cmte_id))
     except Exception as e:
         raise Exception(
             """error on update aggregate amount
@@ -710,7 +712,7 @@ def update_aggregate_amt_se(data):
             #     cmte_id,
             # )
             transaction_list = get_transactions_election_and_office(
-                aggregate_start_date, aggregate_end_date, data
+                aggregate_start_date, aggregate_end_date, data, 'F3X'
             )
             aggregate_amount = 0
             # dissemination_date, disbursement_date = data.get('dissemination_date'), data.get('disbursement_date')
@@ -919,10 +921,8 @@ def post_schedE(data):
             raise Exception(
                 "The post_sql_schedE function is throwing an error: " + str(e)
             )
-        
         update_aggregate_amt_se(data)
         if form_type == 'F24' and data.get('mirror_report_id'):
-            update_aggregate_amt_se(se_data)
             function_to_call_wrapper_update_F3X(data.get("cmte_id"), se_data['report_id'])
         return data
     except:

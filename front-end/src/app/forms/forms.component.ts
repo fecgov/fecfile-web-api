@@ -7,6 +7,7 @@ import { UtilService } from 'src/app/shared/utils/util.service';
 import { ConfirmModalComponent, ModalHeaderClassEnum } from '../shared/partials/confirm-modal/confirm-modal.component';
 import { DialogService } from '../shared/services/DialogService/dialog.service';
 import { FormsService } from '../shared/services/FormsService/forms.service';
+import { MessageService } from '../shared/services/MessageService/message.service';
 
 @Component({
   selector: 'app-forms',
@@ -37,7 +38,8 @@ export class FormsComponent implements OnInit, OnDestroy {
     private _dialogService: DialogService,
     private _formsService: FormsService,
     private _reportsService: ReportsService,
-    private _utilService: UtilService
+    private _utilService: UtilService,
+    private _messageService:MessageService
   ) {
 
     this.queryParamsSubscription = _activeRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
@@ -51,11 +53,9 @@ export class FormsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.paramsSubscription = this._activeRoute.params.subscribe(params => {
       this.formType = params.form_id;
-      // if(!this.formType){
-      //   if(this._router.url.startsWith('/forms/form')){
-      //     this.formType = this._router.url.substring(this._router.url.lastIndexOf('/') + 1);
-      //   }
-      // }
+      if(this.formType){
+        this._messageService.sendMessage({action:'updateHeaderInfo', data:{formType:this.formType}});
+      }
     });
   }
 

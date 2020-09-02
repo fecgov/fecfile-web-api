@@ -815,7 +815,7 @@ public printReport(report: reportModel): void{
           }
         );
       }, 1500);
-    } else if (report.form_type === 'F3X' || report.form_type === 'F24') {
+    } else if (report.form_type === 'F3X' || report.form_type === 'F24' || report.form_type === 'F3L') {
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
@@ -1013,13 +1013,13 @@ public printReport(report: reportModel): void{
       setTimeout(() => {
         this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', reportId: report.report_id } });
       }, 1500);
-    } else if (report.form_type === 'F3X') {
+    } else if (report.form_type === 'F3X' || report.form_type === 'F3L') {
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
           //console.log('getReportInfo res =', res);
-          localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
-          localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+          localStorage.setItem(`form_${report.form_type.substring(1, 3)}_details`, JSON.stringify(res[0]));
+          localStorage.setItem(`form_${report.form_type.substring(1, 3)}_report_type`, JSON.stringify(res[0]));
 
           //return false;
         });
