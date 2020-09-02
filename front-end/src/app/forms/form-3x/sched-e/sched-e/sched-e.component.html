@@ -308,7 +308,7 @@
                           [focusFirst]=false
                           [resultTemplate]="isFieldName(col?.name, 'beneficiary_cand_id') ? rtCandidateId : rtCommitteeId" 
                           [inputFormatter]="isFieldName(col?.name, 'beneficiary_cand_id') ? formatterCandidateId: formatterCommitteeId"
-                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                          (selectItem)="handleSelectedCandidate($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_name')" class="form-control"
                           [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
