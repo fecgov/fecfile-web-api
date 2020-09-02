@@ -1,0 +1,338 @@
+<ng-template #rt let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtOrg let-r="result" let-t="term">
+  <ngb-highlight [result]="formatTypeaheadOrgItem(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<ng-template #rtCommitteeName let-r="result" let-t="term">
+    <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
+</ng-template>
+<div class="individual-receipt-container">
+  <form [formGroup]="frmIndividualReceipt">
+    <header>
+      <div class="header-content">
+        <div class="float-left">
+          <h2>
+            Form {{formType}}
+            <ng-container *ngIf="transactionTypeText && !mainTransactionTypeText"> / {{ transactionTypeText }} </ng-container>
+            <ng-container *ngIf="transactionTypeText && mainTransactionTypeText"> / 
+              {{ mainTransactionTypeText }} / {{ transactionTypeText }}
+            </ng-container>
+            <ng-container *ngIf="scheduleAction === editScheduleAction && !cloned"> / Edit </ng-container>
+            <ng-container *ngIf="scheduleAction === editScheduleAction && cloned"> / Clone </ng-container>
+            <ng-container *ngIf="scheduleAction === viewScheduleAction"> / View </ng-container>
+          </h2>
+        </div>
+        <div class="float-right" ngbDropdown>
+          <button type="button" class="btn btn-link btn-options" id="dropdownBasic2" ngbDropdownToggle>
+            <span class="ellipsis-icon" aria-hidden="true"></span>
+            <span class="sr-only">Click for more options</span>
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <button class="dropdown-item" (click)="printCurrentTransaction()"><i class="print-icon"></i> Print</button>
+            <button class="dropdown-item" (click)="ImportTransactions()">
+              <i class="file-import-icon" ></i> Import
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <hr />
+        </div>
+      </div>
+    </header>
+
+    <section class ="paragraph">
+      <ng-container *ngFor="let hiddenField of hiddenFields; trackBy: trackByName">
+        <input type="hidden" [name]="hiddenField?.name" [value]="hiddenField?.value" />
+      </ng-container>
+        <ng-container *ngFor="let row of formFields; let i = index; trackBy:trackByIndex">
+          <ng-container *ngIf="titles[i]?.fieldset">
+            <div class="subtitle-indv">
+              <div [class]="titles[i]?.colClassName">
+                {{ titles[i]?.label }}
+              </div>
+            </div>
+          </ng-container>
+          <div class="row" *ngIf="row.cols">
+            <ng-container *ngIf="row.cols | isArray">
+              <ng-container *ngFor="let col of row.cols; trackBy: trackByName">
+                <div [class]="row.colClassName" *ngIf="isToggleShow(col)">
+                  <div class="form-group" [style.width]="setSelectTypeWidth(col)">
+                    <label [for]="col?.name">
+                      {{ col?.text }}
+                      <div type="button" class="btn btn-info" ngbTooltip="{{ col?.infoText }}"
+                        tooltipClass="form-tooltip" *ngIf="col?.infoIcon">
+                        <i class="info-icon" aria-hidden="true"></i>
+                        <span class="sr-only">Click here for more information</span>
+                      </div>
+                      <ng-container *ngIf="!col?.validation?.required && !col?.isReadonly">
+                        <ng-container>
+                          (Optional)
+                        </ng-container>
+                      </ng-container>
+                    </label>
+                    <ng-container *ngIf="col?.type === 'text'">
+                      <div [ngClass]="{ 'input-group': col?.inputGroup }">
+                        <ng-container *ngIf="col?.inputGroup">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">
+                              <i *ngIf="col?.inputIcon" [class]="col?.inputIcon" aria-hidden="true"></i>
+                              <span *ngIf="col?.preText">{{col?.preText}}</span>
+                            </span>
+                          </div>
+                        </ng-container>
+                        <input *ngIf="col?.name !== 'first_name' 
+                                && col?.name !== 'last_name'
+                                && !isFieldName(col?.name, 'entity_name')
+                                && !isFieldName(col?.name, 'donor_cmte_id')
+                                && !isFieldName(col?.name, 'donor_cmte_name')
+                                && !isFieldName(col?.name, 'beneficiary_cmte_id')
+                                && !isFieldName(col?.name, 'beneficiary_cmte_name') 
+                                && !isFieldName(col?.name, 'beneficiary_cand_id') 
+                                && !isFieldName(col?.name, 'prefix')
+                                && !isFieldName(col?.name, 'suffix')" 
+                                class="form-control" [style.width]="col?.width" [style.height]="col?.height"
+                          [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
+                          [attr.value]="col?.value"
+                          [maxlength]="(isFieldName(col?.name, 'contribution_amount') || isFieldName(col?.name, 'expenditure_amount') 
+                                        || isFieldName(col?.name, 'contribution_aggregate'))? col?.validation?.max + 5: col?.validation?.max"
+                          [formControlName]="col?.name"
+                          (blur)="handleOnBlurEvent($event, col)"    
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " (keyup)="handleFormFieldKeyup($event, col)" (change)="(isFieldName(col?.name, 'contribution_date') || isFieldName(col?.name, 'expenditure_date')) 
+                                      ? dateChange(col?.name) : null;" />
+                        <input *ngIf="col?.name === 'last_name'" class="form-control" [style.width]="col?.width"
+                          [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-last-name" [ngbTypeahead]="searchLastName" [focusFirst]=false
+                          [resultTemplate]="rt" [inputFormatter]="formatterLastName"
+                          (selectItem)="handleSelectedIndividual($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                        <input *ngIf="col?.name === 'first_name'" class="form-control" [style.width]="col?.width"
+                          [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-first-name" [ngbTypeahead]="searchFirstName" [focusFirst]=false
+                          [resultTemplate]="rt" [inputFormatter]="formatterFirstName"
+                          (selectItem)="handleSelectedIndividual($event, col)" (keyup)="handleFormFieldKeyup($event, col)"
+                          />
+                        <input *ngIf="col?.name === 'prefix'" class="form-control" [style.width]="col?.width"
+                          [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-prefix" [ngbTypeahead]="searchPrefix" [focusFirst]=false
+                          [resultTemplate]="rt" [inputFormatter]="formatterPrefix"
+                          (selectItem)="handleSelectedIndividual($event, col)" (keyup)="handleFormFieldKeyup($event, col)"
+                          />
+                        <input *ngIf="col?.name === 'suffix'" class="form-control" [style.width]="col?.width"
+                          [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [attr.readonly]="isFieldReadOnly(col)"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-suffix" [ngbTypeahead]="searchSuffix" [focusFirst]=false
+                          [resultTemplate]="rt" [inputFormatter]="formatterSuffix"
+                          (selectItem)="handleSelectedIndividual($event, col)" (keyup)="handleFormFieldKeyup($event, col)"                           />
+                        <input *ngIf="isFieldName(col?.name, 'entity_name')" class="form-control" [style.width]="col?.width"
+                          [style.height]="col?.height" [attr.type]="col?.type" [attr.name]="col?.name"
+                          [attr.value]="col?.value" [maxlength]="col?.validation?.max" [formControlName]="col?.name"
+                          [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-org" [ngbTypeahead]="searchOrg" [focusFirst]=false
+                          [resultTemplate]="rtOrg" [inputFormatter]="formatterOrgName"
+                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" 
+                          [attr.readonly]="isFieldReadOnly(col)" />
+                        <input *ngIf="isFieldName(col?.name, 'donor_cmte_id') ||
+                                  isFieldName(col?.name, 'beneficiary_cmte_id') ||
+                                  isFieldName(col?.name, 'beneficiary_cand_id')" class="form-control"
+                          [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
+                          [attr.name]="col?.name" [attr.value]="col?.value" [maxlength]="col?.validation?.max"
+                          [formControlName]="col?.name" [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-committee-id" 
+                          [ngbTypeahead]="isFieldName(col?.name, 'beneficiary_cand_id') ? searchCandidateId : searchCommitteeId" 
+                          [focusFirst]=false
+                          [resultTemplate]="isFieldName(col?.name, 'beneficiary_cand_id') ? rtCandidateId : rtCommitteeId" 
+                          [inputFormatter]="isFieldName(col?.name, 'beneficiary_cand_id') ? formatterCandidateId: formatterCommitteeId"
+                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                        <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
+                                  isFieldName(col?.name, 'beneficiary_cmte_name')" class="form-control"
+                          [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"
+                          [attr.name]="col?.name" [attr.value]="col?.value" [maxlength]="col?.validation?.max"
+                          [formControlName]="col?.name" [ngClass]="
+                              frmIndividualReceipt.get(col?.name)?.invalid &&
+                              (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                                ? 'input-field-error'
+                                : ''
+                            " id="typeahead-template-committee-name" [ngbTypeahead]="searchCommitteeName"
+                          [focusFirst]=false [resultTemplate]="rtCommitteeName" [inputFormatter]="formatterCommitteeName"
+                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                      </div>
+                      <div class="error-text">
+                        
+                      </div>
+                      <ng-container *ngIf="((col.name === 'expenditure_amount' || col.name === 'contribution_amount')  && displayMonthlyQuarterlyThresholdWarning) || (col.name === 'semi_annual_refund_bundled_amount' && displaySemiAnnualThresholdWarning)">
+                        <div class="text-info text-left">
+                          Reportable Bundled Contributions Forwarded By or Credited to Lobbyists/Registrants and 
+                          Lobbyist/Registrant PACs are not required to be disclosed unless the amount is greater 
+                          than {{maximumThresholdAmount | currency:'USD':'symbol-narrow':'1.2-2'}} for the covered period. 
+                        </div>
+                      </ng-container>
+                      <div class="error-text" *ngIf="
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty) &&
+                            frmIndividualReceipt.get(col?.name).invalid
+                          ">
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors?.maxlength">
+                          <div class="text-error text-left" *ngIf="
+                                frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength <
+                                frmIndividualReceipt.get(col?.name).errors.maxlength?.actualLength
+                              ">
+                            Only {{ frmIndividualReceipt.get(col?.name).errors.maxlength?.requiredLength }} characters
+                            allowed.
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonValidAmount">
+                            Please enter a valid amount.
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonAlphaNumeric">
+                            Alphanumeric characters only.
+                          </div>
+                        </ng-container>
+                        <ng-container *ngIf="frmIndividualReceipt.get(col?.name).errors">
+                          <div class="text-error text-left"
+                            *ngIf="frmIndividualReceipt.get(col?.name).errors?.nonFloatingPoint">
+                            Only numerical values are allowed.
+                          </div>
+                        </ng-container>
+                      </div>
+                    </ng-container>
+                    <ng-container *ngIf="col?.type === 'select' && 
+                          isFieldName(col?.name, 'state')">
+                      <ng-select #stateSelect 
+                        [items]="states" 
+                        (change)="handleStateChange($event, col)"
+                        class="forms__select" 
+                        [formControlName]="col?.name" 
+                        bindValue="code" 
+                        bindLabel="code" 
+                        [selectOnTab]="true"
+                        [attr.readonly]="isSelectFieldReadOnly(col)"
+                        [ngClass]="
+                            frmIndividualReceipt.get(col?.name)?.invalid &&
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                              ? 'forms__select-error'
+                              : ''
+                          ">
+                        <ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index">
+                          <span>{{ item.code + ' - ' + item.name }}</span>
+                        </ng-template>
+                      </ng-select>
+                    </ng-container>
+                    <ng-container *ngIf="col?.type === 'select' && isFieldName(col?.name, 'entity_type')">
+                      <ng-select #entityTypeSelect 
+                        [items]="entityTypes" 
+                        (change)="handleEntityTypeChange($event)"
+                        class="forms__select entity-type-select" 
+                        [formControlName]="col?.name" 
+                        bindValue="entityType"
+                        bindLabel="entityTypeDescription" 
+                        [selectOnTab]="true"
+                        [readonly]="isSelectFieldReadOnly(col)"
+                        [ngClass]="
+                            frmIndividualReceipt.get(col?.name)?.invalid &&
+                            (frmIndividualReceipt.touched || frmIndividualReceipt.dirty)
+                              ? 'forms__select-error'
+                              : ''
+                          ">
+                      </ng-select>
+                    </ng-container>
+                  </div>
+                </div>
+              </ng-container>
+              <!-- ./col -->
+            </ng-container>
+          </div>
+          <!-- ./row -->
+          <ng-container *ngIf="row.seperator">
+            <div class="row">
+              <div class="col-md-12">
+                <hr />
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+        <div class="forms__btn-container">
+        </div>
+      <!--</ng-container>-->
+    </section>
+    <footer>
+      <footer>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="forms__btn-container">
+                <div *ngIf="scheduleAction === editScheduleAction">
+                  <button class="btn btn-previous btn-left" type="button" (click)="cancel()">
+                    Cancel
+                  </button>
+                  <button class="btn btn-secondary btn-right" (click)="updateOnly()">
+                    Save
+                  </button>
+                </div>
+                <div *ngIf="scheduleAction !== editScheduleAction">
+                  <button class="btn btn-previous btn-left" type="button"
+                    (click)="previousStep()">
+                    Previous
+                  </button>
+                  <button *ngIf="scheduleAction !== viewScheduleAction" class="btn btn-secondary btn-right" (click)="saveOnly()">
+                    Save &amp; Add Transaction
+                  </button>
+                  <div *ngIf="scheduleAction === viewScheduleAction">
+                    <button type="button" class="btn btn-outline-dark btn-right" (click)="viewTransactions()">Close</button>
+                  </div>
+                  <a *ngIf="scheduleAction === addScheduleAction" class="btn btn-previous btn-right" (click)="(frmIndividualReceipt.dirty) ? saveOrWarn() : viewTransactions()">
+                    Save &amp; View Transactions
+                  </a>
+                </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </footer>
+  </form>
+</div>

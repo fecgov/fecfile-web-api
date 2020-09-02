@@ -272,6 +272,11 @@ def get_transaction_categories(request):
             forms_obj = {}
             form_type = request.query_params.get("form_type")
 
+            # if(form_type == 'F3L'):
+            #     with open('./fecfiler/core/f3l_transaction_categories.json') as f:
+            #         data = json.load(f)
+            #     return Response(data, status=status.HTTP_200_OK)
+
             if (
                     "cmte_type_category" in request.query_params
                     and request.query_params.get("cmte_type_category")
@@ -538,6 +543,12 @@ def get_dynamic_forms_fields(request):
     cmte_id = get_comittee_id(request.user.username)
     form_type = request.query_params.get("form_type")
     transaction_type = request.query_params.get("transaction_type")
+
+    # if form_type == 'F3L' and transaction_type not in("", "", None, " ", "None", "null"):
+    #     with open('./fecfiler/core/f3l_dynamic_forms_json/ind_bndlr.json') as f:
+    #         data = json.load(f)
+    #     return Response(data, status=status.HTTP_200_OK)
+
     if "reportId" in request.query_params and request.query_params.get(
             "reportId"
     ) not in ("", "", None, " ", "None", "null"):
@@ -1362,8 +1373,8 @@ def post_reports(data, reportid=None):
                     post_sql_form3l(
                         report_id,
                         data.get("cmte_id"),
-                        data.get('election_date'),
-                        data.get('election_state')
+                        data.get("date_of_election"),
+                        data.get("state_of_election"),
                         )
 
                 # print('here4')
@@ -10930,7 +10941,7 @@ def post_sql_form3l(
         with connection.cursor() as cursor:
             # Insert data into Form 24 table
             cursor.execute(
-                """INSERT INTO public.form_24 (report_id, cmte_id, election_date, election_state, create_date, last_update_date)
+                """INSERT INTO public.form_3l (report_id, cmte_id, election_date, election_state, create_date, last_update_date)
                                             VALUES (%s,%s,%s,%s,%s,%s)""",
                 [
                     report_id,

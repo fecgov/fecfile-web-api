@@ -198,6 +198,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   routerSubscription: Subscription;
 
   selectedFromMultiplePages: Array <TransactionModel> = [];
+  public receiptsLabel: string;
+  public disbursementsLabel: string;
+  public loansLabel: string;
+  public othersLabel: string;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -321,7 +325,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       }
     } */
 
-    this._transactionTypeService.getTransactionCategories('3X').subscribe(res => {
+    this._transactionTypeService.getTransactionCategories("F"+this.formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
       }
@@ -354,12 +358,30 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.getPage(this.config.currentPage);
     this.applyDisabledColumnOptions();
     this.showHideTabs();
+    this.showTabLabels();
+  }
+
+  showTabLabels() {
+    if(this.formType === '3L'){
+      this.receiptsLabel = 'Bundled Contributions';
+      this.disbursementsLabel = 'Refunds'
+    }
+    else{
+      this.receiptsLabel = 'Receipts';
+      this.disbursementsLabel = 'Disbursements';
+      this.loansLabel = 'Loans and Debts';
+      this.othersLabel = 'Other';
+    }
   }
 
 
   showHideTabs() {
     if(this.formType === '24'){
       this.showReceiptsTab = false;
+      this.showLoansTab = false;
+      this.showOthersTab = false;
+    }
+    else if(this.formType === '3L'){
       this.showLoansTab = false;
       this.showOthersTab = false;
     }

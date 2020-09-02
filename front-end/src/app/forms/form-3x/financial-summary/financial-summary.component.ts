@@ -27,7 +27,9 @@ export class FinancialSummaryComponent implements OnInit, OnDestroy {
 
   private _form3XReportType: any = {};
 
-  private _formType: string = '';
+  public formType: string = '';
+  public viewTransactionsBtnLabel: string;
+  
   constructor(
     private _config: NgbTooltipConfig,
     private _http: HttpClient,
@@ -43,25 +45,36 @@ export class FinancialSummaryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.viewMode = 'tab1';
-    this._formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.step = this._activatedRoute.snapshot.queryParams.step;
     this.editMode = this._activatedRoute.snapshot.queryParams.edit === 'false' ? false : true;
-    localStorage.setItem(`form_${this._formType}_saved`, JSON.stringify({ saved: true }));
+    localStorage.setItem(`form_${this.formType}_saved`, JSON.stringify({ saved: true }));
     //console.log('this.step = ', this.step);
 
-    this._financialSummaryService.getSummaryDetails('3X').subscribe(
+    this._financialSummaryService.getSummaryDetails(this.formType).subscribe(
       res => {
         if (res) {
-          //console.log('Accessing FinancialSummaryComponent res ...', res);
-          this.tab1Data = res['Total Raised'];
-          this.tab2Data = res['Total Spent'];
-          this.tab3Data = res['Cash summary'];
+          if(this.formType === '3X'){
+            this.tab1Data = res['Total Raised'];
+            this.tab2Data = res['Total Spent'];
+            this.tab3Data = res['Cash summary'];
+          }
+          else if(this.formType === '3L'){
+            this.tab1Data = res['Summary'];
+          }
         }
       },
       error => {
         //console.log('error: ', error);
       }
     );
+
+    if(this.formType === '3X'){
+      this.viewTransactionsBtnLabel = "Browse Receipts";
+    }
+    else{
+      this.viewTransactionsBtnLabel = 'Browse Transactions';
+    }
   }
 
   /**
@@ -77,14 +90,14 @@ export class FinancialSummaryComponent implements OnInit, OnDestroy {
 
   public printPreview(): void {
     //console.log('FinancialSummaryComponent printPreview this._formType = ', this._formType);
-    this._reportTypeService.printPreview('financial_screen', this._formType);
+    this._reportTypeService.printPreview('financial_screen', this.formType);
   }
 
   public viewTransactions(transactionCategory?: string): void {
-    this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type`));
+    this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
 
     if (this._form3XReportType === null || typeof this._form3XReportType === 'undefined') {
-      this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this._formType}_report_type_backup`));
+      this._form3XReportType = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type_backup`));
     }
 
     if (typeof this._form3XReportType === 'object' && this._form3XReportType !== null) {
@@ -96,13 +109,13 @@ export class FinancialSummaryComponent implements OnInit, OnDestroy {
     }
     //console.log(' FinancialSummaryComponent this.reportId = ', this.reportId);
     this._transactionsMessageService.sendLoadTransactionsMessage(this.reportId);
-    this._router.navigate([`/forms/form/${this._formType}`], {
+    this._router.navigate([`/forms/form/${this.formType}`], {
       queryParams: { step: 'transactions', reportId: this.reportId, edit: this.editMode, transactionCategory: transactionCategory }
     });
   }
 
   public all_Transactions(): void {
-    this._router.navigate([`/forms/form/${this._formType}`], { queryParams: { step: 'step_2', edit: this.editMode } });
+    this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: 'step_2', edit: this.editMode } });
   }
 
   public expanded_Summary(): void {
@@ -118,6 +131,6 @@ export class FinancialSummaryComponent implements OnInit, OnDestroy {
    */
   public ngOnDestroy(): void {
     localStorage.removeItem('Summary_Screen');
-    localStorage.removeItem(`form_${this._formType}_summary_screen`);
+    localStorage.removeItem(`form_${this.formType}_summary_screen`);
   }
 }

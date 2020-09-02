@@ -252,4 +252,36 @@ export class UtilService {
       itemRange: start + ' - ' + end 
     };
   }
+
+    /**
+   * For some forms, transaction categories are mapped differently (i.e. 'bundled-contributions' => 'receipts', 'refunds' => 'disbursements' for F3L etc.)
+   * This method remaps these transaction categories for the transactions table. 
+   * @param _transactionCategory 
+   */
+  public getMappedTransactionCategory(_transactionCategory: string) {
+    if(_transactionCategory === 'bundled-contributions'){
+      return 'receipts';
+    }
+    else if(_transactionCategory === 'refunds'){
+      return 'disbursements';
+    }
+    return _transactionCategory;
+  }
+
+  /**
+   * converts transactionCategory based on formType, if different from F3X. 
+   * @param transactionCategory 
+   * @param formType 
+   */
+  public convertTransactionCategoryByForm(transactionCategory: string, formType: string){
+    if(formType.endsWith('3L')){
+      if(transactionCategory === 'receipts'){
+        return 'bundled contributions';
+      }
+      else if(transactionCategory === 'disbursements'){
+        return 'refunds';
+      }
+    }
+    return transactionCategory;
+  }
 }

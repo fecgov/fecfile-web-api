@@ -544,6 +544,7 @@ def put_sql_schedA(
     levin_account_id,
     transaction_type_identifier,
     aggregation_ind,
+    semi_annual_refund_bundled_amount,
     election_year = None,
 ):
     """
@@ -574,6 +575,7 @@ def put_sql_schedA(
                     levin_account_id = %s, 
                     transaction_type_identifier = %s, 
                     aggregation_ind = %s, 
+                    semi_annual_refund_bundled_amount = %s,
                     last_update_date = %s 
                 WHERE transaction_id = %s AND report_id in ('{}') AND cmte_id = %s AND delete_ind is distinct from 'Y'
                 """.format(
@@ -598,6 +600,7 @@ def put_sql_schedA(
                     levin_account_id,
                     transaction_type_identifier,
                     aggregation_ind,
+                    semi_annual_refund_bundled_amount,
                     datetime.datetime.now(),
                     transaction_id,
                     cmte_id,
@@ -1041,6 +1044,7 @@ def put_schedA(datum):
                 datum.get("levin_account_id"),
                 datum.get("transaction_type_identifier"),
                 datum.get("aggregation_ind"),
+                datum.get("semi_annual_refund_bundled_amount"),
                 datum.get("election_year"),
             )
             try:
@@ -1324,12 +1328,14 @@ def put_schedA(datum):
             )
 
         # update line number based on aggregate amount info
-        update_date = datetime.datetime.strptime(
-            prev_transaction_data.get("contribution_date"), "%Y-%m-%d"
-        ).date()
-        if update_date > datum.get("contribution_date"):
+        if prev_transaction_data.get("contribution_date") not in [None, '', " ", 'null']:
+            update_date = datetime.datetime.strptime(
+                prev_transaction_data.get("contribution_date"), "%Y-%m-%d"
+            ).date()
+            if update_date > datum.get("contribution_date"):
+                update_date = datum.get("contribution_date")
+        else:
             update_date = datum.get("contribution_date")
-
         if transaction_id.startswith("SA"):
             update_linenumber_aggamt_transactions_SA(
                 update_date,

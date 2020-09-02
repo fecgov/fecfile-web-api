@@ -1,3 +1,4 @@
+import { UtilService } from './../../../shared/utils/util.service';
 import { Subscription } from 'rxjs/Subscription';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
@@ -75,7 +76,8 @@ export class TransactionSidebarComponent implements OnInit {
     private _dialogService: DialogService,
     private _typeaheadService: TypeaheadService,
     private _transactionMessageService: TransactionsMessageService,
-    private _authService: AuthService
+    private _authService: AuthService, 
+    private _utilService: UtilService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -110,7 +112,7 @@ export class TransactionSidebarComponent implements OnInit {
     }
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
     if(this._formType !== '24'){
-      this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
+      this._transactionTypeService.getTransactionCategories("F"+this._formType).takeUntil(this.onDestroy$).subscribe(res => {
         if (res) {
             this.transactionCategories = res.data.transactionCategories;
             this.cashOnHand = res.data.cashOnHand;
@@ -410,11 +412,12 @@ export class TransactionSidebarComponent implements OnInit {
           transactionCategory = 'receipts';
         }
         this._messageService.sendMessage({action:'clearGlobalAllTransactionsFlag'});
+        const mappedTransCategory = this._utilService.getMappedTransactionCategory(transactionCategory);
         this._transactionMessageService.sendLoadDefaultTabMessage({
           step: 'transactions',
           reportId: this.reportId,
           edit: this.editMode,
-          transactionCategory: transactionCategory
+          transactionCategory: mappedTransCategory
         });
       }
     });

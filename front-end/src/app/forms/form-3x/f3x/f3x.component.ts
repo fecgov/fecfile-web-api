@@ -167,7 +167,7 @@ export class F3xComponent implements OnInit, OnDestroy {
       }
     });
 
-    this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
+    this._transactionTypeService.getTransactionCategories("F"+this.formType).subscribe(res => {
       if (res) {
         this.transactionCategoriesMainData = res;
         this.transactionCategories = res.data.transactionCategories;

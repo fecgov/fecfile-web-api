@@ -1,7 +1,7 @@
 import { ScheduleActions } from './../individual-receipt/schedule-actions.enum';
 import { Injectable , ChangeDetectionStrategy } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, identity } from 'rxjs';
+import { Observable, identity, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CookieService } from 'ngx-cookie-service';
 import { environment } from '../../../../environments/environment';
@@ -25,9 +25,14 @@ export class ReportTypeService {
    * @param      {string}  formType  The form type
    */
   public getReportTypes(formType: string): Observable<any> {
+
+    /* if(formType === '3L'){
+      return of(this.quarterlyElectionJSON);
+    }
+ */
     let token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
-    let url: string = '/core/get_report_types?form_type=F3X';
+    let url: string = `/core/get_report_types?form_type=F${formType}`;
     let params = new HttpParams();
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
@@ -75,6 +80,20 @@ export class ReportTypeService {
         formData.append('cvg_start_dt', formReportType.cvgStartDate);
       } else if (formReportType.hasOwnProperty('cvgstartdate')) {
         formData.append('cvg_start_dt', formReportType.cvgstartdate);
+      }
+  
+      if (formReportType.hasOwnProperty('cvgEndDate')) {
+        formData.append('cvg_end_dt', formReportType.cvgEndDate);
+      } else if (formReportType.hasOwnProperty('cvgenddate')) {
+        formData.append('cvg_end_dt', formReportType.cvgenddate);
+      }
+
+      if (formReportType.hasOwnProperty('semi_annual_start_date')) {
+        formData.append('semi_annual_start_date', formReportType.semi_annual_start_date);
+      } 
+
+      if (formReportType.hasOwnProperty('semi_annual_end_date')) {
+        formData.append('semi_annual_end_date', formReportType.semi_annual_end_date);
       }
   
       if (formReportType.hasOwnProperty('cvgEndDate')) {
@@ -838,4 +857,693 @@ export class ReportTypeService {
         );
 
   }
+
+  private monthlyElectionJSON = {
+    "report_type": [
+      {
+        "report_type": "M2",
+        "report_type_desciption": "February 20 Monthly - M2",
+        "report_type_info": "In an election year/non-election year covers activity from January 1 thru January 31 and due on the 20th of February.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-01-01",
+        "cvg_end_date": "2020-01-31",
+        "due_date": "2020-02-20"
+      },
+      {
+        "report_type": "M3",
+        "report_type_desciption": "March 20 Monthly - M3",
+        "report_type_info": "In an election year/non-election year covers activity from February 1 thru February 28 and due on the 20th of March.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-02-01",
+        "cvg_end_date": "2020-02-29",
+        "due_date": "2020-03-20"
+      },
+      {
+        "report_type": "M4",
+        "report_type_desciption": "April 20 Monthly - M4",
+        "report_type_info": "In an election year/non-election year covers activity from March 1 thru March 31 and due on the 20th of April.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-03-01",
+        "cvg_end_date": "2020-03-31",
+        "due_date": "2020-04-20"
+      },
+      {
+        "report_type": "M5",
+        "report_type_desciption": "May 20 Monthly - M5",
+        "report_type_info": "In an election year/non-election year covers activity from April 1 thru April 30 and due on the 20th of May.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-04-01",
+        "cvg_end_date": "2020-04-30",
+        "due_date": "2020-05-20"
+      },
+      {
+        "report_type": "M6",
+        "report_type_desciption": "June 20 Monthly - M6",
+        "report_type_info": "In an election year/non-election year covers activity from May 1 thru May 31 and due on the 20th of June.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-05-01",
+        "cvg_end_date": "2020-05-31",
+        "due_date": "2020-06-20"
+      },
+      {
+        "report_type": "M7S",
+        "report_type_desciption": "July Monthly / Semi-Annual - M7S",
+        "report_type_info": "Placeholder text for July Monthly / Semi-Annual",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-06-01",
+        "cvg_end_date": "2020-06-30",
+        "due_date": "2020-07-20",
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": true
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "report_type": "MSA",
+        "report_type_desciption": "Monthly Semi-Annual (MY) - MSA",
+        "report_type_info": "Placeholder text for Monthly Semi-Annual",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "disableCoverageDates": true,
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": true
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "report_type": "M8",
+        "report_type_desciption": "August 20 Monthly - M8",
+        "report_type_info": "In an election year/non-election year covers activity from July 1 thru July 31 and due on the 20th of August.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-07-01",
+        "cvg_end_date": "2020-07-31",
+        "due_date": "2020-08-20"
+      },
+      {
+        "report_type": "M9",
+        "report_type_desciption": "September 20 Monthly - M9",
+        "report_type_info": "In an election year/non-election year covers activity from August 1 thru August 31 and due on the 20th of September.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-08-01",
+        "cvg_end_date": "2020-08-31",
+        "due_date": "2020-09-20"
+      },
+      {
+        "report_type": "M10",
+        "report_type_desciption": "October 20 Monthly - M10",
+        "report_type_info": "In an election year/non-election year covers activity from September 1 thru September 30 and due on the 20th of October.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-09-01",
+        "cvg_end_date": "2020-09-30",
+        "due_date": "2020-10-20"
+      },
+      {
+        "report_type": "12G",
+        "report_type_desciption": "12 Day Pre-General - 12G",
+        "report_type_info": "Due 12 days before the election, covers activity from the close of books of the previous report filed through the 20th day before the general. A committee must file pre-primary reports only if the committee has made previously undisclosed contributions or  (...)",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-09-01",
+        "cvg_end_date": "2020-09-30",
+        "due_date": "2020-10-30"
+      },
+      {
+        "report_type": "30G",
+        "report_type_desciption": "30 Day Post-General - 30G",
+        "report_type_info": "In an election year covers activity that occurred after the closing date of the last report through the 20th day after the general election.  The report is due 30 days after the election.",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": "EFO",
+        "cvg_end_date": "EFO",
+        "due_date": "EFO"
+      },
+      {
+        "report_type": "MYS",
+        "report_type_desciption": "Monthly Year-End / Semi-Annual - MYS",
+        "report_type_info": "Placeholder text for Monthly Year-End / Semi-Annual",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "EFO",
+        "cvg_end_date": "EFO",
+        "due_date": "EFO",
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": false
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": true
+          }
+        ]
+      },
+      {
+        "report_type": "MSY",
+        "report_type_desciption": "Monthly Semi-Annual (YE) - MSY",
+        "report_type_info": "Placeholder text for Monthly Semi-Annual YE",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "disableCoverageDates": true,
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": false
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": true
+          }
+        ]
+      }
+    ]
+  };
+
+  private monthlyNonElectionJSON  = {
+    "report_type": [
+      {
+        "report_type": "M2",
+        "report_type_desciption": "February 20 Monthly - M2",
+        "report_type_info": "In an election year/non-election year covers activity from January 1 thru January 31 and due on the 20th of February.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-01-01",
+        "cvg_end_date": "2020-01-31",
+        "due_date": "2020-02-20"
+      },
+      {
+        "report_type": "M3",
+        "report_type_desciption": "March 20 Monthly - M3",
+        "report_type_info": "In an election year/non-election year covers activity from February 1 thru February 28 and due on the 20th of March.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-02-01",
+        "cvg_end_date": "2020-02-29",
+        "due_date": "2020-03-20"
+      },
+      {
+        "report_type": "M4",
+        "report_type_desciption": "April 20 Monthly - M4",
+        "report_type_info": "In an election year/non-election year covers activity from March 1 thru March 31 and due on the 20th of April.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-03-01",
+        "cvg_end_date": "2020-03-31",
+        "due_date": "2020-04-20"
+      },
+      {
+        "report_type": "M5",
+        "report_type_desciption": "May 20 Monthly - M5",
+        "report_type_info": "In an election year/non-election year covers activity from April 1 thru April 30 and due on the 20th of May.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-04-01",
+        "cvg_end_date": "2020-04-30",
+        "due_date": "2020-05-20"
+      },
+      {
+        "report_type": "M6",
+        "report_type_desciption": "June 20 Monthly - M6",
+        "report_type_info": "In an election year/non-election year covers activity from May 1 thru May 31 and due on the 20th of June.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-05-01",
+        "cvg_end_date": "2020-05-31",
+        "due_date": "2020-06-20"
+      },
+      {
+        "report_type": "M7S",
+        "report_type_desciption": "July Monthly / Semi-Annual - M7S",
+        "report_type_info": "Placeholder text for July Monthly / Semi-Annual",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-06-01",
+        "cvg_end_date": "2020-06-30",
+        "due_date": "2020-07-20",
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": true
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "report_type": "MSA",
+        "report_type_desciption": "Monthly Semi-Annual (MY) - MSA",
+        "report_type_info": "Placeholder text for Monthly Semi-Annual",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "disableCoverageDates": true,
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": true
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "report_type": "M8",
+        "report_type_desciption": "August 20 Monthly - M8",
+        "report_type_info": "In an election year/non-election year covers activity from July 1 thru July 31 and due on the 20th of August.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-07-01",
+        "cvg_end_date": "2020-07-31",
+        "due_date": "2020-08-20"
+      },
+      {
+        "report_type": "M9",
+        "report_type_desciption": "September 20 Monthly - M9",
+        "report_type_info": "In an election year/non-election year covers activity from August 1 thru August 31 and due on the 20th of September.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-08-01",
+        "cvg_end_date": "2020-08-31",
+        "due_date": "2020-09-20"
+      },
+      {
+        "report_type": "M10",
+        "report_type_desciption": "October 20 Monthly - M10",
+        "report_type_info": "In an election year/non-election year covers activity from September 1 thru September 30 and due on the 20th of October.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-09-01",
+        "cvg_end_date": "2020-09-30",
+        "due_date": "2020-10-20"
+      },
+      {
+        "report_type": "M11",
+        "report_type_desciption": "November 20 Monthly - M11",
+        "report_type_info": "In an election year/non-election year covers activity from October 1 thru October 31 and due on the 20th of November.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-10-01",
+        "cvg_end_date": "2020-10-31",
+        "due_date": "2020-11-20"
+      },
+      {
+        "report_type": "M12",
+        "report_type_desciption": "December 20 Monthly - M12",
+        "report_type_info": "In an election year/non-election year covers activity from November 1 thru November 30 and due on the 20th of December.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-11-01",
+        "cvg_end_date": "2020-11-30",
+        "due_date": "2020-12-20"
+      },
+      {
+        "report_type": "MYS",
+        "report_type_desciption": "Monthly Year-End / Semi-Annual - MYS",
+        "report_type_info": "Placeholder text for Monthly Year-End / Semi-Annual",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-12-01",
+        "cvg_end_date": "2020-12-31",
+        "due_date": "???",
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": false
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": true
+          }
+        ]
+      },
+      {
+        "report_type": "MSY",
+        "report_type_desciption": "Monthly Semi-Annual (YE) - MSY",
+        "report_type_info": "Placeholder text for Monthly Semi-Annual YE",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "disableCoverageDates": true,
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": false
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": true
+          }
+        ]
+      }
+    ]
+  };
+
+  private quarterlyElectionJSON = {
+    "report_type": [
+      {
+        "report_type": "Q1",
+        "report_type_desciption": "April Quarterly - Q1",
+        "report_type_info": "In an election year/non-election year covers activity from January 1 thru March 31 and due on the 20th of April.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-01-01",
+        "cvg_end_date": "2020-03-31",
+        "due_date": "2020-04-20"
+      },
+      {
+        "report_type": "Q2S",
+        "report_type_desciption": "July Quarterly / Semi-Annual - Q2S",
+        "report_type_info": "Placeholder text for July Quarterly / Semi-Annual.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-04-01",
+        "cvg_end_date": "2020-06-30",
+        "due_date": "2020-07-20",
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": true
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "report_type": "QSA",
+        "report_type_desciption": "Quarterly / Semi-Annual (MY) - QSA",
+        "report_type_info": "Placeholder text for Quarterly / Semi-Annual (MY).",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "disableCoverageDates": true,
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": true
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "report_type": "Q3",
+        "report_type_desciption": "October Quarterly - Q3",
+        "report_type_info": "In an election year/non-election year covers activity from Jul 1 thru September 30 and due on the 20th of October.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-07-01",
+        "cvg_end_date": "2020-09-30",
+        "due_date": "2020-10-20"
+      },
+      {
+        "report_type": "QYS",
+        "report_type_desciption": "Quarterly Year-End / Semi-Annual - QYS",
+        "report_type_info": "Placeholder text for Quarterly Year-End / Semi-Annual.",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": "2020-10-01",
+        "cvg_end_date": "2020-12-31",
+        "due_date": "???",
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": false
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": true
+          }
+        ]
+      },
+      {
+        "report_type": "QYE",
+        "report_type_desciption": "Quarterly Semi-Annual (YE) - QYE",
+        "report_type_info": "Placeholder text for Quarterly Semi-Annual (YE).",
+        "regular_special_report_ind": "R",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "disableCoverageDates": true,
+        "semi-annual_dates": [
+          {
+            "start_date": "2020-01-01",
+            "end_date": "2020-06-30",
+            "selected": false
+          },
+          {
+            "start_date": "2020-07-01",
+            "end_date": "2020-12-31",
+            "selected": true
+          }
+        ]
+      },
+      {
+        "report_type": "12C",
+        "report_type_desciption": "12-Day Pre-Convention - 12C",
+        "report_type_info": "Placeholder text for 12-Day Pre-Convention - 12C.",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "semi-annual_dates_optional": true,
+        "semi-annual_dates": [
+            {
+              "start_date": "2020-01-01",
+              "end_date": "2020-06-30",
+              "selected": false
+            },
+            {
+              "start_date": "2020-07-01",
+              "end_date": "2020-12-31",
+              "selected": false
+            }
+        ]
+      },
+      {
+        "report_type": "12G",
+        "report_type_desciption": "12-Day Pre-General - 12G",
+        "report_type_info": "Placeholder text for 12-Day Pre-General - 12G.",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": "EFO",
+        "cvg_end_date": "EFO",
+        "due_date": "EFO",
+        "semi-annual_dates_optional": true,
+        "semi-annual_dates": [
+            {
+              "start_date": "2020-01-01",
+              "end_date": "2020-06-30",
+              "selected": false
+            },
+            {
+              "start_date": "2020-07-01",
+              "end_date": "2020-12-31",
+              "selected": false
+            }
+        ]
+      },
+      {
+        "report_type": "12P",
+        "report_type_desciption": "12-Day Pre-Primary - 12P",
+        "report_type_info": "Placeholder text for 12-Day Pre-Primary - 12P.",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "semi-annual_dates_optional": true,
+        "semi-annual_dates": [
+            {
+              "start_date": "2020-01-01",
+              "end_date": "2020-06-30",
+              "selected": false
+            },
+            {
+              "start_date": "2020-07-01",
+              "end_date": "2020-12-31",
+              "selected": false
+            }
+        ]
+      },
+      {
+        "report_type": "12R",
+        "report_type_desciption": "12-Day Pre-Runoff - 12R",
+        "report_type_info": "Placeholder text for 12-Day Pre-Runoff - 12R.",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "semi-annual_dates_optional": true,
+        "semi-annual_dates": [
+            {
+              "start_date": "2020-01-01",
+              "end_date": "2020-06-30",
+              "selected": false
+            },
+            {
+              "start_date": "2020-07-01",
+              "end_date": "2020-12-31",
+              "selected": false
+            }
+        ]
+      },
+      {
+        "report_type": "12S",
+        "report_type_desciption": "12-Day Pre-Special - 12S",
+        "report_type_info": "Placeholder text for 12-Day Pre-Special - 12S.",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "semi-annual_dates_optional": true,
+        "semi-annual_dates": [
+            {
+              "start_date": "2020-01-01",
+              "end_date": "2020-06-30",
+              "selected": false
+            },
+            {
+              "start_date": "2020-07-01",
+              "end_date": "2020-12-31",
+              "selected": false
+            }
+        ]
+      },
+      {
+        "report_type": "30G",
+        "report_type_desciption": "30-Day Post-General - 30G",
+        "report_type_info": "Placeholder text for 30-Day Post-General - 30G.",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": "EFO",
+        "cvg_end_date": "EFO",
+        "due_date": "EFO",
+        "semi-annual_dates_optional": true,
+        "semi-annual_dates": [
+            {
+              "start_date": "2020-01-01",
+              "end_date": "2020-06-30",
+              "selected": false
+            },
+            {
+              "start_date": "2020-07-01",
+              "end_date": "2020-12-31",
+              "selected": false
+            }
+        ]
+      },
+      {
+        "report_type": "30R",
+        "report_type_desciption": "30-Day Post-Runoff - 30R",
+        "report_type_info": "Placeholder text for 30-Day Post-Runoff - 30R.",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "semi-annual_dates_optional": true,
+        "semi-annual_dates": [
+            {
+              "start_date": "2020-01-01",
+              "end_date": "2020-06-30",
+              "selected": false
+            },
+            {
+              "start_date": "2020-07-01",
+              "end_date": "2020-12-31",
+              "selected": false
+            }
+        ]
+      },
+      {
+        "report_type": "30S",
+        "report_type_desciption": "30-Day Post-Special - 30S",
+        "report_type_info": "Placeholder text for 30-Day Post-Special - 30S.",
+        "regular_special_report_ind": "S",
+        "default_disp_ind": "N",
+        "cvg_start_date": null,
+        "cvg_end_date": null,
+        "due_date": null,
+        "semi-annual_dates_optional": true,
+        "semi-annual_dates": [
+            {
+              "start_date": "2020-01-01",
+              "end_date": "2020-06-30",
+              "selected": false
+            },
+            {
+              "start_date": "2020-07-01",
+              "end_date": "2020-12-31",
+              "selected": false
+            }
+        ]
+      }
+    ]
+  };
 }
