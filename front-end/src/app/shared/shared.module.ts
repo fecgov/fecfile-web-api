@@ -15,6 +15,8 @@ import { OrderByPipe } from 'ngx-pipes';
 import { ModalModule } from 'ngx-bootstrap';
 import { InputModalComponent } from './partials/input-modal/input-modal.component';
 import { ExportDirective } from './directives/export.directive';
+import { ReportTypeSidebarComponent } from '../forms/form-3x/report-type-sidebar/report-type-sidebar.component';
+import { ReportTypeComponent } from '../forms/form-3x/report-type/report-type.component';
 
 @NgModule({
   imports: [
@@ -25,9 +27,11 @@ import { ExportDirective } from './directives/export.directive';
   ],
   declarations: [
     StepsComponent,
+    ReportTypeSidebarComponent,
     SignAndSubmitComponent,
     SubTransactionsTableComponent,
     SubmitComponent,
+    ReportTypeComponent,
     ValidateComponent,
     PhonePipe,
     InputModalComponent
@@ -41,9 +45,11 @@ import { ExportDirective } from './directives/export.directive';
     NgxPaginationModule,
     ModalModule,
     StepsComponent,
+    ReportTypeSidebarComponent,
     SignAndSubmitComponent,
     SubTransactionsTableComponent,
     SubmitComponent,
+    ReportTypeComponent,
     InputModalComponent,
   ],
   providers: [

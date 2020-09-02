@@ -40,7 +40,8 @@ from fecfiler.core.views import (
     remove_entities,
     undo_delete_entities,
     get_comittee_id,
-    update_F3X
+    update_F3X,
+    create_amended,
 
 )
 from fecfiler.sched_A.views import get_next_transaction_id
@@ -387,11 +388,13 @@ def schedD(request):
             else:
                 logger.debug("saving new sd transaction:{}".format(datum))
                 data = post_schedD(datum)
+                do_post_carryover(data['transaction_id'], cmte_id, report_id)
             # Associating child transactions to parent and storing them to DB
 
             output = get_schedD(data)
             return JsonResponse(output[0], status=status.HTTP_201_CREATED)
         except Exception as e:
+            logger.debug(e)
             return Response(
                 "The schedD API - POST is throwing an exception: " + str(e),
                 status=status.HTTP_400_BAD_REQUEST,
@@ -522,6 +525,27 @@ def schedD(request):
 
     else:
         raise NotImplementedError
+
+def do_post_carryover(transaction_id, cmte_id, report_id):
+    try:
+        _sql = """SELECT json_agg(t) FROM (
+            SELECT report_id, status FROM reports 
+            WHERE cmte_id=%s AND form_type='F3X' AND superceded_report_id is null
+            AND cvg_start_date > (SELECT cvg_start_date FROM reports WHERE cmte_id=%s AND report_id=%s)
+            ORDER BY cvg_start_date)t"""
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id, cmte_id, report_id])
+            reports_list = cursor.fetchone()[0]
+        for report in reports_list:
+            if report.get('status') and report.get('status') != 'Saved':
+                create_amended(report['report_id'])
+        with connection.cursor() as cursor:
+            cursor.execute(_sql, [cmte_id, cmte_id, report_id])
+            new_reports_list = cursor.fetchone()[0]
+        for report in new_reports_list:
+            do_carryover(report['report_id'], cmte_id)
+    except Exception as e:
+        raise Exception('The do_post_carryover is throwing an error: '+str(e))
 
 
 def delete_schedD(data):

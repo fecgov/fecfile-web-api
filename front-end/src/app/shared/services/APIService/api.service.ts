@@ -22,6 +22,7 @@ export class ApiService {
     private _appConfigService: AppConfigService
   ) { }
 
+  private states: any[];
 
   /**
    * Logs a user into the API.

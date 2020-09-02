@@ -18,7 +18,6 @@
               </button>
             </label>
             <select formControlName = "state" id="state" name="state" class="form-control" (change)="selectStateChange($event)">
-              <option value="0">---</option>
               <option
                 *ngFor="let state of electionStates"
                 [value]="state.state"
@@ -27,7 +26,7 @@
               </option>
             </select>
           </div>
-          <div class="sidebar-item">
+          <div class="sidebar-item" *ngIf="formType !== '3L'">
             <label for="electionDate">
               Election Date
               <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">
@@ -58,6 +57,33 @@
               </option>
             </select>
           </div>
+          <div class="sidebar-item" *ngIf="formType === '3L'">
+              <label for="electionDate">
+                Election Date*
+                <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">
+                  <i class="info-icon" aria-hidden="true"></i>
+                  <span class="sr-only">
+                    Click for more information
+                  </span>
+                </button>
+              </label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="election_date">
+                    <i class="calendar-icon" aria-hidden="true"></i>
+                  </span>
+                </div>
+                <input
+                  formControlName = "election_date"
+                  type="date"
+                  name="txtElectionDate"
+                  class="form-control"
+                  id="electionDate"
+                  [value]="electionDate"
+                  (change)="selectElectionDateChange($event)"
+                />
+              </div>
+            </div>
         </ng-container>
         <div class="sidebar-item">
           <label for="dateFrom"
@@ -114,6 +140,29 @@
             />
           </div>
         </div>
+        <ng-container *ngIf="selectedReport && (selectedReport['semi-annual_dates'] || selectedReport['semi-annual_dates_optional'])">
+          <div class="sidebar-item py-3">
+            <label for="dateTo">
+              Semi-annual Dates<span *ngIf="!selectedReport['semi-annual_dates_optional']">*</span>
+              <button type="button" class="btn-info" ngbTooltip="Language will be provided by RAD">
+                <i class="info-icon" aria-hidden="true"></i>
+                <span class="sr-only">
+                  Click for more information
+                </span>
+              </button>
+            </label>
+            <div class="input-group">
+              <div class="py-2">
+                <input formControlName="semiAnnualDatesOption"  id="firstHalf" type="radio" value="0" (change)="semiAnnualDateChange($event)"> 
+                {{selectedReport['semi-annual_dates'][0].start_date | date : 'MM/dd/yyyy'}} - {{selectedReport['semi-annual_dates'][0].end_date | date : 'MM/dd/yyyy'}}
+              </div>
+              <div class="py-2">
+                <input formControlName="semiAnnualDatesOption"  id="secondHalf" type="radio" value="1" (change)="semiAnnualDateChange($event)">
+                {{selectedReport['semi-annual_dates'][1].start_date | date : 'MM/dd/yyyy'}} - {{selectedReport['semi-annual_dates'][1].end_date | date : 'MM/dd/yyyy'}}
+              </div>
+            </div>
+          </div>
+        </ng-container>
       </div>
     </form>
   </section>

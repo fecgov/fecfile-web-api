@@ -32,7 +32,7 @@ export class TransactionTypeService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    params = params.append('form_type', 'F3X');
+    params = params.append('form_type', formType);
 
     let cmteTypeCategory = '';
     if (localStorage.getItem('committee_details') !== null) {
