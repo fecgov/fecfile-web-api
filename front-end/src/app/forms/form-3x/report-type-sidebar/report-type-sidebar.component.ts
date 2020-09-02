@@ -167,7 +167,7 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
       }
     }
     
-    this.changeDataBasedOnSelectedReport();
+    this.changeDataBasedOnSelectedReport(); 
     
     //this is being done only the first time the form loads for edit flow since ngONChange is resetting the value so setting it back.
     //TODO - there is a small bug in this that needs to be fixed for default reports (August and October) 
