@@ -2787,15 +2787,16 @@ def trash_restore_transactions(request):
                         # Handling aggregate update for sched_A transactions
                         if transaction_id[:2] == "SA":
                             datum = get_list_schedA(report_id, cmte_id, transaction_id, True)[0]
-                            update_linenumber_aggamt_transactions_SA(
-                                datetime.datetime.strptime(
-                                    datum.get("contribution_date"), "%Y-%m-%d"
-                                ).date(),
-                                datum.get("transaction_type_identifier"),
-                                datum.get("entity_id"),
-                                datum.get("cmte_id"),
-                                datum.get("report_id"),
-                            )
+                            if datum.get("transaction_type_identifier") not in ['IND_BNDLR','REG_ORG_BNDLR']:
+                                update_linenumber_aggamt_transactions_SA(
+                                    datetime.datetime.strptime(
+                                        datum.get("contribution_date"), "%Y-%m-%d"
+                                    ).date(),
+                                    datum.get("transaction_type_identifier"),
+                                    datum.get("entity_id"),
+                                    datum.get("cmte_id"),
+                                    datum.get("report_id"),
+                                )
                             # Deleting/Restoring auto generated transactions for Schedule A
                             if _delete == "Y" or (
                                 _delete != "Y"
@@ -2902,15 +2903,16 @@ def trash_restore_transactions(request):
                                     )
                                 )
                             # datum = get_list_schedB(report_id, cmte_id, transaction_id, True)[0]
-                            update_schedB_aggamt_transactions(
-                                datetime.datetime.strptime(
-                                    datum.get("expenditure_date"), "%Y-%m-%d"
-                                ).date(),
-                                datum.get("transaction_type_identifier"),
-                                datum.get("entity_id"),
-                                datum.get("cmte_id"),
-                                datum.get("report_id"),
-                            )
+                            if datum["transaction_type_identifier"] not in ['IND_REFUND','REG_ORG_REFUND']:
+                                update_schedB_aggamt_transactions(
+                                    datetime.datetime.strptime(
+                                        datum.get("expenditure_date"), "%Y-%m-%d"
+                                    ).date(),
+                                    datum.get("transaction_type_identifier"),
+                                    datum.get("entity_id"),
+                                    datum.get("cmte_id"),
+                                    datum.get("report_id"),
+                                )
                             if datum["transaction_type_identifier"] in [
                                 "OPEXP_HQ_ACC_REG_REF",
                                 "OPEXP_HQ_ACC_IND_REF",
