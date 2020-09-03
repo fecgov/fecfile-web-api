@@ -1,0 +1,197 @@
+@import '../../../../shared/scss/global';
+
+.individual-receipt-container {
+  padding-right: 10px;
+  .row {
+    margin-left: 0;
+    margin-right: 0;
+    .col-md-4,
+    .col-lg-4 {
+      flex: 0 0 28.33333333%;
+      max-width: 28.33333333%;
+    }
+  }
+  form {
+    margin-bottom: 15px;
+    header {
+      .header-content {
+        display: block;
+        margin: 0 auto;
+        width: 96%;
+        h1 {
+          font-family: sans-serif;
+        }
+        @include clearfix();
+        .btn-options {
+          color: $shuttleGray;
+          text-decoration: none;
+          &:hover,
+          &:visited,
+          &:active {
+            color: $shuttleGray;
+            text-decoration: none;
+          }
+        }
+        .dropdown-toggle {
+          &:after {
+            display: none;
+          }
+        }
+        .dropdown-menu {
+          min-width: 0px !important;
+          &.show {
+            .dropdown-item {
+              &:focus,
+              &:hover,
+              &:active,
+              &:visited {
+                background-color: $white;
+                color: $black;
+                cursor: pointer;
+                outline: none;
+              }
+              &:hover {
+                text-decoration: underline;
+              }
+            }
+          }
+        }
+      }
+      @include clearfix();
+    }
+    section {
+      .content {
+        min-height: 100vh;
+        position: relative;
+      }
+      .row {
+        margin-bottom: 20px;
+        .forms__candidate-title {
+          font-size: 1.25em;
+          font-family: sans-serif;
+          font-weight: bold;
+        }
+        .col {
+          &.info-text {
+            padding-top: 45px;
+          }
+          &.fieldset {
+            font-size: 1.5rem;
+            font-family: sans-serif;
+            font-weight: bold;
+          }
+          &.childForm {
+            padding-top: 30px;
+          }
+          label {
+            display: block;
+            padding-bottom: 0.75em;
+          }
+          textarea {
+            &.form-control {
+              overflow: scroll;
+              width: 400px;
+            }
+          }
+          .forms__big_checkbox {
+            -webkit-transform: scale(1.9);
+            -ms-transform: scale(1.9); /* IE */
+            -moz-transform: scale(1.9); /* FF */
+            -webkit-transform: scale(1.9); /* Safari and Chrome */
+            -o-transform: scale(1.9); /* Opera */
+            margin: 10px;
+          }
+          label {
+            font-family: sans-serif;
+            font-size: 1rem;
+          }
+          .input-group-prepend {
+            .input-group-text {
+              color: $blueZodiac;
+            }
+          }
+          .ng-select.forms__select {
+            &.forms__select-error {
+              .ng-select-container {
+                border: 1px solid $red;
+              }
+            }
+            .ng-select-container {
+              height: 45px;
+            }
+          }
+          .ng-dropdown-panel {
+            .ng-dropdown-panel-items {
+              .ng-option {
+                &.ng-option-marked {
+                  background-color: $mercury;
+                }
+              }
+            }
+          }
+        }
+      }
+      .forms__btn-container {
+        margin: 0 auto;
+        padding: 0;
+        width: 80%;
+        #jfMemoDropdown {
+          &:after {
+            display: none;
+          }
+        }
+        #jfMemoDropdown {
+          width: 16em;
+        }
+        #jfMemoDropdown-menu {
+          min-width: 16em;
+          left: 0 !important;
+        }
+        @include media(tablet) {
+          margin: 0;
+          padding: 0;
+          width: 95%;
+        }
+        @include media(mediumDesktop) {
+          width: 95%;
+          .btn-right {
+            margin-right: 20px;
+          }
+        }
+        @include media(largeDesktop) {
+          width: 95%;
+          .btn-right {
+            margin-right: 20px;
+          }
+        }
+        @include clearfix();
+      }
+    }
+  }
+
+  footer {
+    .forms__btn-container {
+      margin: 0 auto;
+      padding: 0;
+      width: 80%;
+      @include media(tablet) {
+        margin: 0;
+        padding: 0;
+        width: 95%;
+      }
+      @include media(mediumDesktop) {
+        width: 95%;
+        .btn-right {
+          margin-right: 20px;
+        }
+      }
+      @include media(largeDesktop) {
+        width: 95%;
+        .btn-right {
+          margin-right: 20px;
+        }
+      }
+      @include clearfix();
+    }
+  }
+}

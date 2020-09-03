@@ -213,27 +213,20 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
   getTitleAndFormTypeByRouteParam(formType: string) {
     switch(formType){
 
-      case '24':
-        if(localStorage.getItem('form_24_report_type')){
-          const reportObj: any = JSON.parse(localStorage.getItem('form_24_report_type'));
-          this.formTitle = `Form 24 / ${reportObj.reporttype} (${reportObj.reporttypedescription})  `;
-        }
-        if(!this.formType){
-          this.formType = '24';
-        }
-        break;
       case '3X':
-        if(localStorage.getItem('form_3X_report_type')){
-          const reportObj: any = JSON.parse(localStorage.getItem('form_3X_report_type'));
-          this.formTitle = `Form 3X / ${reportObj.reporttype} (${reportObj.reporttypedescription})  `;
+      case '24':
+      case '3L':
+        if(localStorage.getItem(`form_${formType}_report_type`)){
+          const reportObj: any = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+          this.formTitle = `Form ${formType} / ${reportObj.reporttype} (${reportObj.reporttypedescription})  `;
         }
         if(!this.formType){
-          this.formType = '3X';
+          this.formType = formType;
         }
         break;
       case '99':
         if(localStorage.getItem('form_99_details')){
-          const reportObj: any = JSON.parse(localStorage.getItem('form_99_details'));
+          // const reportObj: any = JSON.parse(localStorage.getItem('form_99_details'));
           this.formTitle = 'Form 99 / Miscellaneous Reports to the FEC';
         }
         if(!this.formType){
@@ -627,7 +620,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
   public previous(){
     if (this.formType === '99') {
       this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: {step:'step_3'}, queryParamsHandling:'merge'});
-    } else if (this.formType === '3X' || this.formType === '24') {
+    } else if (this.formType === '3X' || this.formType === '24' || this.formType === '3L') {
       this._router.navigate([`/forms/form/${this.formType}`], { queryParams: { step: 'step_2', edit: this.editMode }, queryParamsHandling:'merge' });
     }
   }

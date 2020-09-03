@@ -60,7 +60,6 @@ logger = logging.getLogger(__name__)
 # you need to pass in a valid decimal value: this is valid until db change happens
 list_mandatory_fields_schedB = [
     "report_id",
-    "expenditure_date",
     "expenditure_amount",
     "transaction_type_identifier",
     "entity_type",

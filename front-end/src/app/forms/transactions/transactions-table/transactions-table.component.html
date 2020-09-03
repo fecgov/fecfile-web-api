@@ -1,32 +1,32 @@
 <div class="transactions__table-container">
   <div class="grid-row">
-    <nav class="navbar navbar-light width-100">
+    <nav class="navbar navbar-light width-100 justify-content-start">
       <button *ngIf = "showReceiptsTab" [ngClass]="{
                                     'btn btn-primary': transactionCategory === 'receipts',
                                     'btn btn-secondary-gray': transactionCategory !== 'receipts'
                                   }" class="btn-lg width-25" type="button"
         (click)="changeTransactionCategory('receipts')">
-        Receipts
+        {{receiptsLabel}}
       </button>
       <button  *ngIf = "showDisbursementsTab" [ngClass]="{
                             'btn btn-primary': transactionCategory === 'disbursements',
                             'btn btn-secondary-gray': transactionCategory !== 'disbursements'
                           }" class="btn-lg width-25" type="button"
         (click)="changeTransactionCategory('disbursements')">
-        Disbursements
+        {{disbursementsLabel}}
       </button>
       <button *ngIf = "showLoansTab" [ngClass]="{
                             'btn btn-primary': transactionCategory === 'loans-and-debts',
                             'btn btn-secondary-gray': transactionCategory !== 'loans-and-debts'
                           }" class="btn-lg width-25" type="button"
         (click)="changeTransactionCategory('loans-and-debts')">
-        Loans and Debts
+        {{loansLabel}}
       </button>
       <button *ngIf="showOthersTab" [ngClass]="{
                       'btn btn-primary': transactionCategory === 'other',
                       'btn btn-secondary-gray': transactionCategory !== 'other'
                       }" class="btn-lg width-25" type="button" (click)="changeTransactionCategory('other')">
-        Other
+        {{othersLabel}}
       </button>
     </nav>
   </div>

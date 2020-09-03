@@ -272,6 +272,11 @@ def get_transaction_categories(request):
             forms_obj = {}
             form_type = request.query_params.get("form_type")
 
+            # if(form_type == 'F3L'):
+            #     with open('./fecfiler/core/f3l_transaction_categories.json') as f:
+            #         data = json.load(f)
+            #     return Response(data, status=status.HTTP_200_OK)
+
             if (
                     "cmte_type_category" in request.query_params
                     and request.query_params.get("cmte_type_category")
@@ -538,6 +543,12 @@ def get_dynamic_forms_fields(request):
     cmte_id = get_comittee_id(request.user.username)
     form_type = request.query_params.get("form_type")
     transaction_type = request.query_params.get("transaction_type")
+
+    # if form_type == 'F3L' and transaction_type not in("", "", None, " ", "None", "null"):
+    #     with open('./fecfiler/core/f3l_dynamic_forms_json/ind_bndlr.json') as f:
+    #         data = json.load(f)
+    #     return Response(data, status=status.HTTP_200_OK)
+
     if "reportId" in request.query_params and request.query_params.get(
             "reportId"
     ) not in ("", "", None, " ", "None", "null"):
@@ -669,7 +680,7 @@ REPORTS API- CORE APP - SPRINT 7 - FNE 555 - BY PRAVEEN JINKA
 
 
 def check_form_type(form_type):
-    form_list = ["F3X", "F24"]
+    form_list = ["F3X", "F24", "F3L"]
 
     if not (form_type in form_list):
         raise Exception(
@@ -888,6 +899,8 @@ def post_sql_report(
         email_2,
         additional_email_1,
         additional_email_2,
+        semi_annual_start_date,
+        semi_annual_end_date
 ):
     try:
         with connection.cursor() as cursor:
@@ -895,8 +908,9 @@ def post_sql_report(
             cursor.execute(
                 """INSERT INTO public.reports (report_id, cmte_id, form_type, amend_ind, amend_number, 
                     report_type, cvg_start_date, cvg_end_date, status, due_date, email_1, email_2, 
-                    additional_email_1, additional_email_2, create_date, last_update_date)
-                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    additional_email_1, additional_email_2, semi_annual_start_date, semi_annual_end_date, 
+                    create_date, last_update_date)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 [
                     report_id,
                     cmte_id,
@@ -912,6 +926,8 @@ def post_sql_report(
                     email_2,
                     additional_email_1,
                     additional_email_2,
+                    semi_annual_start_date,
+                    semi_annual_end_date,
                     datetime.datetime.now(),
                     datetime.datetime.now()
                 ],
@@ -933,6 +949,8 @@ def get_list_all_report(cmte_id):
             amend_number, 
             cvg_start_date, 
             cvg_end_date, 
+            semi_annual_start_date,
+            semi_annual_end_date,
             due_date, 
             superceded_report_id, 
             previous_report_id, 
@@ -993,6 +1011,8 @@ def get_list_report(report_id, cmte_id):
                                         email_2            AS    email2, 
                                         additional_email_1 AS    additionalemail1, 
                                         additional_email_2 AS    additionalemail2, 
+                                        semi_annual_start_date,
+                                        semi_annual_end_date,
                                         ( 
                                                 SELECT 
                                                         CASE 
@@ -1037,6 +1057,8 @@ def put_sql_report(
         email_2,
         additional_email_1,
         additional_email_2,
+        semi_annual_start_date,
+        semi_annual_end_date,
         status,
         report_id,
         cmte_id,
@@ -1049,7 +1071,10 @@ def put_sql_report(
 
             if status == "Saved":
                 cursor.execute(
-                    """UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                    """UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, 
+                    email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, 
+                    semi_annual_start_date = %s, semi_annual_end_date = %s,status = %s 
+                    WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                     [
                         report_type,
                         cvg_start_dt,
@@ -1059,6 +1084,8 @@ def put_sql_report(
                         email_2,
                         additional_email_1,
                         additional_email_2,
+                        semi_annual_start_date,
+                        semi_annual_end_date,
                         status,
                         report_id,
                         cmte_id,
@@ -1070,7 +1097,11 @@ def put_sql_report(
                 # print(status)
                 # print(report_type)
                 cursor.execute(
-                    """UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, status = %s, filed_date = last_update_date WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
+                    """UPDATE public.reports SET report_type = %s, cvg_start_date = %s, cvg_end_date = %s,  due_date = %s, 
+                    email_1 = %s,  email_2 = %s,  additional_email_1 = %s,  additional_email_2 = %s, 
+                    semi_annual_start_date = %s, semi_annual_end_date = %s,
+                    status = %s, filed_date = last_update_date 
+                    WHERE report_id = %s AND cmte_id = %s AND delete_ind is distinct from 'Y'""",
                     [
                         report_type,
                         cvg_start_dt,
@@ -1080,6 +1111,8 @@ def put_sql_report(
                         email_2,
                         additional_email_1,
                         additional_email_2,
+                        semi_annual_start_date,
+                        semi_annual_end_date,
                         status,
                         report_id,
                         cmte_id,
@@ -1301,6 +1334,8 @@ def post_reports(data, reportid=None):
                     data.get("email_2"),
                     data.get("additional_email_1"),
                     data.get("additional_email_2"),
+                    data.get("semi_annual_start_date"),
+                    data.get("semi_annual_end_date"),
                 )
 
             except Exception as e:
@@ -1334,6 +1369,14 @@ def post_reports(data, reportid=None):
                         report_id,
                         data.get("cmte_id"),
                         )
+                elif data.get("form_type") == "F3L":
+                    post_sql_form3l(
+                        report_id,
+                        data.get("cmte_id"),
+                        data.get("date_of_election"),
+                        data.get("state_of_election"),
+                        )
+
                 # print('here4')
             except Exception as e:
                 # Resetting Report ID
@@ -1404,6 +1447,8 @@ def put_reports(data):
                 data.get("email_2"),
                 data.get("additional_email_1"),
                 data.get("additional_email_2"),
+                data.get("semi_annual_start_date"),
+                data.get("semi_annual_end_date"),
                 data.get("status"),
                 data.get("report_id"),
                 cmte_id,
@@ -1427,8 +1472,15 @@ def put_reports(data):
                         data.get("report_id"),
                         cmte_id,
                     )
-                update_transactions_change_cvg_dates(cmte_id, report_id, data.get("cvg_start_dt"), prev_cvg_start_dt)
-                update_transactions_change_cvg_dates(cmte_id, report_id, prev_cvg_end_dt, data.get("cvg_end_dt"))
+                    update_transactions_change_cvg_dates(cmte_id, report_id, data.get("cvg_start_dt"), prev_cvg_start_dt)
+                    update_transactions_change_cvg_dates(cmte_id, report_id, prev_cvg_end_dt, data.get("cvg_end_dt"))
+                elif data.get("form_type") == "F3L":
+                    put_sql_form3l(
+                        data.get("report_id"),
+                        cmte_id,
+                        data.get('election_date'),
+                        data.get('election_state')
+                        )
             except Exception as e:
                 put_sql_report(
                     prev_report_type,
@@ -1439,6 +1491,8 @@ def put_reports(data):
                     data.get("email_2"),
                     data.get("additional_email_1"),
                     data.get("additional_email_2"),
+                    data.get("semi_annual_start_date"),
+                    data.get("semi_annual_end_date"),
                     data.get("status"),
                     data.get("report_id"),
                     cmte_id,
@@ -1976,6 +2030,12 @@ def reports(request):
                       "additional_email_1": additional_email_1,
                       "additional_email_2": additional_email_2,
                   }
+
+                datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
+                datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
+                datum['election_date'] = date_format(request.data.get('election_date')) if request.data.get('election_date') else None
+                datum['election_state'] = request.data.get('election_state') if request.data.get('election_state') else None
+
                 data = post_reports(datum)
                 if type(data) is dict:
                     if datum.get("form_type") == "F3X":
@@ -2096,6 +2156,11 @@ def reports(request):
 
                 if "election_code" in request.data:
                     datum["election_code"] = request.data.get("election_code")
+                
+                datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
+                datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
+                datum['election_date'] = date_format(request.data.get('election_date')) if request.data.get('election_date') else None
+                datum['election_state'] = request.data.get('election_state') if request.data.get('election_state') else None
 
                 data = put_reports(datum)
                 orphanedTransactionsExist = count_orphaned_transactions(request.data.get("report_id"), cmte_id)
@@ -6322,18 +6387,19 @@ def get_report_info(request):
                     # GET all rows from Reports table
 
                     query_string = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode, 
-                                        rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
-                                        rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState, 
-                                        x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
-                                        rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
-                                         (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
-                                         email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
-                                         additional_email_2 as additionalEmail2, 
-                                         (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue,
-                                         rp.status AS reportStatus
+                                      rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
+                                      rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState, 
+                                      x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
+                                      rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
+                                      (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
+                                      email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
+                                      additional_email_2 as additionalEmail2, 
+                                      (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue,
+                                      rp.status AS reportStatus, rp.semi_annual_start_date, rp.semi_annual_end_date, f3l.election_date, f3l.election_state
                                       FROM public.reports rp 
                                       LEFT JOIN form_3x x ON rp.report_id = x.report_id
                                       LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
+                                      LEFT JOIN public.form_3l f3l ON f3l.report_id = rp.report_id
                                       WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id = %s AND rp.report_id = %s"""
                     # print("query_string", query_string)
 
@@ -8280,6 +8346,17 @@ def trash_restore_sql_report(cmte_id, report_id, _delete="Y"):
                         _delete, datetime.datetime.now(), cmte_id, report_id
                     )
                 )
+            if report_type == "F3L":
+                 cursor.execute(
+                    """UPDATE public.reports SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(
+                        _delete, datetime.datetime.now(), cmte_id, report_id
+                    )
+                )
+                 cursor.execute(
+                    """UPDATE public.form_3l SET delete_ind = '{}', last_update_date = '{}' WHERE cmte_id = '{}' AND report_id = '{}'  """.format(
+                        _delete, datetime.datetime.now(), cmte_id, report_id
+                    )
+                )
             if report_type == "F3X":
                 # form 3X report
                 cursor.execute(
@@ -9090,6 +9167,10 @@ def create_amended(reportid):
                 data["cvg_end_dt"] = datetime.datetime.strptime(
                     data["cvg_end_date"], "%Y-%m-%d"
                 ).date()
+                if data.get('semi_annual_start_date'):
+                    data['semi_annual_start_date'] = datetime.datetime.strptime(data.get('semi_annual_start_date'), "%Y-%m-%d").date()
+                if data.get('semi_annual_end_date'):
+                    data['semi_annual_end_date'] = datetime.datetime.strptime(data.get('semi_annual_end_date'), "%Y-%m-%d").date()
                 # print('just before post_reports')
                 created_data = post_reports(data, reportid)
                 if type(created_data) is list:
@@ -10850,7 +10931,53 @@ def post_sql_form24(
     except Exception:
         raise
 
+def post_sql_form3l(
+        report_id,
+        cmte_id,
+        election_date,
+        election_state
+):
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into Form 24 table
+            cursor.execute(
+                """INSERT INTO public.form_3l (report_id, cmte_id, election_date, election_state, create_date, last_update_date)
+                                            VALUES (%s,%s,%s,%s,%s,%s)""",
+                [
+                    report_id,
+                    cmte_id,
+                    election_date,
+                    election_state,
+                    datetime.datetime.now(),
+                    datetime.datetime.now()
+                ],
+            )
+    except Exception:
+        raise
 
+
+def put_sql_form3l(
+        report_id,
+        cmte_id,
+        election_date,
+        election_state
+):
+    try:
+        with connection.cursor() as cursor:
+            # Insert data into Form 24 table
+            cursor.execute(
+                """UPDATE public.form_24 SET election_date=%s, election_state=%s, last_update_date=%s WHERE report_id=%s, cmte_id=%s)""",
+                [
+                    election_date,
+                    election_state,
+                    datetime.datetime.now(),
+                    report_id,
+                    cmte_id
+                ],
+            )
+    except Exception:
+        raise
+                        
 def find_form_type(report_id, cmte_id):
     """
     load form type based on report_id and cmte_id

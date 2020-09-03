@@ -1081,7 +1081,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "12G",
@@ -1092,7 +1105,20 @@
             "cvg_start_date": "EFO",
             "cvg_end_date": "EFO",
             "due_date": "EFO",
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "12P",
@@ -1103,7 +1129,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "12R",
@@ -1114,7 +1153,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "12S",
@@ -1125,7 +1177,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "30G",
@@ -1136,7 +1201,20 @@
             "cvg_start_date": "EFO",
             "cvg_end_date": "EFO",
             "due_date": "EFO",
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "30R",
@@ -1147,7 +1225,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "30S",
@@ -1158,7 +1249,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           }
         ]
       },
@@ -1283,7 +1387,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "12G",
@@ -1294,7 +1411,20 @@
             "cvg_start_date": "EFO",
             "cvg_end_date": "EFO",
             "due_date": "EFO",
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "12P",
@@ -1305,7 +1435,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "12R",
@@ -1316,7 +1459,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "12S",
@@ -1327,7 +1483,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "30G",
@@ -1338,7 +1507,20 @@
             "cvg_start_date": "EFO",
             "cvg_end_date": "EFO",
             "due_date": "EFO",
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "30R",
@@ -1349,7 +1531,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           },
           {
             "report_type": "30S",
@@ -1360,7 +1555,20 @@
             "cvg_start_date": null,
             "cvg_end_date": null,
             "due_date": null,
-            "semi-annual_dates_optional": true
+            
+"semi-annual_dates_optional": true, 
+"semi-annual_dates": [
+              {
+                "start_date": "YYYY-01-01",
+                "end_date": "YYYY-06-30",
+                "selected": false
+              },
+              {
+                "start_date": "YYYY-07-01",
+                "end_date": "YYYY-12-31",
+                "selected": false
+              }
+            ]
           }
         ]
       },

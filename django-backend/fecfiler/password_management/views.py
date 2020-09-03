@@ -271,10 +271,7 @@ def authenticate_password(request):
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             else:
                 is_allowed = True
-                # last_time = user_list["updated_at"]
-                # last_time_obj = datetime.strptime(last_time, '"%m-%d-%Y %T')
-                # upper_limit = last_time_obj + timedelta(minutes=30)
-                # print(upper_limit > datetime.now())
+
                 token = create_jwt_token(email, cmte_id)
                 response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
                             'email': email, 'token': token}

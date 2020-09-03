@@ -1,3 +1,4 @@
+import { UtilService } from 'src/app/shared/utils/util.service';
 import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -127,8 +128,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private _receiptService: IndividualReceiptService,
     private _messageService: MessageService,
     private _dialogService: DialogService,
-    private _reportsService: ReportsService
+    private _reportsService: ReportsService, 
+    private _utilService: UtilService
   ) {
+
+    this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.applyFiltersSubscription = this._transactionsMessageService
       .getApplyFiltersMessage()
       .subscribe((message: any) => {
@@ -184,7 +188,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       });
 
       this.activatedRouteSubscription = _activatedRoute.queryParams.subscribe(p => {
-        this.transactionCategory = p.transactionCategory;
+        this.transactionCategory = this._utilService.convertTransactionCategoryByForm(p.transactionCategory,this.formType);
+        
       });
 
     this.viewTransactionSubscription = this._transactionsMessageService
@@ -212,7 +217,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
    */
   public ngOnInit(): void {
     this.showEditTransaction = false;
-    this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    // this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     this.reportId = this._activatedRoute.snapshot.paramMap.get('report_id');
     const reportIdRoute = this._activatedRoute.snapshot.paramMap.get('report_id');
     this._step = this._activatedRoute.snapshot.paramMap.get('step');
@@ -225,7 +230,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
     localStorage.removeItem(`form_${this.formType}_view_transaction_screen`);
 
-    this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
+    this._transactionTypeService.getTransactionCategories("F"+this.formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
 
