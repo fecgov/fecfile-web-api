@@ -506,12 +506,12 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
         this._messageService.sendMessage({action:'showStep5', data: res});
       });
     }
-    else if(this.formType === '3X' || this.formType === '99' || this.formType === '24'){
-      this.submit3xOr99Or24();
+    else if(this.formType === '3X' || this.formType === '99' || this.formType === '24' || this.formType === '3L'){
+      this.submitForms();
     }
   }
 
-  public submit3xOr99Or24(): void {
+  public submitForms(): void {
     if (this.editMode) {
       if (this.formType === '99') {
         this._formsService.Signee_SaveForm({}, this.formType).subscribe(
@@ -540,7 +540,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
             console.error(error);
           }
         );
-      } else if (this.formType === '3X' || this.formType === '24') {
+      } else if (this.formType === '3X' || this.formType === '24' || this.formType === '3L') {
         this._reportTypeService.signandSaveSubmitReport(this.formType, 'Submitted').subscribe(res => {
           if (res) {
             const frmSaved: any = {
@@ -576,7 +576,7 @@ export class SignAndSubmitComponent implements OnInit, OnDestroy{
         });
       }
     } else {
-      if (this.formType === '3X' || this.formType === '24') {
+      if (this.formType === '3X' || this.formType === '24' || this.formType === '3L') {
         this._dialogService
           .confirm(
             'This report has been filed with the FEC. If you want to change, you must Amend the report',

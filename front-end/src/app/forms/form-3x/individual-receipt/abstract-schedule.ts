@@ -118,6 +118,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
   protected _prePopulateFromSchedHData: any;
   protected _prePopulateFromSchedPARTNData: any;
   protected _maxChildAmount: string = null;
+  public displayMonthlyQuarterlyThresholdWarning: boolean = false;
+  public displaySemiAnnualThresholdWarning: boolean = false;
   /**
    * For toggling between 2 screens of Sched F Debt Payment.
    */
@@ -2624,6 +2626,8 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     this.activityEventNames = null;
     this.reattributionTransactionId = null;
     this.redesignationTransactionId = null;
+    this.displayMonthlyQuarterlyThresholdWarning = false;
+    this.displaySemiAnnualThresholdWarning = false;
   }
 
   _prepopulateDefaultPurposeText() {
