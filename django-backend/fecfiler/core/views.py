@@ -4223,9 +4223,11 @@ def get_transactions(request, transaction_id):
     if ctgry_type == "disbursements_tran":
         parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
         param_string += """ AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(""" + parent_transaction_id + """, 'NONE') 
-            OR transaction_type_identifier in ('IK_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT','PARTY_IK_OUT','PAC_IK_OUT')"""
+            OR transaction_type_identifier in ('IK_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT','PARTY_IK_OUT','PAC_IK_OUT'"""
         if transaction_id is not None:
-            param_string += " OR  transaction_id = '" + transaction_id + "'"
+            param_string += ") OR  transaction_id = '" + transaction_id + "'"
+        else:
+            param_string += ",'FEA_100PCT_DEBT_PAY','OPEXP_DEBT','OTH_DISB_DEBT','IE_B4_DISSE','COEXP_PARTY_DEBT','LOAN_REPAY_MADE','LOANS_MADE')"
         param_string += " ) "
 
     filters_post = request.data.get("filters", {})
@@ -4264,7 +4266,7 @@ def get_transactions(request, transaction_id):
     #    trans_query_string = "(" + trans_query_string + ") UNION (" + trans_query_string[0:trans_query_string.index(" from ")] + " from ( SELECT W.* FROM (" + trans_query_string + ") V join " + get_trans_view_name(ctgry_type) + " W on V.transaction_id = W.back_ref_transaction_id) Z)"
 
     with connection.cursor() as cursor:
-        logger.debug('query all transactions with sql:{}'.format(trans_query_string))
+        # logger.debug('query all transactions with sql:{}'.format(trans_query_string))
         cursor.execute(
             """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
         )
@@ -4341,6 +4343,7 @@ def get_transactions(request, transaction_id):
         )
         row1=cursor.fetchone()[0]
         totalcount =  row1[0]['count']
+        print(totalcount)
     
     # logger.debug(output_list)
 #: tweak the query to get the transactions count as per page
@@ -4366,7 +4369,7 @@ def get_transactions(request, transaction_id):
         "pageNumber": page_num,
         "totalPages": numofpages,
     }
-    #print("""aaaaaaaaa""")     
+    print(json_result)
 
     if total_amount:
         json_result["totalAmount"] = total_amount
@@ -4377,24 +4380,31 @@ def get_transactions(request, transaction_id):
 def get_all_transactions(request):
     try:
         json_result, status_value = get_transactions(request, None)
-
-        # Add child transactions
-        transactions = json_result["transactions"].copy()
-        offset = 0
-        for i in range(len(transactions)):
-            j = i + offset
+        if request.data.get("category_type") != 'loans_tran':
+            # Add child transactions
+            transactions = json_result["transactions"].copy()
             offset = 0
+            for i in range(len(transactions)):
+                j = i + offset
+                offset = 0
 
-            transaction = transactions[i]
-            if transaction["haschild"]:
-                transaction_id = transaction["transaction_id"]
-                c_json_result, c_status_value = get_transactions(request, transaction_id)
-                c_transactions = c_json_result["transactions"]
-                if len(c_transactions) > 0:
-                    del json_result["transactions"][j]
-                    json_result["transactions"][j:j] = c_transactions
-                    offset = len(c_transactions) - 1
-
+                transaction = transactions[i]
+                if transaction["haschild"]:
+                    transaction_id = transaction["transaction_id"]
+                    c_json_result, c_status_value = get_transactions(request, transaction_id)
+                    c_transactions = c_json_result["transactions"]
+                    if len(c_transactions) > 0:
+                        del json_result["transactions"][j]
+                        json_result["transactions"][j:j] = c_transactions
+                        offset = len(c_transactions) - 1
+        # Removing duplicates from the list
+        # transaction_id_list=[]
+        # for i,transaction in enumerate(json_result.get('transactions')):
+        #     if transaction.get('transaction_id') in transaction_id_list:
+        #         del json_result["transactions"][i]
+        #     else:
+        #         transaction_id_list.append(transaction.get('transaction_id'))
+        print(json_result)
         return Response(json_result, status=status_value)
     except Exception as e:
         print(e)
@@ -5676,55 +5686,36 @@ def get_summary_table(request):
         ):
             raise Exception("Missing Input: calendar_year is mandatory")
 
+        form_type = request.query_params.get("form_type", 'F3X')
         report_id = check_report_id(request.query_params.get("report_id"))
-        # calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
-        # logger.debug(
-        #     "query_params: report_id {}, calendar_year {}".format(
-        #         report_id, calendar_year
-        #     )
-        # )
-        # cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        # period_args = [
-        #     datetime.date(int(calendar_year), 1, 1),
-        #     # datetime.date(int(calendar_year), 12, 31),
-        #     cvg_end_date,
-        #     cmte_id,
-        #     report_id,
-        # ]
-        # logger.debug("period_args:{}".format(period_args))
+        if form_type == 'F3X':
+            output_dict = get_F3X_data(cmte_id, report_id)
+            period_receipt = summary_receipts_for_sumamry_table(output_dict)
+            period_disbursement = summary_disbursements_for_sumamry_table(output_dict)
 
-        # logger.debug("load receipts and disbursements...")
-        output_dict = get_F3X_data(cmte_id, report_id)
-        period_receipt = summary_receipts_for_sumamry_table(output_dict)
-        period_disbursement = summary_disbursements_for_sumamry_table(output_dict)
+            cash_summary = {
+                "COH AS OF JANUARY 1": output_dict.get('coh_begin_calendar_yr',0.0),
+                "BEGINNING CASH ON HAND": output_dict.get('coh_bop',0.0),
+                "ENDING CASH ON HAND": output_dict.get('coh_cop',0.0),
+            }
+            logger.debug("cash summary:{}".format(cash_summary))
 
-        """
-        calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
-        calendar_receipt = summary_receipts(calendar_args)
-        calendar_disbursement = summary_disbursements(calendar_args)
-        """
-        # logger.debug("load cash on hand...")
-        # coh_bop_ytd = prev_cash_on_hand_cop(report_id, cmte_id, True)
-        # coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
-        # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
+            loan_and_debts = load_loan_debt_summary(output_dict)
+            logger.debug("adding loan and debts:{}".format(loan_and_debts))
+            cash_summary.update(loan_and_debts)
+            logger.debug("adding loan and debts:{}".format(cash_summary))
 
-        cash_summary = {
-            "COH AS OF JANUARY 1": output_dict.get('coh_begin_calendar_yr',0.0),
-            "BEGINNING CASH ON HAND": output_dict.get('coh_bop',0.0),
-            "ENDING CASH ON HAND": output_dict.get('coh_cop',0.0),
-        }
-        logger.debug("cash summary:{}".format(cash_summary))
-
-        loan_and_debts = load_loan_debt_summary(output_dict)
-        logger.debug("adding loan and debts:{}".format(loan_and_debts))
-        cash_summary.update(loan_and_debts)
-        logger.debug("adding loan and debts:{}".format(cash_summary))
-
-        forms_obj = {
-            "Total Raised": {"period_receipts": period_receipt},
-            "Total Spent": {"period_disbursements": period_disbursement},
-            "Cash summary": cash_summary,
-        }
+            forms_obj = {
+                "Total Raised": {"period_receipts": period_receipt},
+                "Total Spent": {"period_disbursements": period_disbursement},
+                "Cash summary": cash_summary,
+            }
+        elif form_type == 'F3L':
+            forms_obj = {
+              "Summary": get_F3L_data(cmte_id, report_id)
+            }
+        else:
+            raise Exception('This API is implemented for only Form 3X and 3L')
         logger.debug("summary result:{}".format(forms_obj))
 
         return Response(forms_obj, status=status.HTTP_200_OK)
@@ -6145,6 +6136,28 @@ def get_F3X_data(cmte_id, report_id):
     except Exception as e:
         raise Exception(
             "The get_F3X_data function is throwing an error: " + str(e)
+        )
+
+def get_F3L_data(cmte_id, report_id):
+    try:
+        _sql = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total", 
+                        COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total" 
+                      FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND
+                      transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR')
+                      AND delete_ind IS DISTINCT FROM 'Y'"""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+            )
+            output_dict = cursor.fetchone()[0]
+            if output_dict:
+                return output_dict[0]
+            else:
+                raise Exception("""The reportId: {} for committee Id: {} does not exist in 
+          sched_a table.""".format(report_id, cmte_id))
+    except Exception as e:
+        raise Exception(
+            "The get_F3L_data function is throwing an error: " + str(e)
         )
 
 """
