@@ -5686,55 +5686,36 @@ def get_summary_table(request):
         ):
             raise Exception("Missing Input: calendar_year is mandatory")
 
+        form_type = request.query_params.get("form_type", 'F3X')
         report_id = check_report_id(request.query_params.get("report_id"))
-        # calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
-        # logger.debug(
-        #     "query_params: report_id {}, calendar_year {}".format(
-        #         report_id, calendar_year
-        #     )
-        # )
-        # cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        # period_args = [
-        #     datetime.date(int(calendar_year), 1, 1),
-        #     # datetime.date(int(calendar_year), 12, 31),
-        #     cvg_end_date,
-        #     cmte_id,
-        #     report_id,
-        # ]
-        # logger.debug("period_args:{}".format(period_args))
+        if form_type == 'F3X':
+            output_dict = get_F3X_data(cmte_id, report_id)
+            period_receipt = summary_receipts_for_sumamry_table(output_dict)
+            period_disbursement = summary_disbursements_for_sumamry_table(output_dict)
 
-        # logger.debug("load receipts and disbursements...")
-        output_dict = get_F3X_data(cmte_id, report_id)
-        period_receipt = summary_receipts_for_sumamry_table(output_dict)
-        period_disbursement = summary_disbursements_for_sumamry_table(output_dict)
+            cash_summary = {
+                "COH AS OF JANUARY 1": output_dict.get('coh_begin_calendar_yr',0.0),
+                "BEGINNING CASH ON HAND": output_dict.get('coh_bop',0.0),
+                "ENDING CASH ON HAND": output_dict.get('coh_cop',0.0),
+            }
+            logger.debug("cash summary:{}".format(cash_summary))
 
-        """
-        calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
-        calendar_receipt = summary_receipts(calendar_args)
-        calendar_disbursement = summary_disbursements(calendar_args)
-        """
-        # logger.debug("load cash on hand...")
-        # coh_bop_ytd = prev_cash_on_hand_cop(report_id, cmte_id, True)
-        # coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
-        # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
+            loan_and_debts = load_loan_debt_summary(output_dict)
+            logger.debug("adding loan and debts:{}".format(loan_and_debts))
+            cash_summary.update(loan_and_debts)
+            logger.debug("adding loan and debts:{}".format(cash_summary))
 
-        cash_summary = {
-            "COH AS OF JANUARY 1": output_dict.get('coh_begin_calendar_yr',0.0),
-            "BEGINNING CASH ON HAND": output_dict.get('coh_bop',0.0),
-            "ENDING CASH ON HAND": output_dict.get('coh_cop',0.0),
-        }
-        logger.debug("cash summary:{}".format(cash_summary))
-
-        loan_and_debts = load_loan_debt_summary(output_dict)
-        logger.debug("adding loan and debts:{}".format(loan_and_debts))
-        cash_summary.update(loan_and_debts)
-        logger.debug("adding loan and debts:{}".format(cash_summary))
-
-        forms_obj = {
-            "Total Raised": {"period_receipts": period_receipt},
-            "Total Spent": {"period_disbursements": period_disbursement},
-            "Cash summary": cash_summary,
-        }
+            forms_obj = {
+                "Total Raised": {"period_receipts": period_receipt},
+                "Total Spent": {"period_disbursements": period_disbursement},
+                "Cash summary": cash_summary,
+            }
+        elif form_type == 'F3L':
+            forms_obj = {
+              "Summary": get_F3L_data(cmte_id, report_id)
+            }
+        else:
+            raise Exception('This API is implemented for only Form 3X and 3L')
         logger.debug("summary result:{}".format(forms_obj))
 
         return Response(forms_obj, status=status.HTTP_200_OK)
@@ -6155,6 +6136,28 @@ def get_F3X_data(cmte_id, report_id):
     except Exception as e:
         raise Exception(
             "The get_F3X_data function is throwing an error: " + str(e)
+        )
+
+def get_F3L_data(cmte_id, report_id):
+    try:
+        _sql = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total", 
+                        COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total" 
+                      FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND
+                      transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR')
+                      AND delete_ind IS DISTINCT FROM 'Y'"""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+            )
+            output_dict = cursor.fetchone()[0]
+            if output_dict:
+                return output_dict[0]
+            else:
+                raise Exception("""The reportId: {} for committee Id: {} does not exist in 
+          sched_a table.""".format(report_id, cmte_id))
+    except Exception as e:
+        raise Exception(
+            "The get_F3L_data function is throwing an error: " + str(e)
         )
 
 """
