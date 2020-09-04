@@ -4223,9 +4223,11 @@ def get_transactions(request, transaction_id):
     if ctgry_type == "disbursements_tran":
         parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
         param_string += """ AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(""" + parent_transaction_id + """, 'NONE') 
-            OR transaction_type_identifier in ('IK_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT','PARTY_IK_OUT','PAC_IK_OUT')"""
+            OR transaction_type_identifier in ('IK_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT','PARTY_IK_OUT','PAC_IK_OUT'"""
         if transaction_id is not None:
-            param_string += " OR  transaction_id = '" + transaction_id + "'"
+            param_string += ") OR  transaction_id = '" + transaction_id + "'"
+        else:
+            param_string += ",'FEA_100PCT_DEBT_PAY','OPEXP_DEBT','OTH_DISB_DEBT','IE_B4_DISSE','COEXP_PARTY_DEBT','LOAN_REPAY_MADE','LOANS_MADE')"
         param_string += " ) "
 
     filters_post = request.data.get("filters", {})
@@ -4264,7 +4266,7 @@ def get_transactions(request, transaction_id):
     #    trans_query_string = "(" + trans_query_string + ") UNION (" + trans_query_string[0:trans_query_string.index(" from ")] + " from ( SELECT W.* FROM (" + trans_query_string + ") V join " + get_trans_view_name(ctgry_type) + " W on V.transaction_id = W.back_ref_transaction_id) Z)"
 
     with connection.cursor() as cursor:
-        logger.debug('query all transactions with sql:{}'.format(trans_query_string))
+        # logger.debug('query all transactions with sql:{}'.format(trans_query_string))
         cursor.execute(
             """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
         )
@@ -4341,6 +4343,7 @@ def get_transactions(request, transaction_id):
         )
         row1=cursor.fetchone()[0]
         totalcount =  row1[0]['count']
+        print(totalcount)
     
     # logger.debug(output_list)
 #: tweak the query to get the transactions count as per page
@@ -4366,7 +4369,7 @@ def get_transactions(request, transaction_id):
         "pageNumber": page_num,
         "totalPages": numofpages,
     }
-    #print("""aaaaaaaaa""")     
+    print(json_result)
 
     if total_amount:
         json_result["totalAmount"] = total_amount
@@ -4377,24 +4380,31 @@ def get_transactions(request, transaction_id):
 def get_all_transactions(request):
     try:
         json_result, status_value = get_transactions(request, None)
-
-        # Add child transactions
-        transactions = json_result["transactions"].copy()
-        offset = 0
-        for i in range(len(transactions)):
-            j = i + offset
+        if request.data.get("category_type") != 'loans_tran':
+            # Add child transactions
+            transactions = json_result["transactions"].copy()
             offset = 0
+            for i in range(len(transactions)):
+                j = i + offset
+                offset = 0
 
-            transaction = transactions[i]
-            if transaction["haschild"]:
-                transaction_id = transaction["transaction_id"]
-                c_json_result, c_status_value = get_transactions(request, transaction_id)
-                c_transactions = c_json_result["transactions"]
-                if len(c_transactions) > 0:
-                    del json_result["transactions"][j]
-                    json_result["transactions"][j:j] = c_transactions
-                    offset = len(c_transactions) - 1
-
+                transaction = transactions[i]
+                if transaction["haschild"]:
+                    transaction_id = transaction["transaction_id"]
+                    c_json_result, c_status_value = get_transactions(request, transaction_id)
+                    c_transactions = c_json_result["transactions"]
+                    if len(c_transactions) > 0:
+                        del json_result["transactions"][j]
+                        json_result["transactions"][j:j] = c_transactions
+                        offset = len(c_transactions) - 1
+        # Removing duplicates from the list
+        # transaction_id_list=[]
+        # for i,transaction in enumerate(json_result.get('transactions')):
+        #     if transaction.get('transaction_id') in transaction_id_list:
+        #         del json_result["transactions"][i]
+        #     else:
+        #         transaction_id_list.append(transaction.get('transaction_id'))
+        print(json_result)
         return Response(json_result, status=status_value)
     except Exception as e:
         print(e)

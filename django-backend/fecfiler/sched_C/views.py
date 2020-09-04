@@ -98,8 +98,7 @@ AUTO_SCHED_B_MAP = {"LOAN_OWN_TO_CMTE": "LOAN_OWN_TO_CMTE_OUT"}
 def check_transaction_id(transaction_id):
     if not (transaction_id[0:2] == "SC"):
         raise Exception(
-            "The Transaction ID: {} is not in the specified format."
-            + "Transaction IDs start with SC characters".format(transaction_id)
+            "The Transaction ID: {} is not in the specified format. Transaction IDs start with SC characters".format(transaction_id)
         )
     return transaction_id
 
@@ -627,6 +626,7 @@ def auto_generate_sched_a(data):
         data.get("transaction_type_identifier"),
         data.get("levin_account_id"),
         data.get("aggregation_ind"),
+        data.get("semi_annual_refund_bundled_amount")
     )
     logger.debug("auto-generation done.")
 
@@ -1143,6 +1143,7 @@ def schedC(request):
                 output = get_schedC(data)
                 return JsonResponse(output[0], status=status.HTTP_201_CREATED)
             except Exception as e:
+                print(e)
                 return Response(
                     "The schedC API - POST is throwing an exception: " + str(e),
                     status=status.HTTP_400_BAD_REQUEST,
