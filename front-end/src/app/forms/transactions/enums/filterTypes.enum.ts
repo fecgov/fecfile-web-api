@@ -1,6 +1,7 @@
 export enum FilterTypes {
   keyword = 'keyword',
   category = 'category',
+  semiAnnualAmount = 'semiAnnualAmount',
   amount = 'amount',
   aggregateAmount = 'aggregateAmount',
   date = 'date',

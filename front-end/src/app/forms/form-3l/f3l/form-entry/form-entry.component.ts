@@ -30,8 +30,6 @@ export class FormEntryComponent extends IndividualReceiptComponent implements On
 
   public reportDetails : any = null;
   public maximumThresholdAmount: any = null;
-  public displayMonthlyQuarterlyThresholdWarning: boolean = false;
-  public displaySemiAnnualThresholdWarning: boolean = false;
 
   constructor(_http: HttpClient,
     _fb: FormBuilder,
@@ -128,9 +126,9 @@ export class FormEntryComponent extends IndividualReceiptComponent implements On
   
 
   ngOnInit() {
-    this.maximumThresholdAmount = "19000";
     // this.reportDetails = this.mockSemiAndQuarterly();
     this.reportDetails = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+    this.maximumThresholdAmount = this.reportDetails.maximumThresholdAmount;
     super.ngOnInit();
   }
   

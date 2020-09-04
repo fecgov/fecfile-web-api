@@ -1655,11 +1655,18 @@ def reposit_f3x_data(cmte_id, report_id, form_type='F3X'):
             "sched_l",
             "form_3x",
         ]
-    else:
+    elif form_type == 'F24':
         transaction_tables = [
             "reports",
             "sched_e",
             "form_24",
+        ]
+    elif form_type == 'F3L':
+        transaction_tables = [
+            "reports",
+            "sched_a",
+            "sched_b",
+            "form_3l",
         ]
     # transaction_tables = ['sched_b']
     backend_connection = psycopg2.connect(
@@ -1847,7 +1854,7 @@ def submit_report(request):
         if not report_id:
             raise Exception()
         fec_id = report_id
-        if form_tp in ["F3X", "F24"]:
+        if form_tp in ["F3X", "F24", "F3L"]:
             update_tbl = "public.reports"
             f_id = "report_id"
         elif form_tp == "F99":
@@ -1856,7 +1863,7 @@ def submit_report(request):
         else:
             raise Exception("Error: invalid form type.")
 
-        if form_tp in ["F3X", "F24"]:
+        if form_tp in ["F3X", "F24", "F3L"]:
             _sql_update = (
                     """
                 UPDATE {}""".format(
@@ -1899,13 +1906,19 @@ def submit_report(request):
                 cursor.execute(_sql_F3X, [datetime.datetime.now(), report_id])
                 if cursor.rowcount == 0:
                     raise Exception("F3X table {} update failed".format(report_id))
+        if form_tp == "F3L":
+            _sql_F3L = """ UPDATE public.form_3l SET sign_date = %s WHERE report_id = %s"""
+            with connection.cursor() as cursor:
+                cursor.execute(_sql_F3L, [datetime.datetime.now(), report_id])
+                if cursor.rowcount == 0:
+                    raise Exception("F3L table {} update failed".format(report_id))
         if form_tp == "F24":
             _sql_F24 = """ UPDATE public.form_24 SET sign_date = %s WHERE report_id = %s"""
             with connection.cursor() as cursor:
                 cursor.execute(_sql_F24, [datetime.datetime.now(), report_id])
                 if cursor.rowcount == 0:
                     raise Exception("F24 table {} update failed".format(report_id))
-        if form_tp in ["F3X", "F24"]:
+        if form_tp in ["F3X", "F24","F3L"]:
             reposit_f3x_data(cmte_id, report_id, form_tp)
         elif form_tp == "F99":
             reposit_f99_data(cmte_id, report_id)
@@ -1930,7 +1943,7 @@ def submit_report(request):
         email(True, email_data)
         logger.debug("email success.")
 
-        if form_tp in ["F3X", "F24"]:
+        if form_tp in ["F3X", "F24", "F3L"]:
             _sql_response = """
             SELECT json_agg(t) FROM (
                 SELECT 'FEC-' || fec_id as fec_id, status, filed_date, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
