@@ -285,12 +285,15 @@ def get_transaction_categories(request):
             else:
                 cmte_type_category = "PAC"
             cursor.execute(
-                "select transaction_category_json from transaction_category_json_view where form_type = %s AND cmte_type_category = %s",
-                [form_type, cmte_type_category],
+                "select transaction_category_json from transaction_category_json_view where (%s is null or form_type = %s) AND cmte_type_category = %s",
+                [form_type, form_type, cmte_type_category],
             )
+            transactionCategories = []
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj = data_row[0]
+                transactionCategories.extend(forms_obj['data']['transactionCategories'])
+            forms_obj['data']['transactionCategories'] = transactionCategories
 
         if not bool(forms_obj):
             return Response(
@@ -347,8 +350,8 @@ def get_transaction_types(request):
             form_type = request.query_params.get("form_type")
 
             cursor.execute(
-                "select tran_identifier,tran_desc,category_type  from ref_transaction_types where form_type = %s",
-                [form_type],
+                "select tran_identifier,tran_desc,category_type  from ref_transaction_types where %s is null or form_type = %s",
+                [form_type,form_type],
             )
             rows = cursor.fetchall()
 
@@ -3647,7 +3650,7 @@ def get_trans_query(category_type, cmte_id, param_string):
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
                                 election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isredesignatable, "isRedesignation",
-                                mirror_report_id, mirror_transaction_id 
+                                mirror_report_id, mirror_transaction_id, semi_annual_refund_bundled_amount 
                                 from all_disbursements_transactions_view
                             where cmte_id='"""
                 + cmte_id
@@ -3687,7 +3690,8 @@ def get_trans_query(category_type, cmte_id, param_string):
                 """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
-                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isreattributable, "isReattribution" 
+                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isreattributable, "isReattribution", 
+                                semi_annual_refund_bundled_amount 
                                 from all_receipts_transactions_view
                             where cmte_id='"""
                 + cmte_id
@@ -3763,6 +3767,20 @@ def filter_get_all_trans(request, param_string):
                 param_string
                 + " AND aggregate_amt <= '"
                 + str(filt_dict["filterAggregateAmountMax"])
+                + "'"
+        )
+    if filt_dict.get("filterSemiAnnualAmountMin") not in [None, "null"]:
+        param_string = (
+                param_string
+                + " AND semi_annual_refund_bundled_amount >= '"
+                + str(filt_dict["filterSemiAnnualAmountMin"])
+                + "'"
+        )
+    if filt_dict.get("filterSemiAnnualAmountMax") not in [None, "null"]:
+        param_string = (
+                param_string
+                + " AND semi_annual_refund_bundled_amount <= '"
+                + str(filt_dict["filterSemiAnnualAmountMax"])
                 + "'"
         )
     if filt_dict.get("filterStates"):
@@ -4259,6 +4277,7 @@ def get_transactions(request, transaction_id):
 
     output_list = []
     total_amount = 0.0
+    totalSemiAnnualAmount = 0.0
     #: set transaction query with offsets.
     if transaction_id is None:
         trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
@@ -4315,6 +4334,7 @@ def get_transactions(request, transaction_id):
                 for tran_id, transaction in transaction_dict.items():
                     if transaction.get("memo_code") != "X":
                         total_amount += transaction.get("transaction_amount", 0.0)
+                        totalSemiAnnualAmount += transaction.get("semi_annual_refund_bundled_amount", 0.0)
                     # if transaction.get('transaction_type_identifier') in NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER:
                     #     transaction['isEditable'] = Falseet
 
@@ -4373,6 +4393,8 @@ def get_transactions(request, transaction_id):
 
     if total_amount:
         json_result["totalAmount"] = total_amount
+    if totalSemiAnnualAmount:
+        json_result["totalSemiAnnualAmount"] = totalSemiAnnualAmount
     
     return json_result, status_value
 
