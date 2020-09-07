@@ -60,7 +60,6 @@ logger = logging.getLogger(__name__)
 # you need to pass in a valid decimal value: this is valid until db change happens
 list_mandatory_fields_schedB = [
     "report_id",
-    "expenditure_date",
     "expenditure_amount",
     "transaction_type_identifier",
     "entity_type",
@@ -1731,54 +1730,55 @@ def update_schedB_aggamt_transactions(
     3/1/2018, 100, 210, 11AI (aggregate_amount > 200, update line number)
     """
     try:
-        itemization_value = 200
-        # itemized_transaction_list = []
-        # unitemized_transaction_list = []
-        form_type = find_form_type(report_id, cmte_id)
-        if isinstance(expenditure_date, str):
-            expenditure_date = date_format_agg(expenditure_date)
-        aggregate_start_date, aggregate_end_date = find_aggregate_date(
-            form_type, expenditure_date
-        )
-        # make sure transaction list comes back sorted by contribution_date ASC
-        transactions_list = list_all_sb_transactions_entity(
-            aggregate_start_date, aggregate_end_date, entity_id, cmte_id
-        )
-        aggregate_amount = 0
-        committee_type = cmte_type(cmte_id)
-        for transaction in transactions_list:
-            # checking in reports table if the delete_ind flag is false for the corresponding report
-            if transaction[5] != "Y":
-                # checking if the back_ref_transaction_id is null or not.
-                # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
-                # according to new spec, all transations need to be aggregated
-                # if transaction[7] != None or (
-                #     transaction[7] == None and
-                #     (transaction[6] != "X")
-                # ):
-                if transaction[10] != "N":
-                    aggregate_amount += transaction[0]
-                if expenditure_date <= transaction[4] or transaction[12] == 'sched_b':
-                    line_number, itemized_ind = transaction[3], transaction[11]
-                    if itemized_ind and itemized_ind.startswith(
-                        "F"
-                    ):  # forced itemize/unitemize
-                        pass
-                    else:
-                        line_number, itemized_ind = get_sb_linenumber_itemization(
-                            transaction[8],
+        if transaction_type_identifier not in ('IND_REFUND','REG_ORG_REFUND'):
+            itemization_value = 200
+            # itemized_transaction_list = []
+            # unitemized_transaction_list = []
+            form_type = find_form_type(report_id, cmte_id)
+            if isinstance(expenditure_date, str):
+                expenditure_date = date_format_agg(expenditure_date)
+            aggregate_start_date, aggregate_end_date = find_aggregate_date(
+                form_type, expenditure_date
+            )
+            # make sure transaction list comes back sorted by contribution_date ASC
+            transactions_list = list_all_sb_transactions_entity(
+                aggregate_start_date, aggregate_end_date, entity_id, cmte_id
+            )
+            aggregate_amount = 0
+            committee_type = cmte_type(cmte_id)
+            for transaction in transactions_list:
+                # checking in reports table if the delete_ind flag is false for the corresponding report
+                if transaction[5] != "Y":
+                    # checking if the back_ref_transaction_id is null or not.
+                    # If back_ref_transaction_id is none, checking if the transaction is a memo or not, using memo_code not equal to X.
+                    # according to new spec, all transations need to be aggregated
+                    # if transaction[7] != None or (
+                    #     transaction[7] == None and
+                    #     (transaction[6] != "X")
+                    # ):
+                    if transaction[10] != "N":
+                        aggregate_amount += transaction[0]
+                    if expenditure_date <= transaction[4] or transaction[12] == 'sched_b':
+                        line_number, itemized_ind = transaction[3], transaction[11]
+                        if itemized_ind and itemized_ind.startswith(
+                            "F"
+                        ):  # forced itemize/unitemize
+                            pass
+                        else:
+                            line_number, itemized_ind = get_sb_linenumber_itemization(
+                                transaction[8],
+                                aggregate_amount,
+                                itemization_value,
+                                transaction[3],
+                            )
+                        put_sql_linenumber_schedB(
+                            cmte_id,
+                            line_number,
+                            itemized_ind,
+                            transaction[1],
+                            entity_id,
                             aggregate_amount,
-                            itemization_value,
-                            transaction[3],
                         )
-                    put_sql_linenumber_schedB(
-                        cmte_id,
-                        line_number,
-                        itemized_ind,
-                        transaction[1],
-                        entity_id,
-                        aggregate_amount,
-                    )
 
     except Exception as e:
         raise Exception(

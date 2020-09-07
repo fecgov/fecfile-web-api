@@ -21,6 +21,7 @@ export class TransactionModel {
   purposeDescription: string;
   contributorEmployer: string;
   contributorOccupation: string;
+  semiAnnualAmount: number;
   memoCode: string;
   memoText: string;
   selected: boolean;
@@ -112,6 +113,7 @@ export class TransactionModel {
     this.zip = transaction.zip ? transaction.zip : '';
     this.date = transaction.date ? transaction.date : null;
     this.amount = transaction.amount ? transaction.amount : null;
+    this.semiAnnualAmount = transaction.semiAnnualAmount ? transaction.semiAnnualAmount : null;
     this.deletedDate = transaction.deletedDate ? transaction.deletedDate : null;
     this.disbursementDate = transaction.disbursementDate ? transaction.disbursementDate : null;
     this.disseminationDate = transaction.disseminationDate ? transaction.disseminationDate : null;

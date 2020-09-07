@@ -70,6 +70,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
   public transactionsModel: Array<TransactionModel>;
   public totalAmount: number;
+  public totalSemiAnnualAmount: number;
   public transactionsView = ActiveView.transactions;
   public recycleBinView = ActiveView.recycleBin;
   public bulkActionDisabled = true;
@@ -139,8 +140,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   private loadTransactionsSubscription: Subscription;
 
   private columnOptionCount = 0;
-  private maxColumnOption = 6;
-  public readonly maxColumnOptionReadOnly = 6;
+  private maxColumnOption = 7;
+  public readonly maxColumnOptionReadOnly = 7;
   private allTransactionsSelected: boolean;
   private clonedTransaction: any;
   private _previousUrl: any;
@@ -198,6 +199,28 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
   routerSubscription: Subscription;
 
   selectedFromMultiplePages: Array <TransactionModel> = [];
+  public receiptsLabel: string;
+  public disbursementsLabel: string;
+  public loansLabel: string;
+  public othersLabel: string;
+  showAmountColumn: boolean;
+  showAggregateAmountColumn: boolean;
+  showItemizationColumn: boolean;
+  showTypeColumn: boolean;
+  showReportTypeColumn: boolean;
+  showDateColumn: boolean;
+  showAggregateColumn: boolean;
+  showMemoCodeColumn: boolean;
+  showStateColumn: boolean;
+  showElectionCodeColumn: boolean;
+  showElectionYearColumn: boolean;
+  showLoanAmountColumn: boolean;
+  showBalanceAtCloseColumn: boolean;
+  showBeginningBalanceColumn: boolean;
+  showScheduleColumn: boolean;
+  showSemiAnnualAmountColumn: boolean;
+  showTransactionIdColumn: boolean;
+  showEmployerColumn: boolean;
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -289,6 +312,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.pageReceivedTransactions = false;
     this.pageReceivedReports = false;
 
+    // this._initializePinColumns();
     this.getCachedValues();
     this.cloneSortableColumns = this._utilService.deepClone(this.sortableColumns);
 
@@ -307,21 +331,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       // this.getPage(this.config.currentPage);
     }
 
-    // When coming from transaction route the reportId is not received
-    // from the input perhaps due to the ngDoCheck in transactions-component.
-    // TODO look at replacing ngDoCheck and reportId as Input()
-    // with a message subscription service.
-    /* if (this.routeData) {
-      if (this.routeData.accessedByRoute) {
-        if (this.routeData.reportId) {
-          //console.log('reportId for transaction accessed directly by route is ' + this.routeData.reportId);
-          this.reportId = this.routeData.reportId;
-          this.getPage(this.config.currentPage);
-        }
-      }
-    } */
 
-    this._transactionTypeService.getTransactionCategories('3X').subscribe(res => {
+    this._transactionTypeService.getTransactionCategories("F"+this.formType).subscribe(res => {
       if (res) {
         this.transactionCategories = res.data.transactionCategories;
       }
@@ -354,12 +365,30 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.getPage(this.config.currentPage);
     this.applyDisabledColumnOptions();
     this.showHideTabs();
+    this.showTabLabels();
+  }
+  
+  showTabLabels() {
+    if(this.formType === '3L'){
+      this.receiptsLabel = 'Bundled Contributions';
+      this.disbursementsLabel = 'Refunds'
+    }
+    else{
+      this.receiptsLabel = 'Receipts';
+      this.disbursementsLabel = 'Disbursements';
+      this.loansLabel = 'Loans and Debts';
+      this.othersLabel = 'Other';
+    }
   }
 
 
   showHideTabs() {
     if(this.formType === '24'){
       this.showReceiptsTab = false;
+      this.showLoansTab = false;
+      this.showOthersTab = false;
+    }
+    else if(this.formType === '3L'){
       this.showLoansTab = false;
       this.showOthersTab = false;
     }
@@ -581,6 +610,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         }
 
         this.totalAmount = res.totalAmount ? res.totalAmount : 0;
+        this.totalSemiAnnualAmount = res.totalSemiAnnualAmount ? res.totalSemiAnnualAmount: 0;
         this.config.totalItems = res.totalTransactionCount ? res.totalTransactionCount : 0;
         this.numberOfPages = res.totalPages;
 
@@ -1770,53 +1800,79 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
-    let defaultSortColumns = ['reportType','type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
-    let otherSortColumns = [
-      'transactionId',
-      'street',
-      'city',
-      'state',
-      'zip',
-      'purposeDescription',
-      'contributorEmployer',
-      'contributorOccupation',
-      'memoText'
-    ];
-    if (this.transactionCategory === 'disbursements') {
-      defaultSortColumns = ['reportType','type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
-      otherSortColumns = [
-        'transactionId',
-        'street',
-        'city',
-        'state',
-        'zip',
-        'memoText',
-        'committeeId',
-        'electionCode',
-        'electionYear'
-      ];
-    } else if (this.transactionCategory === 'loans-and-debts') {
-      defaultSortColumns = ['reportType','type', 'name', 'loanClosingBalance', 'loanIncurredDate'];
-      otherSortColumns = [
-        'transactionId',
-        'street',
-        'city',
-        'state',
-        'zip',
-        'memoCode',
-        'memoText',
-        'purposeDescription',
-        'loanBeginningBalance',
-        'loanAmount',
-        'loanDueDate',
-        'loanIncurredAmt',
-        'loanPaymentAmt',
-        'loanPaymentToDate'
-      ];
-    } else if (this.transactionCategory === 'other') {
-      defaultSortColumns = ['reportType','schedule', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
-      otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', 'eventId'];
+    let defaultSortColumns = [];
+    let otherSortColumns = [];
+    if(!this.formType){
+      this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
     }
+
+    //3L
+    if(this.formType === '3L'){
+      if(this.transactionCategory === 'receipts' || this.transactionCategory === 'disbursements'){
+        defaultSortColumns = ['reportType','type', 'name', 'amount', 'semiAnnualAmount','state'];
+        otherSortColumns = [
+          'street',
+          'city',
+          'zip',
+          'contributorEmployer',
+          'memoText'
+        ];
+      } 
+    }
+    //3X, 24 etc. 
+    else{
+      if(this.transactionCategory === 'receipts'){
+        defaultSortColumns = ['reportType','type', 'name', 'date', 'memoCode', 'amount', 'aggregate'];
+        otherSortColumns = [
+          'transactionId',
+          'street',
+          'city',
+          'state',
+
+          'zip',
+          'purposeDescription',
+          'contributorEmployer',
+          'contributorOccupation',
+          'memoText'
+        ];
+      } 
+      if (this.transactionCategory === 'disbursements') {
+        defaultSortColumns = ['reportType','type', 'name', 'date', 'memoCode', 'amount', 'purposeDescription'];
+        otherSortColumns = [
+          'transactionId',
+          'street',
+          'city',
+          'state',
+          'zip',
+          'memoText',
+          'committeeId',
+          'electionCode',
+          'electionYear'
+        ];
+      } else if (this.transactionCategory === 'loans-and-debts') {
+        defaultSortColumns = ['reportType','type', 'name', 'loanClosingBalance', 'loanIncurredDate'];
+        otherSortColumns = [
+          'transactionId',
+          'street',
+          'city',
+          'state',
+          'zip',
+          'memoCode',
+          'memoText',
+          'purposeDescription',
+          'loanBeginningBalance',
+          'loanAmount',
+          'loanDueDate',
+          'loanIncurredAmt',
+          'loanPaymentAmt',
+          'loanPaymentToDate'
+        ];
+      } else if (this.transactionCategory === 'other') {
+        defaultSortColumns = ['reportType','schedule', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
+        otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', 'eventId'];
+      }
+    }
+    
 
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
