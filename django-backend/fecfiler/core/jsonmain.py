@@ -288,7 +288,7 @@ def get_data_details(report_id, cmte_id):
         elif output['formType'] == 'F3L':
             query_3 = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode, 
                                       rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
-                                      f3l.signed_date as date_signed,
+                                      f3l.sign_date as date_signed,
                                       rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState, 
                                       x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
                                       rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
@@ -301,9 +301,9 @@ def get_data_details(report_id, cmte_id):
                                       LEFT JOIN form_3x x ON rp.report_id = x.report_id
                                       LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
                                       LEFT JOIN public.form_3l f3l ON f3l.report_id = rp.report_id
-                                      WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id = %s AND rp.report_id = %s"""
+                                      WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id =%s AND rp.report_id =%s"""
 
-            values_3 = [report_id, cmte_id]
+            values_3 = [cmte_id, report_id]
             string_3 = "Form 3L"
             f3L_data = json_query(query_3, values_3, string_3, False)
             if f3L_data:
