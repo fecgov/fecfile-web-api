@@ -536,14 +536,15 @@ def do_post_carryover(transaction_id, cmte_id, report_id):
         with connection.cursor() as cursor:
             cursor.execute(_sql, [cmte_id, cmte_id, report_id])
             reports_list = cursor.fetchone()[0]
-        for report in reports_list:
-            if report.get('status') and report.get('status') != 'Saved':
-                create_amended(report['report_id'])
-        with connection.cursor() as cursor:
-            cursor.execute(_sql, [cmte_id, cmte_id, report_id])
-            new_reports_list = cursor.fetchone()[0]
-        for report in new_reports_list:
-            do_carryover(report['report_id'], cmte_id)
+        if reports_list:
+            for report in reports_list:
+                if report.get('status') and report.get('status') != 'Saved':
+                    create_amended(report['report_id'])
+            with connection.cursor() as cursor:
+                cursor.execute(_sql, [cmte_id, cmte_id, report_id])
+                new_reports_list = cursor.fetchone()[0]
+            for report in new_reports_list:
+                do_carryover(report['report_id'], cmte_id)
     except Exception as e:
         raise Exception('The do_post_carryover is throwing an error: '+str(e))
 
