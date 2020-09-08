@@ -870,12 +870,15 @@ def post_schedE(data):
             post_sql_schedE(data)
 
             # update sched_d parent if IE debt payment
+            parent_update_fail = False
             if data.get("transaction_type_identifier") == "IE_B4_DISSE":
+                parent_update_fail = True
                 update_sched_d_parent(
                     data.get("cmte_id"),
                     data.get("back_ref_transaction_id"),
                     data.get("expenditure_amount"),
                 )
+                parent_update_fail = False
 
             #for F24 creating a duplicate transaction
             se_data = {}
@@ -921,6 +924,8 @@ def post_schedE(data):
             raise Exception(
                 "The post_sql_schedE function is throwing an error: " + str(e)
             )
+            if parent_update_fail:
+                trash_sql_schedE(data.get("cmte_id"), data.get("report_id"), data.get("transaction_id"))
         update_aggregate_amt_se(data)
         if form_type == 'F24' and data.get('mirror_report_id'):
             function_to_call_wrapper_update_F3X(data.get("cmte_id"), se_data['report_id'])
@@ -1263,6 +1268,17 @@ def delete_schedE(data):
         )
     except Exception as e:
         raise
+
+def trash_sql_schedE(cmte_id, report_id, transaction_id):
+    """
+    do permanent delete sql transaction
+    """
+    _sql = """
+    DELETE FROM public.sched_e
+    WHERE transaction_id = %s AND report_id = %s AND cmte_id = %s
+    """
+    _v = (transaction_id, report_id, cmte_id)
+    do_transaction(_sql, _v)
 
 
 def update_se_aggregation_status(transaction_id, status):
