@@ -846,12 +846,15 @@ def post_schedE(data):
             old_completing_entity = get_entities(get_data)[0]
             new_completing_entity = put_completing_entities(data)
             completing_rollback_flag = True
+            data["completing_entity_id"] = new_completing_entity.get("entity_id")
         else:
             logger.debug("saving new completing entity:{}".format(data))
-            new_completing_entity = post_completing_entities(data)
-            logger.debug("new entity created:{}".format(new_entity))
-            completing_rollback_flag = False
-        data["completing_entity_id"] = new_completing_entity.get("entity_id")
+            # adding this condition to avoid empty individual entity when we create SE transaction
+            if "completing_last_name" in data:
+                new_completing_entity = post_completing_entities(data)
+                logger.debug("new entity created:{}".format(new_entity))
+                completing_rollback_flag = False
+                data["completing_entity_id"] = new_completing_entity.get("entity_id")
 
         data["transaction_id"] = get_next_transaction_id("SE")
         # print(data)
