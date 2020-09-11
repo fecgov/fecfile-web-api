@@ -321,6 +321,27 @@ def get_data_details(report_id, cmte_id):
     except Exception:
         raise
 
+def get_f3l_summary_details(report_id, cmte_id):
+    try:
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+        cashOnHandYear = cvg_start_date.year
+
+        contribute_amount_query = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total",COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total"FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR') AND delete_ind IS DISTINCT FROM 'Y'"""
+
+        values = [cmte_id, report_id]
+
+        return {
+            "cashOnHandYear": cashOnHandYear,
+            "contribute_amount_query": json_query(contribute_amount_query, values, "Form3L", False)[0],
+            "calAmount": True
+        }
+
+    except NoOPError:
+        raise NoOPError(
+            'The Committee ID: {} does not exist in Committee Master Table'.format(cmte_id))
+    except Exception as e:
+        raise e
+
 
 def get_f3x_summary_details(report_id, cmte_id):
     try:
@@ -618,8 +639,9 @@ def create_json_builders(request):
                     report_id, cmte_id)
             if form_type == 'F24':
                 output['data']['reportPrint'] = False if transaction_flag else True
-            if form_type == 'F3L':
-                output['data']['reportPrint'] = False if transaction_flag else True
+            if form_type == 'F3L' and (not transaction_flag):
+                output['data']['summary'] = get_f3l_summary_details(
+                    report_id, cmte_id)
             output['data']['schedules'] = {}
             for schedule_name in schedule_name_list:
                 schedule = SCHED_SCHED_CODES_DICT.get(
