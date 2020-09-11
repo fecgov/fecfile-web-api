@@ -1815,7 +1815,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
           'city',
           'zip',
           'contributorEmployer',
-          'memoText'
+          'memoText',
+          'committeeId'
         ];
       } 
     }
@@ -1871,6 +1872,10 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
         defaultSortColumns = ['reportType','schedule', 'type', 'name', 'amount', 'date', 'memoCode', 'purposeDescription'];
         otherSortColumns = ['transactionId', 'street', 'city', 'state', 'zip', 'memoText', 'eventId'];
       }
+
+      if(this.formType.endsWith('global')){
+        otherSortColumns = this.addMissingColumnsForGlobalTransactions(otherSortColumns);
+      }
     }
     
 
@@ -1882,6 +1887,13 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       this.sortableColumns.push(new SortableColumnModel(field, false, false, false, true));
     }
     this.sortableColumns.push(new SortableColumnModel('deletedDate', false, true, false, false));
+  }
+  
+  public addMissingColumnsForGlobalTransactions(otherSortColumns: any[]) :any[] {
+    if(this.transactionCategory === 'receipts' || this.transactionCategory === 'disbursements'){
+      otherSortColumns.push('semiAnnualAmount');
+    } 
+    return otherSortColumns;
   }
 
   /**

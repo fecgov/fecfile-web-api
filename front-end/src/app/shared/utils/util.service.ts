@@ -276,7 +276,7 @@ export class UtilService {
   public convertTransactionCategoryByForm(transactionCategory: string, formType: string){
     if(formType.endsWith('3L')){
       if(transactionCategory === 'receipts'){
-        return 'bundled contributions';
+        return 'bundled-contributions';
       }
       else if(transactionCategory === 'disbursements'){
         return 'refunds';

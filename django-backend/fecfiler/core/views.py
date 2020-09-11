@@ -1481,8 +1481,8 @@ def put_reports(data):
                     put_sql_form3l(
                         data.get("report_id"),
                         cmte_id,
-                        data.get('election_date'),
-                        data.get('election_state')
+                        data.get('date_of_election'),
+                        data.get('state_of_election')
                         )
             except Exception as e:
                 put_sql_report(
@@ -11017,9 +11017,9 @@ def put_sql_form3l(
 ):
     try:
         with connection.cursor() as cursor:
-            # Insert data into Form 24 table
+            # Insert data into Form 3L table
             cursor.execute(
-                """UPDATE public.form_24 SET election_date=%s, election_state=%s, last_update_date=%s WHERE report_id=%s, cmte_id=%s)""",
+                """UPDATE public.form_3l SET election_date=%s, election_state=%s, last_update_date=%s WHERE report_id=%s and cmte_id=%s""",
                 [
                     election_date,
                     election_state,

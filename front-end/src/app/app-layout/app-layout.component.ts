@@ -4,10 +4,12 @@ import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { Subscription } from 'rxjs/Subscription';
 import { ApiService } from '../shared/services/APIService/api.service';
+import { AuthService } from '../shared/services/AuthService/auth.service';
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { UtilService } from '../shared/utils/util.service';
-import {AuthService} from '../shared/services/AuthService/auth.service';
+import { ReportsService } from './../reports/service/report.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-app-layout',
@@ -54,6 +56,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   public semiAnnualEndDate: string;
   private _step: string = null;
 
+  private _datePipe: DatePipe;
   private onDestroy$ = new Subject();
 
   constructor(
@@ -65,7 +68,10 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     private _modalService: NgbModal,
     public _activatedRoute: ActivatedRoute,
     public _authService: AuthService,
-  ) {}
+    public _reportService: ReportsService
+  ) {
+    this._datePipe = new DatePipe('en-US');
+  }
 
   ngOnInit(): void {
     let route: string = this._router.url;
@@ -335,32 +341,36 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   }
 
   public editFrom(): void {
-
     
-    let queryParamsMap: any = {
-      step: 'step_1',
-      edit: true,
-      reportId: this._activatedRoute.snapshot.queryParams.reportId
-    };
-
     let formType :string = this.extractFormType();
-    this._router.navigate([`/forms/form/${formType}`], {
-      queryParams: queryParamsMap
-    });
-
-
-    this._messageService.sendUpdateReportTypeMessage({
-      currentReportData: {
-        'currentReportDescription': this.formDescription,
-        'currentStartDate': this.formStartDate, 
-        'currentEndDate': this.formEndDate,
-        'currentDueDate' : this.dueDate,
-        'currentReportType': this.reportType,
-        'currentElectionDate':this.electionDate,
-        'currentElectionState':this.electionState,
-        'currentSemiAnnualStartDate': this.semiAnnualStartDate,
-        'currentSemiAnnualEndDate': this.semiAnnualEndDate
-      }
-    });
+    this._reportService.getReportInfo(formType, this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
+      
+      let queryParamsMap: any = {
+        step: 'step_1',
+        edit: true,
+        reportId: this._activatedRoute.snapshot.queryParams.reportId
+      };
+  
+      this._router.navigate([`/forms/form/${formType}`], {
+        queryParams: queryParamsMap
+      });
+  
+      res = res[0];
+      this._messageService.sendUpdateReportTypeMessage({
+        currentReportData: {
+          
+          'currentReportDescription': res.reporttypedescription,
+          'currentStartDate': res.cvgStartDate ? this._datePipe.transform(res.cvgStartDate, 'yyyy-MM-dd') : null, 
+          'currentEndDate': res.cvgEndDate ? this._datePipe.transform(res.cvgEndDate, 'yyyy-MM-dd') : null,
+          'currentDueDate' : res.duedate,
+          'currentReportType': res.reporttype,
+          'currentElectionDate':res.election_date ? res.election_date : res.electiondate,
+          'currentElectionState':res.election_state ? res.election_state : res.electionstate,
+          'currentSemiAnnualStartDate': res.semi_annual_start_date,
+          'currentSemiAnnualEndDate': res.semi_annual_end_date
+        }
+      });
+    })
+    
   }
 }

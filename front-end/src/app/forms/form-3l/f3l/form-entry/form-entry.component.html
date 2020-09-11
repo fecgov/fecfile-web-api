@@ -8,7 +8,7 @@
     <ngb-highlight [result]="formatTypeaheadCommitteeName(r)" [term]="t"></ngb-highlight>
 </ng-template>
 <div class="individual-receipt-container">
-  <form [formGroup]="frmIndividualReceipt">
+  <form *ngIf="frmIndividualReceipt" [formGroup]="frmIndividualReceipt">
     <header>
       <div class="header-content">
         <div class="float-left">

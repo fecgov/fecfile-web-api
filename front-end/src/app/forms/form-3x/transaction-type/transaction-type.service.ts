@@ -31,11 +31,9 @@ export class TransactionTypeService {
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
-    if(formType === 'Fglobal'){
-      formType = 'F3X';
+    if(!formType.endsWith('global')){
+      params = params.append('form_type', formType);
     }
-
-    params = params.append('form_type', formType);
 
     let cmteTypeCategory = '';
     if (localStorage.getItem('committee_details') !== null) {
@@ -67,10 +65,12 @@ export class TransactionTypeService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
 
-    if(formType === 'global'){
+/*     if(formType === 'global'){
       formType = '3X';
+    } */
+    if(!formType.endsWith('global')){
+      params = params.append('form_type', `F${formType}`);
     }
-    params = params.append('form_type', `F${formType}`);
 
     return this._http.get(`${environment.apiUrl}${url}`, {
       params,
