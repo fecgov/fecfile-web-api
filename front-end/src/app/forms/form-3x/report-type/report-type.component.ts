@@ -695,6 +695,9 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
                 // this.optionFailed = true;
                 this.isValidType = false;
                 window.scrollTo(0, 0);
+                if(!this.reportEditMode){
+                  this.resetReportScreenForms();
+                }
                 this.status.emit({
                   form: {},
                   direction: 'previous',
@@ -733,6 +736,11 @@ export class ReportTypeComponent implements OnInit, OnDestroy {
       }
     });
     return { res, reportId };
+  }
+  resetReportScreenForms() {
+    this.frmReportType.reset();
+    this.coverageDatesMissing = this.electionDateMissing = this.stateMissing = this.showErrors = false;
+    this._messageService.sendMessage({action:'clearCoverageForm', component:'coverage-sidebar'});
   }
 
   private updateThirdNavAmounts(res: any) {
