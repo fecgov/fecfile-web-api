@@ -2148,8 +2148,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         } else if (field === 'contribution_amount' || field === 'expenditure_amount') {
           if (this._contributionAmount === '') {
             let amountValue = this.frmIndividualReceipt.get(field).value;
-            amountValue = amountValue.replace(/,/g, ``);
-            this._contributionAmount = amountValue.toString();
+            if(amountValue){
+              amountValue = amountValue.replace(/,/g, ``);
+              this._contributionAmount = amountValue.toString();
+            }
           }
           receiptObj[field] = this._contributionAmount;
         } else if(field === 'semi_annual_refund_bundled_amount'){
