@@ -1481,8 +1481,8 @@ def put_reports(data):
                     put_sql_form3l(
                         data.get("report_id"),
                         cmte_id,
-                        data.get('election_date'),
-                        data.get('election_state')
+                        data.get('date_of_election'),
+                        data.get('state_of_election')
                         )
             except Exception as e:
                 put_sql_report(
@@ -6449,7 +6449,8 @@ def get_report_info(request):
                                       LEFT JOIN form_3x x ON rp.report_id = x.report_id
                                       LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
                                       LEFT JOIN public.form_3l f3l ON f3l.report_id = rp.report_id
-                                      LEFT JOIN public.ref_max_threshold_amount max ON max.form_type=rp.form_type AND date_part('year',cvg_start_date)=max.year
+                                      LEFT JOIN public.ref_max_threshold_amount max ON max.form_type=rp.form_type 
+                                      AND COALESCE(date_part('year',cvg_start_date),date_part('year',semi_annual_start_date))=max.year
                                       WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id = %s AND rp.report_id = %s"""
                     # print("query_string", query_string)
 
@@ -11016,9 +11017,9 @@ def put_sql_form3l(
 ):
     try:
         with connection.cursor() as cursor:
-            # Insert data into Form 24 table
+            # Insert data into Form 3L table
             cursor.execute(
-                """UPDATE public.form_24 SET election_date=%s, election_state=%s, last_update_date=%s WHERE report_id=%s, cmte_id=%s)""",
+                """UPDATE public.form_3l SET election_date=%s, election_state=%s, last_update_date=%s WHERE report_id=%s and cmte_id=%s""",
                 [
                     election_date,
                     election_state,

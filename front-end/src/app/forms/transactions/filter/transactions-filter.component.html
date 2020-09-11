@@ -25,7 +25,7 @@
           </div>            
           <div class="transactions__filter-type-list-body">
               <ul *ngFor="let categoryGroup of transactionCategories" class="transactions__filter-type-list">
-                <li class="transactions__filter-type-group">{{ categoryGroup.text }}</li>
+                <li *ngIf ="categoryGroup.options && categoryGroup.options.length > 0" class="transactions__filter-type-group">{{ categoryGroup.text }}</li>
                 <app-transactions-filter-type
                   [categoryType]="categoryType"
                   #categoryElements *ngFor="let categoryType of categoryGroup.options">

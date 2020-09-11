@@ -5466,6 +5466,10 @@ def schedH6(request):
                         request.query_params.get("report_id")
                 )
 
+                if "transaction_id" in request.query_params and check_null_value(
+                    request.query_params.get("transaction_id")
+                ):
+                    data["transaction_id"] = request.query_params.get("transaction_id")
                 datum = get_schedH6(data)
                 if query_params.get("page") is None and query_params.get("itemsPerPage") is None: 
                     return JsonResponse(datum, status=status.HTTP_200_OK, safe=False)

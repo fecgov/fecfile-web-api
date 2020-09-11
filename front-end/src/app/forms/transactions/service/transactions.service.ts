@@ -1036,5 +1036,6 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.forceitemizable = row.forceitemizable;
   model.mirrorReportId = row.mirror_report_id;
   model.mirrorTransactionId = row.mirror_transaction_id;
+  model.semiAnnualAmount = row.semi_annual_refund_bundled_amount;
 
 }

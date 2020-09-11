@@ -77,7 +77,7 @@
             [mainTransactionTypeText]="mainTransactionTypeText" [transactionTypeText]="transactionTypeText"
             [transactionType]="transactionType" [scheduleAction]="scheduleAction" [scheduleType]="scheduleType"
             [returnToGlobalAllTransaction]="returnToGlobalAllTransaction" 
-            (status)="onNotify($event)">
+            (status)="onNotify($event)" (parentDataEmitter)="setParentTransactionalData($event)">
           </app-sched-e>
           <f3x-individual-receipt *ngIf="
               scheduleType === 'sched_a' ||
@@ -91,7 +91,7 @@
             [transactionData]="transactionData" [transactionDataForChild]="transactionDataForChild"
             [populateHiddenFieldsMessageObj]="populateHiddenFieldsMessageObj"
             [returnToGlobalAllTransaction]="returnToGlobalAllTransaction" 
-            [populateFieldsMessageObj]="populateFieldsMessageObj" (status)="onNotify($event)">
+            [populateFieldsMessageObj]="populateFieldsMessageObj" (status)="onNotify($event)" (parentDataEmitter)="setParentTransactionalData($event)">
           </f3x-individual-receipt>
 
         </div>
@@ -101,14 +101,14 @@
           [transactionTypeText]="transactionTypeTextSchedF" [transactionType]="transactionTypeSchedF"
           [scheduleAction]="scheduleFAction" [scheduleType]="scheduleType" (status)="onNotify($event)"
           [transactionData]="transactionData" [transactionDataForChild]="transactionDataForChild"
-          [parentTransactionModel]="parentTransactionModel">
+          [parentTransactionModel]="parentTransactionModel" (parentDataEmitter)="setParentTransactionalData($event)">
         </app-sched-f>
         <!-- This component is for the 'core' Schedule F, a different component handles sched F payment -->
         <app-sched-f-core *ngIf="scheduleType === 'sched_f_core'" [formType]="'3X'"
           [transactionTypeText]="transactionTypeTextSchedFCore" [transactionType]="transactionTypeSchedFCore"
           [scheduleAction]="scheduleFCoreAction" [scheduleType]="scheduleType"
           [transactionDataForChild]="transactionDataForChild" [transactionData]="transactionData"
-          (status)="onNotify($event)">
+          (status)="onNotify($event)" (parentDataEmitter)="setParentTransactionalData($event)">
         </app-sched-f-core>
 
         <app-sched-c-loans *ngIf="scheduleType === 'sched_c'" [formType]="'3X'" [scheduleAction]="scheduleCAction"

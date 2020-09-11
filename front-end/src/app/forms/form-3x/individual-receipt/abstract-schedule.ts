@@ -1,7 +1,7 @@
 import { entityTypes } from './entity-types-json';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
+import { EventEmitter, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ModalDismissReasons, NgbTooltipConfig, NgbTypeaheadSelectItemEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -55,6 +55,7 @@ export enum SaveActions {
 
 export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
+  @Output() parentDataEmitter : EventEmitter<any> = new EventEmitter<any>();
   @Input() transactionData: any;
   @Input() transactionDataForChild: any;
   @Input() populateHiddenFieldsMessageObj: any;
@@ -353,6 +354,7 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
 
     this._f3xMessageService.getParentModelMessage().takeUntil(this.onDestroy$).subscribe(message => {
       this._parentTransactionModel = message;
+      this.parentDataEmitter.emit(message);
     });
 
     this._f3xMessageService.getInitFormMessage().takeUntil(this.onDestroy$).subscribe(message => {
@@ -2146,8 +2148,10 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
         } else if (field === 'contribution_amount' || field === 'expenditure_amount') {
           if (this._contributionAmount === '') {
             let amountValue = this.frmIndividualReceipt.get(field).value;
-            amountValue = amountValue.replace(/,/g, ``);
-            this._contributionAmount = amountValue.toString();
+            if(amountValue){
+              amountValue = amountValue.replace(/,/g, ``);
+              this._contributionAmount = amountValue.toString();
+            }
           }
           receiptObj[field] = this._contributionAmount;
         } else if(field === 'semi_annual_refund_bundled_amount'){
