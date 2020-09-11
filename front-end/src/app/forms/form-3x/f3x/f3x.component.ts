@@ -349,6 +349,12 @@ export class F3xComponent implements OnInit, OnDestroy {
     //console.log('showfilters is ' + this.isShowFilters);
   }
 
+  public setParentTransactionalData(e:any){
+    if(e){
+      this.parentTransactionModel = e;
+    }
+  }
+
   /**
    * Get's message from child components.
    *
