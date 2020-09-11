@@ -287,7 +287,7 @@ def get_data_details(report_id, cmte_id):
 
         elif output['formType'] == 'F3L':
             query_3 = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode, 
-                                      rp.report_type as reportType,  rt.rpt_type_desc as reportTypeDescription, 
+                                      rp.report_type as reportCode,  rt.rpt_type_desc as reportTypeDescription, 
                                       f3l.sign_date as date_signed,
                                       rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState, 
                                       x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
