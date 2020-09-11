@@ -6449,7 +6449,8 @@ def get_report_info(request):
                                       LEFT JOIN form_3x x ON rp.report_id = x.report_id
                                       LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
                                       LEFT JOIN public.form_3l f3l ON f3l.report_id = rp.report_id
-                                      LEFT JOIN public.ref_max_threshold_amount max ON max.form_type=rp.form_type AND date_part('year',cvg_start_date)=max.year
+                                      LEFT JOIN public.ref_max_threshold_amount max ON max.form_type=rp.form_type 
+                                      AND COALESCE(date_part('year',cvg_start_date),date_part('year',semi_annual_start_date))=max.year
                                       WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id = %s AND rp.report_id = %s"""
                     # print("query_string", query_string)
 
