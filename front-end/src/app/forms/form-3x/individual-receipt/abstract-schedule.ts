@@ -2145,15 +2145,23 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
           } else {
             receiptObj[field] = typeAheadField;
           }
-        } else if (field === 'contribution_amount' || field === 'expenditure_amount') {
-          if (this._contributionAmount === '') {
-            let amountValue = this.frmIndividualReceipt.get(field).value;
-            if(amountValue){
+        } else if (field === 'contribution_amount' || field === 'expenditure_amount')  {
+            //TODO -- clean this logic up and generalize it. Current separating out 3L since it has two amounts and since we are using
+            //this._contributionAmount, first field is overwriting the second or vice versa and both amounts are becoming the same. 
+            if(!this.formType.endsWith('3L')){
+              if (this._contributionAmount === '') {
+                let amountValue = this.frmIndividualReceipt.get(field).value;
+                amountValue = amountValue.replace(/,/g, ``);
+                this._contributionAmount = amountValue.toString();
+              }
+              receiptObj[field] = this._contributionAmount;
+            }
+            else{
+              let amountValue = this.frmIndividualReceipt.get(field).value;
               amountValue = amountValue.replace(/,/g, ``);
               this._contributionAmount = amountValue.toString();
+              receiptObj[field] = this._contributionAmount;
             }
-          }
-          receiptObj[field] = this._contributionAmount;
         } else if(field === 'semi_annual_refund_bundled_amount'){
           let amountValue = this.frmIndividualReceipt.get(field).value;
           if(amountValue){
