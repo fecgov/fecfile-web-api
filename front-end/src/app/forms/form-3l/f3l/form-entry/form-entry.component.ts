@@ -103,15 +103,17 @@ export class FormEntryComponent extends IndividualReceiptComponent implements On
           this.frmIndividualReceipt.controls[fieldName].patchValue("0.00");
           this.frmIndividualReceipt.controls[fieldName].disable();
         }else{
+          this.frmIndividualReceipt.controls[fieldName].patchValue(null);
           this.frmIndividualReceipt.controls[fieldName].enable();
         }
       }
 
       //no semi-annual dates scenario
       if(!this.reportDetails.semi_annual_start_date && !this.reportDetails.semi_annual_end_date){
-        this.frmIndividualReceipt.controls[fieldName].patchValue("0");
+        this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].patchValue("0.00");
         this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].disable();
       }else{
+        this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].patchValue(null);
         this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].enable();
       }
 

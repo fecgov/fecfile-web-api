@@ -66,6 +66,9 @@
         <app-transactions (sidebarSwitch)="switchSidebar($event)" (showTransaction)="onNotify($event)">
         </app-transactions>
       </div> -->
+      <div class="form__step" [hidden]="step !== 'step_6'">
+        <app-submit></app-submit>
+      </div>
       <div class="form_step" [hidden]="step !== 'transactions' && step !== 'reports'">
         <app-transactions (sidebarSwitch)="switchSidebar($event)" (showTransaction)="onNotify($event)">
         </app-transactions>
