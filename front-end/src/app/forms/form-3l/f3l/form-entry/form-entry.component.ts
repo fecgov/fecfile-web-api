@@ -160,6 +160,15 @@ export class FormEntryComponent extends IndividualReceiptComponent implements On
     if (this.isFieldName(col.name, 'contribution_amount') || this.isFieldName(col.name, 'expenditure_amount') ||
     this.isFieldName(col.name, 'semi_annual_refund_bundled_amount')
     ) {
+
+
+    let contributionAmount: string = $event.target.value;
+
+      // remove commas
+      contributionAmount = contributionAmount.replace(/,/g, ``);
+      this._contributionAmount = contributionAmount;
+
+
       this._formatAmount($event, col.name, col.validation.dollarAmountNegative);
       const amountEntered:Number = this.convertDataToNumber($event,col.validation.dollarAmountNegative);
         
