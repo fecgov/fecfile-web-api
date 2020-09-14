@@ -848,7 +848,7 @@ public printReport(report: reportModel): void{
       setTimeout(() => {
         this._router.navigate(['/forms/form/99'],{ queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
       }, 1500);
-    } else if (report.form_type === 'F3X' || report.form_type === 'F24') {
+    } else if (report.form_type === 'F3X' || report.form_type === 'F24' || report.form_type === 'F3L') {
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {

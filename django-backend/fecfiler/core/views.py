@@ -1431,10 +1431,12 @@ def put_reports(data):
             data.get("report_id"),
         ]
         forms_obj = []
-        if data.get("cvg_start_dt") is None:
-            raise Exception("The cvg_start_dt is null.")
-        if data.get("cvg_end_dt") is None:
-            raise Exception("The cvg_end_dt is null.")
+        # no_coverage_dates_report_types =  ["MSA", "MSY", "QSA", "QYE"]
+        if data.get("form_type") == 'F3X':
+            if data.get("cvg_start_dt") is None:
+                raise Exception("The cvg_start_dt is null.")
+            if data.get("cvg_end_dt") is None:
+                raise Exception("The cvg_end_dt is null.")
         if not (data.get("cvg_start_dt") is None or data.get("cvg_end_dt") is None):
             forms_obj = check_list_cvg_dates(args)
         if len(forms_obj) == 0:
