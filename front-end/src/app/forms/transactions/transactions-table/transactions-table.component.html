@@ -412,6 +412,9 @@
             </th>
             <th  *ngIf="isColumnVisible('name')" [class]="getSortClass('name')" (click)="changeSortDirection('name')">Name
             </th>
+            <th  *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
+              State
+            </th>
             <th  *ngIf="isColumnVisible('date')" [class]="getSortClass('date')" (click)="changeSortDirection('date')">Date
             </th>
             <th  *ngIf="isColumnVisible('memoCode')" [class]="getSortClass('memoCode')"
@@ -432,9 +435,6 @@
               Street
             </th>
             <th  *ngIf="isColumnVisible('city')" [class]="getSortClass('city')" (click)="changeSortDirection('city')">City
-            </th>
-            <th  *ngIf="isColumnVisible('state')" [class]="getSortClass('state')" (click)="changeSortDirection('state')">
-              State
             </th>
             <th  *ngIf="isColumnVisible('zip')" [class]="getSortClass('zip')" (click)="changeSortDirection('zip')">Zip
             </th>
@@ -521,6 +521,7 @@
                 *ngIf="isColumnVisible('name')">{{trx.name}}
                 <div *ngIf="trx.child" class="align_right arrow" [ngClass]="trx.toggleChild ? 'arrow-top' : 'arrow-bottom'"></div>
               </td>
+              <td  *ngIf="isColumnVisible('state')">{{trx.state}}</td>
               <td  *ngIf="isColumnVisible('date')">{{trx.date | date: 'MM/dd/yyyy'}}</td>
               <td  *ngIf="isColumnVisible('memoCode')">{{trx.memoCode}}</td>
               <td  *ngIf="isColumnVisible('amount')" class="transactions__amount">
@@ -533,7 +534,6 @@
               <td  *ngIf="isColumnVisible('transactionId')">{{trx.transactionId}}</td>
               <td  *ngIf="isColumnVisible('street')">{{trx.street}} {{trx.street2}}</td>
               <td  *ngIf="isColumnVisible('city')">{{trx.city}}</td>
-              <td  *ngIf="isColumnVisible('state')">{{trx.state}}</td>
               <td  *ngIf="isColumnVisible('zip')">{{trx.zip | zipCode}}</td>
               <td  *ngIf="isColumnVisible('memoText')">{{trx.memoText}}</td>
               <td  *ngIf="isRecycleBinViewActive()">{{trx.deletedDate | date: 'MM/dd/yyyy'}}</td>
@@ -610,6 +610,7 @@
               <td  *ngIf="_allTransactions">{{trxChild.reportType}}</td>
               <td  *ngIf="isColumnVisible('type')" style="padding-left: 1.5rem;">{{!getCurrentItemizationStatus(trxChild) ? trxChild.type +' (U) ' : trxChild.type}}</td>
               <td  *ngIf="isColumnVisible('name')">{{trxChild.name}}</td>
+              <td  *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
               <td  *ngIf="isColumnVisible('date')">{{trxChild.date | date: 'MM/dd/yyyy'}}</td>
               <td  *ngIf="isColumnVisible('memoCode')">{{trxChild.memoCode}}</td>
               <td  *ngIf="isColumnVisible('amount')" class="transactions__amount">
@@ -622,7 +623,6 @@
               <td  *ngIf="isColumnVisible('transactionId')">{{trxChild.transactionId}}</td>
               <td  *ngIf="isColumnVisible('street')">{{trxChild.street}} {{trxChild.street2}}</td>
               <td  *ngIf="isColumnVisible('city')">{{trxChild.city}}</td>
-              <td  *ngIf="isColumnVisible('state')">{{trxChild.state}}</td>
               <td  *ngIf="isColumnVisible('zip')">{{trxChild.zip | zipCode}}</td>
               <td  *ngIf="isColumnVisible('memoText')">{{trxChild.memoText}}</td>
               <td  *ngIf="isRecycleBinViewActive()">{{trxChild.deletedDate | date: 'MM/dd/yyyy'}}</td>
@@ -1366,7 +1366,7 @@
                   </div>
                 <div class="row">              
                     <ng-container [ngTemplateOutlet]="cmteIdTemplate"></ng-container>
-                    <ng-container [ngTemplateOutlet]="amountTemplate"></ng-container>
+                    <ng-container [ngTemplateOutlet]="semiAnnualAmountTemplate"></ng-container>
                 </div>
           </ng-container>
           </div>
@@ -1400,7 +1400,38 @@
               </div>
             </ng-container>
             <ng-container *ngIf="formType === '3L'">
-                <ng-container [ngTemplateOutlet]="f3l_columns_template"></ng-container>
+              <ng-container [ngTemplateOutlet]="f3l_columns_template"></ng-container>
+            </ng-container>
+            <ng-container *ngIf="formType === 'global'">
+              <div class="row">
+                <ng-container [ngTemplateOutlet]="typeTemplate"></ng-container>
+                <ng-container [ngTemplateOutlet]="transactionIdTemplate"></ng-container>
+                <ng-container [ngTemplateOutlet]="stateTemplate"></ng-container>
+              </div>
+              <div class="row">              
+                  <ng-container [ngTemplateOutlet]="cmteIdTemplate"></ng-container>
+                  <ng-container [ngTemplateOutlet]="electionCodeTemplate"></ng-container>
+                  <ng-container [ngTemplateOutlet]="zipTemplate"></ng-container>
+              </div>
+              <div class="row">
+                  <ng-container [ngTemplateOutlet]="streetTemplate"></ng-container>
+                  <ng-container [ngTemplateOutlet]="nameTemplate"></ng-container>
+                  <ng-container [ngTemplateOutlet]="dateTemplate"></ng-container>
+              </div>
+              <div class="row">
+                  <ng-container [ngTemplateOutlet]="memoCodeTemplate"></ng-container>
+                  <ng-container [ngTemplateOutlet]="memoTextTemplate"></ng-container>
+                  <ng-container [ngTemplateOutlet]="cityTemplate"></ng-container>
+              </div>
+              <div class="row">
+                  <ng-container [ngTemplateOutlet]="purposeTemplate"></ng-container>
+                  <ng-container [ngTemplateOutlet]="amountTemplate"></ng-container>
+                  <ng-container [ngTemplateOutlet]="electionYearTemplate"></ng-container>
+              </div>
+              <div class="row">              
+                <ng-container [ngTemplateOutlet]="cmteIdTemplate"></ng-container>
+                <ng-container [ngTemplateOutlet]="semiAnnualAmountTemplate"></ng-container>
+              </div>
             </ng-container>
           </div>
           <!--transactionCategory = 'loans and debts'-->
