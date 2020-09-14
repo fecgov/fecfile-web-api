@@ -324,14 +324,12 @@ def get_data_details(report_id, cmte_id):
 def get_f3l_summary_details(report_id, cmte_id):
     try:
         cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        cashOnHandYear = cvg_start_date.year
 
         contribute_amount_query = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total",COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total"FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR') AND delete_ind IS DISTINCT FROM 'Y'"""
 
         values = [cmte_id, report_id]
 
         return {
-            "cashOnHandYear": cashOnHandYear,
             "contribute_amount_query": json_query(contribute_amount_query, values, "Form3L", False)[0],
             "calAmount": True
         }
