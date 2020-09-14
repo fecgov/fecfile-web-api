@@ -31,6 +31,8 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   public progressPercent: number;
   public processingPercent: number;
   public hideProcessingProgress: boolean;
+  public showSpinner: boolean;
+  public uploadingText: string;
 
   private onDestroy$: Subject<any>;
   private uploadProcessing$: Subject<any>;
@@ -46,6 +48,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     this.onDestroy$ = new Subject();
     this.showUpload = true;
     this.hideProcessingProgress = true;
+    this.showSpinner = false;
     this.progressPercent = 0;
     this.processingPercent = 0;
     this.getProgress();
@@ -206,6 +209,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   public fileSelected() {
     this.progressPercent = 0;
     this.showUpload = false;
+    this.uploadingText = 'Uploading...';
     if (this.selectFileInput.nativeElement.files) {
       if (this.selectFileInput.nativeElement.files[0]) {
         const file = this.selectFileInput.nativeElement.files[0];
@@ -223,6 +227,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
         });
         this.checkForProcessingProgress();
         this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
+          this.showSpinner = false;
           this.emitUploadResults(res);
         });
       });
@@ -246,6 +251,23 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
    * Check for processing progress now that upload is complete.
    */
   private checkForProcessingProgress() {
+
+    // Ensure Upload complete message and spnner appear simultaneously using delay.
+    const timer1 = timer(300);
+    const timerSubject = new Subject<any>();
+    const timerSubscription = timer1
+      .pipe(takeUntil(timerSubject))
+      .subscribe(() => {
+        this.uploadingText = 'Upload complete!';
+        this.showSpinner = true;
+        if (timerSubscription) {
+          timerSubscription.unsubscribe();
+        }
+        timerSubject.next();
+        timerSubject.complete();
+      });
+
+
     // this.hideProcessingProgress = false;
     // const progressPoller = interval(500);
     // this.uploadProcessing$ = new Subject();
@@ -270,6 +292,9 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   public getProgress() {
     this.uploadContactsService.getProgressPercent().takeUntil(this.onDestroy$).subscribe((percent: number) => {
       this.progressPercent = percent;
+      if (this.progressPercent >= 100) {
+        // this.uploadingText = 'Upload complete!';
+      }
     });
   }
 

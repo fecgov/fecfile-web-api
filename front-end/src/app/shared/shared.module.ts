@@ -17,6 +17,7 @@ import { InputModalComponent } from './partials/input-modal/input-modal.componen
 import { ExportDirective } from './directives/export.directive';
 import { ReportTypeSidebarComponent } from '../forms/form-3x/report-type-sidebar/report-type-sidebar.component';
 import { ReportTypeComponent } from '../forms/form-3x/report-type/report-type.component';
+import { SpinnerComponent } from './partials/spinner/spinner.component';
 
 @NgModule({
   imports: [
@@ -34,7 +35,8 @@ import { ReportTypeComponent } from '../forms/form-3x/report-type/report-type.co
     ReportTypeComponent,
     ValidateComponent,
     PhonePipe,
-    InputModalComponent
+    InputModalComponent,
+    SpinnerComponent
   ],
   exports: [
     CommonModule,
@@ -51,6 +53,7 @@ import { ReportTypeComponent } from '../forms/form-3x/report-type/report-type.co
     SubmitComponent,
     ReportTypeComponent,
     InputModalComponent,
+    SpinnerComponent
   ],
   providers: [
     DecimalPipe,
