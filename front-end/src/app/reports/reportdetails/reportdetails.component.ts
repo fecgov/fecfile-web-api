@@ -958,7 +958,7 @@ public printReport(report: reportModel): void{
       setTimeout(() => {
         this._router.navigate(['/forms/form/99'], { queryParams: { step: 'step_1', edit: false } });
       }, 1500);
-    } else if (report.form_type === 'F3X' || report.form_type === 'F24') {
+    } else if (report.form_type === 'F3X' || report.form_type === 'F24' || report.form_type === 'F3L') {
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
@@ -972,7 +972,7 @@ public printReport(report: reportModel): void{
         const isFiled = report.status.toUpperCase() === 'FILED';
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          if (formType === '3X') {
+          if (formType === '3X' || formType === '3L') {
             this._router.navigate([`/forms/form/${formType}`], {
               queryParams: { step: 'financial_summary', reportId: report.report_id, edit: false, isFiled: isFiled }
             });

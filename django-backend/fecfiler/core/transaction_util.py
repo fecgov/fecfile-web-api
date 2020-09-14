@@ -1088,7 +1088,7 @@ def post_process_it(cursor, cmte_id):
     merged_list = []
     for item in transaction_list:
 
-        entity_id = item.get("entity_id")
+        entity_id = item.get("entity_id",item.get("payee_entity_id"))
         data = {"entity_id": entity_id, "cmte_id": cmte_id}
 
         entity_list = get_entities(data)

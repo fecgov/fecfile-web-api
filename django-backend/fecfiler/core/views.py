@@ -285,12 +285,15 @@ def get_transaction_categories(request):
             else:
                 cmte_type_category = "PAC"
             cursor.execute(
-                "select transaction_category_json from transaction_category_json_view where form_type = %s AND cmte_type_category = %s",
-                [form_type, cmte_type_category],
+                "select transaction_category_json from transaction_category_json_view where (%s is null or form_type = %s) AND cmte_type_category = %s",
+                [form_type, form_type, cmte_type_category],
             )
+            transactionCategories = []
             for row in cursor.fetchall():
                 data_row = list(row)
                 forms_obj = data_row[0]
+                transactionCategories.extend(forms_obj['data']['transactionCategories'])
+            forms_obj['data']['transactionCategories'] = transactionCategories
 
         if not bool(forms_obj):
             return Response(
@@ -347,8 +350,8 @@ def get_transaction_types(request):
             form_type = request.query_params.get("form_type")
 
             cursor.execute(
-                "select tran_identifier,tran_desc,category_type  from ref_transaction_types where form_type = %s",
-                [form_type],
+                "select tran_identifier,tran_desc,category_type  from ref_transaction_types where %s is null or form_type = %s",
+                [form_type,form_type],
             )
             rows = cursor.fetchall()
 
@@ -1478,8 +1481,8 @@ def put_reports(data):
                     put_sql_form3l(
                         data.get("report_id"),
                         cmte_id,
-                        data.get('election_date'),
-                        data.get('election_state')
+                        data.get('date_of_election'),
+                        data.get('state_of_election')
                         )
             except Exception as e:
                 put_sql_report(
@@ -1655,11 +1658,18 @@ def reposit_f3x_data(cmte_id, report_id, form_type='F3X'):
             "sched_l",
             "form_3x",
         ]
-    else:
+    elif form_type == 'F24':
         transaction_tables = [
             "reports",
             "sched_e",
             "form_24",
+        ]
+    elif form_type == 'F3L':
+        transaction_tables = [
+            "reports",
+            "sched_a",
+            "sched_b",
+            "form_3l",
         ]
     # transaction_tables = ['sched_b']
     backend_connection = psycopg2.connect(
@@ -1847,7 +1857,7 @@ def submit_report(request):
         if not report_id:
             raise Exception()
         fec_id = report_id
-        if form_tp in ["F3X", "F24"]:
+        if form_tp in ["F3X", "F24", "F3L"]:
             update_tbl = "public.reports"
             f_id = "report_id"
         elif form_tp == "F99":
@@ -1856,7 +1866,7 @@ def submit_report(request):
         else:
             raise Exception("Error: invalid form type.")
 
-        if form_tp in ["F3X", "F24"]:
+        if form_tp in ["F3X", "F24", "F3L"]:
             _sql_update = (
                     """
                 UPDATE {}""".format(
@@ -1899,13 +1909,19 @@ def submit_report(request):
                 cursor.execute(_sql_F3X, [datetime.datetime.now(), report_id])
                 if cursor.rowcount == 0:
                     raise Exception("F3X table {} update failed".format(report_id))
+        if form_tp == "F3L":
+            _sql_F3L = """ UPDATE public.form_3l SET sign_date = %s WHERE report_id = %s"""
+            with connection.cursor() as cursor:
+                cursor.execute(_sql_F3L, [datetime.datetime.now(), report_id])
+                if cursor.rowcount == 0:
+                    raise Exception("F3L table {} update failed".format(report_id))
         if form_tp == "F24":
             _sql_F24 = """ UPDATE public.form_24 SET sign_date = %s WHERE report_id = %s"""
             with connection.cursor() as cursor:
                 cursor.execute(_sql_F24, [datetime.datetime.now(), report_id])
                 if cursor.rowcount == 0:
                     raise Exception("F24 table {} update failed".format(report_id))
-        if form_tp in ["F3X", "F24"]:
+        if form_tp in ["F3X", "F24","F3L"]:
             reposit_f3x_data(cmte_id, report_id, form_tp)
         elif form_tp == "F99":
             reposit_f99_data(cmte_id, report_id)
@@ -1930,7 +1946,7 @@ def submit_report(request):
         email(True, email_data)
         logger.debug("email success.")
 
-        if form_tp in ["F3X", "F24"]:
+        if form_tp in ["F3X", "F24", "F3L"]:
             _sql_response = """
             SELECT json_agg(t) FROM (
                 SELECT 'FEC-' || fec_id as fec_id, status, filed_date, message, cmte_id as committee_id, submission_id as submissionId, uploaded_date as upload_timestamp
@@ -3634,7 +3650,7 @@ def get_trans_query(category_type, cmte_id, param_string):
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, beneficiary_cmte_id, election_code, 
                                 election_year, election_other_description,transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isredesignatable, "isRedesignation",
-                                mirror_report_id, mirror_transaction_id 
+                                mirror_report_id, mirror_transaction_id, semi_annual_refund_bundled_amount 
                                 from all_disbursements_transactions_view
                             where cmte_id='"""
                 + cmte_id
@@ -3674,7 +3690,8 @@ def get_trans_query(category_type, cmte_id, param_string):
                 """SELECT report_id, form_type, report_type, reportStatus, transaction_type, transaction_type_desc, transaction_id, api_call, name, street_1, street_2, city, state, zip_code, transaction_date, 
                                 COALESCE(transaction_amount, 0.0) AS transaction_amount, back_ref_transaction_id,
                                 COALESCE(aggregate_amt, 0.0) AS aggregate_amt, purpose_description, occupation, employer, memo_code, memo_text, itemized, election_code, election_other_description, 
-                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isreattributable, "isReattribution" 
+                                transaction_type_identifier, entity_id, entity_type, deleteddate, isEditable, forceitemizable, aggregation_ind, hasChild, isreattributable, "isReattribution", 
+                                semi_annual_refund_bundled_amount 
                                 from all_receipts_transactions_view
                             where cmte_id='"""
                 + cmte_id
@@ -3750,6 +3767,20 @@ def filter_get_all_trans(request, param_string):
                 param_string
                 + " AND aggregate_amt <= '"
                 + str(filt_dict["filterAggregateAmountMax"])
+                + "'"
+        )
+    if filt_dict.get("filterSemiAnnualAmountMin") not in [None, "null"]:
+        param_string = (
+                param_string
+                + " AND semi_annual_refund_bundled_amount >= '"
+                + str(filt_dict["filterSemiAnnualAmountMin"])
+                + "'"
+        )
+    if filt_dict.get("filterSemiAnnualAmountMax") not in [None, "null"]:
+        param_string = (
+                param_string
+                + " AND semi_annual_refund_bundled_amount <= '"
+                + str(filt_dict["filterSemiAnnualAmountMax"])
                 + "'"
         )
     if filt_dict.get("filterStates"):
@@ -4210,9 +4241,11 @@ def get_transactions(request, transaction_id):
     if ctgry_type == "disbursements_tran":
         parent_transaction_id = "null" if transaction_id is None else ("'" + transaction_id + "'")
         param_string += """ AND ( COALESCE(back_ref_transaction_id, 'NONE') = COALESCE(""" + parent_transaction_id + """, 'NONE') 
-            OR transaction_type_identifier in ('IK_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT','PARTY_IK_OUT','PAC_IK_OUT')"""
+            OR transaction_type_identifier in ('IK_OUT','IK_TRAN_OUT','IK_TRAN_FEA_OUT','PARTY_IK_OUT','PAC_IK_OUT'"""
         if transaction_id is not None:
-            param_string += " OR  transaction_id = '" + transaction_id + "'"
+            param_string += ") OR  transaction_id = '" + transaction_id + "'"
+        else:
+            param_string += ",'FEA_100PCT_DEBT_PAY','OPEXP_DEBT','OTH_DISB_DEBT','IE_B4_DISSE','COEXP_PARTY_DEBT','LOAN_REPAY_MADE','LOANS_MADE')"
         param_string += " ) "
 
     filters_post = request.data.get("filters", {})
@@ -4244,6 +4277,7 @@ def get_transactions(request, transaction_id):
 
     output_list = []
     total_amount = 0.0
+    totalSemiAnnualAmount = 0.0
     #: set transaction query with offsets.
     if transaction_id is None:
         trans_query_string = set_offset_n_fetch(trans_query_string, page_num, itemsperpage)
@@ -4251,7 +4285,7 @@ def get_transactions(request, transaction_id):
     #    trans_query_string = "(" + trans_query_string + ") UNION (" + trans_query_string[0:trans_query_string.index(" from ")] + " from ( SELECT W.* FROM (" + trans_query_string + ") V join " + get_trans_view_name(ctgry_type) + " W on V.transaction_id = W.back_ref_transaction_id) Z)"
 
     with connection.cursor() as cursor:
-        logger.debug('query all transactions with sql:{}'.format(trans_query_string))
+        # logger.debug('query all transactions with sql:{}'.format(trans_query_string))
         cursor.execute(
             """SELECT json_agg(t) FROM (""" + trans_query_string + """) t"""
         )
@@ -4300,6 +4334,7 @@ def get_transactions(request, transaction_id):
                 for tran_id, transaction in transaction_dict.items():
                     if transaction.get("memo_code") != "X":
                         total_amount += transaction.get("transaction_amount", 0.0)
+                        totalSemiAnnualAmount += transaction.get("semi_annual_refund_bundled_amount", 0.0)
                     # if transaction.get('transaction_type_identifier') in NOT_DELETE_TRANSACTION_TYPE_IDENTIFIER:
                     #     transaction['isEditable'] = Falseet
 
@@ -4328,6 +4363,7 @@ def get_transactions(request, transaction_id):
         )
         row1=cursor.fetchone()[0]
         totalcount =  row1[0]['count']
+        print(totalcount)
     
     # logger.debug(output_list)
 #: tweak the query to get the transactions count as per page
@@ -4353,10 +4389,12 @@ def get_transactions(request, transaction_id):
         "pageNumber": page_num,
         "totalPages": numofpages,
     }
-    #print("""aaaaaaaaa""")     
+    print(json_result)
 
     if total_amount:
         json_result["totalAmount"] = total_amount
+    if totalSemiAnnualAmount:
+        json_result["totalSemiAnnualAmount"] = totalSemiAnnualAmount
     
     return json_result, status_value
 
@@ -4364,24 +4402,31 @@ def get_transactions(request, transaction_id):
 def get_all_transactions(request):
     try:
         json_result, status_value = get_transactions(request, None)
-
-        # Add child transactions
-        transactions = json_result["transactions"].copy()
-        offset = 0
-        for i in range(len(transactions)):
-            j = i + offset
+        if request.data.get("category_type") != 'loans_tran':
+            # Add child transactions
+            transactions = json_result["transactions"].copy()
             offset = 0
+            for i in range(len(transactions)):
+                j = i + offset
+                offset = 0
 
-            transaction = transactions[i]
-            if transaction["haschild"]:
-                transaction_id = transaction["transaction_id"]
-                c_json_result, c_status_value = get_transactions(request, transaction_id)
-                c_transactions = c_json_result["transactions"]
-                if len(c_transactions) > 0:
-                    del json_result["transactions"][j]
-                    json_result["transactions"][j:j] = c_transactions
-                    offset = len(c_transactions) - 1
-
+                transaction = transactions[i]
+                if transaction["haschild"]:
+                    transaction_id = transaction["transaction_id"]
+                    c_json_result, c_status_value = get_transactions(request, transaction_id)
+                    c_transactions = c_json_result["transactions"]
+                    if len(c_transactions) > 0:
+                        del json_result["transactions"][j]
+                        json_result["transactions"][j:j] = c_transactions
+                        offset = len(c_transactions) - 1
+        # Removing duplicates from the list
+        # transaction_id_list=[]
+        # for i,transaction in enumerate(json_result.get('transactions')):
+        #     if transaction.get('transaction_id') in transaction_id_list:
+        #         del json_result["transactions"][i]
+        #     else:
+        #         transaction_id_list.append(transaction.get('transaction_id'))
+        print(json_result)
         return Response(json_result, status=status_value)
     except Exception as e:
         print(e)
@@ -5663,55 +5708,36 @@ def get_summary_table(request):
         ):
             raise Exception("Missing Input: calendar_year is mandatory")
 
+        form_type = request.query_params.get("form_type", 'F3X')
         report_id = check_report_id(request.query_params.get("report_id"))
-        # calendar_year = check_calendar_year(request.query_params.get("calendar_year"))
-        # logger.debug(
-        #     "query_params: report_id {}, calendar_year {}".format(
-        #         report_id, calendar_year
-        #     )
-        # )
-        # cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
-        # period_args = [
-        #     datetime.date(int(calendar_year), 1, 1),
-        #     # datetime.date(int(calendar_year), 12, 31),
-        #     cvg_end_date,
-        #     cmte_id,
-        #     report_id,
-        # ]
-        # logger.debug("period_args:{}".format(period_args))
+        if form_type == 'F3X':
+            output_dict = get_F3X_data(cmte_id, report_id)
+            period_receipt = summary_receipts_for_sumamry_table(output_dict)
+            period_disbursement = summary_disbursements_for_sumamry_table(output_dict)
 
-        # logger.debug("load receipts and disbursements...")
-        output_dict = get_F3X_data(cmte_id, report_id)
-        period_receipt = summary_receipts_for_sumamry_table(output_dict)
-        period_disbursement = summary_disbursements_for_sumamry_table(output_dict)
+            cash_summary = {
+                "COH AS OF JANUARY 1": output_dict.get('coh_begin_calendar_yr',0.0),
+                "BEGINNING CASH ON HAND": output_dict.get('coh_bop',0.0),
+                "ENDING CASH ON HAND": output_dict.get('coh_cop',0.0),
+            }
+            logger.debug("cash summary:{}".format(cash_summary))
 
-        """
-        calendar_args = [cmte_id, date(int(calendar_year), 1, 1), date(int(calendar_year), 12, 31)]
-        calendar_receipt = summary_receipts(calendar_args)
-        calendar_disbursement = summary_disbursements(calendar_args)
-        """
-        # logger.debug("load cash on hand...")
-        # coh_bop_ytd = prev_cash_on_hand_cop(report_id, cmte_id, True)
-        # coh_bop = prev_cash_on_hand_cop(report_id, cmte_id, False)
-        # coh_cop = COH_cop(coh_bop, period_receipt, period_disbursement)
+            loan_and_debts = load_loan_debt_summary(output_dict)
+            logger.debug("adding loan and debts:{}".format(loan_and_debts))
+            cash_summary.update(loan_and_debts)
+            logger.debug("adding loan and debts:{}".format(cash_summary))
 
-        cash_summary = {
-            "COH AS OF JANUARY 1": output_dict.get('coh_begin_calendar_yr',0.0),
-            "BEGINNING CASH ON HAND": output_dict.get('coh_bop',0.0),
-            "ENDING CASH ON HAND": output_dict.get('coh_cop',0.0),
-        }
-        logger.debug("cash summary:{}".format(cash_summary))
-
-        loan_and_debts = load_loan_debt_summary(output_dict)
-        logger.debug("adding loan and debts:{}".format(loan_and_debts))
-        cash_summary.update(loan_and_debts)
-        logger.debug("adding loan and debts:{}".format(cash_summary))
-
-        forms_obj = {
-            "Total Raised": {"period_receipts": period_receipt},
-            "Total Spent": {"period_disbursements": period_disbursement},
-            "Cash summary": cash_summary,
-        }
+            forms_obj = {
+                "Total Raised": {"period_receipts": period_receipt},
+                "Total Spent": {"period_disbursements": period_disbursement},
+                "Cash summary": cash_summary,
+            }
+        elif form_type == 'F3L':
+            forms_obj = {
+              "Summary": get_F3L_data(cmte_id, report_id)
+            }
+        else:
+            raise Exception('This API is implemented for only Form 3X and 3L')
         logger.debug("summary result:{}".format(forms_obj))
 
         return Response(forms_obj, status=status.HTTP_200_OK)
@@ -6134,6 +6160,28 @@ def get_F3X_data(cmte_id, report_id):
             "The get_F3X_data function is throwing an error: " + str(e)
         )
 
+def get_F3L_data(cmte_id, report_id):
+    try:
+        _sql = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total", 
+                        COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total" 
+                      FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND
+                      transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR')
+                      AND delete_ind IS DISTINCT FROM 'Y'"""
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+            )
+            output_dict = cursor.fetchone()[0]
+            if output_dict:
+                return output_dict[0]
+            else:
+                raise Exception("""The reportId: {} for committee Id: {} does not exist in 
+          sched_a table.""".format(report_id, cmte_id))
+    except Exception as e:
+        raise Exception(
+            "The get_F3L_data function is throwing an error: " + str(e)
+        )
+
 """
 ******************************************************************************************************************************
 END - GET SUMMARY TABLE API - CORE APP
@@ -6395,11 +6443,14 @@ def get_report_info(request):
                                       email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
                                       additional_email_2 as additionalEmail2, 
                                       (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue,
-                                      rp.status AS reportStatus, rp.semi_annual_start_date, rp.semi_annual_end_date, f3l.election_date, f3l.election_state
+                                      rp.status AS reportStatus, rp.semi_annual_start_date, rp.semi_annual_end_date, f3l.election_date, f3l.election_state,
+                                      COALESCE(max.max_threshold_amount,0.0) AS "maximumThresholdAmount"
                                       FROM public.reports rp 
                                       LEFT JOIN form_3x x ON rp.report_id = x.report_id
                                       LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
                                       LEFT JOIN public.form_3l f3l ON f3l.report_id = rp.report_id
+                                      LEFT JOIN public.ref_max_threshold_amount max ON max.form_type=rp.form_type 
+                                      AND COALESCE(date_part('year',cvg_start_date),date_part('year',semi_annual_start_date))=max.year
                                       WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id = %s AND rp.report_id = %s"""
                     # print("query_string", query_string)
 
@@ -8982,9 +9033,9 @@ def clone_a_transaction(request):
             # set transaction date to today's date and transaction amount to 0
             from datetime import date
 
-            _today = date.today().strftime("%m/%d/%Y")
+            _today = date.today().strftime("%Y-%m-%d")
             if transaction_id.startswith("SA") or transaction_id.startswith("LA"):
-                select_str = select_str.replace("contribution_date", "'" + _today + "'")
+                select_str = select_str.replace("contribution_date", "CASE WHEN contribution_date is not null THEN '" + _today + "' ELSE contribution_date END")
                 select_str = select_str.replace("contribution_amount", "'" + "0.00" + "'")
             if (
                     transaction_id.startswith("SB")
@@ -9053,11 +9104,13 @@ def clone_a_transaction(request):
             )
             clone_sql = clone_sql + " WHERE transaction_id = %s;"
             logger.debug("clone transaction with sql:{}".format(clone_sql))
-
-            cursor.execute(
-                clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id)
-            )
-
+            try:
+                cursor.execute(
+                    clone_sql, (new_tran_id, datetime.datetime.now(), None, transaction_id)
+                )
+            except Exception as e:
+                print(cursor.query)
+                raise Exception(e)
             if not cursor.rowcount:
                 raise Exception("transaction clone error")
 
@@ -10964,9 +11017,9 @@ def put_sql_form3l(
 ):
     try:
         with connection.cursor() as cursor:
-            # Insert data into Form 24 table
+            # Insert data into Form 3L table
             cursor.execute(
-                """UPDATE public.form_24 SET election_date=%s, election_state=%s, last_update_date=%s WHERE report_id=%s, cmte_id=%s)""",
+                """UPDATE public.form_3l SET election_date=%s, election_state=%s, last_update_date=%s WHERE report_id=%s and cmte_id=%s""",
                 [
                     election_date,
                     election_state,

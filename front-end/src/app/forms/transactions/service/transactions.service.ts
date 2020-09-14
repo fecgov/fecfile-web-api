@@ -17,6 +17,7 @@ import { TransactionModel } from '../model/transaction.model';
 export interface GetTransactionsResponse {
   transactions: TransactionModel[];
   totalAmount: number;
+  totalSemiAnnualAmount: number;
   totalTransactionCount: number;
   totalPages: number;
 
@@ -496,6 +497,9 @@ export class TransactionsService {
       case 'loanBalance':
         name = 'loan_balance';
         break;
+      case 'semiAnnualAmount':
+        name = 'semi_annual_refund_bundled_amount';
+        break;
       case 'loanBeginningBalance':
       case 'debtBeginningBalance':
         name = 'loan_beginning_balance';
@@ -534,6 +538,7 @@ export class TransactionsService {
       return serverObject;
     }
     serverObject.report_type = model.reportType;
+    serverObject.semi_annual_refund_bundled_amount = model.semiAnnualAmount;
     serverObject.entity_id = model.entityId;
     serverObject.transaction_type_desc = model.type;
     serverObject.transaction_type_identifier = model.transactionTypeIdentifier;
@@ -1031,5 +1036,6 @@ function mapDatabaseRowToModel(model: TransactionModel, row: any) {
   model.forceitemizable = row.forceitemizable;
   model.mirrorReportId = row.mirror_report_id;
   model.mirrorTransactionId = row.mirror_transaction_id;
+  model.semiAnnualAmount = row.semi_annual_refund_bundled_amount;
 
 }
