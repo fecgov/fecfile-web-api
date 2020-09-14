@@ -252,7 +252,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
    */
   private checkForProcessingProgress() {
 
-    // Ensure Upload complete message and spnner appear simultaneously using delay.
+    // Ensure Upload complete message and spnner appear simultaneously using delay. 
     const timer1 = timer(300);
     const timerSubject = new Subject<any>();
     const timerSubscription = timer1
