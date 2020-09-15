@@ -21,13 +21,14 @@ import csv
 
 @api_view(["GET"])
 def sample_sql_generate(request):
+        tran = request.query_params.get("tran_type")
         try:
                 List_SA_similar_INDV_REC = ["INDV_REC", "PARTN_MEMO", "IK_REC", "REATT_FROM", "REATT_MEMO", "RET_REC", "EAR_REC",
                             "CON_EAR_UNDEP", "CON_EAR_DEP", "IND_RECNT_REC", "IND_NP_RECNT_ACC", "IND_NP_HQ_ACC", "IND_NP_CONVEN_ACC",
                             "IND_REC_NON_CONT_ACC", "JF_TRAN_IND_MEMO", "JF_TRAN_NP_RECNT_IND_MEMO", "JF_TRAN_NP_CONVEN_IND_MEMO",
                             "JF_TRAN_NP_HQ_IND_MEMO", "EAR_REC_RECNT_ACC", "EAR_REC_CONVEN_ACC", "EAR_REC_HQ_ACC"]
                 INDV_REC_STRING = ""
-                for tran in List_SA_similar_INDV_REC:
+                if tran in List_SA_similar_INDV_REC:
                     query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
                     COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
                     COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
@@ -72,7 +73,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                             "BUS_LAB_NON_CONT_ACC", "JF_TRAN_TRIB_MEMO", "JF_TRAN_NP_RECNT_TRIB_MEMO", "JF_TRAN_NP_CONVEN_TRIB_MEMO",
                             "JF_TRAN_NP_HQ_TRIB_MEMO", "LOAN_FROM_BANK"]
                 PAR_CON_STRING = ""
-                for tran in list_SA_similar_PAR_CON:
+                if tran in list_SA_similar_PAR_CON:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -111,7 +112,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                                 "JF_TRAN_NP_RECNT_ACC", "JF_TRAN_NP_RECNT_PAC_MEMO", "JF_TRAN_NP_CONVEN_ACC", "JF_TRAN_NP_CONVEN_PAC_MEMO", "JF_TRAN_NP_HQ_ACC",
                                 "JF_TRAN_NP_HQ_PAC_MEMO", "EAR_REC_RECNT_ACC_MEMO", "EAR_REC_CONVEN_ACC_MEMO", "EAR_REC_HQ_ACC_MEMO"]
                 COND_EARM_PAC_STRING = ""
-                for tran in list_SA_similar_COND_EARM_PAC:
+                if tran in list_SA_similar_COND_EARM_PAC:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
@@ -143,9 +144,51 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                 list_SA_similar_REF_FED_CAN = ["REF_TO_FED_CAN"]
                 list_SA_similar_OTH_REC = ["OTH_REC", "OTH_REC_DEBT"]
                 list_SA_similar_REF_NFED_CAN = ["REF_TO_OTH_CMTE"]
+                list_SA_similar_F3L_IND = ["IND_BNDLR"]
 
                 SA_OTHER_STRING = ""
-                for tran in list_SA_similar_OFFSET:
+                if tran in list_SA_similar_F3L_IND:
+                    query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                                        COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
+                                        COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
+                                        t1.transaction_id AS "transactionId",
+                                        COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                                        COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                                        COALESCE(to_char(t1.contribution_date,''MM/DD/YYYY''), '''') AS "contributionDate", 
+                                        t1.contribution_amount AS "contributionAmount", 
+                                        COALESCE(t1.aggregate_amt, 0.0) AS "contributionAggregate",                                        
+                                        COALESCE(t1.memo_code, '''') AS "memoCode", 
+                                        COALESCE(t1.memo_text, '''') AS "memoDescription",
+                                        COALESCE(t2.entity_type, '''') AS "entityType", 
+                                        COALESCE(t2.last_name, '''') AS "contributorLastName", 
+                                        COALESCE(t2.first_name, '''') AS "contributorFirstName",
+                                        COALESCE(t2.middle_name, '''') AS "contributorMiddleName", 
+                                        COALESCE(t2.preffix, '''') AS "contributorPrefix", 
+                                        COALESCE(t2.suffix, '''') AS "contributorSuffix",
+                                        COALESCE(t2.street_1, '''') AS "contributorStreet1", 
+                                        COALESCE(t2.street_2, '''') AS "contributorStreet2", 
+                                        COALESCE(t2.city, '''') AS "contributorCity",
+                                        COALESCE(t2.state, '''') AS "contributorState", 
+                                        COALESCE(t2.zip_code, '''') AS "contributorZipCode", 
+                                        COALESCE(t2.employer, '''') AS "contributorEmployer",
+                                        COALESCE(t2.occupation, '''') AS "contributorOccupation"
+                                        FROM public.sched_a t1
+                                        LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                                        WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                                        (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(
+                        tran)
+                    INDV_REC_STRING += """
+                                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                                        AND form_type = '{2}' AND sched_type = '{3}';\n
+                                        """.format(query, tran, 'F3L', 'SA')
+                    INDV_REC_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                    VALUES ('F3L', 'SA', '{0}', '{1}');\n""".format(tran, query)
+
+                    file = open("/tmp/indv_rec_f3L_sql.sql", 'w')
+                    file.write(INDV_REC_STRING)
+                    file.close()
+
+                if tran in list_SA_similar_OFFSET:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
@@ -170,7 +213,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                         SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
-                for tran in list_SA_similar_OTH_REC:
+                if tran in list_SA_similar_OTH_REC:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
@@ -196,7 +239,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                         SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
-                for tran in list_SA_similar_REF_NFED_CAN:
+                if tran in list_SA_similar_REF_NFED_CAN:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
@@ -221,7 +264,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                         SA_OTHER_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
-                for tran in list_SA_similar_REF_FED_CAN:
+                if tran in list_SA_similar_REF_FED_CAN:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
@@ -257,7 +300,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                 list_SB_similar_IK_OUT_PTY = ["PARTY_IK_OUT", "PAC_IK_OUT"]
 
                 SB_SA_CHILD_STRING = ""
-                for tran in list_SB_similar_IK_OUT:
+                if tran in list_SB_similar_IK_OUT:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -294,7 +337,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                         SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                for tran in list_SB_similar_IK_TF_OUT:
+                if tran in list_SB_similar_IK_TF_OUT:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
@@ -318,7 +361,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                         SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                for tran in list_SB_similar_EAR_OUT:
+                if tran in list_SB_similar_EAR_OUT:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
@@ -354,7 +397,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                         SB_SA_CHILD_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
-                for tran in list_SB_similar_IK_OUT_PTY:
+                if tran in list_SB_similar_IK_OUT_PTY:
 
                         query = """
                         SELECT COALESCE(t1.line_number, '''') AS "lineNumber", COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", t1.transaction_type_identifier AS "transactionTypeIdentifier",
@@ -391,13 +434,13 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(SA_OTHER_STRING)
                 file.close()
 
-                List_SB_similar_OPEX_REC = ['OPEXP', 'OPEXP_CC_PAY_MEMO', 'OPEXP_STAF_REIM', 'OPEXP_STAF_REIM_MEMO', 'OPEXP_PMT_TO_PROL_VOID', 'OTH_DISB', 
-                'OTH_DISB_CC_PAY_MEMO', 'OTH_DISB_STAF_REIM', 'OTH_DISB_STAF_REIM_MEMO', 'OPEXP_HQ_ACC_OP_EXP_NP', 
-                'OPEXP_CONV_ACC_OP_EXP_NP', 'OTH_DISB_NC_ACC', 'OTH_DISB_NC_ACC_CC_PAY_MEMO', 'OTH_DISB_NC_ACC_STAF_REIM', 
+                List_SB_similar_OPEX_REC = ['OPEXP', 'OPEXP_CC_PAY_MEMO', 'OPEXP_STAF_REIM', 'OPEXP_STAF_REIM_MEMO', 'OPEXP_PMT_TO_PROL_VOID', 'OTH_DISB',
+                'OTH_DISB_CC_PAY_MEMO', 'OTH_DISB_STAF_REIM', 'OTH_DISB_STAF_REIM_MEMO', 'OPEXP_HQ_ACC_OP_EXP_NP',
+                'OPEXP_CONV_ACC_OP_EXP_NP', 'OTH_DISB_NC_ACC', 'OTH_DISB_NC_ACC_CC_PAY_MEMO', 'OTH_DISB_NC_ACC_STAF_REIM',
                 'OTH_DISB_NC_ACC_STAF_REIM_MEMO', 'OTH_DISB_NC_ACC_PMT_TO_PROL_VOID', 'OPEXP_DEBT', 'OTH_DISB_DEBT', 'LOAN_REPAY_MADE', 'LOANS_MADE']
 
                 OPEX_REC_STRING = ""
-                for tran in List_SB_similar_OPEX_REC:
+                if tran in List_SB_similar_OPEX_REC:
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
                     COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
@@ -427,7 +470,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
-            
+
                     OPEX_REC_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n
@@ -437,13 +480,13 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(OPEX_REC_STRING)
                 file.close()
 
-                List_SB_similar_OPEX__CC = ['OPEXP_CC_PAY','OPEXP_PMT_TO_PROL','OTH_DISB_CC_PAY','OTH_DISB_PMT_TO_PROL','OTH_DISB_RECNT', 
-                'OTH_DISB_NP_RECNT_ACC', 'OTH_DISB_NC_ACC_CC_PAY', 'OTH_DISB_NC_ACC_PMT_TO_PROL', 'OPEXP_HQ_ACC_TRIB_REF', 
+                List_SB_similar_OPEX__CC = ['OPEXP_CC_PAY','OPEXP_PMT_TO_PROL','OTH_DISB_CC_PAY','OTH_DISB_PMT_TO_PROL','OTH_DISB_RECNT',
+                'OTH_DISB_NP_RECNT_ACC', 'OTH_DISB_NC_ACC_CC_PAY', 'OTH_DISB_NC_ACC_PMT_TO_PROL', 'OPEXP_HQ_ACC_TRIB_REF',
                 'OPEXP_CONV_ACC_TRIB_REF', 'OTH_DISB_NP_RECNT_TRIB_REF']
 
 
                 OPEX__CC_STRING = ""
-                for tran in List_SB_similar_OPEX__CC:
+                if tran in List_SB_similar_OPEX__CC:
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
                     COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
@@ -474,16 +517,16 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n
                     """.format(tran, query)
-      
+
                 file = open("/tmp/opex_cc_sql.sql", 'w')
                 file.write(OPEX__CC_STRING)
                 file.close()
 
-                List_SB_similar_PAY_MEMO = ['OPEXP_PMT_TO_PROL_MEMO','REF_CONT_IND', 'REF_CONT_IND_VOID','OTH_DISB_PMT_TO_PROL_MEMO', 
+                List_SB_similar_PAY_MEMO = ['OPEXP_PMT_TO_PROL_MEMO','REF_CONT_IND', 'REF_CONT_IND_VOID','OTH_DISB_PMT_TO_PROL_MEMO',
                 'OTH_DISB_NC_ACC_PMT_TO_PROL_MEMO', 'OPEXP_HQ_ACC_IND_REF', 'OPEXP_CONV_ACC_IND_REF', 'OTH_DISB_NP_RECNT_IND_REF']
 
                 PAY_MEMO_STRING = ""
-                for tran in List_SB_similar_PAY_MEMO:
+                if tran in List_SB_similar_PAY_MEMO:
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
                     COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
@@ -522,11 +565,11 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(PAY_MEMO_STRING)
                 file.close()
 
-                List_SB_similar_OPEX_TRAN = ['TRAN_TO_AFFI', 'CONT_TO_OTH_CMTE', 'REF_CONT_PARTY', 'REF_CONT_PARTY_VOID', 'OPEXP_HQ_ACC_REG_REF', 
+                List_SB_similar_OPEX_TRAN = ['TRAN_TO_AFFI', 'CONT_TO_OTH_CMTE', 'REF_CONT_PARTY', 'REF_CONT_PARTY_VOID', 'OPEXP_HQ_ACC_REG_REF',
                 'OPEXP_CONV_ACC_REG_REF', 'OTH_DISB_NP_RECNT_REG_REF']
 
                 OPEX_TRAN_STRING = ""
-                for tran in List_SB_similar_OPEX_TRAN:
+                if tran in List_SB_similar_OPEX_TRAN:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -564,11 +607,11 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file = open("/tmp/opex_tran_sql.sql", 'w')
                 file.write(OPEX_TRAN_STRING)
                 file.close()
-                
+
                 List_SB_similar_NONFED_PAC_RFD = ['REF_CONT_PAC', 'REF_CONT_NON_FED']
 
                 NONFED_PAC_RFD_STRING = ""
-                for tran in List_SB_similar_NONFED_PAC_RFD:
+                if tran in List_SB_similar_NONFED_PAC_RFD:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -616,11 +659,11 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file = open("/tmp/nonfed_pac_sql.sql", 'w')
                 file.write(NONFED_PAC_RFD_STRING)
                 file.close()
-               
+
                 List_SB_similar_CONTR_CAND = ['CONT_TO_CAN', 'CONT_TO_OTH_CMTE_VOID']
                 #import ipdb;ipdb.set_trace()
                 CONTR_CAND_STRING = ""
-                for tran in List_SB_similar_CONTR_CAND:
+                if tran in List_SB_similar_CONTR_CAND:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -661,7 +704,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                     WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
                     (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''
                     """.format(tran)
-                    
+
                     CONTR_CAND_STRING += """
                     INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
                     VALUES ('F3X', 'SB', '{0}', '{1}');\n
@@ -674,7 +717,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 List_SB_similar_VOID_RFND_PAC = ['REF_CONT_PAC_VOID', 'REF_CONT_NON_FED_VOID']
 
                 VOID_RFND_PAC_STRING = ""
-                for tran in List_SB_similar_VOID_RFND_PAC:
+                if tran in List_SB_similar_VOID_RFND_PAC:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -727,7 +770,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 List_SB_similar_FEA_PAYM = ['FEA_100PCT_PAY']
 
                 FEA_PAYM_STRING = ""
-                for tran in List_SB_similar_FEA_PAYM:
+                if tran in List_SB_similar_FEA_PAYM:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -786,7 +829,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 List_SB_similar_FEA_CC = ['FEA_PAY_TO_PROL', 'FEA_CC_PAY']
 
                 FEA_CC_STRING = ""
-                for tran in List_SB_similar_FEA_CC:
+                if tran in List_SB_similar_FEA_CC:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -838,11 +881,11 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.write(FEA_CC_STRING)
                 file.close()
 
-                List_SB_similar_FEA_CC_MEMO = ['FEA_CC_PAY_MEMO', 'FEA_STAF_REIM', 'FEA_STAF_REIM_MEMO', 'FEA_PAY_TO_PROL_VOID', 'FEA_100PCT_DEBT_PAY', 
+                List_SB_similar_FEA_CC_MEMO = ['FEA_CC_PAY_MEMO', 'FEA_STAF_REIM', 'FEA_STAF_REIM_MEMO', 'FEA_PAY_TO_PROL_VOID', 'FEA_100PCT_DEBT_PAY',
                     'PAC_CON_EAR_DEP_MEMO']
 
                 FEA_CC_MEMO_STRING = ""
-                for tran in List_SB_similar_FEA_CC_MEMO:
+                if tran in List_SB_similar_FEA_CC_MEMO:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -902,7 +945,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 List_SB_similar_FEA_PAY_MEMO = ['FEA_PAY_TO_PROL_MEMO']
 
                 FEA_PAY_MEMO_STRING = ""
-                for tran in List_SB_similar_FEA_PAY_MEMO:
+                if tran in List_SB_similar_FEA_PAY_MEMO:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -974,7 +1017,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SE_similar_IE = ['IE', 'IE_CC_PAY_MEMO', 'IE_STAF_REIM_MEMO', 'IE_VOID', 'IE_B4_DISSE_MEMO']
                 IE_STRING = ""
-                for tran in List_SE_similar_IE:
+                if tran in List_SE_similar_IE:
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
@@ -1037,7 +1080,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SE_similar_IE_CC = ['IE_CC_PAY', 'IE_PMT_TO_PROL']
                 IE_CC_STRING = ""
-                for tran in List_SE_similar_IE_CC:
+                if tran in List_SE_similar_IE_CC:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1098,7 +1141,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SE_similar_IE_STAF_REIM = ['IE_STAF_REIM', 'IE_PMT_TO_PROL_MEMO']
                 IE_STAF_REIM_STRING = ""
-                for tran in List_SE_similar_IE_STAF_REIM:
+                if tran in List_SE_similar_IE_STAF_REIM:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -1167,7 +1210,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SF_similar_CORD_EXP = ['COEXP_PARTY', 'COEXP_PARTY_DEBT']
                 CORD_EXP_STRING = ""
-                for tran in List_SF_similar_CORD_EXP:
+                if tran in List_SF_similar_CORD_EXP:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
@@ -1231,7 +1274,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 List_SF_similar_CORD_EXP_CC = ['COEXP_CC_PAY', 'COEXP_PMT_PROL']
 
                 CORD_EXP_CC_STRING = ""
-                for tran in List_SF_similar_CORD_EXP_CC:
+                if tran in List_SF_similar_CORD_EXP_CC:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
@@ -1290,7 +1333,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 List_SF_similar_CORD_CC_MEMO = ['COEXP_CC_PAY_MEMO', 'COEXP_STAF_REIM_MEMO', 'COEXP_PARTY_VOID']
 
                 CORD_CC_MEMO_STRING = ""
-                for tran in List_SF_similar_CORD_CC_MEMO:
+                if tran in List_SF_similar_CORD_CC_MEMO:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -1353,7 +1396,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SF_similar_CORD_REIM = ['COEXP_STAF_REIM', 'COEXP_PMT_PROL_MEMO']
                 CORD_REIM_STRING = ""
-                for tran in List_SF_similar_CORD_REIM:
+                if tran in List_SF_similar_CORD_REIM:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
@@ -1413,7 +1456,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file = open("/tmp/CORD_REIM_sql.sql", 'w')
                 file.write(CORD_REIM_STRING)
                 file.close()
-                
+
                 file = open("/tmp/SF_sql.sql", 'w')
                 file.write(CORD_EXP_STRING)
                 file.write(CORD_EXP_CC_STRING)
@@ -1423,7 +1466,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SD_similar_DEBT= ['DEBT_TO_VENDOR', 'DEBT_BY_VENDOR']
                 DEBT_STRING = ""
-                for tran in List_SD_similar_DEBT:
+                if tran in List_SD_similar_DEBT:
 
                     query = """
                     SELECT COALESCE(t1.line_num, '''') AS "lineNumber",
@@ -1463,9 +1506,9 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
                 file.close()
 
 
-                List_SH6_similar_ALLOC_FEA_DEBT_VEN= ['ALLOC_FEA_DISB_DEBT'] 
+                List_SH6_similar_ALLOC_FEA_DEBT_VEN= ['ALLOC_FEA_DISB_DEBT']
                 ALLOC_FEA_DEBT_VEN_STRING = ""
-                for tran in List_SH6_similar_ALLOC_FEA_DEBT_VEN:
+                if tran in List_SH6_similar_ALLOC_FEA_DEBT_VEN:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1514,7 +1557,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SH4_similar_ALLOC_EXP_DEBT= ['ALLOC_EXP_DEBT']
                 ALLOC_EXP_DEBT_STRING = ""
-                for tran in List_SH4_similar_ALLOC_EXP_DEBT:
+                if tran in List_SH4_similar_ALLOC_EXP_DEBT:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1563,7 +1606,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SC_similar_LOANS_OWED_BY_CMTE= ['LOANS_OWED_BY_CMTE']
                 LOANS_OWED_BY_CMTE_STRING = ""
-                for tran in List_SC_similar_LOANS_OWED_BY_CMTE:
+                if tran in List_SC_similar_LOANS_OWED_BY_CMTE:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1619,7 +1662,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SC_similar_LOANS_OWED_TO_CMTE = ['LOANS_OWED_TO_CMTE']
                 LOANS_OWED_TO_CMTE_STRING = ""
-                for tran in List_SC_similar_LOANS_OWED_TO_CMTE:
+                if tran in List_SC_similar_LOANS_OWED_TO_CMTE:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1660,7 +1703,7 @@ VALUES ('F3X', 'SB', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SA_SC_similar_LOAN_FROM_IND = ['LOAN_FROM_IND']
                 SA_LOAN_FROM_IND_STRING = ""
-                for tran in List_SA_SC_similar_LOAN_FROM_IND:
+                if tran in List_SA_SC_similar_LOAN_FROM_IND:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1697,7 +1740,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SC1_similar_SC1 = ['SC1']
                 SC1_STRING = ""
-                for tran in List_SC1_similar_SC1:
+                if tran in List_SC1_similar_SC1:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1763,7 +1806,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SC2_similar_SC2 = ['SC2']
                 SC2_STRING = ""
-                for tran in List_SC2_similar_SC2:
+                if tran in List_SC2_similar_SC2:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1806,13 +1849,13 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
                 List_SH_similar_SH2 = ['ALLOC_H2_RATIO']
                 List_SH_similar_SH3 = ['TRAN_FROM_NON_FED_ACC']
                 List_SH_similar_SH5 = ['TRAN_FROM_LEVIN_ACC']
-                parent = {'ALLOC_EXP_CC_PAY': 'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM' :'ALLOC_EXP_STAF_REIM_MEMO', 
+                parent = {'ALLOC_EXP_CC_PAY': 'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM' :'ALLOC_EXP_STAF_REIM_MEMO',
                 'ALLOC_EXP_PMT_TO_PROL': 'ALLOC_EXP_PMT_TO_PROL_MEMO', 'ALLOC_FEA_CC_PAY': 'ALLOC_FEA_CC_PAY_MEMO',
                 'ALLOC_FEA_STAF_REIM': 'ALLOC_FEA_STAF_REIM_MEMO'
                 }
 
                 SH1_STRING = ""
-                for tran in List_SH_similar_SH1:
+                if tran in List_SH_similar_SH1:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1836,7 +1879,7 @@ VALUES ('F3X', 'SA', '{0}', '{1}');\n""".format(tran, query)
 VALUES ('F3X', 'SH1', '{0}', '{1}');\n""".format(tran, query)
 
                 SH2_STRING = ""
-                for tran in List_SH_similar_SH2:
+                if tran in List_SH_similar_SH2:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1857,7 +1900,7 @@ VALUES ('F3X', 'SH1', '{0}', '{1}');\n""".format(tran, query)
 VALUES ('F3X', 'SH2', '{0}', '{1}');\n""".format(tran, query)
 
                 SH3_STRING = ""
-                for tran in List_SH_similar_SH3:
+                if tran in List_SH_similar_SH3:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1882,7 +1925,7 @@ VALUES ('F3X', 'SH2', '{0}', '{1}');\n""".format(tran, query)
 VALUES ('F3X', 'SH3', '{0}', '{1}');\n""".format(tran, query)
 
                 SH5_STRING = ""
-                for tran in List_SH_similar_SH5:
+                if tran in List_SH_similar_SH5:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1905,10 +1948,10 @@ VALUES ('F3X', 'SH3', '{0}', '{1}');\n""".format(tran, query)
                     SH5_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
 VALUES ('F3X', 'SH5', '{0}', '{1}');\n""".format(tran, query)
 
-                List_SH_similar_SH4_ALLOC_EXP = ['ALLOC_EXP', 'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM', 'ALLOC_EXP_STAF_REIM_MEMO', 
+                List_SH_similar_SH4_ALLOC_EXP = ['ALLOC_EXP', 'ALLOC_EXP_CC_PAY_MEMO', 'ALLOC_EXP_STAF_REIM', 'ALLOC_EXP_STAF_REIM_MEMO',
                 'ALLOC_EXP_PMT_TO_PROL', 'ALLOC_EXP_VOID']
                 SH4_ALLOC_EXP_STRING = ""
-                for tran in List_SH_similar_SH4_ALLOC_EXP:
+                if tran in List_SH_similar_SH4_ALLOC_EXP:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1953,7 +1996,7 @@ VALUES ('F3X', 'SH5', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SH_similar_SH4_ALLOC_EXP_CC_PAY = ['ALLOC_EXP_CC_PAY']
                 SH4_ALLOC_EXP_CC_PAY_STRING = ""
-                for tran in List_SH_similar_SH4_ALLOC_EXP_CC_PAY:
+                if tran in List_SH_similar_SH4_ALLOC_EXP_CC_PAY:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -1993,7 +2036,7 @@ VALUES ('F3X', 'SH5', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SH_similar_SH4_ALLOC_EXP_PMT_TO_PROL_MEMO = ['ALLOC_EXP_PMT_TO_PROL_MEMO']
                 SH4_ALLOC_EXP_PMT_TO_PROL_MEMO_STRING = ""
-                for tran in List_SH_similar_SH4_ALLOC_EXP_PMT_TO_PROL_MEMO:
+                if tran in List_SH_similar_SH4_ALLOC_EXP_PMT_TO_PROL_MEMO:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -2035,11 +2078,11 @@ VALUES ('F3X', 'SH5', '{0}', '{1}');\n""".format(tran, query)
                     VALUES ('F3X', 'SH4', '{0}', '{1}');\n
                     """.format(tran, query)
 
-                List_SH_similar_SH6 = ['ALLOC_FEA_DISB', 'ALLOC_FEA_CC_PAY_MEMO', 'ALLOC_FEA_STAF_REIM', 'ALLOC_FEA_STAF_REIM_MEMO', 
+                List_SH_similar_SH6 = ['ALLOC_FEA_DISB', 'ALLOC_FEA_CC_PAY_MEMO', 'ALLOC_FEA_STAF_REIM', 'ALLOC_FEA_STAF_REIM_MEMO',
                 'ALLOC_FEA_VOID']
 
                 SH6_STRING = ""
-                for tran in List_SH_similar_SH6:
+                if tran in List_SH_similar_SH6:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -2084,7 +2127,7 @@ VALUES ('F3X', 'SH5', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SH_similar_SH6_ALLOC_FEA_CC_PAY = ['ALLOC_FEA_CC_PAY']
                 SH6_ALLOC_FEA_CC_PAY_STRING = ""
-                for tran in List_SH_similar_SH6_ALLOC_FEA_CC_PAY:
+                if tran in List_SH_similar_SH6_ALLOC_FEA_CC_PAY:
 
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
@@ -2136,7 +2179,7 @@ VALUES ('F3X', 'SH5', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SL_similar_SL = ['SCHED_L_SUM']
                 SL_STRING = ""
-                for tran in List_SL_similar_SL:
+                if tran in List_SL_similar_SL:
 
                     query = """
                     SELECT t1.transaction_type_identifier AS "transactionTypeIdentifier",
@@ -2194,7 +2237,7 @@ VALUES ('F3X', 'SH5', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SA_similar_INDV_REC = ["LEVIN_INDV_REC", "LEVIN_PARTN_MEMO"]
                 INDV_REC_STRING = ""
-                for tran in List_SA_similar_INDV_REC:
+                if tran in List_SA_similar_INDV_REC:
                     query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
 COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
 COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
@@ -2233,7 +2276,7 @@ VALUES ('F3X', 'SL-A', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SA_similar_BUS = ["LEVIN_ORG_REC"]
                 BUS_STRING = ""
-                for tran in List_SA_similar_BUS:
+                if tran in List_SA_similar_BUS:
                     query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
 COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
 COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
@@ -2268,7 +2311,7 @@ VALUES ('F3X', 'SL-A', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SA_similar_PAR_REC = ["LEVIN_PARTN_REC", "LEVIN_TRIB_REC"]
                 PAR_REC_STRING = ""
-                for tran in List_SA_similar_PAR_REC:
+                if tran in List_SA_similar_PAR_REC:
                     query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
 COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
 COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
@@ -2301,7 +2344,7 @@ VALUES ('F3X', 'SL-A', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SA_similar_PAC_REC = ["LEVIN_PAC_REC", "LEVIN_NON_FED_REC"]
                 PAC_REC_STRING = ""
-                for tran in List_SA_similar_PAC_REC:
+                if tran in List_SA_similar_PAC_REC:
                     query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
 COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
 COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
@@ -2336,7 +2379,7 @@ VALUES ('F3X', 'SL-A', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SA_similar_OTH_REC = ["LEVIN_OTH_REC"]
                 OTH_REC_STRING = ""
-                for tran in List_SA_similar_OTH_REC:
+                if tran in List_SA_similar_OTH_REC:
                     query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
 COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
 COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
@@ -2374,7 +2417,7 @@ VALUES ('F3X', 'SL-A', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SB_similar_VOTER = ["LEVIN_VOTER_REG", "LEVIN_VOTER_ID", "LEVIN_GOTV", "LEVIN_GEN", "LEVIN_OTH_DISB"]
                 VOTER_STRING = ""
-                for tran in List_SB_similar_VOTER:
+                if tran in List_SB_similar_VOTER:
                     query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
 COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
 COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
@@ -2421,7 +2464,7 @@ VALUES ('F3X', 'SL-B', '{0}', '{1}');\n""".format(tran, query)
 
                 List_SE_similar_IE = ['IE', 'IE_CC_PAY_MEMO', 'IE_STAF_REIM_MEMO', 'IE_VOID', 'IE_B4_DISSE']
                 IE_STRING = ""
-                for tran in List_SE_similar_IE:
+                if tran in List_SE_similar_IE:
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
@@ -2481,7 +2524,7 @@ VALUES ('F3X', 'SL-B', '{0}', '{1}');\n""".format(tran, query)
                 file.close()
                 List_SE_similar_MULTI_IE = ['IE_MULTI']
                 MULTI_IE_STRING = ""
-                for tran in List_SE_similar_MULTI_IE:
+                if tran in List_SE_similar_MULTI_IE:
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",  
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
@@ -2541,7 +2584,7 @@ VALUES ('F3X', 'SL-B', '{0}', '{1}');\n""".format(tran, query)
                 file.close()
                 List_SE_similar_IE_CC = ['IE_CC_PAY', 'IE_PMT_TO_PROL']
                 IE_CC_STRING = ""
-                for tran in List_SE_similar_IE_CC:
+                if tran in List_SE_similar_IE_CC:
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
@@ -2597,7 +2640,7 @@ VALUES ('F3X', 'SL-B', '{0}', '{1}');\n""".format(tran, query)
                 file.close()
                 List_SE_similar_IE_STAF_REIM = ['IE_STAF_REIM', 'IE_PMT_TO_PROL_MEMO']
                 IE_STAF_REIM_STRING = ""
-                for tran in List_SE_similar_IE_STAF_REIM:
+                if tran in List_SE_similar_IE_STAF_REIM:
                     query = """
                     SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
                     t1.transaction_type_identifier AS "transactionTypeIdentifier", 
@@ -2660,6 +2703,171 @@ VALUES ('F3X', 'SL-B', '{0}', '{1}');\n""".format(tran, query)
                 file.write(IE_CC_STRING)
                 file.write(IE_STAF_REIM_STRING)
                 file.close()
+
+                list_SA_similar_F3L_IND = ["IND_BNDLR"]
+                list_SA_similar_F3L_IND_ORG = ["REG_ORG_BNDLR"]
+                list_SA_similar_F3L_REF_IND = ["IND_REFUND"]
+                list_SA_similar_F3L_REF_ORG = ["REG_ORG_REFUND"]
+
+                INDV_REC_F3L_STRING = ""
+                if tran in list_SA_similar_F3L_IND:
+                    query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                                                        COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
+                                                        COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
+                                                        t1.transaction_id AS "transactionId",
+                                                        COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                                                        COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                                                        COALESCE(to_char(t1.contribution_date,''MM/DD/YYYY''), '''') AS "contributionDate", 
+                                                        t1.contribution_amount AS "contributionAmount", 
+                                                        COALESCE(t1.semi_annual_refund_bundled_amount, 0.0) AS "contributionAggregate",                                        
+                                                        COALESCE(t1.memo_code, '''') AS "memoCode", 
+                                                        COALESCE(t1.memo_text, '''') AS "memoDescription",
+                                                        COALESCE(t2.entity_type, '''') AS "entityType", 
+                                                        COALESCE(t2.last_name, '''') AS "contributorLastName", 
+                                                        COALESCE(t2.first_name, '''') AS "contributorFirstName",
+                                                        COALESCE(t2.middle_name, '''') AS "contributorMiddleName", 
+                                                        COALESCE(t2.preffix, '''') AS "contributorPrefix", 
+                                                        COALESCE(t2.suffix, '''') AS "contributorSuffix",
+                                                        COALESCE(t2.street_1, '''') AS "contributorStreet1", 
+                                                        COALESCE(t2.street_2, '''') AS "contributorStreet2", 
+                                                        COALESCE(t2.city, '''') AS "contributorCity",
+                                                        COALESCE(t2.state, '''') AS "contributorState", 
+                                                        COALESCE(t2.zip_code, '''') AS "contributorZipCode", 
+                                                        COALESCE(t2.employer, '''') AS "contributorEmployer",
+                                                        COALESCE(t2.occupation, '''') AS "contributorOccupation"
+                                                        FROM public.sched_a t1
+                                                        LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                                                        WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                                                        (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(
+                        tran)
+                    INDV_REC_F3L_STRING += """
+                                                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                                                        AND form_type = '{2}' AND sched_type = '{3}';\n
+                                                        """.format(query, tran, 'F3L', 'SA')
+                    INDV_REC_F3L_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                                    VALUES ('F3L', 'SA', '{0}', '{1}');\n""".format(tran, query)
+
+                    file = open("/tmp/indv_rec_f3L_sql.sql", 'w')
+                    file.write(INDV_REC_F3L_STRING)
+                    file.close()
+
+                ORG_REC_F3L_STRING = ""
+                if tran in list_SA_similar_F3L_IND_ORG:
+                    query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber", 
+                                                        COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
+                                                        COALESCE(t1.transaction_type_identifier, '''') AS "transactionTypeIdentifier",
+                                                        t1.transaction_id AS "transactionId",
+                                                        COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                                                        COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",                                           
+                                                        t1.contribution_amount AS "contributionAmount", 
+                                                        COALESCE(t1.semi_annual_refund_bundled_amount, 0.0) AS "contributionAggregate",                                        
+                                                        COALESCE(t1.memo_code, '''') AS "memoCode", 
+                                                        COALESCE(t1.memo_text, '''') AS "memoDescription",
+                                                        COALESCE(t1.donor_cmte_id, '''') AS "donorCommitteeId",
+                                                        COALESCE(t1.donor_cmte_name, '''') AS "donorCommitteeName",
+                                                        COALESCE(t2.entity_type, '''') AS "entityType", 
+                                                        COALESCE(t2.entity_name, '''') AS "contributorOrgName",
+                                                        COALESCE(t2.street_1, '''') AS "contributorStreet1", 
+                                                        COALESCE(t2.street_2, '''') AS "contributorStreet2", 
+                                                        COALESCE(t2.city, '''') AS "contributorCity",
+                                                        COALESCE(t2.state, '''') AS "contributorState", 
+                                                        COALESCE(t2.zip_code, '''') AS "contributorZipCode"
+                                                        FROM public.sched_a t1
+                                                        LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                                                        WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                                                        (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(
+                        tran)
+                    ORG_REC_F3L_STRING += """
+                                                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                                                        AND form_type = '{2}' AND sched_type = '{3}';\n
+                                                        """.format(query, tran, 'F3L', 'SA')
+                    ORG_REC_F3L_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                                    VALUES ('F3L', 'SA', '{0}', '{1}');\n""".format(tran, query)
+
+                    file = open("/tmp/reg_org_f3L_sql.sql", 'w')
+                    file.write(ORG_REC_F3L_STRING)
+                    file.close()
+
+                REF_IND_F3L_STRING = ""
+                if tran in list_SA_similar_F3L_REF_IND:
+                    query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+                                                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
+                                                t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                                                t1.transaction_id AS "transactionId",
+                                                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                                                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                                                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", 
+                                                t1.expenditure_amount AS "expenditureAmount", 
+                                                COALESCE(t1.semi_annual_refund_bundled_amount, 0.0) AS "contributionAggregate",
+                                                COALESCE(t1.memo_code, '''') AS "memoCode", 
+                                                COALESCE(t1.memo_text, '''') AS "memoDescription",
+                                                COALESCE(t2.entity_type, '''') AS "entityType", 
+                                                COALESCE(t2.last_name, '''') AS "payeeLastName", 
+                                                COALESCE(t2.first_name, '''') AS "payeeFirstName",
+                                                COALESCE(t2.middle_name, '''') AS "payeeMiddleName", 
+                                                COALESCE(t2.preffix, '''') AS "payeePrefix", 
+                                                COALESCE(t2.suffix, '''') AS "payeeSuffix",
+                                                COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                                                COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                                                COALESCE(t2.city, '''') AS "payeeCity",
+                                                COALESCE(t2.state, '''') AS "payeeState", 
+                                                COALESCE(t2.zip_code, '''') AS "payeeZipCode"
+                                                FROM public.sched_b t1
+                                                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                                                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                                                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(
+                                                tran)
+                    REF_IND_F3L_STRING += """
+                                                                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                                                                        AND form_type = '{2}' AND sched_type = '{3}';\n
+                                                                        """.format(query, tran, 'F3L', 'SB')
+                    REF_IND_F3L_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                                                    VALUES ('F3L', 'SB', '{0}', '{1}');\n""".format(tran, query)
+
+                    file = open("/tmp/ref_ind_f3L_sql.sql", 'w')
+                    file.write(REF_IND_F3L_STRING)
+                    file.close()
+
+                REF_ORG_F3L_STRING = ""
+                if tran in list_SA_similar_F3L_REF_ORG:
+                    query = """SELECT COALESCE(t1.line_number, '''') AS "lineNumber",
+                                                                COALESCE(t1.transaction_type, '''') AS "transactionTypeCode", 
+                                                                t1.transaction_type_identifier AS "transactionTypeIdentifier",
+                                                                t1.transaction_id AS "transactionId",
+                                                                COALESCE(t1.back_ref_transaction_id, '''') AS "backReferenceTransactionIdNumber", 
+                                                                COALESCE(t1.back_ref_sched_name, '''') AS "backReferenceScheduleName",
+                                                                to_char(t1.expenditure_date,''MM/DD/YYYY'') AS "expenditureDate", 
+                                                                t1.expenditure_amount AS "expenditureAmount", 
+                                                                COALESCE(t1.semi_annual_refund_bundled_amount, 0.0) AS "contributionAggregate",
+                                                                COALESCE(t1.memo_code, '''') AS "memoCode", 
+                                                                COALESCE(t1.memo_text, '''') AS "memoDescription",
+                                                                COALESCE(t1.beneficiary_cmte_id, '''') AS "beneficiaryCommitteeId",
+                                                                COALESCE(t1.beneficiary_cmte_name, '''') AS "beneficiaryCommitteeName",
+                                                                COALESCE(t1.beneficiary_cand_id, '''') AS "beneficiaryCandidateId",
+                                                                COALESCE(t2.entity_type, '''') AS "entityType",
+                                                                COALESCE(t2.entity_name, '''') AS "payeeOrganizationName", 
+                                                                COALESCE(t2.street_1, '''') AS "payeeStreet1", 
+                                                                COALESCE(t2.street_2, '''') AS "payeeStreet2", 
+                                                                COALESCE(t2.city, '''') AS "payeeCity",
+                                                                COALESCE(t2.state, '''') AS "payeeState", 
+                                                                COALESCE(t2.zip_code, '''') AS "payeeZipCode"
+                                                                FROM public.sched_b t1
+                                                                LEFT JOIN public.entity t2 ON t2.entity_id = t1.entity_id
+                                                                WHERE t1.transaction_type_identifier = ''{}'' AND t1.report_id = %s AND t1.cmte_id = %s AND (t1.back_ref_transaction_id = %s OR
+                                                                (t1.back_ref_transaction_id IS NULL AND %s IS NULL)) AND t1.delete_ind is distinct from ''Y''""".format(
+                        tran)
+                    REF_ORG_F3L_STRING += """
+                                                                                        UPDATE public.tran_query_string SET query_string = '{0}' WHERE tran_type_identifier = '{1}'
+                                                                                        AND form_type = '{2}' AND sched_type = '{3}';\n
+                                                                                        """.format(query, tran, 'F3L',
+                                                                                                   'SB')
+                    REF_ORG_F3L_STRING += """INSERT INTO public.tran_query_string(form_type, sched_type, tran_type_identifier, query_string)
+                                                                    VALUES ('F3L', 'SB', '{0}', '{1}');\n""".format(
+                        tran, query)
+
+                    file = open("/tmp/ref_ind_f3L_sql.sql", 'w')
+                    file.write(REF_ORG_F3L_STRING)
+                    file.close()
 
                 return Response('Success', status=status.HTTP_201_CREATED)
         except Exception as e:

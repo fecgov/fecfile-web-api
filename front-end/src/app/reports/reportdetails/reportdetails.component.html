@@ -163,7 +163,8 @@
                     </div>
                 </td>
                 <td *ngIf="isColumnVisible('cvg_start_date')">
-                    {{(report.form_type !== 'F99' && report.form_type !== 'F1M' && report.form_type !== 'F24')? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
+                    <!-- {{(report.form_type !== 'F99' && report.form_type !== 'F1M' && report.form_type !== 'F24')? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }} -->
+                    {{(report.cvg_start_date && report.cvg_end_date) ? ( (report.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (report.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
                 </td>
                 <td *ngIf="isColumnVisible('report_type_desc')">{{report.report_type_desc}}</td>
                 <td *ngIf="isColumnVisible('filed_date')">
@@ -331,7 +332,8 @@
                         </div>
                     </td>
                     <td *ngIf="isColumnVisible('cvg_start_date')">
-                        {{(child.form_type !== 'F99' && child.form_type !== 'F1M' && child.form_type !== 'F24')? ( (child.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (child.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
+                        <!-- {{(child.form_type !== 'F99' && child.form_type !== 'F1M' && child.form_type !== 'F24')? ( (child.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (child.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }} -->
+                        {{child.cvg_start_date && child.cvg_end_date ? ( (child.cvg_start_date| date: 'MM/dd/yyyy') + " - "  + (child.cvg_end_date| date: 'MM/dd/yyyy' )) : '' }}
                     </td>
                     <td *ngIf="isColumnVisible('report_type_desc')">{{child.report_type_desc}}</td>
                     <td *ngIf="isColumnVisible('filed_date')">

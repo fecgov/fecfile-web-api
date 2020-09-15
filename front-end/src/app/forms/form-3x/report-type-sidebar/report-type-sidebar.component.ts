@@ -343,8 +343,10 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
             this.populateSemiAnnualDates();
 
           if(this.frmReportSidebar){
-            this.frmReportSidebar.controls['fromDate'].patchValue(this.fromDate);
-            this.frmReportSidebar.controls['toDate'].patchValue(this.toDate);
+            this.patchForDisabledField('fromDate',this.fromDate);
+            this.patchForDisabledField('toDate',this.toDate);
+            this.patchForDisabledField('state',null);
+            this.patchForDisabledField('election_date',null);
             if(this.frmReportSidebar.controls['semiAnnualDatesOption'] && this.frmReportSidebar.controls['semiAnnualDatesOption'].value){
               let selectedSemiAnnualOption = this.selectedReport['semi-annual_dates'].filter(obj => obj.selected);
               if(selectedSemiAnnualOption && selectedSemiAnnualOption.length > 0){
@@ -365,6 +367,18 @@ export class ReportTypeSidebarComponent implements OnInit, OnDestroy {
         }
     }
   }
+
+  patchForDisabledField(fieldName: string, value: any){
+    let disabled = false;
+    if(this.frmReportSidebar.controls[fieldName].status === 'DISABLED'){
+      this.frmReportSidebar.controls[fieldName].enable();
+      disabled = true;
+    }
+    this.frmReportSidebar.controls[fieldName].patchValue(value);
+    if(disabled){
+      this.frmReportSidebar.controls[fieldName].disable();
+    }
+  } 
 
   /**
    * retuns the index of element in dates array based on matching start and end dates, or returns null if none found

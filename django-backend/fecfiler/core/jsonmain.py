@@ -32,7 +32,8 @@ from fecfiler.core.views import (get_list_entity, NoOPError, get_cvg_dates, get_
 # Dictionary mapping form type value to form type in forms_and_schedules table
 FORMTYPE_FORM_DICT = {
     'F3X': 'form_3x',
-    'F24': 'form_24'
+    'F24': 'form_24',
+    'F3L': 'form_3l'
 }
 
 # Dictionary mapping schedules to schedule codes in forms_and_schedules table
@@ -84,7 +85,7 @@ list_of_SL_SB_transaction_types = ['LEVIN_VOTER_ID', 'LEVIN_GOTV', 'LEVIN_GEN', 
 DICT_PURPOSE_DESCRIPTION_VALUES = {
     'Bounced': ['PARTY_RET', 'PAC_RET', 'RET_REC'],
     'Convention Account': ['IND_NP_CONVEN_ACC', 'PAC_NP_CONVEN_ACC', 'PARTY_NP_CONVEN_ACC', 'TRIB_NP_CONVEN_ACC',
-                            'OPEXP_CONV_ACC_OP_EXP_NP'],
+                           'OPEXP_CONV_ACC_OP_EXP_NP'],
     'Convention Account Earmarked Through': ['EAR_REC_CONVEN_ACC'],
     'Convention Account - JF Memo for': ['JF_TRAN_NP_CONVEN_IND_MEMO', 'JF_TRAN_NP_CONVEN_PAC_MEMO',
                                          'JF_TRAN_NP_CONVEN_TRIB_MEMO'],
@@ -121,7 +122,7 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     'Recount Account Earmarked Through': ['EAR_REC_RECNT_ACC'],
     'Recount Receipt': ['IND_RECNT_REC', 'PAC_RECNT_REC', 'PARTY_RECNT_REC', 'TRIB_RECNT_REC'],
     'Recount: Refund': ['OTH_DISB_NP_RECNT_TRIB_REF', 'OTH_DISB_NP_RECNT_REG_REF', 'OTH_DISB_NP_RECNT_IND_REF'],
-    'Recount: Purpose of Disbursement' : ['OTH_DISB_RECNT'],
+    'Recount: Purpose of Disbursement': ['OTH_DISB_RECNT'],
     # 'Reimbursement: See Below': ['IE_STAF_REIM'],
     'Return/Void': ['PAC_NON_FED_RET', 'PAC_RET'],
     'See Memos Below': ['LEVIN_PARTN_REC', 'PARTN_REC'],
@@ -129,7 +130,7 @@ DICT_PURPOSE_DESCRIPTION_VALUES = {
     # 'Total Earmarked through Conduit': ['EAR_REC_CONVEN_ACC_MEMO', 'EAR_REC_HQ_ACC_MEMO', 'EAR_REC_RECNT_ACC_MEMO',
     #                                     'PAC_EAR_MEMO'],
     'Staff Reimbursement Memo': ['COEXP_STAF_REIM_MEMO']
-    }
+}
 
 logger = logging.getLogger(__name__)
 
@@ -164,49 +165,53 @@ def json_query(query, query_values_list, error_string, empty_list_flag):
     except:
         raise
 
+
 """
 ***************************** CANDIDATE DETAILS API *************************************
 """
 
+
 def get_candidate_details_jsonbuilder(request_dict):
-  try:
-    if request_dict.get('establishmentStatus') == 'Q':
-      output_list = []
-      for i in range(1,6):
-        column_name = 'can'+str(i)+'_id'
-        candidate_id = request_dict.get(column_name)
-        if candidate_id:
-          candidate_dict = get_sql_candidate_jsonbuilder(candidate_id)
-          candidate_dict['contributionDate'] = request_dict.get(column_name[:-2]+'con')
-          candidate_dict['candidateNumber'] = i
-          output_list.append(candidate_dict)
-        del request_dict[column_name]
-        del request_dict[column_name[:-2]+'con']
-      request_dict['candidates'] = output_list
-    return request_dict
-  except Exception as e:
-    raise Exception(
-      'The get_candidate_details_jsonbuilder function is throwing an error: ' + str(e))
+    try:
+        if request_dict.get('establishmentStatus') == 'Q':
+            output_list = []
+            for i in range(1, 6):
+                column_name = 'can' + str(i) + '_id'
+                candidate_id = request_dict.get(column_name)
+                if candidate_id:
+                    candidate_dict = get_sql_candidate_jsonbuilder(candidate_id)
+                    candidate_dict['contributionDate'] = request_dict.get(column_name[:-2] + 'con')
+                    candidate_dict['candidateNumber'] = i
+                    output_list.append(candidate_dict)
+                del request_dict[column_name]
+                del request_dict[column_name[:-2] + 'con']
+            request_dict['candidates'] = output_list
+        return request_dict
+    except Exception as e:
+        raise Exception(
+            'The get_candidate_details_jsonbuilder function is throwing an error: ' + str(e))
+
 
 def get_sql_candidate_jsonbuilder(candidate_id):
-  try:
-    sql = """SELECT cand_id AS "candidateId", cand_last_name AS "candidateLastName", cand_first_name AS "candidateFirstName", 
+    try:
+        sql = """SELECT cand_id AS "candidateId", cand_last_name AS "candidateLastName", cand_first_name AS "candidateFirstName", 
     cand_middle_name AS "candidateMiddleName", cand_prefix AS "candidatePrefix", cand_suffix AS "candidateSuffix", 
     cand_office AS "candidateOffice", cand_office_state AS "candidateState", 
     cand_office_district AS "candidateDistrict" FROM public.candidate_master WHERE cand_id=%s"""
-    with connection.cursor() as cursor:
-      cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql),[candidate_id])
-      logger.debug("CANDIDATE TABLE")
-      logger.debug(cursor.query)
-      output_dict = cursor.fetchone()[0]
-      if output_dict:
-        return output_dict[0]
-      else:
-        raise Exception("""The candidateId: {} does not exist in 
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM ({}) AS t""".format(sql), [candidate_id])
+            logger.debug("CANDIDATE TABLE")
+            logger.debug(cursor.query)
+            output_dict = cursor.fetchone()[0]
+            if output_dict:
+                return output_dict[0]
+            else:
+                raise Exception("""The candidateId: {} does not exist in 
           candidate table.""".format(candidate_id))
-  except Exception as e:
-    raise Exception(
-      'The get_sql_candidate_jsonbuilder function is throwing an error: ' + str(e))
+    except Exception as e:
+        raise Exception(
+            'The get_sql_candidate_jsonbuilder function is throwing an error: ' + str(e))
+
 
 def get_data_details(report_id, cmte_id):
     try:
@@ -226,7 +231,7 @@ def get_data_details(report_id, cmte_id):
         string_3 = "Reports"
 
         output = {**json_query(query_1, values_1, string_1, False)[0],
-                **json_query(query_3, values_3, string_3, False)[0]}
+                  **json_query(query_3, values_3, string_3, False)[0]}
 
         if output['formType'] == 'F3X':
             query_2 = """SELECT COALESCE(cmte_addr_chg_flag,'') AS "changeOfAddress", COALESCE(state_of_election,'') AS "electionState",
@@ -262,7 +267,8 @@ def get_data_details(report_id, cmte_id):
                 f1m_data = get_candidate_details_jsonbuilder(f1m_data)
                 output = {**output, **f1m_data}
             else:
-                raise Exception('There is no form 1m data for this report id: {} and cmte id: {}'.format(report_id, cmte_id))
+                raise Exception(
+                    'There is no form 1m data for this report id: {} and cmte id: {}'.format(report_id, cmte_id))
 
         elif output['formType'] == 'F24':
             query_3 = """SELECT  cm.cmte_id AS "committeeId", COALESCE(cm.cmte_name,'') AS "committeeName", r.report_type AS "reportType", r.amend_ind AS "amendIndicator",
@@ -273,10 +279,40 @@ def get_data_details(report_id, cmte_id):
             string_3 = "Form 24"
             f24_data = json_query(query_3, values_3, string_3, False)
             if f24_data:
-              f24_data = f24_data[0]
-              output = {**output, **f24_data}
+                f24_data = f24_data[0]
+                output = {**output, **f24_data}
             else:
-              raise Exception('There is no form 24 data for this report id: {} and cmte id: {}'.format(report_id, cmte_id))
+                raise Exception(
+                    'There is no form 24 data for this report id: {} and cmte id: {}'.format(report_id, cmte_id))
+
+        elif output['formType'] == 'F3L':
+            query_3 = """SELECT rp.cmte_id as cmteId, rp.report_id as reportId, rp.form_type as formType, '' as electionCode, 
+                                      rp.report_type as reportCode,  rt.rpt_type_desc as reportTypeDescription, 
+                                      f3l.sign_date as date_signed,
+                                      rt.regular_special_report_ind as regularSpecialReportInd, x.state_of_election as electionState, 
+                                      x.date_of_election::date as electionDate, rp.cvg_start_date as cvgStartDate, rp.cvg_end_date as cvgEndDate, 
+                                      rp.due_date as dueDate, rp.amend_ind as amend_Indicator, 0 as coh_bop,
+                                      (SELECT CASE WHEN due_date IS NOT NULL THEN to_char(due_date, 'YYYY-MM-DD')::date - to_char(now(), 'YYYY-MM-DD')::date ELSE 0 END ) AS daysUntilDue, 
+                                      email_1 as email1, email_2 as email2, additional_email_1 as additionalEmail1, 
+                                      additional_email_2 as additionalEmail2, 
+                                      (SELECT CASE WHEN rp.due_date IS NOT NULL AND rp.due_date < now() THEN True ELSE False END ) AS overdue,
+                                      rp.status AS reportStatus, rp.semi_annual_start_date, rp.semi_annual_end_date, f3l.election_date, f3l.election_state
+                                      FROM public.reports rp 
+                                      LEFT JOIN form_3x x ON rp.report_id = x.report_id
+                                      LEFT JOIN public.ref_rpt_types rt ON rp.report_type=rt.rpt_type
+                                      LEFT JOIN public.form_3l f3l ON f3l.report_id = rp.report_id
+                                      WHERE rp.delete_ind is distinct from 'Y' AND rp.cmte_id =%s AND rp.report_id =%s"""
+
+            values_3 = [cmte_id, report_id]
+            string_3 = "Form 3L"
+            f3L_data = json_query(query_3, values_3, string_3, False)
+            if f3L_data:
+                f3L_data = f3L_data[0]
+                output = {**output, **f3L_data}
+            else:
+                raise Exception(
+                    'There is no form 3L data for this report id: {} and cmte id: {}'.format(report_id, cmte_id))
+
         else:
             raise Exception('The JSON Builder has not been implemented for this report type: ' + output['formType'])
 
@@ -284,6 +320,25 @@ def get_data_details(report_id, cmte_id):
 
     except Exception:
         raise
+
+def get_f3l_summary_details(report_id, cmte_id):
+    try:
+        cvg_start_date, cvg_end_date = get_cvg_dates(report_id, cmte_id)
+
+        contribute_amount_query = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total",COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total"FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR') AND delete_ind IS DISTINCT FROM 'Y'"""
+
+        values = [cmte_id, report_id]
+
+        return {
+            "contribute_amount_query": json_query(contribute_amount_query, values, "Form3L", False)[0],
+            "calAmount": True
+        }
+
+    except NoOPError:
+        raise NoOPError(
+            'The Committee ID: {} does not exist in Committee Master Table'.format(cmte_id))
+    except Exception as e:
+        raise e
 
 
 def get_f3x_summary_details(report_id, cmte_id):
@@ -359,6 +414,7 @@ def get_f3x_summary_details(report_id, cmte_id):
             'The Committee ID: {} does not exist in Committee Master Table'.format(cmte_id))
     except Exception:
         raise
+
 
 def get_transactions(identifier, report_id, cmte_id, back_ref_transaction_id, transaction_id_list):
     try:
@@ -559,7 +615,7 @@ def create_json_builders(request):
         # Figuring out the form type
         form_type = output.get('data').get('formType')
         # Adding Summary data to output based on form type
-        if form_type in ['F3X', 'F24']:
+        if form_type in ['F3X', 'F24', 'F3L']:
             full_form_type = FORMTYPE_FORM_DICT.get(form_type)
             # Figuring out what schedules are to be checked for the form type
             schedule_name_list = get_schedules_for_form_type(full_form_type)
@@ -581,6 +637,9 @@ def create_json_builders(request):
                     report_id, cmte_id)
             if form_type == 'F24':
                 output['data']['reportPrint'] = False if transaction_flag else True
+            if form_type == 'F3L' and (not transaction_flag):
+                output['data']['summary'] = get_f3l_summary_details(
+                    report_id, cmte_id)
             output['data']['schedules'] = {}
             for schedule_name in schedule_name_list:
                 schedule = SCHED_SCHED_CODES_DICT.get(
@@ -641,7 +700,8 @@ def create_json_builders(request):
                             # pre-appending the purpose description
                             transaction = preappending_purpose_description(transaction)
                             # Handling electionOtherDescription value for 'primary' and 'general'
-                            if 'electionOtherDescription' in transaction and transaction['electionOtherDescription'] in ['Primary', 'General']:
+                            if 'electionOtherDescription' in transaction and transaction[
+                                'electionOtherDescription'] in ['Primary', 'General']:
                                 transaction['electionOtherDescription'] = ""
                             if transaction.get('lineNumber') not in EXCLUDED_LINE_NUMBERS_FROM_JSON_LIST:
                                 if transaction.get('transactionTypeIdentifier') in list_of_SL_SA_transaction_types:

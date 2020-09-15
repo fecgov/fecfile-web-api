@@ -1,7 +1,7 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbTooltipConfig } from '@ng-bootstrap/ng-bootstrap';
 import { ContactsService } from 'src/app/contacts/service/contacts.service';
@@ -100,17 +100,27 @@ export class FormEntryComponent extends IndividualReceiptComponent implements On
       // no coverage dates scenario
       if(this.frmIndividualReceipt.controls[fieldName]){
         if(!this.reportDetails.cvgStartDate && !this.reportDetails.cvgEndDate){
+          this.frmIndividualReceipt.controls[fieldName].patchValue("0.00");
           this.frmIndividualReceipt.controls[fieldName].disable();
         }else{
+          this.frmIndividualReceipt.controls[fieldName].patchValue(null);
           this.frmIndividualReceipt.controls[fieldName].enable();
         }
       }
 
       //no semi-annual dates scenario
       if(!this.reportDetails.semi_annual_start_date && !this.reportDetails.semi_annual_end_date){
+        this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].patchValue("0.00");
         this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].disable();
       }else{
+        this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].patchValue(null);
         this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].enable();
+      }
+
+      //employer is always required
+      if(this.frmIndividualReceipt.controls['employer']){
+        this.frmIndividualReceipt.controls['employer'].setValidators([Validators.required]);
+        this.frmIndividualReceipt.controls['employer'].updateValueAndValidity();
       }
 
     }
@@ -127,9 +137,16 @@ export class FormEntryComponent extends IndividualReceiptComponent implements On
 
   ngOnInit() {
     // this.reportDetails = this.mockSemiAndQuarterly();
-    this.reportDetails = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
-    this.maximumThresholdAmount = this.reportDetails.maximumThresholdAmount;
-    super.ngOnInit();
+    this._reportsService.getReportInfo(this.formType,this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
+      if(res && res.length > 0){
+        this.maximumThresholdAmount = res[0].maximumThresholdAmount;
+        if(!localStorage.getItem(`form_${this.formType}_report_type`)){
+          localStorage.setItem(`form_${this.formType}_report_type`, JSON.stringify(res[0]));
+        }
+        this.reportDetails = JSON.parse(localStorage.getItem(`form_${this.formType}_report_type`));
+        super.ngOnInit();
+      }
+    })
   }
   
   trackByName(index, item) {
@@ -145,6 +162,15 @@ export class FormEntryComponent extends IndividualReceiptComponent implements On
     if (this.isFieldName(col.name, 'contribution_amount') || this.isFieldName(col.name, 'expenditure_amount') ||
     this.isFieldName(col.name, 'semi_annual_refund_bundled_amount')
     ) {
+
+
+    let contributionAmount: string = $event.target.value;
+
+      // remove commas
+      contributionAmount = contributionAmount.replace(/,/g, ``);
+      this._contributionAmount = contributionAmount;
+
+
       this._formatAmount($event, col.name, col.validation.dollarAmountNegative);
       const amountEntered:Number = this.convertDataToNumber($event,col.validation.dollarAmountNegative);
         

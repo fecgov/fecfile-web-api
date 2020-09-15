@@ -1422,137 +1422,134 @@ def update_print_f99(request):
 
     est = pytz.timezone('US/Eastern')
 
-    #try:
-    comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
-    if comm_info:
-        header = {
-                "version":"8.3",
-                "softwareName":"ABC Inc",
-                "softwareVersion":"1.02 Beta",
-                "additionalInfomation":"Any other useful information"
-        }
-
-        serializer = CommitteeInfoSerializer(comm_info)
-        conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
-        bucket = conn.get_bucket("dev-efile-repo")
-        k = Key(bucket)
-        k.content_type = "application/json"
-        data_obj = {}
-        data_obj['header'] = header
-        f99data = {}
-        f99data['committeeId'] = comm_info.committeeid
-        f99data['committeeName'] = comm_info.committeename
-        f99data['street1'] = comm_info.street1
-        f99data['street2'] = comm_info.street2
-        f99data['city'] = comm_info.city
-        f99data['state'] = comm_info.state
-        f99data['zipCode'] = str(comm_info.zipcode)
-        f99data['treasurerLastName'] = comm_info.treasurerlastname
-        f99data['treasurerFirstName'] = comm_info.treasurerfirstname
-        f99data['treasurerMiddleName'] = comm_info.treasurermiddlename
-        f99data['treasurerPrefix'] = comm_info.treasurerprefix
-        f99data['treasurerSuffix'] = comm_info.treasurersuffix
-        f99data['reason'] = comm_info.reason
-        f99data['text'] = comm_info.text
-        f99data['dateSigned'] = datetime.datetime.now().strftime('%m/%d/%Y')
-        #f99data['dateSigned'] = '5/15/2019'
-        f99data['email1'] = comm_info.email_on_file
-        f99data['email2'] = comm_info.email_on_file_1
-        f99data['formType'] = comm_info.form_type
-        f99data['attachement'] = 'X'
-        f99data['password'] = "test"
-
-        #data_obj['data'] = serializer.data
-        data_obj['data'] = f99data
-        k.set_contents_from_string(json.dumps(data_obj))            
-        url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
-
-        tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
-        #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
-        vdata = {}
-        #commented by Mahendra 10052019
-        #print ("url= ", url)
-        #print ("tmp_filename= ", tmp_filename)
-
-
-        vdata['wait'] = 'false'
-        #print("vdata",vdata)
-        json.dump(data_obj, open(tmp_filename, 'w'))
-
-        #with open('data.json', 'w') as outfile:
-         #   json.dump(data, outfile, ensure_ascii=False)
-        
-        #obj = open('data.json', 'w')
-        #obj.write(serializer.data)
-        #obj.close
-
-        # variables to be sent along the JSON file in form-data
-        filing_type='FEC'
-        vendor_software_name='FECFILE'
-
-        data_obj = {
-                'form_type':'F99',
-                'filing_type':filing_type,
-                'vendor_software_name':vendor_software_name,
+    try:
+        comm_info = CommitteeInfo.objects.filter(id=update_json_data['id']).last()
+        if comm_info:
+            header = {
+                    "version":"8.3",
+                    "softwareName":"ABC Inc",
+                    "softwareVersion":"1.02 Beta",
+                    "additionalInfomation":"Any other useful information"
             }
 
-        #print(comm_info.file)
-        
-        if not (comm_info.file in [None, '', 'null', ' ',""]):
-            filename = comm_info.file.name 
-            #print(filename)
-            myurl = "https://{}.s3.amazonaws.com/media/".format(settings.AWS_STORAGE_BUCKET_NAME) + filename
-            #myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
-            #print(myurl)
-            myfile = urllib.request.urlopen(myurl)
+            serializer = CommitteeInfoSerializer(comm_info)
+            conn = boto.connect_s3(settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY)
+            bucket = conn.get_bucket("dev-efile-repo")
+            k = Key(bucket)
+            k.content_type = "application/json"
+            data_obj = {}
+            data_obj['header'] = header
+            f99data = {}
+            f99data['committeeId'] = comm_info.committeeid
+            f99data['committeeName'] = comm_info.committeename
+            f99data['street1'] = comm_info.street1
+            f99data['street2'] = comm_info.street2
+            f99data['city'] = comm_info.city
+            f99data['state'] = comm_info.state
+            f99data['zipCode'] = str(comm_info.zipcode)
+            f99data['treasurerLastName'] = comm_info.treasurerlastname
+            f99data['treasurerFirstName'] = comm_info.treasurerfirstname
+            f99data['treasurerMiddleName'] = comm_info.treasurermiddlename
+            f99data['treasurerPrefix'] = comm_info.treasurerprefix
+            f99data['treasurerSuffix'] = comm_info.treasurersuffix
+            f99data['reason'] = comm_info.reason
+            f99data['text'] = comm_info.text
+            f99data['dateSigned'] = datetime.datetime.now().strftime('%m/%d/%Y')
+            #f99data['dateSigned'] = '5/15/2019'
+            f99data['email1'] = comm_info.email_on_file
+            f99data['email2'] = comm_info.email_on_file_1
+            f99data['formType'] = comm_info.form_type
+            f99data['attachement'] = 'X'
+            f99data['password'] = "test"
 
-            #s3 = boto3.client('s3')
+            #data_obj['data'] = serializer.data
+            data_obj['data'] = f99data
+            k.set_contents_from_string(json.dumps(data_obj))            
+            url = k.generate_url(expires_in=0, query_auth=False).replace(":443","")
 
-            #file_object = s3.get_object(Bucket='settings.AWS_STORAGE_BUCKET_NAME', Key='settings.MEDIAFILES_LOCATION' + "/" + 'comm_info.file')
+            tmp_filename = '/tmp/' + comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'   
+            #tmp_filename = comm_info.committeeid + '_' + str(comm_info.id) + '_f99.json'            
+            vdata = {}
+            #commented by Mahendra 10052019
+            #print ("url= ", url)
+            #print ("tmp_filename= ", tmp_filename)
 
-            #attachment = open(file_object['Body'], 'rb')
 
+            vdata['wait'] = 'false'
+            #print("vdata",vdata)
+            json.dump(data_obj, open(tmp_filename, 'w'))
+
+            #with open('data.json', 'w') as outfile:
+             #   json.dump(data, outfile, ensure_ascii=False)
             
-            """
-            file_obj = {
-                'json_file': ('data.json', open('data.json', 'rb'), 'application/json'),
-                'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
-            }
-        else:
-            file_obj = {
-                'json_file': ('data.json', open('data.json', 'rb'), 'application/json')
-            }
-            """
+            #obj = open('data.json', 'w')
+            #obj.write(serializer.data)
+            #obj.close
 
-            file_obj = {
-                'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json'),
-                'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
-            }
-        else:
-            file_obj = {
-                'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json')
-            }
+            # variables to be sent along the JSON file in form-data
+            filing_type='FEC'
+            vendor_software_name='FECFILE'
 
-        # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
-        # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
-        printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
-        if not printresp.ok:
-            return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
+            data_obj = {
+                    'form_type':'F99',
+                    'filing_type':filing_type,
+                    'vendor_software_name':vendor_software_name,
+                }
+
+            #print(comm_info.file)
+            
+            if not (comm_info.file in [None, '', 'null', ' ',""]):
+                filename = comm_info.file.name 
+                #print(filename)
+                myurl = "https://{}.s3.amazonaws.com/media/".format(settings.AWS_STORAGE_BUCKET_NAME) + filename
+                #myurl = "https://fecfile-filing.s3.amazonaws.com/media/" + filename
+                #print(myurl)
+                myfile = urllib.request.urlopen(myurl)
+
+                #s3 = boto3.client('s3')
+
+                #file_object = s3.get_object(Bucket='settings.AWS_STORAGE_BUCKET_NAME', Key='settings.MEDIAFILES_LOCATION' + "/" + 'comm_info.file')
+
+                #attachment = open(file_object['Body'], 'rb')
+
+                
+                """
+                file_obj = {
+                    'json_file': ('data.json', open('data.json', 'rb'), 'application/json'),
+                    'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
+                }
+            else:
+                file_obj = {
+                    'json_file': ('data.json', open('data.json', 'rb'), 'application/json')
+                }
+                """
+
+                file_obj = {
+                    'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json'),
+                    'attachment_file': ('attachment.pdf', myfile, 'application/pdf')
+                }
+            else:
+                file_obj = {
+                    'json_file': ('data.json', open(tmp_filename, 'rb'), 'application/json')
+                }
+
+            # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj)
+            # printresp = requests.post("http://" + settings.NXG_FEC_API_URL + settings.NXG_FEC_API_VERSION + "f99/print_pdf", data=data_obj, files=file_obj, headers={'Authorization': token_use})
+            printresp = requests.post(settings.NXG_FEC_PRINT_API_URL + settings.NXG_FEC_PRINT_API_VERSION, data=data_obj, files=file_obj)
+            if not printresp.ok:
+                return Response(printresp.json(), status=status.HTTP_400_BAD_REQUEST)
+            else:
+                #dictcreate = createresp.json()
+                dictprint = printresp.json()
+                merged_dict = {**update_json_data, **dictprint}
+                #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
+                return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
+                #return Response(printresp.json(), status=status.HTTP_201_CREATED)
         else:
-            #dictcreate = createresp.json()
-            dictprint = printresp.json()
-            merged_dict = {**update_json_data, **dictprint}
-            #merged_dict = {key: value for (key, value) in (dictcreate.items() + dictprint.items())}
-            return JsonResponse(merged_dict, status=status.HTTP_201_CREATED)
-            #return Response(printresp.json(), status=status.HTTP_201_CREATED)
-    else:
-        return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
-    """    
-    except CommitteeInfo.DoesNotExist:
-        return Response({"FEC Error 004":"There is no unsubmitted data. Please create f99 form object before submitting."}, status=status.HTTP_400_BAD_REQUEST)
-    except ValueError:
-        return Response({"FEC Error 006":"This form Id number is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
-    """
+            return Response({"FEC Error 003":"This form Id number does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
+    except Exception as e:
+        return Response('The update_print_f99 is throwing an error: ' + str(e))
     
 def set_need_appearances_writer(writer):
 
