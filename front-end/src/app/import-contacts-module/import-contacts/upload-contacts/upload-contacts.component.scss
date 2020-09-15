@@ -3,8 +3,17 @@
 .upload_contacts__container {
   .upload_contacts__progress_container {
     padding: 0 15em;
+    text-align: center;
   }
-
+  .upload_contact__spinner_container_outer {
+    padding-top: 2em;
+    .upload_contact__spinner_container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      // height: 200px;
+    }
+  }
   .configure_contacts__instructions {
     font-size: 20px;
   }

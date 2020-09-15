@@ -103,15 +103,17 @@ export class FormEntryComponent extends IndividualReceiptComponent implements On
           this.frmIndividualReceipt.controls[fieldName].patchValue("0.00");
           this.frmIndividualReceipt.controls[fieldName].disable();
         }else{
+          this.frmIndividualReceipt.controls[fieldName].patchValue(null);
           this.frmIndividualReceipt.controls[fieldName].enable();
         }
       }
 
       //no semi-annual dates scenario
       if(!this.reportDetails.semi_annual_start_date && !this.reportDetails.semi_annual_end_date){
-        this.frmIndividualReceipt.controls[fieldName].patchValue("0");
+        this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].patchValue("0.00");
         this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].disable();
       }else{
+        this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].patchValue(null);
         this.frmIndividualReceipt.controls['semi_annual_refund_bundled_amount'].enable();
       }
 
@@ -160,6 +162,15 @@ export class FormEntryComponent extends IndividualReceiptComponent implements On
     if (this.isFieldName(col.name, 'contribution_amount') || this.isFieldName(col.name, 'expenditure_amount') ||
     this.isFieldName(col.name, 'semi_annual_refund_bundled_amount')
     ) {
+
+
+    let contributionAmount: string = $event.target.value;
+
+      // remove commas
+      contributionAmount = contributionAmount.replace(/,/g, ``);
+      this._contributionAmount = contributionAmount;
+
+
       this._formatAmount($event, col.name, col.validation.dollarAmountNegative);
       const amountEntered:Number = this.convertDataToNumber($event,col.validation.dollarAmountNegative);
         
