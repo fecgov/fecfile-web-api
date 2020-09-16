@@ -13,7 +13,8 @@ from django_otp.util import random_hex
 from unittest import mock
 import time
 
-from fecfiler.settings import OTP_DIGIT, OTP_TIME_EXPIRY, logger, OTP_MAX_RETRY, OTP_TIMEOUT_TIME
+from fecfiler.settings import OTP_DIGIT, OTP_TIME_EXPIRY, logger, OTP_MAX_RETRY, OTP_TIMEOUT_TIME, OTP_DISABLE, \
+    OTP_DEFAULT_PASSCODE
 
 
 def save_key_datbase(username, key_val, counter):
@@ -101,25 +102,31 @@ class TOTPVerification:
 
     def generate_token(self, username):
 
-        totp = self.totp_obj(username)
-        if totp is None:
-            return -1
-        token = str(totp.token()).zfill(6)
-        print(token)
+        if OTP_DISABLE:
+            token = OTP_DEFAULT_PASSCODE
+        else:
+            totp = self.totp_obj(username)
+            if totp is None:
+                return -1
+            token = str(totp.token()).zfill(6)
 
+        print(token)
         return token
 
     def verify_token(self, key):
         try:
-            print(key)
-            print(key.encode("utf-8"))
-            encode_key = key.encode("utf-8")
-            totp = TOTP(key=encode_key,
-                        step=self.token_validity_period,
-                        digits=self.number_of_digits)
-            token = str(totp.token()).zfill(6)
-            print(token)
+            if OTP_DISABLE:
+                token = OTP_DEFAULT_PASSCODE
+            else:
+                print(key)
+                print(key.encode("utf-8"))
+                encode_key = key.encode("utf-8")
+                totp = TOTP(key=encode_key,
+                            step=self.token_validity_period,
+                            digits=self.number_of_digits)
+                token = str(totp.token()).zfill(6)
 
+            print(token)
             return token
         except ValueError:
             # return False, if token could not be converted to an integer
