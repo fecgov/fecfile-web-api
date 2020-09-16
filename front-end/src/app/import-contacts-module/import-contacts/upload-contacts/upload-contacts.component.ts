@@ -379,6 +379,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   private emitUploadResults(response: any): void {
     let duplicateCount = 0;
     let validationErrorCount = 0;
+    let duplicates = [];
     if (response) {
       if (response.Response) {
         if (response.Response.contacts_failed_validation) {
@@ -387,12 +388,14 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
           }
           if (Array.isArray(response.Response.duplicate)) {
             duplicateCount = response.Response.duplicate.length;
+            duplicates = response.Response.duplicate;
           }
         }
       }
     }
     this.userContactsEmitter.emit({
-      userContactFields: this.userContactFields,
+      // userContactFields: this.userContactFields,
+      duplicates: duplicates,
       duplicateCount: duplicateCount,
       validationErrorCount: validationErrorCount
     });

@@ -4,6 +4,7 @@ import { DialogService } from 'src/app/shared/services/DialogService/dialog.serv
 import { ConfirmModalComponent } from 'src/app/shared/partials/confirm-modal/confirm-modal.component';
 import { TimeoutMessageService } from 'src/app/shared/services/TimeoutMessageService/timeout-message-service.service';
 import { Subject } from 'rxjs';
+import { ImportContactsService } from './service/import-contacts.service';
 
 @Component({
   selector: 'app-import-contacts',
@@ -15,8 +16,9 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
 
   public steps: Array<any>;
   public currentStep: ImportContactsStepsEnum;
+  public readonly start = ImportContactsStepsEnum.start;
   public readonly step1Upload = ImportContactsStepsEnum.step1Upload;
-  public readonly step2Configure = ImportContactsStepsEnum.step2Configure;
+  public readonly step2Review = ImportContactsStepsEnum.step2Review;
   public readonly step3Clean = ImportContactsStepsEnum.step3Clean;
   public readonly step4ImportDone = ImportContactsStepsEnum.step4ImportDone;
   public userContactFields: Array<string>;
@@ -29,6 +31,7 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   private duplicatesExist: boolean;
 
   constructor(
+    private _importContactsService: ImportContactsService,
     private _dialogService: DialogService,
     private _timeoutMessageService: TimeoutMessageService
   ) {
@@ -40,11 +43,11 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.steps = [
       { text: 'Upload', step: this.step1Upload },
-      // { text: 'Configure', step: this.step2Configure },
-      // { text: 'Clean', step: this.step3Clean },
+      { text: 'Review', step: this.step2Review },
+      { text: 'Clean', step: this.step3Clean },
       { text: 'Import', step: this.step4ImportDone }
     ];
-    this.currentStep = this.step1Upload;
+    this.currentStep = this.start;
     // removing warning until fix is made for not showing it when the system navigates
     // to login screen on session timeout.
     // this.unsavedData = true;
@@ -57,11 +60,27 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
     this.onDestroy$.next();
   }
 
+  public showInfo(): void {
+    alert('Not yet supported');
+  }
+
+  public beginUpload() {
+    this.currentStep = this.step1Upload;
+  }
+
+  public viewFormatSpecs(): void {
+    alert('Not yet supported');
+  }
+
+  public viewCsvTemplate(): void {
+    alert('Not yet supported');
+  }
+
   public showNextStep() {
     switch (this.currentStep) {
       case this.step1Upload:
-        // this.currentStep = this.step2Configure;
-        this.currentStep = this.step4ImportDone;
+        this.currentStep = this.step2Review;
+        // this.currentStep = this.step4ImportDone;
         break;
       // case this.step2Configure:
       //   this.currentStep = this.step3Clean;
@@ -80,9 +99,9 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
         this.currentStep = this.step3Clean;
         break;
       case this.step3Clean:
-        this.currentStep = this.step2Configure;
+        this.currentStep = this.step2Review;
         break;
-      case this.step2Configure:
+      case this.step2Review:
         this.currentStep = this.step1Upload;
         break;
       default:
@@ -91,26 +110,40 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
 
   public receiveUserContacts(userContactsMessage: any) {
     this.userContactFields = userContactsMessage.userContactFields;
-    this.userContacts = userContactsMessage.userContactFields;
+    // this.userContacts = userContactsMessage.duplicates;
+    this.userContacts = this._importContactsService.mapAllDupesFromServerFields(userContactsMessage.duplicates);
+
+    // ???? temp
+    let dupeTemp = [];
+    if (userContactsMessage.duplicates) {
+      // console.log('true dupes exist');
+      dupeTemp = userContactsMessage.duplicates;
+    } else {
+      // console.log('false no duplicates');
+    }
+
     if (userContactsMessage.duplicateCount > 0) {
       this.duplicatesExist = true;
     }
     if (userContactsMessage.validationErrorCount > 0) {
       this.validationErrorsExist = true;
     }
-    if (this.validationErrorsExist || this.duplicatesExist) {
-      let message = '';
-      if (this.validationErrorsExist && this.duplicatesExist) {
-        message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates ` +
-          `and ${userContactsMessage.validationErrorCount} were found in error.  They will be excluded from the ` +
-          `import if you coose to proceed.`;
-      } else if (this.duplicatesExist) {
-        message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates. ` +
-          `They will be excluded from the import if you coose to proceed.`;
-      } else if (this.validationErrorsExist) {
-        message = `${userContactsMessage.validationErrorCount} contacts were found in error.  ` +
-          ` They will be excluded from the import if you coose to proceed.`;
-      }
+    // if (this.validationErrorsExist || this.duplicatesExist) {
+    //   let message = '';
+    //   if (this.validationErrorsExist && this.duplicatesExist) {
+    //     message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates ` +
+    //       `and ${userContactsMessage.validationErrorCount} were found in error.  They will be excluded from the ` +
+    //       `import if you coose to proceed.`;
+    //   } else if (this.duplicatesExist) {
+    //     message = `${userContactsMessage.duplicateCount} contacts were identified as duplicates. ` +
+    //       `They will be excluded from the import if you coose to proceed.`;
+    //   } else if (this.validationErrorsExist) {
+    //     message = `${userContactsMessage.validationErrorCount} contacts were found in error.  ` +
+    //       ` They will be excluded from the import if you coose to proceed.`;
+    //   }
+    if (this.validationErrorsExist) {
+      const message = `${userContactsMessage.validationErrorCount} contacts were found in error.  ` +
+        ` They will be excluded from the import if you coose to proceed.`;
       this.confirmProceedWithrrors(message);
     } else {
       this.unsavedData = false;
@@ -130,6 +163,19 @@ export class ImportContactsComponent implements OnInit, OnDestroy {
           this.forceChangeDetectionUpload = new Date();
         }
       });
+  }
+
+  public receiveReviewAction(action: string) {
+    if (action === 'proceed') {
+      this.currentStep = this.step3Clean;
+    }
+    if (action === 'cancel') {
+      this.currentStep = this.start;
+    }
+  }
+
+  public receiveCleanCancel() {
+    this.currentStep = this.start;
   }
 
   /**

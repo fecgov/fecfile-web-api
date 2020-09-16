@@ -75,19 +75,19 @@ export class UploadContactsService {
       this.bucket.upload(params).on('httpUploadProgress', function (evt: S3.ManagedUpload.Progress) {
         // console.log(evt.loaded + ' of ' + evt.total + ' Bytes');
         const progressPercent = Math.trunc((evt.loaded / evt.total) * 100);
-        console.log('progressPercent = ' + progressPercent);
+        // console.log('progressPercent = ' + progressPercent);
         // this.progressPercentSubject.next(this.progressPercent);
         _setPercentage(progressPercent);
       }).send(function (err: AWSError, data: ManagedUpload.SendData) {
         if (err) {
-          console.log('There was an error uploading your file: ', err);
+          // console.log('There was an error uploading your file: ', err);
           _setPercentage(0);
           // return false;
           // return Observable.of(false);
           observer.next(err);
           observer.complete();
         }
-        console.log('Successfully uploaded file.', data);
+        // console.log('Successfully uploaded file.', data);
         _setPercentage(100);
         // return Observable.of(_readFileHeader(file));
         // _readFileHeader(file);
@@ -294,9 +294,9 @@ export class UploadContactsService {
     // return Observable.create(observer => {
     this.bucket.listObjectsV2(params, function (err, data) {
       if (err) {
-        console.log(err, err.stack);
+        // console.log(err, err.stack);
       } else {
-        console.log(data);
+        // console.log(data);
       }
     });
     // });
@@ -312,9 +312,9 @@ export class UploadContactsService {
     // return Observable.create(observer => {
     this.bucket.getObject(params, function (err, data) {
       if (err) {
-        console.log(err, err.stack);
+        // console.log(err, err.stack);
       } else {
-        console.log(data);
+        // console.log(data);
       }
     });
     // });

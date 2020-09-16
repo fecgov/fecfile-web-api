@@ -2,8 +2,16 @@
   <div class="import_contacts__container">
     <header>
       <div class="header-content">
-        <div class="float-left">
-          <h1>Import Contacts</h1>
+        <div class="grid-row">
+          <div class="grid-row__col grid-row__col--12">
+            <div class="float-left">
+              <h1>Import Contacts</h1>
+            </div>
+            <div class="float-left import_contacts__info" (click)="showInfo()">For more
+              information click here
+              <i class="info-icon" aria-hidden="true"></i>
+            </div>
+          </div>
         </div>
       </div>
       <div class="header-content-sep">
@@ -11,17 +19,32 @@
       </div>
     </header>
     <section>
-      <div class="import_contacts__steps">
+      <div *ngIf="currentStep !== start" class="import_contacts__steps">
         <app-steps [steps]="steps" [current_step]="currentStep">
         </app-steps>
       </div>
       <div class="import_contacts__body">
+        <div *ngIf="currentStep === start">
+          <h4 style="color:brown">"FOLLOWING INFORMATION BELOW IS PLACEHOLDER AND WILL BE UPDATED."</h4>
+          <br><br>
+          <h4>To Begin Importing</h4>
+          <p>You can start your Import by taking 1 of the 3 actions provided below:</p>
+          <ul style="list-style-type:none">
+            <li (click)="beginUpload()">Begin Upload</li>
+            <li (click)="viewFormatSpecs()">View Format Specs</li>
+            <li (click)="viewCsvTemplate()">View CSV Template</li>
+          </ul>
+        </div>
         <app-upload-contacts *ngIf="currentStep === step1Upload" [forceChangeDetection]="forceChangeDetectionUpload"
           (userContactsEmitter)="receiveUserContacts($event)">
         </app-upload-contacts>
         <!-- <app-configure-contacts *ngIf="currentStep === step2Configure" [userContactFields]="userContactFields">
-        </app-configure-contacts>
-        <app-clean-contacts *ngIf="currentStep === step3Clean"></app-clean-contacts> -->
+        </app-configure-contacts> -->
+        <app-review-upload *ngIf="currentStep === step2Review" (reviewEmitter)="receiveReviewAction($event)">
+        </app-review-upload>
+        <app-clean-contacts *ngIf="currentStep === step3Clean" [duplicates]="userContacts"
+          (cancelEmitter)="receiveCleanCancel()">
+        </app-clean-contacts>
         <app-import-done-contacts *ngIf="currentStep === step4ImportDone"></app-import-done-contacts>
       </div>
     </section>
