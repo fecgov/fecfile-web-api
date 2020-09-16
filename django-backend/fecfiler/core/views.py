@@ -3811,7 +3811,9 @@ def filter_get_all_trans(request, param_string):
     if filt_dict.get("filterReportTypes"):
         reportTypes_tuple = "('" + "','".join(filt_dict["filterReportTypes"]) + "')"
         param_string = param_string + " AND report_type In " + reportTypes_tuple
-
+    if filt_dict.get("filterEntityId"):
+        entityId_tuple = " ('" + "','".join(filt_dict["filterEntityId"]) + "')"
+        param_string = param_string + "AND entity_id In " + entityId_tuple
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
         None,
         "null",
