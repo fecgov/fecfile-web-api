@@ -18,7 +18,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 
 from fecfiler.core.views import check_null_value
 from fecfiler.password_management.otp import TOTPVerification
-from fecfiler.settings import SECRET_KEY, JWT_PASSWORD_EXPIRY, API_LOGIN, API_PASSWORD
+from fecfiler.settings import SECRET_KEY, JWT_PASSWORD_EXPIRY, API_LOGIN, API_PASSWORD, OTP_DISABLE
 
 logger = logging.getLogger(__name__)
 
@@ -311,7 +311,7 @@ def reset_options_password(request):
                 if token_val != -1:
                     is_allowed = True
 
-                if is_allowed:
+                if is_allowed and not OTP_DISABLE:
                     send_email(token_val, email)
 
                 response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
@@ -347,13 +347,12 @@ def reset_options_password(request):
                 if token_val != -1:
                     is_allowed = True
 
-                if is_allowed:
+                if is_allowed and not OTP_DISABLE:
                     if request.data.get("id") == 'TEXT':
                         send_text(token_val, user_list["contact"])
 
                     elif request.data.get("id") == 'CALL':
                         send_call(token_val, user_list["contact"])
-                        pass
 
                 response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
                             'email': email}
