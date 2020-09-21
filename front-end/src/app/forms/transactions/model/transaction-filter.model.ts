@@ -31,6 +31,7 @@ export class TransactionFilterModel {
   filterSchedule: string;
   filterDebtBeginningBalanceMin: number;
   filterDebtBeginningBalanceMax: number;
+  filterEntityId: string[] = [];
 
   constructor() {}
 }
