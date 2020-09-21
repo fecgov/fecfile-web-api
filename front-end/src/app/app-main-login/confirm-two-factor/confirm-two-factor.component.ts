@@ -23,7 +23,8 @@ export class ConfirmTwoFactorComponent implements OnInit {
   resendOption: string;
   isValid = true;
   entryPoint: string;
-  contactData: any; 
+  contactData: any;
+  isAccountLocked : boolean;
   private _subscription: Subscription;
   private response: any;
   constructor(
@@ -40,32 +41,25 @@ export class ConfirmTwoFactorComponent implements OnInit {
     });
   }
 
-  ngOnInit() {    
+  ngOnInit() {
     this._subscription =
         this._messageService
             .getMessage()
             .subscribe(res => {
               if ( res && res.selectedOption !== 'undefined') {
-
                 if (res.action === 'sendSecurityCode') {
-                  if (res.selectedOption === 'email') {
-                    this.option = 'email';
-                  } else if (res.selectedOption.startsWith('phone')) {
-                    this.option = 'phone number';
-                  }
-                  if (res.data) {
-                    this.contactData = res.data;
-                  }
-                  if (res.entryPoint) {
-                    this.entryPoint = res.entryPoint;
-                  }
-                } else {
                   this.resendOption = res.selectedOption;
                   if (res.selectedOption === 'EMAIL') {
                     this.option = 'Email';
                   } else if (res.selectedOption === 'TEXT' ||
                       res.selectedOption === 'CALL') {
                     this.option = 'Phone Number';
+                  }
+                  if (res.data) {
+                    this.contactData = res.data;
+                  }
+                  if (res.entryPoint) {
+                    this.entryPoint = res.entryPoint;
                   }
                 }
               }
@@ -95,47 +89,49 @@ export class ConfirmTwoFactorComponent implements OnInit {
     if (this.twoFactInfo.valid) {
       const code = this.twoFactInfo.get('securityCode').value;
       if(this.entryPoint === 'login') {
-        const modalRef = this.modalService.open(ConsentModalComponent, {size: 'lg', centered: true});
-        modalRef.result.then((res) => {
-          let navUrl = '';
-          if (res === 'agree') {
-            navUrl = '/dashboard';
-          } else if (res === 'decline') {
-            navUrl = '[/login]';
+        this._twoFactorService.validateCode(code).subscribe( res => {
+          if (res) {
+
+            this.response = res;
+            const isAllowed = res['is_allowed'];
+            if (isAllowed === true || isAllowed === 'true') {
+              this.isValid = isAllowed;
+            } else {
+              this.isValid = false;
+              this.handleAccountLock(res);
+              return;
+            }
+            this.isValid = true;
+            this.askConsent();
+          } else {
+            this.isValid = false;
+            return;
           }
-          this.router.navigate([navUrl]).then(r => {
-            // do nothing
-          });
-        }).catch(e => {
-          // do nothing stay on the same page
         });
-      }else if(this.entryPoint === 'registration') {
-        this._manageUserService.verifyCode(this.twoFactInfo.value.securityCode).subscribe((resp:any) => {
-          if(resp && resp.is_allowed){
+      } else if (this.entryPoint === 'registration') {
+        this._manageUserService.verifyCode(this.twoFactInfo.value.securityCode).subscribe((resp: any) => {
+          if (resp && resp.is_allowed) {
             this.router.navigate(['/createPassword']);
           }
         });
-      } else {
-      this._twoFactorService.validateCode(code).subscribe( res => {
-        if (res) {
-
-          this.response = res;
-          const isAllowed = res['is_allowed'];
-          if (isAllowed === true || isAllowed === 'true') {
-            this.isValid = isAllowed;
-          } else {
-            this.isValid = false;
-            this.handleAccountLock(res);
-            return;
-          }
-          this.isValid = true;
-          this.askConsent();
-        } else {
-          this.isValid = false;
-          return;
-        }
-      });
-     }
+      }
+    }
+  }
+  /**
+   * In the case of account lock sign-out the current session nd navigate to HomePage
+   * @param response
+   * @private
+   */
+  private handleAccountLock (response: any) {
+    this.isAccountLocked = false;
+    if (response['msg'] === this.ACCOUNT_LOCKED_MSG) {
+      this.isAccountLocked = true;
+      setTimeout(() => {
+        this._authService.doSignOut();
+        this.router.navigate(['/login']).then(r => {
+          // do nothing
+        });
+    }, 5000);
     }
   }
 

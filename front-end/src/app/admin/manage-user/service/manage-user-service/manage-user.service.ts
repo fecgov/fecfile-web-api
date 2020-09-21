@@ -152,7 +152,7 @@ export class ManageUserService {
       formData.code = securityCode.toString();
 
       httpOptions = httpOptions.append('Content-Type', 'application/json');
-      httpOptions = httpOptions.append('Authorization', token);
+      httpOptions = httpOptions.append('token', token);
       return this._http
           .post(`${environment.apiUrl}${url}`, formData, {
               headers: httpOptions
@@ -167,7 +167,7 @@ export class ManageUserService {
       formData.password = password.toString();
 
       httpOptions = httpOptions.append('Content-Type', 'application/json');
-      httpOptions = httpOptions.append('Authorization', token);
+      httpOptions = httpOptions.append('token', token);
       return this._http
           .post(`${environment.apiUrl}${url}`, formData, {
               headers: httpOptions
