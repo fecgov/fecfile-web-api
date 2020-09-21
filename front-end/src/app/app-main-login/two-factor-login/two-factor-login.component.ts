@@ -39,7 +39,7 @@ export class TwoFactorLoginComponent implements OnInit {
     if (this.twoFactInfo.valid) {
       const option = this.twoFactInfo.get('twoFactOption').value;
       this._messageService.sendMessage(
-          { selectedOption: option }
+          { action: 'sendSecurityCode',selectedOption: option, entryPoint: 'login' }
           );
         this.router.navigate(['/confirm-2f']).then(r => {
           // handle it
