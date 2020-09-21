@@ -3811,7 +3811,9 @@ def filter_get_all_trans(request, param_string):
     if filt_dict.get("filterReportTypes"):
         reportTypes_tuple = "('" + "','".join(filt_dict["filterReportTypes"]) + "')"
         param_string = param_string + " AND report_type In " + reportTypes_tuple
-
+    if filt_dict.get("filterEntityId"):
+        entityId_tuple = " ('" + "','".join(filt_dict["filterEntityId"]) + "')"
+        param_string = param_string + "AND entity_id In " + entityId_tuple
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
         None,
         "null",
@@ -4902,7 +4904,7 @@ def period_disbursements_for_summary_table_sql(
     helper function on querying report-wise and ytd total amount for sched_b
     """
     logger.debug(
-        "loading period_dsibursements for calendar start {}, end {}, report_id {}".format(
+        "loading period_disbursements for calendar start {}, end {}, report_id {}".format(
             calendar_start_dt, calendar_end_dt, report_id
         )
     )
@@ -6145,7 +6147,7 @@ def get_F3X_data(cmte_id, report_id):
        other_pol_cmte_contb_ytd_ii, ttl_contb_ref_ytd_i, other_disb_ytd, 
        shared_fed_actvy_fed_shr_ytd, shared_fed_actvy_nonfed_ytd, non_alloc_fed_elect_actvy_ytd, 
        ttl_fed_elect_actvy_ytd, ttl_disb_ytd, ttl_fed_disb_ytd FROM public.form_3x WHERE 
-       cmte_id = %s AND report_id = %s"""
+       cmte_id = %s AND report_id = get_original_amend_report(%s)"""
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -9311,7 +9313,7 @@ def create_amended_reports(request):
 
                             if report_id_list:
                                 for i in report_id_list:
-                                    amended_obj = create_amended(i)
+                                    amended_obj =  create_amended(i)
                                     if str(i) == str(reportid):
                                         data_obj = amended_obj
 
@@ -10918,16 +10920,8 @@ def put_F3X(report_id, cmte_id, request_dict):
             param_string += key + "=%s, "
             values_list.append(value)
         _sql = """UPDATE public.form_3x t SET {} last_update_date=%s 
-                WHERE t.cmte_id=%s AND t.report_id=(SELECT r.report_id 
-                FROM public.reports r 
-                WHERE r.cmte_id = %s AND r.cvg_end_date = (SELECT ch.cvg_end_date 
-                FROM public.reports ch 
-                WHERE ch.cmte_id = %s AND ch.report_id = %s) 
-                AND r.delete_ind IS DISTINCT FROM 'Y' 
-                AND r.form_type = 'F3X' AND r.superceded_report_id IS NULL 
-                ORDER BY r.amend_number DESC
-                LIMIT 1)""".format(param_string)
-        values_list.extend([datetime.datetime.now(),cmte_id, cmte_id, cmte_id, report_id])
+                WHERE t.cmte_id=%s AND t.report_id= get_original_amend_report(%s)""".format(param_string)
+        values_list.extend([datetime.datetime.now(),cmte_id,report_id])
         with connection.cursor() as cursor:
             cursor.execute(_sql, values_list)
             # print(cursor.query)

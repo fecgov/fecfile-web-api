@@ -1,11 +1,6 @@
 
 @import 'src/app/shared/scss/global';
 
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
 
 .main-box {
   background: #ece8e8 url("../../../assets/img/fec-logo-5opac.png") no-repeat center;
@@ -54,8 +49,11 @@ input::-webkit-inner-spin-button {
     @include media(largeDesktop) {
       width: 800px;
     }
+    .optionHeader{
+      text-align: left;
+      padding-left:1%;
+    }
     .user-info{
-      width: 500px;
       margin: 30px auto;;
       text-align: left;
       font-weight: bold;
@@ -63,7 +61,6 @@ input::-webkit-inner-spin-button {
         margin-top: 20px;
         margin-bottom: 20px;
         padding-bottom: 10px;
-        padding-top: 10px;
       }
       .bold{
         font-weight: bold;
@@ -72,29 +69,28 @@ input::-webkit-inner-spin-button {
         font-weight: lighter;
         font-size: small;
       }
+      .or-align {
+        margin: auto;
+        text-align: center;
+      }
       hr{
         display:inline-block;
         width:100px;
 
+      }
+      .radio-options{
+        padding-right: 40px;
       }
       input[type="text"]{
         font-size: 16px;
         width: 100%;
         height: 30px;
         padding-bottom: 5px;
-        padding-top: 5px;
 
       }
       input:focus {
         border-color: green
       }
-      a{
-        color: #0000FF;
-        cursor:pointer;
-      }
-     a:hover{
-       text-decoration: underline;
-     }
       .input-field-error{
         border: 1px solid red;
       }
@@ -124,3 +120,12 @@ input::-webkit-inner-spin-button {
     }
   }
 }
+
+.ng-select .ng-select-container {
+  height: 52px;
+}
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 52px;
+}
+
