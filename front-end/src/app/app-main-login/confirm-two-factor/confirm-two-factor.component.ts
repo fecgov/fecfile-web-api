@@ -1,3 +1,4 @@
+import { ManageUserService } from './../../admin/manage-user/service/manage-user-service/manage-user.service';
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
@@ -18,9 +19,11 @@ export class ConfirmTwoFactorComponent implements OnInit {
   public readonly ACCOUNT_LOCKED_MSG = 'Account is locked. Please try again after 15 mins or call IT support to unlock account.';
   twoFactInfo: FormGroup;
   option: string;
+
   resendOption: string;
   isValid = true;
-  isAccountLocked: boolean;
+  entryPoint: string;
+  contactData: any; 
   private _subscription: Subscription;
   private response: any;
   constructor(
@@ -30,26 +33,42 @@ export class ConfirmTwoFactorComponent implements OnInit {
       private _messageService: MessageService,
       private _twoFactorService: TwoFactorHelperService,
       private _authService: AuthService,
+      private _manageUserService: ManageUserService
   ) {
     this.twoFactInfo = _fb.group({
       securityCode: ['', Validators.required],
     });
   }
 
-  ngOnInit() {
+  ngOnInit() {    
     this._subscription =
         this._messageService
             .getMessage()
             .subscribe(res => {
-              if (res.selectedOption !== 'undefined') {
-                this.resendOption = res.selectedOption;
-                if (res.selectedOption === 'EMAIL') {
-                  this.option = 'Email';
-                } else if (res.selectedOption === 'TEXT' ||
-                    res.selectedOption === 'CALL') {
-                  this.option = 'Phone Number';
+              if ( res && res.selectedOption !== 'undefined') {
+
+                if (res.action === 'sendSecurityCode') {
+                  if (res.selectedOption === 'email') {
+                    this.option = 'email';
+                  } else if (res.selectedOption.startsWith('phone')) {
+                    this.option = 'phone number';
+                  }
+                  if (res.data) {
+                    this.contactData = res.data;
+                  }
+                  if (res.entryPoint) {
+                    this.entryPoint = res.entryPoint;
+                  }
+                } else {
+                  this.resendOption = res.selectedOption;
+                  if (res.selectedOption === 'EMAIL') {
+                    this.option = 'Email';
+                  } else if (res.selectedOption === 'TEXT' ||
+                      res.selectedOption === 'CALL') {
+                    this.option = 'Phone Number';
+                  }
                 }
-                    }
+              }
             });
     this.isAccountLocked = false;
   }
@@ -75,6 +94,28 @@ export class ConfirmTwoFactorComponent implements OnInit {
     this.twoFactInfo.markAsTouched();
     if (this.twoFactInfo.valid) {
       const code = this.twoFactInfo.get('securityCode').value;
+      if(this.entryPoint === 'login') {
+        const modalRef = this.modalService.open(ConsentModalComponent, {size: 'lg', centered: true});
+        modalRef.result.then((res) => {
+          let navUrl = '';
+          if (res === 'agree') {
+            navUrl = '/dashboard';
+          } else if (res === 'decline') {
+            navUrl = '[/login]';
+          }
+          this.router.navigate([navUrl]).then(r => {
+            // do nothing
+          });
+        }).catch(e => {
+          // do nothing stay on the same page
+        });
+      }else if(this.entryPoint === 'registration') {
+        this._manageUserService.verifyCode(this.twoFactInfo.value.securityCode).subscribe((resp:any) => {
+          if(resp && resp.is_allowed){
+            this.router.navigate(['/createPassword']);
+          }
+        });
+      } else {
       this._twoFactorService.validateCode(code).subscribe( res => {
         if (res) {
 
@@ -94,24 +135,7 @@ export class ConfirmTwoFactorComponent implements OnInit {
           return;
         }
       });
-    }
-  }
-
-  /**
-   * In the case of account lock sign-out the current session nd navigate to HomePage
-   * @param response
-   * @private
-   */
-  private handleAccountLock (response: any) {
-    this.isAccountLocked = false;
-    if (response['msg'] === this.ACCOUNT_LOCKED_MSG) {
-      this.isAccountLocked = true;
-      setTimeout(() => {
-        this._authService.doSignOut();
-        this.router.navigate(['/login']).then(r => {
-          // do nothing
-        });
-      }, 5000);
+     }
     }
   }
 

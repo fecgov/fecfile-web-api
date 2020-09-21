@@ -1,3 +1,5 @@
+import { MessageService } from 'src/app/shared/services/MessageService/message.service';
+import { Router } from '@angular/router';
 import { Component, Input, OnInit, ViewEncapsulation, ViewChild, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
 import { style, animate, transition, trigger } from '@angular/animations';
 import { PaginationInstance } from 'ngx-pagination';
@@ -128,7 +130,9 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
-    private _authService: AuthService
+    private _authService: AuthService, 
+    private _router: Router, 
+    private _messageService: MessageService
   ) {
     this.showPinColumnsSubscription = this._contactsMessageService.getShowPinColumnMessage()
       .subscribe(
@@ -679,8 +683,32 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    * @param ctn the Contact to view
    */
   public viewActivity(ctn: ContactModel): void {
-    alert('View Activity is not yet supported');
+    let entityList :ContactModel[] = [];
+    entityList.push(ctn);
+    this.setContactsListAndNavigateToAllTransactions(entityList);
   }
+
+  public viewActivityAllSelected(): void{
+    this.setContactsListAndNavigateToAllTransactions(null);
+  }
+
+  private setContactsListAndNavigateToAllTransactions(entityList: ContactModel[]) {
+    if(!entityList){
+      entityList = this.getAllSelectedContacts();
+    }
+    this._contactsService.entityListToFilterBy = entityList;
+    this._router.navigate([`/forms/form/global`], {
+      queryParams: { step: 'transactions', transactionCategory: 'receipts', allTransactions: true, entityFilter: true }
+    });
+  }
+
+  private getAllSelectedContacts() {
+    return this.contactsModel.filter(contact => {
+      return contact.selected;
+    });
+  }
+
+  
 
   /**
    * Edit the contact selected by the user.
