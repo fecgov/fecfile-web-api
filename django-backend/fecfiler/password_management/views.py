@@ -109,8 +109,7 @@ def reset_account_password(cmte_id, password, email):
 
 def token_verification(request):
     try:
-        # token_received = request.headers['token']
-        token_received = request.headers['Authorization']
+        token_received = request.headers['token']
         payload = verify_token(token_received)
         return payload
     except Exception as e:
