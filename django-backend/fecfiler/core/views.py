@@ -293,7 +293,8 @@ def get_transaction_categories(request):
                 data_row = list(row)
                 forms_obj = data_row[0]
                 transactionCategories.extend(forms_obj['data']['transactionCategories'])
-            forms_obj['data']['transactionCategories'] = transactionCategories
+            if forms_obj:
+                forms_obj['data']['transactionCategories'] = transactionCategories
 
         if not bool(forms_obj):
             return Response(
@@ -3942,7 +3943,7 @@ def superceded_report_id_list(report_id):
             # print('in loop')
             with connection.cursor() as cursor:
                 query_string = """SELECT previous_report_id FROM public.reports 
-                  WHERE report_id = %s AND form_type = 'F3X' 
+                  WHERE report_id = %s  
                   AND delete_ind is distinct FROM 'Y' """
                 cursor.execute(query_string, [report_id])
                 reportId = cursor.fetchone()
@@ -6097,13 +6098,15 @@ def get_thirdNavigationTransactionTypes(request):
 
 def get_F24_data(cmte_id, report_id):
     try:
+        report_list = superceded_report_id_list(report_id)
+        print(report_list)
         _sql = """SELECT SUM(expenditure_amount) AS total_amount 
-                      FROM public.sched_e WHERE cmte_id = %s AND report_id = %s
+                      FROM public.sched_e WHERE cmte_id = %s AND report_id in ('{}')
                       AND memo_code IS DISTINCT FROM 'X'
-                      AND delete_ind IS DISTINCT FROM 'Y'"""
+                      AND delete_ind IS DISTINCT FROM 'Y'""".format("', '".join(report_list))
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id]
             )
             output_dict = cursor.fetchone()[0]
             if output_dict:
@@ -9218,12 +9221,14 @@ def create_amended(reportid):
                 del data["report_seq"]
                 data["status"] = "Saved"
                 # print(data,'here')
-                data["cvg_start_dt"] = datetime.datetime.strptime(
-                    data["cvg_start_date"], "%Y-%m-%d"
-                ).date()
-                data["cvg_end_dt"] = datetime.datetime.strptime(
-                    data["cvg_end_date"], "%Y-%m-%d"
-                ).date()
+                if data.get('cvg_start_date'):
+                    data["cvg_start_dt"] = datetime.datetime.strptime(
+                        data["cvg_start_date"], "%Y-%m-%d"
+                    ).date()
+                if data.get('cvg_end_date'):
+                    data["cvg_end_dt"] = datetime.datetime.strptime(
+                        data["cvg_end_date"], "%Y-%m-%d"
+                    ).date()
                 if data.get('semi_annual_start_date'):
                     data['semi_annual_start_date'] = datetime.datetime.strptime(data.get('semi_annual_start_date'), "%Y-%m-%d").date()
                 if data.get('semi_annual_end_date'):
@@ -9327,6 +9332,9 @@ def create_amended_reports(request):
                     output_dict = amend_form1m(data)
                     data_obj = {**data, **output_dict}
 
+                elif data.get('form_type') == 'F24':
+                    output_dict = create_amended(reportid)
+                    data_obj = {**data, **output_dict}
 
                 else:
                     raise Exception("""This form_type cannot be amended. 
