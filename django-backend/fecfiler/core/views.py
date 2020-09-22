@@ -11167,7 +11167,7 @@ def get_f24_reports(request):
 def get_notifications_count(request):
     try:
         cmte_id = get_comittee_id(request.user.username)
-        cmte_id = 'C00111476'
+        #cmte_id = 'C00111476'
         _sql = """SELECT count(1) as count
                   FROM public.core_filing_notification WHERE cmte_id = %s """
         with connection.cursor() as cursor:
