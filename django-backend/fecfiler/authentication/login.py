@@ -139,7 +139,7 @@ def verify_login(request):
             otp_class = TOTPVerification(username)
             token_val = otp_class.verify_token(key)
 
-            if code == token_val:
+            if code == int(token_val):
                 is_allowed = True
                 if not OTP_DISABLE:
                     reset_code_counter(key)
