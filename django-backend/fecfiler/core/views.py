@@ -6169,14 +6169,15 @@ def get_F3X_data(cmte_id, report_id):
 
 def get_F3L_data(cmte_id, report_id):
     try:
+        report_list = superceded_report_id_list(report_id)
         _sql = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total", 
-                        COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total" 
-                      FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND
+                      COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total" 
+                      FROM public.sched_a WHERE cmte_id = %s AND report_id in ('{}') AND
                       transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR')
-                      AND delete_ind IS DISTINCT FROM 'Y'"""
+                      AND delete_ind IS DISTINCT FROM 'Y'""".format("', '".join(report_list))
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id]
             )
             output_dict = cursor.fetchone()[0]
             if output_dict:
@@ -9260,7 +9261,7 @@ def create_amended(reportid):
         return False
 
 
-def get_report_ids(cmte_id, from_date, submit_flag=True, including=True):
+def get_report_ids(cmte_id, from_date, submit_flag=True, including=True, form_type='F3X'):
     data_ids = []
     try:
         with connection.cursor() as cursor:
@@ -9274,8 +9275,8 @@ def get_report_ids(cmte_id, from_date, submit_flag=True, including=True):
                 check_string = ">"
             cursor.execute(
                 """SELECT report_id FROM public.reports WHERE cmte_id= %s AND cvg_start_date {} %s 
-                {} AND form_type = 'F3X' AND superceded_report_id IS NULL AND delete_ind IS DISTINCT FROM 'Y'
-                ORDER BY cvg_start_date ASC""".format(check_string, param_string),
+                {} AND form_type = '{}' AND superceded_report_id IS NULL AND delete_ind IS DISTINCT FROM 'Y'
+                ORDER BY cvg_start_date ASC""".format(check_string, param_string, form_type),
                 [cmte_id, from_date],
             )
             if cursor.rowcount > 0:
@@ -9305,14 +9306,14 @@ def create_amended_reports(request):
                                 status=status.HTTP_400_BAD_REQUEST,
                     )
                 data = val_data[0]
-                if data.get('form_type') == 'F3X':
+                if data.get('form_type') in ['F3X','F3L']:
                             cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
                             # cdate = date.today()
                             from_date = cvg_start_date
                             data_obj = None
 
-                            report_id_list = get_report_ids(cmte_id, from_date)
+                            report_id_list = get_report_ids(cmte_id, from_date, form_type=data.get('form_type'))
 
                             print(report_id_list, from_date)
 
