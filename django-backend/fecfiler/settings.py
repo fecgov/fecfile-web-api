@@ -41,7 +41,7 @@ OTP_MAX_RETRY = 20
 OTP_DIGIT = 6
 OTP_TIME_EXPIRY = 300
 OTP_TIMEOUT_TIME = 30
-OTP_DISABLE = True
+OTP_DISABLE = os.environ.get('OTP_DISABLE', True) # True
 OTP_DEFAULT_PASSCODE = "111111"
 JWT_PASSWORD_EXPIRY = 1800
 API_LOGIN = os.environ.get('API_LOGIN', None)
@@ -130,6 +130,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_HEADERS = default_headers + (
     'enctype',
+    'token'
 )
 
 # Database

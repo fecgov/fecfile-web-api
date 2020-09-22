@@ -544,7 +544,7 @@ def put_sql_schedA(
     levin_account_id,
     transaction_type_identifier,
     aggregation_ind,
-    semi_annual_refund_bundled_amount,
+    semi_annual_refund_bundled_amount = None,
     election_year = None,
 ):
     """
@@ -1642,8 +1642,8 @@ def AUTO_parent_SA_to_child_SB_dict(data):
             "back_ref_sched_name": data.get("back_ref_sched_name"),
             "expenditure_date": data.get("contribution_date"),
             "expenditure_amount": check_decimal(data.get("contribution_amount")),
-            "semi_annual_refund_bundled_amount": check_decimal(
-                data.get("semi_annual_refund_bundled_amount", "0.0")
+            "semi_annual_refund_bundled_amount": "0.0" if data.get("semi_annual_refund_bundled_amount") is None else check_decimal(
+                data.get("semi_annual_refund_bundled_amount")
             ),
             "category_code": None,
             "memo_code": data.get("memo_code"),

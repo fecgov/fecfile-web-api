@@ -14,6 +14,7 @@ export enum FilterTypes {
   loanAmount = 'loanAmount',
   loanClosingBalance = 'loanClosingBalance',
   schedule = 'schedule',
+  entityId = 'entityId',
   debtBeginningBalance = "debtBeginningBalance", 
   reportType = "reportType"
 }

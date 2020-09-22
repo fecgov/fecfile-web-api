@@ -293,7 +293,8 @@ def get_transaction_categories(request):
                 data_row = list(row)
                 forms_obj = data_row[0]
                 transactionCategories.extend(forms_obj['data']['transactionCategories'])
-            forms_obj['data']['transactionCategories'] = transactionCategories
+            if forms_obj:
+                forms_obj['data']['transactionCategories'] = transactionCategories
 
         if not bool(forms_obj):
             return Response(
@@ -3811,7 +3812,9 @@ def filter_get_all_trans(request, param_string):
     if filt_dict.get("filterReportTypes"):
         reportTypes_tuple = "('" + "','".join(filt_dict["filterReportTypes"]) + "')"
         param_string = param_string + " AND report_type In " + reportTypes_tuple
-
+    if filt_dict.get("filterEntityId"):
+        entityId_tuple = " ('" + "','".join(filt_dict["filterEntityId"]) + "')"
+        param_string = param_string + "AND entity_id In " + entityId_tuple
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
         None,
         "null",
@@ -3940,7 +3943,7 @@ def superceded_report_id_list(report_id):
             # print('in loop')
             with connection.cursor() as cursor:
                 query_string = """SELECT previous_report_id FROM public.reports 
-                  WHERE report_id = %s AND form_type = 'F3X' 
+                  WHERE report_id = %s  
                   AND delete_ind is distinct FROM 'Y' """
                 cursor.execute(query_string, [report_id])
                 reportId = cursor.fetchone()
@@ -6095,13 +6098,15 @@ def get_thirdNavigationTransactionTypes(request):
 
 def get_F24_data(cmte_id, report_id):
     try:
+        report_list = superceded_report_id_list(report_id)
+        print(report_list)
         _sql = """SELECT SUM(expenditure_amount) AS total_amount 
-                      FROM public.sched_e WHERE cmte_id = %s AND report_id = %s
+                      FROM public.sched_e WHERE cmte_id = %s AND report_id in ('{}')
                       AND memo_code IS DISTINCT FROM 'X'
-                      AND delete_ind IS DISTINCT FROM 'Y'"""
+                      AND delete_ind IS DISTINCT FROM 'Y'""".format("', '".join(report_list))
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id]
             )
             output_dict = cursor.fetchone()[0]
             if output_dict:
@@ -6164,14 +6169,15 @@ def get_F3X_data(cmte_id, report_id):
 
 def get_F3L_data(cmte_id, report_id):
     try:
+        report_list = superceded_report_id_list(report_id)
         _sql = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total", 
-                        COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total" 
-                      FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND
+                      COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total" 
+                      FROM public.sched_a WHERE cmte_id = %s AND report_id in ('{}') AND
                       transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR')
-                      AND delete_ind IS DISTINCT FROM 'Y'"""
+                      AND delete_ind IS DISTINCT FROM 'Y'""".format("', '".join(report_list))
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id]
             )
             output_dict = cursor.fetchone()[0]
             if output_dict:
@@ -9216,12 +9222,14 @@ def create_amended(reportid):
                 del data["report_seq"]
                 data["status"] = "Saved"
                 # print(data,'here')
-                data["cvg_start_dt"] = datetime.datetime.strptime(
-                    data["cvg_start_date"], "%Y-%m-%d"
-                ).date()
-                data["cvg_end_dt"] = datetime.datetime.strptime(
-                    data["cvg_end_date"], "%Y-%m-%d"
-                ).date()
+                if data.get('cvg_start_date'):
+                    data["cvg_start_dt"] = datetime.datetime.strptime(
+                        data["cvg_start_date"], "%Y-%m-%d"
+                    ).date()
+                if data.get('cvg_end_date'):
+                    data["cvg_end_dt"] = datetime.datetime.strptime(
+                        data["cvg_end_date"], "%Y-%m-%d"
+                    ).date()
                 if data.get('semi_annual_start_date'):
                     data['semi_annual_start_date'] = datetime.datetime.strptime(data.get('semi_annual_start_date'), "%Y-%m-%d").date()
                 if data.get('semi_annual_end_date'):
@@ -9253,7 +9261,7 @@ def create_amended(reportid):
         return False
 
 
-def get_report_ids(cmte_id, from_date, submit_flag=True, including=True):
+def get_report_ids(cmte_id, from_date, submit_flag=True, including=True, form_type='F3X'):
     data_ids = []
     try:
         with connection.cursor() as cursor:
@@ -9267,8 +9275,8 @@ def get_report_ids(cmte_id, from_date, submit_flag=True, including=True):
                 check_string = ">"
             cursor.execute(
                 """SELECT report_id FROM public.reports WHERE cmte_id= %s AND cvg_start_date {} %s 
-                {} AND form_type = 'F3X' AND superceded_report_id IS NULL AND delete_ind IS DISTINCT FROM 'Y'
-                ORDER BY cvg_start_date ASC""".format(check_string, param_string),
+                {} AND form_type = '{}' AND superceded_report_id IS NULL AND delete_ind IS DISTINCT FROM 'Y'
+                ORDER BY cvg_start_date ASC""".format(check_string, param_string, form_type),
                 [cmte_id, from_date],
             )
             if cursor.rowcount > 0:
@@ -9298,14 +9306,14 @@ def create_amended_reports(request):
                                 status=status.HTTP_400_BAD_REQUEST,
                     )
                 data = val_data[0]
-                if data.get('form_type') == 'F3X':
+                if data.get('form_type') in ['F3X','F3L']:
                             cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
 
                             # cdate = date.today()
                             from_date = cvg_start_date
                             data_obj = None
 
-                            report_id_list = get_report_ids(cmte_id, from_date)
+                            report_id_list = get_report_ids(cmte_id, from_date, form_type=data.get('form_type'))
 
                             print(report_id_list, from_date)
 
@@ -9325,6 +9333,9 @@ def create_amended_reports(request):
                     output_dict = amend_form1m(data)
                     data_obj = {**data, **output_dict}
 
+                elif data.get('form_type') == 'F24':
+                    output_dict = create_amended(reportid)
+                    data_obj = {**data, **output_dict}
 
                 else:
                     raise Exception("""This form_type cannot be amended. 

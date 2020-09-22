@@ -37,7 +37,7 @@ export class ApiService {
     // Django uses cmteId+email as unique username
     const username = cmteId + email;
     return this._http
-      .post<Auth>(`${this._appConfigService.getConfig().apiUrl}/token/obtain`, {
+      .post<Auth>(`${this._appConfigService.getConfig().apiUrl}/user/login/authenticate`, {
         username,
         password
       })

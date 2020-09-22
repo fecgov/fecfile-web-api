@@ -51,6 +51,17 @@ export class ContactsService {
   ]);
 
 
+  //data container for sharing entityList info for all transactions table. 
+  private _entityListToFilterBy: any = [];
+  
+  public get entityListToFilterBy(): any {
+    return this._entityListToFilterBy;
+  }
+  public set entityListToFilterBy(value: any) {
+    this._entityListToFilterBy = value;
+  }
+
+
   constructor(
     private _http: HttpClient,
     private _cookieService: CookieService,

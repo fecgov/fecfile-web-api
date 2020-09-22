@@ -1,3 +1,4 @@
+import { MessageService } from './../../../shared/services/MessageService/message.service';
 import { DatePipe } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -235,7 +236,8 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     private _transactionTypeService: TransactionTypeService,
     private _authService: AuthService,
     private _reportsService: ReportsService,
-    private modalService: NgbModal
+    private modalService: NgbModal, 
+    private _messageService: MessageService
   ) {
 
     this._datePipe = new DatePipe('en-US');
@@ -294,6 +296,7 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       } else {
         this._allTransactions = false;
       }
+      this.applyEntityFilterIfApplicable();
       this.getPage(1);
       this.clonedTransaction = {};
       this.setSortableColumns();
@@ -366,6 +369,15 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
     this.applyDisabledColumnOptions();
     this.showHideTabs();
     this.showTabLabels();
+    
+  }
+
+
+  private applyEntityFilterIfApplicable() {
+    if(this._activatedRoute.snapshot.queryParams.entityFilter){
+      // this._messageService.sendMessage({})
+      this._messageService.sendMessage({action:'filterAllTransactionsByEntity'});
+    }
   }
   
   showTabLabels() {
