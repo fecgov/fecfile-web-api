@@ -402,7 +402,7 @@ def code_verify_password(request):
             otp_class = TOTPVerification(username)
             token_val = otp_class.verify_token(key)
 
-            if code == token_val:
+            if code == int(token_val):
                 is_allowed = True
                 reset_code_counter(key)
 
