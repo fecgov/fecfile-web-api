@@ -318,7 +318,7 @@
 
                 </tr>
                 <ng-container *ngFor="let child of report.children">                
-                    <tr *ngIf="child.amend_show" [ngStyle]="{'background-color':'#D9EDF6'}">
+                    <tr *ngIf="true" [ngStyle]="{'background-color':'#D9EDF6'}">
                     <td *ngIf="isColumnVisible('form_type')">{{child.form_type}}</td>
                     <td *ngIf="isColumnVisible('status')">{{child.status}}</td>
                     <td *ngIf="isColumnVisible('fec_id')">{{child.status === 'Filed' ? child.fec_id : '' }}</td>
@@ -422,6 +422,9 @@
                             <div id="forms__trx-dropdown-action2" class="dropdown-menu" ngbDropdownMenu>
                                 <button *ngIf="(child.amend_ind === 'N' || child.amend_max === 'up' || child.amend_max === 'down')" class="dropdown-item"  (click)="viewReport(report)">
                                     <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="dropdown-item" (click)="addMemo(report,true)">
+                                    <i class="fas fa-sticky-note"></i> View Memo
                                 </button>
                                 <!-- <button  *ngIf="(child.amend_ind === 'N' ||child.amend_max === 'up' || child.amend_max === 'down') && !authService.isReadOnly()" class="dropdown-item" (click)="amendReport(report)">
                                     <i class="fas fa-edit"></i> Amend

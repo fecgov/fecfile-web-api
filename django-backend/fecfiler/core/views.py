@@ -5869,7 +5869,7 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
                 """SELECT COALESCE(t1.coh_cop, 0) FROM public.form_3x t1 
                 WHERE t1.cmte_id = %s AND t1.report_id = (SELECT r.report_id FROM public.reports r 
                 WHERE r.cmte_id = %s AND r.cvg_end_date < %s AND r.delete_ind IS DISTINCT FROM 'Y' 
-                AND r.form_type = 'F3X' AND r.superceded_report_id IS NULL 
+                AND r.form_type = 'F3X' AND r.previous_report_id IS NULL 
                 ORDER BY r.cvg_end_date DESC
                 LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'""",
                 [cmte_id, cmte_id, cvg_start_date],
@@ -9372,10 +9372,10 @@ def amend_form1m(request_dict):
             report_id, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
             can5_id, can5_con, date_51, orig_date, metreq_date,
-            create_date, last_update_date)
+            create_date, last_update_date, committee_type)
             SELECT %s, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
-            can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s
+            can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s, committee_type
             FROM public.form_1m WHERE cmte_id=%s AND report_id= %s"""
       value_list = [output_dict['report_id'], datetime.datetime.now(), datetime.datetime.now(),
             report_dict['cmte_id'], report_dict['previous_report_id']]
