@@ -155,7 +155,7 @@
                 <!--<td *ngIf="isColumnVisible('amend_ind')">{{report.form_type !== 'F99' ? report.amend_ind : '' }}</td>-->
                 <td *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())">
                     <div class="row td-amend">
-                        {{(report.amend_ind === 'N' || report.amend_ind === 'T') ? '' : report.amend_ind}}
+                        {{(report.amend_ind === 'N' || report.amend_ind === 'T') ? 'Original' : report.amend_ind}}
                         <div >
                             <i *ngIf="report.amend_max === 'down'" class="fas fa-angle-down amend-arrow" (click)="amendArrow(report)"></i>
                             <i *ngIf="report.amend_max === 'up'" class="fas fa-angle-up amend-arrow" (click)="amendArrow(report)"></i>
@@ -324,7 +324,7 @@
                     <td *ngIf="isColumnVisible('fec_id')">{{child.status === 'Filed' ? child.fec_id : '' }}</td>
                     <td *ngIf="isColumnVisible('amend_ind') && (!isRecycleBinViewActive())">
                         <div class="row td-amend">
-                            {{(child.amend_ind === 'N' || child.amend_ind === 'T') ? '' : child.amend_ind}}
+                            {{(child.amend_ind === 'N' || child.amend_ind === 'T') ? 'Original' : child.amend_ind}}
                             <div >
                                 <i *ngIf="child.amend_max === 'down'" class="fas fa-angle-down amend-arrow" (click)="amendArrow(child)"></i>
                                 <i *ngIf="child.amend_max === 'up'" class="fas fa-angle-up amend-arrow" (click)="amendArrow(child)"></i>

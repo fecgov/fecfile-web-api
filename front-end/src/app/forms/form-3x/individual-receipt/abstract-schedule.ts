@@ -2945,26 +2945,31 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
     if (!this._cloned || this._completedCloning) {
       this.clearFormValues();
       let reportId = this._receiptService.getReportIdFromStorage(this.formType);
-      //console.log('reportId', reportId);
-
       if (!reportId) {
         reportId = '0';
       }
       localStorage.setItem(`form_${this.formType}_view_transaction_screen`, 'Yes');
       localStorage.setItem('Transaction_Table_Screen', 'Yes');
+      if(this._activatedRoute.snapshot.queryParams.amendmentReportId){
+        reportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+      }
       this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
 
       if(this.returnToGlobalAllTransaction){
         this.goToGlobalAllTransactions();        
       }
       else{
+        const queryParams: any = {
+          step: 'transactions',
+          reportId: this._activatedRoute.snapshot.queryParams.amendmentReportId ? this._activatedRoute.snapshot.queryParams.amendmentReportId : reportId,
+          edit: this.editMode,
+          transactionCategory: mappedTransCategory
+        };
+        if(this._activatedRoute.snapshot.queryParams.amendmentReportId){
+          queryParams.amendmentReportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+        }
         this._router.navigate([`/forms/form/${this.formType}`], {
-          queryParams: {
-            step: 'transactions',
-            reportId: reportId,
-            edit: this.editMode,
-            transactionCategory: mappedTransCategory
-          }
+          queryParams: queryParams
         });
       }
     } else {
@@ -3021,14 +3026,18 @@ export abstract class AbstractSchedule implements OnInit, OnDestroy, OnChanges {
                         this.goToGlobalAllTransactions();
                       }
                       else{
+                        const queryParams: any = {
+                          step: 'transactions',
+                          reportId: this._activatedRoute.snapshot.queryParams.amendmentReportId? this._activatedRoute.snapshot.queryParams.amendmentReportId : reportId,
+                          edit: this.editMode,
+                          transactionCategory: mappedTransCategory,
+                          refresh: 1
+                        };
+                        if(this._activatedRoute.snapshot.queryParams.amendmentReportId){
+                          queryParams.amendmentReportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+                        }
                         this._router.navigate([`/forms/form/${this.formType}`], {
-                          queryParams: {
-                            step: 'transactions',
-                            reportId: reportId,
-                            edit: this.editMode,
-                            transactionCategory: mappedTransCategory,
-                            refresh: 1
-                          }
+                          queryParams: queryParams
                         });
                       }
                     }
