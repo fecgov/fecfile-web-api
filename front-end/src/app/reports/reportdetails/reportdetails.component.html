@@ -318,7 +318,7 @@
 
                 </tr>
                 <ng-container *ngFor="let child of report.children">                
-                    <tr *ngIf="child.amend_show" [ngStyle]="{'background-color':'#D9EDF6'}">
+                    <tr *ngIf="true" [ngStyle]="{'background-color':'#D9EDF6'}">
                     <td *ngIf="isColumnVisible('form_type')">{{child.form_type}}</td>
                     <td *ngIf="isColumnVisible('status')">{{child.status}}</td>
                     <td *ngIf="isColumnVisible('fec_id')">{{child.status === 'Filed' ? child.fec_id : '' }}</td>
