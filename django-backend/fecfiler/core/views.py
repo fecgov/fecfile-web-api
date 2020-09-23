@@ -5869,7 +5869,7 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
                 """SELECT COALESCE(t1.coh_cop, 0) FROM public.form_3x t1 
                 WHERE t1.cmte_id = %s AND t1.report_id = (SELECT r.report_id FROM public.reports r 
                 WHERE r.cmte_id = %s AND r.cvg_end_date < %s AND r.delete_ind IS DISTINCT FROM 'Y' 
-                AND r.form_type = 'F3X' AND r.superceded_report_id IS NULL 
+                AND r.form_type = 'F3X' AND r.previous_report_id IS NULL 
                 ORDER BY r.cvg_end_date DESC
                 LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'""",
                 [cmte_id, cmte_id, cvg_start_date],
