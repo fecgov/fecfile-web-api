@@ -269,14 +269,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
       .subscribe(p => {
         this.transactionCategory = p.transactionCategory;
         this.reportId = p.reportId;
+        const queryParams: any = {
+          step: p.step,
+          reportId: p.reportId,
+          edit: p.edit,
+          transactionCategory: p.transactionCategory,
+          allTransactions: p.allTransactions
+        };
+
+        if(this._activatedRoute.snapshot.queryParams.amendmentReportId){
+          queryParams.amendmentReportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+        }
         this._router.navigate([`/forms/form/${this.formType}`], {
-          queryParams: {
-            step: p.step,
-            reportId: p.reportId,
-            edit: p.edit,
-            transactionCategory: p.transactionCategory,
-            allTransactions: p.allTransactions
-          }
+        queryParams: queryParams  
         });
       })
 
@@ -687,15 +692,19 @@ export class TransactionsTableComponent implements OnInit, OnDestroy {
 
     //clear all filters first
     // this._transactionsMessageService.sendClearAllFiltersMessage({});
+    const queryParams: any = {
+      step: this._activatedRoute.snapshot.queryParams.step,
+      reportId: this._activatedRoute.snapshot.queryParams.reportId,
+      edit: this._activatedRoute.snapshot.queryParams.edit,
+      transactionCategory: transactionCategory,
+      allTransactions: this._allTransactions
+    };
 
+    if(this._activatedRoute.snapshot.queryParams.amendmentReportId){
+      queryParams.amendmentReportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+    }
     this._router.navigate([`/forms/form/${this.formType}`], {
-      queryParams: {
-        step: this._activatedRoute.snapshot.queryParams.step,
-        reportId: this._activatedRoute.snapshot.queryParams.reportId,
-        edit: this._activatedRoute.snapshot.queryParams.edit,
-        transactionCategory: transactionCategory,
-        allTransactions: this._allTransactions
-      }
+      queryParams: queryParams
     });
 
     this.selectedFromMultiplePages = [];
