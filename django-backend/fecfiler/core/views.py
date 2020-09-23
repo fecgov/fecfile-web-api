@@ -9372,10 +9372,10 @@ def amend_form1m(request_dict):
             report_id, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
             can5_id, can5_con, date_51, orig_date, metreq_date,
-            create_date, last_update_date)
+            create_date, last_update_date, committee_type)
             SELECT %s, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
-            can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s
+            can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s, committee_type
             FROM public.form_1m WHERE cmte_id=%s AND report_id= %s"""
       value_list = [output_dict['report_id'], datetime.datetime.now(), datetime.datetime.now(),
             report_dict['cmte_id'], report_dict['previous_report_id']]
