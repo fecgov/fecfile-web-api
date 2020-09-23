@@ -423,6 +423,9 @@
                                 <button *ngIf="(child.amend_ind === 'N' || child.amend_max === 'up' || child.amend_max === 'down')" class="dropdown-item"  (click)="viewReport(report)">
                                     <i class="fas fa-eye"></i> View
                                 </button>
+                                <button class="dropdown-item" (click)="addMemo(report,true)">
+                                    <i class="fas fa-sticky-note"></i> View Memo
+                                </button>
                                 <!-- <button  *ngIf="(child.amend_ind === 'N' ||child.amend_max === 'up' || child.amend_max === 'down') && !authService.isReadOnly()" class="dropdown-item" (click)="amendReport(report)">
                                     <i class="fas fa-edit"></i> Amend
                                 </button> -->
