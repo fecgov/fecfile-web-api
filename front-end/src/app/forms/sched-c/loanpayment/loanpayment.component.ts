@@ -431,13 +431,18 @@ export class LoanpaymentComponent implements OnInit, OnDestroy {
     this.editMode = this._activatedRoute.snapshot.queryParams.edit
       ? this._activatedRoute.snapshot.queryParams.edit
       : true;
+
+    const queryParams :any = {
+      step: 'transactions',
+      reportId: this._activatedRoute.snapshot.queryParams.amendmentReportId ? this._activatedRoute.snapshot.queryParams.amendmentReportId : this._reportTypeService.getReportIdFromStorage('3X').toString(),
+      edit: this.editMode,
+      transactionCategory: 'disbursements'
+    };
+    if (this._activatedRoute.snapshot.queryParams.amendmentReportId) {
+      queryParams.amendmentReportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+    }
     this._router.navigate([`/forms/form/3X`], {
-      queryParams: {
-        step: 'transactions',
-        reportId: this._reportTypeService.getReportIdFromStorage('3X').toString(),
-        edit: this.editMode,
-        transactionCategory: 'disbursements'
-      }
+      queryParams: queryParams
     });
   }
 

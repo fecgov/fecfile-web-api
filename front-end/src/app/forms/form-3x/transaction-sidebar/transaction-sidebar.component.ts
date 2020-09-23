@@ -415,7 +415,7 @@ export class TransactionSidebarComponent implements OnInit {
         const mappedTransCategory = this._utilService.getMappedTransactionCategory(transactionCategory);
         this._transactionMessageService.sendLoadDefaultTabMessage({
           step: 'transactions',
-          reportId: this.reportId,
+          reportId: this._activatedRoute.snapshot.queryParams.amendmentReportId ? this._activatedRoute.snapshot.queryParams.amendmentReportId: this.reportId,
           edit: this.editMode,
           transactionCategory: mappedTransCategory
         });
