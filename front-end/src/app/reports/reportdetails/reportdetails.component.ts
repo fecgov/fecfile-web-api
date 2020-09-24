@@ -848,7 +848,7 @@ public printReport(report: reportModel): void{
       setTimeout(() => {
         this._router.navigate(['/forms/form/99'],{ queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
       }, 1500);
-    } else if (report.form_type === 'F3X' || report.form_type === 'F24') {
+    } else if (report.form_type === 'F3X' || report.form_type === 'F24' || report.form_type === 'F3L') {
       this._reportsService
         .getReportInfo(report.form_type, report.report_id)
         .subscribe((res: form3xReportTypeDetails) => {
@@ -857,11 +857,14 @@ public printReport(report: reportModel): void{
         });
 
       setTimeout(() => {
-        // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
 
+        let queryParams: any = { step: 'step_4', edit:true, reportId: report.report_id};
+        if (report.amend_ind.startsWith('A')) {
+          queryParams.amendmentReportId = report.report_id;
+        }
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          this._router.navigate([`/signandSubmit/${report.form_type.substr(1)}`], { queryParams: { step: 'step_4', edit:true, reportId: report.report_id} });
+          this._router.navigate([`/signandSubmit/${report.form_type.substr(1)}`], { queryParams: queryParams });
 
       }, 1500);
     } else if(report.form_type === 'F1M'){
@@ -1025,11 +1028,14 @@ public printReport(report: reportModel): void{
         });
       setTimeout(() => {
         // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
-
+        let queryParams: any = { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'receipts', isFiled: false };
+        if (report.amend_ind.startsWith('A')) {
+          queryParams.amendmentReportId = report.report_id;
+        }
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
         this._router.navigate([`/forms/form/${formType}`], {
-          queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'receipts', isFiled: false  }
+          queryParams: queryParams
         });
       }, 1500);
     }
@@ -1049,9 +1055,13 @@ public printReport(report: reportModel): void{
       setTimeout(() => {
         const formType =
           report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-        this._router.navigate([`/forms/form/${formType}`], {
-          queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'disbursements', isFiled: false  }
-        });
+          let queryParams: any = { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'disbursements', isFiled: false };
+          if (report.amend_ind.startsWith('A')) {
+            queryParams.amendmentReportId = report.report_id;
+          }
+          this._router.navigate([`/forms/form/${formType}`], {
+            queryParams : queryParams
+          });
       }, 1500);
     }
   }
@@ -1624,30 +1634,24 @@ public printReport(report: reportModel): void{
     this._reportsService.amendReport(report).subscribe(res =>
       {        
         report = res;
-        //console.log('new amend Res: ', report)
       
-        if (report.form_type === 'F3X') {
+        if (report.form_type === 'F3X' || report.form_type === 'F24' || report.form_type === 'F3L') {
         this._reportsService
           .getReportInfo(report.form_type, report.report_id)
           .subscribe((res: form3xReportTypeDetails) => {
-            //console.log('getReportInfo res =', res);
-            localStorage.setItem('form_3X_details', JSON.stringify(res[0]));
-            localStorage.setItem(`form_3X_report_type`, JSON.stringify(res[0]));
+            localStorage.setItem(`form_${report.form_type.substr(1)}_details`, JSON.stringify(res[0]));
+            localStorage.setItem(`form_${report.form_type.substr(1)}_report_type`, JSON.stringify(res[0]));
 
-            //return false;
           });
         setTimeout(() => {
-          // this._router.navigate([`/forms/reports/3X/${report.report_id}`], { queryParams: { step: 'step_4' } });
-
+          let transCategory = 'receipts';
+          if(report.form_type === 'F24'){
+            transCategory = 'disbursements';
+          }
           const formType =
             report.form_type && report.form_type.length > 2 ? report.form_type.substring(1, 3) : report.form_type;
-          /*  
           this._router.navigate([`/forms/form/${formType}`], {
-            queryParams: { step: 'reports', reportId: report.report_id }
-            });
-          */
-          this._router.navigate([`/forms/form/${formType}`], {
-            queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: 'receipts'  }
+            queryParams: { step: 'transactions', reportId: report.report_id, edit: true, transactionCategory: transCategory, amendmentReportId: report.report_id }
           });
           }, 1500);
         }    

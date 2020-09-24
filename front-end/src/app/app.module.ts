@@ -199,6 +199,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
   imports: [
     SharedModule,
     AdminModule,
+    
     AppMainLoginModule,
     BrowserModule,
     // NgSelectModule,

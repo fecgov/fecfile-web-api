@@ -16,7 +16,7 @@ from fecfiler.authentication.views import jwt_encode_handler
 from fecfiler.password_management.otp import TOTPVerification
 from fecfiler.password_management.views import token_verification, check_madatory_field, check_account_exist, \
     create_jwt_token
-from fecfiler.settings import LOGIN_MAX_RETRY, LOGIN_TIMEOUT_TIME
+from fecfiler.settings import LOGIN_MAX_RETRY, LOGIN_TIMEOUT_TIME, OTP_DISABLE
 
 logger = logging.getLogger(__name__)
 
@@ -139,9 +139,10 @@ def verify_login(request):
             otp_class = TOTPVerification(username)
             token_val = otp_class.verify_token(key)
 
-            if code == token_val:
+            if code == int(token_val):
                 is_allowed = True
-                reset_code_counter(key)
+                if not OTP_DISABLE:
+                    reset_code_counter(key)
                 # call obtain token here and check
 
                 user = Account.objects.filter(username=username).first()

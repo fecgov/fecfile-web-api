@@ -14,7 +14,7 @@ from fecfiler.core.views import check_null_value
 from fecfiler.password_management.otp import TOTPVerification
 from fecfiler.password_management.views import check_madatory_field, check_account_exist, create_jwt_token, send_email, \
     send_text, send_call, token_verification, reset_account_password, reset_code_counter
-from fecfiler.settings import REGISTER_USER_URL
+from fecfiler.settings import REGISTER_USER_URL, OTP_DISABLE
 
 logger = logging.getLogger(__name__)
 
@@ -173,7 +173,7 @@ def code_verify_register(request):
             otp_class = TOTPVerification(username)
             token_val = otp_class.verify_token(key)
 
-            if code == token_val:
+            if code == int(token_val):
                 is_allowed = True
                 reset_code_counter(key)
 
@@ -251,7 +251,7 @@ def authenticate(request):
                     if token_val != -1:
                         is_allowed = True
 
-                    if is_allowed:
+                    if is_allowed and not OTP_DISABLE:
                         send_email(token_val, email)
                         token = create_jwt_token(email, cmte_id)
 
@@ -279,7 +279,7 @@ def authenticate(request):
                     if token_val != -1:
                         is_allowed = True
 
-                    if is_allowed:
+                    if is_allowed and not OTP_DISABLE:
                         if request.data.get("id") == 'TEXT':
                             send_text(token_val, user_list["contact"])
 

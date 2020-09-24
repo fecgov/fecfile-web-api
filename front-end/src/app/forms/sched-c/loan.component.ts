@@ -1394,11 +1394,18 @@ export class LoanComponent implements OnInit, OnDestroy, OnChanges {
     this._transactionsMessageService.sendLoadTransactionsMessage(reportId);
 
     // TODO when should editMode be true/false?
+
+    let queryParams : any = {
+      step: 'transactions', 
+      reportId: this._activatedRoute.snapshot.queryParams.amendmentReportId ? this._activatedRoute.snapshot.queryParams.amendmentReportId : reportId, 
+      edit: true,
+      transactionCategory: this._transactionCategory
+    };
+    if(this._activatedRoute.snapshot.queryParams.amendmentReportId){
+      queryParams.amendmentReportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+    }
     this._router.navigate([`/forms/form/${this.formType}`], {
-      queryParams: {
-        step: 'transactions', reportId: reportId, edit: true,
-        transactionCategory: this._transactionCategory
-      }
+      queryParams: queryParams
     });
   }
 
