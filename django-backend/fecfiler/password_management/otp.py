@@ -102,6 +102,7 @@ class TOTPVerification:
 
     def generate_token(self, username):
 
+        print("value of OTP flag - register token", OTP_DISABLE)
         if OTP_DISABLE:
             token = OTP_DEFAULT_PASSCODE
         else:
@@ -115,6 +116,7 @@ class TOTPVerification:
 
     def verify_token(self, key):
         try:
+            print("value of OTP flag - verify token", OTP_DISABLE)
             if OTP_DISABLE:
                 token = OTP_DEFAULT_PASSCODE
             else:
