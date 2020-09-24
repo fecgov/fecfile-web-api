@@ -211,11 +211,14 @@ def check_user_present(data):
 
 def update_deleted_record(data):
     try:
+        register_url_token = get_registration_token()
         with connection.cursor() as cursor:
-            _sql = """UPDATE public.authentication_account SET role = %s, first_name = %s, last_name = %s,delete_ind ='N', is_active ='true' WHERE cmtee_id = %s AND email = %s"""
+            _sql = """UPDATE public.authentication_account SET role = %s, first_name = %s, last_name = %s,delete_ind ='N', status='Pending', register_token= %s  WHERE cmtee_id = %s AND lower(email) = lower(%s)"""
             cursor.execute(_sql, [data.get("role"), data.get("first_name"),
-                                  data.get("last_name"), data.get("cmte_id"),
+                                  data.get("last_name"), register_url_token, data.get("cmte_id"),
                                   data.get("email")])
+            return register_url_token
+
     except Exception as e:
         logger.debug("Exception occurred adding deleted user", str(e))
         raise e
@@ -224,15 +227,16 @@ def update_deleted_record(data):
 def user_previously_deleted(data):
     try:
         with connection.cursor() as cursor:
+            registration_token = ""
             # check if user already exist
             _sql = """Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) AND delete_ind ='Y'"""
             cursor.execute(_sql, [data.get("cmte_id"), data.get("email")])
             user_list = cursor.fetchone()
             if user_list is not None:
-                update_deleted_record(data)
-                return True
+                registration_token = update_deleted_record(data)
+                return True, registration_token
             else:
-                return False
+                return False, registration_token
     except Exception as e:
         logger.debug("exception occurred while checking if user was previously deleted", str(e))
         raise e
@@ -458,26 +462,27 @@ def manage_user(request):
             try:
                 cmte_id = get_comittee_id(request.user.username)
                 data = {"cmte_id": cmte_id}
-
                 fields = user_data_dict()
                 data = validate(data, fields, request)
                 # check if user already exsist
                 user_exist = check_user_present(data)
                 # check if user was previously deleted, then reactivate
-                user_reactivated = user_previously_deleted(data)
+                user_reactivated, register_url_token = user_previously_deleted(data)
                 backup_admin_exist = backup_user_exist(data)
                 if data.get("role").upper() == Roles.BC_ADMIN.value and request.user.role != Roles.C_ADMIN.value:
                     raise NoOPError(
-                                    "Current Role does not have authority to create Back Up Admin. Please reach out "
-                                    "to Committee "
-                                    "Admin."
-                                    )
+                        "Current Role does not have authority to create Back Up Admin. Please reach out "
+                        "to Committee "
+                        "Admin."
+                    )
 
                 if not user_exist and not user_reactivated and not backup_admin_exist:
                     register_url_token = get_registration_token()
                     add_new_user(data, cmte_id, register_url_token)
-                    if not OTP_DISABLE:
-                        send_email_register(data, cmte_id, register_url_token)
+                    logger.debug(OTP_DISABLE)
+                if not user_exist and not OTP_DISABLE and not backup_admin_exist:
+                    send_email_register(data, cmte_id, register_url_token)
+                    logger.debug("after sending email")
 
                 output = get_users_list(cmte_id)
                 json_result = {'users': output}

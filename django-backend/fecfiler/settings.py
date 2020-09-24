@@ -36,7 +36,7 @@ TIME_ZONE = "America/New_York"
 
 LOGIN_TIMEOUT_TIME = 15
 LOGIN_MAX_RETRY = 3
-REGISTER_USER_URL = "http://dev-fecfile.efdev.fec.gov/#/register?register_token="
+REGISTER_USER_URL = os.environ.get('REGISTER_USER_URL', "http://dev-fecfile.efdev.fec.gov/#/register?register_token=")
 OTP_MAX_RETRY = 20
 OTP_DIGIT = 6
 OTP_TIME_EXPIRY = 300
