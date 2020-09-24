@@ -31,7 +31,7 @@ import urllib
 from django.db import connection
 import boto
 from boto.s3.key import Key
-from fecfiler.core.views import NoOPError, get_levin_accounts, get_comittee_id
+from fecfiler.core.views import NoOPError, get_levin_accounts, get_comittee_id, superceded_report_id_list
 
 #import datetime as dt
 
@@ -1034,8 +1034,140 @@ def get_form99list(request):
         return Response(json_result, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+def get_previous_amend_reports(request):
+    """
+    API that provides all the reports for a specific committee
+    """
+    if request.method == 'GET':
+        try:
+            cmte_id = get_comittee_id(request.user.username)
+            viewtype = request.query_params.get('view')
+            reportid = request.query_params.get('reportId')
+            parentid = request.query_params.get('parentId')
 
-        
+            #commented by Mahendra 10052019
+            #print ("[cmte_id]", cmte_id)
+            print ("[viewtype]", viewtype)
+            print ("[reportid]", reportid)
+            print ("[parentid]", parentid)
+            report_list = superceded_report_id_list(parentid)
+            forms_obj = None
+            with connection.cursor() as cursor:
+                if reportid in ["None", "null", " ", "","0"]:    
+                    query_string =  """SELECT json_agg(t) FROM 
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype, 
+                                            deleteddate, memo_text,
+                                            (select count(1) from public.reports_view c where c.superceded_report_id = t1.report_id) as child_records_count
+                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
+                                         CASE
+                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
+                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                            ELSE 'current'
+                                        END AS viewtype,
+                                            deleteddate,
+                                            memo_text
+                                         FROM public.reports_view WHERE cmte_id = %s AND COALESCE(superceded_report_id, 0) in ('{}') AND last_update_date is not null AND (delete_ind <> 'Y' OR delete_ind is NULL)
+                                    ) t1
+                                    WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """.format("', '".join(report_list))
+                else:
+                    query_string =  """SELECT json_agg(t) FROM 
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, viewtype,
+                                            deleteddate, memo_text,
+                                            (select count(1) from public.reports_view c where c.superceded_report_id = t1.report_id) as child_records_count
+                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
+                                         CASE
+                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
+                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                            ELSE 'current'
+                                        END AS viewtype,
+                                            deleteddate,
+                                            memo_text
+                                         FROM public.reports_view WHERE cmte_id = %s AND delete_ind is distinct from 'Y'
+                                    ) t1
+                                    WHERE report_id = %s AND COALESCE(superceded_report_id, 0) in ('{}') AND  viewtype = %s ORDER BY last_update_date DESC ) t; """.format("', '".join(report_list))
+
+                #commented by Mahendra 10052019
+                #print("query_string =", query_string)
+
+                # print("query_string = ", query_string)
+                # Pull reports from reports_view
+                #query_string = """select form_fields from dynamic_forms_view where form_type='""" + form_type + """' and transaction_type='""" + transaction_type + """'"""
+                if reportid in ["None", "null", " ", "","0"]:  
+                    cursor.execute(query_string, [cmte_id, viewtype])
+                else:
+                    cursor.execute(query_string, [cmte_id, reportid, viewtype])
+
+                for row in cursor.fetchall():
+                    data_row = list(row)
+                    forms_obj=data_row[0]
+            print(forms_obj)
+            if forms_obj is None:
+               forms_obj = []
+
+            # for submitted report, add FEC- to fec_id
+            SUBMIT_STATUS = 'Filed'
+            for obj in forms_obj:
+                if obj['status'] == SUBMIT_STATUS:
+                    obj['fec_id'] = 'FEC-' + str(obj.get('fec_id', ''))
+
+            with connection.cursor() as cursor:
+
+                if reportid in ["None", "null", " ", "","0"]:    
+                    query_count_string =  """SELECT count('a') as totalreportsCount FROM 
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, 
+                                            superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, 
+                                            delete_ind, create_date, last_update_date,report_type_desc, viewtype, deleteddate    
+                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, 
+                                            superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, 
+                                            delete_ind, create_date, last_update_date, report_type_desc, 
+                                         CASE
+                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
+                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                            ELSE 'current'
+                                        END AS viewtype, deleteddate
+                                         FROM public.reports_view WHERE cmte_id = %s AND (delete_ind <> 'Y' OR delete_ind is NULL) AND last_update_date is not null 
+                                    ) t1
+                                    WHERE  viewtype = %s ORDER BY last_update_date DESC ) t; """
+                else:
+                    query_count_string =  """SELECT count('a') as totalreportsCount FROM 
+                                    (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, 
+                                        superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, 
+                                        delete_ind, create_date, last_update_date,report_type_desc, viewtype, deleteddate    
+                                     FROM   (SELECT report_id, form_type, amend_ind, amend_number, cmte_id, report_type, cvg_start_date, cvg_end_date, due_date, 
+                                            superceded_report_id, previous_report_id, status, filed_date, fec_id, fec_accepted_date, fec_status, most_recent_flag, delete_ind, create_date, last_update_date,report_type_desc, 
+                                         CASE
+                                            WHEN (date_part('year', cvg_end_date) < date_part('year', now()) - integer '1') THEN 'archieve'
+                                            WHEN (date_part('year', cvg_end_date) = date_part('year', now()) - integer '1') AND (date_part('month', now()) > integer '1') THEN 'archieve'
+                                            ELSE 'current'
+                                        END AS viewtype, deleteddate
+                                         FROM public.reports_view WHERE cmte_id = %s  AND (delete_ind <> 'Y' OR delete_ind is NULL) 
+                                    ) t1
+                                    WHERE report_id = %s  AND  viewtype = %s ORDER BY last_update_date DESC ) t; """
+
+                #commented by Mahendra 10052019
+                #print("query_count_string =", query_count_string)
+
+                if reportid in ["None", "null", " ", "","0"]:  
+                    cursor.execute(query_count_string, [cmte_id, viewtype])
+                else:
+                    cursor.execute(query_count_string, [cmte_id, reportid, viewtype])
+
+                for row in cursor.fetchall():
+                    data_row = list(row)
+                    forms_cnt_obj=data_row[0]
+
+            if forms_cnt_obj is None:
+                forms_cnt_obj = []
+
+            json_result = { 'reports': forms_obj, 'totalreportsCount':forms_cnt_obj}    
+        except Exception as e:
+            # print (str(e))
+            return Response("The reports view api - get_form99list is throwing an error" + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+        #return Response(forms_obj, status=status.HTTP_200_OK)
+        return Response(json_result, status=status.HTTP_200_OK)
+
         
 #API to delete saved forms
 @api_view(['POST'])
