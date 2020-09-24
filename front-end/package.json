@@ -80,6 +80,8 @@
     "protractor": "^5.4.1",
     "ts-node": "~5.0.1",
     "tslint": "~5.9.1",
-    "typescript": ">=2.7.0 <2.8.0"
+    "typescript": ">=2.7.0 <2.8.0",
+    "angular-password-strength-meter": "~2.0.0",
+    "zxcvbn": "~4.4.2"
   }
 }

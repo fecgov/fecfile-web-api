@@ -31,6 +31,8 @@ from ..core.transaction_util import do_transaction
 from ..core.views import check_null_value, NoOPError, get_comittee_id, get_email
 
 # jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+from ..settings import OTP_DISABLE
+
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
@@ -474,7 +476,8 @@ def manage_user(request):
                 if not user_exist and not user_reactivated and not backup_admin_exist:
                     register_url_token = get_registration_token()
                     add_new_user(data, cmte_id, register_url_token)
-                    send_email_register(data, cmte_id, register_url_token)
+                    if not OTP_DISABLE:
+                        send_email_register(data, cmte_id, register_url_token)
 
                 output = get_users_list(cmte_id)
                 json_result = {'users': output}

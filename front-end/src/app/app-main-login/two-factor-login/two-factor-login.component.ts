@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
 import {MessageService} from '../../shared/services/MessageService/message.service';
+import {TwoFactorHelperService} from '../service/two-factor-helper/two-factor-helper.service';
 
 @Component({
   selector: 'app-two-factor-login',
@@ -16,6 +17,7 @@ export class TwoFactorLoginComponent implements OnInit {
       private router: Router,
       private _fb: FormBuilder,
       private _messageService: MessageService,
+      private _twoFactorService: TwoFactorHelperService,
   ) {
     this.twoFactInfo = _fb.group({
       twoFactOption: ['', Validators.required],
@@ -33,13 +35,21 @@ export class TwoFactorLoginComponent implements OnInit {
   }
 
   submit() {
+
+    this.twoFactInfo.markAsTouched();
+
     // Check requirements
     // for now navigate to two factor code verify screen
-    this.twoFactInfo.markAsTouched();
+    const option = this.twoFactInfo.get('twoFactOption').value;
+    this._twoFactorService.requestCode(option).subscribe(res => {
+      if (res) {
+      }
+    });
+
     if (this.twoFactInfo.valid) {
-      const option = this.twoFactInfo.get('twoFactOption').value;
+
       this._messageService.sendMessage(
-          { selectedOption: option }
+          { action: 'sendSecurityCode', selectedOption: option, entryPoint: 'login' }
           );
         this.router.navigate(['/confirm-2f']).then(r => {
           // handle it

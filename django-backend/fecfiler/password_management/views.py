@@ -16,9 +16,10 @@ from django_otp.oath import TOTP
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
+from fecfiler.authentication.auth_enum import Roles
 from fecfiler.core.views import check_null_value
 from fecfiler.password_management.otp import TOTPVerification
-from fecfiler.settings import SECRET_KEY, JWT_PASSWORD_EXPIRY, API_LOGIN, API_PASSWORD
+from fecfiler.settings import SECRET_KEY, JWT_PASSWORD_EXPIRY, API_LOGIN, API_PASSWORD, OTP_DISABLE
 
 logger = logging.getLogger(__name__)
 
@@ -269,6 +270,9 @@ def authenticate_password(request):
                 response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
                             'email': email}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+            elif user_list['role'] == Roles.C_ADMIN.value:
+                response = {'is_allowed': is_allowed, 'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+                return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             else:
                 is_allowed = True
 
@@ -311,7 +315,7 @@ def reset_options_password(request):
                 if token_val != -1:
                     is_allowed = True
 
-                if is_allowed:
+                if is_allowed and not OTP_DISABLE:
                     send_email(token_val, email)
 
                 response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
@@ -347,13 +351,12 @@ def reset_options_password(request):
                 if token_val != -1:
                     is_allowed = True
 
-                if is_allowed:
+                if is_allowed and not OTP_DISABLE:
                     if request.data.get("id") == 'TEXT':
                         send_text(token_val, user_list["contact"])
 
                     elif request.data.get("id") == 'CALL':
                         send_call(token_val, user_list["contact"])
-                        pass
 
                 response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
                             'email': email}
@@ -390,13 +393,16 @@ def code_verify_password(request):
                 is_allowed = False
                 response = {'is_allowed': is_allowed}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+            elif user_list['role'] == Roles.C_ADMIN.value:
+                response = {'is_allowed': is_allowed, 'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+                return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
             username = user_list["username"]
             key = user_list["secret_key"]
             otp_class = TOTPVerification(username)
             token_val = otp_class.verify_token(key)
 
-            if code == token_val:
+            if code == int(token_val):
                 is_allowed = True
                 reset_code_counter(key)
 
@@ -425,6 +431,10 @@ def reset_password(request):
             list_mandatory_fields = ["committee_id", "password", "email"]
             check_madatory_field(data, list_mandatory_fields)
             account_exist = check_account_exist(cmte_id, email)
+
+            if account_exist['role'] == Roles.C_ADMIN.value:
+                response = {'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+                return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             if account_exist:
                 password_reset = reset_account_password(cmte_id, password, email)
 

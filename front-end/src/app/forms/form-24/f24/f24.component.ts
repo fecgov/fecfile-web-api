@@ -390,9 +390,17 @@ export class F24Component implements OnInit {
         edit: this.editMode,
         transactionCategory: this.transactionCategory
       };
+      
 
       if (reportId) {
         queryParamsObj.reportId = reportId;
+      }
+
+      if(this._activatedRoute.snapshot.queryParams.amendmentReportId){
+        queryParamsObj.amendmentReportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+        if(this._step === 'transactions'){
+          queryParamsObj.reportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+        }
       }
 
       if (this.direction === 'next') {

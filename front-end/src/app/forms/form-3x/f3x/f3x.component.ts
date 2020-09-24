@@ -1171,7 +1171,7 @@ export class F3xComponent implements OnInit, OnDestroy {
         localStorage.setItem(`reportId`, this._reportId);
       }
 
-      let queryParamsObj: any = {
+      const queryParamsObj: any = {
         step: this.step,
         edit: this.editMode,
         transactionCategory: this.transactionCategory
@@ -1179,6 +1179,13 @@ export class F3xComponent implements OnInit, OnDestroy {
 
       if (reportId) {
         queryParamsObj.reportId = reportId;
+      }
+      
+      if (this._activatedRoute.snapshot.queryParams.amendmentReportId) {
+        queryParamsObj.amendmentReportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+        if(this._step === 'transactions'){
+          queryParamsObj.reportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+        }
       }
 
       if (this.direction === 'next') {
