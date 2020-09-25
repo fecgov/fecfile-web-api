@@ -1,3 +1,6 @@
+import { CookieService } from 'ngx-cookie-service';
+import { AuthService } from './../../shared/services/AuthService/auth.service';
+import { ManageUserService } from './../../admin/manage-user/service/manage-user-service/manage-user.service';
 import { takeUntil } from 'rxjs/operators';
 import { MessageService } from './../../shared/services/MessageService/message.service';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -21,8 +24,11 @@ export class PersonalKeyComponent implements OnInit, OnDestroy {
   private onDestroy$ = new Subject();
 
   constructor(private _router: Router,
-    private _dialogService: DialogService, 
-    private _activatedRoute: ActivatedRoute, 
+    private _dialogService: DialogService,
+    private _activatedRoute: ActivatedRoute,
+    private _authService: AuthService,
+    private _cookieService: CookieService,
+    private _manageUserService: ManageUserService,
     private _messageService: MessageService) {
       this._messageService.getMessage().takeUntil(this.onDestroy$).subscribe(message => {
         if(message && message.action === 'sendPersonalKey'){
@@ -32,7 +38,6 @@ export class PersonalKeyComponent implements OnInit, OnDestroy {
     }
 
   ngOnInit() {
-    // this.personalKey = this._activatedRoute.snapshot.queryParams.key;
   }
 
   public toggleAccordion($event:NgbPanelChangeEvent,acc){
@@ -56,14 +61,17 @@ export class PersonalKeyComponent implements OnInit, OnDestroy {
     this._dialogService.confirm(this.confirmationMessage,ConfirmModalComponent,'Attention!',true,ModalHeaderClassEnum.infoHeaderDark,null).then(res => {
       if(res === 'okay'){
         this._dialogService.confirm(this.successMessage,ConfirmModalComponent,'Success!',false,ModalHeaderClassEnum.infoHeaderDark,null).then(res => {
-            this._router.navigate(['/dashboard']);
+          this._authService.doSignIn(JSON.parse(this._cookieService.get('user')));
+          this._router.navigate(['/dashboard']);
         })
       }
     })
   }
 
   public getAnotherKey(){
-
+    this._manageUserService.getAnotherKey().subscribe((res: any) => {
+      this.personalKey = res.personal_key;
+    });
   }
 
 }

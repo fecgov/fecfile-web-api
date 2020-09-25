@@ -24,7 +24,7 @@ export class TwoFactorHelperService {
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('token' , token);
 
-    const option: any = { id : requestOption };
+    const option: any = { id : requestOption.toUpperCase() };
 
     return this._http
         .post(`${environment.apiUrl}${url}`, option, {
@@ -48,7 +48,7 @@ export class TwoFactorHelperService {
       httpOptions = httpOptions.append('Content-Type', 'application/json');
       httpOptions = httpOptions.append('token' , token);
 
-      const option: any = { code : code };
+      const option: any = { code : code.toString() };
 
       return this._http
           .post(`${environment.apiUrl}${url}`, option, {

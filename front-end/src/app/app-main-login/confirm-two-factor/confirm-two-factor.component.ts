@@ -111,7 +111,7 @@ export class ConfirmTwoFactorComponent implements OnInit {
       } else if (this.entryPoint === 'registration') {
         this._manageUserService.verifyCode(this.twoFactInfo.value.securityCode).subscribe((resp: any) => {
           if (resp && resp.is_allowed) {
-            this.router.navigate(['/createPassword']);
+            this.router.navigate(['/createPassword'], {queryParamsHandling: 'merge'});
           }
         });
       }
