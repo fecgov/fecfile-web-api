@@ -163,16 +163,16 @@ export class F24Component implements OnInit {
             "value": "disbursements",
             "options": [
               {
-                "text": "Contributions/Expenditures to Regular Filers",
-                "name": "contributions-expenditures-to-regular-filers",
-                "value": "contributions-expenditures-to-regular-filers",
+                "text": "Contributions/Expenditures to Registered Filers",
+                "name": "contributions-expenditures-to-registered-filers",
+                "value": "contributions-expenditures-to-registered-filers",
                 "infoIcon": "TRUE",
                 "info": "Language will be provided by RAD",
                 "options": [
                   {
                     "type": "radio",
                     "text": "Independent Expenditure",
-                    "name": "contributions-expenditures-to-regular-filers",
+                    "name": "contributions-expenditures-to-registered-filers",
                     "value": "IE",
                     "infoIcon": "TRUE",
                     "info": "Language will be provided by RAD",

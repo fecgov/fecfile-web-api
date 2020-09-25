@@ -315,6 +315,7 @@ def reset_options_password(request):
                 if token_val != -1:
                     is_allowed = True
 
+                print("value of OTP flag - SENDING EMAIL", OTP_DISABLE)
                 if is_allowed and not OTP_DISABLE:
                     send_email(token_val, email)
 
