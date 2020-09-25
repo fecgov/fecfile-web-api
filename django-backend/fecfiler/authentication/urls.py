@@ -10,4 +10,5 @@ urlpatterns = [
     url(r"^user/register/authenticate$", register.authenticate, name="register_authenticate"),
     url(r"^user/register/verify$", register.code_verify_register, name="register-verify"),
     url(r"^user/register/password$", register.create_password, name="register-password"),
+    url(r"^user/register/getAnotherPersonalKey$", register.get_another_personal_key, name="get_another_personal_key"),
 ]

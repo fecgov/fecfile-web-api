@@ -66,7 +66,7 @@ export class RegisterComponent implements OnInit {
       if(message){
         if(message.is_allowed){
           this._authService.doSignIn(message.token);
-          this.router.navigate(['enterSecCode'],{queryParams:{registerToken:'dummy',option:this.form.value.emailOrPhoneOption}}).then(resp => {
+          this.router.navigate(['enterSecCode'],{queryParams:{email:message.email,option:this.form.value.emailOrPhoneOption}}).then(resp => {
             this._messageService.sendMessage({action:'sendSecurityCode', selectedOption:this.form.value.emailOrPhoneOption, data:this.form.value, entryPoint:'registration'});
           });
         }
