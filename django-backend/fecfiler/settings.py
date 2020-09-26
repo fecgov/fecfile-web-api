@@ -34,6 +34,18 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
 
 TIME_ZONE = "America/New_York"
 
+LOGIN_TIMEOUT_TIME = 15
+LOGIN_MAX_RETRY = 3
+REGISTER_USER_URL = os.environ.get('REGISTER_USER_URL', "http://dev-fecfile.efdev.fec.gov/#/register?register_token=")
+OTP_MAX_RETRY = 20
+OTP_DIGIT = 6
+OTP_TIME_EXPIRY = 300
+OTP_TIMEOUT_TIME = 30
+OTP_DISABLE = os.environ.get('OTP_DISABLE', True) # True
+OTP_DEFAULT_PASSCODE = "111111"
+JWT_PASSWORD_EXPIRY = 1800
+API_LOGIN = os.environ.get('API_LOGIN', None)
+API_PASSWORD = os.environ.get('API_PASSWORD', None)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!0)(sp6(&$=_70&+_(zogh24=)@5&smwtuwq@t*v88tn-#m=)z'
@@ -75,7 +87,10 @@ INSTALLED_APPS = [
     'fecfiler.sched_L',
     'storages',
     'fecfiler.form_1M',
-    'fecfiler.contacts'
+    'fecfiler.contacts',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'fecfiler.password_management'
 ]
 
 
@@ -115,6 +130,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_HEADERS = default_headers + (
     'enctype',
+    'token'
 )
 
 # Database
@@ -207,6 +223,7 @@ AWS_SES_AUTO_THROTTLE = 0.5 # (default; safety factor applied to rate limit, tur
 # add the credentials from IAM and bucket name
 AWS_STORAGE_BUCKET_NAME = 'fecfile-filing' # or None if using service role
 AWS_STORAGE_UPLOAD_BUCKET_NAME = 'fecfile-filing-uploads' # or None if using service role
+AWS_STORAGE_IMPORT_CONTACT_BUCKET_NAME = 'fecfile-filing-frontend'
 #AWS_ACCESS_KEY_ID = '<aws access key >' # or None if using service role
 #AWS_SECRET_ACCESS_KEY = '<aws secret access key>'
 

@@ -1,6 +1,7 @@
 export enum FilterTypes {
   keyword = 'keyword',
   category = 'category',
+  semiAnnualAmount = 'semiAnnualAmount',
   amount = 'amount',
   aggregateAmount = 'aggregateAmount',
   date = 'date',
@@ -13,6 +14,7 @@ export enum FilterTypes {
   loanAmount = 'loanAmount',
   loanClosingBalance = 'loanClosingBalance',
   schedule = 'schedule',
+  entityId = 'entityId',
   debtBeginningBalance = "debtBeginningBalance", 
   reportType = "reportType"
 }

@@ -10,6 +10,10 @@
     <div *ngIf="formType === '24'">
     	<app-f24 [jumpToTransaction]="jumpToTransaction"></app-f24>
     </div>
+    <div *ngIf="formType === '3L'">
+    	<app-f3l [jumpToTransaction]="jumpToTransaction"></app-f3l>
+    </div>
+    
     <div class="forms__wizard" *ngIf="formType === 'global'">
       <div class="form__sidebar">
         <app-transactions-filter title="Filters" [formType]="formType"></app-transactions-filter>

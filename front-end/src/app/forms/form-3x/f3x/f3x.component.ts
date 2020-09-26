@@ -99,7 +99,7 @@ export class F3xComponent implements OnInit, OnDestroy {
     private _fb: FormBuilder,
     private _config: NgbTooltipConfig,
     private _router: Router,
-    private _activatedRoute: ActivatedRoute,
+    public _activatedRoute: ActivatedRoute,
     private _f3xMessageService: F3xMessageService,
     private _loanMessageService: LoanMessageService,
     private _schedHMessageServce: SchedHMessageServiceService,
@@ -167,7 +167,7 @@ export class F3xComponent implements OnInit, OnDestroy {
       }
     });
 
-    this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
+    this._transactionTypeService.getTransactionCategories("F"+this.formType).subscribe(res => {
       if (res) {
         this.transactionCategoriesMainData = res;
         this.transactionCategories = res.data.transactionCategories;
@@ -228,7 +228,7 @@ export class F3xComponent implements OnInit, OnDestroy {
           this.currentReportData = data;
           this._messageService.sendMessage({
             action: 'updateCurrentReportHeaderData',
-            data: data
+            data: data[0]
           });
         }
       });
@@ -244,6 +244,7 @@ export class F3xComponent implements OnInit, OnDestroy {
       this.routerEventsSubscription.unsubscribe();
     }
     this._messageService.clearUpdateReportTypeMessage();
+    this._messageService.sendMessage({action:'updateHeaderInfo', data: {formType: null}});
   }
 
   ngDoCheck(): void {
@@ -346,6 +347,12 @@ export class F3xComponent implements OnInit, OnDestroy {
   public switchSidebar(e: boolean): void {
     this.isShowFilters = e;
     //console.log('showfilters is ' + this.isShowFilters);
+  }
+
+  public setParentTransactionalData(e:any){
+    if(e){
+      this.parentTransactionModel = e;
+    }
   }
 
   /**
@@ -1164,7 +1171,7 @@ export class F3xComponent implements OnInit, OnDestroy {
         localStorage.setItem(`reportId`, this._reportId);
       }
 
-      let queryParamsObj: any = {
+      const queryParamsObj: any = {
         step: this.step,
         edit: this.editMode,
         transactionCategory: this.transactionCategory
@@ -1172,6 +1179,13 @@ export class F3xComponent implements OnInit, OnDestroy {
 
       if (reportId) {
         queryParamsObj.reportId = reportId;
+      }
+      
+      if (this._activatedRoute.snapshot.queryParams.amendmentReportId) {
+        queryParamsObj.amendmentReportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+        if(this._step === 'transactions'){
+          queryParamsObj.reportId = this._activatedRoute.snapshot.queryParams.amendmentReportId;
+        }
       }
 
       if (this.direction === 'next') {

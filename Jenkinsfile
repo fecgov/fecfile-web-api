@@ -18,7 +18,7 @@ pipeline {
         stage("Build Images") {
           parallel {
             stage("Backend") {
-              steps { buildBack("${VERSION}") }
+              steps { buildBack("${VERSION}", "awsdev") }
             }
             stage("front-end") {
               steps { imageBuild("${VERSION}", "awsdev") }
@@ -56,7 +56,7 @@ pipeline {
         stage("Build Images"){
           parallel {
             stage("Backend") {
-              steps { buildBack("${VERSION}") }
+              steps { buildBack("${VERSION}", "awsqa") }
             }
             stage("front-end") {
               steps { imageBuild("${VERSION}qa", "awsqa") }
@@ -89,7 +89,7 @@ pipeline {
         stage("Build Images"){
           parallel {
             stage("Backend") {
-              steps { buildBack("${VERSION}") }
+              steps { buildBack("${VERSION}", "awsuat") }
             }
             stage("front-end") {
               steps { imageBuild("${VERSION}uat", "awsuat") }
@@ -176,7 +176,10 @@ def imageBuild(String version, String frontend_env) {
     imageB.push()
   }
 }
-def buildBack(String version) {
+def buildBack(String version, String denvi) {
+    if ( denvi == "awsdev") {
+      sh("sed -i 's/gunicorn/gunicorn --log-level=debug/g' django-backend/Dockerfile")
+    }
     def imageBack = docker.build("fecnxg-django-backend:${version}", 'django-backend/')
     docker.withRegistry('https://813218302951.dkr.ecr.us-east-1.amazonaws.com/fecnxg-django-backend') {
         imageBack.push()

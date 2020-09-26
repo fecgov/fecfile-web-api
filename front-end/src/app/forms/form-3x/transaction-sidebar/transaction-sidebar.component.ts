@@ -1,3 +1,4 @@
+import { UtilService } from './../../../shared/utils/util.service';
 import { Subscription } from 'rxjs/Subscription';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
@@ -75,7 +76,8 @@ export class TransactionSidebarComponent implements OnInit {
     private _dialogService: DialogService,
     private _typeaheadService: TypeaheadService,
     private _transactionMessageService: TransactionsMessageService,
-    private _authService: AuthService
+    private _authService: AuthService, 
+    private _utilService: UtilService
   ) {
     this._config.placement = 'right';
     this._config.triggers = 'click';
@@ -103,14 +105,14 @@ export class TransactionSidebarComponent implements OnInit {
     // edit mode is set based on the action performed on the report
     // Edit mode does not say if its filed or saved
     // on ViewReport isFiled is passed in query params from report details component
-    if (typeof this._activatedRoute.snapshot.queryParams.isFiled !== 'undefined') {
+    if (typeof this._activatedRoute.snapshot.queryParams.isFiled !== 'undefined' && typeof this._activatedRoute.snapshot.queryParams.isFiled !== undefined) {
       this.isFiled = this._activatedRoute.snapshot.queryParams.isFiled === 'true' ? true : false;
     } else {
-      this.isFiled = this.editMode;
+      this.isFiled = !this.editMode;
     }
     this.reportId = this._activatedRoute.snapshot.queryParams.reportId ? this._activatedRoute.snapshot.queryParams.reportId : 0;
     if(this._formType !== '24'){
-      this._transactionTypeService.getTransactionCategories(this._formType).takeUntil(this.onDestroy$).subscribe(res => {
+      this._transactionTypeService.getTransactionCategories("F"+this._formType).takeUntil(this.onDestroy$).subscribe(res => {
         if (res) {
             this.transactionCategories = res.data.transactionCategories;
             this.cashOnHand = res.data.cashOnHand;
@@ -306,37 +308,49 @@ export class TransactionSidebarComponent implements OnInit {
       return;
     }
     if (this.editMode) {
-      this.itemSelected = transactionCategoryValue;
-
-      this.status.emit({
-        form: this._formType,
-        transactionCategory: transactionCategoryValue
-      });
-
-      this._messageService.sendMessage({
-        form: this._formType,
-        transactionCategory: transactionCategoryValue
-      });
-
-      if (
-        localStorage.getItem('Transaction_Table_Screen') === 'Yes' ||
-        localStorage.getItem('Summary_Screen') === 'Yes' ||
-        localStorage.getItem('Receipts_Entry_Screen') === 'Yes' ||
-        localStorage.getItem('Reports_Edit_Screen') === 'Yes'
-      ) {
-        let queryParamsMap: any = { step: 'step_2', transactionCategory: transactionCategoryValue };
-        if (this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId) {
-          queryParamsMap.reportId = this._activatedRoute.snapshot.queryParams.reportId;
-        }
-
+      
+      //form 24 only has one transaction so we are skipping going to the transaction tree, 
+      //instead going that transaction entry screen directly.
+      if(this._formType === '24'){
         this.canDeactivate().then(result => {
           if (result === true) {
-            localStorage.removeItem(`form_${this._formType}_saved`);
-            this._router.navigate([`/forms/form/${this._formType}`], {
-              queryParams: queryParamsMap
-            });
+            this.sendMessageToGoDirectlyToSpecificTransaction();
           }
         });
+      }
+      else{
+        this.itemSelected = transactionCategoryValue;
+  
+        this.status.emit({
+          form: this._formType,
+          transactionCategory: transactionCategoryValue
+        });
+  
+        this._messageService.sendMessage({
+          form: this._formType,
+          transactionCategory: transactionCategoryValue
+        });
+  
+        if (
+          localStorage.getItem('Transaction_Table_Screen') === 'Yes' ||
+          localStorage.getItem('Summary_Screen') === 'Yes' ||
+          localStorage.getItem('Receipts_Entry_Screen') === 'Yes' ||
+          localStorage.getItem('Reports_Edit_Screen') === 'Yes'
+        ) {
+          let queryParamsMap: any = { step: 'step_2', transactionCategory: transactionCategoryValue };
+          if (this._activatedRoute.snapshot.queryParams && this._activatedRoute.snapshot.queryParams.reportId) {
+            queryParamsMap.reportId = this._activatedRoute.snapshot.queryParams.reportId;
+          }
+  
+          this.canDeactivate().then(result => {
+            if (result === true) {
+              localStorage.removeItem(`form_${this._formType}_saved`);
+              this._router.navigate([`/forms/form/${this._formType}`], {
+                queryParams: queryParamsMap
+              });
+            }
+          });
+        }
       }
     } else {
       this._dialogService
@@ -357,6 +371,19 @@ export class TransactionSidebarComponent implements OnInit {
           }
         });
     }
+  }
+
+  private sendMessageToGoDirectlyToSpecificTransaction() {
+    const transaction = {
+      info: "Language will be provided by RAD",
+      infoIcon: "TRUE",
+      name: "contributions-expenditures-to-regular-filers",
+      scheduleType: "sched_e",
+      text: "Independent Expenditure",
+      type: "radio",
+      value: "IE"
+    };
+    this._messageService.sendMessage({ action: 'goDirectlyToSpecificTransaction', transaction });
   }
 
   public goToAllTransactions() {
@@ -384,11 +411,13 @@ export class TransactionSidebarComponent implements OnInit {
         if (!transactionCategory) {
           transactionCategory = 'receipts';
         }
+        this._messageService.sendMessage({action:'clearGlobalAllTransactionsFlag'});
+        const mappedTransCategory = this._utilService.getMappedTransactionCategory(transactionCategory);
         this._transactionMessageService.sendLoadDefaultTabMessage({
           step: 'transactions',
-          reportId: this.reportId,
+          reportId: this._activatedRoute.snapshot.queryParams.amendmentReportId ? this._activatedRoute.snapshot.queryParams.amendmentReportId: this.reportId,
           edit: this.editMode,
-          transactionCategory: transactionCategory
+          transactionCategory: mappedTransCategory
         });
       }
     });

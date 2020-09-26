@@ -112,7 +112,7 @@
                   </button>
                 </label>
                 <div class="input-group transactions__filter-multi-input">
-                  <input type="text" name="additionalEmail1" [formControlName]="'additionalEmail1'" class="form-control"
+                  <input type="text" name="additionalEmail1" formControlName="additionalEmail1" class="form-control"
                     id="additionalEmail1" aria-label="additional Email 1" aria-describedby="additionalEmail1" 
                     [ngClass]=" form?.get('additionalEmail1')?.invalid &&
                               (form?.touched || form?.dirty)
@@ -136,7 +136,7 @@
                   </button>
                 </label>
                 <div class="input-group transactions__filter-multi-input">
-                  <input type="text" name="confirmAdditionalEmail1" [formControlName]="'confirmAdditionalEmail1'"
+                  <input type="text" name="confirmAdditionalEmail1" formControlName="confirmAdditionalEmail1"
                     class="form-control" id="confirmAdditionalEmail1" aria-label="confirm AdditionalEmail 1"
                     aria-describedby="confirmAdditionalEmail1" [ngClass]=" form?.get('confirmAdditionalEmail1')?.invalid &&
                               (form?.touched || form?.dirty)
@@ -162,7 +162,7 @@
                   </button>
                 </label>
                 <div class="input-group transactions__filter-multi-input">
-                  <input type="text" name="additionalEmail2" [formControlName]="'additionalEmail2'" class="form-control"
+                  <input type="text" name="additionalEmail2" formControlName="additionalEmail2" class="form-control"
                     id="additionalEmail2" aria-label="additional Email 2" aria-describedby="additionalEmail2"
                     [ngClass]=" form?.get('additionalEmail2')?.invalid &&
                               (form?.touched || form?.dirty)
@@ -186,7 +186,7 @@
                   </button>
                 </label>
                 <div class="input-group transactions__filter-multi-input">
-                  <input type="text" name="confirmAdditionalEmail2" [formControlName]="'confirmAdditionalEmail2'"
+                  <input type="text" name="confirmAdditionalEmail2" formControlName="confirmAdditionalEmail2"
                     class="form-control" id="confirmAdditionalEmail2" aria-label="confirm AdditionalEmail 2"
                     aria-describedby="confirmAdditionalEmail2" [ngClass]=" form?.get('confirmAdditionalEmail2')?.invalid &&
                               (form?.touched || form?.dirty)
@@ -265,24 +265,6 @@
           <div class="grid-row">
             <div class="grid-row__col grid-row__col--12">
               <div class="forms__agreement-text">
-                <!-- <label class="agreement__text" for="agreement" style="width: 300px;">
-                  <p>
-                    <input
-                    type="checkbox"
-                    style="transform: scale(2,2);"
-                    id="agreement"
-                    name="agreement"
-                    value="yes"
-                    (change)="updateValidation($event)"/>
-                    I am filing this report on behalf of {{treasurerData.treasurer_first_name}} {{treasurerData.treasurer_last_name}} [{{treasurerData.treasurer_email}} - {{treasurerData.treasurer_phone_number}}] 
-                    and certify that I have examined this statement and to the best of my knowledge and 
-                    belief it is true, correct and complete.
-                  </p>
-                  <p>
-                    In filing this report I also understand that I am filing a legal document with the 
-                    U.S. Government and agree to the terms below.
-                  </p>
-                </label> -->
                 <div class="row pb-4">
                   <div class="col col-md-1 py-4">
                     <input

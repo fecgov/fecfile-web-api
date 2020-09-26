@@ -9,6 +9,7 @@ import {map} from 'rxjs/operators';
   providedIn: 'root'
 })
 export class ManageUserService {
+  
 
   constructor(  private _cookieService: CookieService,
                 private _http: HttpClient) { }
@@ -132,4 +133,44 @@ export class ManageUserService {
           headers: httpOptions,
       });
   }
+
+  authenticateUserWithRegToken(formData: any): Observable<any>{
+    let httpOptions = new HttpHeaders();
+    const url = '/user/register/authenticate';
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    return this._http
+        .post(`${environment.apiUrl}${url}`, formData, {
+            headers: httpOptions
+        })
+    }
+
+    verifyCode(securityCode: string) : Observable<any>{
+      let httpOptions = new HttpHeaders();
+      const token: string = JSON.parse(this._cookieService.get('user'));
+      const url = '/user/register/verify';
+      let formData : any = {};
+      formData.code = securityCode.toString();
+
+      httpOptions = httpOptions.append('Content-Type', 'application/json');
+      httpOptions = httpOptions.append('token', token);
+      return this._http
+          .post(`${environment.apiUrl}${url}`, formData, {
+              headers: httpOptions
+          })
+    }
+
+    createPassword(password:string): Observable<any>{
+      let httpOptions = new HttpHeaders();
+      const token: string = JSON.parse(this._cookieService.get('user'));
+      const url = '/user/register/password';
+      let formData : any = {};
+      formData.password = password.toString();
+
+      httpOptions = httpOptions.append('Content-Type', 'application/json');
+      httpOptions = httpOptions.append('token', token);
+      return this._http
+          .post(`${environment.apiUrl}${url}`, formData, {
+              headers: httpOptions
+          })
+    }
 }

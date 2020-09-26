@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { CsvConverterService } from '../service/csv-converter.service';
 import * as XLSX from 'xlsx';
 import { timer, interval, Observable, Subject } from 'rxjs';
@@ -14,10 +14,13 @@ import { UtilService } from 'src/app/shared/utils/util.service';
   styleUrls: ['./upload-contacts.component.scss'],
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class UploadContactsComponent implements OnInit, OnDestroy {
+export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
 
   @ViewChild('selectFileInput')
   public selectFileInput: ElementRef;
+
+  @Input()
+  public forceChangeDetection: Date;
 
   @Output()
   public userContactsEmitter: EventEmitter<any> = new EventEmitter<any>();
@@ -28,6 +31,8 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
   public progressPercent: number;
   public processingPercent: number;
   public hideProcessingProgress: boolean;
+  public showSpinner: boolean;
+  public uploadingText: string;
 
   private onDestroy$: Subject<any>;
   private uploadProcessing$: Subject<any>;
@@ -43,6 +48,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
     this.onDestroy$ = new Subject();
     this.showUpload = true;
     this.hideProcessingProgress = true;
+    this.showSpinner = false;
     this.progressPercent = 0;
     this.processingPercent = 0;
     this.getProgress();
@@ -53,6 +59,10 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
     if (this.uploadProcessing$) {
       this.uploadProcessing$.next();
     }
+  }
+
+  public ngOnChanges(changes: SimpleChanges) {
+    this.ngOnInit();
   }
 
   /**
@@ -192,9 +202,14 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
     this.selectFileInput.nativeElement.click();
   }
 
+  public onClick(event) {
+    event.target.value = '';
+  }
+
   public fileSelected() {
     this.progressPercent = 0;
     this.showUpload = false;
+    this.uploadingText = 'Uploading...';
     if (this.selectFileInput.nativeElement.files) {
       if (this.selectFileInput.nativeElement.files[0]) {
         const file = this.selectFileInput.nativeElement.files[0];
@@ -211,6 +226,10 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
           this.userContactFields = headerFields;
         });
         this.checkForProcessingProgress();
+        this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
+          this.showSpinner = false;
+          this.emitUploadResults(res);
+        });
       });
   }
 
@@ -232,29 +251,50 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
    * Check for processing progress now that upload is complete.
    */
   private checkForProcessingProgress() {
-    this.hideProcessingProgress = false;
-    const progressPoller = interval(500);
-    this.uploadProcessing$ = new Subject();
-    progressPoller.takeUntil(this.uploadProcessing$);
-    this.processingPercent = 0;
-    progressPoller.subscribe(val => {
-      this.uploadContactsService.checkUploadProcessing().takeUntil(this.uploadProcessing$).subscribe(res => {
-        this.processingPercent += res;
-        if (this.processingPercent > 99) {
-          this.uploadProcessing$.next();
-          // Using setTimeout to avoid another subject but should use RxJs (try delay or interval)
-          // The purpose here is to allow the user to see the 100% completion before switching view.
-          setTimeout(() => {
-            // this.emitUserContacts();
-          }, 1000);
+
+    // Ensure Upload complete message and spnner appear simultaneously using delay. 
+    const timer1 = timer(300);
+    const timerSubject = new Subject<any>();
+    const timerSubscription = timer1
+      .pipe(takeUntil(timerSubject))
+      .subscribe(() => {
+        this.uploadingText = 'Upload complete!';
+        this.showSpinner = true;
+        if (timerSubscription) {
+          timerSubscription.unsubscribe();
         }
+        timerSubject.next();
+        timerSubject.complete();
       });
-    });
+
+
+    // this.hideProcessingProgress = false;
+    // const progressPoller = interval(500);
+    // this.uploadProcessing$ = new Subject();
+    // progressPoller.takeUntil(this.uploadProcessing$);
+    // this.processingPercent = 0;
+    // progressPoller.subscribe(val => {
+    //   this.uploadContactsService.checkUploadProcessing().takeUntil(this.uploadProcessing$).subscribe(res => {
+    //     this.processingPercent += res;
+    //     if (this.processingPercent > 99) {
+    //       this.uploadProcessing$.next();
+    //       this.uploadProcessing$.complete();
+    //       // Using setTimeout to avoid another subject but should use RxJs (try delay or interval)
+    //       // The purpose here is to allow the user to see the 100% completion before switching view.
+    //       setTimeout(() => {
+    //         // this.emitUserContacts();
+    //       }, 1000);
+    //     }
+    //   });
+    // });
   }
 
   public getProgress() {
     this.uploadContactsService.getProgressPercent().takeUntil(this.onDestroy$).subscribe((percent: number) => {
       this.progressPercent = percent;
+      if (this.progressPercent >= 100) {
+        // this.uploadingText = 'Upload complete!';
+      }
     });
   }
 
@@ -328,8 +368,33 @@ export class UploadContactsComponent implements OnInit, OnDestroy {
    */
   public emitUserContacts(): void {
     this.userContactsEmitter.emit({
-      // userContacts: this.userContacts,
-      userContactFields: this.userContactFields
+      userContactFields: this.userContactFields,
+      testMessage: 'Some validation errors and duplicates found'
+    });
+  }
+
+  /**
+ * Emit a message with the user contacts to the parent.
+ */
+  private emitUploadResults(response: any): void {
+    let duplicateCount = 0;
+    let validationErrorCount = 0;
+    if (response) {
+      if (response.Response) {
+        if (response.Response.contacts_failed_validation) {
+          if (Array.isArray(response.Response.contacts_failed_validation)) {
+            validationErrorCount = response.Response.contacts_failed_validation.length;
+          }
+          if (Array.isArray(response.Response.duplicate)) {
+            duplicateCount = response.Response.duplicate.length;
+          }
+        }
+      }
+    }
+    this.userContactsEmitter.emit({
+      userContactFields: this.userContactFields,
+      duplicateCount: duplicateCount,
+      validationErrorCount: validationErrorCount
     });
   }
 

@@ -27,7 +27,7 @@
       
   <section>
     <div class="financial-summary-content">
-      <div class="row">
+      <div class="row" *ngIf="formType === '3X'">
         <div class="col text-center">
           <button
             type="button"
@@ -70,7 +70,7 @@
             class="btn btn-secondary-gray btn-left"
             (click)="viewTransactions('receipts')"
           >
-           Browse Receipts
+           {{viewTransactionsBtnLabel}}
           </button>
         </div>
          <div *ngIf ="viewMode === 'tab2'">
@@ -87,7 +87,7 @@
       <div class="row">
       <div class="tab-container" [ngSwitch]="viewMode">
         <div id="tab1" *ngSwitchDefault>
-          <table class="summary_table_text">
+          <table class="summary_table_text" *ngIf="formType === '3X'">
             <thead>
               <tr  >
                   <th width=50% class="summary_text_amt">&nbsp;</th>
@@ -149,6 +149,40 @@
                       </div>                          
                   </td>  
                </tr>
+            </tbody>
+          </table>
+          <table class="summary_table_text" *ngIf="formType === '3L'">
+            <thead>
+              <tr  >
+                <th width=50% class="summary_text_amt">&nbsp;</th>
+                <th width=25% class="summary_text_amt"><h3>Total This Period</h3></th>
+              </tr>
+            </thead>
+            <tbody *ngIf="tab1Data" class="summary_text">
+                <tr>
+                  <td>
+                    <div class="summary_text_level_1" >
+                      Quarterly/Monthly/ Pre-election or Post Election Covered Period
+                    </div>
+                  </td>
+                  <td>
+                    <div class="summary_text_amt_level_1" >
+                        {{tab1Data.quarterly_monthly_total | currency:'USD':'symbol-narrow':'1.2-2'}}
+                    </div>
+                  </td>  
+               </tr>
+               <tr>
+                <td>
+                  <div class="summary_text_level_1" >
+                    Semi-Annual Covered Period Amount
+                  </div>
+                </td>
+                <td>
+                  <div class="summary_text_amt_level_1" >
+                    {{tab1Data.semi_annual_total | currency:'USD':'symbol-narrow':'1.2-2'}}
+                  </div>
+                </td>  
+             </tr>
             </tbody>
           </table>
         </div>
@@ -256,7 +290,7 @@
     </div>
   </section>
   <footer>
-        <div class="grid-row">
+        <div class="grid-row" *ngIf="formType === '3X'">
             <div class="grid-row__col grid-row__col--12">
             <div class="forms__btn-container">
                    <button id="extended_summary" class="btn btn-previous btn-right" type="button" (click)="expanded_Summary()">

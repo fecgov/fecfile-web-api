@@ -44,13 +44,13 @@
             <button class="dropdown-item"  (click)="ImportTransactions()">
               <i class="file-import-icon"></i> Import
             </button>
-            <button class="dropdown-item" (click)="toggleAggregation()">
+            <button class="dropdown-item" (click)="toggleAggregation()" *ngIf="formType.endsWith('3X')">
               <i class="calculator-icon" *ngIf="isShowForceAggregate()"></i> {{isAggregate?' Un-Aggregate':' Aggregate'}}
             </button>
-            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf="!addByDissemination && (disseminationDate !== null && disseminationDate !== '') && (disbursementDate !== null && disbursementDate !== '')">
+            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf="formType.endsWith('3X') && !addByDissemination && (disseminationDate !== null && disseminationDate !== '') && (disbursementDate !== null && disbursementDate !== '')">
               <i class="calendar-icon" ></i> Add by Dissemination date
             </button>
-            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf="addByDissemination && (disbursementDate !== null && disbursementDate !== '')">
+            <button class="dropdown-item" (click)="toggleDissemination()" *ngIf=" formType.endsWith('3X') && addByDissemination && (disbursementDate !== null && disbursementDate !== '')">
               <i class="calendar-icon" ></i> Add by Disbursement date
             </button>
           </div>
@@ -308,7 +308,7 @@
                           [focusFirst]=false
                           [resultTemplate]="isFieldName(col?.name, 'beneficiary_cand_id') ? rtCandidateId : rtCommitteeId" 
                           [inputFormatter]="isFieldName(col?.name, 'beneficiary_cand_id') ? formatterCandidateId: formatterCommitteeId"
-                          (selectItem)="handleSelectedOrg($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
+                          (selectItem)="handleSelectedCandidate($event, col)" (keyup)="handleFormFieldKeyup($event, col)" />
                         <input *ngIf="isFieldName(col?.name, 'donor_cmte_name') ||
                                   isFieldName(col?.name, 'beneficiary_cmte_name')" class="form-control"
                           [style.width]="col?.width" [style.height]="col?.height" [attr.type]="col?.type"

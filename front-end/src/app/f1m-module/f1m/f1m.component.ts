@@ -47,6 +47,7 @@ export class F1mComponent implements OnInit, OnDestroy {
     type:'qualification',
     candidates: []
   };
+  committeeType: any;
 
   constructor(
     private _cd: ChangeDetectorRef,
@@ -77,7 +78,8 @@ export class F1mComponent implements OnInit, OnDestroy {
       this._reportsService.getReportInfo('F1M', this._activatedRoute.snapshot.queryParams.reportId)
       .subscribe((res: any) => {
         this.editMode = true;
-        this.type = res.establishmentType === 'A' ? 'affiliation' : 'qualification'
+        this.type = res.establishmentType === 'A' ? 'affiliation' : 'qualification';
+        this.committeeType = res.committee_type;
         this.step = this._activatedRoute.snapshot.queryParams.edit ? this._activatedRoute.snapshot.queryParams.step : 'step_2';
         this.scheduleAction = ScheduleActions.edit;
         this.reportId = res.reportId;
@@ -102,7 +104,10 @@ export class F1mComponent implements OnInit, OnDestroy {
         }
         this.refreshScreen();
 
-        this.validateForm();
+
+        if(this._activatedRoute.snapshot.queryParams.step && this._activatedRoute.snapshot.queryParams.step === 'step_4'){
+          this.validateForm();
+        }
 
       })
     }
@@ -166,6 +171,9 @@ export class F1mComponent implements OnInit, OnDestroy {
       }
       if ($event.type) {
         this.type = $event.type;
+      }
+      if($event.committeeType){
+        this.committeeType = $event.committeeType;
       }
     }
     this.refreshScreen();
@@ -232,9 +240,9 @@ export class F1mComponent implements OnInit, OnDestroy {
       if(this.type === 'qualification'){
         //check query params to see if a form of this type has already been created and a report id generate
         //if so, then return false
-        if(this._activatedRoute.snapshot.queryParams.reportId){
-          return false;
-        }
+        // if(this._activatedRoute.snapshot.queryParams.reportId){
+        //   return false;
+        // }
         
         if(this.qualificationComp && this.qualificationComp.showPart2){
           return true;
@@ -274,6 +282,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   private saveAffiliationData() {
     if (this.affiliationComp.form.valid) {
       this.step2data = this.affiliationComp.form.value;
+      this.step2data.committeeType = this.committeeType;
       let tempScheduleAction : ScheduleActions = this.scheduleAction;
       if (this.reportId) {
         this.step2data.reportId = this.reportId;
@@ -296,6 +305,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   private saveDates() {
     if(this.qualificationComp.formPart2.valid){
       this.step2data = this.qualificationComp.formPart2.getRawValue(); //.getRawValue() is used instead of .value to include disabled fields too
+      this.step2data.committeeType = this.committeeType;
       this.step2data.reportId = this.reportId;
       this._f1mService.saveForm(this.step2data, this.scheduleAction, 'saveDates').subscribe(res => {
         this.reportId = res.reportId;
@@ -314,6 +324,7 @@ export class F1mComponent implements OnInit, OnDestroy {
     if (this.qualificationData.candidates.length < 5 || (action && action.action === 'update')) {
       if(this.qualificationComp.form.valid){
         this.step2data = this.qualificationComp.form.value;
+        this.step2data.committeeType = this.committeeType;
         if (this.reportId) {
           this.step2data.reportId = this.reportId;
         }
@@ -517,7 +528,7 @@ export class F1mComponent implements OnInit, OnDestroy {
   }
   
   private validateQualificationForm() {
-    if(!this.qualificationComp.form.valid || this.qualificationComp.qualificationData.candidates.length < 5){
+    if(this.partyType !== 'PTY' && this.qualificationComp.qualificationData.candidates.length < 5){
       this.qualificationComp.showPart2 = false;
       this.step='step_2';
       this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: 
@@ -528,9 +539,18 @@ export class F1mComponent implements OnInit, OnDestroy {
       }});
       
     }
-    else if(this.qualificationComp.formPart2.valid){
+    else if(!this.qualificationComp.formPart2.valid){
       this.qualificationComp.showPart2 = true;
       this.step='step_2';
+      this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: 
+        {
+          step: this.step, 
+          reportId:this._activatedRoute.snapshot.queryParams.reportId,
+          edit:this._activatedRoute.snapshot.queryParams.edit
+      }});
+    }
+    else if(this.qualificationComp.formPart2.valid){
+      this.step = "step_4";
       this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: 
         {
           step: this.step, 

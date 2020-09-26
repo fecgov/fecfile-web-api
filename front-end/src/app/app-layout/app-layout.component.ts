@@ -4,10 +4,12 @@ import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 import { Subscription } from 'rxjs/Subscription';
 import { ApiService } from '../shared/services/APIService/api.service';
+import { AuthService } from '../shared/services/AuthService/auth.service';
 import { MessageService } from '../shared/services/MessageService/message.service';
 import { SessionService } from '../shared/services/SessionService/session.service';
 import { UtilService } from '../shared/utils/util.service';
-import {AuthService} from '../shared/services/AuthService/auth.service';
+import { ReportsService } from './../reports/service/report.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-app-layout',
@@ -16,6 +18,7 @@ import {AuthService} from '../shared/services/AuthService/auth.service';
   encapsulation: ViewEncapsulation.None
 })
 export class AppLayoutComponent implements OnInit, OnDestroy {
+  
   ngOnDestroy(): void {
       this.onDestroy$.next(true);
       this.subscription.unsubscribe();
@@ -49,9 +52,11 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   public currentReportData:any = {};
   public electionDate: string = null;
   public electionState: string = null;
-
+  public semiAnnualStartDate: string;
+  public semiAnnualEndDate: string;
   private _step: string = null;
 
+  private _datePipe: DatePipe;
   private onDestroy$ = new Subject();
 
   constructor(
@@ -63,7 +68,10 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     private _modalService: NgbModal,
     public _activatedRoute: ActivatedRoute,
     public _authService: AuthService,
-  ) {}
+    public _reportService: ReportsService
+  ) {
+    this._datePipe = new DatePipe('en-US');
+  }
 
   ngOnInit(): void {
     let route: string = this._router.url;
@@ -131,17 +139,10 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
 
   }
 
-
-  /**
-   * TODO: Figure out why this was placed here.
-   */
-  // @HostListener('window:beforeunload', ['$event'])
-  // unloadNotification($event: any) {
-  //   localStorage.clear();
-  // }
-
   ngDoCheck(): void {
     const route: string = this._router.url;
+    
+    let formType = this.extractFormType();
     // to refresh/clear Dash Board Filter options
     localStorage.removeItem('reports.filters');
     localStorage.removeItem('Reports.view');
@@ -158,18 +159,17 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       this.showFormDueDate = false;
     } else if (route === '/reports') {
       this.showFormDueDate = false;
-    } else if (
-      route.indexOf('/forms/form/3X') === 0 ||
-      route.indexOf('/forms/transactions/3X') === 0 ||
-      route.indexOf('/signandSubmit') === 0
+    } else if (formType && (
+      route.indexOf(`/forms/form/${formType}`) === 0  ||
+      route.indexOf(`/forms/transactions/${formType}`) === 0 ||
+      route.indexOf('/signandSubmit') === 0)
     ) {
-      if (localStorage.getItem('form_3X_report_type') !== null) {
-        formInfo = JSON.parse(localStorage.getItem('form_3X_report_type'));
-      } else if (localStorage.getItem('form_3X_report_type_backup') !== null) {
-        formInfo = JSON.parse(localStorage.getItem('form_3X_report_type_backup'));
+      if (localStorage.getItem(`form_${formType}_report_type`) !== null) {
+        formInfo = JSON.parse(localStorage.getItem(`form_${formType}_report_type`));
+      } else if (localStorage.getItem(`form_${formType}_report_type_backup`) !== null) {
+        formInfo = JSON.parse(localStorage.getItem(`form_${formType}_report_type_backup`));
       }
 
-      // //console.log(" formInfo = ", formInfo);
 
       if (typeof formInfo === 'object') {
         if(this.currentReportData && Array.isArray(this.currentReportData) && this.currentReportData.length > 0){
@@ -190,6 +190,19 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     }
   }
   
+  private extractFormType() {
+    let formType = null;
+    if (this.formType) {
+      if (this.formType.length === 3) {
+        formType = this.formType.substr(1, 3);
+      }
+      else if (this.formType.length === 2) {
+        formType = this.formType;
+      }
+    }
+    return formType;
+  }
+
   private populateHeaderData(formInfo: any) {
     if (formInfo.hasOwnProperty('formType')) {
       this.formType = formInfo.formType;
@@ -243,17 +256,25 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       // //console.log("formInfo.overdue =", formInfo.overdue);
       this.reportOverDue = formInfo.overdue;
     }
-    if(formInfo.hasOwnProperty('electionDate')){
-      this.electionDate = formInfo.electionDate;
+    if(formInfo.hasOwnProperty('election_date')){
+      this.electionDate = formInfo.election_date;
     }
     else if(formInfo.hasOwnProperty('electiondate')){
       this.electionDate = formInfo.electiondate;
     }
-    if(formInfo.hasOwnProperty('electionState')){
-      this.electionState = formInfo.electionState;
+    if(formInfo.hasOwnProperty('election_state')){
+      this.electionState = formInfo.election_state;
     }
     else if(formInfo.hasOwnProperty('electionstate')){
       this.electionState = formInfo.electionstate;
+    }
+
+    if(formInfo.hasOwnProperty('semi_annual_start_date')){
+      this.semiAnnualStartDate = formInfo.semi_annual_start_date;
+    }
+
+    if(formInfo.hasOwnProperty('semi_annual_end_date')){
+      this.semiAnnualEndDate = formInfo.semi_annual_end_date;
     }
   }
 
@@ -320,36 +341,36 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   }
 
   public editFrom(): void {
-
     
-    let queryParamsMap: any = {
-      step: 'step_1',
-      edit: true,
-      reportId: this._activatedRoute.snapshot.queryParams.reportId
-    };
-
-    let formType :string = '';
-    if(this.formType === 'F3X'){
-      formType='3X';
-    }
-    else if(this.formType === '3X'){
-      formType ='3X';
-    }
-    this._router.navigate([`/forms/form/${formType}`], {
-      queryParams: queryParamsMap
-    });
-
-
-    this._messageService.sendUpdateReportTypeMessage({
-      currentReportData: {
-        'currentReportDescription': this.formDescription,
-        'currentStartDate': this.formStartDate, 
-        'currentEndDate': this.formEndDate,
-        'currentDueDate' : this.dueDate,
-        'currentReportType': this.reportType,
-        'currentElectionDate':this.electionDate,
-        'currentElectionState':this.electionState
-      }
-    });
+    let formType :string = this.extractFormType();
+    this._reportService.getReportInfo(formType, this._activatedRoute.snapshot.queryParams.reportId).subscribe(res => {
+      
+      let queryParamsMap: any = {
+        step: 'step_1',
+        edit: true,
+        reportId: this._activatedRoute.snapshot.queryParams.reportId
+      };
+  
+      this._router.navigate([`/forms/form/${formType}`], {
+        queryParams: queryParamsMap
+      });
+  
+      res = res[0];
+      this._messageService.sendUpdateReportTypeMessage({
+        currentReportData: {
+          
+          'currentReportDescription': res.reporttypedescription,
+          'currentStartDate': res.cvgStartDate ? this._datePipe.transform(res.cvgStartDate, 'yyyy-MM-dd') : null, 
+          'currentEndDate': res.cvgEndDate ? this._datePipe.transform(res.cvgEndDate, 'yyyy-MM-dd') : null,
+          'currentDueDate' : res.duedate,
+          'currentReportType': res.reporttype,
+          'currentElectionDate':res.election_date ? res.election_date : res.electiondate,
+          'currentElectionState':res.election_state ? res.election_state : res.electionstate,
+          'currentSemiAnnualStartDate': res.semi_annual_start_date,
+          'currentSemiAnnualEndDate': res.semi_annual_end_date
+        }
+      });
+    })
+    
   }
 }

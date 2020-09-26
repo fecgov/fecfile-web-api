@@ -16,6 +16,7 @@ export class InputModalComponent implements OnInit {
   titleText = 'Add Memo';
   saveAction = SaveDialogAction.saveNone ;
   inputContent: string;
+  viewOnlyFlag: boolean = false;
   constructor(
       config: NgbModalConfig,
       private modalService: NgbModal,
@@ -49,5 +50,8 @@ export class InputModalComponent implements OnInit {
   }
   public setDialogTitle(title: string) {
     this.titleText = title ? title : '';
+  }
+  public setViewOnlyFlag(viewOnly:boolean){
+    this.viewOnlyFlag = viewOnly;
   }
 }

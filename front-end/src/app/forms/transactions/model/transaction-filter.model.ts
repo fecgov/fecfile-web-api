@@ -10,6 +10,8 @@ export class TransactionFilterModel {
   filterCategories: string[];
   filterAmountMin: number;
   filterAmountMax: number;
+  filterSemiAnnualAmountMin: number;
+  filterSemiAnnualAmountMax: number;
   filterAggregateAmountMin: number;
   filterAggregateAmountMax: number;
   filterDateFrom: Date;
@@ -29,6 +31,7 @@ export class TransactionFilterModel {
   filterSchedule: string;
   filterDebtBeginningBalanceMin: number;
   filterDebtBeginningBalanceMax: number;
+  filterEntityId: string[] = [];
 
   constructor() {}
 }

@@ -1,3 +1,4 @@
+import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Component, Input, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -101,6 +102,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public isHideDeletedDateFilter: boolean;
   public isHideReportTypeFilter: boolean;
   public isHideAmountFilter: boolean;
+  public isHideSemiAnnualAmountFilter: boolean;
   public isHideAggregateAmountFilter: boolean;
   public isHideStateFilter: boolean;
   public isHideMemoFilter: boolean;
@@ -123,6 +125,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public filterCategoriesText = '';
   public filterAmountMin: number;
   public filterAmountMax: number;
+  public filterSemiAnnualAmountMin: number;
+  public filterSemiAnnualAmountMax: number;
   public filterLoanAmountMin: number;
   public filterLoanAmountMax: number;
   public filterAggregateAmountMin: number;
@@ -144,6 +148,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public dateFilterValidation: ValidationErrorModel;
   public deletedDateFilterValidation: ValidationErrorModel;
   public amountFilterValidation: ValidationErrorModel;
+  public semiAnnualAmountFilterValidation: ValidationErrorModel;
   public aggregateAmountFilterValidation: ValidationErrorModel;
   public yearFilterValidation: ValidationErrorModel;
   public loanClosingBalanceFilterValidation: ValidationErrorModel;
@@ -171,6 +176,26 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   private msEdge = true;
   private view = ActiveView.transactions;
   queryParamSubscription: Subscription;
+  
+  //Filters flags based on formType and transactionCategory
+  public showAmountFilter: boolean;
+  public showPeriodAmountFilter: boolean;
+  public showAggregateAmountFilter: boolean;
+  public showItemizationFilter: boolean;
+  public showTypeFilter: boolean;
+  public showReportTypeFilter: boolean;
+  public showDateFilter: boolean;
+  public showLoanAmountFilter: boolean;
+  public showBalanceAtCloseFilter: boolean;
+  public showBeginningBalanceFilter: boolean;
+  public showAggregateFilter: boolean;
+  public showMemoCodeFilter: boolean;
+  public showStateFilter: boolean;
+  public showElectionCodeFilter: boolean;
+  public showElectionYearFilter: boolean;
+  public showScheduleFilter: boolean;
+  public showSemiAnnualAmountFilter: boolean;
+  public entityFilter: string[] = [];
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -178,7 +203,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     private _transactionTypeService: TransactionTypeService,
     public _activatedRoute: ActivatedRoute,
     private _contactsService:ContactsService, 
-    private _reportsService: ReportsService
+    private _reportsService: ReportsService, 
+    private _messageService: MessageService
   ) {
     this._transactionsMessageService
       .getRemoveFilterMessage()
@@ -215,7 +241,21 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     .takeUntil(this.onDestroy$)
     .subscribe(message => {
       this.clearAndApplyFilters();
-    })
+    }); 
+    
+    this._messageService
+    .getMessage()
+    .takeUntil(this.onDestroy$)
+    .subscribe(message => {
+      if(message && message.action === 'filterAllTransactionsByEntity'){
+        // this.entityFilter = message.entityId;
+        let entityList = this._contactsService.entityListToFilterBy;
+        entityList.forEach(element => {
+          this.entityFilter.push(element.id);
+        });
+        this.applyFilters(false);
+      }
+    }); 
 
     this.queryParamSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this.transactionCategory = p.transactionCategory;
@@ -224,6 +264,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       }
       if (p.transactionCategory) {
         this.transactionCategory = p.transactionCategory;
+        this._initializeFilters();
       }
     });
   }
@@ -240,6 +281,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.filterDeletedDateTo = null;
     this.filterAmountMin = null;
     this.filterAmountMax = null;
+    this.filterSemiAnnualAmountMin = null;
+    this.filterSemiAnnualAmountMax = null;
     this.filterLoanAmountMin = null;
     this.filterLoanAmountMax = null;
     this.filterAggregateAmountMin = null;
@@ -254,6 +297,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.isHideDeletedDateFilter = true;
     this.isHideReportTypeFilter = true;
     this.isHideAmountFilter = true;
+    this.isHideSemiAnnualAmountFilter = true;
     this.isHideAggregateAmountFilter = true;
     this.isHideloanClosingBalanceFilter = true;
     this.isHideDebtBeginningBalanceFilter = true;
@@ -277,7 +321,124 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     }
   }
  
+  private _initializeFilters(){
+    if(!this.formType){
+      this.formType = this._activatedRoute.snapshot.paramMap.get('form_id');
+    }
+    if(this.formType.endsWith('3X') || this.formType.endsWith('24')){
+      if(this.transactionCategory === 'receipts'){
+        this._hideAllFilters();
+        this.showF3xReceiptsFilters();
+      }
+      else if(this.transactionCategory === 'disbursements'){
+        this._hideAllFilters();
+        this.showF3xDisbursementsFilters();
+      }
+      else if(this.transactionCategory === 'loans-and-debts'){
+        this._hideAllFilters();
+        this.showLoansAndDebtsFilters();
+      }
+      else if(this.transactionCategory === 'other'){
+        this._hideAllFilters();
+        this.showOthersFilters();
+      }
+    }
+    else if(this.formType.endsWith('3L')){
+      if(this.transactionCategory === 'receipts' || this.transactionCategory === 'disbursements'){
+        this._hideAllFilters();
+        this.showF3lReceiptsOrDisbursementsFilters();
+      }
+    }
+    else if(this.formType.endsWith('global')){
+      if(this.transactionCategory === 'receipts'){
+        this._hideAllFilters();
+        this.showF3xReceiptsFilters();
+        this.showF3lReceiptsOrDisbursementsFilters();
+      }
+      else if(this.transactionCategory === 'disbursements'){
+        this._hideAllFilters();
+        this.showF3xDisbursementsFilters();
+        this.showF3lReceiptsOrDisbursementsFilters();
+      }
+      else if(this.transactionCategory === 'loans-and-debts'){
+        this._hideAllFilters();
+        this.showLoansAndDebtsFilters();
+      }
+      else if(this.transactionCategory === 'other'){
+        this._hideAllFilters();
+        this.showOthersFilters();
+      }
+    }
+  }
 
+  private showF3lReceiptsOrDisbursementsFilters() {
+    this.showPeriodAmountFilter = true;
+    this.showSemiAnnualAmountFilter = true;
+    this.showTypeFilter = true;
+    this.showStateFilter = true;
+  }
+
+  private showF3xDisbursementsFilters() {
+    this.showAmountFilter = true;
+    this.showItemizationFilter = true;
+    this.showTypeFilter = true;
+    this.showReportTypeFilter = true;
+    this.showDateFilter = true;
+    this.showMemoCodeFilter = true;
+    this.showStateFilter = true;
+    this.showElectionCodeFilter = true;
+    this.showElectionYearFilter = true;
+  }
+
+  private showF3xReceiptsFilters() {
+    this.showAmountFilter = true;
+    this.showAggregateAmountFilter = true;
+    this.showItemizationFilter = true;
+    this.showTypeFilter = true;
+    this.showReportTypeFilter = true;
+    this.showDateFilter = true;
+    this.showAggregateFilter = true;
+    this.showMemoCodeFilter = true;
+    this.showStateFilter = true;
+  }
+
+  private showOthersFilters() {
+    this.showTypeFilter = true;
+    this.showReportTypeFilter = true;
+    this.showDateFilter = true;
+    this.showMemoCodeFilter = true;
+    this.showStateFilter = true;
+    this.showScheduleFilter = true;
+  }
+
+  private showLoansAndDebtsFilters() {
+    this.showTypeFilter = true;
+    this.showReportTypeFilter = true;
+    this.showLoanAmountFilter = true;
+    this.showBalanceAtCloseFilter = true;
+    this.showBeginningBalanceFilter = true;
+    this.showMemoCodeFilter = true;
+    this.showStateFilter = true;
+  }
+
+  private _hideAllFilters(){
+    this.showAmountFilter = false;
+    this.showPeriodAmountFilter = false;
+    this.showAggregateAmountFilter = false;
+    this.showItemizationFilter = false;
+    this.showTypeFilter = false;
+    this.showReportTypeFilter = false;
+    this.showDateFilter = false;
+    this.showLoanAmountFilter = false;
+    this.showBalanceAtCloseFilter = false;
+    this.showBeginningBalanceFilter = false;
+    this.showAggregateFilter = false;
+    this.showMemoCodeFilter = false;
+    this.showStateFilter = false;
+    this.showElectionCodeFilter = false;
+    this.showElectionYearFilter = false;
+    this.showSemiAnnualAmountFilter = false;
+  }
  
 
   /**
@@ -321,6 +482,13 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    */
   public toggleAmountFilterItem() {
     this.isHideAmountFilter = !this.isHideAmountFilter;
+  }
+
+  /**
+   * Toggle visibility of the Amount filter
+   */
+  public toggleSemiAnnualAmountFilterItem() {
+    this.isHideSemiAnnualAmountFilter = !this.isHideSemiAnnualAmountFilter;
   }
 
   /**
@@ -515,6 +683,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
     filters.filterAmountMin = this.filterAmountMin;
     filters.filterAmountMax = this.filterAmountMax;
+    filters.filterSemiAnnualAmountMin = this.filterSemiAnnualAmountMin;
+    filters.filterSemiAnnualAmountMax = this.filterSemiAnnualAmountMax;
     filters.filterAggregateAmountMin = this.filterAggregateAmountMin;
     filters.filterAggregateAmountMax = this.filterAggregateAmountMax;
     filters.filterLoanAmountMin = this.filterLoanAmountMin;
@@ -524,7 +694,18 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     filters.filterDebtBeginningBalanceMin = this.filterDebtBeginningBalanceMin;
     filters.filterDebtBeginningBalanceMax = this.filterDebtBeginningBalanceMax;
 
+    filters.filterEntityId = this.entityFilter;
+
     if (this.filterAmountMin !== null) {
+      modified = true;
+    }
+    if (this.filterAmountMax !== null) {
+      modified = true;
+    }
+    if (this.filterSemiAnnualAmountMin !== null) {
+      modified = true;
+    }
+    if (this.filterSemiAnnualAmountMax !== null){
       modified = true;
     }
     if (this.filterAmountMax !== null) {
@@ -644,6 +825,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
 
     this.filterAmountMin = null;
     this.filterAmountMax = null;
+    this.filterSemiAnnualAmountMin = null;
+    this.filterSemiAnnualAmountMax = null;
     this.filterAggregateAmountMin = null;
     this.filterAggregateAmountMax = null;
     this.filterLoanAmountMin = null;
@@ -704,52 +887,6 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
    * filter options on Type.
    */
   private getCategoryTypes() {
-   /*  this._transactionTypeService.getTransactionCategories(this.formType).subscribe(res => {
-      let categoriesExist = false;
-      const categoriesGroupArray = [];
-      if (res.data) {
-        if (res.data.transactionCategories) {
-          categoriesExist = true;
-
-          // 1st node is the group of types (not checkable).
-          // 2nd node is ignored.
-          // 3rd node is the type checkable.
-          for (const node1 of res.data.transactionCategories) {
-            const categoryGroup: any = {};
-            categoryGroup.text = node1.text;
-            categoryGroup.options = [];
-
-            for (const node2 of node1.options) {
-              for (const option of node2.options) {
-                if (this.cachedFilters) {
-                  if (this.cachedFilters.filterCategories) {
-                    // check for categories selected in the filter cache
-                    // TODO scroll to first check item
-                    if (this.cachedFilters.filterCategories.includes(option.text)) {
-                      option.selected = true;
-                      this.isHideTypeFilter = false;
-                    } else {
-                      option.selected = false;
-                    }
-                  }
-                }
-                categoryGroup.options.push(option);
-              }
-            }
-            if (categoryGroup.options.length > 0) {
-              categoriesGroupArray.push(categoryGroup);
-            }
-          }
-        }
-      }
-      if (categoriesExist) {
-        this.transactionCategories = categoriesGroupArray;
-        // this.transactionCategories = this._orderByPipe.transform(
-        //   res.data.transactionCategories, {property: 'text', direction: 1});
-      } else {
-        this.transactionCategories = [];
-      }
-    }); */
     this._transactionTypeService.getTransactionTypes(this.formType).subscribe(res => {
       let categoriesExist = false;
       let categoriesGroupArray = [];
@@ -887,6 +1024,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
         this.filterAmountMax = this.cachedFilters.filterAmountMax;
         this.isHideAmountFilter = !(this.filterAmountMin > 0 && this.filterAmountMax > 0);
 
+        this.filterSemiAnnualAmountMin = this.cachedFilters.filterSemiAnnualAmountMin;
+        this.filterSemiAnnualAmountMax = this.cachedFilters.filterSemiAnnualAmountMax;
+        this.isHideSemiAnnualAmountFilter = !(this.filterSemiAnnualAmountMin > 0 && this.filterSemiAnnualAmountMax > 0);
+
         this.filterAggregateAmountMin = this.cachedFilters.filterAggregateAmountMin;
         this.filterAggregateAmountMax = this.cachedFilters.filterAggregateAmountMax;
         this.isHideAggregateAmountFilter = !(this.filterAggregateAmountMin > 0 && this.filterAggregateAmountMax > 0);
@@ -931,6 +1072,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     this.dateFilterValidation = new ValidationErrorModel(null, false);
     this.deletedDateFilterValidation = new ValidationErrorModel(null, false);
     this.amountFilterValidation = new ValidationErrorModel(null, false);
+    this.semiAnnualAmountFilterValidation = new ValidationErrorModel(null, false);
     this.aggregateAmountFilterValidation = new ValidationErrorModel(null, false);
     this.yearFilterValidation = new ValidationErrorModel(null, false);
     this.loanClosingBalanceFilterValidation = new ValidationErrorModel(null, false);
@@ -995,6 +1137,27 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       this.isHideAmountFilter = false;
       return false;
     }
+    if (this.filterSemiAnnualAmountMin !== null && this.filterSemiAnnualAmountMax === null) {
+      this.semiAnnualAmountFilterValidation.isError = true;
+      this.semiAnnualAmountFilterValidation.message = 'Maximum Amount is required';
+      this.isHideSemiAnnualAmountFilter = false;
+      return false;
+    }
+    if (this.filterSemiAnnualAmountMax !== null && this.filterSemiAnnualAmountMin === null) {
+      this.semiAnnualAmountFilterValidation.isError = true;
+      this.semiAnnualAmountFilterValidation.message = 'Minimum Amount is required';
+      this.isHideSemiAnnualAmountFilter = false;
+      return false;
+    }
+
+
+    if (this.filterSemiAnnualAmountMin > this.filterSemiAnnualAmountMax) {
+      this.semiAnnualAmountFilterValidation.isError = true;
+      this.semiAnnualAmountFilterValidation.message = 'Maximum is less than Minimum';
+      this.isHideSemiAnnualAmountFilter = false;
+      return false;
+    }
+
     if (this.filterAmountMin > this.filterAmountMax) {
       this.amountFilterValidation.isError = true;
       this.amountFilterValidation.message = 'Maximum is less than Minimum';
@@ -1083,8 +1246,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
       this.filterElectionYearFrom !== undefined &&
       (this.filterElectionYearTo === null || this.filterElectionYearTo === undefined)
     ) {
-      this.amountFilterValidation.isError = true;
-      this.amountFilterValidation.message = 'Election year from is required';
+      this.yearFilterValidation.isError = true;
+      this.yearFilterValidation.message = 'Election year from is required';
       this.isHideElectionYear = false;
       return false;
     }
@@ -1172,6 +1335,10 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
             this.filterDeletedDateTo = null;
             break;
           case FilterTypes.amount:
+            this.filterAmountMin = null;
+            this.filterAmountMax = null;
+            break;
+          case FilterTypes.semiAnnualAmount:
             this.filterAmountMin = null;
             this.filterAmountMax = null;
             break;

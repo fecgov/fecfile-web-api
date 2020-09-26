@@ -44,6 +44,33 @@
             >
               You must select coverage dates.
             </div>
+            <div
+              class="text-error text-center"
+              *ngIf=" formType === '3L' &&
+                showErrors &&
+                coverageDatesMissing
+              "
+            >
+              You must select coverage dates.
+            </div>
+            <div
+              class="text-error text-center"
+              *ngIf=" formType === '3L' &&
+                showErrors &&
+                electionDateMissing
+              "
+            >
+              You must select election date. 
+            </div>
+            <div
+              class="text-error text-center"
+              *ngIf=" formType === '3L' &&
+                showErrors &&
+                stateMissing
+              "
+            >
+              You must select election state.
+            </div>
             <div class="text-error text-center" *ngIf="(frmReportType.dirty || frmReportType.touched) && invalidDatesServerValidation">
               <!-- Entered date is outside of the report coverage period. Please enter transactions for this coverage period
               only. -->
@@ -72,7 +99,7 @@
               [value]="committeeReportType.report_type"
               [attr.data-report-type]="committeeReportType?.regular_special_report_ind"
               [attr.checked]="committeeReportType.report_type === reportTypeSelected"
-              (click)="updateTypeSelected($event)"
+              (click)="updateTypeSelected($event,committeeReportType)"
               formControlName="reportTypeRadio"
             />
               {{ committeeReportType.report_type_desciption }}

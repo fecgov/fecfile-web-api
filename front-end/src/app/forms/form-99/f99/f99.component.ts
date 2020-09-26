@@ -115,6 +115,10 @@ export class F99Component implements OnInit , OnDestroy{
 
           this._form99Details = this.committee_details;
         }
+        else if(res && res.action === 'updateForm99ReportId' && res.reportId){
+          this.reportId = res.reportId;
+          this._router.navigate([],{relativeTo:this._activatedRoute, queryParams: {reportId: this.reportId}, queryParamsHandling:'merge'});
+        }
       });
   }
 

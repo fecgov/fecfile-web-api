@@ -14,6 +14,10 @@ import { UtilService } from './utils/util.service';
 import { OrderByPipe } from 'ngx-pipes';
 import { ModalModule } from 'ngx-bootstrap';
 import { InputModalComponent } from './partials/input-modal/input-modal.component';
+import { ExportDirective } from './directives/export.directive';
+import { ReportTypeSidebarComponent } from '../forms/form-3x/report-type-sidebar/report-type-sidebar.component';
+import { ReportTypeComponent } from '../forms/form-3x/report-type/report-type.component';
+import { SpinnerComponent } from './partials/spinner/spinner.component';
 
 @NgModule({
   imports: [
@@ -24,12 +28,15 @@ import { InputModalComponent } from './partials/input-modal/input-modal.componen
   ],
   declarations: [
     StepsComponent,
+    ReportTypeSidebarComponent,
     SignAndSubmitComponent,
     SubTransactionsTableComponent,
     SubmitComponent,
+    ReportTypeComponent,
     ValidateComponent,
     PhonePipe,
-    InputModalComponent
+    InputModalComponent,
+    SpinnerComponent
   ],
   exports: [
     CommonModule,
@@ -40,10 +47,13 @@ import { InputModalComponent } from './partials/input-modal/input-modal.componen
     NgxPaginationModule,
     ModalModule,
     StepsComponent,
+    ReportTypeSidebarComponent,
     SignAndSubmitComponent,
     SubTransactionsTableComponent,
     SubmitComponent,
+    ReportTypeComponent,
     InputModalComponent,
+    SpinnerComponent
   ],
   providers: [
     DecimalPipe,
@@ -51,7 +61,8 @@ import { InputModalComponent } from './partials/input-modal/input-modal.componen
     UtilService,
     OrderByPipe,
     PhonePipe,
-    CurrencyPipe
+    CurrencyPipe,
+    ExportDirective
   ],
   entryComponents: [InputModalComponent]
 })

@@ -1,18 +1,17 @@
-import { Injectable , ChangeDetectionStrategy } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 import { Observable } from 'rxjs';
 import 'rxjs/add/observable/of';
-import { CookieService } from 'ngx-cookie-service';
+import { map } from 'rxjs/operators';
+import { FilterPipe } from 'src/app/shared/pipes/filter/filter.pipe';
+import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
+import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
 import { environment } from 'src/environments/environment';
+import { ReportFilterModel } from '../model/report-filter.model';
 //import { ReportModel } from '../model/report.model';
 import { reportModel } from '../model/report.model';
-import { OrderByPipe } from 'src/app/shared/pipes/order-by/order-by.pipe';
-import { FilterPipe, FilterTypeEnum } from 'src/app/shared/pipes/filter/filter.pipe';
-import { ReportFilterModel } from '../model/report-filter.model';
-import { DatePipe } from '@angular/common';
-import { ZipCodePipe } from 'src/app/shared/pipes/zip-code/zip-code.pipe';
-import { ActiveView } from '../reportheader/reportheader.component';
-import { map } from 'rxjs/operators';
 
 export interface GetReportsResponse {
   reports: reportModel[];
@@ -22,6 +21,7 @@ export interface GetReportsResponse {
   providedIn: 'root'
 })
 export class ReportsService {
+
   // only for mock data
   // only for mock data
   // only for mock data
@@ -98,6 +98,22 @@ export class ReportsService {
       headers: httpOptions
     });
   }
+
+  public getAllF24Reports() : Observable<any>{
+    const token: string = JSON.parse(this._cookieService.get('user'));
+    let httpOptions = new HttpHeaders();
+    let url = '';
+
+    url = '/core/get_f24_reports';
+
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
+
+    return this._http.get(`${environment.apiUrl}${url}`, {
+      headers: httpOptions
+    });
+  }
+
   public getAmendmentIndicators(): Observable<any> {
     const token: string = JSON.parse(this._cookieService.get('user'));
     let httpOptions = new HttpHeaders();
@@ -187,7 +203,7 @@ export class ReportsService {
     let httpOptions = new HttpHeaders();
     let params = new HttpParams();
 
-    const url = '/f99/get_form99list';
+    const url = '/f99/get_previous_amend_reports';
 
     httpOptions = httpOptions.append('Content-Type', 'application/json');
     httpOptions = httpOptions.append('Authorization', 'JWT ' + token);
@@ -577,9 +593,9 @@ export class ReportsService {
     
     params = params.append('reportid', report_id);
 
-    if (form_type === 'F99') {
+    if (form_type === 'F99' || form_type === '99') {
       url = '/f99/get_f99_report_info';
-    } else if (form_type === 'F3X' || form_type === '3X' || form_type === 'F24' || form_type === '24') {
+    } else if (form_type === 'F3X' || form_type === '3X' || form_type === 'F24' || form_type === '24' || form_type === '3L' || form_type === 'F3L') {
       url = '/core/get_report_info';
     } else if(form_type === 'F1M'){
       url = '/f1M/form1M'
@@ -593,7 +609,7 @@ export class ReportsService {
 
     //params = params.append('committeeid', committee_id);
 
-    if (form_type === 'F99') {
+    if (form_type === 'F99' || form_type === '99') {
       return this._http.get(`${environment.apiUrl}${url}`, {
         headers: httpOptions,
         params

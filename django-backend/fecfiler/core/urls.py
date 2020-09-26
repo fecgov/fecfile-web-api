@@ -212,4 +212,14 @@ urlpatterns = [
         views.get_child_max_transaction_amount,
         name="get_child_max_transaction_amount",
     ),
+    url(
+        r"^core/report/additionalEmails$",
+        views.save_additional_email,
+        name="save_additional_email",
+    ),
+    url(
+        r"^core/get_f24_reports$",
+        views.get_f24_reports,
+        name="get_f24_reports",
+    ),
 ]

@@ -44,13 +44,13 @@
             {{ categoryType?.text }}
           </button>
         </div>
-        <ng-container *ngIf="categoryType?.value === 'receipts'">
+        <ng-container *ngIf="categoryType?.value === 'receipts' && formType !== '3L'" >
           <span class="float-right amount"> ${{ receiptsTotal | number: '1.2-2' }} </span>
         </ng-container>
-        <ng-container *ngIf="categoryType?.value === 'disbursements'">
+        <ng-container *ngIf="categoryType?.value === 'disbursements' && formType !== '3L'">
           <span class="float-right amount"> ${{ disbursementsTotal | number: '1.2-2' }} </span>
         </ng-container>
-        <ng-container *ngIf="categoryType?.value === 'loans-and-debts'">
+        <ng-container *ngIf="categoryType?.value === 'loans-and-debts' && formType !== '3L'">
           <span class="float-right amount"> ${{ loansanddebtsTotal | number: '1.2-2' }} </span>
         </ng-container>
         <ng-container *ngIf="categoryType?.value === 'other'">
@@ -82,7 +82,7 @@
     </ng-container> -->
   </section>
   <footer>
-    <div class="form-sidebar__item" *ngIf="formType !== '24'">
+    <div class="form-sidebar__item" *ngIf="formType !== '24' && formType !== '3L'">
       <div class="form-sidebar-item__text">
         Cash on Hand
       </div>
@@ -113,7 +113,7 @@
             type="button"
             class="btn btn-secondary"
             [disabled]="isFiled"
-            [routerLink]="['/signandSubmit', '3X']"
+            [routerLink]="['/signandSubmit', _formType]"
             [queryParams]="{ edit: editMode, reportId: _activatedRoute.snapshot.queryParams.reportId }"
           >
             Sign &amp; Submit
