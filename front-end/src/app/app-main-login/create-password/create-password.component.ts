@@ -2,7 +2,7 @@ import { MessageService } from 'src/app/shared/services/MessageService/message.s
 import { ManageUserService } from './../../admin/manage-user/service/manage-user-service/manage-user.service';
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { mustMatch } from 'src/app/shared/utils/forms/validation/must-match.validator';
 import { of } from 'rxjs';
 import { NgbPanelChangeEvent } from '@ng-bootstrap/ng-bootstrap';
@@ -16,9 +16,9 @@ export class CreatePasswordComponent implements OnInit {
 
   public show = true;
   form: FormGroup;
-  public user: string = 'dummyUser';
   passwordAccordionExpanded: boolean = false;
   cmteDetailsAccordionExpanded: boolean = false;
+  userEmail: any;
 
   get password() {
     if (this.form && this.form.get('password')) {
@@ -29,11 +29,13 @@ export class CreatePasswordComponent implements OnInit {
 
   constructor(private router: Router,
     private _fb: FormBuilder,
+    private _activatedRoute: ActivatedRoute,
     private _manageUserService: ManageUserService, 
     private _messageService: MessageService) { }
 
   ngOnInit() {
     this.initForm();
+    this.userEmail = this._activatedRoute.snapshot.queryParams.email;
   }
 
   public toggleAccordion($event: NgbPanelChangeEvent, acc, accordionType: string) {
@@ -58,8 +60,10 @@ export class CreatePasswordComponent implements OnInit {
 
 
   private initForm() {
+    const passwordRegex = '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&]{8,}';
     this.form = this._fb.group({
-      password: new FormControl(null, [Validators.required]),
+      password: new FormControl(null, [Validators.required, 
+        Validators.pattern(new RegExp(passwordRegex))]),
       confirmPassword: new FormControl(null, [Validators.required]),
     }, { validator: [mustMatch('password', 'confirmPassword')] });
   }

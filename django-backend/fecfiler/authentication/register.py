@@ -145,6 +145,20 @@ def create_account_password(cmte_id, password, email, personal_key):
         raise e
 
 
+def update_personal_key(cmte_id, email, personal_key):
+    try:
+        with connection.cursor() as cursor:
+            _sql = """UPDATE public.authentication_account SET personal_key = %s WHERE cmtee_id = %s AND 
+            email = %s AND delete_ind !='Y' """
+            cursor.execute(_sql, [personal_key, cmte_id, email])
+            if cursor.rowcount != 1:
+                raise Exception("Personal Key was not updated.")
+            else:
+                return True
+    except Exception as e:
+        logger.debug("Exception occurred while updating personal key.", str(e))
+        raise e
+
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([])
@@ -173,7 +187,7 @@ def code_verify_register(request):
             otp_class = TOTPVerification(username)
             token_val = otp_class.verify_token(key)
 
-            if code == int(token_val):
+            if code == token_val:
                 is_allowed = True
                 reset_code_counter(key)
 
@@ -212,6 +226,33 @@ def create_password(request):
             logger.debug("exception occurred while getting account information", str(e))
             json_result = {'message': "Password Reset was not successful."}
             return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
+def get_another_personal_key(request):
+    if request.method == "GET":
+        try:
+            personal_key_updated = False
+            payload = token_verification(request)
+            cmte_id = payload.get('committee_id', None)
+            email = payload.get('email', None)
+            data = {"committee_id": cmte_id, "email": email}
+
+            list_mandatory_fields = ["committee_id", "email"]
+            check_madatory_field(data, list_mandatory_fields)
+            personal_key = uuid.uuid4()
+            update_personal_key(cmte_id, email, personal_key)
+            personal_key_updated = True
+
+            response = {'personal_key_updated': personal_key_updated, 'personal_key': personal_key}
+            return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+        except Exception as e:
+            logger.debug("exception occurred while getting account information", str(e))
+            json_result = {'message': "Personal Key was not updated."}
+            return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
+
 
 
 @api_view(["POST"])

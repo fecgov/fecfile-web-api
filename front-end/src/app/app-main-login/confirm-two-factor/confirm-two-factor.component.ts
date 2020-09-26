@@ -37,7 +37,7 @@ export class ConfirmTwoFactorComponent implements OnInit {
       private _manageUserService: ManageUserService
   ) {
     this.twoFactInfo = _fb.group({
-      securityCode: ['', Validators.required],
+      securityCode: ['', [Validators.required, Validators.pattern(new RegExp('^[0-9]+$'))]],
     });
   }
 
@@ -111,7 +111,7 @@ export class ConfirmTwoFactorComponent implements OnInit {
       } else if (this.entryPoint === 'registration') {
         this._manageUserService.verifyCode(this.twoFactInfo.value.securityCode).subscribe((resp: any) => {
           if (resp && resp.is_allowed) {
-            this.router.navigate(['/createPassword']);
+            this.router.navigate(['/createPassword'], {queryParamsHandling: 'merge'});
           }
         });
       }
@@ -164,7 +164,7 @@ export class ConfirmTwoFactorComponent implements OnInit {
     resend() {
       if (this.resendOption) {
 
-      this._twoFactorService.requestCode(this.resendOption).subscribe(res => {
+      this._twoFactorService.requestCode(this.resendOption, this.entryPoint).subscribe(res => {
         if (res) {
         }
       });
