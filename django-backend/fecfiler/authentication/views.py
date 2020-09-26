@@ -140,7 +140,7 @@ def get_users_list(cmte_id):
     try:
         with connection.cursor() as cursor:
             # GET single row from manage user table
-            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND upper(role) != %s order by id) t"""
+            _sql = """SELECT json_agg(t) FROM (Select first_name, last_name, email, contact, is_active, role, id, status from public.authentication_account WHERE cmtee_id = %s AND delete_ind != 'Y' AND upper(role) != %s order by id) t"""
             cursor.execute(_sql, [cmte_id, Roles.C_ADMIN.value])
             user_list = cursor.fetchall()
             if user_list is None:
@@ -463,9 +463,9 @@ def manage_user(request):
                 data = validate(data, fields, request)
                 # check if user already exsist
                 user_exist = check_user_present(data)
+                backup_admin_exist = backup_user_exist(data)
                 # check if user was previously deleted, then reactivate
                 user_reactivated = user_previously_deleted(data)
-                backup_admin_exist = backup_user_exist(data)
                 if data.get("role").upper() == Roles.BC_ADMIN.value and request.user.role != Roles.C_ADMIN.value:
                     raise NoOPError(
                                     "Current Role does not have authority to create Back Up Admin. Please reach out "
