@@ -14,7 +14,7 @@ export class UserModel {
         this.email = user.email ? user.email : '';
         this.role = user.role ? user.role : '';
         // TODO: Yet to implement
-        this.status = 'Pending';
+        this.status = user.status ? user.status : '';
         this.id = user.id ? user.id : 0;
         this.contact = user.contact ? user.contact : '';
         this.isActive = user.is_active ? true : false;

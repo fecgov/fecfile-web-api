@@ -64,7 +64,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     private _sessionService: SessionService,
     private _messageService: MessageService,
     private _utilService: UtilService,
-    private _router: Router,
+    public _router: Router,
     private _modalService: NgbModal,
     public _activatedRoute: ActivatedRoute,
     public _authService: AuthService,

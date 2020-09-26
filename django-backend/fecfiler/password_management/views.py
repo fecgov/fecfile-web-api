@@ -15,7 +15,6 @@ from django.template.loader import render_to_string
 from django_otp.oath import TOTP
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-
 from fecfiler.authentication.auth_enum import Roles
 from fecfiler.core.views import check_null_value
 from fecfiler.password_management.otp import TOTPVerification
@@ -69,6 +68,24 @@ def check_account_exist(cmte_id, email):
             # check if user already exist
             _sql = """SELECT json_agg(t) FROM (Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) 
             AND status ='Registered' AND delete_ind !='Y') t"""
+            cursor.execute(_sql, [cmte_id, email])
+            user_list = cursor.fetchone()
+            merged_list = []
+            for dictL in user_list:
+                merged_list = dictL[0]
+
+        return merged_list
+    except Exception as e:
+        logger.debug("Exception occurred while checking user already present", str(e))
+        raise e
+
+
+def check_register_account_exist(cmte_id, email):
+    try:
+        with connection.cursor() as cursor:
+            # check if user already exist
+            _sql = """SELECT json_agg(t) FROM (Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) 
+            AND status ='Pending' AND delete_ind !='Y') t"""
             cursor.execute(_sql, [cmte_id, email])
             user_list = cursor.fetchone()
             merged_list = []
@@ -300,10 +317,14 @@ def reset_options_password(request):
                 cmte_id = payload.get('committee_id', None)
                 email = payload.get('email', None)
                 data = {"committee_id": cmte_id, "email": email}
+                api_cal_from = request.data.get("call_from")
 
                 list_mandatory_fields = ["committee_id", "email"]
                 check_madatory_field(data, list_mandatory_fields)
-                user_list = check_account_exist(cmte_id, email)
+                if check_null_value(api_cal_from) and api_cal_from.upper() == 'REGISTRATION':
+                    user_list = check_register_account_exist(cmte_id, email)
+                else:
+                    user_list = check_account_exist(cmte_id, email)
 
                 if user_list is None:
                     response = {'is_allowed': is_allowed}

@@ -41,7 +41,7 @@ export class TwoFactorLoginComponent implements OnInit {
     // Check requirements
     // for now navigate to two factor code verify screen
     const option = this.twoFactInfo.get('twoFactOption').value;
-    this._twoFactorService.requestCode(option).subscribe(res => {
+    this._twoFactorService.requestCode(option, 'login').subscribe(res => {
       if (res) {
       }
     });
