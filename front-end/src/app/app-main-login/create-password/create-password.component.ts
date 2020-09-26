@@ -1,11 +1,12 @@
-import { MessageService } from 'src/app/shared/services/MessageService/message.service';
-import { ManageUserService } from './../../admin/manage-user/service/manage-user-service/manage-user.service';
+import { ApiService } from './../../shared/services/APIService/api.service';
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { mustMatch } from 'src/app/shared/utils/forms/validation/must-match.validator';
-import { of } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgbPanelChangeEvent } from '@ng-bootstrap/ng-bootstrap';
+import { CookieService } from 'ngx-cookie-service';
+import { MessageService } from 'src/app/shared/services/MessageService/message.service';
+import { mustMatch } from 'src/app/shared/utils/forms/validation/must-match.validator';
+import { ManageUserService } from './../../admin/manage-user/service/manage-user-service/manage-user.service';
 
 @Component({
   selector: 'app-create-password',
@@ -19,6 +20,7 @@ export class CreatePasswordComponent implements OnInit {
   passwordAccordionExpanded: boolean = false;
   cmteDetailsAccordionExpanded: boolean = false;
   userEmail: any;
+  cmteDetails: any;
 
   get password() {
     if (this.form && this.form.get('password')) {
@@ -30,12 +32,21 @@ export class CreatePasswordComponent implements OnInit {
   constructor(private router: Router,
     private _fb: FormBuilder,
     private _activatedRoute: ActivatedRoute,
-    private _manageUserService: ManageUserService, 
+    private _apiService: ApiService,
+    private _manageUserService: ManageUserService,
+    private _cookieService: CookieService,
     private _messageService: MessageService) { }
 
   ngOnInit() {
     this.initForm();
+    this.initCmteInfo();
     this.userEmail = this._activatedRoute.snapshot.queryParams.email;
+  }
+
+  private initCmteInfo() {
+    this._apiService.getCommiteeDetailsForUnregisteredUsers().subscribe(res => {
+      this.cmteDetails = res;
+    });
   }
 
   public toggleAccordion($event: NgbPanelChangeEvent, acc, accordionType: string) {

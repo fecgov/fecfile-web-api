@@ -66,8 +66,20 @@ export class RegisterComponent implements OnInit {
       if(message){
         if(message.is_allowed){
           this._authService.doSignIn(message.token);
-          this.router.navigate(['enterSecCode'],{queryParams:{email:message.email,option:this.form.value.emailOrPhoneOption}}).then(resp => {
-            this._messageService.sendMessage({action:'sendSecurityCode', selectedOption:this.form.value.emailOrPhoneOption, data:this.form.value, entryPoint:'registration'});
+          let option = '';
+          if(this.form.value.emailOrPhoneOption === 'email'){
+            option = 'EMAIL';
+          }
+          else if(this.form.value.emailOrPhoneOption === 'phone'){
+            if(this.form.value.voiceOrTextOption === 'V'){
+              option = 'CALL';
+            }
+            else if(this.form.value.voiceOrTextOption === 'T'){
+              option = 'TEXT';
+            }
+          }
+          this.router.navigate(['enterSecCode']).then(resp => {
+            this._messageService.sendMessage({action:'sendSecurityCode', selectedOption:option, data:this.form.value, entryPoint:'registration'});
           });
         }
       }
