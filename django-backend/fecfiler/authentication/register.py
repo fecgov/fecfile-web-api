@@ -2,6 +2,7 @@ import logging
 import uuid
 
 import boto3
+from rest_framework.response import Response
 from botocore.exceptions import ClientError
 from django.contrib.auth.hashers import make_password
 from django.db import connection
@@ -254,6 +255,35 @@ def get_another_personal_key(request):
             return JsonResponse(json_result, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
 
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([])
+def get_committee_details(request):
+    try:
+        payload = token_verification(request)
+        cmte_id = payload.get('committee_id', None)
+        with connection.cursor() as cursor:
+            query_string = """SELECT cm.cmte_id AS "committeeid", cm.cmte_name AS "committeename", cm.street_1 AS "street1", cm.street_2 AS "street2", 
+                cm.city, cm.state, cm.zip_code AS "zipcode", 
+                cm.cmte_email_1 AS "email_on_file", cm.cmte_email_2 AS "email_on_file_1", cm.phone_number, cm.cmte_type, cm.cmte_dsgn, 
+                cm.cmte_filing_freq, cm.cmte_filed_type, 
+                cm.treasurer_last_name AS "treasurerlastname", cm.treasurer_first_name AS "treasurerfirstname", cm.treasurer_middle_name AS "treasurermiddlename", 
+                cm.treasurer_prefix AS "treasurerprefix", cm.treasurer_suffix AS "treasurersuffix", cm.create_date AS "created_at", cm.cmte_type_category, f1.fax, 
+                f1.tphone as "treasurerphone", f1.url as "website", f1.email as "treasureremail"
+                FROM public.committee_master cm
+                LEFT JOIN public.form_1 f1 ON f1.comid=cmte_id
+                WHERE cm.cmte_id = %s ORDER BY cm.create_date, f1.sub_date DESC, f1.create_date DESC LIMIT 1"""
+            cursor.execute("""SELECT json_agg(t) FROM (""" + query_string + """) t""", [cmte_id])
+            modified_output = cursor.fetchone()[0]
+        if modified_output is None:
+            raise NoOPError('The Committee ID: {} does not match records in Committee table'.format(cmte_id))
+        # levin_accounts = get_levin_accounts(cmte_id)
+        # modified_output[0]['levin_accounts'] = levin_accounts
+        return Response(modified_output[0], status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response("The get_committee_details API is throwing  an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
 
 @api_view(["POST"])
 @authentication_classes([])
@@ -306,7 +336,7 @@ def authenticate(request):
 
             elif id == 'TEXT' or id == 'CALL':
                 try:
-                    email = data.get('email', None)
+                    email = user_list['email']
                     contact = data.get("contact")
                     if not check_null_value(contact):
                         raise Exception("contact is required")
