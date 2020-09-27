@@ -78,7 +78,7 @@ export class RegisterComponent implements OnInit {
               option = 'TEXT';
             }
           }
-          this.router.navigate(['enterSecCode']).then(resp => {
+          this.router.navigate(['enterSecCode'], {queryParams: {register_token: this.registerToken}}).then(resp => {
             this._messageService.sendMessage({action:'sendSecurityCode', selectedOption:option, data:this.form.value, entryPoint:'registration'});
           });
         }
