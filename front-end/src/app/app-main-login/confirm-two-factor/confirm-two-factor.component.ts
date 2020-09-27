@@ -8,6 +8,7 @@ import {MessageService} from '../../shared/services/MessageService/message.servi
 import {Subscription} from 'rxjs';
 import {TwoFactorHelperService} from '../service/two-factor-helper/two-factor-helper.service';
 import {AuthService} from '../../shared/services/AuthService/auth.service';
+import {PasswordService} from '../../password/service/password.service';
 
 @Component({
   selector: 'app-confirm-two-factor',
@@ -34,7 +35,8 @@ export class ConfirmTwoFactorComponent implements OnInit {
       private _messageService: MessageService,
       private _twoFactorService: TwoFactorHelperService,
       private _authService: AuthService,
-      private _manageUserService: ManageUserService
+      private _manageUserService: ManageUserService,
+      private _passwordService: PasswordService,
   ) {
     this.twoFactInfo = _fb.group({
       securityCode: ['', [Validators.required, Validators.pattern(new RegExp('^[0-9]+$'))]],
@@ -88,7 +90,7 @@ export class ConfirmTwoFactorComponent implements OnInit {
     this.twoFactInfo.markAsTouched();
     if (this.twoFactInfo.valid) {
       const code = this.twoFactInfo.get('securityCode').value;
-      if(this.entryPoint === 'login') {
+      if (this.entryPoint === 'login') {
         this._twoFactorService.validateCode(code).subscribe( res => {
           if (res) {
 
@@ -114,6 +116,8 @@ export class ConfirmTwoFactorComponent implements OnInit {
             this.router.navigate(['/createPassword'], {queryParamsHandling: 'merge'});
           }
         });
+      } else if (this.entryPoint === 'reset') {
+          this.handleResetPassword(code);
       }
     }
   }
@@ -149,14 +153,19 @@ export class ConfirmTwoFactorComponent implements OnInit {
           this._authService
               .doSignIn(this.response.token);
         }
-        navUrl = '/dashboard';
+          navUrl = '/dashboard';
       } else if (res === 'decline') {
         this._authService.doSignOut();
         navUrl = '[/login]';
       }
-      this.router.navigate([navUrl]).then(r => {
-        // do nothing
-      });
+      if (this.entryPoint === 'reset' && res === 'agree') {
+        this._messageService.sendMessage( { action: 'resetPassword',  entryPoint: 'reset' } );
+        this.router.navigate(['/createPassword'], {queryParamsHandling: 'merge'});
+      } else {
+        this.router.navigate([navUrl]).then(r => {
+          // do nothing
+        });
+      }
     }).catch(e => {
       // do nothing stay on the same page
     });
@@ -169,5 +178,19 @@ export class ConfirmTwoFactorComponent implements OnInit {
         }
       });
     }
+  }
+
+  private handleResetPassword(code: string) {
+    this._passwordService.verify(code).subscribe(res => {
+      if (res) {
+        if (res['is_allowed'] === true) {
+          this.isValid = true;
+          this.response = res;
+          this.askConsent();
+        } else {
+          this.isValid = false;
+        }
+      }
+    });
   }
 }

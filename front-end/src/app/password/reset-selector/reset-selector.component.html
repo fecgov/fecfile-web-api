@@ -1,0 +1,62 @@
+<style>
+  @import url('https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i&display=swap&subset=latin-ext');
+</style>
+<div class="main-box">
+  <div class="main-content">
+    <form [formGroup]="frmUserInfo">
+      <header>
+        <div class="text-center">
+          <img class="fec-title" src="assets/img/FECtitleNew.png" draggable="false" alt="FECTitle" />
+        </div>
+        <div class="title-front-main">Electronic Filing Enrollment and Password Assignment</div>
+        <div class="title-front-sub">
+          Forgot Your Password? You can choose one of the three options to create
+          a new password.
+        </div>
+        <br><br><hr>
+      </header>
+
+      <div class="form-group radio">
+        <div class="user-info form-check-inline">
+
+          <div class="radio-options">
+            <label for="email">
+              <input type="radio"
+                     formControlName="resetOption"
+                     id="email"
+                     value="EMAIL"/>
+              Email
+            </label>
+          </div>
+
+          <div class="radio-options">
+            <label for="phone_number_text">
+              <input type="radio"
+                     formControlName="resetOption"
+                     id="phone_number_text"
+                     value="TEXT" />
+              Phone Number(Text)
+            </label>
+          </div>
+          <div class="radio-options">
+            <label for="phone_number_text">
+              <input type="radio"
+                     formControlName="resetOption"
+                     id="phone_number_call"
+                     value="CALL"/>
+              Phone Number(Call)
+            </label>
+          </div>
+        </div>
+        <div class="text-error" *ngIf="!frmUserInfo.valid && frmUserInfo.touched">
+          <span>Please select a option to continue</span>
+        </div>
+        <div class="user-info-actions">
+          <button class="action__btn clear" (click)="back()"> Back</button>
+          <button class="action__btn clear" (click)="clearForm()"> Clear</button>
+          <button class="action__btn next" (click)="submit()"> Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
