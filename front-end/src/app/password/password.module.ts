@@ -4,9 +4,7 @@ import { UserInfoComponent } from './user-info/user-info.component';
 import { PasswordRoutingModule } from './password.routing.module';
 import {ReactiveFormsModule} from '@angular/forms';
 import { ResetSelectorComponent } from './reset-selector/reset-selector.component';
-import { CreatePasswordComponent } from './create-password/create-password.component';
 import {SharedModule} from '../shared/shared.module';
-import { PasswordStrengthBarComponent } from './password-strength-bar/password-strength-bar.component';
 
 @NgModule({
   imports: [
@@ -15,7 +13,6 @@ import { PasswordStrengthBarComponent } from './password-strength-bar/password-s
     PasswordRoutingModule,
     ReactiveFormsModule
   ],
-  declarations: [UserInfoComponent, ResetSelectorComponent, CreatePasswordComponent, PasswordStrengthBarComponent],
-  exports: [PasswordStrengthBarComponent]
+  declarations: [UserInfoComponent, ResetSelectorComponent ],
 })
 export class PasswordModule { }
