@@ -61,7 +61,6 @@ export class CreatePasswordComponent implements OnInit {
             });
     this.initForm();
     this.initCmteInfo();
-    this.userEmail = this._activatedRoute.snapshot.queryParams.email;
   }
 
   private initCmteInfo() {
