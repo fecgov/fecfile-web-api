@@ -11287,3 +11287,24 @@ def get_f24_reports(request):
           "The get_f24_reports API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )
+
+@api_view(['GET'])
+def get_notifications_count(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        #cmte_id = 'C00111476'
+        _sql = """SELECT count(1) as count
+                  FROM public.core_filing_notification WHERE cmte_id = %s """
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + _sql + """) t""", [cmte_id])
+            row1=cursor.fetchone()[0]
+            totalcount =  row1[0]['count']
+
+        output = {'notification_count': totalcount}
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The get_notifications_count API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
