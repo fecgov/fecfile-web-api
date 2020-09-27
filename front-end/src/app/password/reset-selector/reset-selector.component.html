@@ -17,81 +17,40 @@
       </header>
 
       <div class="form-group radio">
-        <div class="user-info">
-          <div class="container">
-            <label>Email</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <div class="input-group-text">
-                  <input type="radio"
-                         aria-label="Radio button for following text input"
-                         formControlName="resetOption"
-                         id="reset-via-email"
-                         value="reset_email">
-                </div>
-              </div>
-              <input type="text" class="form-control"
-                     aria-label="Text input with radio button"
-                     formControlName="email"
-                     [attr.disabled]="true"
-                     placeholder="Auto Filled Email address">
-            </div>
+        <div class="user-info form-check-inline">
 
-            <div class="or-align">
-              <hr>
-              or
-              <hr>
-            </div>
+          <div class="radio-options">
+            <label for="email">
+              <input type="radio"
+                     formControlName="resetOption"
+                     id="email"
+                     value="EMAIL"/>
+              Email
+            </label>
           </div>
-          <div class="container">
-            <label>Enter Personal Key</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <div class="input-group-text">
-                  <input type="radio"
-                         aria-label="Radio button for following text input"
-                         formControlName="resetOption"
-                         id="reset-via-personal-key"
-                         value="reset_personal_key">
-                </div>
-              </div>
-              <input type="text" class="form-control"
-                     aria-label="Text input with radio button"
-                     formControlName="personalKey"
-                     placeholder="Enter your personal key">
-            </div>
-            <p>
-              <i>Note: Personal key which you saved when creating the account</i>
-            </p>
-            <div class="or-align">
-              <hr>
-              or
-              <hr>
-            </div>
+
+          <div class="radio-options">
+            <label for="phone_number_text">
+              <input type="radio"
+                     formControlName="resetOption"
+                     id="phone_number_text"
+                     value="TEXT" />
+              Phone Number(Text)
+            </label>
           </div>
-          <div class="container">
-            <label>Enter Phone Number</label>
-            <div class="input-group mb-3">
-              <div class="input-group-prepend" id="button-addon3">
-                <div class="input-group-prepend">
-                  <div class="input-group-text">
-                    <input type="radio"
-                           aria-label="Radio button for following text input"
-                           formControlName="resetOption"
-                           id="reset-via-phone"
-                           value="reset_phone">
-                  </div>
-                </div>
-                <select class="custom-select" id="inputGroupSelect02">
-                  <option value="text">Text</option>
-                  <option value="call">Call</option>
-                </select>
-              </div>
-              <input type="text" class="form-control"
-                     formControlName="phone" placeholder="" aria-label="Example text with two button addons" aria-describedby="button-addon3">
-            </div>
+          <div class="radio-options">
+            <label for="phone_number_text">
+              <input type="radio"
+                     formControlName="resetOption"
+                     id="phone_number_call"
+                     value="CALL"/>
+              Phone Number(Call)
+            </label>
           </div>
-      </div>
+        </div>
+        <div class="text-error" *ngIf="!frmUserInfo.valid && frmUserInfo.touched">
+          <span>Please select a option to continue</span>
+        </div>
         <div class="user-info-actions">
           <button class="action__btn clear" (click)="back()"> Back</button>
           <button class="action__btn clear" (click)="clearForm()"> Clear</button>
