@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
     providedIn: 'root'
 })
 export class AuthService {
+    private data: { committeeId: any; email: any };
 
     constructor(
         private _session: SessionService,
@@ -119,7 +120,7 @@ export class AuthService {
         this._router.navigate(['']);
     }
 
-    public showPermissionDeniedMessage(){
+    public showPermissionDeniedMessage() {
         this._dialogService.confirm(
             'You do not have sufficient privileges to perform the requested action.',
             ConfirmModalComponent,
@@ -128,5 +129,12 @@ export class AuthService {
             ModalHeaderClassEnum.errorHeader
           );
     }
-    
+
+    public getCurrentUser() {
+        const sessionData = this._session.getSession();
+        if (sessionData) {
+            const decodedAccessToken = jwt_decode(sessionData);
+            return this.data = { email: decodedAccessToken.email, committeeId : decodedAccessToken.committee_id };
+        }
+    }
 }

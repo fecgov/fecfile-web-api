@@ -46,7 +46,12 @@
           </div>
           <div class="container">
             <label>Didn't receive a code?</label>
-            <a (click)="resend()"> Resend Security Code</a>
+            <div>
+              <a (click)="resend()"> Resend Security Code</a>
+            </div>
+            <div>
+              <a (click)="selectAnotherType()"> Select another method to resend code</a>
+            </div>
           </div>
         </div>
 
