@@ -93,7 +93,7 @@ export class CreatePasswordComponent implements OnInit {
 
 
   private initForm() {
-    const passwordRegex = '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&]{8,}';
+    const passwordRegex = '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$!%*?&#()])[A-Za-z\\d$@$!%*?&#()]{8,}';
     this.form = this._fb.group({
       password: new FormControl(null, [Validators.required,
         Validators.pattern(new RegExp(passwordRegex))]),

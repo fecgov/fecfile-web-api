@@ -117,6 +117,7 @@ export class ConfirmTwoFactorComponent implements OnInit {
       } else if (this.entryPoint === 'registration') {
         this._manageUserService.verifyCode(this.twoFactInfo.value.securityCode).subscribe((resp: any) => {
           if (resp && resp.is_allowed) {
+            this._authService.doSignIn(resp.token);
             this.router.navigate(['/createPassword'], {queryParamsHandling: 'merge'});
           } else if ( resp && !resp.is_allowed) {
             this.isValid = false;
@@ -202,7 +203,13 @@ export class ConfirmTwoFactorComponent implements OnInit {
   }
 
   public selectAnotherType(){
-    this.router.navigate(['/register'], {queryParams: {register_token: this._activatedRoute.snapshot.queryParams.register_token}});
+    if (this.entryPoint === 'login'){
+      this.router.navigate(['/twoFactLogin']);
+    } else if (this.entryPoint === 'registration') {
+      this.router.navigate(['/register'], {queryParams: {register_token: this._activatedRoute.snapshot.queryParams.register_token}});
+    } else if (this.entryPoint === 'reset') {
+      this.router.navigate(['/reset-selector']);
+    }
   }
 
   private handleResetPassword(code: string) {
