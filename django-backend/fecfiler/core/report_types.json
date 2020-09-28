@@ -1105,6 +1105,7 @@
             "cvg_start_date": "EFO",
             "cvg_end_date": "YYYY-10-14",
             "due_date": "YYYY-10-22",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -1201,6 +1202,7 @@
             "cvg_start_date": "EFO",
             "cvg_end_date": "YYYY-10-14",
             "due_date": "YYYY-12-03",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -1411,6 +1413,7 @@
             "cvg_start_date": "EFO",
             "cvg_end_date": "YYYY-10-14",
             "due_date": "YYYY-10-22",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -1507,6 +1510,7 @@
             "cvg_start_date": "EFO",
             "cvg_end_date": "YYYY-10-14",
             "due_date": "YYYY-12-03",
+            "election_date": "2020-11-03",
             
 "semi-annual_dates_optional": true, 
 "semi-annual_dates": [
@@ -1901,7 +1905,8 @@
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
             "cvg_end_date": "YYYY-10-14",
-            "due_date": "YYYY-10-22"
+            "due_date": "YYYY-10-22",
+            "election_date": "2020-11-03"
           },
           {
             "report_type": "30G",
@@ -1911,7 +1916,8 @@
             "default_disp_ind": "N",
             "cvg_start_date": "EFO",
             "cvg_end_date": "YYYY-10-14",
-            "due_date": "YYYY-12-03"
+            "due_date": "YYYY-12-03",
+            "election_date": "2020-11-03"
           },
           {
             "report_type": "MYS",
