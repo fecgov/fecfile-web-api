@@ -13,6 +13,7 @@ import { SessionService } from '../SessionService/session.service';
   providedIn: 'root'
 })
 export class ApiService {
+  
 
   constructor(
     private _http: HttpClient,
@@ -66,6 +67,22 @@ export class ApiService {
     return this._http
      .get(
         `${this._appConfigService.getConfig().apiUrl}/core/get_committee_details`,
+        {
+          headers: httpOptions
+        }
+      );
+  }
+
+  getCommiteeDetailsForUnregisteredUsers() {
+    const token: string = JSON.parse(this._cookieService.get('user'));
+
+    let httpOptions =  new HttpHeaders();
+    httpOptions = httpOptions.append('Content-Type', 'application/json');
+    httpOptions = httpOptions.append('token', token);
+
+    return this._http
+     .get(
+        `${this._appConfigService.getConfig().apiUrl}/user/register/get_committee_details`,
         {
           headers: httpOptions
         }

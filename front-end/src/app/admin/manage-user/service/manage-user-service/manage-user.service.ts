@@ -10,6 +10,7 @@ import {map} from 'rxjs/operators';
 })
 export class ManageUserService {
   
+  
 
   constructor(  private _cookieService: CookieService,
                 private _http: HttpClient) { }
@@ -173,4 +174,15 @@ export class ManageUserService {
               headers: httpOptions
           })
     }
+
+    getAnotherKey() {
+      const token: string = JSON.parse(this._cookieService.get('user'));
+      const url = `${environment.apiUrl}/user/register/getAnotherPersonalKey`;
+      let httpOptions = new HttpHeaders();
+
+      httpOptions = httpOptions.append('token', token);
+      httpOptions = httpOptions.append('Content-Type', 'application/json');
+      return this._http.get(url, {
+          headers: httpOptions,
+      });    }
 }

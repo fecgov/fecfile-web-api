@@ -3,14 +3,15 @@
 </style>
 <div class="main-box">
   <div class="main-content">
-    <form [formGroup]="twoFactInfo">
+    <form [formGroup]="frmUserInfo">
       <header>
         <div class="text-center">
           <img class="fec-title" src="assets/img/FECtitleNew.png" draggable="false" alt="FECTitle" />
         </div>
-        <div class="title-front-main">Electronic Filing Sign in</div>
+        <div class="title-front-main">Electronic Filing Enrollment and Password Assignment</div>
         <div class="title-front-sub">
-          Please choose one of the three options for code verification.
+          Forgot Your Password? You can choose one of the three options to create
+          a new password.
         </div>
         <br><br><hr>
       </header>
@@ -20,38 +21,39 @@
 
           <div class="radio-options">
             <label for="email">
-            <input type="radio"
-                   formControlName="twoFactOption"
-                   id="email"
-                   value="EMAIL"/>
-            Email
-          </label>
+              <input type="radio"
+                     formControlName="resetOption"
+                     id="email"
+                     value="EMAIL"/>
+              Email
+            </label>
           </div>
 
           <div class="radio-options">
             <label for="phone_number_text">
-            <input type="radio"
-                   formControlName="twoFactOption"
-                   id="phone_number_text"
-                   value="TEXT" />
-            Phone Number(Text)
-          </label>
+              <input type="radio"
+                     formControlName="resetOption"
+                     id="phone_number_text"
+                     value="TEXT" />
+              Phone Number(Text)
+            </label>
           </div>
           <div class="radio-options">
             <label for="phone_number_call">
-            <input type="radio"
-                   formControlName="twoFactOption"
-                   id="phone_number_call"
-                   value="CALL"/>
-            Phone Number(Call)
-          </label>
+              <input type="radio"
+                     formControlName="resetOption"
+                     id="phone_number_call"
+                     value="CALL"/>
+              Phone Number(Call)
+            </label>
           </div>
         </div>
-        <div class="text-error" *ngIf="!twoFactInfo.valid && twoFactInfo.touched">
+        <div class="text-error" *ngIf="!frmUserInfo.valid && frmUserInfo.touched">
           <span>Please select a option to continue</span>
         </div>
         <div class="user-info-actions">
           <button class="action__btn clear" (click)="back()"> Back</button>
+          <button class="action__btn clear" (click)="clearForm()"> Clear</button>
           <button class="action__btn next" (click)="submit()"> Submit</button>
         </div>
       </div>

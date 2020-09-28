@@ -15,7 +15,6 @@ from django.template.loader import render_to_string
 from django_otp.oath import TOTP
 from rest_framework import status
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-
 from fecfiler.authentication.auth_enum import Roles
 from fecfiler.core.views import check_null_value
 from fecfiler.password_management.otp import TOTPVerification
@@ -81,6 +80,24 @@ def check_account_exist(cmte_id, email):
         raise e
 
 
+def check_register_account_exist(cmte_id, email):
+    try:
+        with connection.cursor() as cursor:
+            # check if user already exist
+            _sql = """SELECT json_agg(t) FROM (Select * from public.authentication_account WHERE cmtee_id = %s AND lower(email) = lower(%s) 
+            AND status ='Pending' AND delete_ind !='Y') t"""
+            cursor.execute(_sql, [cmte_id, email])
+            user_list = cursor.fetchone()
+            merged_list = []
+            for dictL in user_list:
+                merged_list = dictL[0]
+
+        return merged_list
+    except Exception as e:
+        logger.debug("Exception occurred while checking user already present", str(e))
+        raise e
+
+
 def reset_code_counter(key):
     try:
         with connection.cursor() as cursor:
@@ -128,6 +145,17 @@ def create_jwt_token(email, cmte_id):
     return token
 
 
+def create_password_jwt_token(email, cmte_id):
+    now = int(time.time())
+    token = jwt.encode({
+        'email': email,
+        'committee_id': cmte_id,
+        '2fVerified': True,
+        'exp': now + JWT_PASSWORD_EXPIRY
+    }, SECRET_KEY, algorithm='HS256').decode('utf-8')
+    return token
+
+
 def verify_token(token_received):
     options = {'verify_exp': True,  # Skipping expiration date check
                'verify_aud': False}  # Skipping audience check
@@ -153,7 +181,7 @@ def send_email(token_val, email):
     data = {}
     RECIPIENT.append("%s" % email)
 
-    SUBJECT = "Register Account"
+    SUBJECT = "Verify Account"
 
     # The email body for recipients with non-HTML email clients.
     BODY_TEXT = ("Use the code provided below to continue the verification process of your account.\r\n" +
@@ -238,8 +266,8 @@ def send_call(token_val, phone_no):
             body=[
                 {
                     'phoneNumber': phone_no,
-                    'liveMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ' , , , .Please use this code to login. ',
-                    'machineMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ', , , .Please use this code to login. '
+                    'liveMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ' , , , .Please use this code to login. Again the code is ,, ' + token_formatted_val + ', .',
+                    'machineMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ', , , .Please use this code to login. Again the code is ,, ' + token_formatted_val + ', .'
                 }
             ]
 
@@ -271,7 +299,8 @@ def authenticate_password(request):
                             'email': email}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             elif user_list['role'] == Roles.C_ADMIN.value:
-                response = {'is_allowed': is_allowed, 'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+                response = {'is_allowed': is_allowed,
+                            'message': 'Not allowed to change password.Please use EFO to update/change password.'}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             else:
                 is_allowed = True
@@ -300,10 +329,14 @@ def reset_options_password(request):
                 cmte_id = payload.get('committee_id', None)
                 email = payload.get('email', None)
                 data = {"committee_id": cmte_id, "email": email}
+                api_cal_from = request.data.get("call_from")
 
                 list_mandatory_fields = ["committee_id", "email"]
                 check_madatory_field(data, list_mandatory_fields)
-                user_list = check_account_exist(cmte_id, email)
+                if check_null_value(api_cal_from) and api_cal_from.upper() == 'REGISTRATION':
+                    user_list = check_register_account_exist(cmte_id, email)
+                else:
+                    user_list = check_account_exist(cmte_id, email)
 
                 if user_list is None:
                     response = {'is_allowed': is_allowed}
@@ -334,10 +367,14 @@ def reset_options_password(request):
                 cmte_id = payload.get('committee_id', None)
                 email = payload.get('email', None)
                 data = {"committee_id": cmte_id, "email": email}
+                api_cal_from = request.data.get("call_from")
 
                 list_mandatory_fields = ["committee_id", "email"]
                 check_madatory_field(data, list_mandatory_fields)
-                user_list = check_account_exist(cmte_id, email)
+                if check_null_value(api_cal_from) and api_cal_from.upper() == 'REGISTRATION':
+                    user_list = check_register_account_exist(cmte_id, email)
+                else:
+                    user_list = check_account_exist(cmte_id, email)
 
                 if user_list is None:
                     response = {'is_allowed': is_allowed}
@@ -380,6 +417,7 @@ def code_verify_password(request):
 
         try:
             is_allowed = False
+            token = ''
             code = request.data.get('code', None)
             payload = token_verification(request)
             cmte_id = payload.get('committee_id', None)
@@ -395,20 +433,23 @@ def code_verify_password(request):
                 response = {'is_allowed': is_allowed}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             elif user_list['role'] == Roles.C_ADMIN.value:
-                response = {'is_allowed': is_allowed, 'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+                response = {'is_allowed': is_allowed,
+                            'message': 'Not allowed to change password.Please use EFO to update/change password.'}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
             username = user_list["username"]
             key = user_list["secret_key"]
+            unix_time = user_list["code_time"]
             otp_class = TOTPVerification(username)
-            token_val = otp_class.verify_token(key)
+            token_val = otp_class.verify_token(key, unix_time)
 
-            if code == int(token_val):
+            if code == token_val:
                 is_allowed = True
                 reset_code_counter(key)
+                token = create_password_jwt_token(email, cmte_id)
 
             response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
-                        'email': email}
+                        'email': email, 'token': token}
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             logger.debug("exception occurred while verifying code", str(e))
@@ -427,12 +468,21 @@ def reset_password(request):
             payload = token_verification(request)
             cmte_id = payload.get('committee_id', None)
             email = payload.get('email', None)
-            data = {"committee_id": cmte_id, "email": email, "password": password}
+            two_factor = payload.get('2fVerified', None)
+            data = {"committee_id": cmte_id, "email": email, "password": password, "verified": two_factor}
 
-            list_mandatory_fields = ["committee_id", "password", "email"]
+            list_mandatory_fields = ["committee_id", "password", "email", "verified"]
             check_madatory_field(data, list_mandatory_fields)
             account_exist = check_account_exist(cmte_id, email)
 
+            if not two_factor:
+                is_allowed = False
+                response = {'is_allowed': is_allowed}
+                return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+            if account_exist is None:
+                is_allowed = False
+                response = {'is_allowed': is_allowed}
+                return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             if account_exist['role'] == Roles.C_ADMIN.value:
                 response = {'message': 'Not allowed to change password.Please use EFO to update/change password.'}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
