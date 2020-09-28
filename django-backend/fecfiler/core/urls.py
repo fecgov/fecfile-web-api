@@ -222,4 +222,9 @@ urlpatterns = [
         views.get_f24_reports,
         name="get_f24_reports",
     ),
+    url(
+        r"^core/get_notifications_count$",
+        views.get_notifications_count,
+        name="get_notifications_count",
+    ),
 ]
