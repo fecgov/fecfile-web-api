@@ -39,6 +39,30 @@ import { AuthService} from '../../shared/services/AuthService/auth.service';
 })
 export class ContactsTableComponent implements OnInit, OnDestroy {
 
+  dummyData = {
+    'contactLog': [
+      {
+        'dateTime': '03/05/2020, 4:35pm',
+        'info': '156 Jupiter Lan',
+        'user': 'Smith, John'
+      },
+      {
+        'dateTime': '03/05/2020, 4:30pm',
+        'info': '156 Jupit',
+        'user': 'Smith, John'
+      },
+       {
+        'dateTime': '03/05/2020, 4:15pm',
+        'info': '156 Jupit',
+        'user': 'Smith, John'
+      },
+       {
+        'dateTime': '03/05/2020, 4:35pm',
+        'info': '15',
+        'user': 'Smith, John'
+      },
+    ]
+  };
   @ViewChild('columnOptionsModal')
   public columnOptionsModal: ModalDirective;
 
@@ -130,8 +154,8 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     private _tableService: TableService,
     private _utilService: UtilService,
     private _dialogService: DialogService,
-    private _authService: AuthService, 
-    private _router: Router, 
+    private _authService: AuthService,
+    private _router: Router,
     private _messageService: MessageService
   ) {
     this.showPinColumnsSubscription = this._contactsMessageService.getShowPinColumnMessage()
@@ -177,7 +201,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
       }
     }
 
-    
+
     this.getPage(this.config.currentPage);
   }
 
@@ -209,7 +233,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         break;
       case this.recycleBinView:
         this.getRecyclingPage(page);
-        this.maxColumnOption=6;
+        this.maxColumnOption = 6;
         break;
       default:
         break;
@@ -247,7 +271,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
 	 * @param page the page containing the contacts to get
 	 */
   public getContactsPage(page: number): void {
-    
+
     this.config.currentPage = page;
 
     let sortedCol: SortableColumnModel =
@@ -287,10 +311,15 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         const contactsModelL = this._contactsService.mapFromServerFields(res.contacts);
         this.contactsModel = contactsModelL;
 
+        this.contactsModel.forEach((e) => {
+          console.log(this.dummyData.contactLog);
+          e.setContactLog(this.dummyData.contactLog);
+          console.log(e.getContactLog());
+        });
         this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
 
-        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1).sort((a, b) => b - a);
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1).sort((a, b) => b - a);
         this.allContactsSelected = false;
       });
   }
@@ -357,11 +386,11 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
         this.config.totalItems = res.totalcontactsCount ? res.totalcontactsCount : 0;
         this.numberOfPages = res.totalPages;
 
-        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x,i) => i+1).sort((a, b) => b - a);
+        this.pageNumbers = Array.from(new Array(this.numberOfPages), (x, i) => i + 1).sort((a, b) => b - a);
         this.allContactsSelected = false;
 
 
-        
+
       });
   }
 
@@ -688,12 +717,12 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     this.setContactsListAndNavigateToAllTransactions(entityList);
   }
 
-  public viewActivityAllSelected(): void{
+  public viewActivityAllSelected(): void {
     this.setContactsListAndNavigateToAllTransactions(null);
   }
 
   private setContactsListAndNavigateToAllTransactions(entityList: ContactModel[]) {
-    if(!entityList){
+    if (!entityList) {
       entityList = this.getAllSelectedContacts();
     }
     this._contactsService.entityListToFilterBy = entityList;
@@ -708,7 +737,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  
+
 
   /**
    * Edit the contact selected by the user.
@@ -742,8 +771,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
                   false,
                   ModalHeaderClassEnum.successHeader
                 );
-              } else
-              {
+              } else {
                 this._dialogService.confirm(
                   'Contact has not been successfully deleted and sent to recycle bin. ' + ctn.id,
                   ConfirmModalComponent,
@@ -843,7 +871,7 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
               if (selectedContacts.length === 1) {
                   afterMessage = `Contact ${selectedContacts[0].id} has been successfully deleted`;
               } else {
-                afterMessage = 'Contacts have been successfully deleted.'+ cntIds;
+                afterMessage = 'Contacts have been successfully deleted.' + cntIds;
               }
               this._dialogService
                 .confirm(afterMessage,
@@ -892,9 +920,9 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     this.lastItemOnPage = end;
     return start + ' - ' + end;
   }
-    
+
   public showPageSizes(): boolean {
-    if (this.config && this.config.totalItems && this.config.totalItems > 0){
+    if (this.config && this.config.totalItems && this.config.totalItems > 0) {
       return true;
     }
     return false;
@@ -1146,10 +1174,10 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
    * Set the Table Columns model.
    */
   private setSortableColumns(): void {
-    
+
     const defaultSortColumns = ['name', 'entity_type', 'employer', 'occupation'];
-    const otherSortColumns = ['id','street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'deletedDate'];
-  
+    const otherSortColumns = ['id', 'street', 'city', 'state', 'zip', 'candOffice', 'candOfficeState', 'candOfficeDistrict', 'candCmteId', 'deletedDate'];
+
     this.sortableColumns = [];
     for (const field of defaultSortColumns) {
       this.sortableColumns.push(new SortableColumnModel(field, false, true, true, false));
@@ -1212,6 +1240,8 @@ export class ContactsTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  
 
+  toggleContactLog(cnt: ContactModel) {
+    cnt.toggleLog = !cnt.toggleLog;
+  }
 }
