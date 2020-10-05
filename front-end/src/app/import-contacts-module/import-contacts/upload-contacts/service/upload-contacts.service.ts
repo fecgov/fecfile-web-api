@@ -21,6 +21,8 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class UploadContactsService {
 
+  private readonly CONTACTS_PATH = 'contacts/';
+
   /**
    * Constructor will obtain credentials for AWS S3 Bucket.
    * @param _http
@@ -45,19 +47,19 @@ export class UploadContactsService {
   /**
    * Upload the file to AWS S3 bucket.
    */
-  public uploadFile(file: File): Observable<any> {
+  public uploadFile(file: File, checkSum: string, committeeId: string): Observable<any> {
 
-    let committeeId = null;
-    if (localStorage.getItem('committee_details') !== null) {
-      const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
-      committeeId = cmteDetails.committeeid;
-    }
+    // let committeeId = null;
+    // if (localStorage.getItem('committee_details') !== null) {
+    //   const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+    //   committeeId = cmteDetails.committeeid;
+    // }
 
     this.progressPercent = 0;
     const params = {
       Bucket: this.bucketName,
-      Key: file.name,
-      Metadata: { committeeId: committeeId },
+      Key: this.CONTACTS_PATH + committeeId + '/' + file.name,
+      Metadata: { 'committee-id': committeeId, 'check-sum': checkSum },
       Body: file,
       ACL: 'public-read',
       ContentType: file.type
@@ -75,19 +77,19 @@ export class UploadContactsService {
       this.bucket.upload(params).on('httpUploadProgress', function (evt: S3.ManagedUpload.Progress) {
         // console.log(evt.loaded + ' of ' + evt.total + ' Bytes');
         const progressPercent = Math.trunc((evt.loaded / evt.total) * 100);
-        console.log('progressPercent = ' + progressPercent);
+        // console.log('progressPercent = ' + progressPercent);
         // this.progressPercentSubject.next(this.progressPercent);
         _setPercentage(progressPercent);
       }).send(function (err: AWSError, data: ManagedUpload.SendData) {
         if (err) {
-          console.log('There was an error uploading your file: ', err);
+          // console.log('There was an error uploading your file: ', err);
           _setPercentage(0);
           // return false;
           // return Observable.of(false);
           observer.next(err);
           observer.complete();
         }
-        console.log('Successfully uploaded file.', data);
+        // console.log('Successfully uploaded file.', data);
         _setPercentage(100);
         // return Observable.of(_readFileHeader(file));
         // _readFileHeader(file);
@@ -120,9 +122,9 @@ export class UploadContactsService {
     const request: any = {};
     request.fileName = fileName;
 
-    if (fileName === 'test_errors.csv') {
+    if (fileName === 'test_new.csv') {
       return this._http
-        .get('assets/mock-data/import-contacts/upload_response.json', {
+        .get('assets/mock-data/import-contacts/upload_response2.json', {
           headers: httpOptions
         })
         .pipe(
@@ -284,40 +286,51 @@ export class UploadContactsService {
   }
 
   // public listObjects(): Observable<any> {
-  public listObjects() {
+  public listObjects(committeeId: string) {
 
     const params = {
       Bucket: this.bucketName,
-      MaxKeys: 20
+      // MaxKeys: 20,
+      // Delimiter: this.CONTACTS_PATH + committeeId
+      Prefix: this.CONTACTS_PATH + committeeId
     };
 
-    // return Observable.create(observer => {
-    this.bucket.listObjectsV2(params, function (err, data) {
-      if (err) {
-        console.log(err, err.stack);
-      } else {
-        console.log(data);
-      }
+    return Observable.create(observer => {
+      this.bucket.listObjectsV2(params, function (err, data) {
+        // this.bucket.listObjectVersions(params, function (err, data) {
+
+        if (err) {
+          console.log(err, err.stack);
+          // observer.complete();
+        } else {
+          console.log(data);
+          observer.next(data);
+          observer.complete();
+        }
+      });
     });
-    // });
   }
 
-  public getObject(file: File) {
+  public getHeadObject(key: string) {
 
     const params = {
       Bucket: this.bucketName,
-      Key: file.name
+      Key: key,
+      // ExpectedBucketOwner: 'fa57b28b4ce851da0b7769a3e23fca76b8dd4139846d60a4266c70a6849a5bfc'
     };
 
-    // return Observable.create(observer => {
-    this.bucket.getObject(params, function (err, data) {
-      if (err) {
-        console.log(err, err.stack);
-      } else {
-        console.log(data);
-      }
+    return Observable.create(observer => {
+      this.bucket.headObject(params, function (err, data) {
+        if (err) {
+          observer.next(data);
+          observer.complete();
+        } else {
+          // console.log(data);
+          observer.next(data);
+          observer.complete();
+        }
+      });
     });
-    // });
   }
 
   public checkUploadProcessing(): Observable<any> {

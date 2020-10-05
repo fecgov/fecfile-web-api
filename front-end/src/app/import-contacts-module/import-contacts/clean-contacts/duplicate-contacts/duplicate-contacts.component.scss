@@ -2,6 +2,9 @@
 
 .clean_contacts__container {
   position: relative;
+  p {
+    font-size: 18px;
+  }
 
   .clean_contacts__table-inner {
     overflow-x: auto;
@@ -53,10 +56,15 @@
 
   /* style ngx-pagination - end */
 
-  .clean_contacts__begin-import {
-    width: 20em;
+  .clean_contacts__button {
+    width: 11em;
     height: 3em;
-    margin: 1.2em 0;
+    margin: 1.2em .25em;
+  }
+
+  .clean_contacts__canel-button {
+    background-color: $fecRed;
+    color: white;
   }
 
   .clean_contacts__ignore-warn {
