@@ -49,8 +49,8 @@ export class SessionService {
 
 
   getToken(): string {
-    let user = this._cookieService.get('user')
-    if(user){
+    const user = this._cookieService.get('user');
+    if (user) {
       return JSON.parse(user);
     }
     return null;

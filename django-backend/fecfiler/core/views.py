@@ -293,7 +293,8 @@ def get_transaction_categories(request):
                 data_row = list(row)
                 forms_obj = data_row[0]
                 transactionCategories.extend(forms_obj['data']['transactionCategories'])
-            forms_obj['data']['transactionCategories'] = transactionCategories
+            if forms_obj:
+                forms_obj['data']['transactionCategories'] = transactionCategories
 
         if not bool(forms_obj):
             return Response(
@@ -752,6 +753,55 @@ def check_list_cvg_dates(args):
     except Exception:
         raise
 
+def check_list_semi_cvg_dates(args):
+    try:
+        cmte_id = args[0]
+        form_type = args[1]
+        cvg_start_dt = args[2]
+        cvg_end_dt = args[3]
+
+        forms_obj = []
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT report_id, cvg_start_date, cvg_end_date, report_type, semi_annual_start_date, semi_annual_end_date FROM public.reports 
+                WHERE cmte_id = %s and form_type = %s AND delete_ind is distinct from 'Y' AND superceded_report_id is NULL ORDER BY report_id DESC""",
+                [cmte_id, form_type],
+            )
+            if len(args) == 4:
+                for row in cursor.fetchall():
+                    if not (row[4] is None or row[5] is None):
+                        if cvg_start_dt <= row[5] and row[4] <= cvg_end_dt:
+                            forms_obj.append(
+                                {
+                                    "report_id": row[0],
+                                    "cvg_start_date": row[1],
+                                    "cvg_end_date": row[2],
+                                    "report_type": row[3],
+                                    "semi_annual_start_date": row[4],
+                                    "semi_annual_end_date": row[5]
+                                }
+                            )
+
+            if len(args) == 5:
+                report_id = args[4]
+                for row in cursor.fetchall():
+                    if not (row[4] is None or row[5] is None):
+                        if (cvg_start_dt <= row[5] and row[4] <= cvg_end_dt) and row[
+                            0
+                        ] != int(report_id):
+                            forms_obj.append(
+                                {
+                                    "report_id": row[0],
+                                    "cvg_start_date": row[1],
+                                    "cvg_end_date": row[2],
+                                    "report_type": row[3],
+                                    "semi_annual_start_date": row[4],
+                                    "semi_annual_end_date": row[5]
+                                }
+                            )
+        return forms_obj
+    except Exception:
+        raise
 
 def date_format(cvg_date):
     try:
@@ -1318,6 +1368,12 @@ def post_reports(data, reportid=None):
             forms_obj = check_list_cvg_dates(args)
         # print(forms_obj)
         # print('just in post_reports')
+        if form_type == 'F3L' and data.get('semi_annual_start_date') and data.get('semi_annual_end_date'):
+            semi_args = [cmte_id, form_type, data.get('semi_annual_start_date'), data.get('semi_annual_end_date')]
+            if reportid:
+                semi_args.append(reportid)
+            semi_forms_obj = check_list_semi_cvg_dates(semi_args)
+            forms_obj.extend(semi_forms_obj)
         if len(forms_obj) == 0:
             report_id = get_next_report_id()
             data["report_id"] = str(report_id)
@@ -1439,6 +1495,15 @@ def put_reports(data):
                 raise Exception("The cvg_end_dt is null.")
         if not (data.get("cvg_start_dt") is None or data.get("cvg_end_dt") is None):
             forms_obj = check_list_cvg_dates(args)
+        if data.get("form_type") == 'F3L' and data.get('semi_annual_start_date') and data.get('semi_annual_end_date'):
+            semi_args = [
+                cmte_id, 
+                data.get("form_type"), 
+                data.get('semi_annual_start_date'), 
+                data.get('semi_annual_end_date'), 
+                data.get("report_id")]
+            semi_forms_obj = check_list_semi_cvg_dates(semi_args)
+            forms_obj.extend(semi_forms_obj)
         if len(forms_obj) == 0:
             old_list_report = get_list_report(report_id, cmte_id)
             # print(old_list_report)
@@ -2049,8 +2114,8 @@ def reports(request):
                       "additional_email_2": additional_email_2,
                   }
 
-                datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
-                datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
+                datum['semi_annual_start_date'] = date_format(request.data.get('semi_annual_start_date')) if request.data.get('semi_annual_start_date') else None
+                datum['semi_annual_end_date'] = date_format(request.data.get('semi_annual_end_date')) if request.data.get('semi_annual_end_date') else None
                 datum['election_date'] = date_format(request.data.get('election_date')) if request.data.get('election_date') else None
                 datum['election_state'] = request.data.get('election_state') if request.data.get('election_state') else None
 
@@ -2175,8 +2240,8 @@ def reports(request):
                 if "election_code" in request.data:
                     datum["election_code"] = request.data.get("election_code")
                 
-                datum['semi_annual_start_date'] = request.data.get('semi_annual_start_date') if request.data.get('semi_annual_start_date') else None
-                datum['semi_annual_end_date'] = request.data.get('semi_annual_end_date') if request.data.get('semi_annual_end_date') else None
+                datum['semi_annual_start_date'] = date_format(request.data.get('semi_annual_start_date')) if request.data.get('semi_annual_start_date') else None
+                datum['semi_annual_end_date'] = date_format(request.data.get('semi_annual_end_date')) if request.data.get('semi_annual_end_date') else None
                 datum['election_date'] = date_format(request.data.get('election_date')) if request.data.get('election_date') else None
                 datum['election_state'] = request.data.get('election_state') if request.data.get('election_state') else None
 
@@ -3811,7 +3876,9 @@ def filter_get_all_trans(request, param_string):
     if filt_dict.get("filterReportTypes"):
         reportTypes_tuple = "('" + "','".join(filt_dict["filterReportTypes"]) + "')"
         param_string = param_string + " AND report_type In " + reportTypes_tuple
-
+    if filt_dict.get("filterEntityId"):
+        entityId_tuple = " ('" + "','".join(filt_dict["filterEntityId"]) + "')"
+        param_string = param_string + "AND entity_id In " + entityId_tuple
     if ctgry_type == "loans_tran" and filt_dict.get("filterLoanAmountMin") not in [
         None,
         "null",
@@ -3940,7 +4007,7 @@ def superceded_report_id_list(report_id):
             # print('in loop')
             with connection.cursor() as cursor:
                 query_string = """SELECT previous_report_id FROM public.reports 
-                  WHERE report_id = %s AND form_type = 'F3X' 
+                  WHERE report_id = %s  
                   AND delete_ind is distinct FROM 'Y' """
                 cursor.execute(query_string, [report_id])
                 reportId = cursor.fetchone()
@@ -4902,7 +4969,7 @@ def period_disbursements_for_summary_table_sql(
     helper function on querying report-wise and ytd total amount for sched_b
     """
     logger.debug(
-        "loading period_dsibursements for calendar start {}, end {}, report_id {}".format(
+        "loading period_disbursements for calendar start {}, end {}, report_id {}".format(
             calendar_start_dt, calendar_end_dt, report_id
         )
     )
@@ -5820,6 +5887,29 @@ def get_cvg_dates(report_id, cmte_id, include_deleted=False):
     except Exception as e:
         raise Exception("The get_cvg_dates function is throwing an error: " + str(e))
 
+def get_cvg_dates_with_semi(report_id, cmte_id, include_deleted=False):
+    try:
+        with connection.cursor() as cursor:
+            if include_deleted:
+                param_string = ""
+            else:
+                param_string = "AND delete_ind is distinct from 'Y'"
+            cursor.execute(
+                "SELECT cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date from public.reports where cmte_id = %s AND report_id = %s {}".format(param_string),
+                [cmte_id, report_id],
+            )
+            if cursor.rowcount == 0:
+                raise Exception(
+                    "The Report ID: {} is either deleted or does not exist in Reports table".format(
+                        report_id
+                    )
+                )
+            result = cursor.fetchone()
+            cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date = result
+        return cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date
+    except Exception as e:
+        raise Exception("The get_cvg_dates_with_semi function is throwing an error: " + str(e))
+
 
 def prev_cash_on_hand_cop(report_id, cmte_id, prev_yr):
     """
@@ -5866,7 +5956,7 @@ def prev_cash_on_hand_cop_3rd_nav(report_id, cmte_id, year_flag=False):
                 """SELECT COALESCE(t1.coh_cop, 0) FROM public.form_3x t1 
                 WHERE t1.cmte_id = %s AND t1.report_id = (SELECT r.report_id FROM public.reports r 
                 WHERE r.cmte_id = %s AND r.cvg_end_date < %s AND r.delete_ind IS DISTINCT FROM 'Y' 
-                AND r.form_type = 'F3X' AND r.superceded_report_id IS NULL 
+                AND r.form_type = 'F3X' AND r.previous_report_id IS NULL 
                 ORDER BY r.cvg_end_date DESC
                 LIMIT 1) AND t1.delete_ind IS DISTINCT FROM 'Y'""",
                 [cmte_id, cmte_id, cvg_start_date],
@@ -6095,13 +6185,15 @@ def get_thirdNavigationTransactionTypes(request):
 
 def get_F24_data(cmte_id, report_id):
     try:
+        report_list = superceded_report_id_list(report_id)
+        print(report_list)
         _sql = """SELECT SUM(expenditure_amount) AS total_amount 
-                      FROM public.sched_e WHERE cmte_id = %s AND report_id = %s
+                      FROM public.sched_e WHERE cmte_id = %s AND report_id in ('{}')
                       AND memo_code IS DISTINCT FROM 'X'
-                      AND delete_ind IS DISTINCT FROM 'Y'"""
+                      AND delete_ind IS DISTINCT FROM 'Y'""".format("', '".join(report_list))
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id]
             )
             output_dict = cursor.fetchone()[0]
             if output_dict:
@@ -6145,7 +6237,7 @@ def get_F3X_data(cmte_id, report_id):
        other_pol_cmte_contb_ytd_ii, ttl_contb_ref_ytd_i, other_disb_ytd, 
        shared_fed_actvy_fed_shr_ytd, shared_fed_actvy_nonfed_ytd, non_alloc_fed_elect_actvy_ytd, 
        ttl_fed_elect_actvy_ytd, ttl_disb_ytd, ttl_fed_disb_ytd FROM public.form_3x WHERE 
-       cmte_id = %s AND report_id = %s"""
+       cmte_id = %s AND report_id = get_original_amend_report(%s)"""
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -6164,14 +6256,15 @@ def get_F3X_data(cmte_id, report_id):
 
 def get_F3L_data(cmte_id, report_id):
     try:
+        report_list = superceded_report_id_list(report_id)
         _sql = """SELECT COALESCE(SUM(contribution_amount),0.0) AS "quarterly_monthly_total", 
-                        COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total" 
-                      FROM public.sched_a WHERE cmte_id = %s AND report_id = %s AND
+                      COALESCE(SUM(semi_annual_refund_bundled_amount),0.0) AS "semi_annual_total" 
+                      FROM public.sched_a WHERE cmte_id = %s AND report_id in ('{}') AND
                       transaction_type_identifier in ('IND_BNDLR','REG_ORG_BNDLR')
-                      AND delete_ind IS DISTINCT FROM 'Y'"""
+                      AND delete_ind IS DISTINCT FROM 'Y'""".format("', '".join(report_list))
         with connection.cursor() as cursor:
             cursor.execute(
-                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id, report_id]
+                "SELECT json_agg(t) FROM ({}) t".format(_sql), [cmte_id]
             )
             output_dict = cursor.fetchone()[0]
             if output_dict:
@@ -9197,7 +9290,9 @@ def get_reports_data(report_id):
 
 def create_amended(reportid):
     try:
+        print(reportid)
         data_dict = get_reports_data(reportid)
+        print(data_dict)
         if data_dict:
             # data = data[0]
             # report_id = get_next_report_id()
@@ -9216,12 +9311,14 @@ def create_amended(reportid):
                 del data["report_seq"]
                 data["status"] = "Saved"
                 # print(data,'here')
-                data["cvg_start_dt"] = datetime.datetime.strptime(
-                    data["cvg_start_date"], "%Y-%m-%d"
-                ).date()
-                data["cvg_end_dt"] = datetime.datetime.strptime(
-                    data["cvg_end_date"], "%Y-%m-%d"
-                ).date()
+                if data.get('cvg_start_date'):
+                    data["cvg_start_dt"] = datetime.datetime.strptime(
+                        data["cvg_start_date"], "%Y-%m-%d"
+                    ).date()
+                if data.get('cvg_end_date'):
+                    data["cvg_end_dt"] = datetime.datetime.strptime(
+                        data["cvg_end_date"], "%Y-%m-%d"
+                    ).date()
                 if data.get('semi_annual_start_date'):
                     data['semi_annual_start_date'] = datetime.datetime.strptime(data.get('semi_annual_start_date'), "%Y-%m-%d").date()
                 if data.get('semi_annual_end_date'):
@@ -9229,6 +9326,7 @@ def create_amended(reportid):
                 # print('just before post_reports')
                 created_data = post_reports(data, reportid)
                 if type(created_data) is list:
+                    print(created_data)
                     raise Exception("coverage dates already cover a existing report id")
                 elif type(created_data) is dict:
                     print(created_data)
@@ -9253,24 +9351,48 @@ def create_amended(reportid):
         return False
 
 
-def get_report_ids(cmte_id, from_date, submit_flag=True, including=True):
+def get_report_ids(cmte_id, from_date, submit_flag=True, including=True, form_type='F3X', semi_date=None):
     data_ids = []
     try:
         with connection.cursor() as cursor:
-            if submit_flag:
-                param_string = "AND status = 'Submitted'"
-            else:
-                param_string = ""
-            if including:
-                check_string = ">="
-            else:
-                check_string = ">"
+            # if submit_flag:
+            #     param_string = "AND status = 'Submitted'"
+            # else:
+            #     param_string = ""
+            param_string = "AND status = 'Submitted'" if submit_flag else ""
+            check_string = "cvg_start_date {} %s".format(">=" if including else ">")
+            values_list = [cmte_id, from_date, form_type]
+            # if including:
+            #     check_string = "AND cvg_start_date >= %s"
+            #     values_list = [cmte_id, from_date, form_type]
+            # else:
+            #     check_string = "cvg_start_date > %s"
+            #     values_list = [cmte_id, from_date, form_type]
+            if form_type == 'F3L':
+                if from_date:
+                    check_string = """(({} AND date_part('month',cvg_start_date) {} 6) 
+                            OR (%s >= semi_annual_start_date AND %s <= semi_annual_end_date))""".format(
+                                check_string, "<=" if from_date.month <= 6 else ">")
+                    values_list = [cmte_id, from_date, from_date, from_date, form_type]
+                    # if from_date.month <= 6:
+                    #     check_string = """(({} AND date_part('month',cvg_start_date) <= 6) 
+                    #         OR (%s >= semi_annual_start_date AND %s <= semi_annual_end_date))""".format(check_string)
+                    #     values_list = [cmte_id, from_date, from_date, from_date, form_type]
+                    # else:
+                    #     check_string = """(({} AND date_part('month',cvg_start_date) > 6) 
+                    #         OR (%s >= semi_annual_start_date AND %s <= semi_annual_end_date))""".format(check_string)
+                elif semi_date:
+                    check_string = "%s >= semi_annual_start_date AND %s <= semi_annual_end_date"
+                    values_list = [cmte_id, semi_date, semi_date, form_type]
+                else:
+                    return []
             cursor.execute(
-                """SELECT report_id FROM public.reports WHERE cmte_id= %s AND cvg_start_date {} %s 
-                {} AND form_type = 'F3X' AND superceded_report_id IS NULL AND delete_ind IS DISTINCT FROM 'Y'
-                ORDER BY cvg_start_date ASC""".format(check_string, param_string),
-                [cmte_id, from_date],
+                """SELECT report_id FROM public.reports WHERE cmte_id= %s AND {}
+                {} AND form_type = %s AND superceded_report_id IS NULL AND delete_ind IS DISTINCT FROM 'Y'
+                ORDER BY cvg_start_date ASC NULLS LAST""".format(check_string, param_string),
+                values_list
             )
+            print(cursor.query)
             if cursor.rowcount > 0:
                 for row in cursor.fetchall():
                     data_ids.append(row[0])
@@ -9298,20 +9420,20 @@ def create_amended_reports(request):
                                 status=status.HTTP_400_BAD_REQUEST,
                     )
                 data = val_data[0]
-                if data.get('form_type') == 'F3X':
-                            cvg_start_date, cvg_end_date = get_cvg_dates(reportid, cmte_id)
+                if data.get('form_type') in ['F3X','F3L']:
+                            cvg_start_date, cvg_end_date, semi_annual_start_date, semi_annual_end_date = get_cvg_dates_with_semi(reportid, cmte_id)
 
                             # cdate = date.today()
                             from_date = cvg_start_date
                             data_obj = None
-
-                            report_id_list = get_report_ids(cmte_id, from_date)
+                            print(cvg_start_date, semi_annual_start_date)
+                            report_id_list = get_report_ids(cmte_id, from_date, form_type=data.get('form_type'), semi_date=semi_annual_start_date)
 
                             print(report_id_list, from_date)
 
                             if report_id_list:
                                 for i in report_id_list:
-                                    amended_obj = create_amended(i)
+                                    amended_obj =  create_amended(i)
                                     if str(i) == str(reportid):
                                         data_obj = amended_obj
 
@@ -9325,6 +9447,9 @@ def create_amended_reports(request):
                     output_dict = amend_form1m(data)
                     data_obj = {**data, **output_dict}
 
+                elif data.get('form_type') == 'F24':
+                    output_dict = create_amended(reportid)
+                    data_obj = {**data, **output_dict}
 
                 else:
                     raise Exception("""This form_type cannot be amended. 
@@ -9361,10 +9486,10 @@ def amend_form1m(request_dict):
             report_id, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
             can5_id, can5_con, date_51, orig_date, metreq_date,
-            create_date, last_update_date)
+            create_date, last_update_date, committee_type)
             SELECT %s, est_status, cmte_id, aff_cmte_id, aff_date, can1_id, 
             can1_con, can2_id, can2_con, can3_id, can3_con, can4_id, can4_con, 
-            can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s
+            can5_id, can5_con, date_51, orig_date, metreq_date, %s, %s, committee_type
             FROM public.form_1m WHERE cmte_id=%s AND report_id= %s"""
       value_list = [output_dict['report_id'], datetime.datetime.now(), datetime.datetime.now(),
             report_dict['cmte_id'], report_dict['previous_report_id']]
@@ -10918,16 +11043,8 @@ def put_F3X(report_id, cmte_id, request_dict):
             param_string += key + "=%s, "
             values_list.append(value)
         _sql = """UPDATE public.form_3x t SET {} last_update_date=%s 
-                WHERE t.cmte_id=%s AND t.report_id=(SELECT r.report_id 
-                FROM public.reports r 
-                WHERE r.cmte_id = %s AND r.cvg_end_date = (SELECT ch.cvg_end_date 
-                FROM public.reports ch 
-                WHERE ch.cmte_id = %s AND ch.report_id = %s) 
-                AND r.delete_ind IS DISTINCT FROM 'Y' 
-                AND r.form_type = 'F3X' AND r.superceded_report_id IS NULL 
-                ORDER BY r.amend_number DESC
-                LIMIT 1)""".format(param_string)
-        values_list.extend([datetime.datetime.now(),cmte_id, cmte_id, cmte_id, report_id])
+                WHERE t.cmte_id=%s AND t.report_id= get_original_amend_report(%s)""".format(param_string)
+        values_list.extend([datetime.datetime.now(),cmte_id,report_id])
         with connection.cursor() as cursor:
             cursor.execute(_sql, values_list)
             # print(cursor.query)
@@ -11168,5 +11285,26 @@ def get_f24_reports(request):
     except Exception as e:
         return Response(
           "The get_f24_reports API is throwing an error: " + str(e),
+          status=status.HTTP_400_BAD_REQUEST
+          )
+
+@api_view(['GET'])
+def get_notifications_count(request):
+    try:
+        cmte_id = get_comittee_id(request.user.username)
+        #cmte_id = 'C00111476'
+        _sql = """SELECT count(1) as count
+                  FROM public.core_filing_notification WHERE cmte_id = %s """
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT json_agg(t) FROM (""" + _sql + """) t""", [cmte_id])
+            row1=cursor.fetchone()[0]
+            totalcount =  row1[0]['count']
+
+        output = {'notification_count': totalcount}
+
+        return Response(output, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response(
+          "The get_notifications_count API is throwing an error: " + str(e),
           status=status.HTTP_400_BAD_REQUEST
           )

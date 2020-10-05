@@ -78,7 +78,8 @@ export class F1mComponent implements OnInit, OnDestroy {
       this._reportsService.getReportInfo('F1M', this._activatedRoute.snapshot.queryParams.reportId)
       .subscribe((res: any) => {
         this.editMode = true;
-        this.type = res.establishmentType === 'A' ? 'affiliation' : 'qualification'
+        this.type = res.establishmentType === 'A' ? 'affiliation' : 'qualification';
+        this.committeeType = res.committee_type;
         this.step = this._activatedRoute.snapshot.queryParams.edit ? this._activatedRoute.snapshot.queryParams.step : 'step_2';
         this.scheduleAction = ScheduleActions.edit;
         this.reportId = res.reportId;

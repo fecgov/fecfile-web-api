@@ -1,0 +1,53 @@
+<style>
+  @import url('https://fonts.googleapis.com/css?family=Lato:100,100i,300,300i,400,400i,700,700i,900,900i&display=swap&subset=latin-ext');
+</style>
+<div class="main-box">
+  <div class="main-content">
+    <form>
+      <header>
+        <div class="text-center">
+          <img class="fec-title" src="assets/img/FECtitleNew.png" draggable="false" alt="FECTitle" />
+        </div>
+        <div class="title-front-main">Electronic Filing Enrollment and Password Assignment</div>
+        <div class="title-front-sub">
+          Here is your Personal Key
+        </div>
+        <br><br>
+        <hr><br>
+      </header>
+
+      <div>
+        <div class="form__container title-front-sub personal_key">
+          <div>Your Personal Key</div>
+          <div>{{personalKey}}</div>
+        </div>
+      </div>
+      <div class="user-info-actions">
+        <button class="btn btn-primary mx-2" (click)="print()">Print</button>
+        <button class="btn btn-primary mx-2" (click)="getAnotherKey()">Get Another Key</button>
+        <button class="btn btn-primary mx-2" (click)="continue()">Continue</button>
+      </div>
+    </form>
+    <br>
+    <hr>
+    <ngb-accordion #acc1="ngbAccordion" closeOthers="true" (panelChange)="toggleAccordion($event,acc1)">
+      <ngb-panel>
+        <ng-template ngbPanelTitle>
+          <span><b>Why do I need to store my new key on paper?
+              <i [ngClass]="accordionExpanded ? 'down-arrow-icon' : 'up-arrow-icon'"></i></b></span>
+        </ng-template>
+        <ng-template ngbPanelContent>
+          <p>To protect your account, you need a password and access to your phone, or an authentication application at
+            sign-in. If you can't use your phone, you can sign in with your Personal Key instead. For your privacy and
+            security, fec.gov does not store your password and Personal Key. Only you will know them. You will only have
+            access and the ability to share your personal information. We urge you to store your Personal Key outside of
+            your computer or mobile device so that it will be safe even if your devices are stolen or your online accounts
+            are hacked. If you do not have your Personal Key and you forget your password, the way to keep your account
+            safe is to verify that you are the legal owner by contacting the Electronic Filing Office at (202) 697-1307
+          </p>
+        </ng-template>
+      </ngb-panel>
+    </ngb-accordion>
+  </div>
+
+</div>

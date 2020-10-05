@@ -1,3 +1,4 @@
+import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Component, Input, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -194,6 +195,7 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
   public showElectionYearFilter: boolean;
   public showScheduleFilter: boolean;
   public showSemiAnnualAmountFilter: boolean;
+  public entityFilter: string[] = [];
 
   constructor(
     private _transactionsService: TransactionsService,
@@ -201,7 +203,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     private _transactionTypeService: TransactionTypeService,
     public _activatedRoute: ActivatedRoute,
     private _contactsService:ContactsService, 
-    private _reportsService: ReportsService
+    private _reportsService: ReportsService, 
+    private _messageService: MessageService
   ) {
     this._transactionsMessageService
       .getRemoveFilterMessage()
@@ -238,7 +241,21 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     .takeUntil(this.onDestroy$)
     .subscribe(message => {
       this.clearAndApplyFilters();
-    })
+    }); 
+    
+    this._messageService
+    .getMessage()
+    .takeUntil(this.onDestroy$)
+    .subscribe(message => {
+      if(message && message.action === 'filterAllTransactionsByEntity'){
+        // this.entityFilter = message.entityId;
+        let entityList = this._contactsService.entityListToFilterBy;
+        entityList.forEach(element => {
+          this.entityFilter.push(element.id);
+        });
+        this.applyFilters(false);
+      }
+    }); 
 
     this.queryParamSubscription = _activatedRoute.queryParams.takeUntil(this.onDestroy$).subscribe(p => {
       this.transactionCategory = p.transactionCategory;
@@ -676,6 +693,8 @@ export class TransactionsFilterComponent implements OnInit, OnDestroy {
     filters.filterLoanClosingBalanceMax = this.filterLoanClosingBalanceMax;
     filters.filterDebtBeginningBalanceMin = this.filterDebtBeginningBalanceMin;
     filters.filterDebtBeginningBalanceMax = this.filterDebtBeginningBalanceMax;
+
+    filters.filterEntityId = this.entityFilter;
 
     if (this.filterAmountMin !== null) {
       modified = true;

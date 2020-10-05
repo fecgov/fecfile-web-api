@@ -32,3 +32,10 @@ class My_Forms_View(models.Model):
     form_description = models.CharField(max_length=300, blank=True, null=True)
     form_info = models.CharField(max_length=1000, blank=True, null=True)
 
+class Filing_Notification(models.Model):
+    notification_id = models.BigIntegerField(primary_key=True)
+    cmte_id = models.CharField(max_length=9)
+    notification_type = models.CharField(max_length=100)
+    sent_date = models.DateTimeField(null=True, blank=True)
+    message_subject = models.CharField(max_length=500)
+    message_body = models.TextField()

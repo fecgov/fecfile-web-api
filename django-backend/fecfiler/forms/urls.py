@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^f99/get_signee$', views.get_signee, name='get_signee' ),
     url(r'^f99/get_rad_analyst_info$', views.get_rad_analyst_info, name='get_rad_analyst_info' ),    
     url(r'^f99/get_form99list$', views.get_form99list, name='get_form99list' ),
+    url(r'^f99/get_previous_amend_reports$', views.get_previous_amend_reports, name='get_previous_amend_reports' ),
     #url(r'^forms/get_cmm_lookup$', views.get_comm_lookup, name='get_comm_lookup'),
     #url(r'^core/get_filed_form_types$', views.get_filed_form_types, name='get_filed_form_types'),
     #url(r'^f99/print_f99_info$', views.print_f99_info, name='print_f99_info' ),

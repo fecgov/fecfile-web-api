@@ -1,0 +1,168 @@
+
+@import 'src/app/shared/scss/global';
+
+
+.main-box {
+  background: #ece8e8 url("../../../assets/img/fec-logo-5opac.png") no-repeat center;
+  background-size: 50% auto;
+  height: 100%;
+  header {
+    .logo {
+      margin-bottom: 10px;
+      text-align: center;
+    }
+  }
+  .fec-title {
+    height: 50%;
+    width: 50%;
+    margin-bottom: 25px;
+    align-content: center;
+  }
+  .title-front-main{
+    font-size: 32px;
+    font-family: 'Lato Black ', 'Lato Black';
+    font-weight: bold;
+    font-style: normal;
+    color: #333333;
+    padding-bottom: 20px;
+  }
+  .title-front-sub{
+    font-size: 25px;
+    font-family: 'Lato Black ', 'Lato Black';
+    font-weight: bold;
+    font-style: normal;
+    color: #333333;
+  }
+  .main-content{
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 15px;
+    padding-top: 120px;
+    text-align: center;
+    color: black;
+    @include media(tablet) {
+      width: 500px;
+    }
+    @include media(mediumDesktop) {
+      width: 500px;
+    }
+    @include media(largeDesktop) {
+      width: 800px;
+    }
+    .eye-logo {
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+      }
+    .optionHeader{
+      text-align: left;
+      padding-left:1%;
+      margin-left: -2%;
+      margin-bottom: 1%;
+    }
+    .passwordStrengthContainer{
+        width:53%;
+        margin:2% auto;
+    }
+    .form__container{
+        width:80%;
+        margin: 0 auto;
+        padding-left: 25%;
+    }
+    .personal_key{
+        border-style:dashed;
+        padding: 50px;
+        margin-bottom: 20px;
+    }
+    .user-info{
+      margin: 30px auto;;
+      text-align: left;
+      font-weight: bold;
+      .container{
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+      }
+      .bold{
+        font-weight: bold;
+      }
+      .example{
+        font-weight: lighter;
+        font-size: small;
+      }
+      .or-align {
+        margin: auto;
+        text-align: center;
+      }
+      hr{
+        display:inline-block;
+        width:100px;
+
+      }
+      .radio-options{
+        padding-right: 40px;
+      }
+      input[type="text"]{
+        font-size: 16px;
+        width: 100%;
+        height: 30px;
+        padding-bottom: 5px;
+
+      }
+      input:focus {
+        border-color: green
+      }
+      .input-field-error{
+        border: 1px solid red;
+      }
+
+      .error__committee-id,
+      .error__email-id {
+        @extend .text-error;
+      }
+    }
+    .action__btn {
+      cursor: pointer;
+      font-family: $mainFontFamily;
+      width: 140px;
+      height: 40px;
+      margin-bottom: 40px;
+      margin-left: 30px;
+      color: #ffffff;
+      background-color: #164F85;
+      font-family: 'Lato-Bold', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      border-radius: 5px;
+      border-style: solid;
+    }
+    .action__btn:hover {
+      background-color: #C80505;
+    }
+  }
+}
+
+.ng-select .ng-select-container {
+  height: 52px;
+}
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 52px;
+}
+
+ngb-accordion::ng-deep .card{
+  background-color: transparent;
+  text-align: left;
+  border: none;
+
+}
+
+ngb-accordion::ng-deep .card::ng-deep p{
+  margin:0;
+}
+
+ngb-accordion::ng-deep .card::ng-deep .card-header{
+  background-color: transparent;
+  // border: none;
+  // text-align: right
+}

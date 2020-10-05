@@ -602,7 +602,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             ORDER BY transaction_dt ASC, e.create_date ASC;
         """
         _params = (data.get("cmte_id"), start_date, end_date, data.get("election_code"), cand_office, form_type)
-    elif cand_office == "S":
+    elif cand_office == "S" or (cand_office == "H" and data.get("so_cand_state") in ['AK','DE','MT','ND','SD','VT','WY']):
         _sql = """
         SELECT  
                 e.transaction_id, 
@@ -632,7 +632,7 @@ def get_transactions_election_and_office(start_date, end_date, data, form_type='
             data.get("so_cand_state"),
             form_type
         )
-    elif cand_office == "H":
+    elif cand_office == "H" and data.get("so_cand_state") not in ['AK','DE','MT','ND','SD','VT','WY']:
         _sql = """
         SELECT  
                 e.transaction_id, 
@@ -847,6 +847,7 @@ def post_schedE(data):
             new_completing_entity = put_completing_entities(data)
             completing_rollback_flag = True
             data["completing_entity_id"] = new_completing_entity.get("entity_id")
+            # data["completing_entity_id"] = old_completing_entity.get("entity_id")
         else:
             logger.debug("saving new completing entity:{}".format(data))
             # adding this condition to avoid empty individual entity when we create SE transaction

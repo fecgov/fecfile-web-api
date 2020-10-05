@@ -257,6 +257,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     if (filters.show === true) {
       this.showFilters();
     }
+
   }
 
   public ngDoCheck(): void {

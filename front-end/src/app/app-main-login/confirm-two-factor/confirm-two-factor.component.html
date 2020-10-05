@@ -17,7 +17,7 @@
 
       <div class="form-group">
         <p>
-          We sent (a/an) code to the {{option}} on file.
+          We sent a code to the {{option}} on file.
           Enter the Security Code from that message here.
         </p>
         <div class="user-info">
@@ -32,12 +32,26 @@
             <div class="text-error" *ngIf="!twoFactInfo.valid && twoFactInfo.touched">
               <span>Please enter the security code received</span>
             </div>
+            <div class="text-error" *ngIf="!twoFactInfo.valid && twoFactInfo?.controls['securityCode']?.errors?.pattern">
+              <span>Security code must be numeric</span>
+            </div>
+            <div class="text-error" *ngIf="!isValid && twoFactInfo.touched">
+              <span>Invalid Security Code</span>
+            </div>
+            <div class="text-error" *ngIf="isAccountLocked && twoFactInfo.touched">
+              <span>{{ACCOUNT_LOCKED_MSG}}</span>
+            </div>
             <br>
             <br>
           </div>
           <div class="container">
             <label>Didn't receive a code?</label>
-            <a (click)="resend()"> Resend Security Code</a>
+            <div>
+              <a (click)="resend()"> Resend Security Code</a>
+            </div>
+            <div>
+              <a (click)="selectAnotherType()"> Select another method to resend code</a>
+            </div>
           </div>
         </div>
 
