@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 
 @Component({
   selector: 'app-review-upload',
@@ -6,6 +6,9 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./review-upload.component.scss']
 })
 export class ReviewUploadComponent implements OnInit {
+
+  @Input()
+  public duplicateFile: any;
 
   @Output()
   public reviewEmitter: EventEmitter<any> = new EventEmitter<any>();

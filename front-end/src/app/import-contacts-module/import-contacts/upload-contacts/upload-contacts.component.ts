@@ -1,12 +1,12 @@
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, ViewEncapsulation, ChangeDetectionStrategy, OnDestroy, Input, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { CsvConverterService } from '../service/csv-converter.service';
 import * as XLSX from 'xlsx';
-import { timer, interval, Observable, Subject } from 'rxjs';
-import { takeUntil, finalize, switchMap } from 'rxjs/operators';
-import { style, animate, transition, trigger } from '@angular/animations';
+import { timer, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { UploadContactsService } from './service/upload-contacts.service';
 import { UtilService } from 'src/app/shared/utils/util.service';
-
+import CryptoJS from 'crypto-js';
+import { S3 } from 'aws-sdk/clients/all';
 
 @Component({
   selector: 'app-upload-contacts',
@@ -23,19 +23,22 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   public forceChangeDetection: Date;
 
   @Output()
-  public userContactsEmitter: EventEmitter<any> = new EventEmitter<any>();
+  public uploadResultEmitter: EventEmitter<any> = new EventEmitter<any>();
 
   public userContacts: Array<any>;
-  public userContactFields: Array<string>;
+  // public userContactFields: Array<string>;
   public showUpload: boolean;
   public progressPercent: number;
   public processingPercent: number;
   public hideProcessingProgress: boolean;
   public showSpinner: boolean;
   public uploadingText: string;
+  public duplicateFile: any;
 
   private onDestroy$: Subject<any>;
   private uploadProcessing$: Subject<any>;
+  private checkSum: string;
+  private committeeId: string;
 
 
   constructor(
@@ -45,6 +48,13 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   ) { }
 
   public ngOnInit() {
+
+    this.committeeId = null;
+    if (localStorage.getItem('committee_details') !== null) {
+      const cmteDetails: any = JSON.parse(localStorage.getItem(`committee_details`));
+      this.committeeId = cmteDetails.committeeid;
+    }
+
     this.onDestroy$ = new Subject();
     this.showUpload = true;
     this.hideProcessingProgress = true;
@@ -94,7 +104,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   private scanFiles(entry: any) {
     if (entry.isFile) {
       const promise = this.parseFileEntry(entry).then(file => {
-        this.handleFileType(file);
+        this._startFileImport(file);
       });
     }
   }
@@ -108,10 +118,61 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     return fileExtention;
   }
 
-  private handleFileType(file: File) {
-    if (!this.isValidFileType(file.name)) {
-      // console.log(`Invalid file type for ${file.name}`);
+  // private _createFileCheckSum(file: File) {
+  //   const fileReader = new FileReader();
+  //   fileReader.onload = (e) => {
+  //     const fileData = fileReader.result;
+  //     const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
+  //     const md5 = hash.toString(CryptoJS.enc.Hex);
+  //     const output = 'MD5 (' + file.name + ') = ' + md5;
+  //     console.log(output);
+  //   };
+  //   fileReader.readAsText(file);
+  // }
+
+
+  /**
+   * Check if the Checksum of the file to be imported matches any file in the bucket for the committee.
+   * 
+   * @param data an array of files in the bucket for the current Committee.
+   * @returns true if the file is a duplicate.
+   */
+  private _isDuplicateFile(data: S3.Types.ListObjectsV2Output): boolean {
+    for (const bucketFile of data.Contents) {
+      this.uploadContactsService.getHeadObject(bucketFile.Key).subscribe((headObj: S3.Types.HeadObjectOutput) => {
+        if (!headObj.Metadata) {
+          return false;
+        }
+        if (!headObj.Metadata['x-amz-meta-check-sum']) {
+          return false;
+        }
+        if (headObj.Metadata['x-amz-meta-check-sum'] === this.checkSum) {
+          this.duplicateFile = {
+            checkSum: this.checkSum,
+            fileName: bucketFile.Key,
+            fileDate: bucketFile.LastModified
+          };
+          return true;
+        }
+        return false;
+      });
     }
+    return false;
+  }
+
+  /**
+   * Start the file import process.  First it will check for valid file types and then upload
+   * to S3 Bucket.  If successful, it will call the API to process the file.
+   *
+   * @param file file to import
+   */
+  private _startFileImport(file: File) {
+
+    // No longer checking for upload file duplicates.  Comment out until
+    // we are certain it is not needed.  Any duplicate file with the same name
+    // will be replaced on the bucket.  Any exact match duplicates will be handled by
+    // API.
+
     const fileExtention = this.getFileExtention(file.name);
     switch (fileExtention) {
       case 'json':
@@ -131,6 +192,46 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
       default:
       // console.log('invalid file extention for import contacts ' + fileExtention);
     }
+
+    // const fileReader = new FileReader();
+    // fileReader.onload = (e) => {
+    //   const fileData = fileReader.result;
+    //   const hash = CryptoJS.MD5(CryptoJS.enc.Latin1.parse(fileData));
+    //   const md5 = hash.toString(CryptoJS.enc.Hex);
+    //   this.checkSum = md5;
+
+    //   this.uploadContactsService.listObjects(this.committeeId)
+    //     .subscribe((data: S3.Types.ListObjectsV2Output) => {
+    //       if (!this.isValidFileType(file.name)) {
+    //         // console.log(`Invalid file type for ${file.name}`);
+    //       }
+    //       if (this._isDuplicateFile(data)) {
+    //         alert('duplicate file');
+    //         return;
+    //       }
+    //       const fileExtention = this.getFileExtention(file.name);
+    //       switch (fileExtention) {
+    //         case 'json':
+    //           // this._handleJsonImport_DEPRECATED(file);
+    //           this._uploadJson(file);
+    //           break;
+    //         case 'csv':
+    //           // this._handleCsvImport_DEPRECATED(file);
+    //           this._uploadCsv(file);
+    //           break;
+    //         case 'xls':
+    //           // this._handleXlsImport_DEPRECATED(file);
+    //           break;
+    //         case 'xlsx':
+    //           // this._handleXlsImport_DEPRECATED(file);
+    //           break;
+    //         default:
+    //         // console.log('invalid file extention for import contacts ' + fileExtention);
+    //       }
+    //     });
+
+    // };
+    // fileReader.readAsText(file);
   }
 
   private _handleJsonImport_DEPRECATED(file: File) {
@@ -138,7 +239,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     fileReader.onload = (e) => {
       const json = fileReader.result;
       this.userContacts = JSON.parse(json.toString());
-      this.prepareUserContactFields();
+      // this.prepareUserContactFields();
     };
     fileReader.readAsText(file);
   }
@@ -150,7 +251,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
       if (typeof csvText === 'string') {
         const json = this.csvConverterService.convertCsvToJson(csvText);
         this.userContacts = JSON.parse(json.toString());
-        this.prepareUserContactFields();
+        // this.prepareUserContactFields();
       }
     };
     fileReader.readAsText(file);
@@ -173,27 +274,27 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
 
       const json = JSON.stringify(data);
       this.userContacts = JSON.parse(json.toString());
-      this.prepareUserContactFields();
+      // this.prepareUserContactFields();
     };
     fileReader.readAsBinaryString(file);
   }
 
-  private prepareUserContactFields(): void {
-    // get property names for mapping user fields
-    this.userContactFields = [];
-    if (this.userContacts) {
-      if (Array.isArray(this.userContacts)) {
-        if (this.userContacts.length > 0) {
-          for (const prop in this.userContacts[0]) {
-            if (prop) {
-              this.userContactFields.push(prop);
-            }
-          }
-        }
-      }
-    }
-    this.emitUserContacts();
-  }
+  // private prepareUserContactFields(): void {
+  //   // get property names for mapping user fields
+  //   this.userContactFields = [];
+  //   if (this.userContacts) {
+  //     if (Array.isArray(this.userContacts)) {
+  //       if (this.userContacts.length > 0) {
+  //         for (const prop in this.userContacts[0]) {
+  //           if (prop) {
+  //             this.userContactFields.push(prop);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  //   this.emitUserContacts();
+  // }
 
   /**
    * Programatically trigger a click event on the select file element.
@@ -213,18 +314,18 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     if (this.selectFileInput.nativeElement.files) {
       if (this.selectFileInput.nativeElement.files[0]) {
         const file = this.selectFileInput.nativeElement.files[0];
-        this.handleFileType(file);
+        this._startFileImport(file);
       }
     }
   }
 
   private _uploadCsv(file: File) {
-    this.uploadContactsService.uploadFile(file).takeUntil(this.onDestroy$)
+    this.uploadContactsService.uploadFile(file, this.checkSum, this.committeeId).takeUntil(this.onDestroy$)
       .subscribe((data: any) => {
         // read the header record from the uploaded file
-        this.uploadContactsService.readCsvFileHeader(file).subscribe((headerFields: Array<string>) => {
-          this.userContactFields = headerFields;
-        });
+        // this.uploadContactsService.readCsvFileHeader(file).subscribe((headerFields: Array<string>) => {
+        //   this.userContactFields = headerFields;
+        // });
         this.checkForProcessingProgress();
         this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
           this.showSpinner = false;
@@ -234,16 +335,20 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private _uploadJson(file: File) {
-    this.uploadContactsService.uploadFile(file).takeUntil(this.onDestroy$)
+    this.uploadContactsService.uploadFile(file, this.checkSum, this.committeeId).takeUntil(this.onDestroy$)
       .subscribe((data: any) => {
         // read the header record from the uploaded file
-        this.uploadContactsService.readJsonFilePropertyNames(file).subscribe((headerFields: Array<string>) => {
-          this.userContactFields = headerFields;
-          // setTimeout(() => {
-          //   this.emitUserContacts();
-          // }, 1000);
-        });
+        // this.uploadContactsService.readJsonFilePropertyNames(file).subscribe((headerFields: Array<string>) => {
+        // this.userContactFields = headerFields;
+        // setTimeout(() => {
+        //   this.emitUserContacts();
+        // }, 1000);
+        // });
         this.checkForProcessingProgress();
+        this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
+          this.showSpinner = false;
+          this.emitUploadResults(res);
+        });
       });
   }
 
@@ -363,15 +468,15 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
     );
   }
 
-  /**
-   * Emit a message with the user contacts to the parent.
-   */
-  public emitUserContacts(): void {
-    this.userContactsEmitter.emit({
-      userContactFields: this.userContactFields,
-      testMessage: 'Some validation errors and duplicates found'
-    });
-  }
+  // /**
+  //  * Emit a message with the user contacts to the parent.
+  //  */
+  // public emitUserContacts(): void {
+  //   this.uploadResultEmitter.emit({
+  //     userContactFields: this.userContactFields,
+  //     testMessage: 'Some validation errors and duplicates found'
+  //   });
+  // }
 
   /**
  * Emit a message with the user contacts to the parent.
@@ -379,7 +484,7 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
   private emitUploadResults(response: any): void {
     let duplicateCount = 0;
     let validationErrorCount = 0;
-    let duplicates = [];
+    let duplicateContacts = [];
     if (response) {
       if (response.Response) {
         if (response.Response.contacts_failed_validation) {
@@ -388,16 +493,17 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
           }
           if (Array.isArray(response.Response.duplicate)) {
             duplicateCount = response.Response.duplicate.length;
-            duplicates = response.Response.duplicate;
+            duplicateContacts = response.Response.duplicate;
           }
         }
       }
     }
-    this.userContactsEmitter.emit({
+    this.uploadResultEmitter.emit({
       // userContactFields: this.userContactFields,
-      duplicates: duplicates,
+      duplicateContacts: duplicateContacts,
       duplicateCount: duplicateCount,
-      validationErrorCount: validationErrorCount
+      validationErrorCount: validationErrorCount,
+      duplicateFile: this.duplicateFile
     });
   }
 
