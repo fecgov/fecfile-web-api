@@ -45,7 +45,7 @@ export class ImportContactsService {
         .pipe(
           map((res: any) => {
             if (res) {
-              res.duplicates = this._mapAllDupesFromServerFields(res.duplicates);
+              res.duplicates = this.mapAllDupesFromServerFields(res.duplicates);
               return res;
             }
             return false;
@@ -135,7 +135,7 @@ export class ImportContactsService {
    *
    * TODO The API should be changed to pass the property names expected by the front end.
    */
-  private _mapAllDupesFromServerFields(serverData: any): Array<DuplicateContactModel> {
+  public mapAllDupesFromServerFields(serverData: any): Array<DuplicateContactModel> {
     const modelArray: Array<DuplicateContactModel> = [];
     if (!serverData || !Array.isArray(serverData)) {
       return null;

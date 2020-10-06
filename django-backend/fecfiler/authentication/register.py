@@ -11,10 +11,10 @@ from django.template.loader import render_to_string
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
-from fecfiler.core.views import check_null_value
+from fecfiler.core.views import check_null_value, NoOPError
 from fecfiler.password_management.otp import TOTPVerification
 from fecfiler.password_management.views import check_madatory_field, check_account_exist, create_jwt_token, send_email, \
-    send_text, send_call, token_verification, reset_account_password, reset_code_counter
+    send_text, send_call, token_verification, reset_account_password, reset_code_counter, create_password_jwt_token
 from fecfiler.settings import REGISTER_USER_URL, OTP_DISABLE
 
 logger = logging.getLogger(__name__)
@@ -160,6 +160,7 @@ def update_personal_key(cmte_id, email, personal_key):
         logger.debug("Exception occurred while updating personal key.", str(e))
         raise e
 
+
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([])
@@ -168,6 +169,7 @@ def code_verify_register(request):
 
         try:
             is_allowed = False
+            token = ''
             code = request.data.get('code', None)
             payload = token_verification(request)
             cmte_id = payload.get('committee_id', None)
@@ -185,15 +187,17 @@ def code_verify_register(request):
 
             username = user_list["username"]
             key = user_list["secret_key"]
+            unix_time = user_list["code_time"]
             otp_class = TOTPVerification(username)
-            token_val = otp_class.verify_token(key)
+            token_val = otp_class.verify_token(key, unix_time)
 
             if code == token_val:
                 is_allowed = True
                 reset_code_counter(key)
+                token = create_password_jwt_token(email, cmte_id)
 
             response = {'is_allowed': is_allowed, 'committee_id': cmte_id,
-                        'email': email}
+                        'email': email, 'token': token}
             return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
         except Exception as e:
             logger.debug("exception occurred while verifying code", str(e))
@@ -212,11 +216,21 @@ def create_password(request):
             payload = token_verification(request)
             cmte_id = payload.get('committee_id', None)
             email = payload.get('email', None)
+            two_factor = payload.get('2fVerified', None)
             data = {"committee_id": cmte_id, "email": email, "password": password}
 
             list_mandatory_fields = ["committee_id", "password", "email"]
             check_madatory_field(data, list_mandatory_fields)
             account_exist = check_password_account_exist(cmte_id, email)
+
+            if not two_factor:
+                is_allowed = False
+                response = {'is_allowed': is_allowed}
+                return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
+            if account_exist is None:
+                is_allowed = False
+                response = {'is_allowed': is_allowed}
+                return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             if account_exist:
                 personal_key = uuid.uuid4()
                 password_created = create_account_password(cmte_id, password, email, personal_key)
@@ -281,8 +295,8 @@ def get_committee_details(request):
         # modified_output[0]['levin_accounts'] = levin_accounts
         return Response(modified_output[0], status=status.HTTP_200_OK)
     except Exception as e:
-        return Response("The get_committee_details API is throwing  an error: " + str(e), status=status.HTTP_400_BAD_REQUEST)
-
+        return Response("The get_committee_details API is throwing  an error: " + str(e),
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST"])

@@ -51,12 +51,6 @@
         </form-report-type>
       </div>
 
-      <div class="form__step" [hidden]="step !== 'step_2'">
-        <f3x-transaction-type (status)="onNotify($event)" [transactionCategory]="transactionCategory"
-          [transactionCategories]="transactionCategories">
-        </f3x-transaction-type>
-      </div>
-
       <div class="form__step" [hidden]="step !== 'step_3'">
         <div >
           <app-sched-e *ngIf="scheduleType === 'sched_e'" [transactionData]="transactionData"
@@ -85,8 +79,12 @@
         <app-transactions (sidebarSwitch)="switchSidebar($event)" (showTransaction)="onNotify($event)">
         </app-transactions>
       </div>
-      <div class="form_step" [hidden]="step !== 'loanreceipt'">
-        <app-loanreceipt> </app-loanreceipt>
+      
+      <!-- Do not reorder this div and move it up, its causing user snap issues because of "ngbheader" directive -->
+      <div class="form__step" [hidden]="step !== 'step_2'">
+        <f3x-transaction-type (status)="onNotify($event)" [transactionCategory]="transactionCategory"
+          [transactionCategories]="transactionCategories">
+        </f3x-transaction-type>
       </div>
     </div>
   </div>

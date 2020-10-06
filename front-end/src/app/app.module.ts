@@ -105,6 +105,10 @@ import { ToolsComponent } from './tools/tools.component';
 import { UsersComponent } from './users/users.component';
 import { FormEntryComponent } from './forms/form-3l/f3l/form-entry/form-entry.component';
 
+import * as AWS from 'aws-sdk/global';
+import * as S3 from 'aws-sdk/clients/s3';
+
+import {PasswordModule} from './password/password.module';
 
 const appInitializerFn = (appConfig: AppConfigService) => {
   return () => {
@@ -201,6 +205,7 @@ const appInitializerFn = (appConfig: AppConfigService) => {
   ],
   entryComponents: [ConfirmModalComponent,F24LinkModalComponent, TrashConfirmComponent1, TrashConfirmComponent2, TrashConfirmComponent3],
   imports: [
+    PasswordModule,
     SharedModule,
     AdminModule,
     

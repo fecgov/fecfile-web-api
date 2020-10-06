@@ -7,6 +7,11 @@ import { CookieService } from 'ngx-cookie-service';
 import { MessageService } from 'src/app/shared/services/MessageService/message.service';
 import { mustMatch } from 'src/app/shared/utils/forms/validation/must-match.validator';
 import { ManageUserService } from './../../admin/manage-user/service/manage-user-service/manage-user.service';
+import {AuthService} from '../../shared/services/AuthService/auth.service';
+import {Subscription} from 'rxjs';
+import {PasswordService} from '../../password/service/password.service';
+import {ConfirmModalComponent, ModalHeaderClassEnum} from '../../shared/partials/confirm-modal/confirm-modal.component';
+import {DialogService} from '../../shared/services/DialogService/dialog.service';
 
 @Component({
   selector: 'app-create-password',
@@ -15,13 +20,15 @@ import { ManageUserService } from './../../admin/manage-user/service/manage-user
 })
 export class CreatePasswordComponent implements OnInit {
 
-  public show = true;
+  public show = false;
   form: FormGroup;
   passwordAccordionExpanded: boolean = false;
   cmteDetailsAccordionExpanded: boolean = false;
   userEmail: any;
   cmteDetails: any;
-
+  private _subscription: Subscription;
+  private landingFrom: string;
+  successMessage = 'Password has been reset successfully. Proceed to Login.';
   get password() {
     if (this.form && this.form.get('password')) {
       return this.form.get('password').value;
@@ -29,23 +36,38 @@ export class CreatePasswordComponent implements OnInit {
     return null;
   }
 
-  constructor(private router: Router,
+  constructor(
+    private router: Router,
     private _fb: FormBuilder,
     private _activatedRoute: ActivatedRoute,
     private _apiService: ApiService,
     private _manageUserService: ManageUserService,
     private _cookieService: CookieService,
-    private _messageService: MessageService) { }
+    private _messageService: MessageService,
+    private _authService: AuthService,
+    private _resetPassword: PasswordService,
+    private _dialogService: DialogService,
+    ) { }
 
   ngOnInit() {
+    this._subscription = this._messageService.getMessage().subscribe(res => {
+            if (res && res !== 'undefined') {
+              if (res.action === 'resetPassword') {
+                this.landingFrom = 'resetPassword';
+              } else {
+                this.landingFrom = 'cratePassword';
+              }
+            }
+            });
     this.initForm();
     this.initCmteInfo();
-    this.userEmail = this._activatedRoute.snapshot.queryParams.email;
   }
 
   private initCmteInfo() {
     this._apiService.getCommiteeDetailsForUnregisteredUsers().subscribe(res => {
       this.cmteDetails = res;
+      const userData = this._authService.getCurrentUser();
+      this.userEmail = userData.email;
     });
   }
 
@@ -71,9 +93,9 @@ export class CreatePasswordComponent implements OnInit {
 
 
   private initForm() {
-    const passwordRegex = '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&]{8,}';
+    const passwordRegex = '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[$@$!%*?&#()])[A-Za-z\\d$@$!%*?&#()]{8,}';
     this.form = this._fb.group({
-      password: new FormControl(null, [Validators.required, 
+      password: new FormControl(null, [Validators.required,
         Validators.pattern(new RegExp(passwordRegex))]),
       confirmPassword: new FormControl(null, [Validators.required]),
     }, { validator: [mustMatch('password', 'confirmPassword')] });
@@ -84,18 +106,38 @@ export class CreatePasswordComponent implements OnInit {
   }
 
   public submit() {
-    // of({
-    //   "password_created": true,
-    //   "personal_key": "6cc3697b-7d15-4360-bebf-7a4d08d5b921"
-    // })
-    this._manageUserService.createPassword(this.form.value.password)
-      .subscribe((resp:any) => {
-        if(resp && resp.password_created){
-          this.router.navigate(['/showPersonalKey']).then(success => {
-            this._messageService.sendMessage({action:'sendPersonalKey', key: resp.personal_key});
-          })
-        }
-      })
+    if (this.landingFrom === 'resetPassword') {
+          this.resetPassword();
+    } else {
+      this._manageUserService.createPassword(this.form.value.password)
+          .subscribe((resp: any) => {
+            if (resp && resp.password_created) {
+              this.router.navigate(['/showPersonalKey']).then(success => {
+                this._messageService.sendMessage({action: 'sendPersonalKey', key: resp.personal_key});
+              });
+            }
+          });
+    }
   }
 
+  /**
+   *  Send the new password to API if success notify user and navigate to login screen on dialog
+   * @private
+   */
+  private resetPassword() {
+    this._resetPassword.createPassword(this.form.value.password).subscribe( res => {
+      if (res && res['password_reset'] === true) {
+
+        this._dialogService.confirm(this.successMessage, ConfirmModalComponent, 'Success!', false,
+            ModalHeaderClassEnum.infoHeaderDark, null).then( resp => {
+          this.router.navigate(['/login']);
+        });
+      }
+    });
+  }
+
+
+  public ngOnDestroy(): void {
+    this._subscription.unsubscribe();
+  }
 }

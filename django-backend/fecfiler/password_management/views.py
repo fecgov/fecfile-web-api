@@ -266,8 +266,8 @@ def send_call(token_val, phone_no):
             body=[
                 {
                     'phoneNumber': phone_no,
-                    'liveMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ' , , , .Please use this code to login. ',
-                    'machineMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ', , , .Please use this code to login. '
+                    'liveMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ' , , , .Please use this code to login. Again the code is ,, ' + token_formatted_val + ', .',
+                    'machineMessage': 'From the Federal Election Commission: The one-time code you requested is ' + token_formatted_val + ', , , .Please use this code to login. Again the code is ,, ' + token_formatted_val + ', .'
                 }
             ]
 
@@ -299,7 +299,8 @@ def authenticate_password(request):
                             'email': email}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             elif user_list['role'] == Roles.C_ADMIN.value:
-                response = {'is_allowed': is_allowed, 'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+                response = {'is_allowed': is_allowed,
+                            'message': 'Not allowed to change password.Please use EFO to update/change password.'}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             else:
                 is_allowed = True
@@ -432,13 +433,15 @@ def code_verify_password(request):
                 response = {'is_allowed': is_allowed}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
             elif user_list['role'] == Roles.C_ADMIN.value:
-                response = {'is_allowed': is_allowed, 'message': 'Not allowed to change password.Please use EFO to update/change password.'}
+                response = {'is_allowed': is_allowed,
+                            'message': 'Not allowed to change password.Please use EFO to update/change password.'}
                 return JsonResponse(response, status=status.HTTP_200_OK, safe=False)
 
             username = user_list["username"]
             key = user_list["secret_key"]
+            unix_time = user_list["code_time"]
             otp_class = TOTPVerification(username)
-            token_val = otp_class.verify_token(key)
+            token_val = otp_class.verify_token(key, unix_time)
 
             if code == token_val:
                 is_allowed = True
