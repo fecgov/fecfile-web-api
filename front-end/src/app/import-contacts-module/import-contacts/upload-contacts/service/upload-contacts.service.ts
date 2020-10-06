@@ -55,11 +55,12 @@ export class UploadContactsService {
     //   committeeId = cmteDetails.committeeid;
     // }
 
+    // Metadata: { 'committee-id': committeeId, 'check-sum': checkSum },
     this.progressPercent = 0;
     const params = {
       Bucket: this.bucketName,
       Key: this.CONTACTS_PATH + committeeId + '/' + file.name,
-      Metadata: { 'committee-id': committeeId, 'check-sum': checkSum },
+      Metadata: { 'committee-id': committeeId },
       Body: file,
       ACL: 'public-read',
       ContentType: file.type
@@ -86,24 +87,26 @@ export class UploadContactsService {
           _setPercentage(0);
           // return false;
           // return Observable.of(false);
-          observer.next(err);
+          observer.next(false);
           observer.complete();
+          // throw (err);
+          // return;
+        } else {
+          // console.log('Successfully uploaded file.', data);
+          _setPercentage(100);
+          // return Observable.of(_readFileHeader(file));
+          // _readFileHeader(file);
+          // return true;
+          observer.next(data);
+          observer.complete();
+
+          // _uploadComplete(file.name).subscribe((res: any) => {
+          //   console.log();
+          // });
+
+          // getObject(file);
+          // listObjects();
         }
-        // console.log('Successfully uploaded file.', data);
-        _setPercentage(100);
-        // return Observable.of(_readFileHeader(file));
-        // _readFileHeader(file);
-        // return true;
-        observer.next(data);
-        observer.complete();
-
-        // _uploadComplete(file.name).subscribe((res: any) => {
-        //   console.log();
-        // });
-
-        // getObject(file);
-        // listObjects();
-
       });
     });
   }
@@ -122,33 +125,33 @@ export class UploadContactsService {
     const request: any = {};
     request.fileName = fileName;
 
-    if (fileName === 'test_new.csv') {
-      return this._http
-        .get('assets/mock-data/import-contacts/upload_response2.json', {
-          headers: httpOptions
+    // if (fileName === 'test_new.csv') {
+    //   return this._http
+    //     .get('assets/mock-data/import-contacts/upload_response2.json', {
+    //       headers: httpOptions
+    //     })
+    //     .pipe(
+    //       map(res => {
+    //         if (res) {
+    //           return res;
+    //         }
+    //         return false;
+    //       })
+    //     );
+    // } else {
+    return this._http
+      .post(`${environment.apiUrl}${url}`, request, {
+        headers: httpOptions
+      })
+      .pipe(
+        map(res => {
+          if (res) {
+            return res;
+          }
+          return false;
         })
-        .pipe(
-          map(res => {
-            if (res) {
-              return res;
-            }
-            return false;
-          })
-        );
-    } else {
-      return this._http
-        .post(`${environment.apiUrl}${url}`, request, {
-          headers: httpOptions
-        })
-        .pipe(
-          map(res => {
-            if (res) {
-              return res;
-            }
-            return false;
-          })
-        );
-    }
+      );
+    // }
   }
 
   /**

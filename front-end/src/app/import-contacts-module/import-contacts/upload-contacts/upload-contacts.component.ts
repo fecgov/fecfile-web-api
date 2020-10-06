@@ -326,6 +326,9 @@ export class UploadContactsComponent implements OnInit, OnDestroy, OnChanges {
         // this.uploadContactsService.readCsvFileHeader(file).subscribe((headerFields: Array<string>) => {
         //   this.userContactFields = headerFields;
         // });
+        if (data === false) {
+          return;
+        }
         this.checkForProcessingProgress();
         this.uploadContactsService.uploadComplete(file.name).subscribe((res: any) => {
           this.showSpinner = false;
